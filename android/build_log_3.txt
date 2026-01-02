@@ -1,0 +1,213 @@
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::load has been called by net.rubygrapefruit.platform.internal.NativeLibraryLoader in an unnamed module (file:/C:/Users/roeei/.gradle/wrapper/dists/gradle-8.14-all/c2qonpi39x1mddn7hk5gh9iqj/gradle-8.14/lib/native-platform-0.22-milestone-28.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+> Task :gradle:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :gradle:pluginDescriptors UP-TO-DATE
+> Task :gradle:processResources UP-TO-DATE
+
+> Task :gradle:compileKotlin
+w: file:///C:/Users/roeei/Documents/PowerShell/flutter/packages/flutter_tools/gradle/src/main/kotlin/FlutterPlugin.kt:11:37 'ApkVariant' is deprecated. Deprecated in Java
+w: file:///C:/Users/roeei/Documents/PowerShell/flutter/packages/flutter_tools/gradle/src/main/kotlin/FlutterPlugin.kt:609:69 'ApkVariant' is deprecated. Deprecated in Java
+w: file:///C:/Users/roeei/Documents/PowerShell/flutter/packages/flutter_tools/gradle/src/main/kotlin/plugins/PluginHandler.kt:186:64 Unchecked cast: NamedDomainObjectContainer<out BuildType> to NamedDomainObjectContainer<BuildType>
+w: file:///C:/Users/roeei/Documents/PowerShell/flutter/packages/flutter_tools/gradle/src/main/kotlin/plugins/PluginHandler.kt:187:69 Unchecked cast: NamedDomainObjectContainer<out BuildType> to NamedDomainObjectContainer<BuildType>
+
+> Task :gradle:compileJava NO-SOURCE
+> Task :gradle:compileGroovy NO-SOURCE
+> Task :gradle:classes UP-TO-DATE
+> Task :gradle:jar UP-TO-DATE
+> Task :app:DebugMinSdkCheck
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :app:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :app:compileFlutterBuildDebug
+> Task :app:packJniLibsflutterBuildDebug UP-TO-DATE
+> Task :cloud_firestore:preBuild UP-TO-DATE
+> Task :cloud_firestore:preDebugBuild UP-TO-DATE
+> Task :cloud_firestore:writeDebugAarMetadata UP-TO-DATE
+> Task :device_calendar:preBuild UP-TO-DATE
+> Task :device_calendar:preDebugBuild UP-TO-DATE
+> Task :device_calendar:writeDebugAarMetadata UP-TO-DATE
+> Task :firebase_auth:preBuild UP-TO-DATE
+> Task :firebase_auth:preDebugBuild UP-TO-DATE
+> Task :firebase_auth:writeDebugAarMetadata UP-TO-DATE
+> Task :firebase_core:preBuild UP-TO-DATE
+> Task :firebase_core:preDebugBuild UP-TO-DATE
+> Task :firebase_core:writeDebugAarMetadata UP-TO-DATE
+> Task :flutter_local_notifications:preBuild UP-TO-DATE
+> Task :flutter_local_notifications:preDebugBuild UP-TO-DATE
+> Task :flutter_local_notifications:writeDebugAarMetadata UP-TO-DATE
+> Task :google_sign_in_android:preBuild UP-TO-DATE
+> Task :google_sign_in_android:preDebugBuild UP-TO-DATE
+> Task :google_sign_in_android:writeDebugAarMetadata UP-TO-DATE
+> Task :home_widget:preBuild UP-TO-DATE
+> Task :home_widget:preDebugBuild UP-TO-DATE
+> Task :home_widget:writeDebugAarMetadata UP-TO-DATE
+> Task :path_provider_android:preBuild UP-TO-DATE
+> Task :path_provider_android:preDebugBuild UP-TO-DATE
+> Task :path_provider_android:writeDebugAarMetadata UP-TO-DATE
+> Task :permission_handler_android:preBuild UP-TO-DATE
+> Task :permission_handler_android:preDebugBuild UP-TO-DATE
+> Task :permission_handler_android:writeDebugAarMetadata UP-TO-DATE
+> Task :app:checkDebugAarMetadata UP-TO-DATE
+> Task :app:cleanMergeDebugAssets
+> Task :app:mergeDebugShaders UP-TO-DATE
+> Task :app:compileDebugShaders NO-SOURCE
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :cloud_firestore:mergeDebugShaders UP-TO-DATE
+> Task :cloud_firestore:compileDebugShaders NO-SOURCE
+> Task :cloud_firestore:generateDebugAssets UP-TO-DATE
+> Task :cloud_firestore:mergeDebugAssets UP-TO-DATE
+> Task :device_calendar:mergeDebugShaders UP-TO-DATE
+> Task :device_calendar:compileDebugShaders NO-SOURCE
+> Task :device_calendar:generateDebugAssets UP-TO-DATE
+> Task :device_calendar:mergeDebugAssets UP-TO-DATE
+> Task :firebase_auth:mergeDebugShaders UP-TO-DATE
+> Task :firebase_auth:compileDebugShaders NO-SOURCE
+> Task :firebase_auth:generateDebugAssets UP-TO-DATE
+> Task :firebase_auth:mergeDebugAssets UP-TO-DATE
+> Task :firebase_core:mergeDebugShaders UP-TO-DATE
+> Task :firebase_core:compileDebugShaders NO-SOURCE
+> Task :firebase_core:generateDebugAssets UP-TO-DATE
+> Task :firebase_core:mergeDebugAssets UP-TO-DATE
+> Task :flutter_local_notifications:mergeDebugShaders UP-TO-DATE
+> Task :flutter_local_notifications:compileDebugShaders NO-SOURCE
+> Task :flutter_local_notifications:generateDebugAssets UP-TO-DATE
+> Task :flutter_local_notifications:mergeDebugAssets UP-TO-DATE
+> Task :google_sign_in_android:mergeDebugShaders UP-TO-DATE
+> Task :google_sign_in_android:compileDebugShaders NO-SOURCE
+> Task :google_sign_in_android:generateDebugAssets UP-TO-DATE
+> Task :google_sign_in_android:mergeDebugAssets UP-TO-DATE
+> Task :home_widget:mergeDebugShaders UP-TO-DATE
+> Task :home_widget:compileDebugShaders NO-SOURCE
+> Task :home_widget:generateDebugAssets UP-TO-DATE
+> Task :home_widget:mergeDebugAssets UP-TO-DATE
+> Task :path_provider_android:mergeDebugShaders UP-TO-DATE
+> Task :path_provider_android:compileDebugShaders NO-SOURCE
+> Task :path_provider_android:generateDebugAssets UP-TO-DATE
+> Task :path_provider_android:mergeDebugAssets UP-TO-DATE
+> Task :permission_handler_android:mergeDebugShaders UP-TO-DATE
+> Task :permission_handler_android:compileDebugShaders NO-SOURCE
+> Task :permission_handler_android:generateDebugAssets UP-TO-DATE
+> Task :permission_handler_android:mergeDebugAssets UP-TO-DATE
+> Task :app:mergeDebugAssets
+> Task :app:copyFlutterAssetsDebug
+> Task :app:generateDebugResValues UP-TO-DATE
+> Task :app:processDebugGoogleServices UP-TO-DATE
+> Task :cloud_firestore:generateDebugResValues UP-TO-DATE
+> Task :cloud_firestore:generateDebugResources UP-TO-DATE
+> Task :cloud_firestore:packageDebugResources UP-TO-DATE
+> Task :device_calendar:generateDebugResValues UP-TO-DATE
+> Task :device_calendar:generateDebugResources UP-TO-DATE
+> Task :device_calendar:packageDebugResources UP-TO-DATE
+> Task :firebase_auth:generateDebugResValues UP-TO-DATE
+> Task :firebase_auth:generateDebugResources UP-TO-DATE
+> Task :firebase_auth:packageDebugResources UP-TO-DATE
+> Task :firebase_core:generateDebugResValues UP-TO-DATE
+> Task :firebase_core:generateDebugResources UP-TO-DATE
+> Task :firebase_core:packageDebugResources UP-TO-DATE
+> Task :flutter_local_notifications:generateDebugResValues UP-TO-DATE
+> Task :flutter_local_notifications:generateDebugResources UP-TO-DATE
+> Task :flutter_local_notifications:packageDebugResources UP-TO-DATE
+> Task :google_sign_in_android:generateDebugResValues UP-TO-DATE
+> Task :google_sign_in_android:generateDebugResources UP-TO-DATE
+> Task :google_sign_in_android:packageDebugResources UP-TO-DATE
+> Task :home_widget:generateDebugResValues UP-TO-DATE
+> Task :home_widget:generateDebugResources UP-TO-DATE
+> Task :home_widget:packageDebugResources UP-TO-DATE
+> Task :path_provider_android:generateDebugResValues UP-TO-DATE
+> Task :path_provider_android:generateDebugResources UP-TO-DATE
+> Task :path_provider_android:packageDebugResources UP-TO-DATE
+> Task :permission_handler_android:generateDebugResValues UP-TO-DATE
+> Task :permission_handler_android:generateDebugResources UP-TO-DATE
+> Task :permission_handler_android:packageDebugResources UP-TO-DATE
+> Task :app:mapDebugSourceSetPaths UP-TO-DATE
+> Task :app:generateDebugResources UP-TO-DATE
+> Task :app:mergeDebugResources UP-TO-DATE
+> Task :app:packageDebugResources UP-TO-DATE
+> Task :app:parseDebugLocalResources UP-TO-DATE
+> Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksDebug UP-TO-DATE
+> Task :cloud_firestore:extractDeepLinksDebug UP-TO-DATE
+> Task :cloud_firestore:processDebugManifest UP-TO-DATE
+> Task :device_calendar:extractDeepLinksDebug UP-TO-DATE
+> Task :device_calendar:processDebugManifest UP-TO-DATE
+> Task :firebase_auth:extractDeepLinksDebug UP-TO-DATE
+> Task :firebase_auth:processDebugManifest UP-TO-DATE
+> Task :firebase_core:extractDeepLinksDebug UP-TO-DATE
+> Task :firebase_core:processDebugManifest UP-TO-DATE
+> Task :flutter_local_notifications:extractDeepLinksDebug UP-TO-DATE
+> Task :flutter_local_notifications:processDebugManifest UP-TO-DATE
+> Task :google_sign_in_android:extractDeepLinksDebug UP-TO-DATE
+> Task :google_sign_in_android:processDebugManifest UP-TO-DATE
+> Task :home_widget:extractDeepLinksDebug UP-TO-DATE
+> Task :home_widget:processDebugManifest UP-TO-DATE
+> Task :path_provider_android:extractDeepLinksDebug UP-TO-DATE
+> Task :path_provider_android:processDebugManifest UP-TO-DATE
+> Task :permission_handler_android:extractDeepLinksDebug UP-TO-DATE
+> Task :permission_handler_android:processDebugManifest UP-TO-DATE
+> Task :app:processDebugMainManifest UP-TO-DATE
+> Task :app:outputDebugAppLinkSettings UP-TO-DATE
+> Task :app:processDebugManifest UP-TO-DATE
+> Task :app:processDebugManifestForPackage UP-TO-DATE
+> Task :cloud_firestore:compileDebugLibraryResources UP-TO-DATE
+> Task :cloud_firestore:parseDebugLocalResources UP-TO-DATE
+> Task :cloud_firestore:generateDebugRFile UP-TO-DATE
+> Task :device_calendar:compileDebugLibraryResources UP-TO-DATE
+> Task :device_calendar:parseDebugLocalResources UP-TO-DATE
+> Task :device_calendar:generateDebugRFile UP-TO-DATE
+> Task :firebase_auth:compileDebugLibraryResources UP-TO-DATE
+> Task :firebase_auth:parseDebugLocalResources UP-TO-DATE
+> Task :firebase_auth:generateDebugRFile UP-TO-DATE
+> Task :firebase_core:compileDebugLibraryResources UP-TO-DATE
+> Task :firebase_core:parseDebugLocalResources UP-TO-DATE
+> Task :firebase_core:generateDebugRFile UP-TO-DATE
+> Task :flutter_local_notifications:compileDebugLibraryResources UP-TO-DATE
+> Task :flutter_local_notifications:parseDebugLocalResources UP-TO-DATE
+> Task :flutter_local_notifications:generateDebugRFile UP-TO-DATE
+> Task :google_sign_in_android:compileDebugLibraryResources UP-TO-DATE
+> Task :google_sign_in_android:parseDebugLocalResources UP-TO-DATE
+> Task :google_sign_in_android:generateDebugRFile UP-TO-DATE
+> Task :home_widget:compileDebugLibraryResources UP-TO-DATE
+> Task :home_widget:parseDebugLocalResources UP-TO-DATE
+> Task :home_widget:generateDebugRFile UP-TO-DATE
+> Task :path_provider_android:compileDebugLibraryResources UP-TO-DATE
+> Task :path_provider_android:parseDebugLocalResources UP-TO-DATE
+> Task :path_provider_android:generateDebugRFile UP-TO-DATE
+> Task :permission_handler_android:compileDebugLibraryResources UP-TO-DATE
+> Task :permission_handler_android:parseDebugLocalResources UP-TO-DATE
+> Task :permission_handler_android:generateDebugRFile UP-TO-DATE
+> Task :app:processDebugResources UP-TO-DATE
+> Task :cloud_firestore:generateDebugBuildConfig UP-TO-DATE
+> Task :cloud_firestore:javaPreCompileDebug UP-TO-DATE
+> Task :firebase_core:generateDebugBuildConfig UP-TO-DATE
+> Task :firebase_core:javaPreCompileDebug UP-TO-DATE
+> Task :firebase_core:compileDebugJavaWithJavac
+> Task :device_calendar:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :firebase_core:bundleLibCompileToJarDebug
+> Task :device_calendar:compileDebugKotlin FAILED
+
+[Incubating] Problems report is available at: file:///C:/Users/roeei/Documents/rocis_apps/rocis_tasks/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':device_calendar:compileDebugKotlin'.
+> Inconsistent JVM Target Compatibility Between Java and Kotlin Tasks
+    Inconsistent JVM Target Compatibility Between Java and Kotlin Tasks
+      Inconsistent JVM-target compatibility detected for tasks 'compileDebugJavaWithJavac' (1.8) and 'compileDebugKotlin' (24).
+
+* Try:
+> Consider using JVM Toolchain: https://kotl.in/gradle/jvm/toolchain
+> Run with --scan to get full insights.
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.14/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD FAILED in 30s
+132 actionable tasks: 9 executed, 123 up-to-date

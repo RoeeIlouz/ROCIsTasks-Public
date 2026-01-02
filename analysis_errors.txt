@@ -1,0 +1,93 @@
+Analyzing rocis_tasks...                                        
+
+   info - The imported package 'timezone' isn't a dependency of the importing package - lib\core\services\notification_service.dart:2:8 - depend_on_referenced_packages
+   info - The imported package 'timezone' isn't a dependency of the importing package - lib\core\services\notification_service.dart:3:8 - depend_on_referenced_packages
+  error - The named parameter 'uiLocalNotificationDateInterpretation' isn't defined - lib\core\services\notification_service.dart:56:7 - undefined_named_parameter
+  error - Undefined name 'UILocalNotificationDateInterpretation' - lib\core\services\notification_service.dart:57:11 - undefined_identifier
+   info - 'background' is deprecated and shouldn't be used. Use surface instead. This feature was deprecated after v3.18.0-0.1.pre - lib\core\theme\app_theme.dart:29:9 - deprecated_member_use
+   info - 'onBackground' is deprecated and shouldn't be used. Use onSurface instead. This feature was deprecated after v3.18.0-0.1.pre - lib\core\theme\app_theme.dart:34:9 - deprecated_member_use
+  error - The argument type 'CardTheme' can't be assigned to the parameter type 'CardThemeData?'.  - lib\core\theme\app_theme.dart:51:18 - argument_type_not_assignable
+   info - 'background' is deprecated and shouldn't be used. Use surface instead. This feature was deprecated after v3.18.0-0.1.pre - lib\core\theme\app_theme.dart:74:9 - deprecated_member_use
+   info - 'onBackground' is deprecated and shouldn't be used. Use onSurface instead. This feature was deprecated after v3.18.0-0.1.pre - lib\core\theme\app_theme.dart:79:9 - deprecated_member_use
+  error - The argument type 'CardTheme' can't be assigned to the parameter type 'CardThemeData?'.  - lib\core\theme\app_theme.dart:96:18 - argument_type_not_assignable
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\calendar\presentation\screens\calendar_screen.dart:76:60 - deprecated_member_use
+warning - The declaration '_setupListener' isn't referenced - lib\features\tasks\presentation\providers\task_provider.dart:38:8 - unused_element
+  error - The class '_AddTaskScreenState' doesn't have an unnamed constructor - lib\features\tasks\presentation\screens\add_task_screen.dart:11:41 - new_with_undefined_constructor_default
+warning - The declaration '<unnamed>' isn't referenced - lib\features\tasks\presentation\screens\add_task_screen.dart:14:7 - unused_element
+  error - Missing concrete implementation of 'abstract class State<T extends StatefulWidget> with Diagnosticable.build' - lib\features\tasks\presentation\screens\add_task_screen.dart:14:7 - non_abstract_class_inherits_abstract_member
+   info - An uninitialized field should have an explicit type annotation - lib\features\tasks\presentation\screens\add_task_screen.dart:15:17 - prefer_typing_uninitialized_variables
+   info - Missing type annotation - lib\features\tasks\presentation\screens\add_task_screen.dart:15:17 - strict_top_level_inference
+  error - Expected to find ';' - lib\features\tasks\presentation\screens\add_task_screen.dart:15:17 - expected_token
+  error - Variables must be declared using the keywords 'const', 'final', 'var' or a type name - lib\features\tasks\presentation\screens\add_task_screen.dart:15:17 - missing_const_final_var_or_type
+  error - Expected a class member - lib\features\tasks\presentation\screens\add_task_screen.dart:15:22 - expected_class_member
+  error - Methods must have an explicit list of parameters - lib\features\tasks\presentation\screens\add_task_screen.dart:15:24 - missing_method_parameters
+  error - The name of a constructor must match the name of the enclosing class - lib\features\tasks\presentation\screens\add_task_screen.dart:15:24 - invalid_constructor_name
+warning - The declaration '_AddTaskScreenState.values' isn't referenced - lib\features\tasks\presentation\screens\add_task_screen.dart:15:37 - unused_element
+   info - Empty constructor bodies should be written using a ';' rather than '{}' - lib\features\tasks\presentation\screens\add_task_screen.dart:15:43 - empty_constructor_bodies
+  error - A function body must be provided - lib\features\tasks\presentation\screens\add_task_screen.dart:15:43 - missing_function_body
+  error - Expected a class member - lib\features\tasks\presentation\screens\add_task_screen.dart:15:43 - expected_class_member
+   info - Missing type annotation - lib\features\tasks\presentation\screens\add_task_screen.dart:15:44 - strict_top_level_inference
+   info - Use the generic function type syntax to declare the parameter '' - lib\features\tasks\presentation\screens\add_task_screen.dart:15:48 - use_function_type_syntax_for_parameters
+  error - Expected an identifier - lib\features\tasks\presentation\screens\add_task_screen.dart:15:48 - missing_identifier
+  error - Expected to find ')' - lib\features\tasks\presentation\screens\add_task_screen.dart:15:59 - expected_token
+  error - A function body must be provided - lib\features\tasks\presentation\screens\add_task_screen.dart:20:19 - missing_function_body
+  error - Expected a class member - lib\features\tasks\presentation\screens\add_task_screen.dart:20:19 - expected_class_member
+   info - Missing type annotation - lib\features\tasks\presentation\screens\add_task_screen.dart:20:20 - strict_top_level_inference
+  error - A function body must be provided - lib\features\tasks\presentation\screens\add_task_screen.dart:20:28 - missing_function_body
+  error - Expected a class member - lib\features\tasks\presentation\screens\add_task_screen.dart:20:28 - expected_class_member
+   info - An uninitialized field should have an explicit type annotation - lib\features\tasks\presentation\screens\add_task_screen.dart:21:17 - prefer_typing_uninitialized_variables
+   info - Missing type annotation - lib\features\tasks\presentation\screens\add_task_screen.dart:21:17 - strict_top_level_inference
+  error - Expected to find ';' - lib\features\tasks\presentation\screens\add_task_screen.dart:21:17 - expected_token
+  error - Variables must be declared using the keywords 'const', 'final', 'var' or a type name - lib\features\tasks\presentation\screens\add_task_screen.dart:21:17 - missing_const_final_var_or_type
+  error - Expected a class member - lib\features\tasks\presentation\screens\add_task_screen.dart:21:26 - expected_class_member
+  error - Expected an identifier - lib\features\tasks\presentation\screens\add_task_screen.dart:21:28 - missing_identifier
+   info - Missing type annotation - lib\features\tasks\presentation\screens\add_task_screen.dart:21:29 - strict_top_level_inference
+  error - Undefined name '_priority' - lib\features\tasks\presentation\screens\add_task_screen.dart:24:23 - undefined_identifier
+  error - Expected a class member - lib\features\tasks\presentation\screens\add_task_screen.dart:27:18 - expected_class_member
+  error - Expected a class member - lib\features\tasks\presentation\screens\add_task_screen.dart:28:15 - expected_class_member
+  error - Expected a class member - lib\features\tasks\presentation\screens\add_task_screen.dart:28:16 - expected_class_member
+  error - Getters, setters and methods can't be declared to be 'const' - lib\features\tasks\presentation\screens\add_task_screen.dart:29:15 - const_method
+   info - Missing type annotation - lib\features\tasks\presentation\screens\add_task_screen.dart:29:21 - strict_top_level_inference
+   info - The variable name 'SizedBox' isn't a lowerCamelCase identifier - lib\features\tasks\presentation\screens\add_task_screen.dart:29:21 - non_constant_identifier_names
+   info - Missing type annotation - lib\features\tasks\presentation\screens\add_task_screen.dart:29:30 - strict_top_level_inference
+  error - Named parameters must be enclosed in curly braces ('{' and '}') - lib\features\tasks\presentation\screens\add_task_screen.dart:29:36 - named_parameter_outside_group
+  error - Using a colon as the separator before a default value is no longer supported - lib\features\tasks\presentation\screens\add_task_screen.dart:29:36 - obsolete_colon_for_default_value
+  error - A function body must be provided - lib\features\tasks\presentation\screens\add_task_screen.dart:29:41 - missing_function_body
+  error - Expected a class member - lib\features\tasks\presentation\screens\add_task_screen.dart:29:41 - expected_class_member
+  error - The name of a constructor must match the name of the enclosing class - lib\features\tasks\presentation\screens\add_task_screen.dart:30:15 - invalid_constructor_name
+warning - The declaration '_AddTaskScreenState.icon' isn't referenced - lib\features\tasks\presentation\screens\add_task_screen.dart:30:28 - unused_element
+   info - Missing type annotation - lib\features\tasks\presentation\screens\add_task_screen.dart:31:17 - strict_top_level_inference
+warning - A value for optional parameter 'onPressed' isn't ever given - lib\features\tasks\presentation\screens\add_task_screen.dart:31:17 - unused_element_parameter
+  error - Named parameters must be enclosed in curly braces ('{' and '}') - lib\features\tasks\presentation\screens\add_task_screen.dart:31:26 - named_parameter_outside_group
+  error - Using a colon as the separator before a default value is no longer supported - lib\features\tasks\presentation\screens\add_task_screen.dart:31:26 - obsolete_colon_for_default_value
+  error - Undefined name '_saveTask' - lib\features\tasks\presentation\screens\add_task_screen.dart:31:28 - undefined_identifier
+   info - Missing type annotation - lib\features\tasks\presentation\screens\add_task_screen.dart:32:17 - strict_top_level_inference
+warning - A value for optional parameter 'icon' isn't ever given - lib\features\tasks\presentation\screens\add_task_screen.dart:32:17 - unused_element_parameter
+  error - Named parameters must be enclosed in curly braces ('{' and '}') - lib\features\tasks\presentation\screens\add_task_screen.dart:32:21 - named_parameter_outside_group
+  error - Using a colon as the separator before a default value is no longer supported - lib\features\tasks\presentation\screens\add_task_screen.dart:32:21 - obsolete_colon_for_default_value
+   info - Missing type annotation - lib\features\tasks\presentation\screens\add_task_screen.dart:33:17 - strict_top_level_inference
+warning - A value for optional parameter 'label' isn't ever given - lib\features\tasks\presentation\screens\add_task_screen.dart:33:17 - unused_element_parameter
+  error - Named parameters must be enclosed in curly braces ('{' and '}') - lib\features\tasks\presentation\screens\add_task_screen.dart:33:22 - named_parameter_outside_group
+  error - Using a colon as the separator before a default value is no longer supported - lib\features\tasks\presentation\screens\add_task_screen.dart:33:22 - obsolete_colon_for_default_value
+   info - Missing type annotation - lib\features\tasks\presentation\screens\add_task_screen.dart:34:17 - strict_top_level_inference
+warning - A value for optional parameter 'style' isn't ever given - lib\features\tasks\presentation\screens\add_task_screen.dart:34:17 - unused_element_parameter
+  error - Named parameters must be enclosed in curly braces ('{' and '}') - lib\features\tasks\presentation\screens\add_task_screen.dart:34:22 - named_parameter_outside_group
+  error - Using a colon as the separator before a default value is no longer supported - lib\features\tasks\presentation\screens\add_task_screen.dart:34:22 - obsolete_colon_for_default_value
+  error - Methods can't be invoked in constant expressions - lib\features\tasks\presentation\screens\add_task_screen.dart:34:24 - const_eval_method_invocation
+   info - Empty constructor bodies should be written using a ';' rather than '{}' - lib\features\tasks\presentation\screens\add_task_screen.dart:37:16 - empty_constructor_bodies
+  error - A function body must be provided - lib\features\tasks\presentation\screens\add_task_screen.dart:37:16 - missing_function_body
+  error - Expected a class member - lib\features\tasks\presentation\screens\add_task_screen.dart:37:16 - expected_class_member
+  error - Expected a class member - lib\features\tasks\presentation\screens\add_task_screen.dart:38:13 - expected_class_member
+  error - Expected a class member - lib\features\tasks\presentation\screens\add_task_screen.dart:38:14 - expected_class_member
+  error - Expected a class member - lib\features\tasks\presentation\screens\add_task_screen.dart:39:11 - expected_class_member
+  error - Expected a class member - lib\features\tasks\presentation\screens\add_task_screen.dart:39:12 - expected_class_member
+  error - Expected a class member - lib\features\tasks\presentation\screens\add_task_screen.dart:40:9 - expected_class_member
+  error - Expected a class member - lib\features\tasks\presentation\screens\add_task_screen.dart:40:10 - expected_class_member
+  error - Expected a class member - lib\features\tasks\presentation\screens\add_task_screen.dart:41:7 - expected_class_member
+  error - Expected a class member - lib\features\tasks\presentation\screens\add_task_screen.dart:41:8 - expected_class_member
+  error - Expected a class member - lib\features\tasks\presentation\screens\add_task_screen.dart:42:5 - expected_class_member
+  error - Expected a class member - lib\features\tasks\presentation\screens\add_task_screen.dart:42:6 - expected_class_member
+  error - Expected a method, getter, setter or operator declaration - lib\features\tasks\presentation\screens\add_task_screen.dart:44:1 - expected_executable
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\tasks\presentation\widgets\task_tile.dart:48:54 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\tasks\presentation\widgets\task_tile.dart:81:63 - deprecated_member_use
+

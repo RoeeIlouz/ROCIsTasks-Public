@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_background"
+    android:padding="8dp">
+
+    <!-- Header with Month Name and Navigation -->
+    <LinearLayout
+        android:id="@+id/widget_full_calendar_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingBottom="8dp">
+
+        <TextView
+            android:id="@+id/widget_full_calendar_prev"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:gravity="center"
+            android:text="❮"
+            android:textColor="@color/widget_title_text"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:background="?android:attr/selectableItemBackgroundBorderless" />
+
+        <TextView
+            android:id="@+id/widget_full_calendar_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="sans-serif-bold"
+            android:gravity="center"
+            android:text="Month Year"
+            android:textColor="@color/widget_title_text"
+            android:textSize="26sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/widget_full_calendar_next"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:gravity="center"
+            android:text="❯"
+            android:textColor="@color/widget_title_text"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:background="?android:attr/selectableItemBackgroundBorderless" />
+
+        <TextView
+            android:id="@+id/widget_add_task_btn"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:gravity="center"
+            android:text="+"
+            android:textColor="@color/widget_primary"
+            android:textSize="32sp"
+            android:textStyle="bold"
+            android:background="?android:attr/selectableItemBackgroundBorderless" />
+    </LinearLayout>
+
+    <!-- Weekday Headers -->
+    <LinearLayout
+        android:id="@+id/widget_full_calendar_weekdays"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@id/widget_full_calendar_header"
+        android:weightSum="8"
+        android:paddingBottom="8dp">
+
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="#" android:textSize="14sp" android:textColor="@color/widget_secondary_text" android:textStyle="italic"/>
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="S" android:textSize="16sp" android:textColor="@color/widget_body_text" android:textStyle="bold" />
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="M" android:textSize="16sp" android:textColor="@color/widget_body_text" android:textStyle="bold" />
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="T" android:textSize="16sp" android:textColor="@color/widget_body_text" android:textStyle="bold" />
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="W" android:textSize="16sp" android:textColor="@color/widget_body_text" android:textStyle="bold" />
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="T" android:textSize="16sp" android:textColor="@color/widget_body_text" android:textStyle="bold" />
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="F" android:textSize="16sp" android:textColor="@color/widget_body_text" android:textStyle="bold" />
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="S" android:textSize="16sp" android:textColor="@color/widget_body_text" android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- Calendar Grid -->
+    <GridView
+        android:id="@+id/widget_full_calendar_grid"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/widget_full_calendar_weekdays"
+        android:layout_alignParentBottom="true"
+        android:numColumns="8"
+        android:verticalSpacing="8dp"
+        android:horizontalSpacing="2dp"
+        android:stretchMode="columnWidth"
+        android:gravity="center"
+        android:listSelector="@android:color/transparent" />
+
+    <TextView
+        android:id="@+id/empty_full_calendar_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/widget_full_calendar_weekdays"
+        android:layout_alignParentBottom="true"
+        android:gravity="center"
+        android:text="No data available"
+        android:textColor="@color/widget_body_text"
+        android:visibility="gone" />
+
+</RelativeLayout>

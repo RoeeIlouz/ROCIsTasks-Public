@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_schedule_item_container"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="0dp"
+    android:background="@drawable/widget_item_background"
+    android:gravity="fill_vertical">
+
+    <FrameLayout
+        android:id="@+id/widget_schedule_category_color"
+        android:layout_width="4dp"
+        android:layout_height="match_parent"
+        android:background="@color/widget_primary" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="8dp"
+        android:gravity="center_vertical">
+
+    <LinearLayout
+        android:layout_width="48dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center">
+        
+        <TextView
+            android:id="@+id/widget_schedule_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="10:00"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textColor="@color/widget_primary"/>
+            
+        <TextView
+             android:id="@+id/widget_schedule_ampm"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:text="AM"
+             android:textSize="10sp"
+             android:textColor="@color/widget_secondary_text"/>
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/widget_schedule_icon"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:src="@drawable/ic_calendar_event"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="8dp"
+        android:contentDescription="Icon"/>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/widget_schedule_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Event Title"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="@color/widget_title_text"
+            android:ellipsize="end"
+            android:maxLines="1"/>
+
+        <TextView
+            android:id="@+id/widget_schedule_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Today"
+            android:textSize="11sp"
+            android:textColor="@color/widget_body_text"/>
+    </LinearLayout>
+
+    </LinearLayout>
+</LinearLayout>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_background"
+    android:padding="8dp">
+
+    <TextView
+        android:id="@+id/widget_schedule_title_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:gravity="center"
+        android:text="Schedule"
+        android:textColor="@color/widget_title_text"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <ListView
+        android:id="@+id/widget_schedule_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/widget_schedule_title_header"
+        android:layout_alignParentBottom="true"
+        android:divider="@null"
+        android:dividerHeight="4dp"
+        android:paddingBottom="4dp" />
+
+    <TextView
+        android:id="@+id/empty_schedule_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/widget_schedule_title_header"
+        android:layout_alignParentBottom="true"
+        android:gravity="center"
+        android:text="No upcoming events"
+        android:textColor="@color/widget_body_text"
+        android:visibility="gone" />
+
+</RelativeLayout>

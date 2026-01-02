@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_full_calendar_day_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="2dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:background="@drawable/widget_background">
+
+        <!-- Day Number -->
+        <TextView
+            android:id="@+id/widget_full_calendar_day_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textColor="@color/widget_title_text"
+            android:paddingTop="0dp" />
+
+        <!-- Today Indicator -->
+        <FrameLayout
+            android:id="@+id/widget_full_calendar_today_indicator"
+            android:layout_width="26dp"
+            android:layout_height="4dp"
+            android:background="@color/widget_primary"
+            android:visibility="gone"
+            android:layout_marginTop="0dp" />
+
+        <!-- Event/Task Indicators (up to 3) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:paddingTop="0dp"
+            android:paddingBottom="0dp">
+
+            <TextView
+                android:id="@+id/widget_full_calendar_summary_1"
+                android:layout_width="match_parent"
+                android:layout_height="6dp"
+                android:layout_marginStart="1dp"
+                android:layout_marginEnd="1dp"
+                android:layout_marginBottom="1dp"
+                android:background="@color/widget_secondary_text"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/widget_full_calendar_summary_2"
+                android:layout_width="match_parent"
+                android:layout_height="6dp"
+                android:layout_marginStart="1dp"
+                android:layout_marginEnd="1dp"
+                android:layout_marginBottom="1dp"
+                android:background="@color/widget_secondary_text"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/widget_full_calendar_summary_3"
+                android:layout_width="match_parent"
+                android:layout_height="6dp"
+                android:layout_marginStart="1dp"
+                android:layout_marginEnd="1dp"
+                android:background="@color/widget_secondary_text"
+                android:visibility="gone" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</FrameLayout>

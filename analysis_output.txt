@@ -1,0 +1,18 @@
+Analyzing rocis_tasks...                                        
+
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\calendar\presentation\screens\calendar_screen.dart:105:60 - deprecated_member_use
+   info - 'surfaceVariant' is deprecated and shouldn't be used. Use surfaceContainerHighest instead. This feature was deprecated after v3.18.0-0.1.pre - lib\features\calendar\presentation\screens\calendar_screen.dart:136:33 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\calendar\presentation\screens\calendar_screen.dart:136:48 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\features\categories\presentation\screens\categories_screen.dart:142:65 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\features\categories\presentation\screens\categories_screen.dart:169:46 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\features\categories\presentation\screens\categories_screen.dart:178:55 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\features\categories\presentation\screens\categories_screen.dart:182:52 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\categories\presentation\screens\categories_screen.dart:214:53 - deprecated_member_use
+   info - Statements in an if should be enclosed in a block - lib\features\tasks\presentation\providers\task_provider.dart:270:11 - curly_braces_in_flow_control_structures
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\features\tasks\presentation\screens\add_task_screen.dart:53:9 - use_build_context_synchronously
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\tasks\presentation\widgets\task_sort_filter_sheet.dart:62:59 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\tasks\presentation\widgets\task_sort_filter_sheet.dart:125:29 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\tasks\presentation\widgets\task_sort_filter_sheet.dart:128:29 - deprecated_member_use
+   info - 'groupValue' is deprecated and shouldn't be used. Use a RadioGroup ancestor to manage group value instead. This feature was deprecated after v3.32.0-0.0.pre - lib\features\tasks\presentation\widgets\task_sort_filter_sheet.dart:178:7 - deprecated_member_use
+   info - 'onChanged' is deprecated and shouldn't be used. Use RadioGroup to handle value change instead. This feature was deprecated after v3.32.0-0.0.pre - lib\features\tasks\presentation\widgets\task_sort_filter_sheet.dart:179:7 - deprecated_member_use
+

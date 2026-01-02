@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="@dimen/widget_margin"
+    android:background="@drawable/widget_background">
+
+    <TextView
+        android:id="@+id/widget_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:padding="8dp"
+        android:text="Pending Tasks"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="@color/widget_title_text" />
+
+    <LinearLayout
+        android:id="@+id/widget_tasks_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <include
+            android:id="@+id/task_slot_1"
+            layout="@layout/widget_task_item" />
+
+        <include
+            android:id="@+id/task_slot_2"
+            layout="@layout/widget_task_item" />
+
+        <include
+            android:id="@+id/task_slot_3"
+            layout="@layout/widget_task_item" />
+
+        <include
+            android:id="@+id/task_slot_4"
+            layout="@layout/widget_task_item" />
+
+        <include
+            android:id="@+id/task_slot_5"
+            layout="@layout/widget_task_item" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/empty_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="No pending tasks"
+        android:textColor="@color/widget_body_text"
+        android:visibility="gone" />
+
+</LinearLayout>

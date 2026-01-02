@@ -1,0 +1,868 @@
+Launching lib\main.dart on SM S916B in debug mode...
+Running Gradle task 'assembleDebug'...                              4.6s
+Γטת Built build\app\outputs\flutter-apk\app-debug.apk
+Installing build\app\outputs\flutter-apk\app-debug.apk...           5.0s
+D/FlutterJNI(14377): Beginning load of flutter...
+D/FlutterJNI(14377): flutter (null) was loaded normally!
+I/flutter (14377): [IMPORTANT:flutter/shell/platform/android/android_context_vk_impeller.cc(62)] Using the Impeller rendering backend (Vulkan).
+D/nativeloader(14377): Configuring clns-10 for other apk /system/system_ext/framework/org.carconnectivity.android.digitalkey.rangingintent.jar. target_sdk_version=36, uses_libraries=ALL, library_path=/data/app/~~tw7vSKd4khkLQIbeoTu1Rw==/com.google.android.gms-YIYfzrMU8z-Cjn4zg9Jgjw==/lib/arm64:/data/app/~~tw7vSKd4khkLQIbeoTu1Rw==/com.google.android.gms-YIYfzrMU8z-Cjn4zg9Jgjw==/base.apk!/lib/arm64-v8a, permitted_path=/data:/mnt/expand:/data/user/0/com.google.android.gms
+D/nativeloader(14377): Extending system_exposed_libraries: libhumantracking.arcsoft.so:libface_recognition.arcsoft.so:libpic_best.arcsoft.so:libPortraitDistortionCorrection.arcsoft.so:libPortraitDistortionCorrectionCali.arcsoft.so:libface_landmark.arcsoft.so:libFacialStickerEngine.arcsoft.so:libfrtracking_engine.arcsoft.so:libFaceRecognition.arcsoft.so:libveengine.arcsoft.so:lib_pet_detection.arcsoft.so:libae_bracket_hdr.arcsoft.so:libaiclearzoom_raw.arcsoft.so:libacz_hhdr.arcsoft.so:libhybrid_high_dynamic_range.arcsoft.so:libimage_enhancement.arcsoft.so:libsuperresolution_raw.arcsoft.so:libFacialAttributeDetection.arcsoft.so:libobjectcapture_jni.arcsoft.so:libobjectcapture.arcsoft.so:libaudiomirroring_jni.audiomirroring.samsung.so:libBeauty_v4.camera.samsung.so:libexifa.camera.samsung.so:libjpega.camera.samsung.so:libOpenCv.camera.samsung.so:libaifrcInterface.camera.samsung.so:libBestPhoto.camera.samsung.so:libC2paDps.camera.samsung.so:libVideoClassifier.camera.samsung.so:libImageScreener.camera.samsung.so:libMyFilter.camera.sams
+D/nativeloader(14377): Configuring clns-11 for other apk /system/system_ext/framework/org.carconnectivity.android.digitalkey.secureelement.jar. target_sdk_version=36, uses_libraries=ALL, library_path=/data/app/~~tw7vSKd4khkLQIbeoTu1Rw==/com.google.android.gms-YIYfzrMU8z-Cjn4zg9Jgjw==/lib/arm64:/data/app/~~tw7vSKd4khkLQIbeoTu1Rw==/com.google.android.gms-YIYfzrMU8z-Cjn4zg9Jgjw==/base.apk!/lib/arm64-v8a, permitted_path=/data:/mnt/expand:/data/user/0/com.google.android.gms
+D/nativeloader(14377): Extending system_exposed_libraries: libhumantracking.arcsoft.so:libface_recognition.arcsoft.so:libpic_best.arcsoft.so:libPortraitDistortionCorrection.arcsoft.so:libPortraitDistortionCorrectionCali.arcsoft.so:libface_landmark.arcsoft.so:libFacialStickerEngine.arcsoft.so:libfrtracking_engine.arcsoft.so:libFaceRecognition.arcsoft.so:libveengine.arcsoft.so:lib_pet_detection.arcsoft.so:libae_bracket_hdr.arcsoft.so:libaiclearzoom_raw.arcsoft.so:libacz_hhdr.arcsoft.so:libhybrid_high_dynamic_range.arcsoft.so:libimage_enhancement.arcsoft.so:libsuperresolution_raw.arcsoft.so:libFacialAttributeDetection.arcsoft.so:libobjectcapture_jni.arcsoft.so:libobjectcapture.arcsoft.so:libaudiomirroring_jni.audiomirroring.samsung.so:libBeauty_v4.camera.samsung.so:libexifa.camera.samsung.so:libjpega.camera.samsung.so:libOpenCv.camera.samsung.so:libaifrcInterface.camera.samsung.so:libBestPhoto.camera.samsung.so:libC2paDps.camera.samsung.so:libVideoClassifier.camera.samsung.so:libImageScreener.camera.samsung.so:libMyFilter.camera.sams
+D/nativeloader(14377): Configuring clns-12 for other apk /system_ext/framework/org.carconnectivity.android.digitalkey.timesync.jar. target_sdk_version=36, uses_libraries=ALL, library_path=/data/app/~~tw7vSKd4khkLQIbeoTu1Rw==/com.google.android.gms-YIYfzrMU8z-Cjn4zg9Jgjw==/lib/arm64:/data/app/~~tw7vSKd4khkLQIbeoTu1Rw==/com.google.android.gms-YIYfzrMU8z-Cjn4zg9Jgjw==/base.apk!/lib/arm64-v8a, permitted_path=/data:/mnt/expand:/data/user/0/com.google.android.gms
+D/nativeloader(14377): Extending system_exposed_libraries: libhumantracking.arcsoft.so:libface_recognition.arcsoft.so:libpic_best.arcsoft.so:libPortraitDistortionCorrection.arcsoft.so:libPortraitDistortionCorrectionCali.arcsoft.so:libface_landmark.arcsoft.so:libFacialStickerEngine.arcsoft.so:libfrtracking_engine.arcsoft.so:libFaceRecognition.arcsoft.so:libveengine.arcsoft.so:lib_pet_detection.arcsoft.so:libae_bracket_hdr.arcsoft.so:libaiclearzoom_raw.arcsoft.so:libacz_hhdr.arcsoft.so:libhybrid_high_dynamic_range.arcsoft.so:libimage_enhancement.arcsoft.so:libsuperresolution_raw.arcsoft.so:libFacialAttributeDetection.arcsoft.so:libobjectcapture_jni.arcsoft.so:libobjectcapture.arcsoft.so:libaudiomirroring_jni.audiomirroring.samsung.so:libBeauty_v4.camera.samsung.so:libexifa.camera.samsung.so:libjpega.camera.samsung.so:libOpenCv.camera.samsung.so:libaifrcInterface.camera.samsung.so:libBestPhoto.camera.samsung.so:libC2paDps.camera.samsung.so:libVideoClassifier.camera.samsung.so:libImageScreener.camera.samsung.so:libMyFilter.camera.sams
+D/ApplicationLoaders(14377): Returning zygote-cached class loader: /system_ext/framework/androidx.window.extensions.jar
+D/ApplicationLoaders(14377): Returning zygote-cached class loader: /system_ext/framework/androidx.window.sidecar.jar
+W/ple.rocis_tasks(14377): Loading /data/app/~~tw7vSKd4khkLQIbeoTu1Rw==/com.google.android.gms-YIYfzrMU8z-Cjn4zg9Jgjw==/oat/arm64/base.odex non-executable as it requires an image which we failed to load
+D/nativeloader(14377): Configuring clns-13 for other apk /data/app/~~tw7vSKd4khkLQIbeoTu1Rw==/com.google.android.gms-YIYfzrMU8z-Cjn4zg9Jgjw==/base.apk. target_sdk_version=36, uses_libraries=, library_path=/data/app/~~tw7vSKd4khkLQIbeoTu1Rw==/com.google.android.gms-YIYfzrMU8z-Cjn4zg9Jgjw==/lib/arm64:/data/app/~~tw7vSKd4khkLQIbeoTu1Rw==/com.google.android.gms-YIYfzrMU8z-Cjn4zg9Jgjw==/base.apk!/lib/arm64-v8a, permitted_path=/data:/mnt/expand:/data/user/0/com.google.android.gms
+W/ProviderInstaller(14377): Failed to report request stats: com.google.android.gms.common.security.ProviderInstallerImpl.reportRequestStats [class android.content.Context, long, long]
+Syncing files to device SM S916B...                             
+I/ple.rocis_tasks(14377): hiddenapi: Accessing hidden method Ldalvik/system/VMStack;->getStackClass2()Ljava/lang/Class; (runtime_flags=0, domain=core-platform, api=unsupported) from Lgoih; (domain=app) using reflection: allowed
+E/GoogleApiManager(14377): Failed to get service from broker. 
+E/GoogleApiManager(14377): java.lang.SecurityException: Unknown calling package name 'com.google.android.gms'.
+E/GoogleApiManager(14377): 	at android.os.Parcel.createExceptionOrNull(Parcel.java:3354)
+E/GoogleApiManager(14377): 	at android.os.Parcel.createException(Parcel.java:3338)
+E/GoogleApiManager(14377): 	at android.os.Parcel.readException(Parcel.java:3321)
+E/GoogleApiManager(14377): 	at android.os.Parcel.readException(Parcel.java:3263)
+E/GoogleApiManager(14377): 	at bddz.a(:com.google.android.gms@254932035@25.49.32 (260400-843446962):36)
+E/GoogleApiManager(14377): 	at bdca.z(:com.google.android.gms@254932035@25.49.32 (260400-843446962):143)
+E/GoogleApiManager(14377): 	at bcid.run(:com.google.android.gms@254932035@25.49.32 (260400-843446962):42)
+E/GoogleApiManager(14377): 	at android.os.Handler.handleCallback(Handler.java:995)
+E/GoogleApiManager(14377): 	at android.os.Handler.dispatchMessage(Handler.java:103)
+E/GoogleApiManager(14377): 	at cqne.mv(:com.google.android.gms@254932035@25.49.32 (260400-843446962):1)
+E/GoogleApiManager(14377): 	at cqne.dispatchMessage(:com.google.android.gms@254932035@25.49.32 (260400-843446962):5)
+E/GoogleApiManager(14377): 	at android.os.Looper.loopOnce(Looper.java:273)
+E/GoogleApiManager(14377): 	at android.os.Looper.loop(Looper.java:363)
+E/GoogleApiManager(14377): 	at android.os.HandlerThread.run(HandlerThread.java:85)
+W/GoogleApiManager(14377): Not showing notification since connectionResult is not user-facing: ConnectionResult{statusCode=DEVELOPER_ERROR, resolution=null, message=null, clientMethodKey=null}
+W/FlagRegistrar(14377): Failed to register com.google.android.gms.providerinstaller#com.example.rocis_tasks
+W/FlagRegistrar(14377): fvxl: 17: 17: API: Phenotype.API is not available on this device. Connection failed with: ConnectionResult{statusCode=DEVELOPER_ERROR, resolution=null, message=null, clientMethodKey=null}
+W/FlagRegistrar(14377): 	at fvxn.a(:com.google.android.gms@254932035@25.49.32 (260400-843446962):13)
+W/FlagRegistrar(14377): 	at gtqr.d(:com.google.android.gms@254932035@25.49.32 (260400-843446962):3)
+W/FlagRegistrar(14377): 	at gtqt.run(:com.google.android.gms@254932035@25.49.32 (260400-843446962):130)
+W/FlagRegistrar(14377): 	at gtta.execute(:com.google.android.gms@254932035@25.49.32 (260400-843446962):1)
+W/FlagRegistrar(14377): 	at gtrb.f(:com.google.android.gms@254932035@25.49.32 (260400-843446962):1)
+W/FlagRegistrar(14377): 	at gtrb.m(:com.google.android.gms@254932035@25.49.32 (260400-843446962):99)
+W/FlagRegistrar(14377): 	at gtrb.r(:com.google.android.gms@254932035@25.49.32 (260400-843446962):17)
+W/FlagRegistrar(14377): 	at fopg.hz(:com.google.android.gms@254932035@25.49.32 (260400-843446962):35)
+W/FlagRegistrar(14377): 	at fcbp.run(:com.google.android.gms@254932035@25.49.32 (260400-843446962):12)
+W/FlagRegistrar(14377): 	at gtta.execute(:com.google.android.gms@254932035@25.49.32 (260400-843446962):1)
+W/FlagRegistrar(14377): 	at fcbq.b(:com.google.android.gms@254932035@25.49.32 (260400-843446962):18)
+W/FlagRegistrar(14377): 	at fccf.b(:com.google.android.gms@254932035@25.49.32 (260400-843446962):34)
+W/FlagRegistrar(14377): 	at fcch.d(:com.google.android.gms@254932035@25.49.32 (260400-843446962):25)
+W/FlagRegistrar(14377): 	at bcfm.c(:com.google.android.gms@254932035@25.49.32 (260400-843446962):9)
+W/FlagRegistrar(14377): 	at bcib.q(:com.google.android.gms@254932035@25.49.32 (260400-843446962):48)
+W/FlagRegistrar(14377): 	at bcib.d(:com.google.android.gms@254932035@25.49.32 (260400-843446962):10)
+W/FlagRegistrar(14377): 	at bcib.g(:com.google.android.gms@254932035@25.49.32 (260400-843446962):191)
+W/FlagRegistrar(14377): 	at bcib.onConnectionFailed(:com.google.android.gms@254932035@25.49.32 (260400-843446962):2)
+W/FlagRegistrar(14377): 	at bcid.run(:com.google.android.gms@254932035@25.49.32 (260400-843446962):70)
+W/FlagRegistrar(14377): 	at android.os.Handler.handleCallback(Handler.java:995)
+W/FlagRegistrar(14377): 	at android.os.Handler.dispatchMessage(Handler.java:103)
+W/FlagRegistrar(14377): 	at cqne.mv(:com.google.android.gms@254932035@25.49.32 (260400-843446962):1)
+W/FlagRegistrar(14377): 	at cqne.dispatchMessage(:com.google.android.gms@254932035@25.49.32 (260400-843446962):5)
+W/FlagRegistrar(14377): 	at android.os.Looper.loopOnce(Looper.java:273)
+W/FlagRegistrar(14377): 	at android.os.Looper.loop(Looper.java:363)
+W/FlagRegistrar(14377): 	at android.os.HandlerThread.run(HandlerThread.java:85)
+W/FlagRegistrar(14377): Caused by: bcdt: 17: API: Phenotype.API is not available on this device. Connection failed with: ConnectionResult{statusCode=DEVELOPER_ERROR, resolution=null, message=null, clientMethodKey=null}
+W/FlagRegistrar(14377): 	at bdbm.a(:com.google.android.gms@254932035@25.49.32 (260400-843446962):15)
+W/FlagRegistrar(14377): 	at bcfp.a(:com.google.android.gms@254932035@25.49.32 (260400-843446962):1)
+W/FlagRegistrar(14377): 	at bcfm.c(:com.google.android.gms@254932035@25.49.32 (260400-843446962):5)
+W/FlagRegistrar(14377): 	... 12 more
+D/nativeloader(14377): Load /data/app/~~tw7vSKd4khkLQIbeoTu1Rw==/com.google.android.gms-YIYfzrMU8z-Cjn4zg9Jgjw==/base.apk!/lib/arm64-v8a/libconscrypt_gmscore_jni.so using class loader ns clns-13 (caller=/data/app/~~tw7vSKd4khkLQIbeoTu1Rw==/com.google.android.gms-YIYfzrMU8z-Cjn4zg9Jgjw==/base.apk): ok
+V/NativeCrypto(14377): Registering com/google/android/gms/org/conscrypt/NativeCrypto's 329 native methods...
+I/ple.rocis_tasks(14377): hiddenapi: Accessing hidden method Ljava/security/spec/ECParameterSpec;->getCurveName()Ljava/lang/String; (runtime_flags=0, domain=core-platform, api=unsupported) from Lcom/google/android/gms/org/conscrypt/Platform; (domain=app) using reflection: allowed
+I/ProviderInstaller(14377): Installed default security provider GmsCore_OpenSSL
+D/ConnectivityManager(14377): StackLog: [android.net.ConnectivityManager.sendRequestForNetwork(ConnectivityManager.java:4736)] [android.net.ConnectivityManager.registerDefaultNetworkCallbackForUid(ConnectivityManager.java:5461)] [android.net.ConnectivityManager.registerDefaultNetworkCallback(ConnectivityManager.java:5428)] [android.net.ConnectivityManager.registerDefaultNetworkCallback(ConnectivityManager.java:5402)] [io.grpc.android.AndroidChannelBuilder$AndroidChannel.configureNetworkMonitoring(AndroidChannelBuilder.java:217)] [io.grpc.android.AndroidChannelBuilder$AndroidChannel.<init>(AndroidChannelBuilder.java:198)] [io.grpc.android.AndroidChannelBuilder.build(AndroidChannelBuilder.java:169)] [com.google.firebase.firestore.remote.GrpcCallProvider.initChannel(GrpcCallProvider.java:116)] [com.google.firebase.firestore.remote.GrpcCallProvider.lambda$initChannelTask$6$com-google-firebase-firestore-remote-GrpcCallProvider(GrpcCallProvider.java:242)] [com.google.firebase.firestore.remote.GrpcCallProvider$$ExternalSyntheticLambda4.call(D8$$SyntheticClass:0)] [com.google.android.gms.tasks.zzz.run(com.google.android.gms:play-services-tasks@@18.1.0:1)] [com.google.firebase.firestore.util.ThrottledForwardingExecutor.lambda$execute$0$com-google-firebase-firestore-util-ThrottledForwardingExecutor(ThrottledForwardingExecutor.java:54)] [com.google.firebase.firestore.util.ThrottledForwardingExecutor$$ExternalSyntheticLambda0.run(D8$$SyntheticClass:0)] [java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1156)] [java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:651)] [java.lang.Thread.run(Thread.java:1119)]
+I/ple.rocis_tasks(14377): hiddenapi: Accessing hidden field Ljava/net/Socket;->impl:Ljava/net/SocketImpl; (runtime_flags=0, domain=core-platform, api=unsupported) from Lcom/google/android/gms/org/conscrypt/Platform; (domain=app) using reflection: allowed
+Syncing files to device SM S916B...                                 81ms
+I/ple.rocis_tasks(14377): hiddenapi: Accessing hidden method Ljava/security/spec/ECParameterSpec;->setCurveName(Ljava/lang/String;)V (runtime_flags=0, domain=core-platform, api=unsupported) from Lcom/google/android/gms/org/conscrypt/Platform; (domain=app) using reflection: allowed
+
+Flutter run key commands.
+r Hot reload. 
+R Hot restart.
+h List all available interactive commands.
+d Detach (terminate "flutter run" but leave application running).
+c Clear the screen
+q Quit (terminate the application on the device).
+
+A Dart VM Service on SM S916B is available at: http://127.0.0.1:43578/1fCRFjOqZXI=/
+The Flutter DevTools debugger and profiler on SM S916B is available at: http://127.0.0.1:43578/1fCRFjOqZXI=/devtools/?uri=ws://127.0.0.1:43578/1fCRFjOqZXI=/ws
+D/AppWidgetProvider(14377): onReceive:android.appwidget.action.APPWIDGET_UPDATE
+I/flutter (14377): WIDGET DEBUG: Saving schedule list with 23 items. Payload size: 4854
+D/AppWidgetProvider(14377): onReceive:android.appwidget.action.APPWIDGET_UPDATE
+I/NotificationManager(14377): com.example.rocis_tasks: notify(888, null, Notification(channel=rocis_tasks_persistent shortcut=null contentView=null vibrate=null sound=null defaults=0 flags=ONGOING_EVENT color=0x00000000 actions=1 vis=PRIVATE semFlags=0x0 semPriority=0 semMissedCount=0)) as user
+D/NotificationManager(14377): BOOTING pkg =com.example.rocis_tasks mBlockedChannelsForOverflowNoti=[]
+D/AppWidgetProvider(14377): onReceive:android.appwidget.action.APPWIDGET_UPDATE
+D/AppWidgetProvider(14377): onReceive:android.appwidget.action.APPWIDGET_UPDATE
+I/AppWidgetManager(14377): updateAppWidget() appWidgetIds = [142]
+D/ProfileInstaller(14377): Installing profile for com.example.rocis_tasks
+D/Choreographer(14377): BBA2 receive callback when in bg : 4
+D/HWUI    (14377): CacheManager::trimMemory(40)
+I/flutter (14377): dynamic_color: Core palette detected.
+D/TaskWidget(14377): onDataSetChanged: Raw tasks count: 4
+D/TaskWidget(14377): onDataSetChanged: Final sorted/filtered count: 4
+D/AppWidgetProvider(14377): onReceive:android.appwidget.action.APPWIDGET_UPDATE
+D/TaskWidget(14377): onUpdate called for 1 widgets
+D/TaskWidget(14377): Updating widget ID: 146
+I/AppWidgetManager(14377): notifyAppWidgetViewDataChanged() appWidgetIds = [146], viewId = 2131232208
+I/AppWidgetManager(14377): updateAppWidget() appWidgetIds = [146]
+D/TaskWidget(14377): Widget 146 updated successfully
+D/TaskWidget(14377): onDataSetChanged: Raw tasks count: 4
+D/TaskWidget(14377): onDataSetChanged: Final sorted/filtered count: 4
+D/AppWidgetProvider(14377): onReceive:android.appwidget.action.APPWIDGET_UPDATE
+I/flutter (14377): WIDGET DEBUG: Saving schedule list with 23 items. Payload size: 4854
+I/NotificationManager(14377): com.example.rocis_tasks: notify(888, null, Notification(channel=rocis_tasks_persistent shortcut=null contentView=null vibrate=null sound=null defaults=0 flags=ONGOING_EVENT color=0x00000000 actions=1 vis=PRIVATE semFlags=0x0 semPriority=0 semMissedCount=0)) as user
+D/AppWidgetProvider(14377): onReceive:android.appwidget.action.APPWIDGET_UPDATE
+D/AppWidgetProvider(14377): onReceive:android.appwidget.action.APPWIDGET_UPDATE
+D/AppWidgetProvider(14377): onReceive:android.appwidget.action.APPWIDGET_UPDATE
+I/AppWidgetManager(14377): updateAppWidget() appWidgetIds = [142]
+E/GoogleApiManager(14377): Failed to get service from broker. 
+E/GoogleApiManager(14377): java.lang.SecurityException: Unknown calling package name 'com.google.android.gms'.
+E/GoogleApiManager(14377): 	at android.os.Parcel.createExceptionOrNull(Parcel.java:3354)
+E/GoogleApiManager(14377): 	at android.os.Parcel.createException(Parcel.java:3338)
+E/GoogleApiManager(14377): 	at android.os.Parcel.readException(Parcel.java:3321)
+E/GoogleApiManager(14377): 	at android.os.Parcel.readException(Parcel.java:3263)
+E/GoogleApiManager(14377): 	at bddz.a(:com.google.android.gms@254932035@25.49.32 (260400-843446962):36)
+E/GoogleApiManager(14377): 	at bdca.z(:com.google.android.gms@254932035@25.49.32 (260400-843446962):143)
+E/GoogleApiManager(14377): 	at bcid.run(:com.google.android.gms@254932035@25.49.32 (260400-843446962):42)
+E/GoogleApiManager(14377): 	at android.os.Handler.handleCallback(Handler.java:995)
+E/GoogleApiManager(14377): 	at android.os.Handler.dispatchMessage(Handler.java:103)
+E/GoogleApiManager(14377): 	at cqne.mv(:com.google.android.gms@254932035@25.49.32 (260400-843446962):1)
+E/GoogleApiManager(14377): 	at cqne.dispatchMessage(:com.google.android.gms@254932035@25.49.32 (260400-843446962):5)
+E/GoogleApiManager(14377): 	at android.os.Looper.loopOnce(Looper.java:273)
+E/GoogleApiManager(14377): 	at android.os.Looper.loop(Looper.java:363)
+E/GoogleApiManager(14377): 	at android.os.HandlerThread.run(HandlerThread.java:85)
+W/GoogleApiManager(14377): Not showing notification since connectionResult is not user-facing: ConnectionResult{statusCode=DEVELOPER_ERROR, resolution=null, message=null, clientMethodKey=null}
+V/NativeCrypto(14377): Read error: ssl=0xb400006ed5709348: I/O error during system call, Software caused connection abort
+W/ManagedChannelImpl(14377): [{0}] Failed to resolve name. status={1}
+W/Firestore(14377): (25.1.4) [WriteStream]: (3930f1a) Stream closed with status: Status{code=UNAVAILABLE, description=End of stream or IOException, cause=null}.
+W/Firestore(14377): (25.1.4) [WatchStream]: (e0fc94b) Stream closed with status: Status{code=UNAVAILABLE, description=End of stream or IOException, cause=null}.
+V/NativeCrypto(14377): Write error: ssl=0xb400006ed5709348: I/O error during system call, Broken pipe
+V/NativeCrypto(14377): SSL shutdown failed: ssl=0xb400006ed5709348: I/O error during system call, Success
+W/Firestore(14377): (25.1.4) [WatchStream]: (e0fc94b) Stream closed with status: Status{code=UNAVAILABLE, description=Unable to resolve host firestore.googleapis.com, cause=java.lang.RuntimeException: java.net.UnknownHostException: Unable to resolve host "firestore.googleapis.com": No address associated with hostname
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.resolveAddresses(DnsNameResolver.java:223)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.doResolve(DnsNameResolver.java:282)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver$Resolve.run(DnsNameResolver.java:318)
+W/Firestore(14377): 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1156)
+W/Firestore(14377): 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:651)
+W/Firestore(14377): 	at java.lang.Thread.run(Thread.java:1119)
+W/Firestore(14377): Caused by: java.net.UnknownHostException: Unable to resolve host "firestore.googleapis.com": No address associated with hostname
+W/Firestore(14377): 	at java.net.Inet6AddressImpl.lookupHostByName(Inet6AddressImpl.java:156)
+W/Firestore(14377): 	at java.net.Inet6AddressImpl.lookupAllHostAddr(Inet6AddressImpl.java:103)
+W/Firestore(14377): 	at java.net.InetAddress.getAllByName(InetAddress.java:1152)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver$JdkAddressResolver.resolveAddress(DnsNameResolver.java:632)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.resolveAddresses(DnsNameResolver.java:219)
+W/Firestore(14377): 	... 5 more
+W/Firestore(14377): Caused by: android.system.GaiException: android_getaddrinfo failed: EAI_NODATA (No address associated with hostname)
+W/Firestore(14377): 	at libcore.io.Linux.android_getaddrinfo(Native Method)
+W/Firestore(14377): 	at libcore.io.ForwardingOs.android_getaddrinfo(ForwardingOs.java:133)
+W/Firestore(14377): 	at libcore.io.BlockGuardOs.android_getaddrinfo(BlockGuardOs.java:222)
+W/Firestore(14377): 	at libcore.io.ForwardingOs.android_getaddrinfo(ForwardingOs.java:133)
+W/Firestore(14377): 	at java.net.Inet6AddressImpl.lookupHostByName(Inet6AddressImpl.java:135)
+W/Firestore(14377): 	... 9 more
+W/Firestore(14377): }.
+W/ManagedChannelImpl(14377): [{0}] Failed to resolve name. status={1}
+W/Firestore(14377): (25.1.4) [WatchStream]: (e0fc94b) Stream closed with status: Status{code=UNAVAILABLE, description=Unable to resolve host firestore.googleapis.com, cause=java.lang.RuntimeException: java.net.UnknownHostException: Unable to resolve host "firestore.googleapis.com": No address associated with hostname
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.resolveAddresses(DnsNameResolver.java:223)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.doResolve(DnsNameResolver.java:282)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver$Resolve.run(DnsNameResolver.java:318)
+W/Firestore(14377): 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1156)
+W/Firestore(14377): 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:651)
+W/Firestore(14377): 	at java.lang.Thread.run(Thread.java:1119)
+W/Firestore(14377): Caused by: java.net.UnknownHostException: Unable to resolve host "firestore.googleapis.com": No address associated with hostname
+W/Firestore(14377): 	at java.net.Inet6AddressImpl.lookupHostByName(Inet6AddressImpl.java:124)
+W/Firestore(14377): 	at java.net.Inet6AddressImpl.lookupAllHostAddr(Inet6AddressImpl.java:103)
+W/Firestore(14377): 	at java.net.InetAddress.getAllByName(InetAddress.java:1152)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver$JdkAddressResolver.resolveAddress(DnsNameResolver.java:632)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.resolveAddresses(DnsNameResolver.java:219)
+W/Firestore(14377): 	... 5 more
+W/Firestore(14377): }.
+W/ManagedChannelImpl(14377): [{0}] Failed to resolve name. status={1}
+W/Firestore(14377): (25.1.4) [WatchStream]: (e0fc94b) Stream closed with status: Status{code=UNAVAILABLE, description=Unable to resolve host firestore.googleapis.com, cause=java.lang.RuntimeException: java.net.UnknownHostException: Unable to resolve host "firestore.googleapis.com": No address associated with hostname
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.resolveAddresses(DnsNameResolver.java:223)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.doResolve(DnsNameResolver.java:282)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver$Resolve.run(DnsNameResolver.java:318)
+W/Firestore(14377): 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1156)
+W/Firestore(14377): 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:651)
+W/Firestore(14377): 	at java.lang.Thread.run(Thread.java:1119)
+W/Firestore(14377): Caused by: java.net.UnknownHostException: Unable to resolve host "firestore.googleapis.com": No address associated with hostname
+W/Firestore(14377): 	at java.net.Inet6AddressImpl.lookupHostByName(Inet6AddressImpl.java:156)
+W/Firestore(14377): 	at java.net.Inet6AddressImpl.lookupAllHostAddr(Inet6AddressImpl.java:103)
+W/Firestore(14377): 	at java.net.InetAddress.getAllByName(InetAddress.java:1152)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver$JdkAddressResolver.resolveAddress(DnsNameResolver.java:632)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.resolveAddresses(DnsNameResolver.java:219)
+W/Firestore(14377): 	... 5 more
+W/Firestore(14377): Caused by: android.system.GaiException: android_getaddrinfo failed: EAI_NODATA (No address associated with hostname)
+W/Firestore(14377): 	at libcore.io.Linux.android_getaddrinfo(Native Method)
+W/Firestore(14377): 	at libcore.io.ForwardingOs.android_getaddrinfo(ForwardingOs.java:133)
+W/Firestore(14377): 	at libcore.io.BlockGuardOs.android_getaddrinfo(BlockGuardOs.java:222)
+W/Firestore(14377): 	at libcore.io.ForwardingOs.android_getaddrinfo(ForwardingOs.java:133)
+W/Firestore(14377): 	at java.net.Inet6AddressImpl.lookupHostByName(Inet6AddressImpl.java:135)
+W/Firestore(14377): 	... 9 more
+W/Firestore(14377): }.
+I/VRI[MainActivity]@94d3e1f(14377): handleAppVisibility mAppVisible = false visible = true
+W/ManagedChannelImpl(14377): [{0}] Failed to resolve name. status={1}
+I/VRI[MainActivity]@94d3e1f(14377): stopped(false) old = true
+D/VRI[MainActivity]@94d3e1f(14377): WindowStopped on com.example.rocis_tasks/com.example.rocis_tasks.MainActivity set to false
+I/AdrenoGLES-0(14377): QUALCOMM build                   : dc3d4da3a2, Idd45c2c082
+I/AdrenoGLES-0(14377): Build Date                       : 05/30/25
+I/AdrenoGLES-0(14377): OpenGL ES Shader Compiler Version: E031.41.03.62
+I/AdrenoGLES-0(14377): Local Branch                     : 
+I/AdrenoGLES-0(14377): Remote Branch                    : refs/tags/AU_LINUX_ANDROID_LA.VENDOR.13.2.0.11.00.00.856.062
+I/AdrenoGLES-0(14377): Remote Branch                    : NONE
+I/AdrenoGLES-0(14377): Reconstruct Branch               : NOTHING
+I/AdrenoGLES-0(14377): Build Config                     : S P 14.1.4 AArch64
+I/AdrenoGLES-0(14377): Driver Path                      : /vendor/lib64/egl/libGLESv2_adreno.so
+I/AdrenoGLES-0(14377): Driver Version                   : 0676.73
+D/SurfaceView(14377): 190416292 updateSurface: has no frame
+I/AdrenoGLES-0(14377): PFP: 0x01740181, ME: 0x00000000
+W/Adreno-AppProfiles(14377): Could not find QSPM HAL service. Skipping adreno profile processing.
+I/SV[190416292 MainActivity](14377): onWindowVisibilityChanged(0) true io.flutter.embedding.android.FlutterSurfaceView{b5985a4 V.E...... ......I. 0,0-0,0} of VRI[MainActivity]@94d3e1f
+D/SurfaceView(14377): 190416292 updateSurface: has no frame
+E/BufferQueueProducer(14377): Unable to open libpenguin.so: dlopen failed: library "libpenguin.so" not found.
+E/ple.rocis_tasks(14377): Unable to open libpenguin.so: dlopen failed: library "libpenguin.so" not found.
+W/libc    (14377): Access denied finding property "vendor.display.enable_optimal_refresh_rate"
+I/BufferQueueProducer(14377): [](id:382900000000,api:0,p:0,c:14377) setDequeueTimeout:2077252342
+I/BLASTBufferQueue_Java(14377): new BLASTBufferQueue, mName= VRI[MainActivity]@94d3e1f mNativeObject= 0xb400006ee2613000 caller= android.view.ViewRootImpl.updateBlastSurfaceIfNeeded:3585 android.view.ViewRootImpl.relayoutWindow:11685 android.view.ViewRootImpl.performTraversals:4804 android.view.ViewRootImpl.doTraversal:3924 android.view.ViewRootImpl$TraversalRunnable.run:12903 android.view.Choreographer$CallbackRecord.run:1901 android.view.Choreographer$CallbackRecord.run:1910 android.view.Choreographer.doCallbacks:1367 android.view.Choreographer.doFrame:1292 android.view.Choreographer$FrameDisplayEventReceiver.run:1870 
+I/BLASTBufferQueue_Java(14377): update, w= 1080 h= 2340 mName = VRI[MainActivity]@94d3e1f mNativeObject= 0xb400006ee2613000 sc.mNativeObject= 0xb400006e1de77b00 format= -3 caller= android.view.ViewRootImpl.updateBlastSurfaceIfNeeded:3590 android.view.ViewRootImpl.relayoutWindow:11685 android.view.ViewRootImpl.performTraversals:4804 android.view.ViewRootImpl.doTraversal:3924 android.view.ViewRootImpl$TraversalRunnable.run:12903 android.view.Choreographer$CallbackRecord.run:1901 
+W/libc    (14377): Access denied finding property "vendor.display.enable_optimal_refresh_rate"
+I/VRI[MainActivity]@94d3e1f(14377): Relayout returned: old=(0,0,1080,2340) new=(0,0,1080,2340) relayoutAsync=false req=(1080,2340)0 dur=5 res=0x3 s={true 0xb400006ed5744200} ch=true seqId=0
+I/VRI[MainActivity]@94d3e1f(14377): performConfigurationChange setNightDimText nightDimLevel=0
+D/VRI[MainActivity]@94d3e1f(14377): mThreadedRenderer.initialize() mSurface={isValid=true 0xb400006ed5744200} hwInitialized=true
+D/SurfaceView(14377): 190416292 updateSurface: has no frame
+I/SV[190416292 MainActivity](14377): windowStopped(false) true io.flutter.embedding.android.FlutterSurfaceView{b5985a4 V.E...... ......ID 0,0-1080,2340} of VRI[MainActivity]@94d3e1f
+D/SurfaceView(14377): 190416292 updateSurface: has no frame
+D/VRI[MainActivity]@94d3e1f(14377): reportNextDraw android.view.ViewRootImpl.performTraversals:5443 android.view.ViewRootImpl.doTraversal:3924 android.view.ViewRootImpl$TraversalRunnable.run:12903 android.view.Choreographer$CallbackRecord.run:1901 android.view.Choreographer$CallbackRecord.run:1910 
+I/SurfaceView(14377): 190416292 Changes: creating=true format=true size=true visible=true alpha=false hint=false left=true top=true z=false attached=true lifecycleStrategy=false
+W/libc    (14377): Access denied finding property "vendor.display.enable_optimal_refresh_rate"
+I/BufferQueueProducer(14377): [](id:382900000001,api:0,p:0,c:14377) setDequeueTimeout:2077252342
+I/BLASTBufferQueue_Java(14377): new BLASTBufferQueue, mName= b5985a4 SurfaceView[com.example.rocis_tasks/com.example.rocis_tasks.MainActivity]@0 mNativeObject= 0xb400006ee25a7000 caller= android.view.SurfaceView.createBlastSurfaceControls:1781 android.view.SurfaceView.updateSurface:1450 android.view.SurfaceView.lambda$new$0:280 android.view.SurfaceView.$r8$lambda$NfZyM_TG8F8lqzaOVZ7noREFjzU:0 android.view.SurfaceView$$ExternalSyntheticLambda1.onPreDraw:0 android.view.ViewTreeObserver.dispatchOnPreDraw:1229 android.view.ViewRootImpl.performTraversals:5448 android.view.ViewRootImpl.doTraversal:3924 android.view.ViewRootImpl$TraversalRunnable.run:12903 android.view.Choreographer$CallbackRecord.run:1901 
+I/BLASTBufferQueue_Java(14377): update, w= 1080 h= 2340 mName = b5985a4 SurfaceView[com.example.rocis_tasks/com.example.rocis_tasks.MainActivity]@0 mNativeObject= 0xb400006ee25a7000 sc.mNativeObject= 0xb400006e1e14af40 format= 4 caller= android.view.SurfaceView.createBlastSurfaceControls:1782 android.view.SurfaceView.updateSurface:1450 android.view.SurfaceView.lambda$new$0:280 android.view.SurfaceView.$r8$lambda$NfZyM_TG8F8lqzaOVZ7noREFjzU:0 android.view.SurfaceView$$ExternalSyntheticLambda1.onPreDraw:0 android.view.ViewTreeObserver.dispatchOnPreDraw:1229 
+I/SurfaceView(14377): 190416292 Cur surface: Surface(name=null mNativeObject=0)/@0x36392a
+D/SurfaceComposerClient(14377): setCornerRadius ## b5985a4 SurfaceView[com.example.rocis_tasks/com.example.rocis_tasks.MainActivity]@0#50834 cornerRadius=0.000000
+I/SV[190416292 MainActivity](14377): pST: sr = Rect(0, 0 - 1080, 2340) sw = 1080 sh = 2340
+D/SurfaceView(14377): 190416292 performSurfaceTransaction RenderWorker position = [0, 0, 1080, 2340] surfaceSize = 1080x2340
+W/libc    (14377): Access denied finding property "vendor.display.enable_optimal_refresh_rate"
+I/SV[190416292 MainActivity](14377): updateSurface: mVisible = true mSurface.isValid() = true
+I/SV[190416292 MainActivity](14377): updateSurface: mSurfaceCreated = false surfaceChanged = true visibleChanged = true
+I/SurfaceView(14377): 190416292 visibleChanged -- surfaceCreated
+I/SV[190416292 MainActivity](14377): surfaceCreated 1 #8 io.flutter.embedding.android.FlutterSurfaceView{b5985a4 V.E...... ......ID 0,0-1080,2340}
+E/qdgralloc(14377): GetSize: Unrecognized pixel format: 0x3b
+W/qdgralloc(14377): gralloc failed to allocate buffer for size 0 format 59 AWxAH 1x1 usage 2816
+E/Gralloc4(14377): isSupported(1, 1, 59, 1, ...) failed with 7
+E/GraphicBufferAllocator(14377): Failed to allocate (4 x 4) layerCount 1 format 59 usage b00: 7
+E/AHardwareBuffer(14377): GraphicBuffer(w=4, h=4, lc=1) failed (Unknown error -7), handle=0x0
+E/qdgralloc(14377): GetSize: Unrecognized pixel format: 0x3b
+W/qdgralloc(14377): gralloc failed to allocate buffer for size 0 format 59 AWxAH 1x1 usage 2816
+E/Gralloc4(14377): isSupported(1, 1, 59, 1, ...) failed with 7
+E/GraphicBufferAllocator(14377): Failed to allocate (4 x 4) layerCount 1 format 59 usage b00: 7
+E/AHardwareBuffer(14377): GraphicBuffer(w=4, h=4, lc=1) failed (Unknown error -7), handle=0x0
+W/qdgralloc(14377): getInterlacedFlag: getMetaData returned 3, defaulting to interlaced_flag = 0
+W/qdgralloc(14377): getInterlacedFlag: getMetaData returned 3, defaulting to interlaced_flag = 0
+W/qdgralloc(14377): getInterlacedFlag: getMetaData returned 3, defaulting to interlaced_flag = 0
+W/qdgralloc(14377): getInterlacedFlag: getMetaData returned 3, defaulting to interlaced_flag = 0
+W/qdgralloc(14377): getInterlacedFlag: getMetaData returned 3, defaulting to interlaced_flag = 0
+I/SurfaceView(14377): 190416292 surfaceChanged -- format=4 w=1080 h=2340
+I/SV[190416292 MainActivity](14377): surfaceChanged (1080,2340) 1 #8 io.flutter.embedding.android.FlutterSurfaceView{b5985a4 V.E...... ......ID 0,0-1080,2340}
+I/SurfaceView(14377): 190416292 surfaceRedrawNeeded
+V/SurfaceView(14377): Layout: x=0 y=0 w=1080 h=2340, frame=Rect(0, 0 - 1080, 2340)
+I/InsetsSourceConsumer(14377): applyRequestedVisibilityToControl: visible=true, type=navigationBars, host=com.example.rocis_tasks/com.example.rocis_tasks.MainActivity
+I/InsetsSourceConsumer(14377): applyRequestedVisibilityToControl: visible=true, type=statusBars, host=com.example.rocis_tasks/com.example.rocis_tasks.MainActivity
+I/BLASTBufferQueue(14377): [b5985a4 SurfaceView[com.example.rocis_tasks/com.example.rocis_tasks.MainActivity]@0#1](f:0,a:0,s:0) onFrameAvailable the first frame is available
+I/SurfaceComposerClient(14377): apply transaction with the first frame. layerId: 50835, bufferData(ID: 61748744814604, frameNumber: 1)
+I/SurfaceView(14377): 190416292 finishedDrawing
+D/VRI[MainActivity]@94d3e1f(14377): Setup new sync=wmsSync-VRI[MainActivity]@94d3e1f#1
+I/VRI[MainActivity]@94d3e1f(14377): Creating new active sync group VRI[MainActivity]@94d3e1f#2
+D/VRI[MainActivity]@94d3e1f(14377): Draw frame after cancel
+D/VRI[MainActivity]@94d3e1f(14377): registerCallbacksForSync syncBuffer=false
+D/SurfaceView(14377): 190416292 updateSurfacePosition RenderWorker, frameNr = 1, position = [0, 0, 1080, 2340] surfaceSize = 1080x2340
+I/SV[190416292 MainActivity](14377): uSP: rtp = Rect(0, 0 - 1080, 2340) rtsw = 1080 rtsh = 2340
+I/SV[190416292 MainActivity](14377): onSSPAndSRT: pl = 0 pt = 0 sx = 1.0 sy = 1.0
+I/SV[190416292 MainActivity](14377): aOrMT: VRI[MainActivity]@94d3e1f t = android.view.SurfaceControl$Transaction@d747ad0 fN = 1 android.view.SurfaceView.-$$Nest$mapplyOrMergeTransaction:0 android.view.SurfaceView$SurfaceViewPositionUpdateListener.positionChanged:1932 android.graphics.RenderNode$CompositePositionUpdateListener.positionChanged:401 
+I/VRI[MainActivity]@94d3e1f(14377): mWNT: t=0xb400006ed5640580 mBlastBufferQueue=0xb400006ee2613000 fn= 1 HdrRenderState mRenderHdrSdrRatio=1.0 caller= android.view.SurfaceView.applyOrMergeTransaction:1863 android.view.SurfaceView.-$$Nest$mapplyOrMergeTransaction:0 android.view.SurfaceView$SurfaceViewPositionUpdateListener.positionChanged:1932 
+D/VRI[MainActivity]@94d3e1f(14377): Received frameDrawingCallback syncResult=0 frameNum=1.
+I/VRI[MainActivity]@94d3e1f(14377): mWNT: t=0xb400006e1e285a80 mBlastBufferQueue=0xb400006ee2613000 fn= 1 HdrRenderState mRenderHdrSdrRatio=1.0 caller= android.view.ViewRootImpl$12.onFrameDraw:15441 android.view.ThreadedRenderer$1.onFrameDraw:718 <bottom of call stack> 
+I/VRI[MainActivity]@94d3e1f(14377): Setting up sync and frameCommitCallback
+I/BLASTBufferQueue(14377): [VRI[MainActivity]@94d3e1f#0](f:0,a:0,s:0) onFrameAvailable the first frame is available
+I/SurfaceComposerClient(14377): apply transaction with the first frame. layerId: 50830, bufferData(ID: 61748744814609, frameNumber: 1)
+I/VRI[MainActivity]@94d3e1f(14377): Received frameCommittedCallback lastAttemptedDrawFrameNum=1 didProduceBuffer=true
+D/HWUI    (14377): CFMS:: SetUp Pid : 14377    Tid : 14581
+D/VRI[MainActivity]@94d3e1f(14377): reportDrawFinished seqId=0
+D/VRI[MainActivity]@94d3e1f(14377): mThreadedRenderer.initializeIfNeeded()#2 mSurface={isValid=true 0xb400006ed5744200}
+D/InputMethodManagerUtils(14377): startInputInner - Id : 0
+I/InputMethodManager(14377): startInputInner - IInputMethodManagerGlobalInvoker.startInputOrWindowGainedFocus
+I/InputMethodManager(14377): handleMessage: setImeVisibility visible=false
+D/InsetsController(14377): hide(ime(), fromIme=false)
+I/ImeTracker(14377): com.example.rocis_tasks:4847271a: onCancelled at PHASE_CLIENT_ALREADY_HIDDEN
+D/InputTransport(14377): Input channel constructed: 'ClientS', fd=209
+I/VRI[MainActivity]@94d3e1f(14377): handleResized, frames=ClientWindowFrames{frame=[0,0][1080,2340] display=[0,0][1080,2340] parentFrame=[0,0][0,0]} displayId=0 dragResizing=false compatScale=1.0 frameChanged=false attachedFrameChanged=false configChanged=false displayChanged=false compatScaleChanged=false dragResizingChanged=false
+I/InsetsSourceConsumer(14377): applyRequestedVisibilityToControl: visible=true, type=statusBars, host=com.example.rocis_tasks/com.example.rocis_tasks.MainActivity
+I/VRI[MainActivity]@94d3e1f(14377): handleAppVisibility mAppVisible = true visible = false
+D/VRI[MainActivity]@94d3e1f(14377): visibilityChanged oldVisibility=true newVisibility=false
+I/SV[190416292 MainActivity](14377): onWindowVisibilityChanged(8) false io.flutter.embedding.android.FlutterSurfaceView{b5985a4 V.E...... ........ 0,0-1080,2340} of VRI[MainActivity]@94d3e1f
+I/SurfaceView(14377): 190416292 Changes: creating=false format=false size=false visible=true alpha=false hint=false left=false top=false z=false attached=true lifecycleStrategy=false
+I/SurfaceView(14377): 190416292 Cur surface: Surface(name=null mNativeObject=-5476376668037139200)/@0x36392a
+D/SurfaceComposerClient(14377): setCornerRadius ## b5985a4 SurfaceView[com.example.rocis_tasks/com.example.rocis_tasks.MainActivity]@0#50834 cornerRadius=0.000000
+I/SurfaceView(14377): 190416292 surfaceDestroyed
+I/SV[190416292 MainActivity](14377): surfaceDestroyed callback.size 1 #2 io.flutter.embedding.android.FlutterSurfaceView{b5985a4 V.E...... ........ 0,0-1080,2340}
+I/SV[190416292 MainActivity](14377): updateSurface: mVisible = false mSurface.isValid() = true
+I/SV[190416292 MainActivity](14377): releaseSurfaces: viewRoot = VRI[MainActivity]@94d3e1f
+V/SurfaceView(14377): Layout: x=0 y=0 w=1080 h=2340, frame=Rect(0, 0 - 1080, 2340)
+D/SurfaceView(14377): 54573667 windowPositionLost, frameNr = 0
+D/HWUI    (14377): CacheManager::trimMemory(20)
+I/VRI[MainActivity]@94d3e1f(14377): Relayout returned: old=(0,0,1080,2340) new=(0,0,1080,2340) relayoutAsync=false req=(1080,2340)8 dur=8 res=0x2 s={false 0x0} ch=true seqId=0
+I/SV[190416292 MainActivity](14377): windowStopped(true) false io.flutter.embedding.android.FlutterSurfaceView{b5985a4 V.E...... ........ 0,0-1080,2340} of VRI[MainActivity]@94d3e1f
+D/SV[190416292 MainActivity](14377): updateSurface: surface is not valid
+I/SV[190416292 MainActivity](14377): releaseSurfaces: viewRoot = VRI[MainActivity]@94d3e1f
+D/VRI[MainActivity]@94d3e1f(14377): applyTransactionOnDraw applyImmediately
+D/SV[190416292 MainActivity](14377): updateSurface: surface is not valid
+I/SV[190416292 MainActivity](14377): releaseSurfaces: viewRoot = VRI[MainActivity]@94d3e1f
+D/VRI[MainActivity]@94d3e1f(14377): applyTransactionOnDraw applyImmediately
+D/VRI[MainActivity]@94d3e1f(14377): Not drawing due to not visible. Reason=!mAppVisible && !mForceDecorViewVisibility
+D/VRI[MainActivity]@94d3e1f(14377): Pending transaction will not be applied in sync with a draw due to view not visible
+I/VRI[MainActivity]@94d3e1f(14377): mWNT: t=0xb400006ed563e180 mBlastBufferQueue=0xnull fn= 0 HdrRenderState mRenderHdrSdrRatio=1.0 caller= android.view.ViewRootImpl.handleSyncRequestWhenNoAsyncDraw:6733 android.view.ViewRootImpl.performTraversals:5504 android.view.ViewRootImpl.doTraversal:3924 
+D/HWUI    (14377): CacheManager::trimMemory(20)
+I/VRI[MainActivity]@94d3e1f(14377): stopped(true) old = false
+D/VRI[MainActivity]@94d3e1f(14377): WindowStopped on com.example.rocis_tasks/com.example.rocis_tasks.MainActivity set to true
+D/HWUI    (14377): CacheManager::trimMemory(20)
+D/SV[190416292 MainActivity](14377): updateSurface: surface is not valid
+I/SV[190416292 MainActivity](14377): releaseSurfaces: viewRoot = VRI[MainActivity]@94d3e1f
+D/VRI[MainActivity]@94d3e1f(14377): applyTransactionOnDraw applyImmediately
+I/VRI[MainActivity]@94d3e1f(14377): onDisplayChanged oldDisplayState=2 newDisplayState=1
+I/ImeFocusController(14377): onPreWindowFocus: skipped hasWindowFocus=false mHasImeFocus=true
+I/ImeFocusController(14377): onPostWindowFocus: skipped hasWindowFocus=false mHasImeFocus=true
+D/SV[190416292 MainActivity](14377): updateSurface: surface is not valid
+I/SV[190416292 MainActivity](14377): releaseSurfaces: viewRoot = VRI[MainActivity]@94d3e1f
+D/VRI[MainActivity]@94d3e1f(14377): applyTransactionOnDraw applyImmediately
+V/NativeCrypto(14377): Read error: ssl=0xb400006ed57094c8: I/O error during system call, Software caused connection abort
+V/NativeCrypto(14377): Write error: ssl=0xb400006ed57094c8: I/O error during system call, Broken pipe
+V/NativeCrypto(14377): SSL shutdown failed: ssl=0xb400006ed57094c8: I/O error during system call, Success
+W/Firestore(14377): (25.1.4) [WatchStream]: (e0fc94b) Stream closed with status: Status{code=UNAVAILABLE, description=End of stream or IOException, cause=null}.
+W/ManagedChannelImpl(14377): [{0}] Failed to resolve name. status={1}
+W/Firestore(14377): (25.1.4) [WatchStream]: (e0fc94b) Stream closed with status: Status{code=UNAVAILABLE, description=Unable to resolve host firestore.googleapis.com, cause=java.lang.RuntimeException: java.net.UnknownHostException: Unable to resolve host "firestore.googleapis.com": No address associated with hostname
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.resolveAddresses(DnsNameResolver.java:223)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.doResolve(DnsNameResolver.java:282)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver$Resolve.run(DnsNameResolver.java:318)
+W/Firestore(14377): 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1156)
+W/Firestore(14377): 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:651)
+W/Firestore(14377): 	at java.lang.Thread.run(Thread.java:1119)
+W/Firestore(14377): Caused by: java.net.UnknownHostException: Unable to resolve host "firestore.googleapis.com": No address associated with hostname
+W/Firestore(14377): 	at java.net.Inet6AddressImpl.lookupHostByName(Inet6AddressImpl.java:156)
+W/Firestore(14377): 	at java.net.Inet6AddressImpl.lookupAllHostAddr(Inet6AddressImpl.java:103)
+W/Firestore(14377): 	at java.net.InetAddress.getAllByName(InetAddress.java:1152)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver$JdkAddressResolver.resolveAddress(DnsNameResolver.java:632)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.resolveAddresses(DnsNameResolver.java:219)
+W/Firestore(14377): 	... 5 more
+W/Firestore(14377): Caused by: android.system.GaiException: android_getaddrinfo failed: EAI_NODATA (No address associated with hostname)
+W/Firestore(14377): 	at libcore.io.Linux.android_getaddrinfo(Native Method)
+W/Firestore(14377): 	at libcore.io.ForwardingOs.android_getaddrinfo(ForwardingOs.java:133)
+W/Firestore(14377): 	at libcore.io.BlockGuardOs.android_getaddrinfo(BlockGuardOs.java:222)
+W/Firestore(14377): 	at libcore.io.ForwardingOs.android_getaddrinfo(ForwardingOs.java:133)
+W/Firestore(14377): 	at java.net.Inet6AddressImpl.lookupHostByName(Inet6AddressImpl.java:135)
+W/Firestore(14377): 	... 9 more
+W/Firestore(14377): }.
+W/Firestore(14377): (25.1.4) [WatchStream]: (e0fc94b) Stream closed with status: Status{code=UNAVAILABLE, description=Unable to resolve host firestore.googleapis.com, cause=java.lang.RuntimeException: java.net.UnknownHostException: Unable to resolve host "firestore.googleapis.com": No address associated with hostname
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.resolveAddresses(DnsNameResolver.java:223)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.doResolve(DnsNameResolver.java:282)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver$Resolve.run(DnsNameResolver.java:318)
+W/Firestore(14377): 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1156)
+W/Firestore(14377): 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:651)
+W/Firestore(14377): 	at java.lang.Thread.run(Thread.java:1119)
+W/Firestore(14377): Caused by: java.net.UnknownHostException: Unable to resolve host "firestore.googleapis.com": No address associated with hostname
+W/Firestore(14377): 	at java.net.Inet6AddressImpl.lookupHostByName(Inet6AddressImpl.java:156)
+W/Firestore(14377): 	at java.net.Inet6AddressImpl.lookupAllHostAddr(Inet6AddressImpl.java:103)
+W/Firestore(14377): 	at java.net.InetAddress.getAllByName(InetAddress.java:1152)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver$JdkAddressResolver.resolveAddress(DnsNameResolver.java:632)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.resolveAddresses(DnsNameResolver.java:219)
+W/Firestore(14377): 	... 5 more
+W/Firestore(14377): Caused by: android.system.GaiException: android_getaddrinfo failed: EAI_NODATA (No address associated with hostname)
+W/Firestore(14377): 	at libcore.io.Linux.android_getaddrinfo(Native Method)
+W/Firestore(14377): 	at libcore.io.ForwardingOs.android_getaddrinfo(ForwardingOs.java:133)
+W/Firestore(14377): 	at libcore.io.BlockGuardOs.android_getaddrinfo(BlockGuardOs.java:222)
+W/Firestore(14377): 	at libcore.io.ForwardingOs.android_getaddrinfo(ForwardingOs.java:133)
+W/Firestore(14377): 	at java.net.Inet6AddressImpl.lookupHostByName(Inet6AddressImpl.java:135)
+W/Firestore(14377): 	... 9 more
+W/Firestore(14377): }.
+W/ManagedChannelImpl(14377): [{0}] Failed to resolve name. status={1}
+W/Firestore(14377): (25.1.4) [WatchStream]: (e0fc94b) Stream closed with status: Status{code=UNAVAILABLE, description=Unable to resolve host firestore.googleapis.com, cause=java.lang.RuntimeException: java.net.UnknownHostException: Unable to resolve host "firestore.googleapis.com": No address associated with hostname
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.resolveAddresses(DnsNameResolver.java:223)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.doResolve(DnsNameResolver.java:282)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver$Resolve.run(DnsNameResolver.java:318)
+W/Firestore(14377): 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1156)
+W/Firestore(14377): 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:651)
+W/Firestore(14377): 	at java.lang.Thread.run(Thread.java:1119)
+W/Firestore(14377): Caused by: java.net.UnknownHostException: Unable to resolve host "firestore.googleapis.com": No address associated with hostname
+W/Firestore(14377): 	at java.net.Inet6AddressImpl.lookupHostByName(Inet6AddressImpl.java:124)
+W/Firestore(14377): 	at java.net.Inet6AddressImpl.lookupAllHostAddr(Inet6AddressImpl.java:103)
+W/Firestore(14377): 	at java.net.InetAddress.getAllByName(InetAddress.java:1152)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver$JdkAddressResolver.resolveAddress(DnsNameResolver.java:632)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.resolveAddresses(DnsNameResolver.java:219)
+W/Firestore(14377): 	... 5 more
+W/Firestore(14377): }.
+W/ManagedChannelImpl(14377): [{0}] Failed to resolve name. status={1}
+W/Firestore(14377): (25.1.4) [WatchStream]: (e0fc94b) Stream closed with status: Status{code=UNAVAILABLE, description=Unable to resolve host firestore.googleapis.com, cause=java.lang.RuntimeException: java.net.UnknownHostException: Unable to resolve host "firestore.googleapis.com": No address associated with hostname
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.resolveAddresses(DnsNameResolver.java:223)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.doResolve(DnsNameResolver.java:282)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver$Resolve.run(DnsNameResolver.java:318)
+W/Firestore(14377): 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1156)
+W/Firestore(14377): 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:651)
+W/Firestore(14377): 	at java.lang.Thread.run(Thread.java:1119)
+W/Firestore(14377): Caused by: java.net.UnknownHostException: Unable to resolve host "firestore.googleapis.com": No address associated with hostname
+W/Firestore(14377): 	at java.net.Inet6AddressImpl.lookupHostByName(Inet6AddressImpl.java:156)
+W/Firestore(14377): 	at java.net.Inet6AddressImpl.lookupAllHostAddr(Inet6AddressImpl.java:103)
+W/Firestore(14377): 	at java.net.InetAddress.getAllByName(InetAddress.java:1152)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver$JdkAddressResolver.resolveAddress(DnsNameResolver.java:632)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.resolveAddresses(DnsNameResolver.java:219)
+W/Firestore(14377): 	... 5 more
+W/Firestore(14377): Caused by: android.system.GaiException: android_getaddrinfo failed: EAI_NODATA (No address associated with hostname)
+W/Firestore(14377): 	at libcore.io.Linux.android_getaddrinfo(Native Method)
+W/Firestore(14377): 	at libcore.io.ForwardingOs.android_getaddrinfo(ForwardingOs.java:133)
+W/Firestore(14377): 	at libcore.io.BlockGuardOs.android_getaddrinfo(BlockGuardOs.java:222)
+W/Firestore(14377): 	at libcore.io.ForwardingOs.android_getaddrinfo(ForwardingOs.java:133)
+W/Firestore(14377): 	at java.net.Inet6AddressImpl.lookupHostByName(Inet6AddressImpl.java:135)
+W/Firestore(14377): 	... 9 more
+W/Firestore(14377): }.
+W/ManagedChannelImpl(14377): [{0}] Failed to resolve name. status={1}
+W/Firestore(14377): (25.1.4) [WatchStream]: (e0fc94b) Stream closed with status: Status{code=UNAVAILABLE, description=Unable to resolve host firestore.googleapis.com, cause=java.lang.RuntimeException: java.net.UnknownHostException: Unable to resolve host "firestore.googleapis.com": No address associated with hostname
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.resolveAddresses(DnsNameResolver.java:223)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.doResolve(DnsNameResolver.java:282)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver$Resolve.run(DnsNameResolver.java:318)
+W/Firestore(14377): 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1156)
+W/Firestore(14377): 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:651)
+W/Firestore(14377): 	at java.lang.Thread.run(Thread.java:1119)
+W/Firestore(14377): Caused by: java.net.UnknownHostException: Unable to resolve host "firestore.googleapis.com": No address associated with hostname
+W/Firestore(14377): 	at java.net.Inet6AddressImpl.lookupHostByName(Inet6AddressImpl.java:156)
+W/Firestore(14377): 	at java.net.Inet6AddressImpl.lookupAllHostAddr(Inet6AddressImpl.java:103)
+W/Firestore(14377): 	at java.net.InetAddress.getAllByName(InetAddress.java:1152)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver$JdkAddressResolver.resolveAddress(DnsNameResolver.java:632)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.resolveAddresses(DnsNameResolver.java:219)
+W/Firestore(14377): 	... 5 more
+W/Firestore(14377): Caused by: android.system.GaiException: android_getaddrinfo failed: EAI_NODATA (No address associated with hostname)
+W/Firestore(14377): 	at libcore.io.Linux.android_getaddrinfo(Native Method)
+W/Firestore(14377): 	at libcore.io.ForwardingOs.android_getaddrinfo(ForwardingOs.java:133)
+W/Firestore(14377): 	at libcore.io.BlockGuardOs.android_getaddrinfo(BlockGuardOs.java:222)
+W/Firestore(14377): 	at libcore.io.ForwardingOs.android_getaddrinfo(ForwardingOs.java:133)
+W/Firestore(14377): 	at java.net.Inet6AddressImpl.lookupHostByName(Inet6AddressImpl.java:135)
+W/Firestore(14377): 	... 9 more
+W/Firestore(14377): }.
+W/ManagedChannelImpl(14377): [{0}] Failed to resolve name. status={1}
+W/Firestore(14377): (25.1.4) [WatchStream]: (e0fc94b) Stream closed with status: Status{code=UNAVAILABLE, description=Unable to resolve host firestore.googleapis.com, cause=java.lang.RuntimeException: java.net.UnknownHostException: Unable to resolve host "firestore.googleapis.com": No address associated with hostname
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.resolveAddresses(DnsNameResolver.java:223)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.doResolve(DnsNameResolver.java:282)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver$Resolve.run(DnsNameResolver.java:318)
+W/Firestore(14377): 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1156)
+W/Firestore(14377): 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:651)
+W/Firestore(14377): 	at java.lang.Thread.run(Thread.java:1119)
+W/Firestore(14377): Caused by: java.net.UnknownHostException: Unable to resolve host "firestore.googleapis.com": No address associated with hostname
+W/Firestore(14377): 	at java.net.Inet6AddressImpl.lookupHostByName(Inet6AddressImpl.java:156)
+W/Firestore(14377): 	at java.net.Inet6AddressImpl.lookupAllHostAddr(Inet6AddressImpl.java:103)
+W/Firestore(14377): 	at java.net.InetAddress.getAllByName(InetAddress.java:1152)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver$JdkAddressResolver.resolveAddress(DnsNameResolver.java:632)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.resolveAddresses(DnsNameResolver.java:219)
+W/Firestore(14377): 	... 5 more
+W/Firestore(14377): Caused by: android.system.GaiException: android_getaddrinfo failed: EAI_NODATA (No address associated with hostname)
+W/Firestore(14377): 	at libcore.io.Linux.android_getaddrinfo(Native Method)
+W/Firestore(14377): 	at libcore.io.ForwardingOs.android_getaddrinfo(ForwardingOs.java:133)
+W/Firestore(14377): 	at libcore.io.BlockGuardOs.android_getaddrinfo(BlockGuardOs.java:222)
+W/Firestore(14377): 	at libcore.io.ForwardingOs.android_getaddrinfo(ForwardingOs.java:133)
+W/Firestore(14377): 	at java.net.Inet6AddressImpl.lookupHostByName(Inet6AddressImpl.java:135)
+W/Firestore(14377): 	... 9 more
+W/Firestore(14377): }.
+W/ManagedChannelImpl(14377): [{0}] Failed to resolve name. status={1}
+W/Firestore(14377): (25.1.4) [WatchStream]: (e0fc94b) Stream closed with status: Status{code=UNAVAILABLE, description=Unable to resolve host firestore.googleapis.com, cause=java.lang.RuntimeException: java.net.UnknownHostException: Unable to resolve host "firestore.googleapis.com": No address associated with hostname
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.resolveAddresses(DnsNameResolver.java:223)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.doResolve(DnsNameResolver.java:282)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver$Resolve.run(DnsNameResolver.java:318)
+W/Firestore(14377): 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1156)
+W/Firestore(14377): 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:651)
+W/Firestore(14377): 	at java.lang.Thread.run(Thread.java:1119)
+W/Firestore(14377): Caused by: java.net.UnknownHostException: Unable to resolve host "firestore.googleapis.com": No address associated with hostname
+W/Firestore(14377): 	at java.net.Inet6AddressImpl.lookupHostByName(Inet6AddressImpl.java:156)
+W/Firestore(14377): 	at java.net.Inet6AddressImpl.lookupAllHostAddr(Inet6AddressImpl.java:103)
+W/Firestore(14377): 	at java.net.InetAddress.getAllByName(InetAddress.java:1152)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver$JdkAddressResolver.resolveAddress(DnsNameResolver.java:632)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.resolveAddresses(DnsNameResolver.java:219)
+W/Firestore(14377): 	... 5 more
+W/Firestore(14377): Caused by: android.system.GaiException: android_getaddrinfo failed: EAI_NODATA (No address associated with hostname)
+W/Firestore(14377): 	at libcore.io.Linux.android_getaddrinfo(Native Method)
+W/Firestore(14377): 	at libcore.io.ForwardingOs.android_getaddrinfo(ForwardingOs.java:133)
+W/Firestore(14377): 	at libcore.io.BlockGuardOs.android_getaddrinfo(BlockGuardOs.java:222)
+W/Firestore(14377): 	at libcore.io.ForwardingOs.android_getaddrinfo(ForwardingOs.java:133)
+W/Firestore(14377): 	at java.net.Inet6AddressImpl.lookupHostByName(Inet6AddressImpl.java:135)
+W/Firestore(14377): 	... 9 more
+W/Firestore(14377): }.
+W/ManagedChannelImpl(14377): [{0}] Failed to resolve name. status={1}
+W/Firestore(14377): (25.1.4) [WatchStream]: (e0fc94b) Stream closed with status: Status{code=UNAVAILABLE, description=Unable to resolve host firestore.googleapis.com, cause=java.lang.RuntimeException: java.net.UnknownHostException: Unable to resolve host "firestore.googleapis.com": No address associated with hostname
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.resolveAddresses(DnsNameResolver.java:223)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.doResolve(DnsNameResolver.java:282)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver$Resolve.run(DnsNameResolver.java:318)
+W/Firestore(14377): 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1156)
+W/Firestore(14377): 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:651)
+W/Firestore(14377): 	at java.lang.Thread.run(Thread.java:1119)
+W/Firestore(14377): Caused by: java.net.UnknownHostException: Unable to resolve host "firestore.googleapis.com": No address associated with hostname
+W/Firestore(14377): 	at java.net.Inet6AddressImpl.lookupHostByName(Inet6AddressImpl.java:156)
+W/Firestore(14377): 	at java.net.Inet6AddressImpl.lookupAllHostAddr(Inet6AddressImpl.java:103)
+W/Firestore(14377): 	at java.net.InetAddress.getAllByName(InetAddress.java:1152)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver$JdkAddressResolver.resolveAddress(DnsNameResolver.java:632)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.resolveAddresses(DnsNameResolver.java:219)
+W/Firestore(14377): 	... 5 more
+W/Firestore(14377): Caused by: android.system.GaiException: android_getaddrinfo failed: EAI_NODATA (No address associated with hostname)
+W/Firestore(14377): 	at libcore.io.Linux.android_getaddrinfo(Native Method)
+W/Firestore(14377): 	at libcore.io.ForwardingOs.android_getaddrinfo(ForwardingOs.java:133)
+W/Firestore(14377): 	at libcore.io.BlockGuardOs.android_getaddrinfo(BlockGuardOs.java:222)
+W/Firestore(14377): 	at libcore.io.ForwardingOs.android_getaddrinfo(ForwardingOs.java:133)
+W/Firestore(14377): 	at java.net.Inet6AddressImpl.lookupHostByName(Inet6AddressImpl.java:135)
+W/Firestore(14377): 	... 9 more
+W/Firestore(14377): }.
+I/VRI[MainActivity]@94d3e1f(14377): onDisplayChanged oldDisplayState=1 newDisplayState=2
+D/SV[190416292 MainActivity](14377): updateSurface: surface is not valid
+I/SV[190416292 MainActivity](14377): releaseSurfaces: viewRoot = VRI[MainActivity]@94d3e1f
+D/VRI[MainActivity]@94d3e1f(14377): applyTransactionOnDraw applyImmediately
+I/VRI[MainActivity]@94d3e1f(14377): handleAppVisibility mAppVisible = false visible = true
+I/VRI[MainActivity]@94d3e1f(14377): stopped(false) old = true
+D/VRI[MainActivity]@94d3e1f(14377): WindowStopped on com.example.rocis_tasks/com.example.rocis_tasks.MainActivity set to false
+D/ViewRootImpl(14377): Skipping stats log for color mode
+D/SV[190416292 MainActivity](14377): updateSurface: surface is not valid
+I/SV[190416292 MainActivity](14377): releaseSurfaces: viewRoot = VRI[MainActivity]@94d3e1f
+D/VRI[MainActivity]@94d3e1f(14377): applyTransactionOnDraw applyImmediately
+I/SV[190416292 MainActivity](14377): onWindowVisibilityChanged(0) false io.flutter.embedding.android.FlutterSurfaceView{b5985a4 V.E...... ......ID 0,0-1080,2340} of VRI[MainActivity]@94d3e1f
+D/SV[190416292 MainActivity](14377): updateSurface: surface is not valid
+I/SV[190416292 MainActivity](14377): releaseSurfaces: viewRoot = VRI[MainActivity]@94d3e1f
+D/VRI[MainActivity]@94d3e1f(14377): applyTransactionOnDraw applyImmediately
+I/InsetsController(14377): onStateChanged: host=com.example.rocis_tasks/com.example.rocis_tasks.MainActivity, from=android.view.ViewRootImpl.onInsetsStateChanged:3026, state=InsetsState: {mDisplayFrame=Rect(0, 0 - 1080, 2340), mDisplayCutout=DisplayCutout{insets=Rect(0, 74 - 0, 0) waterfall=Insets{left=0, top=0, right=0, bottom=0} boundingRect={Bounds=[Rect(0, 0 - 0, 0), Rect(514, 0 - 566, 74), Rect(0, 0 - 0, 0), Rect(0, 0 - 0, 0)]} cutoutPathParserInfo={CutoutPathParserInfo{displayWidth=1080 displayHeight=2340 physicalDisplayWidth=1080 physicalDisplayHeight=2340 density={2.8125} cutoutSpec={M 0,0 H -9.244444444444444Γא¼ V 26.31111111111111 H 9.244444444444444Γא¼ V 0 H 0 Z @dp} rotation={0} scale={1.0} physicalPixelDisplaySizeRatio={1.0}}} sideOverrides={}}, mRoundedCorners=RoundedCorners{[RoundedCorner{position=TopLeft, radius=95, center=Point(95, 95)}, RoundedCorner{position=TopRight, radius=95, center=Point(985, 95)}, RoundedCorner{position=BottomRight, radius=95, center=Point(985, 2245)}, RoundedCorner{position=BottomLeft, radius=95, center=Point(95, 2245)}]}  mRoundedCornerFrame=Rect(0, 0 - 1080, 2340), mPrivacyIndicatorBounds=PrivacyIndicatorBounds {static bounds=Rect(964, 0 - 1080, 74) rotation=0}, mDisplayShape=DisplayShape{ spec=-311912193 displayWidth=1080 displayHeight=2340 physicalPixelDisplaySizeRatio=1.0 rotation=0 offsetX=0 offsetY=0 scale=1.0}, mSources= { InsetsSource: {cdc20000 mType=statusBars mFrame=[0,0][1080,74] mVisible=true mFlags= mSideHint=TOP mBoundingRects=null}, InsetsSource: {cdc20005 mType=mandatorySystemGestures mFrame=[0,0][1080,106] mVisible=true mFlags= mSideHint=TOP mBoundingRects=null}, InsetsSource: {cdc20006 mType=tappableElement mFrame=[0,0][1080,74] mVisible=true mFlags= mSideHint=TOP mBoundingRects=null}, InsetsSource: {3 mType=ime mFrame=[0,0][0,0] mVisible=false mFlags= mSideHint=NONE mBoundingRects=null}, InsetsSource: {27 mType=displayCutout mFrame=[0,0][1080,74] mVisible=true mFlags= mSideHint=TOP mBoundingRects=null}, InsetsSource: {71310001 mType=navigationBars mFrame=[0,2301][1080,2340] mVisible=false mFlags=SUPPRESS_SCRIM mSideHint=BOTTOM mBoundingRects=null}, InsetsSource: {71310004 mType=systemGestures mFrame=[0,0][78,2340] mVisible=true mFlags= mSideHint=LEFT mBoundingRects=null}, InsetsSource: {71310005 mType=mandatorySystemGestures mFrame=[0,2256][1080,2340] mVisible=true mFlags= mSideHint=BOTTOM mBoundingRects=null}, InsetsSource: {71310006 mType=tappableElement mFrame=[0,0][0,0] mVisible=true mFlags= mSideHint=NONE mBoundingRects=null}, InsetsSource: {71310024 mType=systemGestures mFrame=[1002,0][1080,2340] mVisible=true mFlags= mSideHint=RIGHT mBoundingRects=null} }
+W/libc    (14377): Access denied finding property "vendor.display.enable_optimal_refresh_rate"
+I/BufferQueueProducer(14377): [](id:382900000002,api:0,p:0,c:14377) setDequeueTimeout:2077252342
+I/BLASTBufferQueue_Java(14377): new BLASTBufferQueue, mName= VRI[MainActivity]@94d3e1f mNativeObject= 0xb400006ee2613000 caller= android.view.ViewRootImpl.updateBlastSurfaceIfNeeded:3585 android.view.ViewRootImpl.relayoutWindow:11685 android.view.ViewRootImpl.performTraversals:4804 android.view.ViewRootImpl.doTraversal:3924 android.view.ViewRootImpl$TraversalRunnable.run:12903 android.view.Choreographer$CallbackRecord.run:1901 android.view.Choreographer$CallbackRecord.run:1910 android.view.Choreographer.doCallbacks:1367 android.view.Choreographer.doFrame:1292 android.view.Choreographer$FrameDisplayEventReceiver.run:1870 
+I/BLASTBufferQueue_Java(14377): update, w= 1080 h= 2340 mName = VRI[MainActivity]@94d3e1f mNativeObject= 0xb400006ee2613000 sc.mNativeObject= 0xb400006f7d6886c0 format= -3 caller= android.view.ViewRootImpl.updateBlastSurfaceIfNeeded:3590 android.view.ViewRootImpl.relayoutWindow:11685 android.view.ViewRootImpl.performTraversals:4804 android.view.ViewRootImpl.doTraversal:3924 android.view.ViewRootImpl$TraversalRunnable.run:12903 android.view.Choreographer$CallbackRecord.run:1901 
+W/libc    (14377): Access denied finding property "vendor.display.enable_optimal_refresh_rate"
+I/VRI[MainActivity]@94d3e1f(14377): Relayout returned: old=(0,0,1080,2340) new=(0,0,1080,2340) relayoutAsync=false req=(1080,2340)0 dur=28 res=0x3 s={true 0xb400006ed5743d00} ch=true seqId=0
+D/VRI[MainActivity]@94d3e1f(14377): mThreadedRenderer.initialize() mSurface={isValid=true 0xb400006ed5743d00} hwInitialized=true
+I/SurfaceView(14377): 190416292 Changes: creating=false format=false size=false visible=false alpha=false hint=false left=false top=false z=false attached=true lifecycleStrategy=false
+I/SV[190416292 MainActivity](14377): windowStopped(false) true io.flutter.embedding.android.FlutterSurfaceView{b5985a4 V.E...... ......ID 0,0-1080,2340} of VRI[MainActivity]@94d3e1f
+I/SurfaceView(14377): 190416292 Changes: creating=true format=false size=false visible=true alpha=false hint=false left=false top=false z=false attached=true lifecycleStrategy=false
+W/libc    (14377): Access denied finding property "vendor.display.enable_optimal_refresh_rate"
+I/BufferQueueProducer(14377): [](id:382900000003,api:0,p:0,c:14377) setDequeueTimeout:2077252342
+I/BLASTBufferQueue_Java(14377): new BLASTBufferQueue, mName= b5985a4 SurfaceView[com.example.rocis_tasks/com.example.rocis_tasks.MainActivity]@0 mNativeObject= 0xb400006ee24b3000 caller= android.view.SurfaceView.createBlastSurfaceControls:1781 android.view.SurfaceView.updateSurface:1450 android.view.SurfaceView.setWindowStopped:539 android.view.SurfaceView.surfaceCreated:2327 android.view.ViewRootImpl.notifySurfaceCreated:3502 android.view.ViewRootImpl.performTraversals:5286 android.view.ViewRootImpl.doTraversal:3924 android.view.ViewRootImpl$TraversalRunnable.run:12903 android.view.Choreographer$CallbackRecord.run:1901 android.view.Choreographer$CallbackRecord.run:1910 
+I/BLASTBufferQueue_Java(14377): update, w= 1080 h= 2340 mName = b5985a4 SurfaceView[com.example.rocis_tasks/com.example.rocis_tasks.MainActivity]@0 mNativeObject= 0xb400006ee24b3000 sc.mNativeObject= 0xb400006e1e14af40 format= 4 caller= android.view.SurfaceView.createBlastSurfaceControls:1782 android.view.SurfaceView.updateSurface:1450 android.view.SurfaceView.setWindowStopped:539 android.view.SurfaceView.surfaceCreated:2327 android.view.ViewRootImpl.notifySurfaceCreated:3502 android.view.ViewRootImpl.performTraversals:5286 
+I/SurfaceView(14377): 190416292 Cur surface: Surface(name=null mNativeObject=0)/@0x36392a
+D/SurfaceComposerClient(14377): setCornerRadius ## b5985a4 SurfaceView[com.example.rocis_tasks/com.example.rocis_tasks.MainActivity]@0#50860 cornerRadius=0.000000
+I/SV[190416292 MainActivity](14377): pST: sr = Rect(0, 0 - 1080, 2340) sw = 1080 sh = 2340
+D/SurfaceView(14377): 190416292 performSurfaceTransaction RenderWorker position = [0, 0, 1080, 2340] surfaceSize = 1080x2340
+W/libc    (14377): Access denied finding property "vendor.display.enable_optimal_refresh_rate"
+I/SV[190416292 MainActivity](14377): updateSurface: mVisible = true mSurface.isValid() = true
+I/SV[190416292 MainActivity](14377): updateSurface: mSurfaceCreated = false surfaceChanged = true visibleChanged = true
+I/SurfaceView(14377): 190416292 visibleChanged -- surfaceCreated
+I/SV[190416292 MainActivity](14377): surfaceCreated 1 #1 io.flutter.embedding.android.FlutterSurfaceView{b5985a4 V.E...... ......ID 0,0-1080,2340}
+E/qdgralloc(14377): GetSize: Unrecognized pixel format: 0x3b
+W/qdgralloc(14377): gralloc failed to allocate buffer for size 0 format 59 AWxAH 1x1 usage 2816
+E/Gralloc4(14377): isSupported(1, 1, 59, 1, ...) failed with 7
+E/GraphicBufferAllocator(14377): Failed to allocate (4 x 4) layerCount 1 format 59 usage b00: 7
+E/AHardwareBuffer(14377): GraphicBuffer(w=4, h=4, lc=1) failed (Unknown error -7), handle=0x0
+E/qdgralloc(14377): GetSize: Unrecognized pixel format: 0x3b
+W/qdgralloc(14377): gralloc failed to allocate buffer for size 0 format 59 AWxAH 1x1 usage 2816
+E/Gralloc4(14377): isSupported(1, 1, 59, 1, ...) failed with 7
+E/GraphicBufferAllocator(14377): Failed to allocate (4 x 4) layerCount 1 format 59 usage b00: 7
+E/AHardwareBuffer(14377): GraphicBuffer(w=4, h=4, lc=1) failed (Unknown error -7), handle=0x0
+W/qdgralloc(14377): getInterlacedFlag: getMetaData returned 3, defaulting to interlaced_flag = 0
+W/qdgralloc(14377): getInterlacedFlag: getMetaData returned 3, defaulting to interlaced_flag = 0
+W/qdgralloc(14377): getInterlacedFlag: getMetaData returned 3, defaulting to interlaced_flag = 0
+W/qdgralloc(14377): getInterlacedFlag: getMetaData returned 3, defaulting to interlaced_flag = 0
+W/qdgralloc(14377): getInterlacedFlag: getMetaData returned 3, defaulting to interlaced_flag = 0
+I/SurfaceView(14377): 190416292 surfaceChanged -- format=4 w=1080 h=2340
+I/SV[190416292 MainActivity](14377): surfaceChanged (1080,2340) 1 #1 io.flutter.embedding.android.FlutterSurfaceView{b5985a4 V.E...... ......ID 0,0-1080,2340}
+I/SurfaceView(14377): 190416292 surfaceRedrawNeeded
+V/SurfaceView(14377): Layout: x=0 y=0 w=1080 h=2340, frame=Rect(0, 0 - 1080, 2340)
+D/VRI[MainActivity]@94d3e1f(14377): reportNextDraw android.view.ViewRootImpl.performTraversals:5443 android.view.ViewRootImpl.doTraversal:3924 android.view.ViewRootImpl$TraversalRunnable.run:12903 android.view.Choreographer$CallbackRecord.run:1901 android.view.Choreographer$CallbackRecord.run:1910 
+D/VRI[MainActivity]@94d3e1f(14377): Setup new sync=wmsSync-VRI[MainActivity]@94d3e1f#4
+I/VRI[MainActivity]@94d3e1f(14377): Creating new active sync group VRI[MainActivity]@94d3e1f#5
+D/VRI[MainActivity]@94d3e1f(14377): Start draw after previous draw not visible
+D/VRI[MainActivity]@94d3e1f(14377): registerCallbacksForSync syncBuffer=false
+D/SurfaceView(14377): 190416292 updateSurfacePosition RenderWorker, frameNr = 1, position = [0, 0, 1080, 2340] surfaceSize = 1080x2340
+I/SV[190416292 MainActivity](14377): uSP: rtp = Rect(0, 0 - 1080, 2340) rtsw = 1080 rtsh = 2340
+I/SV[190416292 MainActivity](14377): onSSPAndSRT: pl = 0 pt = 0 sx = 1.0 sy = 1.0
+I/SV[190416292 MainActivity](14377): aOrMT: VRI[MainActivity]@94d3e1f t = android.view.SurfaceControl$Transaction@b066f69 fN = 1 android.view.SurfaceView.-$$Nest$mapplyOrMergeTransaction:0 android.view.SurfaceView$SurfaceViewPositionUpdateListener.positionChanged:1932 android.graphics.RenderNode$CompositePositionUpdateListener.positionChanged:401 
+I/VRI[MainActivity]@94d3e1f(14377): mWNT: t=0xb400006ee2591c80 mBlastBufferQueue=0xb400006ee2613000 fn= 1 HdrRenderState mRenderHdrSdrRatio=1.0 caller= android.view.SurfaceView.applyOrMergeTransaction:1863 android.view.SurfaceView.-$$Nest$mapplyOrMergeTransaction:0 android.view.SurfaceView$SurfaceViewPositionUpdateListener.positionChanged:1932 
+D/VRI[MainActivity]@94d3e1f(14377): Received frameDrawingCallback syncResult=0 frameNum=1.
+I/VRI[MainActivity]@94d3e1f(14377): mWNT: t=0xb400006e1e2a4980 mBlastBufferQueue=0xb400006ee2613000 fn= 1 HdrRenderState mRenderHdrSdrRatio=1.0 caller= android.view.ViewRootImpl$12.onFrameDraw:15441 android.view.ThreadedRenderer$1.onFrameDraw:718 <bottom of call stack> 
+I/VRI[MainActivity]@94d3e1f(14377): Setting up sync and frameCommitCallback
+I/BLASTBufferQueue(14377): [VRI[MainActivity]@94d3e1f#2](f:0,a:0,s:0) onFrameAvailable the first frame is available
+I/SurfaceComposerClient(14377): apply transaction with the first frame. layerId: 50857, bufferData(ID: 61748744814627, frameNumber: 1)
+I/VRI[MainActivity]@94d3e1f(14377): Received frameCommittedCallback lastAttemptedDrawFrameNum=1 didProduceBuffer=true
+I/InsetsController(14377): onStateChanged: host=com.example.rocis_tasks/com.example.rocis_tasks.MainActivity, from=android.view.ViewRootImpl.onInsetsStateChanged:3026, state=InsetsState: {mDisplayFrame=Rect(0, 0 - 1080, 2340), mDisplayCutout=DisplayCutout{insets=Rect(0, 74 - 0, 0) waterfall=Insets{left=0, top=0, right=0, bottom=0} boundingRect={Bounds=[Rect(0, 0 - 0, 0), Rect(514, 0 - 566, 74), Rect(0, 0 - 0, 0), Rect(0, 0 - 0, 0)]} cutoutPathParserInfo={CutoutPathParserInfo{displayWidth=1080 displayHeight=2340 physicalDisplayWidth=1080 physicalDisplayHeight=2340 density={2.8125} cutoutSpec={M 0,0 H -9.244444444444444Γא¼ V 26.31111111111111 H 9.244444444444444Γא¼ V 0 H 0 Z @dp} rotation={0} scale={1.0} physicalPixelDisplaySizeRatio={1.0}}} sideOverrides={}}, mRoundedCorners=RoundedCorners{[RoundedCorner{position=TopLeft, radius=95, center=Point(95, 95)}, RoundedCorner{position=TopRight, radius=95, center=Point(985, 95)}, RoundedCorner{position=BottomRight, radius=95, center=Point(985, 2245)}, RoundedCorner{position=BottomLeft, radius=95, center=Point(95, 2245)}]}  mRoundedCornerFrame=Rect(0, 0 - 1080, 2340), mPrivacyIndicatorBounds=PrivacyIndicatorBounds {static bounds=Rect(964, 0 - 1080, 74) rotation=0}, mDisplayShape=DisplayShape{ spec=-311912193 displayWidth=1080 displayHeight=2340 physicalPixelDisplaySizeRatio=1.0 rotation=0 offsetX=0 offsetY=0 scale=1.0}, mSources= { InsetsSource: {cdc20000 mType=statusBars mFrame=[0,0][1080,74] mVisible=true mFlags= mSideHint=TOP mBoundingRects=null}, InsetsSource: {cdc20005 mType=mandatorySystemGestures mFrame=[0,0][1080,106] mVisible=true mFlags= mSideHint=TOP mBoundingRects=null}, InsetsSource: {cdc20006 mType=tappableElement mFrame=[0,0][1080,74] mVisible=true mFlags= mSideHint=TOP mBoundingRects=null}, InsetsSource: {3 mType=ime mFrame=[0,0][0,0] mVisible=false mFlags= mSideHint=NONE mBoundingRects=null}, InsetsSource: {27 mType=displayCutout mFrame=[0,0][1080,74] mVisible=true mFlags= mSideHint=TOP mBoundingRects=null}, InsetsSource: {71310001 mType=navigationBars mFrame=[0,2301][1080,2340] mVisible=false mFlags=SUPPRESS_SCRIM mSideHint=BOTTOM mBoundingRects=null}, InsetsSource: {71310004 mType=systemGestures mFrame=[0,0][78,2340] mVisible=true mFlags= mSideHint=LEFT mBoundingRects=null}, InsetsSource: {71310005 mType=mandatorySystemGestures mFrame=[0,2256][1080,2340] mVisible=true mFlags= mSideHint=BOTTOM mBoundingRects=null}, InsetsSource: {71310006 mType=tappableElement mFrame=[0,0][0,0] mVisible=true mFlags= mSideHint=NONE mBoundingRects=null}, InsetsSource: {71310024 mType=systemGestures mFrame=[1002,0][1080,2340] mVisible=true mFlags= mSideHint=RIGHT mBoundingRects=null} }
+I/InsetsController(14377): onStateChanged: host=com.example.rocis_tasks/com.example.rocis_tasks.MainActivity, from=android.view.ViewRootImpl.onInsetsStateChanged:3026, state=InsetsState: {mDisplayFrame=Rect(0, 0 - 1080, 2340), mDisplayCutout=DisplayCutout{insets=Rect(0, 74 - 0, 0) waterfall=Insets{left=0, top=0, right=0, bottom=0} boundingRect={Bounds=[Rect(0, 0 - 0, 0), Rect(514, 0 - 566, 74), Rect(0, 0 - 0, 0), Rect(0, 0 - 0, 0)]} cutoutPathParserInfo={CutoutPathParserInfo{displayWidth=1080 displayHeight=2340 physicalDisplayWidth=1080 physicalDisplayHeight=2340 density={2.8125} cutoutSpec={M 0,0 H -9.244444444444444Γא¼ V 26.31111111111111 H 9.244444444444444Γא¼ V 0 H 0 Z @dp} rotation={0} scale={1.0} physicalPixelDisplaySizeRatio={1.0}}} sideOverrides={}}, mRoundedCorners=RoundedCorners{[RoundedCorner{position=TopLeft, radius=95, center=Point(95, 95)}, RoundedCorner{position=TopRight, radius=95, center=Point(985, 95)}, RoundedCorner{position=BottomRight, radius=95, center=Point(985, 2245)}, RoundedCorner{position=BottomLeft, radius=95, center=Point(95, 2245)}]}  mRoundedCornerFrame=Rect(0, 0 - 1080, 2340), mPrivacyIndicatorBounds=PrivacyIndicatorBounds {static bounds=Rect(964, 0 - 1080, 74) rotation=0}, mDisplayShape=DisplayShape{ spec=-311912193 displayWidth=1080 displayHeight=2340 physicalPixelDisplaySizeRatio=1.0 rotation=0 offsetX=0 offsetY=0 scale=1.0}, mSources= { InsetsSource: {cdc20000 mType=statusBars mFrame=[0,0][1080,74] mVisible=true mFlags= mSideHint=TOP mBoundingRects=null}, InsetsSource: {cdc20005 mType=mandatorySystemGestures mFrame=[0,0][1080,106] mVisible=true mFlags= mSideHint=TOP mBoundingRects=null}, InsetsSource: {cdc20006 mType=tappableElement mFrame=[0,0][1080,74] mVisible=true mFlags= mSideHint=TOP mBoundingRects=null}, InsetsSource: {3 mType=ime mFrame=[0,0][0,0] mVisible=false mFlags= mSideHint=NONE mBoundingRects=null}, InsetsSource: {27 mType=displayCutout mFrame=[0,0][1080,74] mVisible=true mFlags= mSideHint=TOP mBoundingRects=null}, InsetsSource: {71310001 mType=navigationBars mFrame=[0,2301][1080,2340] mVisible=true mFlags=SUPPRESS_SCRIM mSideHint=BOTTOM mBoundingRects=null}, InsetsSource: {71310004 mType=systemGestures mFrame=[0,0][78,2340] mVisible=true mFlags= mSideHint=LEFT mBoundingRects=null}, InsetsSource: {71310005 mType=mandatorySystemGestures mFrame=[0,2256][1080,2340] mVisible=true mFlags= mSideHint=BOTTOM mBoundingRects=null}, InsetsSource: {71310006 mType=tappableElement mFrame=[0,0][0,0] mVisible=true mFlags= mSideHint=NONE mBoundingRects=null}, InsetsSource: {71310024 mType=systemGestures mFrame=[1002,0][1080,2340] mVisible=true mFlags= mSideHint=RIGHT mBoundingRects=null} }
+I/VRI[MainActivity]@94d3e1f(14377): handleResized, frames=ClientWindowFrames{frame=[0,0][1080,2340] display=[0,0][1080,2340] parentFrame=[0,0][0,0]} displayId=0 dragResizing=false compatScale=1.0 frameChanged=false attachedFrameChanged=false configChanged=false displayChanged=false compatScaleChanged=false dragResizingChanged=false
+I/VRI[MainActivity]@94d3e1f(14377): handleResized mSyncSeqId = 0
+D/VRI[MainActivity]@94d3e1f(14377): reportNextDraw android.view.ViewRootImpl.handleResized:2983 android.view.ViewRootImpl.-$$Nest$mhandleResized:0 android.view.ViewRootImpl$W.resized:14082 android.app.servertransaction.WindowStateResizeItem.execute:93 android.app.servertransaction.WindowStateTransactionItem.execute:62 
+D/VRI[MainActivity]@94d3e1f(14377): Setup new sync=wmsSync-VRI[MainActivity]@94d3e1f#6
+I/VRI[MainActivity]@94d3e1f(14377): Creating new active sync group VRI[MainActivity]@94d3e1f#7
+D/VRI[MainActivity]@94d3e1f(14377): registerCallbacksForSync syncBuffer=false
+I/BLASTBufferQueue(14377): [b5985a4 SurfaceView[com.example.rocis_tasks/com.example.rocis_tasks.MainActivity]@0#3](f:0,a:0,s:0) onFrameAvailable the first frame is available
+I/SurfaceComposerClient(14377): apply transaction with the first frame. layerId: 50861, bufferData(ID: 61748744814622, frameNumber: 1)
+D/VRI[MainActivity]@94d3e1f(14377): Received frameDrawingCallback syncResult=0 frameNum=2.
+I/VRI[MainActivity]@94d3e1f(14377): Setting up sync and frameCommitCallback
+I/VRI[MainActivity]@94d3e1f(14377): Received frameCommittedCallback lastAttemptedDrawFrameNum=2 didProduceBuffer=false
+I/BLASTBufferQueue_Java(14377): gatherPendingTransactions, mName= VRI[MainActivity]@94d3e1f mNativeObject= 0xb400006ee2613000 frameNumber= 2 caller= android.view.ViewRootImpl$12.lambda$onFrameDraw$3:15525 android.view.ViewRootImpl$12.$r8$lambda$CTo3ExVBk8akdVTGlqHPAoYLRVI:0 android.view.ViewRootImpl$12$$ExternalSyntheticLambda1.onFrameCommit:0 android.view.ThreadedRenderer$1.lambda$onFrameDraw$0:730 android.view.ThreadedRenderer$1$$ExternalSyntheticLambda0.onFrameCommit:0 <bottom of call stack> 
+D/VRI[MainActivity]@94d3e1f(14377): reportDrawFinished seqId=0
+D/VRI[MainActivity]@94d3e1f(14377): reportDrawFinished seqId=0
+I/SurfaceView(14377): 190416292 finishedDrawing
+I/InsetsSourceConsumer(14377): applyRequestedVisibilityToControl: visible=true, type=navigationBars, host=com.example.rocis_tasks/com.example.rocis_tasks.MainActivity
+I/InsetsSourceConsumer(14377): applyRequestedVisibilityToControl: visible=true, type=statusBars, host=com.example.rocis_tasks/com.example.rocis_tasks.MainActivity
+D/VRI[MainActivity]@94d3e1f(14377): mThreadedRenderer.initializeIfNeeded()#2 mSurface={isValid=true 0xb400006ed5743d00}
+D/InputMethodManagerUtils(14377): startInputInner - Id : 0
+I/InputMethodManager(14377): startInputInner - IInputMethodManagerGlobalInvoker.startInputOrWindowGainedFocus
+I/InputMethodManager(14377): handleMessage: setImeVisibility visible=false
+D/InsetsController(14377): hide(ime(), fromIme=false)
+I/ImeTracker(14377): com.example.rocis_tasks:3e4c2ac4: onCancelled at PHASE_CLIENT_ALREADY_HIDDEN
+D/InputTransport(14377): Input channel constructed: 'ClientS', fd=210
+I/VRI[MainActivity]@94d3e1f(14377): handleResized, frames=ClientWindowFrames{frame=[0,0][1080,2340] display=[0,0][1080,2340] parentFrame=[0,0][0,0]} displayId=0 dragResizing=false compatScale=1.0 frameChanged=false attachedFrameChanged=false configChanged=false displayChanged=false compatScaleChanged=false dragResizingChanged=false
+I/ImeFocusController(14377): onPreWindowFocus: skipped hasWindowFocus=false mHasImeFocus=true
+I/ImeFocusController(14377): onPostWindowFocus: skipped hasWindowFocus=false mHasImeFocus=true
+I/InsetsSourceConsumer(14377): applyRequestedVisibilityToControl: visible=true, type=navigationBars, host=com.example.rocis_tasks/com.example.rocis_tasks.MainActivity
+I/InsetsSourceConsumer(14377): applyRequestedVisibilityToControl: visible=true, type=statusBars, host=com.example.rocis_tasks/com.example.rocis_tasks.MainActivity
+D/VRI[MainActivity]@94d3e1f(14377): mThreadedRenderer.initializeIfNeeded()#2 mSurface={isValid=true 0xb400006ed5743d00}
+D/InputMethodManagerUtils(14377): startInputInner - Id : 0
+I/InputMethodManager(14377): startInputInner - IInputMethodManagerGlobalInvoker.startInputOrWindowGainedFocus
+I/InputMethodManager(14377): handleMessage: setImeVisibility visible=false
+D/InsetsController(14377): hide(ime(), fromIme=false)
+I/ImeTracker(14377): com.example.rocis_tasks:26af8910: onCancelled at PHASE_CLIENT_ALREADY_HIDDEN
+D/InputTransport(14377): Input channel constructed: 'ClientS', fd=225
+I/VRI[MainActivity]@94d3e1f(14377): call setFrameRateCategory for touch hint category=high hint, reason=touch, vri=VRI[MainActivity]@94d3e1f
+I/VRI[MainActivity]@94d3e1f(14377): call setFrameRateCategory for touch hint category=no preference, reason=boost timeout, vri=VRI[MainActivity]@94d3e1f
+I/VRI[MainActivity]@94d3e1f(14377): call setFrameRateCategory for touch hint category=high hint, reason=touch, vri=VRI[MainActivity]@94d3e1f
+I/VRI[MainActivity]@94d3e1f(14377): call setFrameRateCategory for touch hint category=no preference, reason=boost timeout, vri=VRI[MainActivity]@94d3e1f
+I/VRI[MainActivity]@94d3e1f(14377): call setFrameRateCategory for touch hint category=high hint, reason=touch, vri=VRI[MainActivity]@94d3e1f
+I/VRI[MainActivity]@94d3e1f(14377): call setFrameRateCategory for touch hint category=no preference, reason=boost timeout, vri=VRI[MainActivity]@94d3e1f
+I/VRI[MainActivity]@94d3e1f(14377): handleAppVisibility mAppVisible = true visible = false
+D/VRI[MainActivity]@94d3e1f(14377): visibilityChanged oldVisibility=true newVisibility=false
+I/SV[190416292 MainActivity](14377): onWindowVisibilityChanged(8) false io.flutter.embedding.android.FlutterSurfaceView{b5985a4 V.E...... ........ 0,0-1080,2340} of VRI[MainActivity]@94d3e1f
+I/SurfaceView(14377): 190416292 Changes: creating=false format=false size=false visible=true alpha=false hint=false left=false top=false z=false attached=true lifecycleStrategy=false
+I/SurfaceView(14377): 190416292 Cur surface: Surface(name=null mNativeObject=-5476376670636973568)/@0x36392a
+D/SurfaceComposerClient(14377): setCornerRadius ## b5985a4 SurfaceView[com.example.rocis_tasks/com.example.rocis_tasks.MainActivity]@0#50860 cornerRadius=0.000000
+I/SurfaceView(14377): 190416292 surfaceDestroyed
+I/SV[190416292 MainActivity](14377): surfaceDestroyed callback.size 1 #2 io.flutter.embedding.android.FlutterSurfaceView{b5985a4 V.E...... ........ 0,0-1080,2340}
+I/SV[190416292 MainActivity](14377): updateSurface: mVisible = false mSurface.isValid() = true
+I/SV[190416292 MainActivity](14377): releaseSurfaces: viewRoot = VRI[MainActivity]@94d3e1f
+V/SurfaceView(14377): Layout: x=0 y=0 w=1080 h=2340, frame=Rect(0, 0 - 1080, 2340)
+D/SurfaceView(14377): 148702425 windowPositionLost, frameNr = 0
+D/HWUI    (14377): CacheManager::trimMemory(20)
+I/VRI[MainActivity]@94d3e1f(14377): Relayout returned: old=(0,0,1080,2340) new=(0,0,1080,2340) relayoutAsync=false req=(1080,2340)8 dur=6 res=0x2 s={false 0x0} ch=true seqId=0
+I/SV[190416292 MainActivity](14377): windowStopped(true) false io.flutter.embedding.android.FlutterSurfaceView{b5985a4 V.E...... ........ 0,0-1080,2340} of VRI[MainActivity]@94d3e1f
+D/SV[190416292 MainActivity](14377): updateSurface: surface is not valid
+I/SV[190416292 MainActivity](14377): releaseSurfaces: viewRoot = VRI[MainActivity]@94d3e1f
+D/VRI[MainActivity]@94d3e1f(14377): applyTransactionOnDraw applyImmediately
+D/SV[190416292 MainActivity](14377): updateSurface: surface is not valid
+I/SV[190416292 MainActivity](14377): releaseSurfaces: viewRoot = VRI[MainActivity]@94d3e1f
+D/VRI[MainActivity]@94d3e1f(14377): applyTransactionOnDraw applyImmediately
+D/VRI[MainActivity]@94d3e1f(14377): Not drawing due to not visible. Reason=!mAppVisible && !mForceDecorViewVisibility
+D/VRI[MainActivity]@94d3e1f(14377): Pending transaction will not be applied in sync with a draw due to view not visible
+I/VRI[MainActivity]@94d3e1f(14377): mWNT: t=0xb400006ed563e180 mBlastBufferQueue=0xnull fn= 0 HdrRenderState mRenderHdrSdrRatio=1.0 caller= android.view.ViewRootImpl.handleSyncRequestWhenNoAsyncDraw:6733 android.view.ViewRootImpl.performTraversals:5504 android.view.ViewRootImpl.doTraversal:3924 
+D/HWUI    (14377): CacheManager::trimMemory(20)
+I/VRI[MainActivity]@94d3e1f(14377): stopped(true) old = false
+D/VRI[MainActivity]@94d3e1f(14377): WindowStopped on com.example.rocis_tasks/com.example.rocis_tasks.MainActivity set to true
+D/HWUI    (14377): CacheManager::trimMemory(20)
+D/SV[190416292 MainActivity](14377): updateSurface: surface is not valid
+I/SV[190416292 MainActivity](14377): releaseSurfaces: viewRoot = VRI[MainActivity]@94d3e1f
+D/VRI[MainActivity]@94d3e1f(14377): applyTransactionOnDraw applyImmediately
+I/VRI[MainActivity]@94d3e1f(14377): onDisplayChanged oldDisplayState=2 newDisplayState=1
+D/SV[190416292 MainActivity](14377): updateSurface: surface is not valid
+I/SV[190416292 MainActivity](14377): releaseSurfaces: viewRoot = VRI[MainActivity]@94d3e1f
+D/VRI[MainActivity]@94d3e1f(14377): applyTransactionOnDraw applyImmediately
+I/ImeFocusController(14377): onPreWindowFocus: skipped hasWindowFocus=false mHasImeFocus=true
+I/ImeFocusController(14377): onPostWindowFocus: skipped hasWindowFocus=false mHasImeFocus=true
+V/NativeCrypto(14377): Read error: ssl=0xb400006ed57094c8: I/O error during system call, Software caused connection abort
+V/NativeCrypto(14377): Write error: ssl=0xb400006ed57094c8: I/O error during system call, Broken pipe
+W/Firestore(14377): (25.1.4) [WatchStream]: (e0fc94b) Stream closed with status: Status{code=UNAVAILABLE, description=End of stream or IOException, cause=null}.
+V/NativeCrypto(14377): SSL shutdown failed: ssl=0xb400006ed57094c8: I/O error during system call, Success
+W/ManagedChannelImpl(14377): [{0}] Failed to resolve name. status={1}
+W/Firestore(14377): (25.1.4) [WatchStream]: (e0fc94b) Stream closed with status: Status{code=UNAVAILABLE, description=Unable to resolve host firestore.googleapis.com, cause=java.lang.RuntimeException: java.net.UnknownHostException: Unable to resolve host "firestore.googleapis.com": No address associated with hostname
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.resolveAddresses(DnsNameResolver.java:223)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.doResolve(DnsNameResolver.java:282)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver$Resolve.run(DnsNameResolver.java:318)
+W/Firestore(14377): 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1156)
+W/Firestore(14377): 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:651)
+W/Firestore(14377): 	at java.lang.Thread.run(Thread.java:1119)
+W/Firestore(14377): Caused by: java.net.UnknownHostException: Unable to resolve host "firestore.googleapis.com": No address associated with hostname
+W/Firestore(14377): 	at java.net.Inet6AddressImpl.lookupHostByName(Inet6AddressImpl.java:156)
+W/Firestore(14377): 	at java.net.Inet6AddressImpl.lookupAllHostAddr(Inet6AddressImpl.java:103)
+W/Firestore(14377): 	at java.net.InetAddress.getAllByName(InetAddress.java:1152)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver$JdkAddressResolver.resolveAddress(DnsNameResolver.java:632)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.resolveAddresses(DnsNameResolver.java:219)
+W/Firestore(14377): 	... 5 more
+W/Firestore(14377): Caused by: android.system.GaiException: android_getaddrinfo failed: EAI_NODATA (No address associated with hostname)
+W/Firestore(14377): 	at libcore.io.Linux.android_getaddrinfo(Native Method)
+W/Firestore(14377): 	at libcore.io.ForwardingOs.android_getaddrinfo(ForwardingOs.java:133)
+W/Firestore(14377): 	at libcore.io.BlockGuardOs.android_getaddrinfo(BlockGuardOs.java:222)
+W/Firestore(14377): 	at libcore.io.ForwardingOs.android_getaddrinfo(ForwardingOs.java:133)
+W/Firestore(14377): 	at java.net.Inet6AddressImpl.lookupHostByName(Inet6AddressImpl.java:135)
+W/Firestore(14377): 	... 9 more
+W/Firestore(14377): }.
+W/ManagedChannelImpl(14377): [{0}] Failed to resolve name. status={1}
+W/Firestore(14377): (25.1.4) [WatchStream]: (e0fc94b) Stream closed with status: Status{code=UNAVAILABLE, description=Unable to resolve host firestore.googleapis.com, cause=java.lang.RuntimeException: java.net.UnknownHostException: Unable to resolve host "firestore.googleapis.com": No address associated with hostname
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.resolveAddresses(DnsNameResolver.java:223)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.doResolve(DnsNameResolver.java:282)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver$Resolve.run(DnsNameResolver.java:318)
+W/Firestore(14377): 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1156)
+W/Firestore(14377): 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:651)
+W/Firestore(14377): 	at java.lang.Thread.run(Thread.java:1119)
+W/Firestore(14377): Caused by: java.net.UnknownHostException: Unable to resolve host "firestore.googleapis.com": No address associated with hostname
+W/Firestore(14377): 	at java.net.Inet6AddressImpl.lookupHostByName(Inet6AddressImpl.java:124)
+W/Firestore(14377): 	at java.net.Inet6AddressImpl.lookupAllHostAddr(Inet6AddressImpl.java:103)
+W/Firestore(14377): 	at java.net.InetAddress.getAllByName(InetAddress.java:1152)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver$JdkAddressResolver.resolveAddress(DnsNameResolver.java:632)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.resolveAddresses(DnsNameResolver.java:219)
+W/Firestore(14377): 	... 5 more
+W/Firestore(14377): }.
+W/Firestore(14377): (25.1.4) [WatchStream]: (e0fc94b) Stream closed with status: Status{code=UNAVAILABLE, description=Unable to resolve host firestore.googleapis.com, cause=java.lang.RuntimeException: java.net.UnknownHostException: Unable to resolve host "firestore.googleapis.com": No address associated with hostname
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.resolveAddresses(DnsNameResolver.java:223)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.doResolve(DnsNameResolver.java:282)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver$Resolve.run(DnsNameResolver.java:318)
+W/Firestore(14377): 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1156)
+W/Firestore(14377): 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:651)
+W/Firestore(14377): 	at java.lang.Thread.run(Thread.java:1119)
+W/Firestore(14377): Caused by: java.net.UnknownHostException: Unable to resolve host "firestore.googleapis.com": No address associated with hostname
+W/Firestore(14377): 	at java.net.Inet6AddressImpl.lookupHostByName(Inet6AddressImpl.java:124)
+W/Firestore(14377): 	at java.net.Inet6AddressImpl.lookupAllHostAddr(Inet6AddressImpl.java:103)
+W/Firestore(14377): 	at java.net.InetAddress.getAllByName(InetAddress.java:1152)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver$JdkAddressResolver.resolveAddress(DnsNameResolver.java:632)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.resolveAddresses(DnsNameResolver.java:219)
+W/Firestore(14377): 	... 5 more
+W/Firestore(14377): }.
+W/ManagedChannelImpl(14377): [{0}] Failed to resolve name. status={1}
+W/Firestore(14377): (25.1.4) [WatchStream]: (e0fc94b) Stream closed with status: Status{code=UNAVAILABLE, description=Unable to resolve host firestore.googleapis.com, cause=java.lang.RuntimeException: java.net.UnknownHostException: Unable to resolve host "firestore.googleapis.com": No address associated with hostname
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.resolveAddresses(DnsNameResolver.java:223)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.doResolve(DnsNameResolver.java:282)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver$Resolve.run(DnsNameResolver.java:318)
+W/Firestore(14377): 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1156)
+W/Firestore(14377): 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:651)
+W/Firestore(14377): 	at java.lang.Thread.run(Thread.java:1119)
+W/Firestore(14377): Caused by: java.net.UnknownHostException: Unable to resolve host "firestore.googleapis.com": No address associated with hostname
+W/Firestore(14377): 	at java.net.Inet6AddressImpl.lookupHostByName(Inet6AddressImpl.java:156)
+W/Firestore(14377): 	at java.net.Inet6AddressImpl.lookupAllHostAddr(Inet6AddressImpl.java:103)
+W/Firestore(14377): 	at java.net.InetAddress.getAllByName(InetAddress.java:1152)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver$JdkAddressResolver.resolveAddress(DnsNameResolver.java:632)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.resolveAddresses(DnsNameResolver.java:219)
+W/Firestore(14377): 	... 5 more
+W/Firestore(14377): Caused by: android.system.GaiException: android_getaddrinfo failed: EAI_NODATA (No address associated with hostname)
+W/Firestore(14377): 	at libcore.io.Linux.android_getaddrinfo(Native Method)
+W/Firestore(14377): 	at libcore.io.ForwardingOs.android_getaddrinfo(ForwardingOs.java:133)
+W/Firestore(14377): 	at libcore.io.BlockGuardOs.android_getaddrinfo(BlockGuardOs.java:222)
+W/Firestore(14377): 	at libcore.io.ForwardingOs.android_getaddrinfo(ForwardingOs.java:133)
+W/Firestore(14377): 	at java.net.Inet6AddressImpl.lookupHostByName(Inet6AddressImpl.java:135)
+W/Firestore(14377): 	... 9 more
+W/Firestore(14377): }.
+W/ManagedChannelImpl(14377): [{0}] Failed to resolve name. status={1}
+W/ManagedChannelImpl(14377): [{0}] Failed to resolve name. status={1}
+W/Firestore(14377): (25.1.4) [WatchStream]: (e0fc94b) Stream closed with status: Status{code=UNAVAILABLE, description=Unable to resolve host firestore.googleapis.com, cause=java.lang.RuntimeException: java.net.UnknownHostException: Unable to resolve host "firestore.googleapis.com": No address associated with hostname
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.resolveAddresses(DnsNameResolver.java:223)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.doResolve(DnsNameResolver.java:282)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver$Resolve.run(DnsNameResolver.java:318)
+W/Firestore(14377): 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1156)
+W/Firestore(14377): 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:651)
+W/Firestore(14377): 	at java.lang.Thread.run(Thread.java:1119)
+W/Firestore(14377): Caused by: java.net.UnknownHostException: Unable to resolve host "firestore.googleapis.com": No address associated with hostname
+W/Firestore(14377): 	at java.net.Inet6AddressImpl.lookupHostByName(Inet6AddressImpl.java:156)
+W/Firestore(14377): 	at java.net.Inet6AddressImpl.lookupAllHostAddr(Inet6AddressImpl.java:103)
+W/Firestore(14377): 	at java.net.InetAddress.getAllByName(InetAddress.java:1152)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver$JdkAddressResolver.resolveAddress(DnsNameResolver.java:632)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.resolveAddresses(DnsNameResolver.java:219)
+W/Firestore(14377): 	... 5 more
+W/Firestore(14377): Caused by: android.system.GaiException: android_getaddrinfo failed: EAI_NODATA (No address associated with hostname)
+W/Firestore(14377): 	at libcore.io.Linux.android_getaddrinfo(Native Method)
+W/Firestore(14377): 	at libcore.io.ForwardingOs.android_getaddrinfo(ForwardingOs.java:133)
+W/Firestore(14377): 	at libcore.io.BlockGuardOs.android_getaddrinfo(BlockGuardOs.java:222)
+W/Firestore(14377): 	at libcore.io.ForwardingOs.android_getaddrinfo(ForwardingOs.java:133)
+W/Firestore(14377): 	at java.net.Inet6AddressImpl.lookupHostByName(Inet6AddressImpl.java:135)
+W/Firestore(14377): 	... 9 more
+W/Firestore(14377): }.
+W/Firestore(14377): (25.1.4) [WatchStream]: (e0fc94b) Stream closed with status: Status{code=UNAVAILABLE, description=Unable to resolve host firestore.googleapis.com, cause=java.lang.RuntimeException: java.net.UnknownHostException: Unable to resolve host "firestore.googleapis.com": No address associated with hostname
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.resolveAddresses(DnsNameResolver.java:223)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.doResolve(DnsNameResolver.java:282)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver$Resolve.run(DnsNameResolver.java:318)
+W/Firestore(14377): 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1156)
+W/Firestore(14377): 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:651)
+W/Firestore(14377): 	at java.lang.Thread.run(Thread.java:1119)
+W/Firestore(14377): Caused by: java.net.UnknownHostException: Unable to resolve host "firestore.googleapis.com": No address associated with hostname
+W/Firestore(14377): 	at java.net.Inet6AddressImpl.lookupHostByName(Inet6AddressImpl.java:156)
+W/Firestore(14377): 	at java.net.Inet6AddressImpl.lookupAllHostAddr(Inet6AddressImpl.java:103)
+W/Firestore(14377): 	at java.net.InetAddress.getAllByName(InetAddress.java:1152)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver$JdkAddressResolver.resolveAddress(DnsNameResolver.java:632)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.resolveAddresses(DnsNameResolver.java:219)
+W/Firestore(14377): 	... 5 more
+W/Firestore(14377): Caused by: android.system.GaiException: android_getaddrinfo failed: EAI_NODATA (No address associated with hostname)
+W/Firestore(14377): 	at libcore.io.Linux.android_getaddrinfo(Native Method)
+W/Firestore(14377): 	at libcore.io.ForwardingOs.android_getaddrinfo(ForwardingOs.java:133)
+W/Firestore(14377): 	at libcore.io.BlockGuardOs.android_getaddrinfo(BlockGuardOs.java:222)
+W/Firestore(14377): 	at libcore.io.ForwardingOs.android_getaddrinfo(ForwardingOs.java:133)
+W/Firestore(14377): 	at java.net.Inet6AddressImpl.lookupHostByName(Inet6AddressImpl.java:135)
+W/Firestore(14377): 	... 9 more
+W/Firestore(14377): }.
+W/ManagedChannelImpl(14377): [{0}] Failed to resolve name. status={1}
+W/Firestore(14377): (25.1.4) [WatchStream]: (e0fc94b) Stream closed with status: Status{code=UNAVAILABLE, description=Unable to resolve host firestore.googleapis.com, cause=java.lang.RuntimeException: java.net.UnknownHostException: Unable to resolve host "firestore.googleapis.com": No address associated with hostname
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.resolveAddresses(DnsNameResolver.java:223)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.doResolve(DnsNameResolver.java:282)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver$Resolve.run(DnsNameResolver.java:318)
+W/Firestore(14377): 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1156)
+W/Firestore(14377): 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:651)
+W/Firestore(14377): 	at java.lang.Thread.run(Thread.java:1119)
+W/Firestore(14377): Caused by: java.net.UnknownHostException: Unable to resolve host "firestore.googleapis.com": No address associated with hostname
+W/Firestore(14377): 	at java.net.Inet6AddressImpl.lookupHostByName(Inet6AddressImpl.java:156)
+W/Firestore(14377): 	at java.net.Inet6AddressImpl.lookupAllHostAddr(Inet6AddressImpl.java:103)
+W/Firestore(14377): 	at java.net.InetAddress.getAllByName(InetAddress.java:1152)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver$JdkAddressResolver.resolveAddress(DnsNameResolver.java:632)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.resolveAddresses(DnsNameResolver.java:219)
+W/Firestore(14377): 	... 5 more
+W/Firestore(14377): Caused by: android.system.GaiException: android_getaddrinfo failed: EAI_NODATA (No address associated with hostname)
+W/Firestore(14377): 	at libcore.io.Linux.android_getaddrinfo(Native Method)
+W/Firestore(14377): 	at libcore.io.ForwardingOs.android_getaddrinfo(ForwardingOs.java:133)
+W/Firestore(14377): 	at libcore.io.BlockGuardOs.android_getaddrinfo(BlockGuardOs.java:222)
+W/Firestore(14377): 	at libcore.io.ForwardingOs.android_getaddrinfo(ForwardingOs.java:133)
+W/Firestore(14377): 	at java.net.Inet6AddressImpl.lookupHostByName(Inet6AddressImpl.java:135)
+W/Firestore(14377): 	... 9 more
+W/Firestore(14377): }.
+W/ManagedChannelImpl(14377): [{0}] Failed to resolve name. status={1}
+W/Firestore(14377): (25.1.4) [WatchStream]: (e0fc94b) Stream closed with status: Status{code=UNAVAILABLE, description=Unable to resolve host firestore.googleapis.com, cause=java.lang.RuntimeException: java.net.UnknownHostException: Unable to resolve host "firestore.googleapis.com": No address associated with hostname
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.resolveAddresses(DnsNameResolver.java:223)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.doResolve(DnsNameResolver.java:282)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver$Resolve.run(DnsNameResolver.java:318)
+W/Firestore(14377): 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1156)
+W/Firestore(14377): 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:651)
+W/Firestore(14377): 	at java.lang.Thread.run(Thread.java:1119)
+W/Firestore(14377): Caused by: java.net.UnknownHostException: Unable to resolve host "firestore.googleapis.com": No address associated with hostname
+W/Firestore(14377): 	at java.net.Inet6AddressImpl.lookupHostByName(Inet6AddressImpl.java:156)
+W/Firestore(14377): 	at java.net.Inet6AddressImpl.lookupAllHostAddr(Inet6AddressImpl.java:103)
+W/Firestore(14377): 	at java.net.InetAddress.getAllByName(InetAddress.java:1152)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver$JdkAddressResolver.resolveAddress(DnsNameResolver.java:632)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.resolveAddresses(DnsNameResolver.java:219)
+W/Firestore(14377): 	... 5 more
+W/Firestore(14377): Caused by: android.system.GaiException: android_getaddrinfo failed: EAI_NODATA (No address associated with hostname)
+W/Firestore(14377): 	at libcore.io.Linux.android_getaddrinfo(Native Method)
+W/Firestore(14377): 	at libcore.io.ForwardingOs.android_getaddrinfo(ForwardingOs.java:133)
+W/Firestore(14377): 	at libcore.io.BlockGuardOs.android_getaddrinfo(BlockGuardOs.java:222)
+W/Firestore(14377): 	at libcore.io.ForwardingOs.android_getaddrinfo(ForwardingOs.java:133)
+W/Firestore(14377): 	at java.net.Inet6AddressImpl.lookupHostByName(Inet6AddressImpl.java:135)
+W/Firestore(14377): 	... 9 more
+W/Firestore(14377): }.
+W/ManagedChannelImpl(14377): [{0}] Failed to resolve name. status={1}
+W/Firestore(14377): (25.1.4) [WatchStream]: (e0fc94b) Stream closed with status: Status{code=UNAVAILABLE, description=Unable to resolve host firestore.googleapis.com, cause=java.lang.RuntimeException: java.net.UnknownHostException: Unable to resolve host "firestore.googleapis.com": No address associated with hostname
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.resolveAddresses(DnsNameResolver.java:223)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.doResolve(DnsNameResolver.java:282)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver$Resolve.run(DnsNameResolver.java:318)
+W/Firestore(14377): 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1156)
+W/Firestore(14377): 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:651)
+W/Firestore(14377): 	at java.lang.Thread.run(Thread.java:1119)
+W/Firestore(14377): Caused by: java.net.UnknownHostException: Unable to resolve host "firestore.googleapis.com": No address associated with hostname
+W/Firestore(14377): 	at java.net.Inet6AddressImpl.lookupHostByName(Inet6AddressImpl.java:156)
+W/Firestore(14377): 	at java.net.Inet6AddressImpl.lookupAllHostAddr(Inet6AddressImpl.java:103)
+W/Firestore(14377): 	at java.net.InetAddress.getAllByName(InetAddress.java:1152)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver$JdkAddressResolver.resolveAddress(DnsNameResolver.java:632)
+W/Firestore(14377): 	at io.grpc.internal.DnsNameResolver.resolveAddresses(DnsNameResolver.java:219)
+W/Firestore(14377): 	... 5 more
+W/Firestore(14377): Caused by: android.system.GaiException: android_getaddrinfo failed: EAI_NODATA (No address associated with hostname)
+W/Firestore(14377): 	at libcore.io.Linux.android_getaddrinfo(Native Method)
+W/Firestore(14377): 	at libcore.io.ForwardingOs.android_getaddrinfo(ForwardingOs.java:133)
+W/Firestore(14377): 	at libcore.io.BlockGuardOs.android_getaddrinfo(BlockGuardOs.java:222)
+W/Firestore(14377): 	at libcore.io.ForwardingOs.android_getaddrinfo(ForwardingOs.java:133)
+W/Firestore(14377): 	at java.net.Inet6AddressImpl.lookupHostByName(Inet6AddressImpl.java:135)
+W/Firestore(14377): 	... 9 more
+W/Firestore(14377): }.
+Lost connection to device.
