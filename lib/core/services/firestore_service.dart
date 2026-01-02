@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart' hide Category;
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/features/categories/domain/models/category.dart';
+import 'package:rocis_tasks/core/services/encryption_service.dart';
 
 class FirestoreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -92,8 +93,8 @@ class FirestoreService {
     try {
       await collection.doc(task.id).set({
         'id': task.id,
-        'title': task.title,
-        'description': task.description,
+        'title': EncryptionService.encrypt(task.title),
+        'description': EncryptionService.encrypt(task.description),
         'isCompleted': task.isCompleted,
         'dueDate': task.dueDate?.toIso8601String(),
         'priority': task.priority.index,
@@ -113,8 +114,8 @@ class FirestoreService {
 
     try {
       await collection.doc(task.id).update({
-        'title': task.title,
-        'description': task.description,
+        'title': EncryptionService.encrypt(task.title),
+        'description': EncryptionService.encrypt(task.description),
         'isCompleted': task.isCompleted,
         'dueDate': task.dueDate?.toIso8601String(),
         'priority': task.priority.index,
@@ -148,8 +149,8 @@ class FirestoreService {
         final data = doc.data();
         return Task(
           id: data['id'],
-          title: data['title'],
-          description: data['description'],
+          title: EncryptionService.decrypt(data['title'] ?? ''),
+          description: EncryptionService.decrypt(data['description'] ?? ''),
           isCompleted: data['isCompleted'] ?? false,
           dueDate: data['dueDate'] != null
               ? DateTime.tryParse(data['dueDate'])
