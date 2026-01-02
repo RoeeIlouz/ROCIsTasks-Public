@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/widget_background"
-    android:padding="8dp">
+    android:padding="4dp">
 
     <!-- Header with Month Name and Navigation -->
     <LinearLayout
@@ -88,7 +88,7 @@
         android:layout_below="@id/widget_full_calendar_weekdays"
         android:layout_alignParentBottom="true"
         android:numColumns="8"
-        android:verticalSpacing="8dp"
+        android:verticalSpacing="4dp"
         android:horizontalSpacing="2dp"
         android:stretchMode="columnWidth"
         android:gravity="center"
