@@ -61,5 +61,8 @@
   "deletePermanently": "למחוק לצמיתות?",
   "actionUndone": "פעולה זו אינה ניתנת לביטול.",
   "delete": "מחק",
-  "noTasksYet": "אין משימות עדיין"
+  "noTasksYet": "אין משימות עדיין",
+  "duePrefix": "יעד: ",
+  "deleteTaskTitle": "מחק משימה",
+  "deleteTaskConfirmation": "האם אתה בטוח שברצונך למחוק משימה זו?"
 }

@@ -5,6 +5,7 @@ import 'package:rocis_tasks/features/categories/domain/models/category.dart';
 import 'package:provider/provider.dart';
 import 'package:rocis_tasks/core/theme/theme_service.dart';
 import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
+import 'package:rocis_tasks/l10n/app_localizations.dart';
 
 class TaskTile extends StatelessWidget {
   final Task task;
@@ -27,6 +28,8 @@ class TaskTile extends StatelessWidget {
   });
 
   Color _getPriorityColor(BuildContext context, TaskPriority priority) {
+    // These colors are semantic and generally safe for both themes,
+    // but could be moved to theme extension if strict adherence is needed.
     switch (priority) {
       case TaskPriority.high:
         return Colors.red;
@@ -37,14 +40,17 @@ class TaskTile extends StatelessWidget {
     }
   }
 
+  static final _dateFormat = DateFormat('dd/MM/yy');
+  static final _timeFormat24 = DateFormat.Hm();
+  static final _timeFormat12 = DateFormat.jm();
+
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final _lang = Localizations.localeOf(context).languageCode;
     final theme = Theme.of(context);
     final themeService = Provider.of<ThemeService>(context);
-    final _date = DateFormat('dd/MM/yy');
-    final _time24 = DateFormat().add_Hm();
-    final _time12 = DateFormat().add_jm();
+
     return Dismissible(
       key: Key(task.id),
       direction: enableSwipeToDelete
@@ -56,16 +62,16 @@ class TaskTile extends StatelessWidget {
           return await showDialog(
             context: context,
             builder: (context) => AlertDialog(
-              title: const Text('Delete Task'),
-              content: const Text('Are you sure you want to delete this task?'),
+              title: Text(l10n.deleteTaskTitle),
+              content: Text(l10n.deleteTaskConfirmation),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context, false),
-                  child: const Text('Cancel'),
+                  child: Text(l10n.cancel),
                 ),
                 TextButton(
                   onPressed: () => Navigator.pop(context, true),
-                  child: const Text('Delete'),
+                  child: Text(l10n.delete),
                 ),
               ],
             ),
@@ -202,8 +208,8 @@ class TaskTile extends StatelessWidget {
                               const SizedBox(width: 4),
                               Text(
                                 themeService.use24HourFormat
-                                    ? 'Due: ${_date.format(task.dueDate!)} | ${_time24.format(task.dueDate!)}'
-                                    : 'Due: ${_date.format(task.dueDate!)} | ${_time12.format(task.dueDate!)}',
+                                    ? '${l10n.duePrefix}${_dateFormat.format(task.dueDate!)} | ${_timeFormat24.format(task.dueDate!)}'
+                                    : '${l10n.duePrefix}${_dateFormat.format(task.dueDate!)} | ${_timeFormat12.format(task.dueDate!)}',
                                 style: theme.textTheme.labelSmall?.copyWith(
                                   overflow: TextOverflow.clip,
                                   color: theme.colorScheme.primary,

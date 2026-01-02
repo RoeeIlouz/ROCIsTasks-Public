@@ -475,6 +475,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No tasks yet'**
   String get noTasksYet;
+
+  /// No description provided for @duePrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'Due: '**
+  String get duePrefix;
+
+  /// No description provided for @deleteTaskTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Task'**
+  String get deleteTaskTitle;
+
+  /// No description provided for @deleteTaskConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this task?'**
+  String get deleteTaskConfirmation;
 }
 
 class _AppLocalizationsDelegate

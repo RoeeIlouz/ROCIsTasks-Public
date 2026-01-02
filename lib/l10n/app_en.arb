@@ -61,5 +61,8 @@
   "deletePermanently": "Delete Permanently?",
   "actionUndone": "This action cannot be undone.",
   "delete": "Delete",
-  "noTasksYet": "No tasks yet"
+  "noTasksYet": "No tasks yet",
+  "duePrefix": "Due: ",
+  "deleteTaskTitle": "Delete Task",
+  "deleteTaskConfirmation": "Are you sure you want to delete this task?"
 }

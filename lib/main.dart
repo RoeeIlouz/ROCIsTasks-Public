@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:firebase_core/firebase_core.dart';
+
 import 'package:rocis_tasks/core/theme/app_theme.dart';
 import 'package:rocis_tasks/core/theme/theme_service.dart';
 import 'package:rocis_tasks/features/home/presentation/screens/home_screen.dart';
 import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
-import 'package:rocis_tasks/firebase_options.dart';
+
 import 'package:rocis_tasks/core/services/auth_service.dart';
 import 'package:rocis_tasks/features/auth/presentation/screens/login_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -21,113 +21,199 @@ import 'package:rocis_tasks/features/home/services/month_widget_service.dart';
 import 'package:rocis_tasks/features/tasks/data/datasources/local_task_source.dart';
 import 'dart:convert';
 import 'core/services/notification_service.dart';
-import 'package:rocis_tasks/core/services/background_service_helper.dart';
+
+// import 'package:rocis_tasks/core/services/background_service_helper.dart'; // Deprecated
+import 'package:rocis_tasks/core/services/app_initializer.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:rocis_tasks/features/home/services/full_calendar_widget_service.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Hive.initFlutter();
+Future<void> main() async {
+  // Initialize App (Core, Firebase, Hive)
+  await AppInitializer.initialize();
 
-  try {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-  } catch (e) {
-    debugPrint('Firebase initialization failed: $e');
+  // Register callback immediately
+  HomeWidget.registerInteractivityCallback(interactiveCallback);
+  runApp(const AppRoot());
+}
+
+class AppRoot extends StatefulWidget {
+  const AppRoot({super.key});
+
+  @override
+  State<AppRoot> createState() => _AppRootState();
+}
+
+class _AppRootState extends State<AppRoot> {
+  late Future<void> _initFuture;
+  final _authService = AuthService();
+  final _calendarService = CalendarService();
+  final _themeService = ThemeService();
+  late final _taskProvider = TaskProvider(_authService, _calendarService);
+
+  @override
+  void initState() {
+    super.initState();
+    _initFuture = _initServices();
   }
 
-  // Initialize HomeWidget callback
-  HomeWidget.registerInteractivityCallback(interactiveCallback);
+  Future<void> _initServices() async {
+    // Parallel init of other services
+    await Future.wait([
+      _taskProvider.init().catchError((e) {
+        debugPrint('TaskProvider init failed: $e');
+        return;
+      }),
+      _calendarService.init().catchError((e) {
+        debugPrint('CalendarService init failed: $e');
+        return;
+      }),
+      _themeService.init().catchError((e) {
+        debugPrint('ThemeService init failed: $e');
+        return;
+      }),
+    ]);
+  }
 
-  ErrorWidget.builder = (FlutterErrorDetails details) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        backgroundColor: Colors.black,
-        body: SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: _initFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const MaterialApp(
+            debugShowCheckedModeBanner: false,
+            home: Scaffold(
+              backgroundColor: Colors.black,
+              body: Center(
                 child: Column(
-                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(
-                      Icons.error_outline,
-                      color: Colors.red,
-                      size: 64,
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'APPLICATION ERROR',
+                    // You might want to replace this with your app logo
+                    CircularProgressIndicator(color: Colors.white),
+                    SizedBox(height: 20),
+                    Text(
+                      "ROCI's Tasks",
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 20,
                         fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    SelectableText(
-                      '${details.exception}\n\nSTACK:\n${details.stack}',
-                      style: const TextStyle(
-                        color: Colors.redAccent,
-                        fontFamily: 'monospace',
-                        fontSize: 12,
+                        fontSize: 24,
                       ),
                     ),
                   ],
                 ),
               ),
             ),
-          ),
-        ),
-      ),
+          );
+        }
+
+        if (snapshot.hasError) {
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            home: Scaffold(
+              backgroundColor: Colors.black,
+              body: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.error_outline,
+                        color: Colors.red,
+                        size: 64,
+                      ),
+                      const SizedBox(height: 16),
+                      const Text(
+                        'CRITICAL ERROR',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Failed to initialize app: ${snapshot.error}',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(color: Colors.redAccent),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        }
+
+        return MultiProvider(
+          providers: [
+            ChangeNotifierProvider.value(value: _themeService),
+            ChangeNotifierProvider.value(value: _authService),
+            ChangeNotifierProvider.value(value: _taskProvider),
+            Provider.value(value: _calendarService),
+            ChangeNotifierProvider(
+              create: (_) => CalendarProvider(_calendarService)..loadEvents(),
+            ),
+          ],
+          child: const MyApp(),
+        );
+      },
     );
-  };
+  }
+}
 
-  // Create and init services with robust error handling
-  try {
-    final authService = AuthService();
-    final calendarService = CalendarService();
-    final themeService = ThemeService();
-    final taskProvider = TaskProvider(authService, calendarService);
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
-    debugPrint('Initializing services...');
-    await Future.wait([
-      taskProvider.init().catchError(
-        (e) => debugPrint('TaskProvider init failed: $e'),
-      ),
-      calendarService.init().catchError(
-        (e) => debugPrint('CalendarService init failed: $e'),
-      ),
-      themeService.init().catchError(
-        (e) => debugPrint('ThemeService init failed: $e'),
-      ),
-    ]);
-    debugPrint('Services initialized successfully.');
+  @override
+  Widget build(BuildContext context) {
+    final themeService = Provider.of<ThemeService>(context);
 
-    runApp(
-      MultiProvider(
-        providers: [
-          ChangeNotifierProvider.value(value: themeService),
-          ChangeNotifierProvider.value(value: authService),
-          ChangeNotifierProvider.value(value: taskProvider),
-          Provider.value(value: calendarService),
-          ChangeNotifierProvider(
-            create: (_) => CalendarProvider(calendarService)..loadEvents(),
+    // DynamicColorBuilder provides the system's dynamic colors if available (Android 12+)
+    return DynamicColorBuilder(
+      builder: (lightDynamic, darkDynamic) {
+        return MaterialApp(
+          title: "ROCI's Tasks",
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.createLightTheme(
+            themeService.useMaterialTheme ? lightDynamic : null,
           ),
-        ],
-        child: const MyApp(),
-      ),
-    );
-  } catch (e, stack) {
-    debugPrint('CRITICAL STARTUP ERROR: $e\n$stack');
-    runApp(
-      MaterialApp(
-        home: Scaffold(body: Center(child: Text('Failed to start: $e'))),
-      ),
+          darkTheme: AppTheme.createDarkTheme(
+            themeService.useMaterialTheme ? darkDynamic : null,
+            isAmoled: themeService.useAmoledTheme,
+          ),
+          themeMode: themeService.themeMode,
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en'), Locale('he')],
+          locale: themeService.locale,
+          home: StreamBuilder<User?>(
+            stream: Provider.of<AuthService>(
+              context,
+              listen: false,
+            ).authStateChanges,
+            builder: (context, snapshot) {
+              // We can keep a minimal loader here or just show Login/Home
+              // The main initialization is already done.
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                // Usually this is very fast if auth is already initialized
+                return const Scaffold(
+                  body: Center(child: CircularProgressIndicator()),
+                );
+              }
+              if (snapshot.hasData) {
+                return const HomeScreen();
+              }
+              return const LoginScreen();
+            },
+          ),
+        );
+      },
     );
   }
 }
@@ -152,7 +238,7 @@ Future<void> interactiveCallback(Uri? uri) async {
 
 Future<void> _handleMonthNavigation(bool isNext) async {
   // Initialize shared services
-  await BackgroundServiceHelper.initBackgroundServices();
+  await AppInitializer.initialize(isBackground: true);
 
   final prefs = await SharedPreferences.getInstance();
   int offset = prefs.getInt('month_widget_offset') ?? 0;
@@ -172,7 +258,7 @@ Future<void> _handleMonthNavigation(bool isNext) async {
 
 Future<void> _handleFullCalendarNavigation(bool isNext) async {
   // Initialize shared services
-  await BackgroundServiceHelper.initBackgroundServices();
+  await AppInitializer.initialize(isBackground: true);
 
   final prefs = await SharedPreferences.getInstance();
   int offset = prefs.getInt('full_calendar_offset') ?? 0;
@@ -196,7 +282,7 @@ Future<void> _handleFullCalendarNavigation(bool isNext) async {
 Future<void> _completeTaskInBackground(String taskId) async {
   try {
     // Initialize shared services
-    await BackgroundServiceHelper.initBackgroundServices();
+    await AppInitializer.initialize(isBackground: true);
 
     final box = await Hive.openBox<Task>('tasks');
 
@@ -257,57 +343,5 @@ Future<void> _completeTaskInBackground(String taskId) async {
     );
   } catch (e) {
     debugPrint('Background task error: $e');
-  }
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final themeService = Provider.of<ThemeService>(context);
-
-    // DynamicColorBuilder provides the system's dynamic colors if available (Android 12+)
-    return DynamicColorBuilder(
-      builder: (lightDynamic, darkDynamic) {
-        return MaterialApp(
-          title: "ROCI's Tasks",
-          debugShowCheckedModeBanner: false,
-          theme: AppTheme.createLightTheme(
-            themeService.useMaterialTheme ? lightDynamic : null,
-          ),
-          darkTheme: AppTheme.createDarkTheme(
-            themeService.useMaterialTheme ? darkDynamic : null,
-            isAmoled: themeService.useAmoledTheme,
-          ),
-          themeMode: themeService.themeMode,
-          localizationsDelegates: const [
-            AppLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          supportedLocales: const [Locale('en'), Locale('he')],
-          locale: themeService.locale,
-          home: StreamBuilder<User?>(
-            stream: Provider.of<AuthService>(
-              context,
-              listen: false,
-            ).authStateChanges,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Scaffold(
-                  body: Center(child: CircularProgressIndicator()),
-                );
-              }
-              if (snapshot.hasData) {
-                return const HomeScreen();
-              }
-              return const LoginScreen();
-            },
-          ),
-        );
-      },
-    );
   }
 }

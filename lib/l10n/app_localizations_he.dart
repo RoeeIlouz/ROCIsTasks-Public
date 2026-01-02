@@ -198,4 +198,13 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get noTasksYet => 'אין משימות עדיין';
+
+  @override
+  String get duePrefix => 'יעד: ';
+
+  @override
+  String get deleteTaskTitle => 'מחק משימה';
+
+  @override
+  String get deleteTaskConfirmation => 'האם אתה בטוח שברצונך למחוק משימה זו?';
 }

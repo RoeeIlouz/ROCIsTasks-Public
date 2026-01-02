@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/widget_full_calendar_day_container"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_width="0dp"
+    android:layout_height="75dp"
+    android:layout_weight="1"
     android:padding="2dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
+        android:layout_marginTop="1dp"
         android:gravity="center_horizontal"
         android:background="@drawable/widget_background">
 
@@ -18,7 +20,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="1"
-            android:textSize="22sp"
+            android:textSize="14sp"
             android:textStyle="bold"
             android:textColor="@color/widget_title_text"
             android:paddingTop="0dp" />
@@ -45,30 +47,48 @@
             <TextView
                 android:id="@+id/widget_full_calendar_summary_1"
                 android:layout_width="match_parent"
-                android:layout_height="6dp"
+                android:layout_height="14dp"
                 android:layout_marginStart="1dp"
                 android:layout_marginEnd="1dp"
                 android:layout_marginBottom="1dp"
                 android:background="@color/widget_secondary_text"
+                android:textSize="9sp"
+                android:textColor="#FFFFFF"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:paddingStart="2dp"
+                android:paddingEnd="2dp"
                 android:visibility="gone" />
 
             <TextView
                 android:id="@+id/widget_full_calendar_summary_2"
                 android:layout_width="match_parent"
-                android:layout_height="6dp"
+                android:layout_height="14dp"
                 android:layout_marginStart="1dp"
                 android:layout_marginEnd="1dp"
                 android:layout_marginBottom="1dp"
                 android:background="@color/widget_secondary_text"
+                android:textSize="9sp"
+                android:textColor="#FFFFFF"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:paddingStart="2dp"
+                android:paddingEnd="2dp"
                 android:visibility="gone" />
 
             <TextView
                 android:id="@+id/widget_full_calendar_summary_3"
                 android:layout_width="match_parent"
-                android:layout_height="6dp"
+                android:layout_height="14dp"
                 android:layout_marginStart="1dp"
                 android:layout_marginEnd="1dp"
                 android:background="@color/widget_secondary_text"
+                android:textSize="9sp"
+                android:textColor="#FFFFFF"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:paddingStart="2dp"
+                android:paddingEnd="2dp"
                 android:visibility="gone" />
         </LinearLayout>
 

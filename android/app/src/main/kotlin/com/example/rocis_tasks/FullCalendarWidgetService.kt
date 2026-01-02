@@ -43,108 +43,97 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
     }
 
     override fun getCount(): Int {
-        val count = days.size
-        android.util.Log.d("FullCalendarWidget", "=== getCount returning: $count ===")
+        val count = days.size / 8
+        android.util.Log.d("FullCalendarWidget", "=== getCount returning rows: $count ===")
         return count
     }
 
     override fun getViewAt(position: Int): RemoteViews {
-        android.util.Log.d("FullCalendarWidget", "=== getViewAt called for position: $position ===")
-        if (position < 0 || position >= days.size) {
-            return RemoteViews(context.packageName, R.layout.widget_full_calendar_day_item)
-        }
-
-        val views = RemoteViews(context.packageName, R.layout.widget_full_calendar_day_item)
+        android.util.Log.d("FullCalendarWidget", "=== getViewAt called for row: $position ===")
+        val rowViews = RemoteViews(context.packageName, R.layout.widget_full_calendar_row)
         try {
-            val day = days[position]
-            val isWeekNumber = day.optBoolean("isWeekNumber", false)
+            rowViews.removeAllViews(R.id.widget_full_calendar_row_container)
 
-            if (isWeekNumber) {
-                // Week number cell
-                val weekNum = day.optInt("weekNumber", 0)
-                views.setTextViewText(R.id.widget_full_calendar_day_text, weekNum.toString())
-                views.setViewVisibility(R.id.widget_full_calendar_today_indicator, android.view.View.GONE)
-                views.setTextColor(R.id.widget_full_calendar_day_text, context.getColor(R.color.widget_secondary_text))
-                views.setTextViewTextSize(R.id.widget_full_calendar_day_text, android.util.TypedValue.COMPLEX_UNIT_SP, 8f)
-                
-                // Hide summaries
-                views.setViewVisibility(R.id.widget_full_calendar_summary_1, android.view.View.GONE)
-                views.setViewVisibility(R.id.widget_full_calendar_summary_2, android.view.View.GONE)
-                views.setViewVisibility(R.id.widget_full_calendar_summary_3, android.view.View.GONE)
-                
-                // Make non-clickable
-                views.setOnClickFillInIntent(R.id.widget_full_calendar_day_container, Intent())
-            } else {
-                // Regular day cell
-                val dayNum = day.optInt("day", 1)
-                val isToday = day.optBoolean("isToday", false)
-                val isCurrentMonth = day.optBoolean("isCurrentMonth", true)
-                val date = day.optString("date", "")
+            val startIndex = position * 8
+            for (i in 0 until 8) {
+                val cellIndex = startIndex + i
+                if (cellIndex >= days.size) break
 
-                views.setTextViewText(R.id.widget_full_calendar_day_text, dayNum.toString())
-                views.setViewVisibility(R.id.widget_full_calendar_today_indicator, if (isToday) android.view.View.VISIBLE else android.view.View.GONE)
-                views.setTextViewTextSize(R.id.widget_full_calendar_day_text, android.util.TypedValue.COMPLEX_UNIT_SP, 14f)
-                
-                val textColor = if (isToday) {
-                    android.graphics.Color.WHITE
-                } else if (isCurrentMonth) {
-                    context.getColor(R.color.widget_title_text)
+                val day = days[cellIndex]
+                val isWeekNumber = day.optBoolean("isWeekNumber", false)
+
+                val cellViews: RemoteViews
+                if (isWeekNumber) {
+                    cellViews = RemoteViews(context.packageName, R.layout.widget_full_calendar_week_num_item)
+                    val weekNum = day.optInt("weekNumber", 0)
+                    cellViews.setTextViewText(R.id.widget_full_calendar_day_text, weekNum.toString())
                 } else {
-                    context.getColor(R.color.widget_secondary_text)
-                }
-                views.setTextColor(R.id.widget_full_calendar_day_text, textColor)
+                    cellViews = RemoteViews(context.packageName, R.layout.widget_full_calendar_day_item)
+                    val dayNum = day.optInt("day", 1)
+                    val isToday = day.optBoolean("isToday", false)
+                    val isCurrentMonth = day.optBoolean("isCurrentMonth", true)
+                    val date = day.optString("date", "")
 
-                // Summaries (event/task indicators)
-                val summaries = day.optJSONArray("summaries") ?: JSONArray()
-                
-                // Reset visibility
-                views.setViewVisibility(R.id.widget_full_calendar_summary_1, android.view.View.GONE)
-                views.setViewVisibility(R.id.widget_full_calendar_summary_2, android.view.View.GONE)
-                views.setViewVisibility(R.id.widget_full_calendar_summary_3, android.view.View.GONE)
-                
-                // Populate up to 3 summaries
-                for (i in 0 until minOf(3, summaries.length())) {
-                    val summary = summaries.getJSONObject(i)
-                    val colorHex = summary.optString("color", "")
+                    cellViews.setTextViewText(R.id.widget_full_calendar_day_text, dayNum.toString())
+                    cellViews.setViewVisibility(R.id.widget_full_calendar_today_indicator, if (isToday) android.view.View.VISIBLE else android.view.View.GONE)
                     
-                    val viewId = when(i) {
-                        0 -> R.id.widget_full_calendar_summary_1
-                        1 -> R.id.widget_full_calendar_summary_2
-                        else -> R.id.widget_full_calendar_summary_3
+                    val textColor = if (isToday) {
+                        android.graphics.Color.WHITE
+                    } else if (isCurrentMonth) {
+                        context.getColor(R.color.widget_title_text)
+                    } else {
+                        context.getColor(R.color.widget_secondary_text)
                     }
-                    
-                    views.setViewVisibility(viewId, android.view.View.VISIBLE)
-                    
-                    if (colorHex.isNotEmpty()) {
-                        try {
-                            val color = android.graphics.Color.parseColor(colorHex)
-                            views.setInt(viewId, "setBackgroundColor", color)
-                        } catch (e: Exception) {}
-                    }
-                }
+                    cellViews.setTextColor(R.id.widget_full_calendar_day_text, textColor)
 
-                // Click Intent to open app to specific date
-                if (date.isNotEmpty()) {
-                    val fillInIntent = Intent().apply {
-                        data = Uri.parse("rocistasks://calendar/day/$date")
+                    // Summaries (event/task titles)
+                    val summaries = day.optJSONArray("summaries") ?: JSONArray()
+                    
+                    // Reset visibility
+                    cellViews.setViewVisibility(R.id.widget_full_calendar_summary_1, android.view.View.GONE)
+                    cellViews.setViewVisibility(R.id.widget_full_calendar_summary_2, android.view.View.GONE)
+                    cellViews.setViewVisibility(R.id.widget_full_calendar_summary_3, android.view.View.GONE)
+                    
+                    // Populate up to 3 summaries
+                    for (j in 0 until minOf(3, summaries.length())) {
+                        val summary = summaries.getJSONObject(j)
+                        val title = summary.optString("text", "")
+                        val colorHex = summary.optString("color", "")
+                        
+                        val viewId = when(j) {
+                            0 -> R.id.widget_full_calendar_summary_1
+                            1 -> R.id.widget_full_calendar_summary_2
+                            else -> R.id.widget_full_calendar_summary_3
+                        }
+                        
+                        cellViews.setViewVisibility(viewId, android.view.View.VISIBLE)
+                        cellViews.setTextViewText(viewId, title)
+                        cellViews.setTextColor(viewId, android.graphics.Color.WHITE)
+                        cellViews.setTextViewTextSize(viewId, android.util.TypedValue.COMPLEX_UNIT_SP, 10f)
+                        
+                        if (colorHex.isNotEmpty()) {
+                            try {
+                                val color = android.graphics.Color.parseColor(colorHex)
+                                cellViews.setInt(viewId, "setBackgroundColor", color)
+                            } catch (e: Exception) {}
+                        }
                     }
-                    views.setOnClickFillInIntent(R.id.widget_full_calendar_day_container, fillInIntent)
-                } else {
-                    // Empty cell
-                    views.setOnClickFillInIntent(R.id.widget_full_calendar_day_container, Intent())
+
+                    // Click Intent to open app to specific date
+                    if (date.isNotEmpty()) {
+                        val fillInIntent = Intent().apply {
+                            data = Uri.parse("rocistasks://calendar/day/$date")
+                        }
+                        cellViews.setOnClickFillInIntent(R.id.widget_full_calendar_day_container, fillInIntent)
+                    }
                 }
+                rowViews.addView(R.id.widget_full_calendar_row_container, cellViews)
             }
         } catch (e: Exception) {
-            android.util.Log.e("FullCalendarWidget", "=== ERROR in getViewAt $position ===", e)
-            // Reset views to safe state on error
-            views.setTextViewText(R.id.widget_full_calendar_day_text, "!")
-            views.setViewVisibility(R.id.widget_full_calendar_today_indicator, android.view.View.GONE)
-            views.setViewVisibility(R.id.widget_full_calendar_summary_1, android.view.View.GONE)
-            views.setViewVisibility(R.id.widget_full_calendar_summary_2, android.view.View.GONE)
-            views.setViewVisibility(R.id.widget_full_calendar_summary_3, android.view.View.GONE)
+            android.util.Log.e("FullCalendarWidget", "Error in getViewAt rows", e)
         }
 
-        return views
+        return rowViews
     }
 
     override fun getLoadingView(): RemoteViews? = null

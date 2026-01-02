@@ -198,4 +198,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noTasksYet => 'No tasks yet';
+
+  @override
+  String get duePrefix => 'Due: ';
+
+  @override
+  String get deleteTaskTitle => 'Delete Task';
+
+  @override
+  String get deleteTaskConfirmation =>
+      'Are you sure you want to delete this task?';
 }

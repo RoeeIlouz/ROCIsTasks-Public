@@ -51,13 +51,13 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
                 )
                 views.setOnClickPendingIntent(R.id.widget_add_task_btn, addTaskPendingIntent)
 
-                // 4. Grid Adapter
+                // 4. List Adapter
                 val serviceIntent = Intent(context, FullCalendarWidgetService::class.java).apply {
                     putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
                     data = Uri.parse("widget://rocis/full_calendar/$appWidgetId")
                 }
-                views.setRemoteAdapter(R.id.widget_full_calendar_grid, serviceIntent)
-                views.setEmptyView(R.id.widget_full_calendar_grid, R.id.empty_full_calendar_view)
+                views.setRemoteAdapter(R.id.widget_full_calendar_list, serviceIntent)
+                views.setEmptyView(R.id.widget_full_calendar_list, R.id.empty_full_calendar_view)
 
                 val appIntent = Intent(context, MainActivity::class.java).apply {
                     action = Intent.ACTION_VIEW
@@ -65,15 +65,15 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
                 }
                 val appPendingIntent = android.app.PendingIntent.getActivity(
                     context,
-                    100, // Request code for calendar grid template
+                    100, // Request code for calendar row template
                     appIntent,
                     android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_MUTABLE
                 )
-                views.setPendingIntentTemplate(R.id.widget_full_calendar_grid, appPendingIntent)
+                views.setPendingIntentTemplate(R.id.widget_full_calendar_list, appPendingIntent)
 
                 // 5. Finalize Update
                 appWidgetManager.updateAppWidget(appWidgetId, views)
-                appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_full_calendar_grid)
+                appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_full_calendar_list)
                 android.util.Log.d("FullCalendarWidget", "Widget $appWidgetId updated successfully")
             } catch (e: Exception) {
                 android.util.Log.e("FullCalendarWidget", "Error updating widget $appWidgetId", e)

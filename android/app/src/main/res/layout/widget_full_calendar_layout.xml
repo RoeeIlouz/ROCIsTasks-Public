@@ -16,12 +16,12 @@
 
         <TextView
             android:id="@+id/widget_full_calendar_prev"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:gravity="center"
             android:text="❮"
             android:textColor="@color/widget_title_text"
-            android:textSize="22sp"
+            android:textSize="18sp"
             android:textStyle="bold"
             android:background="?android:attr/selectableItemBackgroundBorderless" />
 
@@ -34,17 +34,17 @@
             android:gravity="center"
             android:text="Month Year"
             android:textColor="@color/widget_title_text"
-            android:textSize="26sp"
+            android:textSize="22sp"
             android:textStyle="bold" />
 
         <TextView
             android:id="@+id/widget_full_calendar_next"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:gravity="center"
             android:text="❯"
             android:textColor="@color/widget_title_text"
-            android:textSize="22sp"
+            android:textSize="18sp"
             android:textStyle="bold"
             android:background="?android:attr/selectableItemBackgroundBorderless" />
 
@@ -67,10 +67,10 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_below="@id/widget_full_calendar_header"
-        android:weightSum="8"
+        android:weightSum="7.6"
         android:paddingBottom="8dp">
 
-        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="#" android:textSize="14sp" android:textColor="@color/widget_secondary_text" android:textStyle="italic"/>
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="0.6" android:gravity="center" android:text="#" android:textSize="14sp" android:textColor="@color/widget_secondary_text" android:textStyle="italic"/>
         <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="S" android:textSize="16sp" android:textColor="@color/widget_body_text" android:textStyle="bold" />
         <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="M" android:textSize="16sp" android:textColor="@color/widget_body_text" android:textStyle="bold" />
         <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="T" android:textSize="16sp" android:textColor="@color/widget_body_text" android:textStyle="bold" />
@@ -80,19 +80,15 @@
         <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="S" android:textSize="16sp" android:textColor="@color/widget_body_text" android:textStyle="bold" />
     </LinearLayout>
 
-    <!-- Calendar Grid -->
-    <GridView
-        android:id="@+id/widget_full_calendar_grid"
+    <!-- Calendar List (Rows of weeks) -->
+    <ListView
+        android:id="@+id/widget_full_calendar_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/widget_full_calendar_weekdays"
         android:layout_alignParentBottom="true"
-        android:numColumns="8"
-        android:verticalSpacing="4dp"
-        android:horizontalSpacing="2dp"
-        android:stretchMode="columnWidth"
-        android:gravity="center"
-        android:listSelector="@android:color/transparent" />
+        android:divider="@null"
+        android:dividerHeight="0dp" />
 
     <TextView
         android:id="@+id/empty_full_calendar_view"
