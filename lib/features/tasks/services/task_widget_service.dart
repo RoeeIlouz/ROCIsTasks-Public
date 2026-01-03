@@ -1,13 +1,17 @@
 import 'dart:convert';
-import 'package:flutter/foundation.dart' hide Category;
+import 'package:flutter/material.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/features/categories/domain/models/category.dart';
+import 'package:rocis_tasks/features/tasks/presentation/widgets/circular_task_chart.dart';
 
 /// Service responsible for preparing and updating Task Widget data
 class TaskWidgetService {
   /// Standardized task data structure for widget consumption
-  static Map<String, dynamic> _serializeTaskForWidget(Task task, Category? category) {
+  static Map<String, dynamic> _serializeTaskForWidget(
+    Task task,
+    Category? category,
+  ) {
     try {
       return {
         'id': task.id,
@@ -17,7 +21,7 @@ class TaskWidgetService {
             ? _formatColorForWidget(category.colorValue)
             : '',
         'dueDate': task.dueDate != null
-            ? _formatDateForDisplay(task.dueDate!)
+            ? formatDateForDisplay(task.dueDate!)
             : '',
         'dueDateIso': task.dueDate?.toIso8601String() ?? '',
         'isCompleted': task.isCompleted,
@@ -64,16 +68,65 @@ class TaskWidgetService {
   }
 
   /// Update Task Widget with current pending tasks data
-  static Future<void> updateTaskWidget(
+  static Future<String?> updateTaskWidget(
     List<Task> allTasks,
-    Category? Function(String?) getCategoryById,
-  ) async {
+    Category? Function(String?) getCategoryById, {
+    bool isDarkText = false,
+  }) async {
+    String? chartPath;
     try {
       debugPrint('TaskWidgetService: Starting widget update');
-      
+
+      // Calculate stats
+      int completed = 0;
+      int pending = 0;
+      int deleted = 0;
+
+      for (final task in allTasks) {
+        if (task.isDeleted ?? false) {
+          deleted++;
+        } else if (task.isCompleted) {
+          completed++;
+        } else {
+          pending++;
+        }
+      }
+
+      // Generate Progressive Circle Chart
+      try {
+        chartPath = await HomeWidget.renderFlutterWidget(
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              CircularTaskChart(
+                completed: completed,
+                pending: pending,
+                deleted: deleted,
+                size: 200,
+              ),
+              Text(
+                pending > 99 ? '99+' : '$pending',
+                style: TextStyle(
+                  fontSize: 110,
+                  fontWeight: FontWeight.bold,
+                  color: isDarkText ? Colors.black : Colors.white,
+                  decoration: TextDecoration.none,
+                ),
+              ),
+            ],
+          ),
+          key: 'chart_image_path',
+          logicalSize: const Size(200, 200),
+        );
+      } catch (e) {
+        debugPrint('Error generating chart widget: $e');
+      }
+
       // Filter to get only pending tasks
       final pendingTasks = filterPendingTasks(allTasks);
-      debugPrint('TaskWidgetService: Found ${pendingTasks.length} pending tasks');
+      debugPrint(
+        'TaskWidgetService: Found ${pendingTasks.length} pending tasks',
+      );
 
       // Sort by due date
       sortTasksByDueDate(pendingTasks);
@@ -94,8 +147,13 @@ class TaskWidgetService {
       // Save widget data with error handling
       try {
         final jsonString = jsonEncode(tasksJson);
-        debugPrint('TaskWidgetService: Saving ${tasksJson.length} tasks, payload size: ${jsonString.length}');
-        await HomeWidget.saveWidgetData<String>('pending_tasks_list', jsonString);
+        debugPrint(
+          'TaskWidgetService: Saving ${tasksJson.length} tasks, payload size: ${jsonString.length}',
+        );
+        await HomeWidget.saveWidgetData<String>(
+          'pending_tasks_list',
+          jsonString,
+        );
       } catch (e) {
         debugPrint('Error serializing tasks for widget: $e');
         // Provide fallback empty data to prevent widget crashes
@@ -109,6 +167,7 @@ class TaskWidgetService {
       );
 
       debugPrint('TaskWidgetService: Widget update completed successfully');
+      return chartPath;
     } catch (e) {
       debugPrint('TaskWidgetService: Critical error during widget update: $e');
       // Ensure widget has some data even if update fails
@@ -119,8 +178,11 @@ class TaskWidgetService {
           iOSName: 'TaskWidget',
         );
       } catch (fallbackError) {
-        debugPrint('TaskWidgetService: Fallback update also failed: $fallbackError');
+        debugPrint(
+          'TaskWidgetService: Fallback update also failed: $fallbackError',
+        );
       }
+      return null;
     }
   }
 
@@ -135,11 +197,11 @@ class TaskWidgetService {
   }
 
   /// Format date for consistent display across widgets (YYYY-MM-DD format)
-  static String _formatDateForDisplay(DateTime date) {
+  static String formatDateForDisplay(DateTime date) {
     try {
       return '${date.year.toString().padLeft(4, '0')}-'
-             '${date.month.toString().padLeft(2, '0')}-'
-             '${date.day.toString().padLeft(2, '0')}';
+          '${date.month.toString().padLeft(2, '0')}-'
+          '${date.day.toString().padLeft(2, '0')}';
     } catch (e) {
       debugPrint('Error formatting date $date: $e');
       return ''; // Return empty string as fallback

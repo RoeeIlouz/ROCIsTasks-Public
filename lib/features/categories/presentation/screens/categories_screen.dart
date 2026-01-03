@@ -4,6 +4,7 @@ import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.
 import 'package:rocis_tasks/features/categories/domain/models/category.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:rocis_tasks/core/theme/app_theme.dart';
+import 'package:rocis_tasks/core/utils/icon_utils.dart';
 
 class CategoriesScreen extends StatelessWidget {
   const CategoriesScreen({super.key});
@@ -50,7 +51,7 @@ class CategoriesScreen extends StatelessWidget {
                   leading: CircleAvatar(
                     backgroundColor: Color(category.colorValue),
                     child: Icon(
-                      IconData(category.iconCode, fontFamily: 'MaterialIcons'),
+                      IconUtils.getIconData(category.iconCode),
                       color: Colors.white,
                       size: 20,
                     ),
@@ -128,34 +129,14 @@ class _CategorySheetState extends State<_CategorySheet> {
     Colors.blueGrey,
   ];
 
-  final List<IconData> _icons = [
-    Icons.work,
-    Icons.home,
-    Icons.school,
-    Icons.flight,
-    Icons.local_cafe,
-    Icons.local_grocery_store,
-    Icons.fitness_center,
-    Icons.local_hospital,
-    Icons.code,
-    Icons.build,
-    Icons.pets,
-    Icons.local_florist,
-    Icons.wifi,
-    Icons.local_dining,
-    Icons.directions_car,
-    Icons.directions_bus,
-    Icons.directions_bike,
-    Icons.directions_boat,
-    Icons.local_mall,
-    Icons.local_offer,
-  ];
+  final List<IconData> _icons = IconUtils.categoryIcons;
 
   @override
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.category?.name ?? '');
-    _selectedColor = widget.category?.colorValue ?? AppTheme.primaryColor.value;
+    _selectedColor =
+        widget.category?.colorValue ?? AppTheme.primaryColor.toARGB32();
     _selectedIcon = widget.category?.iconCode ?? Icons.category.codePoint;
   }
 
@@ -192,7 +173,7 @@ class _CategorySheetState extends State<_CategorySheet> {
                 height: 4,
                 margin: const EdgeInsets.only(bottom: 24),
                 decoration: BoxDecoration(
-                  color: theme.dividerColor.withOpacity(0.2),
+                  color: theme.dividerColor.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -214,7 +195,7 @@ class _CategorySheetState extends State<_CategorySheet> {
                     radius: 32,
                     backgroundColor: Color(_selectedColor),
                     child: Icon(
-                      IconData(_selectedIcon, fontFamily: 'MaterialIcons'),
+                      IconUtils.getIconData(_selectedIcon),
                       color: Colors.white,
                       size: 32,
                     ),
@@ -262,9 +243,10 @@ class _CategorySheetState extends State<_CategorySheet> {
                 separatorBuilder: (context, index) => const SizedBox(width: 12),
                 itemBuilder: (context, index) {
                   final color = _colors[index];
-                  final isSelected = _selectedColor == color.value;
+                  final isSelected = _selectedColor == color.toARGB32();
                   return GestureDetector(
-                    onTap: () => setState(() => _selectedColor = color.value),
+                    onTap: () =>
+                        setState(() => _selectedColor = color.toARGB32()),
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
                       width: 40,
@@ -281,7 +263,7 @@ class _CategorySheetState extends State<_CategorySheet> {
                         boxShadow: isSelected
                             ? [
                                 BoxShadow(
-                                  color: color.withOpacity(0.4),
+                                  color: color.withValues(alpha: 0.4),
                                   blurRadius: 8,
                                   offset: const Offset(0, 4),
                                 ),
@@ -327,9 +309,9 @@ class _CategorySheetState extends State<_CategorySheet> {
                     duration: const Duration(milliseconds: 200),
                     decoration: BoxDecoration(
                       color: isSelected
-                          ? Color(_selectedColor).withOpacity(0.1)
+                          ? Color(_selectedColor).withValues(alpha: 0.1)
                           : theme.colorScheme.surfaceContainerHighest
-                                .withOpacity(0.3),
+                                .withValues(alpha: 0.3),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
                         color: isSelected

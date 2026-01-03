@@ -9,6 +9,14 @@ import android.widget.RemoteViews
 import es.antonborri.home_widget.HomeWidgetProvider
 
 class TaskWidgetProvider : HomeWidgetProvider() {
+
+    companion object {
+        const val ACTION_SORT_CHANGE = "com.example.rocis_tasks.ACTION_SORT_CHANGE"
+        const val ACTION_FILTER_CHANGE = "com.example.rocis_tasks.ACTION_FILTER_CHANGE"
+        const val PREF_SORT_KEY = "widget_sort_mode" // 0: Date, 1: Priority
+        const val PREF_FILTER_KEY = "widget_filter_mode" // 0: All, 1: Today, 2: High Priority
+    }
+
     override fun onUpdate(
         context: Context,
         appWidgetManager: AppWidgetManager,
@@ -18,44 +26,114 @@ class TaskWidgetProvider : HomeWidgetProvider() {
         android.util.Log.d("TaskWidget", "onUpdate started for ${appWidgetIds.size} widgets")
         appWidgetIds.forEach { appWidgetId ->
             try {
-                android.util.Log.d("TaskWidget", "Processing widget ID: $appWidgetId")
-                val views = RemoteViews(context.packageName, R.layout.widget_layout)
-                android.util.Log.d("TaskWidget", "Created RemoteViews for widget_layout")
-
-                // Set up the intent that starts the TaskWidgetService
-                val intent = Intent(context, TaskWidgetService::class.java).apply {
-                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-                    data = Uri.parse("widget://rocis/task/$appWidgetId")
-                }
-                android.util.Log.d("TaskWidget", "Created service intent with URI: ${intent.data}")
-
-                android.util.Log.d("TaskWidget", "Calling setRemoteAdapter for R.id.widget_list_view")
-                views.setRemoteAdapter(R.id.widget_list_view, intent)
-                
-                android.util.Log.d("TaskWidget", "Calling setEmptyView")
-                views.setEmptyView(R.id.widget_list_view, R.id.empty_view)
-
-                // Template for item clicks
-                val appIntent = Intent(context, MainActivity::class.java)
-                val appPendingIntent = android.app.PendingIntent.getActivity(
-                    context,
-                    201,
-                    appIntent,
-                    android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_MUTABLE
-                )
-                views.setPendingIntentTemplate(R.id.widget_list_view, appPendingIntent)
-                android.util.Log.d("TaskWidget", "Set PendingIntentTemplate")
-
-                android.util.Log.d("TaskWidget", "Calling updateAppWidget")
-                appWidgetManager.updateAppWidget(appWidgetId, views)
-                
-                android.util.Log.d("TaskWidget", "Calling notifyAppWidgetViewDataChanged")
-                appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_list_view)
-                
-                android.util.Log.d("TaskWidget", "=== Widget $appWidgetId updated successfully ===")
+                updateWidget(context, appWidgetManager, appWidgetId, widgetData)
             } catch (e: Exception) {
                 android.util.Log.e("TaskWidget", "=== ERROR updating widget $appWidgetId ===", e)
             }
+        }
+    }
+
+    private fun updateWidget(
+        context: Context, 
+        appWidgetManager: AppWidgetManager, 
+        appWidgetId: Int,
+        widgetData: SharedPreferences
+    ) {
+        android.util.Log.d("TaskWidget", "Processing widget ID: $appWidgetId")
+        val views = RemoteViews(context.packageName, R.layout.widget_layout)
+        
+        // Setup List Adapter
+        val intent = Intent(context, TaskWidgetService::class.java).apply {
+            putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+            data = Uri.parse("widget://rocis/task/$appWidgetId")
+        }
+        views.setRemoteAdapter(R.id.widget_list_view, intent)
+        views.setEmptyView(R.id.widget_list_view, R.id.empty_view)
+
+        // Setup Item Click Template
+        val appIntent = Intent(context, MainActivity::class.java)
+        val appPendingIntent = android.app.PendingIntent.getActivity(
+            context,
+            201,
+            appIntent,
+            android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_MUTABLE
+        )
+        views.setPendingIntentTemplate(R.id.widget_list_view, appPendingIntent)
+
+        // Setup Sort/Filter Buttons
+        updateButtonState(views, widgetData)
+        setupButtonIntents(context, views, appWidgetId)
+
+        appWidgetManager.updateAppWidget(appWidgetId, views)
+        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_list_view)
+        android.util.Log.d("TaskWidget", "=== Widget $appWidgetId updated successfully ===")
+    }
+
+    private fun updateButtonState(views: RemoteViews, prefs: SharedPreferences) {
+        val sortMode = prefs.getInt(PREF_SORT_KEY, 0)
+        val filterMode = prefs.getInt(PREF_FILTER_KEY, 0)
+
+        val sortText = if (sortMode == 0) "Sort: Date" else "Sort: Priority"
+        val filterText = when (filterMode) {
+            0 -> "Filter: All"
+            1 -> "Filter: Today"
+            2 -> "Filter: High Prio"
+            else -> "Filter: All"
+        }
+
+        views.setTextViewText(R.id.widget_btn_sort, sortText)
+        views.setTextViewText(R.id.widget_btn_filter, filterText)
+    }
+
+    private fun setupButtonIntents(context: Context, views: RemoteViews, appWidgetId: Int) {
+        val sortIntent = Intent(context, TaskWidgetProvider::class.java).apply {
+            action = ACTION_SORT_CHANGE
+            putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+            // Need URI to distinguish intents for different widgets/actions if needed, 
+            // but for broadcast usually unique action/request code is enough.
+            // However, request code must be unique per pending intent.
+        }
+        val sortPendingIntent = android.app.PendingIntent.getBroadcast(
+            context, appWidgetId, sortIntent, 
+            android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_MUTABLE
+        )
+        views.setOnClickPendingIntent(R.id.widget_btn_sort, sortPendingIntent)
+
+        val filterIntent = Intent(context, TaskWidgetProvider::class.java).apply {
+            action = ACTION_FILTER_CHANGE
+            putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+        }
+        val filterPendingIntent = android.app.PendingIntent.getBroadcast(
+            context, appWidgetId + 10000, filterIntent, // Offset to avoid collision
+            android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_MUTABLE
+        )
+        views.setOnClickPendingIntent(R.id.widget_btn_filter, filterPendingIntent)
+    }
+
+    override fun onReceive(context: Context, intent: Intent) {
+        super.onReceive(context, intent)
+        val action = intent.action
+        if (action == ACTION_SORT_CHANGE || action == ACTION_FILTER_CHANGE) {
+            android.util.Log.d("TaskWidget", "Received action: $action")
+            val widgetData = es.antonborri.home_widget.HomeWidgetPlugin.getData(context)
+            val editor = widgetData.edit()
+
+            if (action == ACTION_SORT_CHANGE) {
+                val currentSort = widgetData.getInt(PREF_SORT_KEY, 0)
+                editor.putInt(PREF_SORT_KEY, if (currentSort == 0) 1 else 0)
+            } else if (action == ACTION_FILTER_CHANGE) {
+                val currentFilter = widgetData.getInt(PREF_FILTER_KEY, 0)
+                val nextFilter = (currentFilter + 1) % 3
+                editor.putInt(PREF_FILTER_KEY, nextFilter)
+            }
+            editor.apply()
+
+            val appWidgetManager = AppWidgetManager.getInstance(context)
+            val thisAppWidget = android.content.ComponentName(context, TaskWidgetProvider::class.java)
+            val appWidgetIds = appWidgetManager.getAppWidgetIds(thisAppWidget)
+            
+            // Re-update all widgets to reflect state
+            onUpdate(context, appWidgetManager, appWidgetIds, widgetData)
         }
     }
 }

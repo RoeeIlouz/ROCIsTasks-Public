@@ -9,6 +9,7 @@ import 'package:rocis_tasks/features/tasks/data/datasources/local_task_source.da
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/core/services/firestore_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:rocis_tasks/core/theme/theme_service.dart';
 import 'package:rocis_tasks/core/services/auth_service.dart';
 import 'package:rocis_tasks/core/services/calendar_service.dart';
 
@@ -25,6 +26,7 @@ class TaskProvider extends ChangeNotifier {
   final FirestoreService _firestoreService = FirestoreService();
   final AuthService _authService;
   final CalendarService _calendarService;
+  final ThemeService _themeService;
   late final MonthWidgetService _monthWidgetService;
   late final FullCalendarWidgetService _fullCalendarWidgetService;
   bool _isLoading = true;
@@ -32,10 +34,18 @@ class TaskProvider extends ChangeNotifier {
   StreamSubscription? _categoriesSubscription;
   StreamSubscription? _authSubscription;
 
-  TaskProvider(this._authService, this._calendarService);
+  TaskProvider(this._authService, this._calendarService, this._themeService);
   Timer? _widgetDebounce;
   bool _widgetUpdateInProgress = false;
   bool get isLoading => _isLoading;
+
+  Task? _taskToEdit;
+  Task? get taskToEdit => _taskToEdit;
+
+  void clearTaskToEdit() {
+    _taskToEdit = null;
+    notifyListeners();
+  }
 
   Future<void> init() async {
     _monthWidgetService = MonthWidgetService(_calendarService, _source);
@@ -46,6 +56,32 @@ class TaskProvider extends ChangeNotifier {
     await _source.init();
     await _notificationService.init();
     await _notificationService.requestPermissions();
+
+    // Clear ghost notifications from previous sessions (fix for duplicate notifications)
+    await _notificationService.cancelAllNotifications();
+
+    // Reschedule valid notifications with stable IDs
+    final allTasks = _source.getTasks();
+    for (var task in allTasks) {
+      if (!task.isCompleted &&
+          !(task.isDeleted ?? false) &&
+          task.dueDate != null &&
+          task.dueDate!.isAfter(DateTime.now())) {
+        try {
+          await _notificationService.scheduleNotification(
+            id: NotificationService.getNotificationId(task.id),
+            title: 'Task Reminder: ${task.title}',
+            body: task.description.isNotEmpty
+                ? task.description
+                : 'You have a task due now!',
+            scheduledDate: task.dueDate!,
+            taskId: task.id,
+          );
+        } catch (e) {
+          debugPrint('Error rescheduling notification during init: $e');
+        }
+      }
+    }
 
     final prefs = await SharedPreferences.getInstance();
     // Load Sort Option
@@ -86,6 +122,60 @@ class TaskProvider extends ChangeNotifier {
       await uploadLocalDataToCloud(); // Ensure local data is pushed on startup
       await syncWithCloud();
       updateHomeWidget();
+    }
+
+    // Listen for notification actions
+    _notificationService.onNotificationResponse.listen((response) {
+      final payload = response.payload;
+      if (payload != null) {
+        final taskId = payload;
+        final actionId = response.actionId;
+        if (actionId == 'snooze') {
+          _snoozeTask(taskId);
+        } else if (actionId == 'complete') {
+          _completeTaskFromNotification(taskId);
+        } else {
+          // 'reschedule' or tapping the notification body
+          _navigateToTask(taskId);
+        }
+      }
+    });
+  }
+
+  void _navigateToTask(String taskId) {
+    try {
+      final task = _source.getTasks().firstWhere((t) => t.id == taskId);
+      _taskToEdit = task;
+      notifyListeners();
+      debugPrint('Task $taskId set for editing/navigation');
+    } catch (e) {
+      debugPrint('Error navigating to task: $e');
+    }
+  }
+
+  Future<void> _snoozeTask(String taskId) async {
+    try {
+      final task = _source.getTasks().firstWhere((t) => t.id == taskId);
+      if (task.dueDate != null) {
+        // Add 15 minutes
+        final newDate = task.dueDate!.add(const Duration(minutes: 15));
+        await updateTask(task, dueDate: newDate);
+        debugPrint('Task $taskId snoozed to $newDate');
+      }
+    } catch (e) {
+      debugPrint('Error snoozing task: $e');
+    }
+  }
+
+  Future<void> _completeTaskFromNotification(String taskId) async {
+    try {
+      final task = _source.getTasks().firstWhere((t) => t.id == taskId);
+      if (!task.isCompleted) {
+        await toggleTaskCompletion(task);
+        debugPrint('Task $taskId marked completed from notification');
+      }
+    } catch (e) {
+      debugPrint('Error completing task from notification: $e');
     }
   }
 
@@ -128,6 +218,21 @@ class TaskProvider extends ChangeNotifier {
         (cloudTasks) async {
           for (var cloudTask in cloudTasks) {
             await _source.addTask(cloudTask);
+            // Schedule notification for synced task if needed
+            if (!cloudTask.isCompleted &&
+                !(cloudTask.isDeleted ?? false) &&
+                cloudTask.dueDate != null &&
+                cloudTask.dueDate!.isAfter(DateTime.now())) {
+              await _notificationService.scheduleNotification(
+                id: NotificationService.getNotificationId(cloudTask.id),
+                title: 'Task Reminder: ${cloudTask.title}',
+                body: cloudTask.description.isNotEmpty
+                    ? cloudTask.description
+                    : 'You have a task due now!',
+                scheduledDate: cloudTask.dueDate!,
+                taskId: cloudTask.id,
+              );
+            }
           }
           notifyListeners();
           updateHomeWidget();
@@ -271,23 +376,36 @@ class TaskProvider extends ChangeNotifier {
   }
 
   Future<void> updateHomeWidget() async {
-    // 1. Update Persistent Notification FIRST to ensure visibility
+    // Debounced update to avoid spamming during rapid changes
     _widgetDebounce?.cancel();
     _widgetDebounce = Timer(const Duration(milliseconds: 300), () async {
       if (_widgetUpdateInProgress) return;
       _widgetUpdateInProgress = true;
+
       try {
+        debugPrint('WIDGET DEBUG: updateHomeWidget started (debounced)');
+
+        final bool isDarkText = !_themeService.isDarkMode;
+
+        // 1. Update Task Widget & Generate Chart
+        // This service now returns the path to the generated chart image
+        final chartPath = await TaskWidgetService.updateTaskWidget(
+          _source.getTasks(),
+          getCategoryById,
+          isDarkText: isDarkText,
+        );
+
+        // 2. Update Notification with Chart
         final uncompletedTasks = _source
             .getTasks()
             .where((t) => !t.isCompleted && !(t.isDeleted ?? false))
             .toList();
 
+        // Sort for notification listing (Priority -> Due Date)
         uncompletedTasks.sort((a, b) {
-          // Priority descending (High -> Medium -> Low)
           if (a.priority != b.priority) {
             return b.priority.index.compareTo(a.priority.index);
           }
-          // Fallback to due date
           if (a.dueDate == null && b.dueDate == null) return 0;
           if (a.dueDate == null) return 1;
           if (b.dueDate == null) return -1;
@@ -297,287 +415,243 @@ class TaskProvider extends ChangeNotifier {
         await _notificationService.showTaskCountNotification(
           uncompletedTasks.length,
           uncompletedTasks.map((t) => t.title).toList(),
+          largeIconPath: chartPath,
+          isDarkText: !_themeService.isDarkMode, // Black text on Light mode
         );
+
+        // 3. Continue with other widget updates (Calendar, Schedule, Month)
+        // We do this here to ensure sequential execution and avoid race conditions
+
+        // Get Events for Month View
+        final now = DateTime.now();
+        final start = DateTime(now.year, now.month - 1, 1);
+        final end = DateTime(now.year, now.month + 2, 0);
+        final eventsByDay = <String, bool>{};
+
+        final allTasks = _source.getTasks().where(
+          (t) => !(t.isDeleted ?? false),
+        );
+        for (var task in allTasks) {
+          if (task.dueDate != null) {
+            final dateKey = DateFormat('yyyy-MM-dd').format(task.dueDate!);
+            eventsByDay[dateKey] = true;
+          }
+        }
+
+        try {
+          final calendarEvents = await _calendarService.getEvents(
+            startDate: start,
+            endDate: end,
+          );
+          for (var event in calendarEvents) {
+            if (event.start != null) {
+              final dateKey = DateFormat('yyyy-MM-dd').format(event.start!);
+              eventsByDay[dateKey] = true;
+            }
+          }
+        } catch (e) {
+          debugPrint('Error fetching calendar events for widget: $e');
+        }
+
+        try {
+          await HomeWidget.saveWidgetData<String>(
+            'month_events_map',
+            jsonEncode(eventsByDay),
+          );
+        } catch (e) {
+          await HomeWidget.saveWidgetData<String>('month_events_map', '{}');
+        }
+
+        await HomeWidget.updateWidget(
+          name: 'CalendarWidgetProvider',
+          iOSName: 'CalendarWidget',
+        );
+
+        // Update Schedule Widget
+        await _updateScheduleWidget();
+
+        // Update Calendar List Widget
+        await _updateCalendarListWidget();
+
+        // Update Month & Full Calendar Widgets
+        await _monthWidgetService.updateMonthWidget();
+        await _fullCalendarWidgetService.updateFullCalendarWidget();
       } catch (e) {
-        debugPrint('Error updating notification early: $e');
+        debugPrint('Error in updateHomeWidget: $e');
       } finally {
         _widgetUpdateInProgress = false;
       }
     });
+  }
 
-    // Continue with other widget updates
-    debugPrint('WIDGET DEBUG: updateHomeWidget started');
+  // Helper for Schedule Widget Logic (extracted for clarity)
+  Future<void> _updateScheduleWidget() async {
+    final scheduleStart = DateTime.now().subtract(const Duration(days: 1));
+    final scheduleEnd = DateTime.now().add(const Duration(days: 30));
+    final scheduleItems = <Map<String, dynamic>>[];
+
+    final scheduleTasks = _source.getTasks().where((t) {
+      if (t.isCompleted || (t.isDeleted ?? false) || t.dueDate == null) {
+        return false;
+      }
+      return t.dueDate!.isAfter(scheduleStart) &&
+          t.dueDate!.isBefore(scheduleEnd);
+    });
+
+    for (var t in scheduleTasks) {
+      final cat = getCategoryById(t.categoryId);
+      scheduleItems.add({
+        'type': 'task',
+        'id': t.id,
+        'title': t.title,
+        'description': t.description,
+        'category_color': cat != null
+            ? '#${cat.colorValue.toRadixString(16).padLeft(8, '0')}'
+            : '',
+        'date': t.dueDate!.toIso8601String(),
+        'dateDisplay': TaskWidgetService.formatDateForDisplay(
+          t.dueDate!,
+        ), // Need to expose public helper or duplicate
+        'timeDisplay': DateFormat('HH:mm').format(t.dueDate!),
+        'isAllDay': false,
+        'location': '',
+        'priority': t.priority.name,
+      });
+    }
+
     try {
-      // 1. Update Task Widget using dedicated service
-      await TaskWidgetService.updateTaskWidget(
-        _source.getTasks(),
-        getCategoryById,
+      final calendarEvents = await _calendarService.getEvents(
+        startDate: scheduleStart,
+        endDate: scheduleEnd,
       );
+      for (var event in calendarEvents) {
+        if (event.start != null) {
+          scheduleItems.add({
+            'type': 'event',
+            'id': event.eventId ?? '',
+            'title': event.title ?? 'No Title',
+            'description': event.description ?? '',
+            'date': event.start!.toIso8601String(),
+            'dateDisplay': TaskWidgetService.formatDateForDisplay(event.start!),
+            'timeDisplay': event.allDay == true
+                ? 'All Day'
+                : DateFormat('HH:mm').format(event.start!),
+            'isAllDay': event.allDay ?? false,
+            'location': event.location ?? '',
+            'category_color': '#4285F4',
+            'priority': '',
+          });
+        }
+      }
+    } catch (e) {
+      debugPrint('Error fetching calendar events for schedule: $e');
+    }
 
-      // 2. Get Events for Month View (Tasks + Calendar Events)
-      final now = DateTime.now();
-      final start = DateTime(now.year, now.month - 1, 1);
-      final end = DateTime(now.year, now.month + 2, 0);
+    scheduleItems.sort(
+      (a, b) => DateTime.parse(a['date']).compareTo(DateTime.parse(b['date'])),
+    );
 
-      final eventsByDay = <String, bool>{};
+    try {
+      await HomeWidget.saveWidgetData<String>(
+        'schedule_list',
+        jsonEncode(scheduleItems),
+      );
+    } catch (e) {
+      await HomeWidget.saveWidgetData<String>('schedule_list', '[]');
+    }
 
-      // Add Tasks with Due Dates
-      final allTasks = _source.getTasks().where((t) => !(t.isDeleted ?? false));
-      for (var task in allTasks) {
-        if (task.dueDate != null) {
-          final dateKey = DateFormat('yyyy-MM-dd').format(task.dueDate!);
-          eventsByDay[dateKey] = true;
+    await HomeWidget.updateWidget(
+      name: 'ScheduleWidgetProvider',
+      iOSName: 'ScheduleWidget',
+    );
+  }
+
+  // Helper for Calendar List Widget Logic (extracted for clarity)
+  Future<void> _updateCalendarListWidget() async {
+    final listStart = DateTime.now();
+    final listEnd = listStart.add(const Duration(days: 7));
+    final calendarListEvents = <Map<String, dynamic>>[];
+
+    try {
+      final events = await _calendarService.getEvents(
+        startDate: listStart,
+        endDate: listEnd,
+      );
+      for (var event in events) {
+        if (event.start != null) {
+          calendarListEvents.add({
+            'type': 'event',
+            'id': event.eventId ?? '',
+            'title': event.title ?? 'No Title',
+            'start': event.start!.toIso8601String(),
+            'startDisplay': event.allDay == true
+                ? 'All Day'
+                : DateFormat('HH:mm').format(event.start!),
+            'dateDisplay': TaskWidgetService.formatDateForDisplay(event.start!),
+            'category_color': '#4285F4',
+          });
         }
       }
 
-      // Add Calendar Events
-      try {
-        final calendarEvents = await _calendarService.getEvents(
-          startDate: start,
-          endDate: end,
-        );
-        for (var event in calendarEvents) {
-          if (event.start != null) {
-            final dateKey = DateFormat('yyyy-MM-dd').format(event.start!);
-            eventsByDay[dateKey] = true;
-          }
-        }
-      } catch (e) {
-        debugPrint('Error fetching calendar events for widget: $e');
-      }
-
-      try {
-        final monthMapJson = jsonEncode(eventsByDay);
-        debugPrint(
-          'WIDGET DEBUG: Saving month_events_map. Payload length: ${monthMapJson.length}',
-        );
-        await HomeWidget.saveWidgetData<String>(
-          'month_events_map',
-          monthMapJson,
-        );
-      } catch (e) {
-        debugPrint('Error serializing month events for widget: $e');
-        // Provide fallback empty data
-        await HomeWidget.saveWidgetData<String>('month_events_map', '{}');
-      }
-
-      // Update Widgets
-      await HomeWidget.updateWidget(
-        name: 'CalendarWidgetProvider',
-        iOSName: 'CalendarWidget',
-      );
-
-      // 3. Get Schedule List (Combined Tasks + Events for Agenda)
-      final scheduleStart = DateTime.now().subtract(
-        const Duration(days: 1),
-      ); // Include today
-      final scheduleEnd = DateTime.now().add(const Duration(days: 30));
-
-      final scheduleItems = <Map<String, dynamic>>[];
-
-      // Add Tasks
-      final scheduleTasks = _source.getTasks().where((t) {
+      final listTasks = _source.getTasks().where((t) {
         if (t.isCompleted || (t.isDeleted ?? false) || t.dueDate == null) {
           return false;
         }
-        return t.dueDate!.isAfter(scheduleStart) &&
-            t.dueDate!.isBefore(scheduleEnd);
+        return t.dueDate!.isAfter(listStart) && t.dueDate!.isBefore(listEnd);
       });
 
-      for (var t in scheduleTasks) {
+      for (var t in listTasks) {
         final cat = getCategoryById(t.categoryId);
-        scheduleItems.add({
+        calendarListEvents.add({
           'type': 'task',
           'id': t.id,
           'title': t.title,
-          'description': t.description,
+          'start': t.dueDate!.toIso8601String(),
+          'startDisplay': DateFormat('HH:mm').format(t.dueDate!),
+          'dateDisplay': TaskWidgetService.formatDateForDisplay(t.dueDate!),
           'category_color': cat != null
               ? '#${cat.colorValue.toRadixString(16).padLeft(8, '0')}'
-              : '',
-          'date': t.dueDate!.toIso8601String(),
-          'dateDisplay': _formatDateForDisplay(t.dueDate!),
-          'timeDisplay': DateFormat('HH:mm').format(t.dueDate!),
-          'isAllDay': false,
-          'location': '', // Tasks don't have location
-          'priority': t.priority.name,
+              : '#9E9E9E',
         });
-      }
-
-      // Add Events (Fetch for schedule range)
-      try {
-        final calendarEvents = await _calendarService.getEvents(
-          startDate: scheduleStart,
-          endDate: scheduleEnd,
-        );
-        for (var event in calendarEvents) {
-          if (event.start != null) {
-            scheduleItems.add({
-              'type': 'event',
-              'id': event.eventId ?? '',
-              'title': event.title ?? 'No Title',
-              'description': event.description ?? '',
-              'date': event.start!.toIso8601String(),
-              'dateDisplay': _formatDateForDisplay(event.start!),
-              'timeDisplay': event.allDay == true
-                  ? 'All Day'
-                  : DateFormat('HH:mm').format(event.start!),
-              'isAllDay': event.allDay ?? false,
-              'location': event.location ?? '',
-              'category_color': '#4285F4', // Default event color
-              'priority': '', // Events don't have priority
-            });
-          }
-        }
-      } catch (e) {
-        debugPrint('Error fetching calendar events for schedule: $e');
-      }
-
-      // Sort by date
-      scheduleItems.sort((a, b) {
-        final dateA = DateTime.parse(a['date']);
-        final dateB = DateTime.parse(b['date']);
-        return dateA.compareTo(dateB);
-      });
-
-      try {
-        final scheduleJson = jsonEncode(scheduleItems);
-        debugPrint(
-          'WIDGET DEBUG: Saving schedule list with ${scheduleItems.length} items. Payload size: ${scheduleJson.length}',
-        );
-
-        await HomeWidget.saveWidgetData<String>('schedule_list', scheduleJson);
-      } catch (e) {
-        debugPrint('Error serializing schedule items for widget: $e');
-        // Provide fallback empty data
-        await HomeWidget.saveWidgetData<String>('schedule_list', '[]');
-      }
-
-      await HomeWidget.updateWidget(
-        name: 'ScheduleWidgetProvider',
-        iOSName: 'ScheduleWidget',
-      );
-      // (Persistent Notification now updated at the beginning of this method)
-
-      // 4. Get Calendar Events for CalendarWidget (List View)
-      // Showing Next 7 Days of events
-      final listStart = DateTime.now();
-      final listEnd = listStart.add(const Duration(days: 7));
-      final calendarListEvents = <Map<String, dynamic>>[];
-
-      try {
-        final events = await _calendarService.getEvents(
-          startDate: listStart,
-          endDate: listEnd,
-        );
-
-        // Process events with proper field completeness
-        for (var event in events) {
-          if (event.start != null) {
-            final timeStr = event.allDay == true
-                ? 'All Day'
-                : DateFormat('HH:mm').format(event.start!);
-
-            calendarListEvents.add({
-              'type': 'event',
-              'id': event.eventId ?? '',
-              'title': event.title ?? 'No Title',
-              'start': event.start!.toIso8601String(),
-              'startDisplay': timeStr,
-              'dateDisplay': _formatDateForDisplay(event.start!),
-              'category_color': '#4285F4', // Default event color
-            });
-          }
-        }
-
-        // Add Tasks with proper filtering and field completeness
-        final listTasks = _source.getTasks().where((t) {
-          if (t.isCompleted || (t.isDeleted ?? false) || t.dueDate == null) {
-            return false;
-          }
-          return t.dueDate!.isAfter(listStart) && t.dueDate!.isBefore(listEnd);
-        });
-
-        for (var t in listTasks) {
-          final cat = getCategoryById(t.categoryId);
-          calendarListEvents.add({
-            'type': 'task',
-            'id': t.id,
-            'title': t.title,
-            'start': t.dueDate!.toIso8601String(),
-            'startDisplay': DateFormat('HH:mm').format(t.dueDate!),
-            'dateDisplay': _formatDateForDisplay(t.dueDate!),
-            'category_color': cat != null
-                ? '#${cat.colorValue.toRadixString(16).padLeft(8, '0')}'
-                : '#9E9E9E', // Default gray color for tasks without category
-          });
-        }
-      } catch (e) {
-        debugPrint('Error fetching events/tasks for CalendarWidget list: $e');
-        // Provide fallback empty data on error
-        calendarListEvents.clear();
-      }
-
-      // Sort combined list chronologically (proper data merging)
-      calendarListEvents.sort((a, b) {
-        final aStart = a['start'] as String;
-        final bStart = b['start'] as String;
-        if (aStart.isEmpty && bStart.isEmpty) return 0;
-        if (aStart.isEmpty) return 1;
-        if (bStart.isEmpty) return -1;
-        return DateTime.parse(aStart).compareTo(DateTime.parse(bStart));
-      });
-
-      // Add header with week number calculation
-      final currentWeekNumber = _getWeekNumber(DateTime.now());
-      final headerData = {
-        'currentWeek': currentWeekNumber,
-        'dateRange':
-            '${_formatDateForDisplay(listStart)} - ${_formatDateForDisplay(listEnd)}',
-        'itemCount': calendarListEvents.length,
-      };
-
-      try {
-        await HomeWidget.saveWidgetData<String>(
-          'calendar_events_list',
-          jsonEncode(calendarListEvents),
-        );
-
-        // Save header data separately
-        await HomeWidget.saveWidgetData<String>(
-          'calendar_header_data',
-          jsonEncode(headerData),
-        );
-      } catch (e) {
-        debugPrint('Error serializing calendar events list for widget: $e');
-        // Provide fallback empty data
-        await HomeWidget.saveWidgetData<String>('calendar_events_list', '[]');
-        await HomeWidget.saveWidgetData<String>(
-          'calendar_header_data',
-          jsonEncode({'currentWeek': 1, 'dateRange': '', 'itemCount': 0}),
-        );
-      }
-
-      await HomeWidget.updateWidget(
-        name: 'CalendarWidgetProvider',
-        iOSName: 'CalendarWidget',
-      );
-
-      // 5. Update Month Widget
-      try {
-        await _monthWidgetService.updateMonthWidget();
-      } catch (e) {
-        debugPrint('Error updating Month Widget in TaskProvider: $e');
-      }
-
-      // 6. Update Full Calendar Widget
-      try {
-        await _fullCalendarWidgetService.updateFullCalendarWidget();
-      } catch (e) {
-        debugPrint('Error updating Full Calendar Widget in TaskProvider: $e');
       }
     } catch (e) {
-      debugPrint('Error updating home widget: $e');
+      calendarListEvents.clear();
     }
+
+    calendarListEvents.sort((a, b) {
+      final aStart = a['start'] as String;
+      final bStart = b['start'] as String;
+      return DateTime.parse(aStart).compareTo(DateTime.parse(bStart));
+    });
+
+    final headerData = {
+      'currentWeek': _getWeekNumber(DateTime.now()),
+      'dateRange':
+          '${TaskWidgetService.formatDateForDisplay(listStart)} - ${TaskWidgetService.formatDateForDisplay(listEnd)}',
+      'itemCount': calendarListEvents.length,
+    };
+
+    try {
+      await HomeWidget.saveWidgetData<String>(
+        'calendar_events_list',
+        jsonEncode(calendarListEvents),
+      );
+      await HomeWidget.saveWidgetData<String>(
+        'calendar_header_data',
+        jsonEncode(headerData),
+      );
+    } catch (e) {
+      await HomeWidget.saveWidgetData<String>('calendar_events_list', '[]');
+      await HomeWidget.saveWidgetData<String>(
+        'calendar_header_data',
+        jsonEncode({'currentWeek': 1, 'dateRange': '', 'itemCount': 0}),
+      );
+    }
+
+    await HomeWidget.updateWidget(
+      name: 'CalendarWidgetProvider',
+      iOSName: 'CalendarWidget',
+    );
   }
 
   Future<void> addTask(
@@ -604,12 +678,13 @@ class TaskProvider extends ChangeNotifier {
     if (dueDate != null && dueDate.isAfter(DateTime.now())) {
       try {
         await _notificationService.scheduleNotification(
-          id: task.id.hashCode,
+          id: NotificationService.getNotificationId(task.id),
           title: 'Task Reminder: $title',
           body: description.isNotEmpty
               ? description
               : 'You have a task due now!',
           scheduledDate: dueDate,
+          taskId: task.id,
         );
       } catch (e) {
         debugPrint('Notification schedule error: $e');
@@ -626,15 +701,18 @@ class TaskProvider extends ChangeNotifier {
     await _firestoreService.updateTask(task);
 
     if (task.isCompleted) {
-      await _notificationService.cancelNotification(task.id.hashCode);
+      await _notificationService.cancelNotification(
+        NotificationService.getNotificationId(task.id),
+      );
     } else if (task.dueDate != null && task.dueDate!.isAfter(DateTime.now())) {
       await _notificationService.scheduleNotification(
-        id: task.id.hashCode,
+        id: NotificationService.getNotificationId(task.id),
         title: 'Task Reminder: ${task.title}',
         body: task.description.isNotEmpty
             ? task.description
             : 'You have a task due now!',
         scheduledDate: task.dueDate!,
+        taskId: task.id,
       );
     }
 
@@ -664,18 +742,21 @@ class TaskProvider extends ChangeNotifier {
     }
 
     // Handle notifications
-    await _notificationService.cancelNotification(task.id.hashCode);
+    await _notificationService.cancelNotification(
+      NotificationService.getNotificationId(task.id),
+    );
     if (!task.isCompleted &&
         task.dueDate != null &&
         task.dueDate!.isAfter(DateTime.now())) {
       try {
         await _notificationService.scheduleNotification(
-          id: task.id.hashCode,
+          id: NotificationService.getNotificationId(task.id),
           title: 'Task Reminder: ${task.title}',
           body: task.description.isNotEmpty
               ? task.description
               : 'You have a task due now!',
           scheduledDate: task.dueDate!,
+          taskId: task.id,
         );
       } catch (e) {
         debugPrint('Notification reschedule error: $e');
@@ -701,7 +782,9 @@ class TaskProvider extends ChangeNotifier {
       task.isDeleted = true;
       await _source.updateTask(task);
       await _firestoreService.updateTask(task); // Update, not delete in cloud
-      await _notificationService.cancelNotification(id.hashCode);
+      await _notificationService.cancelNotification(
+        NotificationService.getNotificationId(id),
+      );
     } catch (e) {
       debugPrint('Error soft deleting task: $e');
     }
@@ -720,12 +803,13 @@ class TaskProvider extends ChangeNotifier {
         task.dueDate!.isAfter(DateTime.now())) {
       try {
         await _notificationService.scheduleNotification(
-          id: task.id.hashCode,
+          id: NotificationService.getNotificationId(task.id),
           title: 'Task Reminder: ${task.title}',
           body: task.description.isNotEmpty
               ? task.description
               : 'You have a task due now!',
           scheduledDate: task.dueDate!,
+          taskId: task.id,
         );
       } catch (e) {
         debugPrint('Notification restore error: $e');
@@ -739,7 +823,9 @@ class TaskProvider extends ChangeNotifier {
   Future<void> deleteTaskPermanently(String id) async {
     await _source.deleteTask(id);
     await _firestoreService.deleteTask(id);
-    await _notificationService.cancelNotification(id.hashCode);
+    await _notificationService.cancelNotification(
+      NotificationService.getNotificationId(id),
+    );
     notifyListeners();
     updateHomeWidget();
   }
@@ -795,13 +881,6 @@ class TaskProvider extends ChangeNotifier {
     } catch (e) {
       return null;
     }
-  }
-
-  /// Format date for consistent display across widgets (YYYY-MM-DD format)
-  String _formatDateForDisplay(DateTime date) {
-    return '${date.year.toString().padLeft(4, '0')}-'
-        '${date.month.toString().padLeft(2, '0')}-'
-        '${date.day.toString().padLeft(2, '0')}';
   }
 
   /// Calculate ISO week number for a given date

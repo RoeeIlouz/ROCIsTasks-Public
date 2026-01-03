@@ -11,8 +11,9 @@ class LocalTaskSource {
   Box<Category> get _categoriesBox => Hive.box<Category>(categoriesBoxName);
 
   Future<void> init() async {
-    if (!Hive.isAdapterRegistered(0))
+    if (!Hive.isAdapterRegistered(0)) {
       Hive.registerAdapter(TaskPriorityAdapter());
+    }
     if (!Hive.isAdapterRegistered(1)) Hive.registerAdapter(TaskAdapter());
     if (!Hive.isAdapterRegistered(2)) Hive.registerAdapter(CategoryAdapter());
 

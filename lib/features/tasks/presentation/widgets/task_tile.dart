@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:rocis_tasks/core/theme/theme_service.dart';
 import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
+import 'package:rocis_tasks/core/utils/icon_utils.dart';
 
 class TaskTile extends StatelessWidget {
   final Task task;
@@ -179,10 +180,7 @@ class TaskTile extends StatelessWidget {
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Icon(
-                                      IconData(
-                                        category!.iconCode,
-                                        fontFamily: 'MaterialIcons',
-                                      ),
+                                      IconUtils.getIconData(category!.iconCode),
                                       size: 12,
                                       color: Color(category!.colorValue),
                                     ),

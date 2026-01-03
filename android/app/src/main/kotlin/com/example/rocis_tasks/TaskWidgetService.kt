@@ -29,21 +29,80 @@ class TaskWidgetFactory(private val context: Context) : RemoteViewsService.Remot
         tasks.clear()
         try {
             val widgetData = HomeWidgetPlugin.getData(context)
-            android.util.Log.d("TaskWidget", "Got widgetData: $widgetData")
+            android.util.Log.d("TaskWidget", "Got widgetData")
             
             val tasksJson = widgetData.getString("pending_tasks_list", "[]") ?: "[]"
-            android.util.Log.d("TaskWidget", "tasksJson length: ${tasksJson.length}")
-            android.util.Log.d("TaskWidget", "tasksJson first 100 chars: ${tasksJson.take(100)}")
-            
-            // Improved JSON parsing with proper error handling
             val parsedTasks = parseTasksJsonSafely(tasksJson)
-            tasks.addAll(parsedTasks)
             
-            android.util.Log.d("TaskWidget", "=== Parsed ${tasks.size} valid tasks ===")
+            // Read sort/filter prefs
+            val sortMode = widgetData.getInt(TaskWidgetProvider.PREF_SORT_KEY, 0)
+            val filterMode = widgetData.getInt(TaskWidgetProvider.PREF_FILTER_KEY, 0)
+            
+            android.util.Log.d("TaskWidget", "Applying Filter: $filterMode, Sort: $sortMode")
+            
+            // Filter
+            var processedList = parsedTasks.filter { task ->
+                when (filterMode) {
+                    1 -> isDueToday(task)
+                    2 -> isHighPriority(task)
+                    else -> true
+                }
+            }
+            
+            // Sort
+            processedList = if (sortMode == 1) { // Priority
+                processedList.sortedWith(Comparator { a, b ->
+                    val pA = getPriorityLevel(a)
+                    val pB = getPriorityLevel(b)
+                    
+                    // If priorities are equal, sort by date
+                    if (pA == pB) {
+                        val dA = a.optString("dueDate", "9999-99-99")
+                        val dB = b.optString("dueDate", "9999-99-99")
+                        val d1 = if (dA.isEmpty()) "9999-99-99" else dA
+                        val d2 = if (dB.isEmpty()) "9999-99-99" else dB
+                        d1.compareTo(d2)
+                    } else {
+                        pB - pA // Descending (3 > 2)
+                    }
+                })
+            } else { // Date
+                processedList.sortedWith(Comparator { a, b ->
+                    val dA = a.optString("dueDate", "9999-99-99")
+                    val dB = b.optString("dueDate", "9999-99-99")
+                    val d1 = if (dA.isEmpty()) "9999-99-99" else dA
+                    val d2 = if (dB.isEmpty()) "9999-99-99" else dB
+                    d1.compareTo(d2)
+                })
+            }
+
+            tasks.addAll(processedList)
+            android.util.Log.d("TaskWidget", "=== Showing ${tasks.size} tasks after filter/sort ===")
+            
         } catch (e: Exception) {
             android.util.Log.e("TaskWidget", "=== ERROR in onDataSetChanged ===", e)
-            // Ensure tasks list is empty on error to prevent crashes
             tasks.clear()
+        }
+    }
+
+    private fun isDueToday(task: JSONObject): Boolean {
+        val dueDate = task.optString("dueDate", "")
+        if (dueDate.isEmpty()) return false
+        val sdf = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
+        val today = sdf.format(java.util.Date())
+        return dueDate == today
+    }
+
+    private fun isHighPriority(task: JSONObject): Boolean {
+        return task.optString("priority", "").equals("high", ignoreCase = true)
+    }
+
+    private fun getPriorityLevel(task: JSONObject): Int {
+        return when (task.optString("priority", "").lowercase()) {
+            "high" -> 3
+            "medium" -> 2
+            "low" -> 1
+            else -> 0
         }
     }
 

@@ -67,36 +67,44 @@ class TaskSortFilterSheet extends StatelessWidget {
                         ).dividerColor.withValues(alpha: 0.1),
                       ),
                     ),
-                    child: Column(
-                      children: [
-                        _buildSortOption(
-                          context,
-                          l10n.date,
-                          TaskSortOption.dueDate,
-                          provider,
-                        ),
-                        const Divider(height: 1),
-                        _buildSortOption(
-                          context,
-                          l10n.priority,
-                          TaskSortOption.priority,
-                          provider,
-                        ),
-                        const Divider(height: 1),
-                        _buildSortOption(
-                          context,
-                          l10n.title,
-                          TaskSortOption.title,
-                          provider,
-                        ),
-                        const Divider(height: 1),
-                        _buildSortOption(
-                          context,
-                          l10n.createdDate,
-                          TaskSortOption.dateCreated,
-                          provider,
-                        ),
-                      ],
+                    child: RadioGroup<TaskSortOption>(
+                      groupValue: provider.currentSortOption,
+                      onChanged: (value) {
+                        if (value != null) {
+                          provider.setSortOption(value);
+                        }
+                      },
+                      child: Column(
+                        children: [
+                          _buildSortOption(
+                            context,
+                            l10n.date,
+                            TaskSortOption.dueDate,
+                            provider,
+                          ),
+                          const Divider(height: 1),
+                          _buildSortOption(
+                            context,
+                            l10n.priority,
+                            TaskSortOption.priority,
+                            provider,
+                          ),
+                          const Divider(height: 1),
+                          _buildSortOption(
+                            context,
+                            l10n.title,
+                            TaskSortOption.title,
+                            provider,
+                          ),
+                          const Divider(height: 1),
+                          _buildSortOption(
+                            context,
+                            l10n.createdDate,
+                            TaskSortOption.dateCreated,
+                            provider,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
 
@@ -181,12 +189,6 @@ class TaskSortFilterSheet extends StatelessWidget {
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
       title: Text(title),
       value: option,
-      groupValue: provider.currentSortOption,
-      onChanged: (value) {
-        if (value != null) {
-          provider.setSortOption(value);
-        }
-      },
     );
   }
 }

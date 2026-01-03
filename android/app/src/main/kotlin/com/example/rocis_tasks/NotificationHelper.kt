@@ -41,15 +41,27 @@ class NotificationHelper(private val context: Context) {
         }
     }
 
-    fun showTaskCountNotification(count: Int, titles: List<String>) {
-        android.util.Log.d("NotificationHelper", "showTaskCountNotification called with count: $count")
+    fun showTaskCountNotification(count: Int, titles: List<String>, largeIconPath: String?, isDarkText: Boolean = false) {
+        android.util.Log.d("NotificationHelper", "showTaskCountNotification called with count: $count, path: $largeIconPath, isDarkText: $isDarkText")
         try {
-            val bitmap = createCountBitmap(count)
+            var bitmap: Bitmap? = null
+            if (largeIconPath != null) {
+                try {
+                    bitmap = android.graphics.BitmapFactory.decodeFile(largeIconPath)
+                } catch (e: Exception) {
+                    android.util.Log.e("NotificationHelper", "Error loading bitmap from path: $largeIconPath", e)
+                }
+            }
+            
+            if (bitmap == null) {
+                bitmap = createCountBitmap(count, isDarkText)
+            }
+
             val body = if (titles.isEmpty()) "$count uncompleted tasks" else titles.joinToString("\n")
             val icon = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 Icon.createWithBitmap(bitmap)
             } else {
-                null // Fallback if needed, but we targeting M+ mostly
+                null // Fallback if needed
             }
 
             val addIntent = android.content.Intent(context, MainActivity::class.java).apply {
@@ -78,14 +90,14 @@ class NotificationHelper(private val context: Context) {
                 .setContentText("$count uncompleted tasks")
                 .setSmallIcon(R.mipmap.launcher_icon) // Fallback small icon
                 .setOngoing(true)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setPriority(NotificationCompat.PRIORITY_LOW) // Changed to LOW to match NotificationService logic, avoid intrusion
                 .setAutoCancel(false)
                 .setStyle(NotificationCompat.BigTextStyle().bigText(body))
                 .setContentIntent(mainPendingIntent)
                 .addAction(android.R.drawable.ic_input_add, "Add Task", addPendingIntent)
 
             if (icon != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                // Use native Notification.Builder for API 23+ to support Icon object
+                // Use native Notification.Builder for API 23+
                 val nativeBuilder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     android.app.Notification.Builder(context, channelId)
                 } else {
@@ -96,7 +108,7 @@ class NotificationHelper(private val context: Context) {
                 nativeBuilder
                     .setContentTitle("Tasks Remaining")
                     .setContentText("$count uncompleted tasks")
-                    .setSmallIcon(icon)
+                    .setSmallIcon(icon) // Use dynamic icon as Small Icon (status bar)
                     .setOngoing(true)
                     .setAutoCancel(false)
                     .setStyle(android.app.Notification.BigTextStyle().bigText(body))
@@ -110,14 +122,16 @@ class NotificationHelper(private val context: Context) {
                     )
             
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    nativeBuilder.setPriority(android.app.Notification.PRIORITY_HIGH)
+                    nativeBuilder.setPriority(android.app.Notification.PRIORITY_LOW)
                 } else {
                     @Suppress("DEPRECATION")
-                    nativeBuilder.setPriority(android.app.Notification.PRIORITY_HIGH)
+                    nativeBuilder.setPriority(android.app.Notification.PRIORITY_LOW)
                 }
 
+                notificationManager.cancel(notificationId)
                 notificationManager.notify(notificationId, nativeBuilder.build())
             } else {
+                notificationManager.cancel(notificationId)
                 notificationManager.notify(notificationId, builder.build())
             }
         } catch (e: Exception) {
@@ -125,13 +139,13 @@ class NotificationHelper(private val context: Context) {
         }
     }
 
-    private fun createCountBitmap(count: Int): Bitmap {
+    private fun createCountBitmap(count: Int, isDarkText: Boolean = false): Bitmap {
         val size = 64 // Standard small icon size is small
         val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
         
         val paint = Paint().apply {
-            color = Color.WHITE
+            color = if (isDarkText) Color.BLACK else Color.WHITE
             isAntiAlias = true
             textAlign = Paint.Align.CENTER
             textSize = 42f

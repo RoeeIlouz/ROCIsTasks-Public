@@ -18,7 +18,9 @@ class MainActivity : FlutterActivity() {
             if (call.method == "updateTaskCountIcon") {
                 val count = call.argument<Int>("count") ?: 0
                 val titles = call.argument<List<String>>("titles") ?: emptyList()
-                notificationHelper.showTaskCountNotification(count, titles)
+                val largeIconPath = call.argument<String>("largeIconPath")
+                val isDarkText = call.argument<Boolean>("isDarkText") ?: false
+                notificationHelper.showTaskCountNotification(count, titles, largeIconPath, isDarkText)
                 result.success(null)
             } else {
                 result.notImplemented()

@@ -11,6 +11,7 @@ import 'package:rocis_tasks/features/calendar/presentation/providers/calendar_pr
 import 'package:rocis_tasks/core/services/notification_service.dart';
 import 'dart:async';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
+import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -109,9 +110,24 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final taskProvider = Provider.of<TaskProvider>(context);
+
+    if (taskProvider.taskToEdit != null) {
+      final task = taskProvider.taskToEdit!;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        taskProvider.clearTaskToEdit();
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => AddTaskScreen(task: task)),
+        );
+      });
+    }
 
     return Scaffold(
       appBar: AppBar(
+        elevation: 1.0,
+        shadowColor: Colors.black,
+
         /*leading: IconButton(
           icon: const Icon(Icons.settings),
           onPressed: () {

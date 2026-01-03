@@ -6,6 +6,7 @@ import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.
 
 import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:rocis_tasks/core/theme/theme_service.dart';
+import 'package:rocis_tasks/core/utils/icon_utils.dart';
 
 class AddTaskScreen extends StatefulWidget {
   final Task? task;
@@ -51,7 +52,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
       lastDate: DateTime(2101),
     );
     if (pickedDate != null) {
-      if (!mounted) return;
+      if (!context.mounted) return;
       final TimeOfDay? pickedTime = await showTimePicker(
         context: context,
         initialTime: _selectedDate != null
@@ -59,7 +60,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
             : TimeOfDay.now(),
       );
 
-      if (!mounted) return;
+      if (!context.mounted) return;
 
       if (pickedTime != null) {
         setState(() {
@@ -204,7 +205,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                 builder: (context, provider, child) {
                   final categories = provider.categories;
                   return DropdownButtonFormField<String>(
-                    value: categories.any((c) => c.id == _category)
+                    initialValue: categories.any((c) => c.id == _category)
                         ? _category
                         : null,
                     decoration: InputDecoration(
@@ -227,10 +228,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                                 radius: 10,
                                 backgroundColor: Color(category.colorValue),
                                 child: Icon(
-                                  IconData(
-                                    category.iconCode,
-                                    fontFamily: 'MaterialIcons',
-                                  ),
+                                  IconUtils.getIconData(category.iconCode),
                                   size: 12,
                                   color: Colors.white,
                                 ),
@@ -257,7 +255,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<TaskPriority>(
-                value: _priority,
+                initialValue: _priority,
                 decoration: InputDecoration(
                   labelText: l10n.priorityLabel,
                   border: const OutlineInputBorder(),

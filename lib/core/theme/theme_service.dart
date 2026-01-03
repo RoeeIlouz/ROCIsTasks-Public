@@ -38,9 +38,9 @@ class ThemeService extends ChangeNotifier {
 
   bool get isDarkMode {
     if (_themeMode == ThemeMode.system) {
-      // This is a bit tricky without context, but for logic checks we might need it.
-      // For now, we rely on the UI to handle system mode.
-      return false; // Ideally we'd check platform brightness
+      final brightness =
+          WidgetsBinding.instance.platformDispatcher.platformBrightness;
+      return brightness == Brightness.dark;
     }
     return _themeMode == ThemeMode.dark;
   }

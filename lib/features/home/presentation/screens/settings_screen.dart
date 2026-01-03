@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rocis_tasks/core/services/auth_service.dart';
+import 'package:rocis_tasks/core/services/notification_service.dart';
 import 'package:rocis_tasks/core/theme/theme_service.dart';
 import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
 import 'package:rocis_tasks/features/tasks/presentation/screens/trash_screen.dart';
@@ -142,6 +143,40 @@ class SettingsScreen extends StatelessWidget {
               context,
               MaterialPageRoute(builder: (context) => const TrashScreen()),
             );
+          },
+        ),
+        const Divider(),
+        _buildSectionHeader(context, 'Debug & Tools'),
+        ListTile(
+          leading: const Icon(Icons.notifications_active),
+          title: const Text('Send Test Immediate'),
+          subtitle: const Text('Verify basic system notifications'),
+          onTap: () async {
+            await NotificationService().testImmediateNotification();
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Test immediate notification sent!'),
+                ),
+              );
+            }
+          },
+        ),
+        ListTile(
+          leading: const Icon(Icons.timer),
+          title: const Text('Schedule Test (1 min)'),
+          subtitle: const Text('Verify if scheduling is working correctly'),
+          onTap: () async {
+            await NotificationService().testScheduledNotification();
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text(
+                    'Test notification scheduled for 1 minute from now!',
+                  ),
+                ),
+              );
+            }
           },
         ),
       ],

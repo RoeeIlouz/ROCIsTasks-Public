@@ -26,6 +26,8 @@ import 'core/services/notification_service.dart';
 import 'package:rocis_tasks/core/services/app_initializer.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
+import 'package:rocis_tasks/features/categories/domain/models/category.dart';
+import 'package:rocis_tasks/features/tasks/services/task_widget_service.dart';
 import 'package:rocis_tasks/features/home/services/full_calendar_widget_service.dart';
 
 Future<void> main() async {
@@ -49,7 +51,11 @@ class _AppRootState extends State<AppRoot> {
   final _authService = AuthService();
   final _calendarService = CalendarService();
   final _themeService = ThemeService();
-  late final _taskProvider = TaskProvider(_authService, _calendarService);
+  late final _taskProvider = TaskProvider(
+    _authService,
+    _calendarService,
+    _themeService,
+  );
 
   @override
   void initState() {
@@ -337,9 +343,41 @@ Future<void> _completeTaskInBackground(String taskId) async {
     // Update Persistent Notification from Background
     final notificationService = NotificationService();
     await notificationService.init();
+
+    // Determine if we should use dark text based on background theme preference
+    final prefs = await SharedPreferences.getInstance();
+    final themeModeIndex = prefs.getInt('theme_mode') ?? 0; // system
+    bool isDarkText = true; // default for light
+    if (themeModeIndex == 1) {
+      // Light
+      isDarkText = true;
+    } else if (themeModeIndex == 2) {
+      // Dark
+      isDarkText = false;
+    } else {
+      // System - this is slightly inaccurate in background but best effort
+      final brightness =
+          WidgetsBinding.instance.platformDispatcher.platformBrightness;
+      isDarkText = brightness != Brightness.dark;
+    }
+
+    // Regenerate the chart image with the correct text color
+    final taskSource = LocalTaskSource();
+    await taskSource.init();
+    final chartPath = await TaskWidgetService.updateTaskWidget(
+      box.values.toList(),
+      (id) {
+        final categoryBox = Hive.box<Category>('categories');
+        return categoryBox.get(id);
+      },
+      isDarkText: isDarkText,
+    );
+
     await notificationService.showTaskCountNotification(
       pendingTasks.length,
       pendingTasks.map((t) => t.title).toList(),
+      largeIconPath: chartPath,
+      isDarkText: isDarkText,
     );
   } catch (e) {
     debugPrint('Background task error: $e');
