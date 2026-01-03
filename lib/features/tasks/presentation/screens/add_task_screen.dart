@@ -6,7 +6,8 @@ import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.
 
 import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:rocis_tasks/core/theme/theme_service.dart';
-import 'package:rocis_tasks/core/utils/icon_utils.dart';
+
+import 'package:google_fonts/google_fonts.dart';
 
 class AddTaskScreen extends StatefulWidget {
   final Task? task;
@@ -45,11 +46,25 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   }
 
   Future<void> _selectDate(BuildContext context) async {
+    final theme = Theme.of(context);
     final DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: _selectedDate ?? DateTime.now(),
       firstDate: DateTime.now(),
       lastDate: DateTime(2101),
+      builder: (context, child) {
+        return Theme(
+          data: theme.copyWith(
+            colorScheme: theme.colorScheme.copyWith(
+              primary: theme.colorScheme.primary,
+              onPrimary: theme.colorScheme.onPrimary,
+              surface: theme.colorScheme.surface,
+              onSurface: theme.colorScheme.onSurface,
+            ),
+          ),
+          child: child!,
+        );
+      },
     );
     if (pickedDate != null) {
       if (!context.mounted) return;
@@ -121,16 +136,53 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     }
   }
 
+  InputDecoration _getInputDecoration(
+    String label,
+    IconData? prefixIcon,
+    ThemeData theme,
+  ) {
+    return InputDecoration(
+      labelText: label,
+      labelStyle: GoogleFonts.outfit(
+        color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+      ),
+      prefixIcon: prefixIcon != null ? Icon(prefixIcon, size: 22) : null,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide.none,
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide.none,
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide(color: theme.colorScheme.primary, width: 2),
+      ),
+      filled: true,
+      fillColor: theme.brightness == Brightness.light
+          ? Colors.grey.withValues(alpha: 0.05)
+          : Colors.white.withValues(alpha: 0.05),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isEditing = widget.task != null;
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
     final themeService = Provider.of<ThemeService>(context);
 
     return Scaffold(
-      appBar: AppBar(title: Text(isEditing ? l10n.editTask : l10n.newTask)),
+      appBar: AppBar(
+        title: Text(
+          isEditing ? l10n.editTask : l10n.newTask,
+          style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
+        ),
+      ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20.0),
         child: Form(
           key: _formKey,
           child: Column(
@@ -138,11 +190,8 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
             children: [
               TextFormField(
                 controller: _titleController,
-                decoration: InputDecoration(
-                  labelText: l10n.title,
-                  border: const OutlineInputBorder(),
-                  filled: true,
-                ),
+                style: GoogleFonts.outfit(fontWeight: FontWeight.w600),
+                decoration: _getInputDecoration(l10n.title, Icons.title, theme),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return l10n.pleaseEnterATitle;
@@ -150,57 +199,87 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   return null;
                 },
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
               TextFormField(
                 controller: _descriptionController,
-                decoration: InputDecoration(
-                  labelText: l10n.description,
-                  border: const OutlineInputBorder(),
-                  filled: true,
-                  alignLabelWithHint: true,
+                style: GoogleFonts.outfit(),
+                decoration: _getInputDecoration(
+                  l10n.description,
+                  Icons.description_outlined,
+                  theme,
                 ),
-                maxLines: 3,
+                maxLines: 4,
               ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(
-                    child: InkWell(
-                      onTap: () => _selectDate(context),
-                      borderRadius: BorderRadius.circular(4),
-                      child: InputDecorator(
-                        decoration: InputDecoration(
-                          labelText: l10n.dueDateAndTime,
-                          border: const OutlineInputBorder(),
-                          filled: true,
-                          prefixIcon: const Icon(Icons.calendar_today),
-                        ),
-                        child: Text(
-                          _selectedDate == null
-                              ? l10n.noDateSelected
-                              : themeService.use24HourFormat
-                              ? DateFormat.yMMMd().add_Hm().format(
-                                  _selectedDate!,
-                                )
-                              : DateFormat.yMMMd().add_jm().format(
-                                  _selectedDate!,
-                                ),
-                        ),
-                      ),
-                    ),
+              const SizedBox(height: 24),
+              Text(
+                l10n.dueDateAndTime,
+                style: GoogleFonts.outfit(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                  color: theme.colorScheme.primary,
+                ),
+              ),
+              const SizedBox(height: 12),
+              InkWell(
+                onTap: () => _selectDate(context),
+                borderRadius: BorderRadius.circular(16),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 14,
                   ),
-                  if (_selectedDate != null)
-                    IconButton(
-                      icon: const Icon(Icons.clear),
-                      onPressed: () {
-                        setState(() {
-                          _selectedDate = null;
-                        });
-                      },
-                    ),
-                ],
+                  decoration: BoxDecoration(
+                    color: theme.brightness == Brightness.light
+                        ? Colors.grey.withValues(alpha: 0.05)
+                        : Colors.white.withValues(alpha: 0.05),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.calendar_today_rounded,
+                        size: 20,
+                        color: theme.colorScheme.primary,
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        _selectedDate == null
+                            ? l10n.noDateSelected
+                            : themeService.use24HourFormat
+                            ? DateFormat.yMMMd().add_Hm().format(_selectedDate!)
+                            : DateFormat.yMMMd().add_jm().format(
+                                _selectedDate!,
+                              ),
+                        style: GoogleFonts.outfit(fontWeight: FontWeight.w500),
+                      ),
+                      const Spacer(),
+                      if (_selectedDate != null)
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _selectedDate = null;
+                            });
+                          },
+                          child: Icon(
+                            Icons.cancel_rounded,
+                            size: 20,
+                            color: theme.disabledColor,
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 24),
+              Text(
+                l10n.category,
+                style: GoogleFonts.outfit(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                  color: theme.colorScheme.primary,
+                ),
+              ),
+              const SizedBox(height: 12),
               Consumer<TaskProvider>(
                 builder: (context, provider, child) {
                   final categories = provider.categories;
@@ -208,38 +287,38 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                     initialValue: categories.any((c) => c.id == _category)
                         ? _category
                         : null,
-                    decoration: InputDecoration(
-                      labelText: l10n.category,
-                      border: const OutlineInputBorder(),
-                      filled: true,
-                      prefixIcon: const Icon(Icons.category),
+                    style: GoogleFonts.outfit(
+                      color: theme.colorScheme.onSurface,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    decoration: _getInputDecoration(
+                      l10n.category,
+                      Icons.category_outlined,
+                      theme,
                     ),
                     items: [
                       DropdownMenuItem<String>(
                         value: null,
-                        child: Text(l10n.noCategory),
+                        child: Text(
+                          l10n.noCategory,
+                          style: GoogleFonts.outfit(),
+                        ),
                       ),
                       ...categories.map((category) {
                         return DropdownMenuItem(
                           value: category.id,
                           child: Row(
                             children: [
-                              CircleAvatar(
-                                radius: 10,
-                                backgroundColor: Color(category.colorValue),
-                                child: Icon(
-                                  IconUtils.getIconData(category.iconCode),
-                                  size: 12,
-                                  color: Colors.white,
+                              Container(
+                                width: 12,
+                                height: 12,
+                                decoration: BoxDecoration(
+                                  color: Color(category.colorValue),
+                                  shape: BoxShape.circle,
                                 ),
                               ),
                               const SizedBox(width: 12),
-                              Text(
-                                category.name,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
+                              Text(category.name, style: GoogleFonts.outfit()),
                             ],
                           ),
                         );
@@ -253,20 +332,33 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   );
                 },
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 24),
+              Text(
+                l10n.priorityLabel,
+                style: GoogleFonts.outfit(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                  color: theme.colorScheme.primary,
+                ),
+              ),
+              const SizedBox(height: 12),
               DropdownButtonFormField<TaskPriority>(
                 initialValue: _priority,
-                decoration: InputDecoration(
-                  labelText: l10n.priorityLabel,
-                  border: const OutlineInputBorder(),
-                  filled: true,
-                  prefixIcon: const Icon(Icons.flag),
+                style: GoogleFonts.outfit(
+                  color: theme.colorScheme.onSurface,
+                  fontWeight: FontWeight.w500,
+                ),
+                decoration: _getInputDecoration(
+                  l10n.priorityLabel,
+                  Icons.flag_outlined,
+                  theme,
                 ),
                 items: TaskPriority.values.map((priority) {
                   return DropdownMenuItem(
                     value: priority,
                     child: Text(
-                      _getPriorityLabel(priority, l10n).toUpperCase(),
+                      _getPriorityLabel(priority, l10n),
+                      style: GoogleFonts.outfit(),
                     ),
                   );
                 }).toList(),
@@ -278,13 +370,29 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   }
                 },
               ),
-              const SizedBox(height: 32),
-              FilledButton.icon(
+              const SizedBox(height: 40),
+              FilledButton(
                 onPressed: _saveTask,
-                icon: const Icon(Icons.save),
-                label: Text(isEditing ? l10n.updateTask : l10n.saveTask),
                 style: FilledButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  padding: const EdgeInsets.symmetric(vertical: 18),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  elevation: 2,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(isEditing ? Icons.check_rounded : Icons.add_rounded),
+                    const SizedBox(width: 8),
+                    Text(
+                      isEditing ? l10n.updateTask : l10n.saveTask,
+                      style: GoogleFonts.outfit(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],

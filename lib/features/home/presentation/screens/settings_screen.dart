@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rocis_tasks/core/services/auth_service.dart';
-import 'package:rocis_tasks/core/services/notification_service.dart';
 import 'package:rocis_tasks/core/theme/theme_service.dart';
 import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
 import 'package:rocis_tasks/features/tasks/presentation/screens/trash_screen.dart';
@@ -92,6 +91,7 @@ class SettingsScreen extends StatelessWidget {
           trailing: const Icon(Icons.chevron_right),
           onTap: () {
             showModalBottomSheet(
+              useSafeArea: true,
               context: context,
               builder: (context) => Column(
                 mainAxisSize: MainAxisSize.min,
@@ -116,6 +116,7 @@ class SettingsScreen extends StatelessWidget {
                         ? const Icon(Icons.check)
                         : null,
                   ),
+                  const SizedBox(height: 24),
                 ],
               ),
             );
@@ -145,6 +146,7 @@ class SettingsScreen extends StatelessWidget {
             );
           },
         ),
+        /*
         const Divider(),
         _buildSectionHeader(context, 'Debug & Tools'),
         ListTile(
@@ -178,7 +180,7 @@ class SettingsScreen extends StatelessWidget {
               );
             }
           },
-        ),
+        ),*/
       ],
     );
   }

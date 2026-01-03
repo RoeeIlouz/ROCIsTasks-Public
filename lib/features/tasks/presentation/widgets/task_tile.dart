@@ -7,6 +7,7 @@ import 'package:rocis_tasks/core/theme/theme_service.dart';
 import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:rocis_tasks/core/utils/icon_utils.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class TaskTile extends StatelessWidget {
   final Task task;
@@ -29,26 +30,22 @@ class TaskTile extends StatelessWidget {
   });
 
   Color _getPriorityColor(BuildContext context, TaskPriority priority) {
-    // These colors are semantic and generally safe for both themes,
-    // but could be moved to theme extension if strict adherence is needed.
     switch (priority) {
       case TaskPriority.high:
-        return Colors.red;
+        return Colors.redAccent;
       case TaskPriority.medium:
-        return Colors.orange;
+        return Colors.orangeAccent;
       case TaskPriority.low:
-        return Colors.green;
+        return Colors.greenAccent;
     }
   }
 
-  static final _dateFormat = DateFormat('dd/MM/yy');
   static final _timeFormat24 = DateFormat.Hm();
   static final _timeFormat12 = DateFormat.jm();
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final _lang = Localizations.localeOf(context).languageCode;
     final theme = Theme.of(context);
     final themeService = Provider.of<ThemeService>(context);
 
@@ -63,16 +60,34 @@ class TaskTile extends StatelessWidget {
           return await showDialog(
             context: context,
             builder: (context) => AlertDialog(
-              title: Text(l10n.deleteTaskTitle),
-              content: Text(l10n.deleteTaskConfirmation),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(24),
+              ),
+              title: Text(
+                l10n.deleteTaskTitle,
+                style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
+              ),
+              content: Text(
+                l10n.deleteTaskConfirmation,
+                style: GoogleFonts.outfit(),
+              ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context, false),
-                  child: Text(l10n.cancel),
+                  child: Text(
+                    l10n.cancel,
+                    style: GoogleFonts.outfit(fontWeight: FontWeight.w600),
+                  ),
                 ),
                 TextButton(
                   onPressed: () => Navigator.pop(context, true),
-                  child: Text(l10n.delete),
+                  child: Text(
+                    l10n.delete,
+                    style: GoogleFonts.outfit(
+                      color: theme.colorScheme.error,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -81,189 +96,247 @@ class TaskTile extends StatelessWidget {
         return false;
       },
       background: Container(
-        alignment: _lang == 'he' ? Alignment.centerRight : Alignment.centerLeft,
-        padding: const EdgeInsets.only(left: 20, right: 20),
-        color: theme.colorScheme.error,
-        child: const Icon(Icons.delete, color: Colors.white),
-      ),
-      child: Card(
-        elevation: 1,
-        color: theme.colorScheme.surface,
-        clipBehavior: Clip.antiAlias,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side: BorderSide(color: theme.dividerColor.withValues(alpha: 0.1)),
+        margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.error.withValues(alpha: 0.9),
+          borderRadius: BorderRadius.circular(24),
         ),
-        margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxHeight: 90),
+        alignment: Alignment.centerLeft,
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Icon(Icons.delete_outline, color: Colors.white, size: 28),
+            const Icon(Icons.delete_outline, color: Colors.white, size: 28),
+          ],
+        ),
+      ),
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+        decoration: BoxDecoration(
+          color: theme.cardTheme.color,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(
+            color: theme.brightness == Brightness.light
+                ? Colors.grey.withValues(alpha: 0.1)
+                : Colors.white.withValues(alpha: 0.05),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.03),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: IntrinsicHeight(
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              // Category Color Edge
               if (category != null)
-                Container(width: 4, color: Color(category!.colorValue)),
+                Container(width: 6, color: Color(category!.colorValue)),
               Expanded(
-                child: ListTile(
-                  isThreeLine: true,
-                  dense: true,
-                  titleAlignment: ListTileTitleAlignment.titleHeight,
-                  minVerticalPadding: 0,
-                  horizontalTitleGap: 0,
+                child: InkWell(
                   onTap: onTap,
-                  leading: Checkbox(
-                    value: task.isCompleted,
-                    onChanged: (_) => onToggle(),
-                    activeColor: category != null
-                        ? Color(category!.colorValue)
-                        : theme.colorScheme.primary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(4),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 10,
                     ),
-                  ),
-                  title: Text(
-                    task.title,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      decoration: task.isCompleted
-                          ? TextDecoration.lineThrough
-                          : null,
-                      color: task.isCompleted ? theme.disabledColor : null,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  // Task Desc + DueDate + Category
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Description
-                      task.description.isNotEmpty
-                          ? SizedBox(
-                              height: 25,
-                              child: SingleChildScrollView(
-                                primary: false,
-                                child: Text(
-                                  task.description,
-                                  style: theme.textTheme.bodySmall?.copyWith(
-                                    color: task.isCompleted
-                                        ? theme.disabledColor
-                                        : theme.textTheme.bodySmall?.color
-                                              ?.withValues(alpha: 0.8),
-                                  ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(top: 2),
+                          child: GestureDetector(
+                            onTap: onToggle,
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 300),
+                              width: 28,
+                              height: 28,
+                              decoration: BoxDecoration(
+                                color: task.isCompleted
+                                    ? (category != null
+                                          ? Color(category!.colorValue)
+                                          : theme.colorScheme.primary)
+                                    : Colors.transparent,
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                  color: task.isCompleted
+                                      ? Colors.transparent
+                                      : (category != null
+                                                ? Color(category!.colorValue)
+                                                : theme.colorScheme.primary)
+                                            .withValues(alpha: 0.5),
+                                  width: 2,
                                 ),
                               ),
-                            )
-                          : SizedBox(),
-                      const SizedBox(height: 4),
-                      // DueDate Icon and text
-                      if (task.dueDate != null ||
-                          (task.categoryId != null &&
-                              task.categoryId!.isNotEmpty))
-                        Row(
-                          mainAxisSize: MainAxisSize.max,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            if (category != null)
-                              Container(
-                                margin: const EdgeInsets.symmetric(
-                                  horizontal: 4,
+                              child: task.isCompleted
+                                  ? const Icon(
+                                      Icons.check,
+                                      color: Colors.white,
+                                      size: 18,
+                                    )
+                                  : null,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                task.title,
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: task.isCompleted
+                                      ? theme.disabledColor
+                                      : theme.colorScheme.onSurface,
+                                  decoration: task.isCompleted
+                                      ? TextDecoration.lineThrough
+                                      : null,
                                 ),
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 4,
-                                  vertical: 2,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Color(
-                                    category!.colorValue,
-                                  ).withValues(alpha: 0.2),
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(
-                                      IconUtils.getIconData(category!.iconCode),
-                                      size: 12,
-                                      color: Color(category!.colorValue),
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      category!.name,
-                                      style: theme.textTheme.labelSmall
+                              ),
+                              if (task.description.isNotEmpty) ...[
+                                const SizedBox(height: 8),
+                                Container(
+                                  constraints: const BoxConstraints(
+                                    maxHeight: 80,
+                                  ),
+                                  child: SingleChildScrollView(
+                                    physics: const BouncingScrollPhysics(),
+                                    child: Text(
+                                      task.description,
+                                      style: theme.textTheme.bodySmall
                                           ?.copyWith(
-                                            color: Color(category!.colorValue),
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.bold,
+                                            color: theme.colorScheme.onSurface
+                                                .withValues(alpha: 0.6),
+                                            height: 1.4,
                                           ),
                                     ),
+                                  ),
+                                ),
+                              ],
+                              const SizedBox(height: 12),
+                              Row(
+                                children: [
+                                  if (category != null) ...[
+                                    _buildChip(
+                                      context,
+                                      icon: IconUtils.getIconData(
+                                        category!.iconCode,
+                                      ),
+                                      label: category!.name,
+                                      color: Color(category!.colorValue),
+                                    ),
+                                    const SizedBox(width: 8),
                                   ],
-                                ),
+                                  if (task.dueDate != null)
+                                    _buildChip(
+                                      context,
+                                      icon: Icons.access_time_rounded,
+                                      label: themeService.use24HourFormat
+                                          ? _timeFormat24.format(task.dueDate!)
+                                          : _timeFormat12.format(task.dueDate!),
+                                      color: theme.colorScheme.primary,
+                                    ),
+                                ],
                               ),
-                            if (task.dueDate != null) ...[
-                              Icon(
-                                Icons.calendar_today,
-                                size: 12,
-                                color: theme.colorScheme.primary,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                themeService.use24HourFormat
-                                    ? '${l10n.duePrefix}${_dateFormat.format(task.dueDate!)} | ${_timeFormat24.format(task.dueDate!)}'
-                                    : '${l10n.duePrefix}${_dateFormat.format(task.dueDate!)} | ${_timeFormat12.format(task.dueDate!)}',
-                                style: theme.textTheme.labelSmall?.copyWith(
-                                  overflow: TextOverflow.clip,
-                                  color: theme.colorScheme.primary,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                              const SizedBox(width: 8),
                             ],
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            if (enablePin)
+                              IconButton(
+                                icon: Icon(
+                                  (task.isPinned ?? false)
+                                      ? Icons.push_pin
+                                      : Icons.push_pin_outlined,
+                                  size: 20,
+                                  color: (task.isPinned ?? false)
+                                      ? theme.colorScheme.primary
+                                      : theme.disabledColor,
+                                ),
+                                onPressed: () {
+                                  Provider.of<TaskProvider>(
+                                    context,
+                                    listen: false,
+                                  ).toggleTaskPin(task);
+                                },
+                                constraints: const BoxConstraints(),
+                                padding: EdgeInsets.zero,
+                              )
+                            else
+                              const SizedBox(height: 40),
+                            Container(
+                              width: 10,
+                              height: 10,
+                              margin: const EdgeInsets.only(bottom: 4),
+                              decoration: BoxDecoration(
+                                color: _getPriorityColor(
+                                  context,
+                                  task.priority,
+                                ),
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: _getPriorityColor(
+                                      context,
+                                      task.priority,
+                                    ).withValues(alpha: 0.4),
+                                    blurRadius: 6,
+                                    spreadRadius: 1,
+                                  ),
+                                ],
+                              ),
+                            ),
                           ],
                         ),
-                    ],
-                  ),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (enablePin)
-                        IconButton(
-                          icon: Icon(
-                            (task.isPinned ?? false)
-                                ? Icons.push_pin
-                                : Icons.push_pin_outlined,
-                            size: 20,
-                            color: (task.isPinned ?? false)
-                                ? theme.colorScheme.primary
-                                : theme.disabledColor,
-                          ),
-                          onPressed: () {
-                            final provider = Provider.of<TaskProvider>(
-                              context,
-                              listen: false,
-                            );
-                            provider.toggleTaskPin(task);
-                          },
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
-                        ),
-                      const SizedBox(width: 8),
-                      Container(
-                        width: 12,
-                        height: 12,
-                        decoration: BoxDecoration(
-                          color: _getPriorityColor(context, task.priority),
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                    ],
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
+                      ],
+                    ),
                   ),
                 ),
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildChip(
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    required Color color,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 12, color: color),
+          const SizedBox(width: 4),
+          Text(
+            label,
+            style: GoogleFonts.outfit(
+              color: color,
+              fontSize: 11,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
       ),
     );
   }

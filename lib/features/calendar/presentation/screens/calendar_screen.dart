@@ -141,30 +141,70 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 return Card(
                   margin: const EdgeInsets.symmetric(
                     horizontal: 16,
-                    vertical: 4,
+                    vertical: 6,
                   ),
                   elevation: 0,
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                    side: BorderSide(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.outlineVariant.withValues(alpha: 0.5),
+                    ),
+                  ),
+                  color: Theme.of(context).colorScheme.surface,
                   child: ListTile(
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
                     leading: Container(
-                      width: 4,
-                      height: double.infinity,
+                      padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.secondary.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        Icons.event_note_rounded,
                         color: Theme.of(context).colorScheme.secondary,
-                        borderRadius: BorderRadius.circular(4),
+                        size: 24,
                       ),
                     ),
                     title: Text(
                       item.title ?? 'No Title',
-                      style: const TextStyle(fontWeight: FontWeight.w500),
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: -0.5,
+                      ),
                     ),
-                    subtitle: Text(
-                      '${item.start != null ? timeFormat.format(item.start!) : ''} - '
-                      '${item.end != null ? timeFormat.format(item.end!) : ''}',
+                    subtitle: Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.access_time_rounded,
+                            size: 14,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurfaceVariant,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            '${item.start != null ? timeFormat.format(item.start!) : ''} - '
+                            '${item.end != null ? timeFormat.format(item.end!) : ''}',
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurfaceVariant,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                          ),
+                        ],
+                      ),
                     ),
-                    trailing: const Icon(Icons.event_note, size: 20),
                   ),
                 );
               }

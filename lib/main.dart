@@ -1,41 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:dynamic_color/dynamic_color.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:home_widget/home_widget.dart';
 
 import 'package:rocis_tasks/core/theme/app_theme.dart';
 import 'package:rocis_tasks/core/theme/theme_service.dart';
-import 'package:rocis_tasks/features/home/presentation/screens/home_screen.dart';
-import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
-
 import 'package:rocis_tasks/core/services/auth_service.dart';
-import 'package:rocis_tasks/features/auth/presentation/screens/login_screen.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:home_widget/home_widget.dart';
-import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
-import 'package:rocis_tasks/core/services/firestore_service.dart';
 import 'package:rocis_tasks/core/services/calendar_service.dart';
-import 'package:rocis_tasks/features/calendar/presentation/providers/calendar_provider.dart';
-import 'package:dynamic_color/dynamic_color.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:rocis_tasks/features/home/services/month_widget_service.dart';
-import 'package:rocis_tasks/features/tasks/data/datasources/local_task_source.dart';
-import 'dart:convert';
-import 'core/services/notification_service.dart';
-
-// import 'package:rocis_tasks/core/services/background_service_helper.dart'; // Deprecated
 import 'package:rocis_tasks/core/services/app_initializer.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:rocis_tasks/core/services/background_handler.dart';
+import 'package:rocis_tasks/features/home/presentation/screens/home_screen.dart';
+import 'package:rocis_tasks/features/auth/presentation/screens/login_screen.dart';
+import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
+import 'package:rocis_tasks/features/calendar/presentation/providers/calendar_provider.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
-import 'package:rocis_tasks/features/categories/domain/models/category.dart';
-import 'package:rocis_tasks/features/tasks/services/task_widget_service.dart';
-import 'package:rocis_tasks/features/home/services/full_calendar_widget_service.dart';
 
 Future<void> main() async {
   // Initialize App (Core, Firebase, Hive)
   await AppInitializer.initialize();
 
-  // Register callback immediately
-  HomeWidget.registerInteractivityCallback(interactiveCallback);
+  // Register callback for home widget interactivity
+  HomeWidget.registerInteractivityCallback(
+    BackgroundHandler.handleInteractivity,
+  );
   runApp(const AppRoot());
 }
 
@@ -64,19 +53,15 @@ class _AppRootState extends State<AppRoot> {
   }
 
   Future<void> _initServices() async {
-    // Parallel init of other services
     await Future.wait([
       _taskProvider.init().catchError((e) {
         debugPrint('TaskProvider init failed: $e');
-        return;
       }),
       _calendarService.init().catchError((e) {
         debugPrint('CalendarService init failed: $e');
-        return;
       }),
       _themeService.init().catchError((e) {
         debugPrint('ThemeService init failed: $e');
-        return;
       }),
     ]);
   }
@@ -95,15 +80,15 @@ class _AppRootState extends State<AppRoot> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // You might want to replace this with your app logo
                     CircularProgressIndicator(color: Colors.white),
-                    SizedBox(height: 20),
+                    SizedBox(height: 24),
                     Text(
                       "ROCI's Tasks",
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
-                        fontSize: 24,
+                        fontSize: 28,
+                        letterSpacing: 1.2,
                       ),
                     ),
                   ],
@@ -120,21 +105,21 @@ class _AppRootState extends State<AppRoot> {
               backgroundColor: Colors.black,
               body: Center(
                 child: Padding(
-                  padding: const EdgeInsets.all(24.0),
+                  padding: const EdgeInsets.all(32.0),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       const Icon(
                         Icons.error_outline,
                         color: Colors.red,
-                        size: 64,
+                        size: 80,
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 24),
                       const Text(
                         'CRITICAL ERROR',
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 20,
+                          fontSize: 22,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -142,7 +127,10 @@ class _AppRootState extends State<AppRoot> {
                       Text(
                         'Failed to initialize app: ${snapshot.error}',
                         textAlign: TextAlign.center,
-                        style: const TextStyle(color: Colors.redAccent),
+                        style: const TextStyle(
+                          color: Colors.redAccent,
+                          fontSize: 16,
+                        ),
                       ),
                     ],
                   ),
@@ -176,7 +164,6 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeService = Provider.of<ThemeService>(context);
 
-    // DynamicColorBuilder provides the system's dynamic colors if available (Android 12+)
     return DynamicColorBuilder(
       builder: (lightDynamic, darkDynamic) {
         return MaterialApp(
@@ -204,182 +191,18 @@ class MyApp extends StatelessWidget {
               listen: false,
             ).authStateChanges,
             builder: (context, snapshot) {
-              // We can keep a minimal loader here or just show Login/Home
-              // The main initialization is already done.
               if (snapshot.connectionState == ConnectionState.waiting) {
-                // Usually this is very fast if auth is already initialized
                 return const Scaffold(
                   body: Center(child: CircularProgressIndicator()),
                 );
               }
-              if (snapshot.hasData) {
-                return const HomeScreen();
-              }
-              return const LoginScreen();
+              return snapshot.hasData
+                  ? const HomeScreen()
+                  : const LoginScreen();
             },
           ),
         );
       },
     );
-  }
-}
-
-@pragma('vm:entry-point')
-Future<void> interactiveCallback(Uri? uri) async {
-  if (uri?.host == 'complete') {
-    final taskId = uri?.queryParameters['id'];
-    if (taskId != null) {
-      await _completeTaskInBackground(taskId);
-    }
-  } else if (uri?.host == 'prev_month' || uri?.host == 'next_month') {
-    await _handleMonthNavigation(uri?.host == 'next_month');
-  } else if (uri?.host == 'full_calendar_prev' ||
-      uri?.host == 'full_calendar_next') {
-    await _handleFullCalendarNavigation(uri?.host == 'full_calendar_next');
-  } else if (uri?.host == 'add_task') {
-    // This will be handled by opening the app
-    // The app will open to the task creation screen
-  }
-}
-
-Future<void> _handleMonthNavigation(bool isNext) async {
-  // Initialize shared services
-  await AppInitializer.initialize(isBackground: true);
-
-  final prefs = await SharedPreferences.getInstance();
-  int offset = prefs.getInt('month_widget_offset') ?? 0;
-  offset = isNext ? offset + 1 : offset - 1;
-  await prefs.setInt('month_widget_offset', offset);
-
-  // Initialize Services needed for MonthWidget
-  final calendarService = CalendarService();
-  await calendarService.init();
-
-  final taskSource = LocalTaskSource();
-  await taskSource.init();
-
-  final monthService = MonthWidgetService(calendarService, taskSource);
-  await monthService.updateMonthWidget(monthOffset: offset);
-}
-
-Future<void> _handleFullCalendarNavigation(bool isNext) async {
-  // Initialize shared services
-  await AppInitializer.initialize(isBackground: true);
-
-  final prefs = await SharedPreferences.getInstance();
-  int offset = prefs.getInt('full_calendar_offset') ?? 0;
-  offset = isNext ? offset + 1 : offset - 1;
-  await prefs.setInt('full_calendar_offset', offset);
-
-  // Initialize Services needed for FullCalendarWidget
-  final calendarService = CalendarService();
-  await calendarService.init();
-
-  final taskSource = LocalTaskSource();
-  await taskSource.init();
-
-  final fullCalendarService = FullCalendarWidgetService(
-    calendarService,
-    taskSource,
-  );
-  await fullCalendarService.updateFullCalendarWidget(monthOffset: offset);
-}
-
-Future<void> _completeTaskInBackground(String taskId) async {
-  try {
-    // Initialize shared services
-    await AppInitializer.initialize(isBackground: true);
-
-    final box = await Hive.openBox<Task>('tasks');
-
-    // Find task
-    final task = box.values.firstWhere((t) => t.id == taskId);
-    task.isCompleted = true; // Toggle or set complete
-    await task.save();
-
-    // Push to Firestore if user is logged in
-    final currentUser = FirebaseAuth.instance.currentUser;
-    if (currentUser != null) {
-      final firestoreService = FirestoreService();
-      firestoreService.setUserId(currentUser.uid);
-      await firestoreService.updateTask(task);
-    }
-
-    // Update Widget Data from background
-    final pendingTasks = box.values.where((t) => !t.isCompleted).toList();
-
-    pendingTasks.sort((a, b) {
-      if (a.dueDate == null && b.dueDate == null) return 0;
-      if (a.dueDate == null) return 1;
-      if (b.dueDate == null) return -1;
-      return a.dueDate!.compareTo(b.dueDate!);
-    });
-
-    final tasksJson = pendingTasks.map((t) {
-      return {
-        'id': t.id,
-        'title': t.title,
-        'priority': t.priority.name,
-        'dueDate': t.dueDate != null ? t.dueDate.toString().split(' ')[0] : '',
-      };
-    }).toList();
-
-    final jsonString = jsonEncode(tasksJson);
-
-    await HomeWidget.saveWidgetData<String>('pending_tasks_list', jsonString);
-    await HomeWidget.updateWidget(
-      name: 'CalendarWidgetProvider',
-      iOSName: 'CalendarWidget',
-    );
-    await HomeWidget.updateWidget(
-      name: 'ScheduleWidgetProvider',
-      iOSName: 'ScheduleWidget',
-    );
-    await HomeWidget.updateWidget(
-      name: 'TaskWidgetProvider',
-      iOSName: 'TaskWidget',
-    );
-
-    // Update Persistent Notification from Background
-    final notificationService = NotificationService();
-    await notificationService.init();
-
-    // Determine if we should use dark text based on background theme preference
-    final prefs = await SharedPreferences.getInstance();
-    final themeModeIndex = prefs.getInt('theme_mode') ?? 0; // system
-    bool isDarkText = true; // default for light
-    if (themeModeIndex == 1) {
-      // Light
-      isDarkText = true;
-    } else if (themeModeIndex == 2) {
-      // Dark
-      isDarkText = false;
-    } else {
-      // System - this is slightly inaccurate in background but best effort
-      final brightness =
-          WidgetsBinding.instance.platformDispatcher.platformBrightness;
-      isDarkText = brightness != Brightness.dark;
-    }
-
-    // Regenerate the chart image with the correct text color
-    final taskSource = LocalTaskSource();
-    await taskSource.init();
-    final chartPath = await TaskWidgetService.updateTaskWidget(
-      box.values.toList(),
-      (id) {
-        final categoryBox = Hive.box<Category>('categories');
-        return categoryBox.get(id);
-      },
-      isDarkText: isDarkText,
-    );
-
-    await notificationService.showTaskCountNotification(
-      pendingTasks.length,
-      pendingTasks.map((t) => t.title).toList(),
-      largeIconPath: chartPath,
-      isDarkText: isDarkText,
-    );
-  } catch (e) {
-    debugPrint('Background task error: $e');
   }
 }

@@ -5,13 +5,15 @@ import 'package:rocis_tasks/features/tasks/presentation/screens/add_task_screen.
 import 'package:rocis_tasks/features/tasks/presentation/screens/task_list_screen.dart';
 import 'package:rocis_tasks/features/tasks/presentation/widgets/task_sort_filter_sheet.dart';
 import 'package:rocis_tasks/features/home/presentation/screens/settings_screen.dart';
-import 'package:home_widget/home_widget.dart';
+import 'package:home_widget/home_widget.dart' as hw;
 import 'package:provider/provider.dart';
 import 'package:rocis_tasks/features/calendar/presentation/providers/calendar_provider.dart';
 import 'package:rocis_tasks/core/services/notification_service.dart';
 import 'dart:async';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
+
+import 'package:google_fonts/google_fonts.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -36,9 +38,9 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _pageController = PageController(initialPage: _currentIndex);
 
-    // Handle Click Intents
-    HomeWidget.initiallyLaunchedFromHomeWidget().then(_handleWidgetLaunch);
-    HomeWidget.widgetClicked.listen(_handleWidgetLaunch);
+    // Handle Click Intents from Home Widgets
+    hw.HomeWidget.initiallyLaunchedFromHomeWidget().then(_handleWidgetLaunch);
+    hw.HomeWidget.widgetClicked.listen(_handleWidgetLaunch);
 
     // Handle Notification Actions
     _notificationActionSubscription = NotificationService().onAction.listen((
@@ -53,7 +55,10 @@ class _HomeScreenState extends State<HomeScreen> {
   void _navigateToAddTask() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const AddTaskScreen()),
+      MaterialPageRoute(
+        builder: (context) => const AddTaskScreen(),
+        fullscreenDialog: true,
+      ),
     );
   }
 
@@ -69,10 +74,8 @@ class _HomeScreenState extends State<HomeScreen> {
     if (dateStr != null) {
       try {
         final date = DateTime.parse(dateStr);
-        // Switch to Calendar tab (index 1)
         _onItemTapped(1);
 
-        // Use post-frame callback to ensure CalendarScreen is rebuilt/available
         WidgetsBinding.instance.addPostFrameCallback((_) {
           final calendarProvider = Provider.of<CalendarProvider>(
             context,
@@ -102,8 +105,8 @@ class _HomeScreenState extends State<HomeScreen> {
   void _onItemTapped(int index) {
     _pageController.animateToPage(
       index,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
+      duration: const Duration(milliseconds: 400),
+      curve: Curves.fastOutSlowIn,
     );
   }
 
@@ -125,29 +128,19 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        elevation: 1.0,
-        shadowColor: Colors.black,
-
-        /*leading: IconButton(
-          icon: const Icon(Icons.settings),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const SettingsScreen()),
-            );
-          },
-        ),*/
         title: Text(
           _currentIndex == 0
               ? l10n.myTasks
               : _currentIndex == 1
               ? l10n.calendar
               : l10n.settings,
+          style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
         ),
         actions: [
-          if (_currentIndex == 0)
+          if (_currentIndex == 0) ...[
             IconButton(
-              icon: const Icon(Icons.category),
+              icon: const Icon(Icons.category_outlined),
+              tooltip: l10n.categories,
               onPressed: () {
                 Navigator.push(
                   context,
@@ -157,9 +150,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
               },
             ),
-          if (_currentIndex == 0)
             IconButton(
-              icon: const Icon(Icons.sort),
+              icon: const Icon(Icons.sort_rounded),
+              tooltip: l10n.sortAndFilter,
               onPressed: () {
                 showModalBottomSheet(
                   context: context,
@@ -169,47 +162,59 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
               },
             ),
+          ],
+          const SizedBox(width: 8),
         ],
       ),
       body: PageView(
         controller: _pageController,
         onPageChanged: _onPageChanged,
+        physics: const BouncingScrollPhysics(),
         children: _screens,
       ),
       floatingActionButton: _currentIndex == 0 || _currentIndex == 1
           ? FloatingActionButton.extended(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const AddTaskScreen(),
-                  ),
-                );
-              },
-              label: Text(l10n.newTask),
-              icon: const Icon(Icons.add),
+              onPressed: _navigateToAddTask,
+              label: Text(
+                l10n.newTask,
+                style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
+              ),
+              icon: const Icon(Icons.add_rounded),
             )
           : null,
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _currentIndex,
-        onDestinationSelected: _onItemTapped,
-        destinations: [
-          NavigationDestination(
-            icon: const Icon(Icons.task_alt_outlined),
-            selectedIcon: const Icon(Icons.task_alt),
-            label: l10n.tasks,
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.calendar_month_outlined),
-            selectedIcon: const Icon(Icons.calendar_month),
-            label: l10n.calendar,
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.settings_outlined),
-            selectedIcon: const Icon(Icons.settings),
-            label: l10n.settings,
-          ),
-        ],
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.1),
+              blurRadius: 20,
+              offset: const Offset(0, -4),
+            ),
+          ],
+        ),
+        child: NavigationBar(
+          selectedIndex: _currentIndex,
+          onDestinationSelected: _onItemTapped,
+          height: 65,
+          labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+          destinations: [
+            NavigationDestination(
+              icon: const Icon(Icons.task_alt_outlined),
+              selectedIcon: const Icon(Icons.task_alt),
+              label: l10n.tasks,
+            ),
+            NavigationDestination(
+              icon: const Icon(Icons.calendar_month_outlined),
+              selectedIcon: const Icon(Icons.calendar_month),
+              label: l10n.calendar,
+            ),
+            NavigationDestination(
+              icon: const Icon(Icons.settings_outlined),
+              selectedIcon: const Icon(Icons.settings),
+              label: l10n.settings,
+            ),
+          ],
+        ),
       ),
     );
   }

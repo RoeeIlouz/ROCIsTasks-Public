@@ -2,19 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
-  // Premium Color Palette
-  static const Color primaryColor = Color(0xFF6C63FF); // Modern Indigo
-  static const Color secondaryColor = Color(0xFF03DAC6); // Vibrant Teal
+  // Premium Color Palette - Refined
+  static const Color primaryColor = Color(0xFF6366F1); // Modern Indigo
+  static const Color secondaryColor = Color(0xFF10B981); // Emerald
+  static const Color accentColor = Color(0xFFF59E0B); // Amber
 
-  static const Color backgroundLight = Color(0xFFF8F9FA);
+  static const Color backgroundLight = Color(0xFFF8FAFC);
   static const Color surfaceLight = Colors.white;
-  static const Color textLight = Color(0xFF1C1C1E);
+  static const Color textLight = Color(0xFF0F172A);
 
-  static const Color backgroundDark = Color(0xFF121212);
-  static const Color surfaceDark = Color(0xFF1E1E1E);
-  static const Color textDark = Color(0xFFE1E1E1);
+  static const Color backgroundDark = Color(0xFF0F172A);
+  static const Color surfaceDark = Color(0xFF1E293B);
+  static const Color textDark = Color(0xFFF8FAFC);
 
-  static const Color errorColor = Color(0xFFCF6679);
+  static const Color errorColor = Color(0xFFEF4444);
 
   static ThemeData get lightTheme {
     return createLightTheme(null);

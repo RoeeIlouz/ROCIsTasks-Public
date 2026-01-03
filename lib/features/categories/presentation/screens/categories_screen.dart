@@ -3,8 +3,9 @@ import 'package:provider/provider.dart';
 import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
 import 'package:rocis_tasks/features/categories/domain/models/category.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
-import 'package:rocis_tasks/core/theme/app_theme.dart';
 import 'package:rocis_tasks/core/utils/icon_utils.dart';
+
+import 'package:google_fonts/google_fonts.dart';
 
 class CategoriesScreen extends StatelessWidget {
   const CategoriesScreen({super.key});
@@ -12,8 +13,15 @@ class CategoriesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.categories)),
+      appBar: AppBar(
+        title: Text(
+          l10n.categories,
+          style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
+        ),
+      ),
       body: Consumer<TaskProvider>(
         builder: (context, provider, child) {
           final categories = provider.categories;
@@ -25,15 +33,35 @@ class CategoriesScreen extends StatelessWidget {
                 children: [
                   Icon(
                     Icons.category_outlined,
-                    size: 64,
-                    color: Theme.of(context).disabledColor,
+                    size: 80,
+                    color: theme.disabledColor.withValues(alpha: 0.2),
+                  ),
+                  const SizedBox(height: 24),
+                  Text(
+                    l10n.noCategoriesYet,
+                    style: GoogleFonts.outfit(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: theme.disabledColor,
+                    ),
                   ),
                   const SizedBox(height: 16),
-                  Text(l10n.noCategoriesYet),
-                  const SizedBox(height: 8),
-                  ElevatedButton(
+                  FilledButton.icon(
                     onPressed: () => _showCategorySheet(context),
-                    child: Text(l10n.addCategory),
+                    icon: const Icon(Icons.add_rounded),
+                    label: Text(
+                      l10n.addCategory,
+                      style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
+                    ),
+                    style: FilledButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 12,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -41,29 +69,57 @@ class CategoriesScreen extends StatelessWidget {
           }
 
           return ListView.builder(
-            padding: const EdgeInsets.symmetric(vertical: 8),
+            padding: const EdgeInsets.all(16),
             itemCount: categories.length,
             itemBuilder: (context, index) {
               final category = categories[index];
-              return Card(
+              return Container(
+                margin: const EdgeInsets.only(bottom: 12),
+                decoration: BoxDecoration(
+                  color: theme.cardTheme.color,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: theme.brightness == Brightness.light
+                        ? Colors.grey.withValues(alpha: 0.1)
+                        : Colors.white.withValues(alpha: 0.05),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.02),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
                 child: ListTile(
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 4,
+                  ),
                   onTap: () => _showCategorySheet(context, category: category),
-                  leading: CircleAvatar(
-                    backgroundColor: Color(category.colorValue),
+                  leading: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Color(category.colorValue).withValues(alpha: 0.1),
+                      shape: BoxShape.circle,
+                    ),
                     child: Icon(
                       IconUtils.getIconData(category.iconCode),
-                      color: Colors.white,
-                      size: 20,
+                      color: Color(category.colorValue),
+                      size: 24,
                     ),
                   ),
                   title: Text(
                     category.name,
-                    style: const TextStyle(fontWeight: FontWeight.w600),
+                    style: GoogleFonts.outfit(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
                   ),
                   trailing: IconButton(
                     icon: Icon(
-                      Icons.delete_outline,
-                      color: Theme.of(context).colorScheme.error,
+                      Icons.delete_outline_rounded,
+                      color: theme.colorScheme.error.withValues(alpha: 0.7),
                     ),
                     onPressed: () {
                       provider.deleteCategory(category.id);
@@ -77,8 +133,12 @@ class CategoriesScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showCategorySheet(context),
-        icon: const Icon(Icons.add),
-        label: Text(l10n.addCategory),
+        icon: const Icon(Icons.add_rounded),
+        label: Text(
+          l10n.addCategory,
+          style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
+        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
     );
   }
@@ -108,25 +168,20 @@ class _CategorySheetState extends State<_CategorySheet> {
   late int _selectedIcon;
 
   final List<Color> _colors = [
-    Colors.red,
-    Colors.pink,
-    Colors.purple,
-    Colors.deepPurple,
-    Colors.indigo,
-    Colors.blue,
-    Colors.lightBlue,
-    Colors.cyan,
-    Colors.teal,
-    Colors.green,
-    Colors.lightGreen,
-    Colors.lime,
-    Colors.yellow,
-    Colors.amber,
-    Colors.orange,
-    Colors.deepOrange,
-    Colors.brown,
-    Colors.grey,
-    Colors.blueGrey,
+    const Color(0xFF6366F1), // Indigo
+    const Color(0xFF10B981), // Emerald
+    const Color(0xFFF59E0B), // Amber
+    const Color(0xFFEF4444), // Red
+    const Color(0xFFEC4899), // Pink
+    const Color(0xFF8B5CF6), // Violet
+    const Color(0xFF3B82F6), // Blue
+    const Color(0xFF06B6D4), // Cyan
+    const Color(0xFF14B8A6), // Teal
+    const Color(0xFF84CC16), // Lime
+    const Color(0xFFEAB308), // Yellow
+    const Color(0xFFF97316), // Orange
+    const Color(0xFF78350F), // Brown
+    const Color(0xFF64748B), // Slate
   ];
 
   final List<IconData> _icons = IconUtils.categoryIcons;
@@ -135,8 +190,7 @@ class _CategorySheetState extends State<_CategorySheet> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.category?.name ?? '');
-    _selectedColor =
-        widget.category?.colorValue ?? AppTheme.primaryColor.toARGB32();
+    _selectedColor = widget.category?.colorValue ?? _colors.first.toARGB32();
     _selectedIcon = widget.category?.iconCode ?? Icons.category.codePoint;
   }
 
@@ -154,13 +208,20 @@ class _CategorySheetState extends State<_CategorySheet> {
     return Container(
       decoration: BoxDecoration(
         color: theme.scaffoldBackgroundColor,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 20,
+            offset: const Offset(0, -5),
+          ),
+        ],
       ),
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom + 24,
         top: 12,
-        left: 20,
-        right: 20,
+        left: 24,
+        right: 24,
       ),
       child: SingleChildScrollView(
         child: Column(
@@ -180,37 +241,28 @@ class _CategorySheetState extends State<_CategorySheet> {
             ),
             Text(
               widget.category == null ? l10n.newCategory : l10n.editCategory,
-              style: theme.textTheme.headlineSmall?.copyWith(
+              style: GoogleFonts.outfit(
+                fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 32),
 
             // Preview Section
             Center(
-              child: Column(
-                children: [
-                  CircleAvatar(
-                    radius: 32,
-                    backgroundColor: Color(_selectedColor),
-                    child: Icon(
-                      IconUtils.getIconData(_selectedIcon),
-                      color: Colors.white,
-                      size: 32,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    _nameController.text.isEmpty
-                        ? l10n.name
-                        : _nameController.text,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: Color(_selectedColor),
-                    ),
-                  ),
-                ],
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Color(_selectedColor).withValues(alpha: 0.05),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  IconUtils.getIconData(_selectedIcon),
+                  color: Color(_selectedColor),
+                  size: 48,
+                ),
               ),
             ),
             const SizedBox(height: 32),
@@ -218,25 +270,35 @@ class _CategorySheetState extends State<_CategorySheet> {
             TextField(
               controller: _nameController,
               onChanged: (value) => setState(() {}),
+              style: GoogleFonts.outfit(fontWeight: FontWeight.w600),
               decoration: InputDecoration(
                 labelText: l10n.name,
-                prefixIcon: const Icon(Icons.edit_outlined),
+                labelStyle: GoogleFonts.outfit(),
+                prefixIcon: const Icon(Icons.edit_rounded, size: 22),
+                filled: true,
+                fillColor: theme.brightness == Brightness.light
+                    ? Colors.grey.withValues(alpha: 0.05)
+                    : Colors.white.withValues(alpha: 0.05),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide.none,
                 ),
+                contentPadding: const EdgeInsets.all(18),
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 28),
 
             Text(
               l10n.color,
-              style: theme.textTheme.titleSmall?.copyWith(
+              style: GoogleFonts.outfit(
                 fontWeight: FontWeight.bold,
+                fontSize: 14,
+                color: theme.colorScheme.primary,
               ),
             ),
             const SizedBox(height: 12),
             SizedBox(
-              height: 44,
+              height: 50,
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 itemCount: _colors.length,
@@ -249,8 +311,8 @@ class _CategorySheetState extends State<_CategorySheet> {
                         setState(() => _selectedColor = color.toARGB32()),
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
-                      width: 40,
-                      height: 40,
+                      width: 44,
+                      height: 44,
                       decoration: BoxDecoration(
                         color: color,
                         shape: BoxShape.circle,
@@ -260,20 +322,11 @@ class _CategorySheetState extends State<_CategorySheet> {
                                 width: 3,
                               )
                             : null,
-                        boxShadow: isSelected
-                            ? [
-                                BoxShadow(
-                                  color: color.withValues(alpha: 0.4),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ]
-                            : null,
                       ),
                       child: isSelected
                           ? const Icon(
-                              Icons.check,
-                              size: 20,
+                              Icons.check_rounded,
+                              size: 24,
                               color: Colors.white,
                             )
                           : null,
@@ -282,12 +335,14 @@ class _CategorySheetState extends State<_CategorySheet> {
                 },
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 28),
 
             Text(
               l10n.icon,
-              style: theme.textTheme.titleSmall?.copyWith(
+              style: GoogleFonts.outfit(
                 fontWeight: FontWeight.bold,
+                fontSize: 14,
+                color: theme.colorScheme.primary,
               ),
             ),
             const SizedBox(height: 12),
@@ -295,7 +350,7 @@ class _CategorySheetState extends State<_CategorySheet> {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 5,
+                crossAxisCount: 6,
                 mainAxisSpacing: 12,
                 crossAxisSpacing: 12,
               ),
@@ -310,8 +365,9 @@ class _CategorySheetState extends State<_CategorySheet> {
                     decoration: BoxDecoration(
                       color: isSelected
                           ? Color(_selectedColor).withValues(alpha: 0.1)
-                          : theme.colorScheme.surfaceContainerHighest
-                                .withValues(alpha: 0.3),
+                          : theme.brightness == Brightness.light
+                          ? Colors.grey.withValues(alpha: 0.05)
+                          : Colors.white.withValues(alpha: 0.05),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
                         color: isSelected
@@ -322,14 +378,16 @@ class _CategorySheetState extends State<_CategorySheet> {
                     ),
                     child: Icon(
                       icon,
-                      color: isSelected ? Color(_selectedColor) : Colors.grey,
+                      color: isSelected
+                          ? Color(_selectedColor)
+                          : theme.disabledColor,
                       size: 24,
                     ),
                   ),
                 );
               },
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 40),
 
             Row(
               children: [
@@ -339,10 +397,16 @@ class _CategorySheetState extends State<_CategorySheet> {
                     style: TextButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(16),
                       ),
                     ),
-                    child: Text(l10n.cancel),
+                    child: Text(
+                      l10n.cancel,
+                      style: GoogleFonts.outfit(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -376,10 +440,17 @@ class _CategorySheetState extends State<_CategorySheet> {
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       backgroundColor: Color(_selectedColor),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      elevation: 2,
+                    ),
+                    child: Text(
+                      widget.category == null ? l10n.add : l10n.save,
+                      style: GoogleFonts.outfit(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
                       ),
                     ),
-                    child: Text(widget.category == null ? l10n.add : l10n.save),
                   ),
                 ),
               ],
