@@ -1,9 +1,0 @@
-Analyzing ROCIs-tasks...                                        
-
-   info - The imported package 'flutter_local_notifications_platform_interface' isn't a dependency of the importing package - lib\core\services\notification_service.dart:4:8 - depend_on_referenced_packages
-warning - The library 'package:flutter_local_notifications_platform_interface/flutter_local_notifications_platform_interface.dart' doesn't export a member with the shown name 'UILocalNotificationDateInterpretation' - lib\core\services\notification_service.dart:5:10 - undefined_shown_name
-  error - The named parameter 'uiLocalNotificationDateInterpretation' isn't defined - lib\core\services\notification_service.dart:153:11 - undefined_named_parameter
-  error - Undefined name 'UILocalNotificationDateInterpretation' - lib\core\services\notification_service.dart:154:15 - undefined_identifier
-  error - The named parameter 'uiLocalNotificationDateInterpretation' isn't defined - lib\core\services\notification_service.dart:226:9 - undefined_named_parameter
-  error - Undefined name 'UILocalNotificationDateInterpretation' - lib\core\services\notification_service.dart:227:13 - undefined_identifier
-
