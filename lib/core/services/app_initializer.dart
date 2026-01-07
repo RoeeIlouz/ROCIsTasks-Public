@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rocis_tasks/firebase_options.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/features/categories/domain/models/category.dart';
@@ -61,6 +62,16 @@ class AppInitializer {
       await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
       );
+
+      // Enable Firestore offline persistence for offline support
+      try {
+        await FirebaseFirestore.instance.enablePersistence(
+          const PersistenceSettings(synchronizeTabs: true),
+        );
+        debugPrint('Firestore offline persistence enabled');
+      } catch (e) {
+        debugPrint('Firestore persistence already enabled or failed: $e');
+      }
     } catch (e) {
       debugPrint(
         'Firebase initialization failed (non-critical if offline): $e',

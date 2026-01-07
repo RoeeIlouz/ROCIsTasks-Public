@@ -77,20 +77,28 @@ class TaskWidgetService {
     try {
       debugPrint('TaskWidgetService: Starting widget update');
 
-      // Calculate stats
-      int completed = 0;
-      int pending = 0;
-      int deleted = 0;
+      // Calculate priority stats for pending tasks
+      int high = 0;
+      int medium = 0;
+      int low = 0;
 
       for (final task in allTasks) {
-        if (task.isDeleted ?? false) {
-          deleted++;
-        } else if (task.isCompleted) {
-          completed++;
-        } else {
-          pending++;
+        if (!(task.isDeleted ?? false) && !task.isCompleted) {
+          switch (task.priority) {
+            case TaskPriority.high:
+              high++;
+              break;
+            case TaskPriority.medium:
+              medium++;
+              break;
+            case TaskPriority.low:
+              low++;
+              break;
+          }
         }
       }
+
+      final pendingCount = high + medium + low;
 
       // Generate Progressive Circle Chart
       try {
@@ -99,13 +107,13 @@ class TaskWidgetService {
             alignment: Alignment.center,
             children: [
               CircularTaskChart(
-                completed: completed,
-                pending: pending,
-                deleted: deleted,
+                high: high,
+                medium: medium,
+                low: low,
                 size: 200,
               ),
               Text(
-                pending > 99 ? '99+' : '$pending',
+                pendingCount > 99 ? '99+' : '$pendingCount',
                 style: TextStyle(
                   fontSize: 110,
                   fontWeight: FontWeight.bold,

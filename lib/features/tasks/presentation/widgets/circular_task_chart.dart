@@ -2,16 +2,16 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 class CircularTaskChart extends StatelessWidget {
-  final int completed;
-  final int pending;
-  final int deleted;
+  final int high;
+  final int medium;
+  final int low;
   final double size;
 
   const CircularTaskChart({
     super.key,
-    required this.completed,
-    required this.pending,
-    required this.deleted,
+    required this.high,
+    required this.medium,
+    required this.low,
     this.size = 100,
   });
 
@@ -21,25 +21,21 @@ class CircularTaskChart extends StatelessWidget {
       width: size,
       height: size,
       child: CustomPaint(
-        painter: _CircularChartPainter(
-          completed: completed,
-          pending: pending,
-          deleted: deleted,
-        ),
+        painter: _CircularChartPainter(high: high, medium: medium, low: low),
       ),
     );
   }
 }
 
 class _CircularChartPainter extends CustomPainter {
-  final int completed;
-  final int pending;
-  final int deleted;
+  final int high;
+  final int medium;
+  final int low;
 
   _CircularChartPainter({
-    required this.completed,
-    required this.pending,
-    required this.deleted,
+    required this.high,
+    required this.medium,
+    required this.low,
   });
 
   @override
@@ -48,7 +44,7 @@ class _CircularChartPainter extends CustomPainter {
     final radius = size.width / 2;
     final strokeWidth = size.width * 0.12; // 12% thickness
 
-    final total = completed + pending + deleted;
+    final total = high + medium + low;
     if (total == 0) {
       // Draw empty circle
       final paint = Paint()
@@ -62,9 +58,9 @@ class _CircularChartPainter extends CustomPainter {
     }
 
     // Colors
-    const colorCompleted = Color(0xFF4CAF50); // Green
-    const colorPending = Color(0xFFFF9800); // Orange
-    const colorDeleted = Color(0xFFF44336); // Red
+    const colorHigh = Color(0xFFFF5252); // Red Accent
+    const colorMedium = Color(0xFFFFAB40); // Orange Accent
+    const colorLow = Color(0xFF69F0AE); // Green Accent
 
     final rect = Rect.fromCircle(
       center: center,
@@ -77,13 +73,10 @@ class _CircularChartPainter extends CustomPainter {
 
     double startAngle = -pi / 2; // Start from top
 
-    // Draw background circle first to ensure continuity if gaps exist
-    // Actually, distinct segments look better.
-
     final segments = [
-      _ChartSegment(completed, colorCompleted),
-      _ChartSegment(pending, colorPending),
-      _ChartSegment(deleted, colorDeleted),
+      _ChartSegment(low, colorLow),
+      _ChartSegment(medium, colorMedium),
+      _ChartSegment(high, colorHigh),
     ];
 
     // Filter empty segments
@@ -98,9 +91,6 @@ class _CircularChartPainter extends CustomPainter {
 
     for (final segment in activeSegments) {
       final sweepAngle = (segment.value / total) * 2 * pi;
-
-      // Add a small gap between segments ?
-      // For a progressive circle, typically they are continuous.
 
       paint.color = segment.color;
       canvas.drawArc(rect, startAngle, sweepAngle, false, paint);

@@ -139,7 +139,7 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           if (_currentIndex == 0) ...[
             IconButton(
-              icon: const Icon(Icons.category_outlined),
+              icon: const Icon(Icons.dashboard_customize_outlined),
               tooltip: l10n.categories,
               onPressed: () {
                 Navigator.push(
@@ -151,7 +151,7 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
             IconButton(
-              icon: const Icon(Icons.sort_rounded),
+              icon: const Icon(Icons.filter_alt_outlined),
               tooltip: l10n.sortAndFilter,
               onPressed: () {
                 showModalBottomSheet(

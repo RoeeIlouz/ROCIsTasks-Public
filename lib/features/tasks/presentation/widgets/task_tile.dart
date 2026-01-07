@@ -55,7 +55,7 @@ class TaskTile extends StatelessWidget {
           ? DismissDirection.startToEnd
           : DismissDirection.none,
       onDismissed: (_) => onDelete(),
-      confirmDismiss: (direction) async {
+      /*confirmDismiss: (direction) async {
         if (direction == DismissDirection.startToEnd) {
           return await showDialog(
             context: context,
@@ -94,7 +94,7 @@ class TaskTile extends StatelessWidget {
           );
         }
         return false;
-      },
+      },*/
       background: Container(
         margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
         decoration: BoxDecoration(

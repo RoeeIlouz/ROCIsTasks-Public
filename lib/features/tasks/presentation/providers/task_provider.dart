@@ -9,6 +9,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:rocis_tasks/core/theme/theme_service.dart';
 import 'package:rocis_tasks/core/services/auth_service.dart';
 import 'package:rocis_tasks/core/services/calendar_service.dart';
+import 'package:rocis_tasks/core/services/connectivity_service.dart';
 
 import 'package:rocis_tasks/features/categories/domain/models/category.dart';
 import 'package:rocis_tasks/features/home/services/month_widget_service.dart';
@@ -22,6 +23,7 @@ class TaskProvider extends ChangeNotifier {
   final LocalTaskSource _source = LocalTaskSource();
   final NotificationService _notificationService = NotificationService();
   final FirestoreService _firestoreService = FirestoreService();
+  final ConnectivityService _connectivityService = ConnectivityService();
   final AuthService _authService;
   final CalendarService _calendarService;
   final ThemeService _themeService;
@@ -32,6 +34,7 @@ class TaskProvider extends ChangeNotifier {
   StreamSubscription? _tasksSubscription;
   StreamSubscription? _categoriesSubscription;
   StreamSubscription? _authSubscription;
+  StreamSubscription? _connectivitySubscription;
 
   TaskProvider(this._authService, this._calendarService, this._themeService);
   Timer? _widgetDebounce;
@@ -90,13 +93,32 @@ class TaskProvider extends ChangeNotifier {
     _selectedCategoryIds = prefs.getStringList('category_filters') ?? [];
     _showCompleted = prefs.getBool('show_completed') ?? true;
 
+    // Initialize connectivity service
+    await _connectivityService.init();
+
+    // Listen to connectivity changes to sync when coming back online
+    _connectivitySubscription =
+        _connectivityService.addListener(() {
+              if (_connectivityService.isOnline &&
+                  _authService.currentUser != null) {
+                debugPrint('Network restored - attempting sync');
+                syncWithCloud();
+              }
+            })
+            as StreamSubscription?;
+
     _authSubscription = _authService.authStateChanges.listen((
       User? user,
     ) async {
       if (user != null) {
         _firestoreService.setUserId(user.uid);
-        await uploadLocalDataToCloud();
-        await syncWithCloud();
+        // Only sync if online
+        if (_connectivityService.isOnline) {
+          await uploadLocalDataToCloud();
+          await syncWithCloud();
+        } else {
+          debugPrint('User signed in but offline - will sync when online');
+        }
       } else {
         _firestoreService.setUserId(null);
         await _cancelSubscriptions();
@@ -113,9 +135,14 @@ class TaskProvider extends ChangeNotifier {
 
     if (_authService.currentUser != null) {
       _firestoreService.setUserId(_authService.currentUser!.uid);
-      await uploadLocalDataToCloud();
-      await syncWithCloud();
-      updateHomeWidget();
+      // Only sync if online
+      if (_connectivityService.isOnline) {
+        await uploadLocalDataToCloud();
+        await syncWithCloud();
+        updateHomeWidget();
+      } else {
+        debugPrint('App started offline - will sync when online');
+      }
     }
 
     _notificationService.onNotificationResponse.listen((response) {
@@ -177,60 +204,82 @@ class TaskProvider extends ChangeNotifier {
   @override
   void dispose() {
     _authSubscription?.cancel();
+    _connectivitySubscription?.cancel();
     _cancelSubscriptions();
     super.dispose();
   }
 
   Future<void> uploadLocalDataToCloud() async {
     if (_authService.currentUser == null) return;
-    final tasks = _source.getTasks();
-    final categories = _source.getCategories();
-    for (var category in categories) {
-      await _firestoreService.addCategory(category);
-    }
-    for (var task in tasks) {
-      await _firestoreService.addTask(task);
+
+    try {
+      final tasks = _source.getTasks();
+      final categories = _source.getCategories();
+      for (var category in categories) {
+        await _firestoreService.addCategory(category);
+      }
+      for (var task in tasks) {
+        await _firestoreService.addTask(task);
+      }
+      debugPrint('Successfully uploaded local data to cloud');
+    } catch (e) {
+      debugPrint('Failed to upload local data (offline or error): $e');
     }
   }
 
   Future<void> syncWithCloud() async {
     if (_authService.currentUser == null) return;
+
+    // Don't attempt to sync if offline
+    if (!_connectivityService.isOnline) {
+      debugPrint('Skipping cloud sync - offline');
+      return;
+    }
+
     await _cancelSubscriptions();
     try {
-      _tasksSubscription = _firestoreService.getTasksStream().listen((
-        cloudTasks,
-      ) async {
-        for (var cloudTask in cloudTasks) {
-          await _source.addTask(cloudTask);
-          if (!cloudTask.isCompleted &&
-              !(cloudTask.isDeleted ?? false) &&
-              cloudTask.dueDate != null &&
-              cloudTask.dueDate!.isAfter(DateTime.now())) {
-            await _notificationService.scheduleNotification(
-              id: NotificationService.getNotificationId(cloudTask.id),
-              title: 'Task Reminder: ${cloudTask.title}',
-              body: cloudTask.description.isNotEmpty
-                  ? cloudTask.description
-                  : 'You have a task due now!',
-              scheduledDate: cloudTask.dueDate!,
-              taskId: cloudTask.id,
-            );
+      _tasksSubscription = _firestoreService.getTasksStream().listen(
+        (cloudTasks) async {
+          for (var cloudTask in cloudTasks) {
+            await _source.addTask(cloudTask);
+            if (!cloudTask.isCompleted &&
+                !(cloudTask.isDeleted ?? false) &&
+                cloudTask.dueDate != null &&
+                cloudTask.dueDate!.isAfter(DateTime.now())) {
+              await _notificationService.scheduleNotification(
+                id: NotificationService.getNotificationId(cloudTask.id),
+                title: 'Task Reminder: ${cloudTask.title}',
+                body: cloudTask.description.isNotEmpty
+                    ? cloudTask.description
+                    : 'You have a task due now!',
+                scheduledDate: cloudTask.dueDate!,
+                taskId: cloudTask.id,
+              );
+            }
           }
-        }
-        notifyListeners();
-        updateHomeWidget();
-      });
+          notifyListeners();
+          updateHomeWidget();
+        },
+        onError: (error) {
+          debugPrint('Error in tasks stream (may be offline): $error');
+        },
+      );
 
-      _categoriesSubscription = _firestoreService.getCategoriesStream().listen((
-        cloudCategories,
-      ) async {
-        for (var cloudCategory in cloudCategories) {
-          await _source.addCategory(cloudCategory);
-        }
-        notifyListeners();
-      });
+      _categoriesSubscription = _firestoreService.getCategoriesStream().listen(
+        (cloudCategories) async {
+          for (var cloudCategory in cloudCategories) {
+            await _source.addCategory(cloudCategory);
+          }
+          notifyListeners();
+        },
+        onError: (error) {
+          debugPrint('Error in categories stream (may be offline): $error');
+        },
+      );
+
+      debugPrint('Cloud sync started successfully');
     } catch (e) {
-      debugPrint('Error in cloud sync: $e');
+      debugPrint('Error starting cloud sync: $e');
     }
   }
 

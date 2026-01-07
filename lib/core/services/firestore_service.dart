@@ -3,9 +3,11 @@ import 'package:flutter/foundation.dart' hide Category;
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/features/categories/domain/models/category.dart';
 import 'package:rocis_tasks/core/services/encryption_service.dart';
+import 'package:rocis_tasks/core/services/connectivity_service.dart';
 
 class FirestoreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final ConnectivityService _connectivityService = ConnectivityService();
   String? _userId;
 
   // Singleton pattern
@@ -16,6 +18,9 @@ class FirestoreService {
   void setUserId(String? userId) {
     _userId = userId;
   }
+
+  /// Check if we should attempt Firestore operations
+  bool get _shouldSync => _userId != null && _connectivityService.isOnline;
 
   CollectionReference<Map<String, dynamic>>? get _tasksCollection {
     if (_userId == null) return null;
@@ -29,7 +34,7 @@ class FirestoreService {
 
   Future<void> addCategory(Category category) async {
     final collection = _categoriesCollection;
-    if (collection == null) return;
+    if (collection == null || !_shouldSync) return;
 
     try {
       await collection.doc(category.id).set({
@@ -39,13 +44,14 @@ class FirestoreService {
         'iconCode': category.iconCode,
       });
     } catch (e) {
-      debugPrint('Error adding category to Firestore: $e');
+      // Silently fail when offline - local data is source of truth
+      debugPrint('Firestore addCategory skipped (offline or error): $e');
     }
   }
 
   Future<void> updateCategory(Category category) async {
     final collection = _categoriesCollection;
-    if (collection == null) return;
+    if (collection == null || !_shouldSync) return;
 
     try {
       await collection.doc(category.id).update({
@@ -54,18 +60,18 @@ class FirestoreService {
         'iconCode': category.iconCode,
       });
     } catch (e) {
-      debugPrint('Error updating category in Firestore: $e');
+      debugPrint('Firestore updateCategory skipped (offline or error): $e');
     }
   }
 
   Future<void> deleteCategory(String id) async {
     final collection = _categoriesCollection;
-    if (collection == null) return;
+    if (collection == null || !_shouldSync) return;
 
     try {
       await collection.doc(id).delete();
     } catch (e) {
-      debugPrint('Error deleting category from Firestore: $e');
+      debugPrint('Firestore deleteCategory skipped (offline or error): $e');
     }
   }
 
@@ -88,7 +94,7 @@ class FirestoreService {
 
   Future<void> addTask(Task task) async {
     final collection = _tasksCollection;
-    if (collection == null) return;
+    if (collection == null || !_shouldSync) return;
 
     try {
       await collection.doc(task.id).set({
@@ -104,13 +110,13 @@ class FirestoreService {
         'updatedAt': FieldValue.serverTimestamp(),
       });
     } catch (e) {
-      debugPrint('Error adding task to Firestore: $e');
+      debugPrint('Firestore addTask skipped (offline or error): $e');
     }
   }
 
   Future<void> updateTask(Task task) async {
     final collection = _tasksCollection;
-    if (collection == null) return;
+    if (collection == null || !_shouldSync) return;
 
     try {
       await collection.doc(task.id).update({
@@ -125,18 +131,18 @@ class FirestoreService {
         'updatedAt': FieldValue.serverTimestamp(),
       });
     } catch (e) {
-      debugPrint('Error updating task in Firestore: $e');
+      debugPrint('Firestore updateTask skipped (offline or error): $e');
     }
   }
 
   Future<void> deleteTask(String id) async {
     final collection = _tasksCollection;
-    if (collection == null) return;
+    if (collection == null || !_shouldSync) return;
 
     try {
       await collection.doc(id).delete();
     } catch (e) {
-      debugPrint('Error deleting task from Firestore: $e');
+      debugPrint('Firestore deleteTask skipped (offline or error): $e');
     }
   }
 
