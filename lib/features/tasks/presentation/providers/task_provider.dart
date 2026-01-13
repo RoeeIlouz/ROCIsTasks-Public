@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart' hide Category;
 import 'dart:async';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rocis_tasks/core/services/notification_service.dart';
+import 'package:rocis_tasks/core/services/encryption_service.dart';
 import 'package:rocis_tasks/features/tasks/data/datasources/local_task_source.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/core/services/firestore_service.dart';
@@ -62,34 +63,47 @@ class TaskProvider extends ChangeNotifier {
 
     // Initialize pagination service
     _taskPagination = PaginationService<Task>(_getFilteredAndSortedTasks);
+    // Don't initialize yet - wait for source init
 
     await _source.init();
+    _taskPagination.initialize();
     await _notificationService.init();
     await _notificationService.requestPermissions();
+    try {
+      await _repairEncryptedData();
+    } catch (e) {
+      debugPrint('Error repairing encrypted data: $e');
+    }
+    _refreshPagination();
 
     await _notificationService.cancelAllNotifications();
 
-    final allTasks = _source.getTasks();
-    for (var task in allTasks) {
-      if (!task.isCompleted &&
-          !(task.isDeleted ?? false) &&
-          task.dueDate != null &&
-          task.dueDate!.isAfter(DateTime.now())) {
-        try {
-          await _notificationService.scheduleNotification(
-            id: NotificationService.getNotificationId(task.id),
-            title: 'Task Reminder: ${task.title}',
-            body: task.description.isNotEmpty
-                ? task.description
-                : 'You have a task due now!',
-            scheduledDate: task.dueDate!,
-            taskId: task.id,
-          );
-        } catch (e) {
-          debugPrint('Error rescheduling notification: $e');
+    await _notificationService.cancelAllNotifications();
+
+    // Defer notification rescheduling to not block startup
+    Future.delayed(const Duration(seconds: 2), () async {
+      final allTasks = _source.getTasks();
+      for (var task in allTasks) {
+        if (!task.isCompleted &&
+            !(task.isDeleted ?? false) &&
+            task.dueDate != null &&
+            task.dueDate!.isAfter(DateTime.now())) {
+          try {
+            await _notificationService.scheduleNotification(
+              id: NotificationService.getNotificationId(task.id),
+              title: 'Task Reminder: ${task.title}',
+              body: task.description.isNotEmpty
+                  ? task.description
+                  : 'You have a task due now!',
+              scheduledDate: task.dueDate!,
+              taskId: task.id,
+            );
+          } catch (e) {
+            debugPrint('Error rescheduling notification: $e');
+          }
         }
       }
-    }
+    });
 
     final prefs = await SharedPreferences.getInstance();
     final sortIndex = prefs.getInt('sort_option');
@@ -137,15 +151,20 @@ class TaskProvider extends ChangeNotifier {
     _isLoading = false;
     notifyListeners();
 
-    await updateHomeWidget();
+    // Defer home widget update
+    Future.delayed(
+      const Duration(seconds: 1),
+      () async => await updateHomeWidget(),
+    );
 
     if (_authService.currentUser != null) {
       _firestoreService.setUserId(_authService.currentUser!.uid);
       // Only sync if online
       if (_connectivityService.isOnline) {
-        await uploadLocalDataToCloud();
-        await syncWithCloud();
-        updateHomeWidget();
+        // Don't await sync in init to unblock startup
+        uploadLocalDataToCloud()
+            .then((_) => syncWithCloud())
+            .then((_) => updateHomeWidget());
       } else {
         debugPrint('App started offline - will sync when online');
       }
@@ -165,6 +184,54 @@ class TaskProvider extends ChangeNotifier {
         }
       }
     });
+  }
+
+  Future<void> _repairEncryptedData() async {
+    // Only run this repair if encryption service is ready
+    if (!await EncryptionService.hasKey()) return;
+
+    final allTasks = _source.getTasks();
+    bool needsUpdate = false;
+
+    for (var task in allTasks) {
+      bool changed = false;
+      // Check if title looks like it's encrypted (contains exactly one ':')
+      // and isn't just a normal string that happens to have a colon
+      if (_isLikelyEncrypted(task.title)) {
+        final decryptedInfo = EncryptionService.decrypt(task.title);
+        // Only update if it actually changed
+        if (decryptedInfo != task.title) {
+          task.title = decryptedInfo;
+          changed = true;
+        }
+      }
+
+      if (_isLikelyEncrypted(task.description)) {
+        final decryptedDesc = EncryptionService.decrypt(task.description);
+        if (decryptedDesc != task.description) {
+          task.description = decryptedDesc;
+          changed = true;
+        }
+      }
+
+      if (changed) {
+        await _source.updateTask(task);
+        needsUpdate = true;
+      }
+    }
+
+    if (needsUpdate) {
+      debugPrint('Repaired encrypted tasks in local storage');
+    }
+  }
+
+  bool _isLikelyEncrypted(String text) {
+    if (text.isEmpty) return false;
+    // Basic check for our encryption format IV:CipherText
+    // IV is 16 bytes base64 (~24 chars), CipherText is base64
+    if (!text.contains(':')) return false;
+    final parts = text.split(':');
+    return parts.length == 2 && parts[0].length >= 20;
   }
 
   void _navigateToTask(String taskId) {

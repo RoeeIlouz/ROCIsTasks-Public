@@ -10,6 +10,8 @@ import 'package:rocis_tasks/core/services/notification_service.dart';
 import 'package:rocis_tasks/core/services/error_service.dart';
 import 'package:rocis_tasks/core/config/app_config.dart';
 
+import 'package:rocis_tasks/core/services/encryption_service.dart';
+
 class AppInitializer {
   static bool _isInitialized = false;
 
@@ -32,6 +34,7 @@ class AppInitializer {
         _initHive(),
         _initEnvironment(),
         _initFirebase(),
+        _initEncryption(),
       ]).timeout(
         Duration(seconds: AppConfig.syncTimeoutSeconds),
         onTimeout: () {
@@ -126,6 +129,15 @@ class AppInitializer {
 
       // This is a critical error - rethrow to show error screen
       throw Exception('Firebase initialization failed: $e');
+    }
+  }
+
+  static Future<void> _initEncryption() async {
+    try {
+      await EncryptionService.getOrGenerateKey();
+      debugPrint('AppInitializer: Encryption initialized successfully');
+    } catch (e) {
+      debugPrint('AppInitializer: Encryption initialization failed: $e');
     }
   }
 }

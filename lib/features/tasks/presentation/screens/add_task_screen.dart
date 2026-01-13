@@ -1,3 +1,4 @@
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -27,6 +28,8 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   DateTime? _selectedDate;
   TaskPriority _priority = TaskPriority.medium;
   String? _category;
+  ui.TextDirection _titleDirection = ui.TextDirection.ltr;
+  ui.TextDirection _descriptionDirection = ui.TextDirection.ltr;
 
   @override
   void initState() {
@@ -38,6 +41,8 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     _selectedDate = widget.task?.dueDate;
     _priority = widget.task?.priority ?? TaskPriority.medium;
     _category = widget.task?.categoryId;
+    _titleDirection = _getTextDirection(_titleController.text);
+    _descriptionDirection = _getTextDirection(_descriptionController.text);
   }
 
   @override
@@ -114,8 +119,12 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
         }
 
         // Sanitize inputs
-        final sanitizedTitle = ValidationService.sanitizeText(_titleController.text);
-        final sanitizedDescription = ValidationService.sanitizeText(_descriptionController.text);
+        final sanitizedTitle = ValidationService.sanitizeText(
+          _titleController.text,
+        );
+        final sanitizedDescription = ValidationService.sanitizeText(
+          _descriptionController.text,
+        );
 
         if (widget.task != null) {
           Provider.of<TaskProvider>(context, listen: false).updateTask(
@@ -144,6 +153,12 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
         );
       }
     }
+  }
+
+  ui.TextDirection _getTextDirection(String text) {
+    return Bidi.detectRtlDirectionality(text)
+        ? ui.TextDirection.rtl
+        : ui.TextDirection.ltr;
   }
 
   String _getPriorityLabel(TaskPriority priority, AppLocalizations l10n) {
@@ -212,33 +227,30 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
               TextFormField(
                 controller: _titleController,
                 style: GoogleFonts.outfit(fontWeight: FontWeight.w600),
+                textDirection: _titleDirection,
                 decoration: _getInputDecoration(l10n.title, Icons.title, theme),
                 validator: (value) {
                   final sanitized = ValidationService.sanitizeText(value ?? '');
                   final error = ValidationService.validateTaskTitle(sanitized);
                   if (error != null) return error;
-                  
+
                   if (ValidationService.containsHarmfulContent(sanitized)) {
                     return 'Title contains invalid content';
                   }
-                  
+
                   return null;
                 },
                 onChanged: (value) {
-                  // Auto-sanitize as user types
-                  final sanitized = ValidationService.sanitizeText(value);
-                  if (sanitized != value) {
-                    _titleController.value = _titleController.value.copyWith(
-                      text: sanitized,
-                      selection: TextSelection.collapsed(offset: sanitized.length),
-                    );
-                  }
+                  setState(() {
+                    _titleDirection = _getTextDirection(value);
+                  });
                 },
               ),
               const SizedBox(height: 20),
               TextFormField(
                 controller: _descriptionController,
                 style: GoogleFonts.outfit(),
+                textDirection: _descriptionDirection,
                 decoration: _getInputDecoration(
                   l10n.description,
                   Icons.description_outlined,
@@ -246,14 +258,22 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                 ),
                 maxLines: 4,
                 validator: (value) {
-                  final error = ValidationService.validateTaskDescription(value);
+                  final error = ValidationService.validateTaskDescription(
+                    value,
+                  );
                   if (error != null) return error;
-                  
-                  if (value != null && ValidationService.containsHarmfulContent(value)) {
+
+                  if (value != null &&
+                      ValidationService.containsHarmfulContent(value)) {
                     return 'Description contains invalid content';
                   }
-                  
+
                   return null;
+                },
+                onChanged: (value) {
+                  setState(() {
+                    _descriptionDirection = _getTextDirection(value);
+                  });
                 },
               ),
               const SizedBox(height: 24),

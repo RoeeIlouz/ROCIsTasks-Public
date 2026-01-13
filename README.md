@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # ROCI's Tasks
 
 A comprehensive Flutter-based task management application with calendar integration, multi-platform support, and cloud synchronization.
@@ -288,3 +289,8 @@ Planned features for future releases:
 ---
 
 **ROCI's Tasks** - Simplifying task management across all your devices.
+=======
+# ROCIs-tasks-Android-
+
+A brief description of what this project does and who it's for.
+>>>>>>> 49f59a2274400143427ecfeb4b1f397d9f6bfece

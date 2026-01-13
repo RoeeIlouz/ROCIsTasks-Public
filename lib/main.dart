@@ -15,7 +15,10 @@ import 'package:rocis_tasks/features/home/presentation/screens/home_screen.dart'
 import 'package:rocis_tasks/features/auth/presentation/screens/login_screen.dart';
 import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
 import 'package:rocis_tasks/features/calendar/presentation/providers/calendar_provider.dart';
+import 'package:rocis_tasks/features/onboarding/data/services/onboarding_service.dart';
+import 'package:rocis_tasks/features/onboarding/presentation/screens/onboarding_screen.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> main() async {
   // Initialize App (Core, Firebase, Hive)
@@ -45,6 +48,7 @@ class _AppRootState extends State<AppRoot> {
     _calendarService,
     _themeService,
   );
+  late final OnboardingService _onboardingService;
 
   @override
   void initState() {
@@ -53,6 +57,9 @@ class _AppRootState extends State<AppRoot> {
   }
 
   Future<void> _initServices() async {
+    final prefs = await SharedPreferences.getInstance();
+    _onboardingService = OnboardingService(prefs);
+
     await Future.wait([
       _taskProvider.init().catchError((e) {
         debugPrint('TaskProvider init failed: $e');
@@ -157,6 +164,7 @@ class _AppRootState extends State<AppRoot> {
             ChangeNotifierProvider(
               create: (_) => CalendarProvider(_calendarService)..loadEvents(),
             ),
+            Provider.value(value: _onboardingService),
           ],
           child: const MyApp(),
         );
@@ -204,9 +212,18 @@ class MyApp extends StatelessWidget {
                   body: Center(child: CircularProgressIndicator()),
                 );
               }
-              return snapshot.hasData
-                  ? const HomeScreen()
-                  : const LoginScreen();
+              if (snapshot.hasData) {
+                final onboardingService = Provider.of<OnboardingService>(
+                  context,
+                  listen: false,
+                );
+                if (onboardingService.hasSeenOnboarding) {
+                  return const HomeScreen();
+                } else {
+                  return const OnboardingScreen();
+                }
+              }
+              return const LoginScreen();
             },
           ),
         );

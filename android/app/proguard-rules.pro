@@ -52,3 +52,7 @@
 -keepclassmembers class * extends androidx.work.Worker {
     public <init>(android.content.Context,androidx.work.WorkerParameters);
 }
+
+# Play Core rules (fixes missing class errors)
+-dontwarn com.google.android.play.core.**
+-keep class com.google.android.play.core.** { *; }
