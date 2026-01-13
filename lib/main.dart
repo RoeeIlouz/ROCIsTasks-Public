@@ -91,6 +91,14 @@ class _AppRootState extends State<AppRoot> {
                         letterSpacing: 1.2,
                       ),
                     ),
+                    Text(
+                      "Dotting the i's and crossing the t's",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        letterSpacing: 1.2,
+                      ),
+                    ),
                   ],
                 ),
               ),

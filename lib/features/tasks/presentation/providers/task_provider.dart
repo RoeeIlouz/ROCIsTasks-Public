@@ -10,6 +10,8 @@ import 'package:rocis_tasks/core/theme/theme_service.dart';
 import 'package:rocis_tasks/core/services/auth_service.dart';
 import 'package:rocis_tasks/core/services/calendar_service.dart';
 import 'package:rocis_tasks/core/services/connectivity_service.dart';
+import 'package:rocis_tasks/core/config/app_config.dart';
+import 'package:rocis_tasks/core/services/pagination_service.dart';
 
 import 'package:rocis_tasks/features/categories/domain/models/category.dart';
 import 'package:rocis_tasks/features/home/services/month_widget_service.dart';
@@ -30,6 +32,7 @@ class TaskProvider extends ChangeNotifier {
   late final MonthWidgetService _monthWidgetService;
   late final FullCalendarWidgetService _fullCalendarWidgetService;
   late final WidgetDataService _widgetDataService;
+  late final PaginationService<Task> _taskPagination;
   bool _isLoading = true;
   StreamSubscription? _tasksSubscription;
   StreamSubscription? _categoriesSubscription;
@@ -56,6 +59,9 @@ class TaskProvider extends ChangeNotifier {
       _source,
     );
     _widgetDataService = WidgetDataService(_calendarService);
+
+    // Initialize pagination service
+    _taskPagination = PaginationService<Task>(_getFilteredAndSortedTasks);
 
     await _source.init();
     await _notificationService.init();
@@ -257,6 +263,7 @@ class TaskProvider extends ChangeNotifier {
               );
             }
           }
+          _refreshPagination();
           notifyListeners();
           updateHomeWidget();
         },
@@ -270,6 +277,7 @@ class TaskProvider extends ChangeNotifier {
           for (var cloudCategory in cloudCategories) {
             await _source.addCategory(cloudCategory);
           }
+          _refreshPagination();
           notifyListeners();
         },
         onError: (error) {
@@ -293,6 +301,7 @@ class TaskProvider extends ChangeNotifier {
 
   void setSortOption(TaskSortOption option) {
     _currentSortOption = option;
+    _refreshPagination();
     notifyListeners();
     SharedPreferences.getInstance().then((prefs) {
       prefs.setInt('sort_option', option.index);
@@ -305,12 +314,14 @@ class TaskProvider extends ChangeNotifier {
     } else {
       _selectedCategoryIds.add(categoryId);
     }
+    _refreshPagination();
     notifyListeners();
     _saveCategoryFilters();
   }
 
   void clearCategoryFilters() {
     _selectedCategoryIds = [];
+    _refreshPagination();
     notifyListeners();
     _saveCategoryFilters();
   }
@@ -323,6 +334,7 @@ class TaskProvider extends ChangeNotifier {
 
   void toggleShowCompleted(bool value) {
     _showCompleted = value;
+    _refreshPagination();
     notifyListeners();
     SharedPreferences.getInstance().then((prefs) {
       prefs.setBool('show_completed', value);
@@ -331,6 +343,11 @@ class TaskProvider extends ChangeNotifier {
 
   List<Task> get tasks {
     if (_isLoading) return [];
+    return _taskPagination.items;
+  }
+
+  /// Get all tasks without pagination (for internal use)
+  List<Task> _getFilteredAndSortedTasks() {
     var tasks = _source
         .getTasks()
         .where((t) => !(t.isDeleted ?? false))
@@ -380,45 +397,71 @@ class TaskProvider extends ChangeNotifier {
     return _source.getCategories();
   }
 
+  // Pagination methods
+  bool get hasMoreTasks => _taskPagination.hasMoreItems;
+  bool get isLoadingMoreTasks => _taskPagination.isLoading;
+  int get currentTaskPage => _taskPagination.currentPage;
+  int get totalTaskPages => _taskPagination.totalPages;
+  int get totalTaskCount => _taskPagination.totalItems;
+
+  /// Load more tasks (for infinite scroll)
+  Future<void> loadMoreTasks() async {
+    await _taskPagination.loadNextPage();
+    notifyListeners();
+  }
+
+  /// Check if should load more tasks based on scroll position
+  bool shouldLoadMoreTasks(int index) {
+    return _taskPagination.shouldLoadMore(index);
+  }
+
+  /// Refresh pagination when data changes
+  void _refreshPagination() {
+    _taskPagination.refresh();
+  }
+
   Future<void> updateHomeWidget() async {
     _widgetDebounce?.cancel();
-    _widgetDebounce = Timer(const Duration(milliseconds: 300), () async {
-      if (_widgetUpdateInProgress) return;
-      _widgetUpdateInProgress = true;
-      try {
-        final chartPath = await TaskWidgetService.updateTaskWidget(
-          _source.getTasks(),
-          getCategoryById,
-          isDarkText: !_themeService.isDarkMode,
-        );
+    _widgetDebounce = Timer(
+      Duration(milliseconds: AppConfig.notificationDebounceMs),
+      () async {
+        if (_widgetUpdateInProgress) return;
+        _widgetUpdateInProgress = true;
+        try {
+          final chartPath = await TaskWidgetService.updateTaskWidget(
+            _source.getTasks(),
+            getCategoryById,
+            isDarkText: !_themeService.isDarkMode,
+          );
 
-        final uncompletedTasks = _source
-            .getTasks()
-            .where((t) => !t.isCompleted && !(t.isDeleted ?? false))
-            .toList();
+          final uncompletedTasks = _source
+              .getTasks()
+              .where((t) => !t.isCompleted && !(t.isDeleted ?? false))
+              .toList();
 
-        await _notificationService.showTaskCountNotification(
-          uncompletedTasks.length,
-          uncompletedTasks.map((t) => t.title).toList(),
-          largeIconPath: chartPath,
-          isDarkText: !_themeService.isDarkMode,
-        );
+          await _notificationService.showTaskCountNotification(
+            uncompletedTasks.length,
+            uncompletedTasks.map((t) => t.title).toList(),
+            largeIconPath: chartPath,
+            isDarkText: !_themeService.isDarkMode,
+          );
 
-        await _widgetDataService.updateMonthEventsMap(_source.getTasks());
-        await _widgetDataService.updateScheduleWidget(
-          _source.getTasks(),
-          getCategoryById,
-        );
-        await _widgetDataService.updateCalendarListWidget(_source.getTasks());
+          await _widgetDataService.updateMonthEventsMap(_source.getTasks());
+          await _widgetDataService.updateScheduleWidget(
+            _source.getTasks(),
+            getCategoryById,
+          );
+          await _widgetDataService.updateCalendarListWidget(_source.getTasks());
 
-        await _monthWidgetService.updateMonthWidget();
-        await _fullCalendarWidgetService.updateFullCalendarWidget();
-      } catch (e) {
-        debugPrint('Error updating widgets: $e');
-      } finally {
-        _widgetUpdateInProgress = false;
-      }
-    });
+          await _monthWidgetService.updateMonthWidget();
+          await _fullCalendarWidgetService.updateFullCalendarWidget();
+        } catch (e) {
+          debugPrint('Error updating widgets: $e');
+        } finally {
+          _widgetUpdateInProgress = false;
+        }
+      },
+    );
   }
 
   Future<void> addTask(
@@ -453,12 +496,14 @@ class TaskProvider extends ChangeNotifier {
         );
       } catch (_) {}
     }
+    _refreshPagination();
     notifyListeners();
     updateHomeWidget();
   }
 
   Future<void> toggleTaskCompletion(Task task) async {
     task.isCompleted = !task.isCompleted;
+    notifyListeners();
     await _source.updateTask(task);
     await _firestoreService.updateTask(task);
 
@@ -477,6 +522,7 @@ class TaskProvider extends ChangeNotifier {
         taskId: task.id,
       );
     }
+    _refreshPagination();
     notifyListeners();
     updateHomeWidget();
   }
@@ -516,14 +562,17 @@ class TaskProvider extends ChangeNotifier {
         taskId: task.id,
       );
     }
+    _refreshPagination();
     notifyListeners();
     updateHomeWidget();
   }
 
   Future<void> toggleTaskPin(Task task) async {
     task.isPinned = !(task.isPinned ?? false);
+    notifyListeners();
     await _source.updateTask(task);
     await _firestoreService.updateTask(task);
+    _refreshPagination();
     notifyListeners();
     updateHomeWidget();
   }
@@ -538,6 +587,7 @@ class TaskProvider extends ChangeNotifier {
         NotificationService.getNotificationId(id),
       );
     } catch (_) {}
+    _refreshPagination();
     notifyListeners();
     updateHomeWidget();
   }
@@ -559,6 +609,7 @@ class TaskProvider extends ChangeNotifier {
         taskId: task.id,
       );
     }
+    _refreshPagination();
     notifyListeners();
     updateHomeWidget();
   }
@@ -569,6 +620,7 @@ class TaskProvider extends ChangeNotifier {
     await _notificationService.cancelNotification(
       NotificationService.getNotificationId(id),
     );
+    _refreshPagination();
     notifyListeners();
     updateHomeWidget();
   }
@@ -612,8 +664,10 @@ class TaskProvider extends ChangeNotifier {
 
   Category? getCategoryById(String? id) {
     if (id == null) return null;
+
     try {
-      return _source.getCategories().firstWhere((c) => c.id == id);
+      final category = _source.getCategories().firstWhere((c) => c.id == id);
+      return category;
     } catch (_) {
       return null;
     }

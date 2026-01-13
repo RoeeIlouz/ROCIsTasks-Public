@@ -5,7 +5,6 @@ import 'package:rocis_tasks/features/categories/domain/models/category.dart';
 import 'package:provider/provider.dart';
 import 'package:rocis_tasks/core/theme/theme_service.dart';
 import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
-import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:rocis_tasks/core/utils/icon_utils.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -45,7 +44,6 @@ class TaskTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final themeService = Provider.of<ThemeService>(context);
 

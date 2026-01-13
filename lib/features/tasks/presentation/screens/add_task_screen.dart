@@ -3,6 +3,8 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
+import 'package:rocis_tasks/core/services/validation_service.dart';
+import 'package:rocis_tasks/core/services/error_service.dart';
 
 import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:rocis_tasks/core/theme/theme_service.dart';
@@ -103,25 +105,44 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
 
   void _saveTask() {
     if (_formKey.currentState!.validate()) {
-      if (widget.task != null) {
-        Provider.of<TaskProvider>(context, listen: false).updateTask(
-          widget.task!,
-          title: _titleController.text,
-          description: _descriptionController.text,
-          dueDate: _selectedDate,
-          priority: _priority,
-          categoryId: _category,
-        );
-      } else {
-        Provider.of<TaskProvider>(context, listen: false).addTask(
-          _titleController.text,
-          _descriptionController.text,
-          _selectedDate,
-          _priority,
-          _category,
+      try {
+        // Validate due date
+        final dateError = ValidationService.validateDueDate(_selectedDate);
+        if (dateError != null) {
+          ErrorService.handleUserError(context, dateError);
+          return;
+        }
+
+        // Sanitize inputs
+        final sanitizedTitle = ValidationService.sanitizeText(_titleController.text);
+        final sanitizedDescription = ValidationService.sanitizeText(_descriptionController.text);
+
+        if (widget.task != null) {
+          Provider.of<TaskProvider>(context, listen: false).updateTask(
+            widget.task!,
+            title: sanitizedTitle,
+            description: sanitizedDescription,
+            dueDate: _selectedDate,
+            priority: _priority,
+            categoryId: _category,
+          );
+        } else {
+          Provider.of<TaskProvider>(context, listen: false).addTask(
+            sanitizedTitle,
+            sanitizedDescription,
+            _selectedDate,
+            _priority,
+            _category,
+          );
+        }
+        Navigator.pop(context);
+      } catch (e) {
+        ErrorService.handleUserError(
+          context,
+          'Failed to save task. Please try again.',
+          error: e,
         );
       }
-      Navigator.pop(context);
     }
   }
 
@@ -193,10 +214,25 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                 style: GoogleFonts.outfit(fontWeight: FontWeight.w600),
                 decoration: _getInputDecoration(l10n.title, Icons.title, theme),
                 validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return l10n.pleaseEnterATitle;
+                  final sanitized = ValidationService.sanitizeText(value ?? '');
+                  final error = ValidationService.validateTaskTitle(sanitized);
+                  if (error != null) return error;
+                  
+                  if (ValidationService.containsHarmfulContent(sanitized)) {
+                    return 'Title contains invalid content';
                   }
+                  
                   return null;
+                },
+                onChanged: (value) {
+                  // Auto-sanitize as user types
+                  final sanitized = ValidationService.sanitizeText(value);
+                  if (sanitized != value) {
+                    _titleController.value = _titleController.value.copyWith(
+                      text: sanitized,
+                      selection: TextSelection.collapsed(offset: sanitized.length),
+                    );
+                  }
                 },
               ),
               const SizedBox(height: 20),
@@ -209,6 +245,16 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   theme,
                 ),
                 maxLines: 4,
+                validator: (value) {
+                  final error = ValidationService.validateTaskDescription(value);
+                  if (error != null) return error;
+                  
+                  if (value != null && ValidationService.containsHarmfulContent(value)) {
+                    return 'Description contains invalid content';
+                  }
+                  
+                  return null;
+                },
               ),
               const SizedBox(height: 24),
               Text(

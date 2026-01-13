@@ -4,6 +4,7 @@ import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/features/categories/domain/models/category.dart';
 import 'package:rocis_tasks/core/services/encryption_service.dart';
 import 'package:rocis_tasks/core/services/connectivity_service.dart';
+import 'package:rocis_tasks/core/services/retry_service.dart';
 
 class FirestoreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -37,15 +38,17 @@ class FirestoreService {
     if (collection == null || !_shouldSync) return;
 
     try {
-      await collection.doc(category.id).set({
-        'id': category.id,
-        'name': category.name,
-        'colorValue': category.colorValue,
-        'iconCode': category.iconCode,
+      await RetryService.retryFirestoreOperation(() async {
+        await collection.doc(category.id).set({
+          'id': category.id,
+          'name': category.name,
+          'colorValue': category.colorValue,
+          'iconCode': category.iconCode,
+        });
       });
     } catch (e) {
-      // Silently fail when offline - local data is source of truth
-      debugPrint('Firestore addCategory skipped (offline or error): $e');
+      // Log error but don't throw - local data is source of truth
+      debugPrint('Firestore addCategory failed after retries: $e');
     }
   }
 
