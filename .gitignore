@@ -65,3 +65,7 @@ config/secrets/
 *.pem
 *.p12
 *.mobileprovision
+
+
+# Improvement Plan
+IMPROVEMENT_PLAN.md

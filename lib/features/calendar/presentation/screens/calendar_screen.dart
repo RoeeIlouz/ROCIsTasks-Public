@@ -27,6 +27,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
     super.initState();
     final provider = Provider.of<CalendarProvider>(context, listen: false);
     _focusedDay = provider.selectedDate;
+
+    // Reload events when entering the screen to ensure we have the latest data
+    // and to retry if permissions were previously denied
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      provider.loadEvents();
+    });
   }
 
   List<dynamic> _getEventsForDay(

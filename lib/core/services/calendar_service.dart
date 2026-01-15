@@ -9,13 +9,18 @@ class CalendarService {
     // or when loading events, to avoid blocking app startup.
   }
 
-  Future<void> requestPermissions() async {
-    var permissionsGranted = await _deviceCalendarPlugin.hasPermissions();
-    if (permissionsGranted.isSuccess && !permissionsGranted.data!) {
-      permissionsGranted = await _deviceCalendarPlugin.requestPermissions();
-      if (!permissionsGranted.isSuccess || !permissionsGranted.data!) {
-        return;
+  Future<bool> requestPermissions() async {
+    try {
+      var permissionsGranted = await _deviceCalendarPlugin.hasPermissions();
+      if (permissionsGranted.isSuccess && permissionsGranted.data!) {
+        return true;
       }
+
+      permissionsGranted = await _deviceCalendarPlugin.requestPermissions();
+      return permissionsGranted.isSuccess && permissionsGranted.data!;
+    } catch (e) {
+      debugPrint('Error requesting permissions: $e');
+      return false;
     }
   }
 
@@ -23,7 +28,12 @@ class CalendarService {
     DateTime? startDate,
     DateTime? endDate,
   }) async {
-    await requestPermissions();
+    final hasPermission = await requestPermissions();
+    if (!hasPermission) {
+      debugPrint('Calendar permissions not granted');
+      return [];
+    }
+
     final now = DateTime.now();
     final start = startDate ?? now.subtract(const Duration(days: 365));
     final end = endDate ?? now.add(const Duration(days: 365));

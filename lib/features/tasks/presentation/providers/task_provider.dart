@@ -54,6 +54,14 @@ class TaskProvider extends ChangeNotifier {
   }
 
   Future<void> init() async {
+    final prefs = await SharedPreferences.getInstance();
+    final sortIndex = prefs.getInt('sort_option');
+    if (sortIndex != null && sortIndex < TaskSortOption.values.length) {
+      _currentSortOption = TaskSortOption.values[sortIndex];
+    }
+    _selectedCategoryIds = prefs.getStringList('category_filters') ?? [];
+    _showCompleted = prefs.getBool('show_completed') ?? true;
+
     _monthWidgetService = MonthWidgetService(_calendarService, _source);
     _fullCalendarWidgetService = FullCalendarWidgetService(
       _calendarService,
@@ -104,14 +112,6 @@ class TaskProvider extends ChangeNotifier {
         }
       }
     });
-
-    final prefs = await SharedPreferences.getInstance();
-    final sortIndex = prefs.getInt('sort_option');
-    if (sortIndex != null && sortIndex < TaskSortOption.values.length) {
-      _currentSortOption = TaskSortOption.values[sortIndex];
-    }
-    _selectedCategoryIds = prefs.getStringList('category_filters') ?? [];
-    _showCompleted = prefs.getBool('show_completed') ?? true;
 
     // Initialize connectivity service
     await _connectivityService.init();

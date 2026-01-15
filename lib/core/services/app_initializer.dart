@@ -11,6 +11,9 @@ import 'package:rocis_tasks/core/services/error_service.dart';
 import 'package:rocis_tasks/core/config/app_config.dart';
 
 import 'package:rocis_tasks/core/services/encryption_service.dart';
+import 'package:timezone/data/latest_all.dart' as tz;
+import 'package:timezone/timezone.dart' as t;
+import 'package:flutter_timezone/flutter_timezone.dart';
 
 class AppInitializer {
   static bool _isInitialized = false;
@@ -35,6 +38,7 @@ class AppInitializer {
         _initEnvironment(),
         _initFirebase(),
         _initEncryption(),
+        _initTimezone(),
       ]).timeout(
         Duration(seconds: AppConfig.syncTimeoutSeconds),
         onTimeout: () {
@@ -138,6 +142,20 @@ class AppInitializer {
       debugPrint('AppInitializer: Encryption initialized successfully');
     } catch (e) {
       debugPrint('AppInitializer: Encryption initialization failed: $e');
+    }
+  }
+
+  static Future<void> _initTimezone() async {
+    try {
+      tz.initializeTimeZones();
+      final String timeZoneName = await FlutterTimezone.getLocalTimezone();
+      t.setLocalLocation(t.getLocation(timeZoneName));
+      debugPrint(
+        'AppInitializer: Timezone initialized successfully ($timeZoneName)',
+      );
+    } catch (e) {
+      debugPrint('AppInitializer: Timezone initialization failed: $e');
+      // Fallback to UTC or don't set local location if failing
     }
   }
 }
