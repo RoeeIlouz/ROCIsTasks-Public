@@ -1,6 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class OnboardingService {
+class OnboardingService extends ChangeNotifier {
   static const String _onboardingCompleteKey = 'onboarding_complete';
   final SharedPreferences _prefs;
 
@@ -10,5 +11,6 @@ class OnboardingService {
 
   Future<void> completeOnboarding() async {
     await _prefs.setBool(_onboardingCompleteKey, true);
+    notifyListeners();
   }
 }

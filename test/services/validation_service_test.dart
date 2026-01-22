@@ -22,14 +22,20 @@ void main() {
 
     group('validateTaskDescription', () {
       test('should return null for valid description', () {
-        expect(ValidationService.validateTaskDescription('Valid description'), isNull);
+        expect(
+          ValidationService.validateTaskDescription('Valid description'),
+          isNull,
+        );
         expect(ValidationService.validateTaskDescription(null), isNull);
         expect(ValidationService.validateTaskDescription(''), isNull);
       });
 
       test('should return error for description too long', () {
         final longDescription = 'a' * 501; // Exceeds max length
-        expect(ValidationService.validateTaskDescription(longDescription), isNotNull);
+        expect(
+          ValidationService.validateTaskDescription(longDescription),
+          isNotNull,
+        );
       });
     });
 
@@ -67,21 +73,35 @@ void main() {
       });
 
       test('should replace multiple spaces with single space', () {
-        expect(ValidationService.sanitizeText('hello    world'), equals('hello world'));
+        expect(
+          ValidationService.sanitizeText('hello    world'),
+          equals('hello world'),
+        );
       });
     });
 
     group('containsHarmfulContent', () {
       test('should detect script tags', () {
-        expect(ValidationService.containsHarmfulContent('<script>alert("xss")</script>'), isTrue);
+        expect(
+          ValidationService.containsHarmfulContent(
+            '<script>alert("xss")</script>',
+          ),
+          isTrue,
+        );
       });
 
       test('should detect javascript protocol', () {
-        expect(ValidationService.containsHarmfulContent('javascript:alert("xss")'), isTrue);
+        expect(
+          ValidationService.containsHarmfulContent('javascript:alert("xss")'),
+          isTrue,
+        );
       });
 
       test('should return false for safe content', () {
-        expect(ValidationService.containsHarmfulContent('This is safe content'), isFalse);
+        expect(
+          ValidationService.containsHarmfulContent('This is safe content'),
+          isFalse,
+        );
       });
     });
   });

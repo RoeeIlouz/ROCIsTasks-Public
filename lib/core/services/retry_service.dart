@@ -22,7 +22,7 @@ class RetryService {
         return await operation();
       } catch (error) {
         attempt++;
-        
+
         if (AppConfig.enableDebugLogging) {
           debugPrint('Retry attempt $attempt/$maxAttempts failed: $error');
         }
@@ -78,27 +78,27 @@ class RetryService {
   /// Check if an error is retryable for network operations
   static bool _isRetryableNetworkError(dynamic error) {
     final errorString = error.toString().toLowerCase();
-    
+
     // Common retryable network errors
     return errorString.contains('timeout') ||
-           errorString.contains('connection') ||
-           errorString.contains('network') ||
-           errorString.contains('socket') ||
-           errorString.contains('host') ||
-           errorString.contains('unreachable');
+        errorString.contains('connection') ||
+        errorString.contains('network') ||
+        errorString.contains('socket') ||
+        errorString.contains('host') ||
+        errorString.contains('unreachable');
   }
 
   /// Check if an error is retryable for Firestore operations
   static bool _isRetryableFirestoreError(dynamic error) {
     final errorString = error.toString().toLowerCase();
-    
+
     // Retryable Firestore errors
     return errorString.contains('unavailable') ||
-           errorString.contains('deadline-exceeded') ||
-           errorString.contains('internal') ||
-           errorString.contains('timeout') ||
-           errorString.contains('cancelled') ||
-           _isRetryableNetworkError(error);
+        errorString.contains('deadline-exceeded') ||
+        errorString.contains('internal') ||
+        errorString.contains('timeout') ||
+        errorString.contains('cancelled') ||
+        _isRetryableNetworkError(error);
   }
 
   /// Retry with circuit breaker pattern
@@ -109,7 +109,7 @@ class RetryService {
     Duration circuitBreakerTimeout = const Duration(minutes: 5),
   }) async {
     final circuitBreakerKey = 'circuit_breaker_$operationName';
-    
+
     // Check if circuit breaker is open
     if (_circuitBreakers.containsKey(circuitBreakerKey)) {
       final breakerInfo = _circuitBreakers[circuitBreakerKey]!;

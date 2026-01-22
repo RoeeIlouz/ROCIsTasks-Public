@@ -7,7 +7,7 @@ import 'package:rocis_tasks/features/tasks/data/datasources/local_task_source.da
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/core/services/firestore_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:rocis_tasks/core/theme/theme_service.dart';
+import 'package:rocis_tasks/shared/ui/ui_kit.dart';
 import 'package:rocis_tasks/core/services/auth_service.dart';
 import 'package:rocis_tasks/core/services/calendar_service.dart';
 import 'package:rocis_tasks/core/services/connectivity_service.dart';
@@ -20,16 +20,19 @@ import 'package:rocis_tasks/features/home/services/full_calendar_widget_service.
 import 'package:rocis_tasks/features/tasks/services/task_widget_service.dart';
 import 'package:rocis_tasks/core/services/widget_data_service.dart';
 
+import 'package:rocis_tasks/core/services/error_handling_service.dart';
+
 enum TaskSortOption { dueDate, priority, title, dateCreated }
 
 class TaskProvider extends ChangeNotifier {
-  final LocalTaskSource _source = LocalTaskSource();
-  final NotificationService _notificationService = NotificationService();
-  final FirestoreService _firestoreService = FirestoreService();
-  final ConnectivityService _connectivityService = ConnectivityService();
+  final LocalTaskSource _source;
+  final NotificationService _notificationService;
+  final FirestoreService _firestoreService;
+  final ConnectivityService _connectivityService;
   final AuthService _authService;
   final CalendarService _calendarService;
   final ThemeService _themeService;
+  final ErrorHandlingService _errorHandlingService;
   late final MonthWidgetService _monthWidgetService;
   late final FullCalendarWidgetService _fullCalendarWidgetService;
   late final WidgetDataService _widgetDataService;
@@ -40,7 +43,19 @@ class TaskProvider extends ChangeNotifier {
   StreamSubscription? _authSubscription;
   StreamSubscription? _connectivitySubscription;
 
-  TaskProvider(this._authService, this._calendarService, this._themeService);
+  TaskProvider(
+    this._authService,
+    this._calendarService,
+    this._themeService,
+    this._errorHandlingService, {
+    LocalTaskSource? source,
+    NotificationService? notificationService,
+    FirestoreService? firestoreService,
+    ConnectivityService? connectivityService,
+  }) : _source = source ?? LocalTaskSource(),
+       _notificationService = notificationService ?? NotificationService(),
+       _firestoreService = firestoreService ?? FirestoreService(),
+       _connectivityService = connectivityService ?? ConnectivityService();
   Timer? _widgetDebounce;
   bool _widgetUpdateInProgress = false;
   bool get isLoading => _isLoading;
@@ -50,6 +65,21 @@ class TaskProvider extends ChangeNotifier {
 
   void clearTaskToEdit() {
     _taskToEdit = null;
+    notifyListeners();
+  }
+
+  String? _errorMessage;
+  String? get errorMessage => _errorMessage;
+
+  void clearError() {
+    if (_errorMessage != null) {
+      _errorMessage = null;
+      notifyListeners();
+    }
+  }
+
+  void _setError(String message) {
+    _errorMessage = message;
     notifyListeners();
   }
 
@@ -73,18 +103,23 @@ class TaskProvider extends ChangeNotifier {
     _taskPagination = PaginationService<Task>(_getFilteredAndSortedTasks);
     // Don't initialize yet - wait for source init
 
-    await _source.init();
-    _taskPagination.initialize();
-    await _notificationService.init();
-    await _notificationService.requestPermissions();
+    try {
+      await _source.init();
+      _taskPagination.initialize();
+      await _notificationService.init();
+      await _notificationService.requestPermissions();
+    } catch (e, s) {
+      _errorHandlingService.logError(e, s, reason: 'Initialization failed');
+      _setError('Failed to initialize app data. Please restart.');
+    }
+
     try {
       await _repairEncryptedData();
-    } catch (e) {
-      debugPrint('Error repairing encrypted data: $e');
+    } catch (e, s) {
+      _errorHandlingService.logError(e, s, reason: 'Repairing encrypted data');
+      // Non-critical, don't show user error
     }
     _refreshPagination();
-
-    await _notificationService.cancelAllNotifications();
 
     await _notificationService.cancelAllNotifications();
 
@@ -106,8 +141,12 @@ class TaskProvider extends ChangeNotifier {
               scheduledDate: task.dueDate!,
               taskId: task.id,
             );
-          } catch (e) {
-            debugPrint('Error rescheduling notification: $e');
+          } catch (e, s) {
+            _errorHandlingService.logError(
+              e,
+              s,
+              reason: 'Rescheduling notification',
+            );
           }
         }
       }
@@ -164,7 +203,11 @@ class TaskProvider extends ChangeNotifier {
         // Don't await sync in init to unblock startup
         uploadLocalDataToCloud()
             .then((_) => syncWithCloud())
-            .then((_) => updateHomeWidget());
+            .then((_) => updateHomeWidget())
+            .catchError(
+              (e, s) =>
+                  _errorHandlingService.logError(e, s, reason: 'Initial sync'),
+            );
       } else {
         debugPrint('App started offline - will sync when online');
       }
@@ -239,8 +282,8 @@ class TaskProvider extends ChangeNotifier {
       final task = _source.getTasks().firstWhere((t) => t.id == taskId);
       _taskToEdit = task;
       notifyListeners();
-    } catch (e) {
-      debugPrint('Error navigating to task: $e');
+    } catch (e, s) {
+      _errorHandlingService.logError(e, s, reason: 'Navigating to task');
     }
   }
 
@@ -251,8 +294,8 @@ class TaskProvider extends ChangeNotifier {
         final newDate = task.dueDate!.add(const Duration(minutes: 15));
         await updateTask(task, dueDate: newDate);
       }
-    } catch (e) {
-      debugPrint('Error snoozing task: $e');
+    } catch (e, s) {
+      _errorHandlingService.logError(e, s, reason: 'Snoozing task');
     }
   }
 
@@ -262,8 +305,12 @@ class TaskProvider extends ChangeNotifier {
       if (!task.isCompleted) {
         await toggleTaskCompletion(task);
       }
-    } catch (e) {
-      debugPrint('Error completing task: $e');
+    } catch (e, s) {
+      _errorHandlingService.logError(
+        e,
+        s,
+        reason: 'Completing task from notification',
+      );
     }
   }
 
@@ -295,8 +342,12 @@ class TaskProvider extends ChangeNotifier {
         await _firestoreService.addTask(task);
       }
       debugPrint('Successfully uploaded local data to cloud');
-    } catch (e) {
-      debugPrint('Failed to upload local data (offline or error): $e');
+    } catch (e, s) {
+      _errorHandlingService.logError(
+        e,
+        s,
+        reason: 'Uploading local data to cloud',
+      );
     }
   }
 
@@ -334,8 +385,12 @@ class TaskProvider extends ChangeNotifier {
           notifyListeners();
           updateHomeWidget();
         },
-        onError: (error) {
-          debugPrint('Error in tasks stream (may be offline): $error');
+        onError: (error, stackTrace) {
+          _errorHandlingService.logError(
+            error,
+            stackTrace,
+            reason: 'Tasks stream error',
+          );
         },
       );
 
@@ -347,14 +402,18 @@ class TaskProvider extends ChangeNotifier {
           _refreshPagination();
           notifyListeners();
         },
-        onError: (error) {
-          debugPrint('Error in categories stream (may be offline): $error');
+        onError: (error, stackTrace) {
+          _errorHandlingService.logError(
+            error,
+            stackTrace,
+            reason: 'Categories stream error',
+          );
         },
       );
 
       debugPrint('Cloud sync started successfully');
-    } catch (e) {
-      debugPrint('Error starting cloud sync: $e');
+    } catch (e, s) {
+      _errorHandlingService.logError(e, s, reason: 'Starting cloud sync');
     }
   }
 
@@ -370,9 +429,17 @@ class TaskProvider extends ChangeNotifier {
     _currentSortOption = option;
     _refreshPagination();
     notifyListeners();
-    SharedPreferences.getInstance().then((prefs) {
-      prefs.setInt('sort_option', option.index);
-    });
+    SharedPreferences.getInstance()
+        .then((prefs) {
+          prefs.setInt('sort_option', option.index);
+        })
+        .catchError(
+          (e, s) => _errorHandlingService.logError(
+            e,
+            s,
+            reason: 'Saving sort option',
+          ),
+        );
   }
 
   void toggleCategoryFilter(String categoryId) {
@@ -394,18 +461,34 @@ class TaskProvider extends ChangeNotifier {
   }
 
   void _saveCategoryFilters() {
-    SharedPreferences.getInstance().then((prefs) {
-      prefs.setStringList('category_filters', _selectedCategoryIds);
-    });
+    SharedPreferences.getInstance()
+        .then((prefs) {
+          prefs.setStringList('category_filters', _selectedCategoryIds);
+        })
+        .catchError(
+          (e, s) => _errorHandlingService.logError(
+            e,
+            s,
+            reason: 'Saving category filters',
+          ),
+        );
   }
 
   void toggleShowCompleted(bool value) {
     _showCompleted = value;
     _refreshPagination();
     notifyListeners();
-    SharedPreferences.getInstance().then((prefs) {
-      prefs.setBool('show_completed', value);
-    });
+    SharedPreferences.getInstance()
+        .then((prefs) {
+          prefs.setBool('show_completed', value);
+        })
+        .catchError(
+          (e, s) => _errorHandlingService.logError(
+            e,
+            s,
+            reason: 'Saving show completed preference',
+          ),
+        );
   }
 
   List<Task> get tasks {
@@ -522,8 +605,8 @@ class TaskProvider extends ChangeNotifier {
 
           await _monthWidgetService.updateMonthWidget();
           await _fullCalendarWidgetService.updateFullCalendarWidget();
-        } catch (e) {
-          debugPrint('Error updating widgets: $e');
+        } catch (e, s) {
+          _errorHandlingService.logError(e, s, reason: 'Updating home widgets');
         } finally {
           _widgetUpdateInProgress = false;
         }
@@ -548,7 +631,10 @@ class TaskProvider extends ChangeNotifier {
     await _source.addTask(task);
     try {
       await _firestoreService.addTask(task);
-    } catch (_) {}
+    } catch (e, s) {
+      _errorHandlingService.logError(e, s, reason: 'Adding task to firestore');
+      _setError('Failed to sync task to cloud');
+    }
 
     if (dueDate != null && dueDate.isAfter(DateTime.now())) {
       try {
@@ -561,7 +647,14 @@ class TaskProvider extends ChangeNotifier {
           scheduledDate: dueDate,
           taskId: task.id,
         );
-      } catch (_) {}
+      } catch (e, s) {
+        _errorHandlingService.logError(
+          e,
+          s,
+          reason: 'Scheduling notification for new task',
+        );
+        // Not critical enough to show error, but good to know
+      }
     }
     _refreshPagination();
     notifyListeners();
@@ -579,15 +672,23 @@ class TaskProvider extends ChangeNotifier {
         NotificationService.getNotificationId(task.id),
       );
     } else if (task.dueDate != null && task.dueDate!.isAfter(DateTime.now())) {
-      await _notificationService.scheduleNotification(
-        id: NotificationService.getNotificationId(task.id),
-        title: 'Task Reminder: ${task.title}',
-        body: task.description.isNotEmpty
-            ? task.description
-            : 'You have a task due now!',
-        scheduledDate: task.dueDate!,
-        taskId: task.id,
-      );
+      try {
+        await _notificationService.scheduleNotification(
+          id: NotificationService.getNotificationId(task.id),
+          title: 'Task Reminder: ${task.title}',
+          body: task.description.isNotEmpty
+              ? task.description
+              : 'You have a task due now!',
+          scheduledDate: task.dueDate!,
+          taskId: task.id,
+        );
+      } catch (e, s) {
+        _errorHandlingService.logError(
+          e,
+          s,
+          reason: 'Rescheduling notification after un-completing task',
+        );
+      }
     }
     _refreshPagination();
     notifyListeners();
@@ -611,7 +712,14 @@ class TaskProvider extends ChangeNotifier {
     await _source.updateTask(task);
     try {
       await _firestoreService.updateTask(task);
-    } catch (_) {}
+    } catch (e, s) {
+      _errorHandlingService.logError(
+        e,
+        s,
+        reason: 'Updating task in firestore',
+      );
+      _setError('Failed to sync changes to cloud');
+    }
 
     await _notificationService.cancelNotification(
       NotificationService.getNotificationId(task.id),
@@ -619,15 +727,23 @@ class TaskProvider extends ChangeNotifier {
     if (!task.isCompleted &&
         task.dueDate != null &&
         task.dueDate!.isAfter(DateTime.now())) {
-      await _notificationService.scheduleNotification(
-        id: NotificationService.getNotificationId(task.id),
-        title: 'Task Reminder: ${task.title}',
-        body: task.description.isNotEmpty
-            ? task.description
-            : 'You have a task due now!',
-        scheduledDate: task.dueDate!,
-        taskId: task.id,
-      );
+      try {
+        await _notificationService.scheduleNotification(
+          id: NotificationService.getNotificationId(task.id),
+          title: 'Task Reminder: ${task.title}',
+          body: task.description.isNotEmpty
+              ? task.description
+              : 'You have a task due now!',
+          scheduledDate: task.dueDate!,
+          taskId: task.id,
+        );
+      } catch (e, s) {
+        _errorHandlingService.logError(
+          e,
+          s,
+          reason: 'Rescheduling notification after task update',
+        );
+      }
     }
     _refreshPagination();
     notifyListeners();
@@ -653,7 +769,9 @@ class TaskProvider extends ChangeNotifier {
       await _notificationService.cancelNotification(
         NotificationService.getNotificationId(id),
       );
-    } catch (_) {}
+    } catch (e, s) {
+      _errorHandlingService.logError(e, s, reason: 'Deleting task');
+    }
     _refreshPagination();
     notifyListeners();
     updateHomeWidget();
@@ -666,15 +784,23 @@ class TaskProvider extends ChangeNotifier {
     if (!task.isCompleted &&
         task.dueDate != null &&
         task.dueDate!.isAfter(DateTime.now())) {
-      await _notificationService.scheduleNotification(
-        id: NotificationService.getNotificationId(task.id),
-        title: 'Task Reminder: ${task.title}',
-        body: task.description.isNotEmpty
-            ? task.description
-            : 'You have a task due now!',
-        scheduledDate: task.dueDate!,
-        taskId: task.id,
-      );
+      try {
+        await _notificationService.scheduleNotification(
+          id: NotificationService.getNotificationId(task.id),
+          title: 'Task Reminder: ${task.title}',
+          body: task.description.isNotEmpty
+              ? task.description
+              : 'You have a task due now!',
+          scheduledDate: task.dueDate!,
+          taskId: task.id,
+        );
+      } catch (e, s) {
+        _errorHandlingService.logError(
+          e,
+          s,
+          reason: 'Rescheduling notification after task restoration',
+        );
+      }
     }
     _refreshPagination();
     notifyListeners();
@@ -701,7 +827,13 @@ class TaskProvider extends ChangeNotifier {
     await _source.addCategory(category);
     try {
       await _firestoreService.addCategory(category);
-    } catch (_) {}
+    } catch (e, s) {
+      _errorHandlingService.logError(
+        e,
+        s,
+        reason: 'Adding category to firestore',
+      );
+    }
     notifyListeners();
   }
 
@@ -717,7 +849,13 @@ class TaskProvider extends ChangeNotifier {
     await _source.updateCategory(category);
     try {
       await _firestoreService.updateCategory(category);
-    } catch (_) {}
+    } catch (e, s) {
+      _errorHandlingService.logError(
+        e,
+        s,
+        reason: 'Updating category in firestore',
+      );
+    }
     notifyListeners();
   }
 
@@ -725,7 +863,13 @@ class TaskProvider extends ChangeNotifier {
     await _source.deleteCategory(id);
     try {
       await _firestoreService.deleteCategory(id);
-    } catch (_) {}
+    } catch (e, s) {
+      _errorHandlingService.logError(
+        e,
+        s,
+        reason: 'Deleting category from firestore',
+      );
+    }
     notifyListeners();
   }
 
@@ -735,7 +879,12 @@ class TaskProvider extends ChangeNotifier {
     try {
       final category = _source.getCategories().firstWhere((c) => c.id == id);
       return category;
-    } catch (_) {
+    } catch (e, s) {
+      _errorHandlingService.logError(
+        e,
+        s,
+        reason: 'Getting category by id: $id',
+      );
       return null;
     }
   }

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/features/categories/domain/models/category.dart';
-import 'package:rocis_tasks/features/tasks/presentation/widgets/circular_task_chart.dart';
+import 'package:rocis_tasks/shared/ui/ui_kit.dart';
 
 /// Service responsible for preparing and updating Task Widget data
 class TaskWidgetService {

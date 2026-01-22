@@ -1,19 +1,19 @@
 import 'package:flutter/foundation.dart' hide Category;
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
-import 'package:rocis_tasks/features/categories/domain/models/category.dart' as cat;
+import 'package:rocis_tasks/features/categories/domain/models/category.dart'
+    as cat;
 
 /// Conflict resolution strategies
 enum ConflictStrategy {
-  localWins,      // Local changes take precedence
-  remoteWins,     // Remote changes take precedence
-  lastWriteWins,  // Most recent timestamp wins
-  merge,          // Attempt to merge changes
-  userChoice,     // Ask user to resolve
+  localWins, // Local changes take precedence
+  remoteWins, // Remote changes take precedence
+  lastWriteWins, // Most recent timestamp wins
+  merge, // Attempt to merge changes
+  userChoice, // Ask user to resolve
 }
 
 /// Service for handling data conflicts during sync
 class ConflictResolutionService {
-
   /// Resolve task conflicts
   static Task resolveTaskConflict(
     Task localTask,
@@ -23,10 +23,10 @@ class ConflictResolutionService {
     switch (strategy) {
       case ConflictStrategy.localWins:
         return localTask;
-      
+
       case ConflictStrategy.remoteWins:
         return remoteTask;
-      
+
       case ConflictStrategy.lastWriteWins:
         // Compare timestamps (assuming we add lastModified field)
         // For now, use a simple heuristic based on completion status
@@ -35,10 +35,10 @@ class ConflictResolutionService {
           return localTask.isCompleted ? localTask : remoteTask;
         }
         return localTask; // Default to local if no clear winner
-      
+
       case ConflictStrategy.merge:
         return _mergeTaskChanges(localTask, remoteTask);
-      
+
       case ConflictStrategy.userChoice:
         // This would trigger a UI dialog in practice
         debugPrint('User choice needed for task conflict: ${localTask.id}');
@@ -61,14 +61,16 @@ class ConflictResolutionService {
         remoteTask.description,
         (a, b) => a.length > b.length, // Prefer longer description
       ),
-      isCompleted: localTask.isCompleted || remoteTask.isCompleted, // Prefer completed
+      isCompleted:
+          localTask.isCompleted || remoteTask.isCompleted, // Prefer completed
       dueDate: _selectBestValue(
         localTask.dueDate,
         remoteTask.dueDate,
         (a, b) => a?.isAfter(b ?? DateTime(1970)) ?? false, // Prefer later date
       ),
       priority: _selectHigherPriority(localTask.priority, remoteTask.priority),
-      categoryId: localTask.categoryId ?? remoteTask.categoryId, // Prefer non-null
+      categoryId:
+          localTask.categoryId ?? remoteTask.categoryId, // Prefer non-null
       isPinned: localTask.isPinned ?? remoteTask.isPinned ?? false,
       isDeleted: localTask.isDeleted ?? remoteTask.isDeleted ?? false,
     );
@@ -105,47 +107,53 @@ class ConflictResolutionService {
     switch (strategy) {
       case ConflictStrategy.localWins:
         return localCategory;
-      
+
       case ConflictStrategy.remoteWins:
         return remoteCategory;
-      
+
       case ConflictStrategy.lastWriteWins:
       case ConflictStrategy.merge:
         // For categories, merge by preferring non-default values
         return cat.Category(
           id: localCategory.id,
-          name: localCategory.name.isNotEmpty ? localCategory.name : remoteCategory.name,
-          colorValue: localCategory.colorValue != 0 ? localCategory.colorValue : remoteCategory.colorValue,
-          iconCode: localCategory.iconCode != 0 ? localCategory.iconCode : remoteCategory.iconCode,
+          name: localCategory.name.isNotEmpty
+              ? localCategory.name
+              : remoteCategory.name,
+          colorValue: localCategory.colorValue != 0
+              ? localCategory.colorValue
+              : remoteCategory.colorValue,
+          iconCode: localCategory.iconCode != 0
+              ? localCategory.iconCode
+              : remoteCategory.iconCode,
         );
-      
+
       case ConflictStrategy.userChoice:
-        debugPrint('User choice needed for category conflict: ${localCategory.id}');
+        debugPrint(
+          'User choice needed for category conflict: ${localCategory.id}',
+        );
         return localCategory;
     }
   }
 
   /// Check if two tasks have conflicts
   static bool hasTaskConflict(Task task1, Task task2) {
-    return task1.id == task2.id && (
-      task1.title != task2.title ||
-      task1.description != task2.description ||
-      task1.isCompleted != task2.isCompleted ||
-      task1.dueDate != task2.dueDate ||
-      task1.priority != task2.priority ||
-      task1.categoryId != task2.categoryId ||
-      task1.isPinned != task2.isPinned ||
-      task1.isDeleted != task2.isDeleted
-    );
+    return task1.id == task2.id &&
+        (task1.title != task2.title ||
+            task1.description != task2.description ||
+            task1.isCompleted != task2.isCompleted ||
+            task1.dueDate != task2.dueDate ||
+            task1.priority != task2.priority ||
+            task1.categoryId != task2.categoryId ||
+            task1.isPinned != task2.isPinned ||
+            task1.isDeleted != task2.isDeleted);
   }
 
   /// Check if two categories have conflicts
   static bool hasCategoryConflict(cat.Category cat1, cat.Category cat2) {
-    return cat1.id == cat2.id && (
-      cat1.name != cat2.name ||
-      cat1.colorValue != cat2.colorValue ||
-      cat1.iconCode != cat2.iconCode
-    );
+    return cat1.id == cat2.id &&
+        (cat1.name != cat2.name ||
+            cat1.colorValue != cat2.colorValue ||
+            cat1.iconCode != cat2.iconCode);
   }
 
   /// Generate conflict summary for logging
@@ -179,7 +187,7 @@ class ConflictResolutionService {
         },
       };
     }
-    
+
     return {'type': 'unknown', 'error': 'Unsupported item type'};
   }
 }

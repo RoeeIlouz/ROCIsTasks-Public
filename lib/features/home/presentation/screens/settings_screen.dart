@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rocis_tasks/core/services/auth_service.dart';
-import 'package:rocis_tasks/core/theme/theme_service.dart';
+import 'package:rocis_tasks/shared/ui/ui_kit.dart';
 import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
 import 'package:rocis_tasks/features/tasks/presentation/screens/trash_screen.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';

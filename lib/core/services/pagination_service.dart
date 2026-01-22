@@ -5,7 +5,7 @@ import 'package:rocis_tasks/core/config/app_config.dart';
 class PaginationService<T> extends ChangeNotifier {
   final List<T> Function() _getAllItems;
   final int _pageSize;
-  
+
   List<T> _allItems = [];
   List<T> _currentPageItems = [];
   int _currentPage = 0;
@@ -19,19 +19,19 @@ class PaginationService<T> extends ChangeNotifier {
 
   /// Current page items
   List<T> get items => _currentPageItems;
-  
+
   /// Current page number (0-based)
   int get currentPage => _currentPage;
-  
+
   /// Whether more items are available
   bool get hasMoreItems => _hasMoreItems;
-  
+
   /// Whether currently loading
   bool get isLoading => _isLoading;
-  
+
   /// Total number of items
   int get totalItems => _allItems.length;
-  
+
   /// Total number of pages
   int get totalPages => (_allItems.length / _pageSize).ceil();
 
@@ -89,7 +89,7 @@ class PaginationService<T> extends ChangeNotifier {
   void _loadCurrentPage() {
     final startIndex = _currentPage * _pageSize;
     final endIndex = (startIndex + _pageSize).clamp(0, _allItems.length);
-    
+
     if (_currentPage == 0) {
       // First page - replace all items
       _currentPageItems = _allItems.sublist(startIndex, endIndex);
@@ -98,7 +98,7 @@ class PaginationService<T> extends ChangeNotifier {
       final newItems = _allItems.sublist(startIndex, endIndex);
       _currentPageItems.addAll(newItems);
     }
-    
+
     _hasMoreItems = endIndex < _allItems.length;
   }
 
@@ -118,6 +118,8 @@ class PaginationService<T> extends ChangeNotifier {
 
   /// Check if should load more items (for infinite scroll)
   bool shouldLoadMore(int index) {
-    return index >= _currentPageItems.length - 5 && _hasMoreItems && !_isLoading;
+    return index >= _currentPageItems.length - 5 &&
+        _hasMoreItems &&
+        !_isLoading;
   }
 }

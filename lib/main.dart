@@ -1,24 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:home_widget/home_widget.dart';
 
-import 'package:rocis_tasks/core/theme/app_theme.dart';
-import 'package:rocis_tasks/core/theme/theme_service.dart';
+import 'package:rocis_tasks/shared/ui/ui_kit.dart';
 import 'package:rocis_tasks/core/services/auth_service.dart';
 import 'package:rocis_tasks/core/services/calendar_service.dart';
 import 'package:rocis_tasks/core/services/app_initializer.dart';
 import 'package:rocis_tasks/core/services/background_handler.dart';
-import 'package:rocis_tasks/features/home/presentation/screens/home_screen.dart';
-import 'package:rocis_tasks/features/auth/presentation/screens/login_screen.dart';
 import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
 import 'package:rocis_tasks/features/calendar/presentation/providers/calendar_provider.dart';
 import 'package:rocis_tasks/features/onboarding/data/services/onboarding_service.dart';
-import 'package:rocis_tasks/features/onboarding/presentation/screens/onboarding_screen.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:rocis_tasks/core/config/router.dart';
+import 'package:rocis_tasks/core/services/error_handling_service.dart';
 
 Future<void> main() async {
   // Initialize App (Core, Firebase, Hive)
@@ -40,15 +37,18 @@ class AppRoot extends StatefulWidget {
 
 class _AppRootState extends State<AppRoot> {
   late Future<void> _initFuture;
-  final _authService = AuthService();
+  final _errorHandlingService = ErrorHandlingService();
+  late final _authService = AuthService(_errorHandlingService);
   final _calendarService = CalendarService();
   final _themeService = ThemeService();
   late final _taskProvider = TaskProvider(
     _authService,
     _calendarService,
     _themeService,
+    _errorHandlingService,
   );
   late final OnboardingService _onboardingService;
+  AppRouter? _appRouter;
 
   @override
   void initState() {
@@ -59,6 +59,7 @@ class _AppRootState extends State<AppRoot> {
   Future<void> _initServices() async {
     final prefs = await SharedPreferences.getInstance();
     _onboardingService = OnboardingService(prefs);
+    _appRouter = AppRouter(_authService, _onboardingService);
 
     await Future.wait([
       _taskProvider.init().catchError((e) {
@@ -164,7 +165,9 @@ class _AppRootState extends State<AppRoot> {
             ChangeNotifierProvider(
               create: (_) => CalendarProvider(_calendarService)..loadEvents(),
             ),
-            Provider.value(value: _onboardingService),
+            ChangeNotifierProvider.value(value: _onboardingService),
+            Provider.value(value: _appRouter!),
+            Provider.value(value: _errorHandlingService),
           ],
           child: const MyApp(),
         );
@@ -179,10 +182,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeService = Provider.of<ThemeService>(context);
+    final appRouter = Provider.of<AppRouter>(context);
 
     return DynamicColorBuilder(
       builder: (lightDynamic, darkDynamic) {
-        return MaterialApp(
+        return MaterialApp.router(
           title: "ROCI's Tasks",
           debugShowCheckedModeBanner: false,
           theme: AppTheme.createLightTheme(
@@ -201,31 +205,7 @@ class MyApp extends StatelessWidget {
           ],
           supportedLocales: const [Locale('en'), Locale('he')],
           locale: themeService.locale,
-          home: StreamBuilder<User?>(
-            stream: Provider.of<AuthService>(
-              context,
-              listen: false,
-            ).authStateChanges,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Scaffold(
-                  body: Center(child: CircularProgressIndicator()),
-                );
-              }
-              if (snapshot.hasData) {
-                final onboardingService = Provider.of<OnboardingService>(
-                  context,
-                  listen: false,
-                );
-                if (onboardingService.hasSeenOnboarding) {
-                  return const HomeScreen();
-                } else {
-                  return const OnboardingScreen();
-                }
-              }
-              return const LoginScreen();
-            },
-          ),
+          routerConfig: appRouter.router,
         );
       },
     );

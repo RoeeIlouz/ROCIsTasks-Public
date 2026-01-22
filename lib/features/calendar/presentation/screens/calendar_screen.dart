@@ -9,7 +9,7 @@ import 'package:device_calendar/device_calendar.dart';
 import 'package:intl/intl.dart';
 import 'package:rocis_tasks/features/categories/domain/models/category.dart';
 
-import 'package:rocis_tasks/core/theme/theme_service.dart';
+import 'package:rocis_tasks/shared/ui/ui_kit.dart';
 
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({super.key});

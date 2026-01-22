@@ -5,7 +5,9 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:encrypt/encrypt.dart' as enc;
 
 class EncryptionService {
-  static const _secureStorage = FlutterSecureStorage();
+  static const _secureStorage = FlutterSecureStorage(
+    aOptions: AndroidOptions(encryptedSharedPreferences: true),
+  );
   static const _keyName = 'hive_encryption_key_v1';
 
   static enc.Encrypter? _encrypter;

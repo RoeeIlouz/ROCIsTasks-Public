@@ -56,3 +56,6 @@
 # Play Core rules (fixes missing class errors)
 -dontwarn com.google.android.play.core.**
 -keep class com.google.android.play.core.** { *; }
+
+# Device Calendar rules
+-keep class com.builttoroam.devicecalendar.** { *; }

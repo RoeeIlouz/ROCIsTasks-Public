@@ -8,7 +8,7 @@ import 'package:rocis_tasks/core/services/validation_service.dart';
 import 'package:rocis_tasks/core/services/error_service.dart';
 
 import 'package:rocis_tasks/l10n/app_localizations.dart';
-import 'package:rocis_tasks/core/theme/theme_service.dart';
+import 'package:rocis_tasks/shared/ui/ui_kit.dart';
 
 import 'package:google_fonts/google_fonts.dart';
 
@@ -172,37 +172,6 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     }
   }
 
-  InputDecoration _getInputDecoration(
-    String label,
-    IconData? prefixIcon,
-    ThemeData theme,
-  ) {
-    return InputDecoration(
-      labelText: label,
-      labelStyle: GoogleFonts.outfit(
-        color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-      ),
-      prefixIcon: prefixIcon != null ? Icon(prefixIcon, size: 22) : null,
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16),
-        borderSide: BorderSide.none,
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16),
-        borderSide: BorderSide.none,
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16),
-        borderSide: BorderSide(color: theme.colorScheme.primary, width: 2),
-      ),
-      filled: true,
-      fillColor: theme.brightness == Brightness.light
-          ? Colors.grey.withValues(alpha: 0.05)
-          : Colors.white.withValues(alpha: 0.05),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final isEditing = widget.task != null;
@@ -228,7 +197,11 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                 controller: _titleController,
                 style: GoogleFonts.outfit(fontWeight: FontWeight.w600),
                 textDirection: _titleDirection,
-                decoration: _getInputDecoration(l10n.title, Icons.title, theme),
+                decoration: SharedInputDecorations.getFieldDecoration(
+                  label: l10n.title,
+                  prefixIcon: Icons.title,
+                  theme: theme,
+                ),
                 validator: (value) {
                   final sanitized = ValidationService.sanitizeText(value ?? '');
                   final error = ValidationService.validateTaskTitle(sanitized);
@@ -251,10 +224,10 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                 controller: _descriptionController,
                 style: GoogleFonts.outfit(),
                 textDirection: _descriptionDirection,
-                decoration: _getInputDecoration(
-                  l10n.description,
-                  Icons.description_outlined,
-                  theme,
+                decoration: SharedInputDecorations.getFieldDecoration(
+                  label: l10n.description,
+                  prefixIcon: Icons.description_outlined,
+                  theme: theme,
                 ),
                 maxLines: 4,
                 validator: (value) {
@@ -357,10 +330,10 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                       color: theme.colorScheme.onSurface,
                       fontWeight: FontWeight.w500,
                     ),
-                    decoration: _getInputDecoration(
-                      l10n.category,
-                      Icons.category_outlined,
-                      theme,
+                    decoration: SharedInputDecorations.getFieldDecoration(
+                      label: l10n.category,
+                      prefixIcon: Icons.category_outlined,
+                      theme: theme,
                     ),
                     items: [
                       DropdownMenuItem<String>(
@@ -414,10 +387,10 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   color: theme.colorScheme.onSurface,
                   fontWeight: FontWeight.w500,
                 ),
-                decoration: _getInputDecoration(
-                  l10n.priorityLabel,
-                  Icons.flag_outlined,
-                  theme,
+                decoration: SharedInputDecorations.getFieldDecoration(
+                  label: l10n.priorityLabel,
+                  prefixIcon: Icons.flag_outlined,
+                  theme: theme,
                 ),
                 items: TaskPriority.values.map((priority) {
                   return DropdownMenuItem(

@@ -7,20 +7,21 @@ class ValidationService {
     if (title == null || title.trim().isEmpty) {
       return 'Task title cannot be empty';
     }
-    
+
     if (title.trim().length > AppConfig.maxTitleLength) {
       return 'Task title cannot exceed ${AppConfig.maxTitleLength} characters';
     }
-    
+
     return null;
   }
 
   /// Validate task description
   static String? validateTaskDescription(String? description) {
-    if (description != null && description.length > AppConfig.maxDescriptionLength) {
+    if (description != null &&
+        description.length > AppConfig.maxDescriptionLength) {
       return 'Description cannot exceed ${AppConfig.maxDescriptionLength} characters';
     }
-    
+
     return null;
   }
 
@@ -29,26 +30,26 @@ class ValidationService {
     if (name == null || name.trim().isEmpty) {
       return 'Category name cannot be empty';
     }
-    
+
     if (name.trim().length > 50) {
       return 'Category name cannot exceed 50 characters';
     }
-    
+
     return null;
   }
 
   /// Validate due date
   static String? validateDueDate(DateTime? dueDate) {
     if (dueDate == null) return null;
-    
+
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final dueDateOnly = DateTime(dueDate.year, dueDate.month, dueDate.day);
-    
+
     if (dueDateOnly.isBefore(today)) {
       return 'Due date cannot be in the past';
     }
-    
+
     return null;
   }
 
@@ -65,7 +66,7 @@ class ValidationService {
       RegExp(r'javascript:', caseSensitive: false),
       RegExp(r'on\w+\s*=', caseSensitive: false),
     ];
-    
+
     return harmfulPatterns.any((pattern) => pattern.hasMatch(text));
   }
 }

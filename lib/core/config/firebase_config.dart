@@ -15,9 +15,11 @@ class FirebaseConfig {
         return _getEnvironmentConfig();
       }
     } catch (e) {
-      debugPrint('FirebaseConfig: Environment config failed, using default: $e');
+      debugPrint(
+        'FirebaseConfig: Environment config failed, using default: $e',
+      );
     }
-    
+
     // Always fallback to default Firebase options (this should always work)
     debugPrint('FirebaseConfig: Using default Firebase configuration');
     return default_options.DefaultFirebaseOptions.currentPlatform;
@@ -31,23 +33,31 @@ class FirebaseConfig {
         debugPrint('FirebaseConfig: Environment variables not loaded');
         return false;
       }
-      
+
       // Check if we have the minimum required variables
       final projectId = dotenv.env['FIREBASE_PROJECT_ID'];
       final androidApiKey = dotenv.env['FIREBASE_ANDROID_API_KEY'];
       final androidAppId = dotenv.env['FIREBASE_ANDROID_APP_ID'];
-      
-      final hasRequired = projectId != null && projectId.isNotEmpty &&
-                         androidApiKey != null && androidApiKey.isNotEmpty &&
-                         androidAppId != null && androidAppId.isNotEmpty;
-      
+
+      final hasRequired =
+          projectId != null &&
+          projectId.isNotEmpty &&
+          androidApiKey != null &&
+          androidApiKey.isNotEmpty &&
+          androidAppId != null &&
+          androidAppId.isNotEmpty;
+
       if (!hasRequired) {
         debugPrint('FirebaseConfig: Missing required environment variables');
         debugPrint('  - FIREBASE_PROJECT_ID: ${projectId ?? "MISSING"}');
-        debugPrint('  - FIREBASE_ANDROID_API_KEY: ${androidApiKey != null ? "SET" : "MISSING"}');
-        debugPrint('  - FIREBASE_ANDROID_APP_ID: ${androidAppId != null ? "SET" : "MISSING"}');
+        debugPrint(
+          '  - FIREBASE_ANDROID_API_KEY: ${androidApiKey != null ? "SET" : "MISSING"}',
+        );
+        debugPrint(
+          '  - FIREBASE_ANDROID_APP_ID: ${androidAppId != null ? "SET" : "MISSING"}',
+        );
       }
-      
+
       return hasRequired;
     } catch (e) {
       debugPrint('FirebaseConfig: Error checking environment completeness: $e');
@@ -61,23 +71,23 @@ class FirebaseConfig {
       final projectId = dotenv.env['FIREBASE_PROJECT_ID'];
       final androidApiKey = dotenv.env['FIREBASE_ANDROID_API_KEY'];
       final androidAppId = dotenv.env['FIREBASE_ANDROID_APP_ID'];
-      
+
       // Validate format and content
       if (projectId == null || !projectId.contains('-')) {
         debugPrint('FirebaseConfig: Invalid project ID format');
         return false;
       }
-      
+
       if (androidApiKey == null || !androidApiKey.startsWith('AIza')) {
         debugPrint('FirebaseConfig: Invalid Android API key format');
         return false;
       }
-      
+
       if (androidAppId == null || !androidAppId.contains(':')) {
         debugPrint('FirebaseConfig: Invalid Android app ID format');
         return false;
       }
-      
+
       return true;
     } catch (e) {
       debugPrint('FirebaseConfig: Error validating environment config: $e');

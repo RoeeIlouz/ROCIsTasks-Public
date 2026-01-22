@@ -98,7 +98,7 @@ class ErrorService {
     VoidCallback? onRetry,
   }) {
     _logError('User Error', error ?? message, stack);
-    
+
     // Show user-friendly error message
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -130,10 +130,7 @@ class ErrorService {
   }
 
   /// Handle sync errors
-  static void handleSyncError(
-    BuildContext context, {
-    VoidCallback? onRetry,
-  }) {
+  static void handleSyncError(BuildContext context, {VoidCallback? onRetry}) {
     handleUserError(
       context,
       'Sync failed. Your data is saved locally and will sync when connection is restored.',
@@ -143,10 +140,7 @@ class ErrorService {
 
   /// Handle authentication errors
   static void handleAuthError(BuildContext context) {
-    handleUserError(
-      context,
-      'Authentication failed. Please sign in again.',
-    );
+    handleUserError(context, 'Authentication failed. Please sign in again.');
   }
 
   /// Handle storage errors

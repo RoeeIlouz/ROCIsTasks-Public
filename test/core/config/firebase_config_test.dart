@@ -12,23 +12,25 @@ void main() {
     test('should use default Firebase options when no .env file', () {
       // When no environment variables are loaded
       final options = FirebaseConfig.currentPlatform;
-      
+
       // Should use default configuration
       expect(options.projectId, 'rocis-todo');
     });
 
     test('should use environment config when valid .env is loaded', () {
       // Load test environment variables
-      dotenv.testLoad(fileInput: '''
+      dotenv.testLoad(
+        fileInput: '''
 FIREBASE_PROJECT_ID=test-project
 FIREBASE_ANDROID_API_KEY=test-android-key
 FIREBASE_ANDROID_APP_ID=test-android-app-id
 FIREBASE_WEB_MESSAGING_SENDER_ID=test-sender-id
 FIREBASE_WEB_STORAGE_BUCKET=test-bucket
-''');
+''',
+      );
 
       final options = FirebaseConfig.currentPlatform;
-      
+
       // Should use environment configuration
       expect(options.projectId, 'test-project');
     });
@@ -39,11 +41,13 @@ FIREBASE_WEB_STORAGE_BUCKET=test-bucket
       expect(FirebaseConfig.validateConfig(), false);
 
       // Test with all required variables
-      dotenv.testLoad(fileInput: '''
+      dotenv.testLoad(
+        fileInput: '''
 FIREBASE_PROJECT_ID=test-project
 FIREBASE_ANDROID_API_KEY=test-key
 FIREBASE_ANDROID_APP_ID=test-app-id
-''');
+''',
+      );
       expect(FirebaseConfig.validateConfig(), true);
     });
   });

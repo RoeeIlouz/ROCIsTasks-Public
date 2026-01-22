@@ -12,16 +12,27 @@ void main() {
     });
 
     test('should validate task description correctly', () {
-      expect(ValidationService.validateTaskDescription('Valid description'), isNull);
+      expect(
+        ValidationService.validateTaskDescription('Valid description'),
+        isNull,
+      );
       expect(ValidationService.validateTaskDescription(null), isNull);
     });
 
     test('should sanitize text correctly', () {
-      expect(ValidationService.sanitizeText('  hello  world  '), equals('hello world'));
+      expect(
+        ValidationService.sanitizeText('  hello  world  '),
+        equals('hello world'),
+      );
     });
 
     test('should detect harmful content', () {
-      expect(ValidationService.containsHarmfulContent('<script>alert("xss")</script>'), isTrue);
+      expect(
+        ValidationService.containsHarmfulContent(
+          '<script>alert("xss")</script>',
+        ),
+        isTrue,
+      );
       expect(ValidationService.containsHarmfulContent('Safe content'), isFalse);
     });
   });

@@ -19,7 +19,7 @@ class CacheService {
 
   // In-memory cache
   final Map<String, _CacheEntry> _memoryCache = {};
-  
+
   // Cache configuration
   static const Duration _defaultTtl = Duration(minutes: 30);
   static const int _maxMemoryCacheSize = 100;
@@ -49,7 +49,7 @@ class CacheService {
   void set<T>(String key, T data, {Duration? ttl}) {
     final expiry = DateTime.now().add(ttl ?? _defaultTtl);
     _memoryCache[key] = _CacheEntry(data, expiry);
-    
+
     // Cleanup if too large
     if (_memoryCache.length > _maxMemoryCacheSize) {
       _cleanupMemoryCache();
@@ -79,7 +79,7 @@ class CacheService {
   void _cleanupMemoryCache() {
     final entries = _memoryCache.entries.toList();
     entries.sort((a, b) => a.value.expiry.compareTo(b.value.expiry));
-    
+
     // Remove oldest 20% of entries
     final removeCount = (_maxMemoryCacheSize * 0.2).round();
     for (int i = 0; i < removeCount && entries.isNotEmpty; i++) {

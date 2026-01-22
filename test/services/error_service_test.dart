@@ -8,7 +8,9 @@ void main() {
       expect(() => ErrorService.initialize(), returnsNormally);
     });
 
-    testWidgets('should handle user error with snackbar', (WidgetTester tester) async {
+    testWidgets('should handle user error with snackbar', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -16,10 +18,7 @@ void main() {
               builder: (context) {
                 return ElevatedButton(
                   onPressed: () {
-                    ErrorService.handleUserError(
-                      context,
-                      'Test error message',
-                    );
+                    ErrorService.handleUserError(context, 'Test error message');
                   },
                   child: const Text('Trigger Error'),
                 );

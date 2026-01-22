@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/features/categories/domain/models/category.dart';
 import 'package:provider/provider.dart';
-import 'package:rocis_tasks/core/theme/theme_service.dart';
+import 'package:rocis_tasks/shared/ui/ui_kit.dart';
 import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
 import 'package:rocis_tasks/core/utils/icon_utils.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -53,46 +53,6 @@ class TaskTile extends StatelessWidget {
           ? DismissDirection.startToEnd
           : DismissDirection.none,
       onDismissed: (_) => onDelete(),
-      /*confirmDismiss: (direction) async {
-        if (direction == DismissDirection.startToEnd) {
-          return await showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(24),
-              ),
-              title: Text(
-                l10n.deleteTaskTitle,
-                style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
-              ),
-              content: Text(
-                l10n.deleteTaskConfirmation,
-                style: GoogleFonts.outfit(),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context, false),
-                  child: Text(
-                    l10n.cancel,
-                    style: GoogleFonts.outfit(fontWeight: FontWeight.w600),
-                  ),
-                ),
-                TextButton(
-                  onPressed: () => Navigator.pop(context, true),
-                  child: Text(
-                    l10n.delete,
-                    style: GoogleFonts.outfit(
-                      color: theme.colorScheme.error,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          );
-        }
-        return false;
-      },*/
       background: Container(
         margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
         decoration: BoxDecoration(
@@ -136,20 +96,23 @@ class TaskTile extends StatelessWidget {
               if (category != null)
                 Container(width: 6, color: Color(category!.colorValue)),
               Expanded(
-                child: InkWell(
-                  onTap: onTap,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 10,
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(top: 2),
-                          child: GestureDetector(
-                            onTap: onToggle,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 10,
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(top: 2),
+                        child: GestureDetector(
+                          onTap: onToggle,
+                          child: Semantics(
+                            label: task.isCompleted
+                                ? 'Mark task as incomplete'
+                                : 'Mark task as complete',
+                            checked: task.isCompleted,
                             child: AnimatedContainer(
                               duration: const Duration(milliseconds: 300),
                               width: 28,
@@ -181,34 +144,41 @@ class TaskTile extends StatelessWidget {
                             ),
                           ),
                         ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                task.title,
-                                style: theme.textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: task.isCompleted
-                                      ? theme.disabledColor
-                                      : theme.colorScheme.onSurface,
-                                  decoration: task.isCompleted
-                                      ? TextDecoration.lineThrough
-                                      : null,
-                                ),
-                              ),
-                              if (task.description.isNotEmpty) ...[
-                                const SizedBox(height: 8),
-                                Container(
-                                  constraints: const BoxConstraints(
-                                    maxHeight: 80,
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: InkWell(
+                          onTap: onTap,
+                          borderRadius: BorderRadius.circular(12),
+                          child: Semantics(
+                            label: 'Task: ${task.title}',
+                            hint: 'Double tap to edit task details',
+                            container: true,
+                            child: Padding(
+                              padding: const EdgeInsets.all(4.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    task.title,
+                                    style: theme.textTheme.titleMedium
+                                        ?.copyWith(
+                                          fontWeight: FontWeight.bold,
+                                          color: task.isCompleted
+                                              ? theme.disabledColor
+                                              : theme.colorScheme.onSurface,
+                                          decoration: task.isCompleted
+                                              ? TextDecoration.lineThrough
+                                              : null,
+                                        ),
                                   ),
-                                  child: SingleChildScrollView(
-                                    physics: const BouncingScrollPhysics(),
-                                    child: Text(
+                                  if (task.description.isNotEmpty) ...[
+                                    const SizedBox(height: 8),
+                                    Text(
                                       task.description,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
                                       style: theme.textTheme.bodySmall
                                           ?.copyWith(
                                             color: theme.colorScheme.onSurface
@@ -216,43 +186,53 @@ class TaskTile extends StatelessWidget {
                                             height: 1.4,
                                           ),
                                     ),
-                                  ),
-                                ),
-                              ],
-                              const SizedBox(height: 12),
-                              Row(
-                                children: [
-                                  if (category != null) ...[
-                                    _buildChip(
-                                      context,
-                                      icon: IconUtils.getIconData(
-                                        category!.iconCode,
-                                      ),
-                                      label: category!.name,
-                                      color: Color(category!.colorValue),
-                                    ),
-                                    const SizedBox(width: 8),
                                   ],
-                                  if (task.dueDate != null)
-                                    _buildChip(
-                                      context,
-                                      icon: Icons.access_time_rounded,
-                                      label: themeService.use24HourFormat
-                                          ? _timeFormat24.format(task.dueDate!)
-                                          : _timeFormat12.format(task.dueDate!),
-                                      color: theme.colorScheme.primary,
-                                    ),
+                                  const SizedBox(height: 12),
+                                  Row(
+                                    children: [
+                                      if (category != null) ...[
+                                        _buildChip(
+                                          context,
+                                          icon: IconUtils.getIconData(
+                                            category!.iconCode,
+                                          ),
+                                          label: category!.name,
+                                          color: Color(category!.colorValue),
+                                        ),
+                                        const SizedBox(width: 8),
+                                      ],
+                                      if (task.dueDate != null)
+                                        _buildChip(
+                                          context,
+                                          icon: Icons.access_time_rounded,
+                                          label: themeService.use24HourFormat
+                                              ? _timeFormat24.format(
+                                                  task.dueDate!,
+                                                )
+                                              : _timeFormat12.format(
+                                                  task.dueDate!,
+                                                ),
+                                          color: theme.colorScheme.primary,
+                                        ),
+                                    ],
+                                  ),
                                 ],
                               ),
-                            ],
+                            ),
                           ),
                         ),
-                        const SizedBox(width: 16),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            if (enablePin)
-                              IconButton(
+                      ),
+                      const SizedBox(width: 16),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          if (enablePin)
+                            Semantics(
+                              label: (task.isPinned ?? false)
+                                  ? 'Unpin task'
+                                  : 'Pin task',
+                              button: true,
+                              child: IconButton(
                                 icon: Icon(
                                   (task.isPinned ?? false)
                                       ? Icons.push_pin
@@ -270,35 +250,32 @@ class TaskTile extends StatelessWidget {
                                 },
                                 constraints: const BoxConstraints(),
                                 padding: EdgeInsets.zero,
-                              )
-                            else
-                              const SizedBox(height: 40),
-                            Container(
-                              width: 10,
-                              height: 10,
-                              margin: const EdgeInsets.only(bottom: 4),
-                              decoration: BoxDecoration(
-                                color: _getPriorityColor(
-                                  context,
-                                  task.priority,
-                                ),
-                                shape: BoxShape.circle,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: _getPriorityColor(
-                                      context,
-                                      task.priority,
-                                    ).withValues(alpha: 0.4),
-                                    blurRadius: 6,
-                                    spreadRadius: 1,
-                                  ),
-                                ],
                               ),
+                            )
+                          else
+                            const SizedBox(height: 40),
+                          Container(
+                            width: 10,
+                            height: 10,
+                            margin: const EdgeInsets.only(bottom: 4),
+                            decoration: BoxDecoration(
+                              color: _getPriorityColor(context, task.priority),
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: _getPriorityColor(
+                                    context,
+                                    task.priority,
+                                  ).withValues(alpha: 0.4),
+                                  blurRadius: 6,
+                                  spreadRadius: 1,
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                      ],
-                    ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ),

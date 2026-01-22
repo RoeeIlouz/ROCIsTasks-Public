@@ -1,10 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter/foundation.dart';
+import 'package:rocis_tasks/core/services/error_handling_service.dart';
 
 class AuthService extends ChangeNotifier {
+  final ErrorHandlingService _errorHandlingService;
   FirebaseAuth get _auth => FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
+
+  AuthService(this._errorHandlingService);
 
   User? get currentUser => _auth.currentUser;
 
@@ -28,8 +32,8 @@ class AuthService extends ChangeNotifier {
       );
       notifyListeners();
       return userCredential;
-    } catch (e) {
-      debugPrint('Error signing in with Google: $e');
+    } catch (e, s) {
+      _errorHandlingService.logError(e, s, reason: 'Sign in with Google');
       return null;
     }
   }
@@ -39,8 +43,8 @@ class AuthService extends ChangeNotifier {
       await _googleSignIn.signOut();
       await _auth.signOut();
       notifyListeners();
-    } catch (e) {
-      debugPrint('Error signing out: $e');
+    } catch (e, s) {
+      _errorHandlingService.logError(e, s, reason: 'Sign out');
     }
   }
 }
