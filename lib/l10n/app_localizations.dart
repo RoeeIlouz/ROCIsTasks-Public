@@ -493,6 +493,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Are you sure you want to delete this task?'**
   String get deleteTaskConfirmation;
+
+  /// No description provided for @calendarColors.
+  ///
+  /// In en, this message translates to:
+  /// **'Calendar Colors'**
+  String get calendarColors;
+
+  /// No description provided for @calendarFiltersTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Calendar Filters'**
+  String get calendarFiltersTitle;
+
+  /// No description provided for @showCalendarTasks.
+  ///
+  /// In en, this message translates to:
+  /// **'Show Tasks'**
+  String get showCalendarTasks;
+
+  /// No description provided for @showGoogleCalendar.
+  ///
+  /// In en, this message translates to:
+  /// **'Show Google Calendar'**
+  String get showGoogleCalendar;
+
+  /// No description provided for @showRocisSchedule.
+  ///
+  /// In en, this message translates to:
+  /// **'Show ROCIs Schedule'**
+  String get showRocisSchedule;
+
+  /// No description provided for @taskColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Task Color'**
+  String get taskColor;
+
+  /// No description provided for @googleCalendarColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Google Calendar Color'**
+  String get googleCalendarColor;
+
+  /// No description provided for @scheduleColor.
+  ///
+  /// In en, this message translates to:
+  /// **'ROCIs Schedule Color'**
+  String get scheduleColor;
+
+  /// No description provided for @assignmentColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Assignment Color'**
+  String get assignmentColor;
+
+  /// No description provided for @resetColors.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset to Defaults'**
+  String get resetColors;
+
+  /// No description provided for @selectColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Color'**
+  String get selectColor;
+
+  /// No description provided for @selectGoogleCalendars.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Google Calendars'**
+  String get selectGoogleCalendars;
+
+  /// No description provided for @selectAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Select All'**
+  String get selectAll;
+
+  /// No description provided for @deselectAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Deselect All'**
+  String get deselectAll;
 }
 
 class _AppLocalizationsDelegate

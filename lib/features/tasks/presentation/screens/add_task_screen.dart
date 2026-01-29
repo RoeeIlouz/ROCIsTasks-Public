@@ -259,53 +259,62 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                 ),
               ),
               const SizedBox(height: 12),
-              InkWell(
-                onTap: () => _selectDate(context),
-                borderRadius: BorderRadius.circular(16),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 14,
-                  ),
-                  decoration: BoxDecoration(
-                    color: theme.brightness == Brightness.light
-                        ? Colors.grey.withValues(alpha: 0.05)
-                        : Colors.white.withValues(alpha: 0.05),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.calendar_today_rounded,
-                        size: 20,
-                        color: theme.colorScheme.primary,
-                      ),
-                      const SizedBox(width: 12),
-                      Text(
-                        _selectedDate == null
-                            ? l10n.noDateSelected
-                            : themeService.use24HourFormat
-                            ? DateFormat.yMMMd().add_Hm().format(_selectedDate!)
-                            : DateFormat.yMMMd().add_jm().format(
-                                _selectedDate!,
-                              ),
-                        style: GoogleFonts.outfit(fontWeight: FontWeight.w500),
-                      ),
-                      const Spacer(),
-                      if (_selectedDate != null)
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _selectedDate = null;
-                            });
-                          },
-                          child: Icon(
-                            Icons.cancel_rounded,
-                            size: 20,
-                            color: theme.disabledColor,
-                          ),
+              Semantics(
+                label: l10n.dueDateAndTime,
+                hint: 'Double tap to open date and time picker',
+                button: true,
+                child: InkWell(
+                  onTap: () => _selectDate(context),
+                  borderRadius: BorderRadius.circular(16),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
+                    decoration: BoxDecoration(
+                      color: theme.brightness == Brightness.light
+                          ? Colors.grey.withValues(alpha: 0.05)
+                          : Colors.white.withValues(alpha: 0.05),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.calendar_today_rounded,
+                          size: 20,
+                          color: theme.colorScheme.primary,
                         ),
-                    ],
+                        const SizedBox(width: 12),
+                        Text(
+                          _selectedDate == null
+                              ? l10n.noDateSelected
+                              : themeService.use24HourFormat
+                              ? DateFormat.yMMMd().add_Hm().format(_selectedDate!)
+                              : DateFormat.yMMMd().add_jm().format(
+                                  _selectedDate!,
+                                ),
+                          style: GoogleFonts.outfit(fontWeight: FontWeight.w500),
+                        ),
+                        const Spacer(),
+                        if (_selectedDate != null)
+                          Semantics(
+                            label: 'Clear selected date',
+                            button: true,
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  _selectedDate = null;
+                                });
+                              },
+                              child: Icon(
+                                Icons.cancel_rounded,
+                                size: 20,
+                                color: theme.disabledColor,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -410,28 +419,32 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                 },
               ),
               const SizedBox(height: 40),
-              FilledButton(
-                onPressed: _saveTask,
-                style: FilledButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 18),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  elevation: 2,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(isEditing ? Icons.check_rounded : Icons.add_rounded),
-                    const SizedBox(width: 8),
-                    Text(
-                      isEditing ? l10n.updateTask : l10n.saveTask,
-                      style: GoogleFonts.outfit(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+              Semantics(
+                label: isEditing ? l10n.updateTask : l10n.saveTask,
+                button: true,
+                child: FilledButton(
+                  onPressed: _saveTask,
+                  style: FilledButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 18),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
                     ),
-                  ],
+                    elevation: 2,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(isEditing ? Icons.check_rounded : Icons.add_rounded),
+                      const SizedBox(width: 8),
+                      Text(
+                        isEditing ? l10n.updateTask : l10n.saveTask,
+                        style: GoogleFonts.outfit(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],

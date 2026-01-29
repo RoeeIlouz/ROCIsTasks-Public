@@ -3,15 +3,21 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:encrypt/encrypt.dart' as enc;
+import 'package:rocis_tasks/core/services/logger_service.dart';
 
 class EncryptionService {
   static const _secureStorage = FlutterSecureStorage(
-    aOptions: AndroidOptions(encryptedSharedPreferences: true),
+    aOptions: AndroidOptions(),
   );
   static const _keyName = 'hive_encryption_key_v1';
 
   static enc.Encrypter? _encrypter;
   static enc.Key? _key;
+
+  /// Initialize encryption service
+  static Future<void> init() async {
+    await getOrGenerateKey();
+  }
 
   /// Retrieves the existing encryption key or generates a new one.
   static Future<List<int>> getOrGenerateKey() async {
@@ -32,7 +38,7 @@ class EncryptionService {
       _initEncrypter(keyBytes);
       return keyBytes;
     } catch (e) {
-      debugPrint('EncryptionService Error: $e');
+      AppLogger.error('EncryptionService Error', error: e);
       rethrow;
     }
   }
@@ -55,40 +61,43 @@ class EncryptionService {
   static String encrypt(String plainText) {
     if (plainText.isEmpty) return plainText;
     if (_encrypter == null) {
-      debugPrint('Warning: Encrypter not initialized. Returning plain text.');
-      return plainText;
+      AppLogger.critical('SECURITY ALERT: Encrypter not initialized. Blocking operation.', tag: 'Security');
+      throw StateError('Encryption service not initialized');
     }
     try {
       final iv = enc.IV.fromLength(16);
       final encrypted = _encrypter!.encrypt(plainText, iv: iv);
       return '${iv.base64}:${encrypted.base64}'; // Format: IV:CipherText
     } catch (e) {
-      debugPrint('Encryption failed: $e');
-      return plainText;
+      AppLogger.critical('SECURITY ALERT: Encryption failed', error: e, tag: 'Security');
+      throw Exception('Failed to secure data: $e');
     }
   }
 
   static String decrypt(String cipherText) {
     if (cipherText.isEmpty) return cipherText;
-    if (_encrypter == null) return cipherText;
+    if (_encrypter == null) {
+      AppLogger.critical('SECURITY ALERT: Decrypter not initialized. Blocking operation.', tag: 'Security');
+      return '[SECURE_DATA_LOCKED]';
+    }
 
     if (!cipherText.contains(':')) {
-      // Assume Legacy (Unencrypted)
+      // Assume Legacy (Unencrypted) - In a hardened environment, you might want to block this
+      AppLogger.warning('Accessing legacy unencrypted data', tag: 'Security');
       return cipherText;
     }
 
     try {
       final parts = cipherText.split(':');
-      if (parts.length != 2) return cipherText; // Not our format
+      if (parts.length != 2) throw const FormatException('Invalid secure data format');
 
       final iv = enc.IV.fromBase64(parts[0]);
       final encrypted = enc.Encrypted.fromBase64(parts[1]);
 
       return _encrypter!.decrypt(encrypted, iv: iv);
     } catch (e) {
-      // Fallback for any errors (malformed, different key, or plain text containing :)
-      // We assume it might be plain text if decryption fails.
-      return cipherText;
+      AppLogger.error('Decryption failed', error: e, tag: 'Security');
+      return '[DECRYPTION_ERROR]';
     }
   }
 }

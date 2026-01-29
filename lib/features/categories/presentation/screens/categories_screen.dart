@@ -91,39 +91,47 @@ class CategoriesScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-                child: ListTile(
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 4,
-                  ),
-                  onTap: () => _showCategorySheet(context, category: category),
-                  leading: Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: Color(category.colorValue).withValues(alpha: 0.1),
-                      shape: BoxShape.circle,
+                child: Semantics(
+                  label: 'Category: ${category.name}',
+                  hint: 'Double tap to edit category',
+                  child: ListTile(
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 4,
                     ),
-                    child: Icon(
-                      IconUtils.getIconData(category.iconCode),
-                      color: Color(category.colorValue),
-                      size: 24,
+                    onTap: () => _showCategorySheet(context, category: category),
+                    leading: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Color(category.colorValue).withValues(alpha: 0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        IconUtils.getIconData(category.iconCode),
+                        color: Color(category.colorValue),
+                        size: 24,
+                      ),
                     ),
-                  ),
-                  title: Text(
-                    category.name,
-                    style: GoogleFonts.outfit(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
+                    title: Text(
+                      category.name,
+                      style: GoogleFonts.outfit(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
                     ),
-                  ),
-                  trailing: IconButton(
-                    icon: Icon(
-                      Icons.delete_outline_rounded,
-                      color: theme.colorScheme.error.withValues(alpha: 0.7),
+                    trailing: Semantics(
+                      label: 'Delete category',
+                      button: true,
+                      child: IconButton(
+                        icon: Icon(
+                          Icons.delete_outline_rounded,
+                          color: theme.colorScheme.error.withValues(alpha: 0.7),
+                        ),
+                        onPressed: () {
+                          provider.deleteCategory(category.id);
+                        },
+                      ),
                     ),
-                    onPressed: () {
-                      provider.deleteCategory(category.id);
-                    },
                   ),
                 ),
               );
@@ -306,30 +314,35 @@ class _CategorySheetState extends State<_CategorySheet> {
                 itemBuilder: (context, index) {
                   final color = _colors[index];
                   final isSelected = _selectedColor == color.toARGB32();
-                  return GestureDetector(
-                    onTap: () =>
-                        setState(() => _selectedColor = color.toARGB32()),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: color,
-                        shape: BoxShape.circle,
-                        border: isSelected
-                            ? Border.all(
-                                color: theme.colorScheme.onSurface,
-                                width: 3,
+                  return Semantics(
+                    label: 'Color option ${index + 1}',
+                    selected: isSelected,
+                    button: true,
+                    child: GestureDetector(
+                      onTap: () =>
+                          setState(() => _selectedColor = color.toARGB32()),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          color: color,
+                          shape: BoxShape.circle,
+                          border: isSelected
+                              ? Border.all(
+                                  color: theme.colorScheme.onSurface,
+                                  width: 3,
+                                )
+                              : null,
+                        ),
+                        child: isSelected
+                            ? const Icon(
+                                Icons.check_rounded,
+                                size: 24,
+                                color: Colors.white,
                               )
                             : null,
                       ),
-                      child: isSelected
-                          ? const Icon(
-                              Icons.check_rounded,
-                              size: 24,
-                              color: Colors.white,
-                            )
-                          : null,
                     ),
                   );
                 },
@@ -358,30 +371,35 @@ class _CategorySheetState extends State<_CategorySheet> {
               itemBuilder: (context, index) {
                 final icon = _icons[index];
                 final isSelected = _selectedIcon == icon.codePoint;
-                return GestureDetector(
-                  onTap: () => setState(() => _selectedIcon = icon.codePoint),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? Color(_selectedColor).withValues(alpha: 0.1)
-                          : theme.brightness == Brightness.light
-                          ? Colors.grey.withValues(alpha: 0.05)
-                          : Colors.white.withValues(alpha: 0.05),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
+                return Semantics(
+                  label: 'Icon option ${index + 1}',
+                  selected: isSelected,
+                  button: true,
+                  child: GestureDetector(
+                    onTap: () => setState(() => _selectedIcon = icon.codePoint),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? Color(_selectedColor).withValues(alpha: 0.1)
+                            : theme.brightness == Brightness.light
+                            ? Colors.grey.withValues(alpha: 0.05)
+                            : Colors.white.withValues(alpha: 0.05),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: isSelected
+                              ? Color(_selectedColor)
+                              : Colors.transparent,
+                          width: 2,
+                        ),
+                      ),
+                      child: Icon(
+                        icon,
                         color: isSelected
                             ? Color(_selectedColor)
-                            : Colors.transparent,
-                        width: 2,
+                            : theme.disabledColor,
+                        size: 24,
                       ),
-                    ),
-                    child: Icon(
-                      icon,
-                      color: isSelected
-                          ? Color(_selectedColor)
-                          : theme.disabledColor,
-                      size: 24,
                     ),
                   ),
                 );

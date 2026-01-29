@@ -5,6 +5,7 @@ import 'package:rocis_tasks/shared/ui/ui_kit.dart';
 import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
 import 'package:rocis_tasks/features/tasks/presentation/screens/trash_screen.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -22,8 +23,9 @@ class SettingsScreen extends StatelessWidget {
         if (user != null)
           ListTile(
             leading: CircleAvatar(
+              backgroundColor: themeService.isDarkMode ? Colors.grey[800] : Colors.grey[200],
               backgroundImage: user.photoURL != null
-                  ? NetworkImage(user.photoURL!)
+                  ? CachedNetworkImageProvider(user.photoURL!)
                   : null,
               child: user.photoURL == null
                   ? Text(user.displayName?[0].toUpperCase() ?? 'U')
@@ -122,7 +124,6 @@ class SettingsScreen extends StatelessWidget {
             );
           },
         ),
-
         const Divider(),
         _buildSectionHeader(context, l10n.dataAndSync),
         ListTile(

@@ -24,6 +24,10 @@ import 'package:rocis_tasks/core/services/error_handling_service.dart';
 
 enum TaskSortOption { dueDate, priority, title, dateCreated }
 
+/// Main provider for task management and synchronization.
+/// 
+/// This class handles local persistence via Hive, cloud synchronization via Firestore,
+/// and coordination between various services (notifications, widgets, etc.).
 class TaskProvider extends ChangeNotifier {
   final LocalTaskSource _source;
   final NotificationService _notificationService;
@@ -83,6 +87,9 @@ class TaskProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Initialize the provider and its dependencies.
+  /// 
+  /// Sets up listeners for authentication changes, connectivity, and Firestore streams.
   Future<void> init() async {
     final prefs = await SharedPreferences.getInstance();
     final sortIndex = prefs.getInt('sort_option');
@@ -98,6 +105,10 @@ class TaskProvider extends ChangeNotifier {
       _source,
     );
     _widgetDataService = WidgetDataService(_calendarService);
+
+    // Initialize schedule service for ROCIs-Schedule integration
+    await _widgetDataService.initScheduleService();
+    await _fullCalendarWidgetService.initScheduleService();
 
     // Initialize pagination service
     _taskPagination = PaginationService<Task>(_getFilteredAndSortedTasks);
@@ -190,10 +201,10 @@ class TaskProvider extends ChangeNotifier {
     _isLoading = false;
     notifyListeners();
 
-    // Defer home widget update
+    // Defer home widget update - show notification on app first open
     Future.delayed(
       const Duration(seconds: 1),
-      () async => await updateHomeWidget(),
+      () async => await updateHomeWidgetWithNotification(),
     );
 
     if (_authService.currentUser != null) {
@@ -204,10 +215,9 @@ class TaskProvider extends ChangeNotifier {
         uploadLocalDataToCloud()
             .then((_) => syncWithCloud())
             .then((_) => updateHomeWidget())
-            .catchError(
-              (e, s) =>
-                  _errorHandlingService.logError(e, s, reason: 'Initial sync'),
-            );
+            .catchError((e, s) {
+              _errorHandlingService.logError(e, s, reason: 'Initial sync');
+            });
       } else {
         debugPrint('App started offline - will sync when online');
       }
@@ -433,13 +443,9 @@ class TaskProvider extends ChangeNotifier {
         .then((prefs) {
           prefs.setInt('sort_option', option.index);
         })
-        .catchError(
-          (e, s) => _errorHandlingService.logError(
-            e,
-            s,
-            reason: 'Saving sort option',
-          ),
-        );
+        .catchError((e, s) {
+          _errorHandlingService.logError(e, s, reason: 'Saving sort option');
+        });
   }
 
   void toggleCategoryFilter(String categoryId) {
@@ -465,13 +471,13 @@ class TaskProvider extends ChangeNotifier {
         .then((prefs) {
           prefs.setStringList('category_filters', _selectedCategoryIds);
         })
-        .catchError(
-          (e, s) => _errorHandlingService.logError(
+        .catchError((e, s) {
+          _errorHandlingService.logError(
             e,
             s,
             reason: 'Saving category filters',
-          ),
-        );
+          );
+        });
   }
 
   void toggleShowCompleted(bool value) {
@@ -482,13 +488,13 @@ class TaskProvider extends ChangeNotifier {
         .then((prefs) {
           prefs.setBool('show_completed', value);
         })
-        .catchError(
-          (e, s) => _errorHandlingService.logError(
+        .catchError((e, s) {
+          _errorHandlingService.logError(
             e,
             s,
             reason: 'Saving show completed preference',
-          ),
-        );
+          );
+        });
   }
 
   List<Task> get tasks {
@@ -570,7 +576,20 @@ class TaskProvider extends ChangeNotifier {
     _taskPagination.refresh();
   }
 
+  /// Update home widgets without showing the task count notification
+  /// Use this for general widget updates (color changes, pin/unpin, etc.)
   Future<void> updateHomeWidget() async {
+    await _updateWidgets(showNotification: false);
+  }
+
+  /// Update home widgets AND show the task count notification
+  /// Use this only when tasks are added, completed, or deleted
+  Future<void> updateHomeWidgetWithNotification() async {
+    await _updateWidgets(showNotification: true);
+  }
+
+  /// Internal method to update widgets with optional notification
+  Future<void> _updateWidgets({required bool showNotification}) async {
     _widgetDebounce?.cancel();
     _widgetDebounce = Timer(
       Duration(milliseconds: AppConfig.notificationDebounceMs),
@@ -584,27 +603,46 @@ class TaskProvider extends ChangeNotifier {
             isDarkText: !_themeService.isDarkMode,
           );
 
-          final uncompletedTasks = _source
-              .getTasks()
-              .where((t) => !t.isCompleted && !(t.isDeleted ?? false))
-              .toList();
+          // Only show notification when explicitly requested
+          // (task added, completed, deleted, or app first opened)
+          if (showNotification) {
+            final uncompletedTasks = _source
+                .getTasks()
+                .where((t) => !t.isCompleted && !(t.isDeleted ?? false))
+                .toList();
 
-          await _notificationService.showTaskCountNotification(
-            uncompletedTasks.length,
-            uncompletedTasks.map((t) => t.title).toList(),
-            largeIconPath: chartPath,
-            isDarkText: !_themeService.isDarkMode,
+            await _notificationService.showTaskCountNotification(
+              uncompletedTasks.length,
+              uncompletedTasks.map((t) => t.title).toList(),
+              largeIconPath: chartPath,
+              isDarkText: !_themeService.isDarkMode,
+            );
+          }
+
+          // Get current user ID and email for ROCIs-Schedule integration
+          final userId = _authService.currentUser?.uid;
+          final userEmail = _authService.currentUser?.email;
+          
+          // Set user email for cross-app schedule data lookup
+          _widgetDataService.setUserEmail(userEmail);
+          _fullCalendarWidgetService.setUserEmail(userEmail);
+
+          await _widgetDataService.updateMonthEventsMap(
+            _source.getTasks(),
+            userId: userId,
           );
-
-          await _widgetDataService.updateMonthEventsMap(_source.getTasks());
           await _widgetDataService.updateScheduleWidget(
             _source.getTasks(),
             getCategoryById,
+            userId: userId,
           );
-          await _widgetDataService.updateCalendarListWidget(_source.getTasks());
+          await _widgetDataService.updateCalendarListWidget(
+            _source.getTasks(),
+            userId: userId,
+          );
 
           await _monthWidgetService.updateMonthWidget();
-          await _fullCalendarWidgetService.updateFullCalendarWidget();
+          await _fullCalendarWidgetService.updateFullCalendarWidget(userId: userId);
         } catch (e, s) {
           _errorHandlingService.logError(e, s, reason: 'Updating home widgets');
         } finally {
@@ -614,6 +652,7 @@ class TaskProvider extends ChangeNotifier {
     );
   }
 
+  /// Add a new task to local storage and sync with cloud.
   Future<void> addTask(
     String title,
     String description,
@@ -658,7 +697,7 @@ class TaskProvider extends ChangeNotifier {
     }
     _refreshPagination();
     notifyListeners();
-    updateHomeWidget();
+    updateHomeWidgetWithNotification(); // Show notification when task is added
   }
 
   Future<void> toggleTaskCompletion(Task task) async {
@@ -692,7 +731,7 @@ class TaskProvider extends ChangeNotifier {
     }
     _refreshPagination();
     notifyListeners();
-    updateHomeWidget();
+    updateHomeWidgetWithNotification(); // Show notification when task is completed/uncompleted
   }
 
   Future<void> updateTask(
@@ -774,7 +813,7 @@ class TaskProvider extends ChangeNotifier {
     }
     _refreshPagination();
     notifyListeners();
-    updateHomeWidget();
+    updateHomeWidgetWithNotification(); // Show notification when task is deleted
   }
 
   Future<void> restoreTask(Task task) async {
@@ -804,7 +843,7 @@ class TaskProvider extends ChangeNotifier {
     }
     _refreshPagination();
     notifyListeners();
-    updateHomeWidget();
+    updateHomeWidgetWithNotification(); // Show notification when task is restored
   }
 
   Future<void> deleteTaskPermanently(String id) async {
@@ -815,7 +854,7 @@ class TaskProvider extends ChangeNotifier {
     );
     _refreshPagination();
     notifyListeners();
-    updateHomeWidget();
+    updateHomeWidgetWithNotification(); // Show notification when task is permanently deleted
   }
 
   Future<void> addCategory(String name, int colorValue, int iconCode) async {

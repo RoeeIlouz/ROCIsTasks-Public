@@ -208,4 +208,46 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get deleteTaskConfirmation =>
       'Are you sure you want to delete this task?';
+
+  @override
+  String get calendarColors => 'Calendar Colors';
+
+  @override
+  String get calendarFiltersTitle => 'Calendar Filters';
+
+  @override
+  String get showCalendarTasks => 'Show Tasks';
+
+  @override
+  String get showGoogleCalendar => 'Show Google Calendar';
+
+  @override
+  String get showRocisSchedule => 'Show ROCIs Schedule';
+
+  @override
+  String get taskColor => 'Task Color';
+
+  @override
+  String get googleCalendarColor => 'Google Calendar Color';
+
+  @override
+  String get scheduleColor => 'ROCIs Schedule Color';
+
+  @override
+  String get assignmentColor => 'Assignment Color';
+
+  @override
+  String get resetColors => 'Reset to Defaults';
+
+  @override
+  String get selectColor => 'Select Color';
+
+  @override
+  String get selectGoogleCalendars => 'Select Google Calendars';
+
+  @override
+  String get selectAll => 'Select All';
+
+  @override
+  String get deselectAll => 'Deselect All';
 }

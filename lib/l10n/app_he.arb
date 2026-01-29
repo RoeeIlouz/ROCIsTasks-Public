@@ -64,5 +64,19 @@
   "noTasksYet": "אין משימות עדיין",
   "duePrefix": "יעד: ",
   "deleteTaskTitle": "מחק משימה",
-  "deleteTaskConfirmation": "האם אתה בטוח שברצונך למחוק משימה זו?"
+  "deleteTaskConfirmation": "האם אתה בטוח שברצונך למחוק משימה זו?",
+  "calendarColors": "צבעי לוח שנה",
+  "calendarFiltersTitle": "מסנני לוח שנה",
+  "showCalendarTasks": "הצג משימות",
+  "showGoogleCalendar": "הצג יומן Google",
+  "showRocisSchedule": "הצג מערכת שעות ROCIs",
+  "taskColor": "צבע משימות",
+  "googleCalendarColor": "צבע יומן Google",
+  "scheduleColor": "צבע מערכת שעות ROCIs",
+  "assignmentColor": "צבע מטלות",
+  "resetColors": "אפס לברירת מחדל",
+  "selectColor": "בחר צבע",
+  "selectGoogleCalendars": "בחר יומני Google",
+  "selectAll": "בחר הכל",
+  "deselectAll": "בטל בחירת הכל"
 }

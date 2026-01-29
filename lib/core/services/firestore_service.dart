@@ -1,10 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart' hide Category;
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/features/categories/domain/models/category.dart';
 import 'package:rocis_tasks/core/services/encryption_service.dart';
 import 'package:rocis_tasks/core/services/connectivity_service.dart';
 import 'package:rocis_tasks/core/services/retry_service.dart';
+import 'package:rocis_tasks/core/services/logger_service.dart';
 
 class FirestoreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -48,7 +48,7 @@ class FirestoreService {
       });
     } catch (e) {
       // Log error but don't throw - local data is source of truth
-      debugPrint('Firestore addCategory failed after retries: $e');
+      AppLogger.error('Firestore addCategory failed after retries', error: e, tag: 'Firestore');
     }
   }
 
@@ -63,7 +63,7 @@ class FirestoreService {
         'iconCode': category.iconCode,
       });
     } catch (e) {
-      debugPrint('Firestore updateCategory skipped (offline or error): $e');
+      AppLogger.warning('Firestore updateCategory skipped (offline or error)', error: e, tag: 'Firestore');
     }
   }
 
@@ -74,7 +74,7 @@ class FirestoreService {
     try {
       await collection.doc(id).delete();
     } catch (e) {
-      debugPrint('Firestore deleteCategory skipped (offline or error): $e');
+      AppLogger.warning('Firestore deleteCategory skipped (offline or error)', error: e, tag: 'Firestore');
     }
   }
 
@@ -113,7 +113,7 @@ class FirestoreService {
         'updatedAt': FieldValue.serverTimestamp(),
       });
     } catch (e) {
-      debugPrint('Firestore addTask skipped (offline or error): $e');
+      AppLogger.warning('Firestore addTask skipped (offline or error)', error: e, tag: 'Firestore');
     }
   }
 
@@ -134,7 +134,7 @@ class FirestoreService {
         'updatedAt': FieldValue.serverTimestamp(),
       });
     } catch (e) {
-      debugPrint('Firestore updateTask skipped (offline or error): $e');
+      AppLogger.warning('Firestore updateTask skipped (offline or error)', error: e, tag: 'Firestore');
     }
   }
 
@@ -145,7 +145,7 @@ class FirestoreService {
     try {
       await collection.doc(id).delete();
     } catch (e) {
-      debugPrint('Firestore deleteTask skipped (offline or error): $e');
+      AppLogger.warning('Firestore deleteTask skipped (offline or error)', error: e, tag: 'Firestore');
     }
   }
 

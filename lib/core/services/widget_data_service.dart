@@ -3,19 +3,35 @@ import 'package:flutter/material.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:intl/intl.dart';
 import 'package:rocis_tasks/core/services/calendar_service.dart';
+import 'package:rocis_tasks/core/services/schedule_firestore_service.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/features/categories/domain/models/category.dart';
 import 'package:rocis_tasks/features/tasks/services/task_widget_service.dart';
 
 class WidgetDataService {
   final CalendarService _calendarService;
+  final ScheduleFirestoreService _scheduleService;
+  bool _scheduleServiceInitialized = false;
 
-  WidgetDataService(this._calendarService);
+  WidgetDataService(this._calendarService) : _scheduleService = ScheduleFirestoreService();
+
+  /// Initialize the schedule service (call once after Firebase is ready)
+  Future<void> initScheduleService() async {
+    if (_scheduleServiceInitialized) return;
+    await _scheduleService.initialize();
+    _scheduleServiceInitialized = true;
+  }
+  
+  /// Set the user email for cross-app schedule data lookup
+  void setUserEmail(String? email) {
+    _scheduleService.setUserEmail(email);
+  }
 
   Future<void> updateScheduleWidget(
     List<Task> allTasks,
-    Category? Function(String?) getCategoryById,
-  ) async {
+    Category? Function(String?) getCategoryById, {
+    String? userId,
+  }) async {
     final scheduleStart = DateTime.now().subtract(const Duration(days: 1));
     final scheduleEnd = DateTime.now().add(const Duration(days: 30));
     final scheduleItems = <Map<String, dynamic>>[];
@@ -47,6 +63,7 @@ class WidgetDataService {
       });
     }
 
+    // Fetch device calendar events
     try {
       final calendarEvents = await _calendarService.getEvents(
         startDate: scheduleStart,
@@ -75,6 +92,52 @@ class WidgetDataService {
       debugPrint('Error fetching calendar events for schedule: $e');
     }
 
+    // Fetch ROCIs-Schedule data if user is logged in and authenticated in secondary Firebase
+    if (userId != null && _scheduleService.isReady) {
+      if (!_scheduleService.isAuthenticated) {
+        debugPrint('WidgetDataService: User not authenticated in secondary Firebase (rocis-schedule)');
+        debugPrint('WidgetDataService: Schedule integration requires signing in with Google');
+      } else {
+        try {
+          debugPrint('WidgetDataService: Fetching ROCIs-Schedule data for user $userId');
+          debugPrint('WidgetDataService: Authenticated as ${_scheduleService.authenticatedUserId} in rocis-schedule');
+          final scheduleData = await _scheduleService.getScheduleDataForWidget(
+            userId,
+            scheduleStart,
+            scheduleEnd,
+          );
+          
+          // Add schedule events and assignments
+          for (var item in scheduleData) {
+            final date = DateTime.parse(item['date'] as String);
+            scheduleItems.add({
+              'type': item['type'],
+              'id': item['id'],
+              'title': item['title'],
+              'description': item['description'] ?? '',
+              'date': item['date'],
+              'dateDisplay': TaskWidgetService.formatDateForDisplay(date),
+              'timeDisplay': item['isAllDay'] == true
+                  ? (item['type'] == 'assignment' ? 'Due' : 'All Day')
+                  : DateFormat('HH:mm').format(date),
+              'isAllDay': item['isAllDay'] ?? false,
+              'location': item['location'] ?? '',
+              'category_color': item['category_color'] ?? '#4285F4',
+              'priority': item['priority'] ?? '',
+              'eventType': item['eventType'] ?? '',
+            });
+          }
+          debugPrint('WidgetDataService: Added ${scheduleData.length} items from ROCIs-Schedule');
+        } catch (e) {
+          debugPrint('Error fetching ROCIs-Schedule data: $e');
+        }
+      }
+    } else if (userId == null) {
+      debugPrint('WidgetDataService: No userId provided, skipping ROCIs-Schedule data');
+    } else if (!_scheduleService.isReady) {
+      debugPrint('WidgetDataService: Schedule service not ready, skipping ROCIs-Schedule data');
+    }
+
     scheduleItems.sort(
       (a, b) => DateTime.parse(a['date']).compareTo(DateTime.parse(b['date'])),
     );
@@ -94,7 +157,10 @@ class WidgetDataService {
     );
   }
 
-  Future<void> updateCalendarListWidget(List<Task> allTasks) async {
+  Future<void> updateCalendarListWidget(
+    List<Task> allTasks, {
+    String? userId,
+  }) async {
     final listStart = DateTime.now();
     final listEnd = listStart.add(const Duration(days: 7));
     final calendarListEvents = <Map<String, dynamic>>[];
@@ -139,6 +205,34 @@ class WidgetDataService {
         });
       }
 
+      // Fetch ROCIs-Schedule data if user is logged in and authenticated
+      if (userId != null && _scheduleService.isReady && _scheduleService.isAuthenticated) {
+        try {
+          final scheduleData = await _scheduleService.getScheduleDataForWidget(
+            userId,
+            listStart,
+            listEnd,
+          );
+          
+          for (var item in scheduleData) {
+            final date = DateTime.parse(item['date'] as String);
+            calendarListEvents.add({
+              'type': item['type'],
+              'id': item['id'],
+              'title': item['title'],
+              'start': item['date'],
+              'startDisplay': item['isAllDay'] == true
+                  ? (item['type'] == 'assignment' ? 'Due' : 'All Day')
+                  : DateFormat('HH:mm').format(date),
+              'dateDisplay': TaskWidgetService.formatDateForDisplay(date),
+              'category_color': item['category_color'] ?? '#4285F4',
+            });
+          }
+        } catch (e) {
+          debugPrint('Error fetching ROCIs-Schedule data for calendar list: $e');
+        }
+      }
+
       calendarListEvents.sort(
         (a, b) =>
             DateTime.parse(a['start']).compareTo(DateTime.parse(b['start'])),
@@ -157,7 +251,10 @@ class WidgetDataService {
     }
   }
 
-  Future<void> updateMonthEventsMap(List<Task> allTasks) async {
+  Future<void> updateMonthEventsMap(
+    List<Task> allTasks, {
+    String? userId,
+  }) async {
     final now = DateTime.now();
     final start = DateTime(now.year, now.month - 1, 1);
     final end = DateTime(now.year, now.month + 2, 0);
@@ -185,6 +282,33 @@ class WidgetDataService {
       debugPrint('Error fetching calendar events for map: $e');
     }
 
+    // Add ROCIs-Schedule events to the month map
+    if (userId != null && _scheduleService.isReady && _scheduleService.isAuthenticated) {
+      try {
+        final scheduleEvents = await _scheduleService.getScheduleEvents(
+          userId,
+          start,
+          end,
+        );
+        for (var event in scheduleEvents) {
+          final dateKey = DateFormat('yyyy-MM-dd').format(event.startTime);
+          eventsByDay[dateKey] = true;
+        }
+
+        final assignments = await _scheduleService.getAssignments(
+          userId,
+          start,
+          end,
+        );
+        for (var assignment in assignments) {
+          final dateKey = DateFormat('yyyy-MM-dd').format(assignment.dueDate);
+          eventsByDay[dateKey] = true;
+        }
+      } catch (e) {
+        debugPrint('Error fetching ROCIs-Schedule data for month map: $e');
+      }
+    }
+
     try {
       await HomeWidget.saveWidgetData<String>(
         'month_events_map',
@@ -198,5 +322,10 @@ class WidgetDataService {
       name: 'CalendarWidgetProvider',
       iOSName: 'CalendarWidget',
     );
+  }
+
+  /// Clear the schedule service cache (call when user logs out)
+  void clearScheduleCache() {
+    _scheduleService.clearCache();
   }
 }

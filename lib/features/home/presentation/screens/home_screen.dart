@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:rocis_tasks/features/calendar/presentation/screens/calendar_screen.dart';
+import 'package:rocis_tasks/features/calendar/presentation/widgets/calendar_filter_sheet.dart';
+import 'package:rocis_tasks/features/calendar/presentation/widgets/calendar_coloring_sheet.dart';
 import 'package:rocis_tasks/features/categories/presentation/screens/categories_screen.dart';
 import 'package:rocis_tasks/features/tasks/presentation/screens/add_task_screen.dart';
 import 'package:rocis_tasks/features/tasks/presentation/screens/task_list_screen.dart';
@@ -27,6 +30,13 @@ class _HomeScreenState extends State<HomeScreen> {
   late final PageController _pageController;
   StreamSubscription? _notificationActionSubscription;
 
+  // Widget channel for receiving deep links from Android
+  static const _widgetChannel = MethodChannel('com.example.rocis_tasks/widget');
+
+  // Track last handled URI to prevent duplicate handling
+  String? _lastHandledUri;
+  DateTime? _lastHandledTime;
+
   final List<Widget> _screens = const [
     TaskListView(),
     CalendarScreen(),
@@ -38,9 +48,12 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _pageController = PageController(initialPage: _currentIndex);
 
-    // Handle Click Intents from Home Widgets
+    // Handle Click Intents from Home Widgets (HomeWidget plugin)
     hw.HomeWidget.initiallyLaunchedFromHomeWidget().then(_handleWidgetLaunch);
     hw.HomeWidget.widgetClicked.listen(_handleWidgetLaunch);
+
+    // Handle widget deep links via method channel (for fill-in intents)
+    _widgetChannel.setMethodCallHandler(_handleWidgetMethodCall);
 
     // Handle Notification Actions
     _notificationActionSubscription = NotificationService().onAction.listen((
@@ -50,6 +63,22 @@ class _HomeScreenState extends State<HomeScreen> {
         _navigateToAddTask();
       }
     });
+  }
+
+  Future<dynamic> _handleWidgetMethodCall(MethodCall call) async {
+    debugPrint(
+      'HomeScreen: Widget method call: ${call.method}, args: ${call.arguments}',
+    );
+    if (call.method == 'onWidgetClick') {
+      final uriString = call.arguments as String?;
+      if (uriString != null) {
+        final uri = Uri.tryParse(uriString);
+        if (uri != null) {
+          _handleWidgetLaunch(uri);
+        }
+      }
+    }
+    return null;
   }
 
   void _navigateToAddTask() {
@@ -65,11 +94,37 @@ class _HomeScreenState extends State<HomeScreen> {
   void _handleWidgetLaunch(Uri? uri) {
     if (uri == null) return;
 
+    // Prevent duplicate handling of the same URI within 1 second
+    final now = DateTime.now();
+    final uriString = uri.toString();
+    if (_lastHandledUri == uriString &&
+        _lastHandledTime != null &&
+        now.difference(_lastHandledTime!).inMilliseconds < 1000) {
+      debugPrint('HomeScreen: Ignoring duplicate widget launch: $uri');
+      return;
+    }
+    _lastHandledUri = uriString;
+    _lastHandledTime = now;
+
+    debugPrint('HomeScreen: Widget launch with uri: $uri');
+    debugPrint(
+      'HomeScreen: host=${uri.host}, path=${uri.path}, pathSegments=${uri.pathSegments}',
+    );
+
     if (uri.host == 'add_task') {
       _navigateToAddTask();
       return;
     }
 
+    // Handle calendar/day/$date path format from FullCalendarWidget
+    // Just navigate to calendar page without setting a specific date
+    if (uri.host == 'calendar') {
+      debugPrint('HomeScreen: Navigating to calendar page');
+      _onItemTapped(1);
+      return;
+    }
+
+    // Handle legacy selected_date query parameter format
     final dateStr = uri.queryParameters['selected_date'];
     if (dateStr != null) {
       try {
@@ -159,6 +214,32 @@ class _HomeScreenState extends State<HomeScreen> {
                   isScrollControlled: true,
                   backgroundColor: Colors.transparent,
                   builder: (context) => const TaskSortFilterSheet(),
+                );
+              },
+            ),
+          ],
+          if (_currentIndex == 1) ...[
+            IconButton(
+              icon: const Icon(Icons.palette_outlined),
+              tooltip: l10n.calendarColors,
+              onPressed: () {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (context) => const CalendarColoringSheet(),
+                );
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.filter_alt_outlined),
+              tooltip: l10n.calendarFiltersTitle,
+              onPressed: () {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (context) => const CalendarFilterSheet(),
                 );
               },
             ),

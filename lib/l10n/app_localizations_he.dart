@@ -207,4 +207,46 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get deleteTaskConfirmation => 'האם אתה בטוח שברצונך למחוק משימה זו?';
+
+  @override
+  String get calendarColors => 'צבעי לוח שנה';
+
+  @override
+  String get calendarFiltersTitle => 'מסנני לוח שנה';
+
+  @override
+  String get showCalendarTasks => 'הצג משימות';
+
+  @override
+  String get showGoogleCalendar => 'הצג יומן Google';
+
+  @override
+  String get showRocisSchedule => 'הצג מערכת שעות ROCIs';
+
+  @override
+  String get taskColor => 'צבע משימות';
+
+  @override
+  String get googleCalendarColor => 'צבע יומן Google';
+
+  @override
+  String get scheduleColor => 'צבע מערכת שעות ROCIs';
+
+  @override
+  String get assignmentColor => 'צבע מטלות';
+
+  @override
+  String get resetColors => 'אפס לברירת מחדל';
+
+  @override
+  String get selectColor => 'בחר צבע';
+
+  @override
+  String get selectGoogleCalendars => 'בחר יומני Google';
+
+  @override
+  String get selectAll => 'בחר הכל';
+
+  @override
+  String get deselectAll => 'בטל בחירת הכל';
 }

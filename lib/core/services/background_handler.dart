@@ -14,14 +14,23 @@ import 'package:rocis_tasks/features/home/services/full_calendar_widget_service.
 import 'package:rocis_tasks/features/tasks/data/datasources/local_task_source.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/features/tasks/services/task_widget_service.dart';
+import 'package:rocis_tasks/core/services/logger_service.dart';
 
+@pragma('vm:entry-point')
 class BackgroundHandler {
   @pragma('vm:entry-point')
   static Future<void> handleInteractivity(Uri? uri) async {
-    if (uri == null) return;
+    AppLogger.info(
+      'handleInteractivity called with uri: $uri',
+      tag: 'Background',
+    );
+    if (uri == null) {
+      return;
+    }
 
     final host = uri.host;
     final queryParams = uri.queryParameters;
+    AppLogger.info('host=$host, queryParams=$queryParams', tag: 'Background');
 
     if (host == 'complete') {
       final taskId = queryParams['id'];
@@ -31,7 +40,25 @@ class BackgroundHandler {
     } else if (host == 'prev_month' || host == 'next_month') {
       await _handleMonthNavigation(host == 'next_month');
     } else if (host == 'full_calendar_prev' || host == 'full_calendar_next') {
+      final timestamp = DateTime.now().toIso8601String();
+      AppLogger.info(
+        '[$timestamp] FULL_CALENDAR NAV CLICKED: $host',
+        tag: 'Background',
+      );
+      print('DEBUG: Full calendar navigation triggered: $host at $timestamp');
       await _handleFullCalendarNavigation(host == 'full_calendar_next');
+      AppLogger.info('[$timestamp] Navigation completed', tag: 'Background');
+    } else if (host == 'full_calendar_filter_tasks') {
+      AppLogger.info('Handling filter_tasks toggle', tag: 'Background');
+      await _handleFullCalendarFilterToggle('tasks');
+    } else if (host == 'full_calendar_filter_google') {
+      AppLogger.info('Handling filter_google toggle', tag: 'Background');
+      await _handleFullCalendarFilterToggle('google');
+    } else if (host == 'full_calendar_filter_rocis') {
+      AppLogger.info('Handling filter_rocis toggle', tag: 'Background');
+      await _handleFullCalendarFilterToggle('rocis');
+    } else {
+      AppLogger.warning('Unknown host: $host', tag: 'Background');
     }
   }
 
@@ -71,7 +98,69 @@ class BackgroundHandler {
       calendarService,
       taskSource,
     );
-    await fullCalendarService.updateFullCalendarWidget(monthOffset: offset);
+
+    // Initialize schedule service and set user email for ROCIs-Schedule integration
+    await fullCalendarService.initScheduleService();
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser != null) {
+      fullCalendarService.setUserEmail(currentUser.email);
+    }
+
+    await fullCalendarService.updateFullCalendarWidget(
+      monthOffset: offset,
+      userId: currentUser?.uid,
+    );
+  }
+
+  static Future<void> _handleFullCalendarFilterToggle(String filterName) async {
+    AppLogger.info(
+      '_handleFullCalendarFilterToggle started for $filterName',
+      tag: 'Background',
+    );
+    try {
+      await AppInitializer.initialize(isBackground: true);
+      AppLogger.info('AppInitializer completed', tag: 'Background');
+
+      final calendarService = CalendarService();
+      await calendarService.init();
+
+      final taskSource = LocalTaskSource();
+      await taskSource.init();
+
+      final fullCalendarService = FullCalendarWidgetService(
+        calendarService,
+        taskSource,
+      );
+
+      // Toggle the filter
+      AppLogger.info('Toggling filter $filterName', tag: 'Background');
+      await fullCalendarService.toggleFilter(filterName);
+
+      // Initialize schedule service and set user email for ROCIs-Schedule integration
+      await fullCalendarService.initScheduleService();
+      final currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser != null) {
+        fullCalendarService.setUserEmail(currentUser.email);
+      }
+
+      // Refresh the widget with current offset
+      final prefs = await SharedPreferences.getInstance();
+      final offset = prefs.getInt('full_calendar_offset') ?? 0;
+
+      AppLogger.info('Updating widget with offset $offset', tag: 'Background');
+      await fullCalendarService.updateFullCalendarWidget(
+        monthOffset: offset,
+        userId: currentUser?.uid,
+      );
+      AppLogger.info('Filter toggle completed successfully', tag: 'Background');
+    } catch (e, stackTrace) {
+      AppLogger.error(
+        'Error in filter toggle',
+        error: e,
+        stack: stackTrace,
+        tag: 'Background',
+      );
+    }
   }
 
   static Future<void> _completeTaskInBackground(String taskId) async {
@@ -155,7 +244,7 @@ class BackgroundHandler {
         isDarkText: isDarkText,
       );
     } catch (e) {
-      debugPrint('Background task error: $e');
+      AppLogger.error('Background task error', error: e, tag: 'Background');
     }
   }
 }

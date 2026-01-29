@@ -64,5 +64,19 @@
   "noTasksYet": "No tasks yet",
   "duePrefix": "Due: ",
   "deleteTaskTitle": "Delete Task",
-  "deleteTaskConfirmation": "Are you sure you want to delete this task?"
+  "deleteTaskConfirmation": "Are you sure you want to delete this task?",
+  "calendarColors": "Calendar Colors",
+  "calendarFiltersTitle": "Calendar Filters",
+  "showCalendarTasks": "Show Tasks",
+  "showGoogleCalendar": "Show Google Calendar",
+  "showRocisSchedule": "Show ROCIs Schedule",
+  "taskColor": "Task Color",
+  "googleCalendarColor": "Google Calendar Color",
+  "scheduleColor": "ROCIs Schedule Color",
+  "assignmentColor": "Assignment Color",
+  "resetColors": "Reset to Defaults",
+  "selectColor": "Select Color",
+  "selectGoogleCalendars": "Select Google Calendars",
+  "selectAll": "Select All",
+  "deselectAll": "Deselect All"
 }

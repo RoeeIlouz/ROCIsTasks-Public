@@ -32,7 +32,8 @@ migrate_working_dir/
 .pub/
 /build/
 /coverage/
-
+.agent/
+.kilocode/
 # Symbolication related
 app.*.symbols
 

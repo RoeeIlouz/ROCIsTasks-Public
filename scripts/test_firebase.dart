@@ -29,8 +29,7 @@ void main() async {
               );
           if (line.isNotEmpty) {
             final value = line.split('=')[1].trim();
-            if (value.isNotEmpty) {
-            } else {
+            if (value.isEmpty) {
               allPresent = false;
             }
           } else {
@@ -41,18 +40,18 @@ void main() async {
         }
       }
 
-      if (allPresent) {
-      } else {}
-    } catch (e) {}
-  } else {}
+      if (!allPresent) {
+        // Handle missing vars
+      }
+    } catch (e) {
+      // ignore: avoid_print
+      print('Error reading .env: $e');
+    }
+  }
 
   // Test 4: Check firebase_options.dart
   final firebaseOptionsFile = File('lib/firebase_options.dart');
-  if (await firebaseOptionsFile.exists()) {
-  } else {}
-}
-
-String _maskValue(String value) {
-  if (value.length <= 8) return '***';
-  return '${value.substring(0, 4)}***${value.substring(value.length - 4)}';
+  if (!await firebaseOptionsFile.exists()) {
+    // Handle missing firebase_options.dart
+  }
 }

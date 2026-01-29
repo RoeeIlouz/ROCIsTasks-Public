@@ -24,9 +24,25 @@ class CalendarService {
     }
   }
 
+  Future<List<Calendar>> getAvailableCalendars() async {
+    final hasPermission = await requestPermissions();
+    if (!hasPermission) return [];
+
+    try {
+      final calendarsResult = await _deviceCalendarPlugin.retrieveCalendars();
+      if (calendarsResult.isSuccess && calendarsResult.data != null) {
+        return calendarsResult.data!;
+      }
+    } catch (e) {
+      debugPrint('Error retrieving calendars: $e');
+    }
+    return [];
+  }
+
   Future<List<Event>> getEvents({
     DateTime? startDate,
     DateTime? endDate,
+    List<String>? calendarIds,
   }) async {
     final hasPermission = await requestPermissions();
     if (!hasPermission) {
@@ -40,20 +56,38 @@ class CalendarService {
     final allEvents = <Event>[];
 
     try {
-      final calendarsResult = await _deviceCalendarPlugin.retrieveCalendars();
-
-      if (calendarsResult.isSuccess && calendarsResult.data != null) {
-        for (var calendar in calendarsResult.data!) {
+      if (calendarIds != null && calendarIds.isNotEmpty) {
+        // Fetch only from specified calendars
+        for (var calendarId in calendarIds) {
           try {
             final eventsResult = await _deviceCalendarPlugin.retrieveEvents(
-              calendar.id,
+              calendarId,
               RetrieveEventsParams(startDate: start, endDate: end),
             );
             if (eventsResult.isSuccess && eventsResult.data != null) {
               allEvents.addAll(eventsResult.data!);
             }
           } catch (e) {
-            debugPrint('Error accessing calendar ${calendar.id}: $e');
+            debugPrint('Error accessing calendar $calendarId: $e');
+          }
+        }
+      } else {
+        // Fetch from all calendars
+        final calendarsResult = await _deviceCalendarPlugin.retrieveCalendars();
+
+        if (calendarsResult.isSuccess && calendarsResult.data != null) {
+          for (var calendar in calendarsResult.data!) {
+            try {
+              final eventsResult = await _deviceCalendarPlugin.retrieveEvents(
+                calendar.id,
+                RetrieveEventsParams(startDate: start, endDate: end),
+              );
+              if (eventsResult.isSuccess && eventsResult.data != null) {
+                allEvents.addAll(eventsResult.data!);
+              }
+            } catch (e) {
+              debugPrint('Error accessing calendar ${calendar.id}: $e');
+            }
           }
         }
       }

@@ -4,11 +4,13 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:rocis_tasks/firebase_options.dart' as default_options;
+import 'package:rocis_tasks/firebase_schedule_options.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/features/categories/domain/models/category.dart';
 import 'package:rocis_tasks/core/services/notification_service.dart';
 import 'package:rocis_tasks/core/services/error_service.dart';
 import 'package:rocis_tasks/core/config/app_config.dart';
+import 'package:rocis_tasks/core/services/logger_service.dart';
 
 import 'package:rocis_tasks/core/services/encryption_service.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
@@ -42,10 +44,8 @@ class AppInitializer {
       ]).timeout(
         Duration(seconds: AppConfig.syncTimeoutSeconds),
         onTimeout: () {
-          debugPrint(
-            'AppInitializer: Initialization timeout, continuing with partial setup',
-          );
-          return [];
+          AppLogger.critical('SECURITY ALERT: Initialization timeout. Potential compromised environment.');
+          throw Exception('Security initialization timeout');
         },
       );
 
@@ -56,28 +56,25 @@ class AppInitializer {
         await NotificationService().init();
       }
     } catch (e, stack) {
-      debugPrint('AppInitializer: Critical error during initialization: $e');
-      debugPrint('Stack: $stack');
+      AppLogger.critical('Critical error during initialization', error: e, stack: stack);
       // Don't rethrow - allow app to continue with degraded functionality
     }
 
     _isInitialized = true;
     if (AppConfig.enableDebugLogging) {
-      debugPrint(
-        'AppInitializer: Initialization took ${stopwatch.elapsedMilliseconds}ms (isBackground: $isBackground)',
-      );
+      AppLogger.info('Initialization took ${stopwatch.elapsedMilliseconds}ms (isBackground: $isBackground)');
     }
     stopwatch.stop();
   }
 
   static Future<void> _initEnvironment() async {
     try {
-      debugPrint('AppInitializer: Attempting to load environment variables...');
+      AppLogger.info('Attempting to load environment variables...');
       await dotenv.load(fileName: ".env");
-      debugPrint('AppInitializer: Environment variables loaded successfully');
+      AppLogger.info('Environment variables loaded successfully');
     } catch (e) {
-      debugPrint('AppInitializer: Could not load .env file (this is OK): $e');
-      debugPrint('AppInitializer: App will use default configuration');
+      AppLogger.warning('Could not load .env file (this is OK)', error: e);
+      AppLogger.info('App will use default configuration');
       // This is not critical - continue without .env file
     }
   }
@@ -99,49 +96,74 @@ class AppInitializer {
     try {
       // Check if already initialized (common in hot restart or mixed environments)
       if (Firebase.apps.isNotEmpty) {
-        debugPrint('AppInitializer: Firebase already initialized');
+        AppLogger.info('Firebase already initialized');
+        // Still try to initialize secondary app if not present
+        await _initSecondaryFirebase();
         return;
       }
 
-      debugPrint(
-        'AppInitializer: Initializing Firebase with default configuration...',
-      );
+      AppLogger.info('Initializing Firebase with default configuration...');
 
       // Use default Firebase configuration directly to avoid any environment variable issues
       await Firebase.initializeApp(
         options: default_options.DefaultFirebaseOptions.currentPlatform,
       );
 
-      debugPrint('AppInitializer: Firebase initialized successfully');
+      AppLogger.info('Firebase initialized successfully');
 
       // Enable Firestore offline persistence for offline support
       try {
         FirebaseFirestore.instance.settings = const Settings(
           persistenceEnabled: true,
         );
-        debugPrint('AppInitializer: Firestore offline persistence enabled');
+        AppLogger.info('Firestore offline persistence enabled');
       } catch (e) {
-        debugPrint(
-          'AppInitializer: Firestore persistence setup failed (non-critical): $e',
-        );
+        AppLogger.warning('Firestore persistence setup failed (non-critical)', error: e);
       }
+
+      // Initialize secondary Firebase app for ROCIs-Schedule data
+      await _initSecondaryFirebase();
     } catch (e, stack) {
-      debugPrint(
-        'AppInitializer: CRITICAL - Firebase initialization failed: $e',
-      );
-      debugPrint('AppInitializer: Stack trace: $stack');
+      AppLogger.critical('CRITICAL - Firebase initialization failed', error: e, stack: stack);
 
       // This is a critical error - rethrow to show error screen
       throw Exception('Firebase initialization failed: $e');
     }
   }
 
+  /// Initialize secondary Firebase app for accessing ROCIs-Schedule Firestore
+  static Future<void> _initSecondaryFirebase() async {
+    try {
+      // Check if secondary app already exists
+      try {
+        Firebase.app('rocis-schedule');
+        AppLogger.info('Secondary Firebase app already initialized');
+        return;
+      } catch (_) {
+        // App doesn't exist, continue to initialize
+      }
+
+      AppLogger.info('Initializing secondary Firebase app (rocis-schedule)...');
+
+      await Firebase.initializeApp(
+        name: 'rocis-schedule',
+        options: ScheduleFirebaseOptions.currentPlatform,
+      );
+
+      AppLogger.info('Secondary Firebase app initialized successfully');
+    } catch (e) {
+      AppLogger.warning('Secondary Firebase initialization failed (non-critical)', error: e);
+      AppLogger.info('ROCIs-Schedule integration will be unavailable');
+    }
+  }
+
   static Future<void> _initEncryption() async {
     try {
-      await EncryptionService.getOrGenerateKey();
-      debugPrint('AppInitializer: Encryption initialized successfully');
+      await EncryptionService.init();
+      AppLogger.info('Encryption initialized successfully');
     } catch (e) {
-      debugPrint('AppInitializer: Encryption initialization failed: $e');
+      AppLogger.critical('CRITICAL SECURITY FAILURE: Encryption initialization failed', error: e);
+      throw Exception('Critical security initialization failed. Please restart the app.');
     }
   }
 
@@ -150,12 +172,9 @@ class AppInitializer {
       tz.initializeTimeZones();
       final String timeZoneName = await FlutterTimezone.getLocalTimezone();
       t.setLocalLocation(t.getLocation(timeZoneName));
-      debugPrint(
-        'AppInitializer: Timezone initialized successfully ($timeZoneName)',
-      );
+      AppLogger.info('Timezone initialized: $timeZoneName');
     } catch (e) {
-      debugPrint('AppInitializer: Timezone initialization failed: $e');
-      // Fallback to UTC or don't set local location if failing
+      AppLogger.error('Timezone initialization failed', error: e);
     }
   }
 }

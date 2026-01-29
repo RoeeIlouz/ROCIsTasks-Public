@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
+import 'package:rocis_tasks/core/services/logger_service.dart';
 
 /// Service to monitor network connectivity status
 class ConnectivityService extends ChangeNotifier {
@@ -34,7 +35,7 @@ class ConnectivityService extends ChangeNotifier {
       _updateConnectivity(results);
       _hasCheckedInitial = true;
     } catch (e) {
-      debugPrint('Error checking connectivity: $e');
+      AppLogger.error('Error checking connectivity', error: e, tag: 'Connectivity');
       _isOnline = false;
       _hasCheckedInitial = true;
       notifyListeners();
@@ -50,7 +51,7 @@ class ConnectivityService extends ChangeNotifier {
         !results.every((result) => result == ConnectivityResult.none);
 
     if (wasOnline != _isOnline && _hasCheckedInitial) {
-      debugPrint('Connectivity changed: ${_isOnline ? "ONLINE" : "OFFLINE"}');
+      AppLogger.info('Connectivity changed: ${_isOnline ? "ONLINE" : "OFFLINE"}', tag: 'Connectivity');
       notifyListeners();
     }
   }

@@ -4,6 +4,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:flutter_timezone/flutter_timezone.dart';
+import 'package:rocis_tasks/core/services/logger_service.dart';
 export 'package:flutter_local_notifications/flutter_local_notifications.dart'
     show NotificationResponse;
 
@@ -57,14 +58,11 @@ class NotificationService {
     tz.initializeTimeZones();
     final String timeZoneName = await FlutterTimezone.getLocalTimezone();
     tz.setLocalLocation(tz.getLocation(timeZoneName));
-    debugPrint(
-      '[NotificationService] Initialized with timezone: $timeZoneName',
-    );
+    AppLogger.info('NotificationService initialized with timezone: $timeZoneName', tag: 'Notifications');
+    
     final now = DateTime.now();
     final tzNow = tz.TZDateTime.now(tz.local);
-    debugPrint('  - Current DateTime.now(): $now');
-    debugPrint('  - Current TZDateTime.now(tz.local): $tzNow');
-    debugPrint('  - Timezone Offset: ${tzNow.timeZoneOffset}');
+    AppLogger.info('Timing info - Now: $now, TZNow: $tzNow, Offset: ${tzNow.timeZoneOffset}', tag: 'Notifications');
 
     final androidPlugin = flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<
@@ -73,7 +71,7 @@ class NotificationService {
     if (androidPlugin != null) {
       final canScheduleExact = await androidPlugin
           .canScheduleExactNotifications();
-      debugPrint('  - Can schedule exact notifications: $canScheduleExact');
+      AppLogger.info('Can schedule exact notifications: $canScheduleExact', tag: 'Notifications');
     }
 
     const AndroidInitializationSettings initializationSettingsAndroid =
@@ -107,11 +105,7 @@ class NotificationService {
   }) async {
     if (scheduledDate.isBefore(DateTime.now())) return;
 
-    debugPrint('[NotificationService] Requesting to schedule notification:');
-    debugPrint('  - ID: $id');
-    debugPrint('  - Title: $title');
-    debugPrint('  - Scheduled Date: $scheduledDate (Local)');
-    debugPrint('  - TZ Local: ${tz.local.name}');
+    AppLogger.info('Scheduling notification - ID: $id, Title: $title, Date: $scheduledDate', tag: 'Notifications');
 
     await flutterLocalNotificationsPlugin
         .zonedSchedule(
@@ -151,14 +145,10 @@ class NotificationService {
           payload: taskId,
         )
         .then((_) {
-          debugPrint(
-            '[NotificationService] Successfully scheduled notification $id',
-          );
+          AppLogger.info('Successfully scheduled notification $id', tag: 'Notifications');
         })
         .catchError((e) {
-          debugPrint(
-            '[NotificationService] Error scheduling notification $id: $e',
-          );
+          AppLogger.error('Error scheduling notification $id', error: e, tag: 'Notifications');
         });
   }
 

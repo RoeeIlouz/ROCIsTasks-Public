@@ -16,6 +16,10 @@ import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rocis_tasks/core/config/router.dart';
 import 'package:rocis_tasks/core/services/error_handling_service.dart';
+import 'package:rocis_tasks/core/services/schedule_firestore_service.dart';
+import 'package:rocis_tasks/features/home/services/full_calendar_widget_service.dart';
+import 'package:rocis_tasks/features/tasks/data/datasources/local_task_source.dart';
+import 'package:rocis_tasks/core/services/calendar_color_service.dart';
 
 Future<void> main() async {
   // Initialize App (Core, Firebase, Hive)
@@ -41,6 +45,13 @@ class _AppRootState extends State<AppRoot> {
   late final _authService = AuthService(_errorHandlingService);
   final _calendarService = CalendarService();
   final _themeService = ThemeService();
+  final _calendarColorService = CalendarColorService();
+  final _scheduleService = ScheduleFirestoreService();
+  late final _taskSource = LocalTaskSource();
+  late final _fullCalendarWidgetService = FullCalendarWidgetService(
+    _calendarService,
+    _taskSource,
+  );
   late final _taskProvider = TaskProvider(
     _authService,
     _calendarService,
@@ -62,6 +73,9 @@ class _AppRootState extends State<AppRoot> {
     _appRouter = AppRouter(_authService, _onboardingService);
 
     await Future.wait([
+      _taskSource.init().catchError((e) {
+        debugPrint('LocalTaskSource init failed: $e');
+      }),
       _taskProvider.init().catchError((e) {
         debugPrint('TaskProvider init failed: $e');
       }),
@@ -70,6 +84,12 @@ class _AppRootState extends State<AppRoot> {
       }),
       _themeService.init().catchError((e) {
         debugPrint('ThemeService init failed: $e');
+      }),
+      _calendarColorService.init().catchError((e) {
+        debugPrint('CalendarColorService init failed: $e');
+      }),
+      _scheduleService.initialize().catchError((e) {
+        debugPrint('ScheduleFirestoreService init failed: $e');
       }),
     ]);
   }
@@ -159,11 +179,18 @@ class _AppRootState extends State<AppRoot> {
         return MultiProvider(
           providers: [
             ChangeNotifierProvider.value(value: _themeService),
+            ChangeNotifierProvider.value(value: _calendarColorService),
             ChangeNotifierProvider.value(value: _authService),
             ChangeNotifierProvider.value(value: _taskProvider),
             Provider.value(value: _calendarService),
+            Provider.value(value: _scheduleService),
+            Provider.value(value: _fullCalendarWidgetService),
             ChangeNotifierProvider(
-              create: (_) => CalendarProvider(_calendarService)..loadEvents(),
+              create: (_) => CalendarProvider(
+                _calendarService,
+                _scheduleService,
+                _fullCalendarWidgetService,
+              )..loadEvents(),
             ),
             ChangeNotifierProvider.value(value: _onboardingService),
             Provider.value(value: _appRouter!),

@@ -254,23 +254,26 @@ class TaskTile extends StatelessWidget {
                             )
                           else
                             const SizedBox(height: 40),
-                          Container(
-                            width: 10,
-                            height: 10,
-                            margin: const EdgeInsets.only(bottom: 4),
-                            decoration: BoxDecoration(
-                              color: _getPriorityColor(context, task.priority),
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: _getPriorityColor(
-                                    context,
-                                    task.priority,
-                                  ).withValues(alpha: 0.4),
-                                  blurRadius: 6,
-                                  spreadRadius: 1,
-                                ),
-                              ],
+                          Semantics(
+                            label: 'Priority: ${task.priority.name}',
+                            child: Container(
+                              width: 10,
+                              height: 10,
+                              margin: const EdgeInsets.only(bottom: 4),
+                              decoration: BoxDecoration(
+                                color: _getPriorityColor(context, task.priority),
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: _getPriorityColor(
+                                      context,
+                                      task.priority,
+                                    ).withValues(alpha: 0.4),
+                                    blurRadius: 6,
+                                    spreadRadius: 1,
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ],

@@ -115,21 +115,11 @@ class ScheduleWidgetFactory(private val context: Context) : RemoteViewsService.R
                 } catch (e: Exception) {
                     android.util.Log.w("ScheduleWidget", "Failed to parse color: $colorHex", e)
                     // Use default color based on type
-                    if (type == "event") {
-                        views.setInt(R.id.widget_schedule_category_color, "setBackgroundColor", android.graphics.Color.parseColor("#4285F4"))
-                        views.setViewVisibility(R.id.widget_schedule_category_color, android.view.View.VISIBLE)
-                    } else {
-                        views.setViewVisibility(R.id.widget_schedule_category_color, android.view.View.INVISIBLE)
-                    }
+                    setDefaultColorForType(views, type)
                 }
             } else {
                 // No color provided, use default based on type
-                if (type == "event") {
-                    views.setInt(R.id.widget_schedule_category_color, "setBackgroundColor", android.graphics.Color.parseColor("#4285F4"))
-                    views.setViewVisibility(R.id.widget_schedule_category_color, android.view.View.VISIBLE)
-                } else {
-                    views.setViewVisibility(R.id.widget_schedule_category_color, android.view.View.INVISIBLE)
-                }
+                setDefaultColorForType(views, type)
             }
 
             // Set up click intent with proper type identification
@@ -145,6 +135,37 @@ class ScheduleWidgetFactory(private val context: Context) : RemoteViewsService.R
             views.setTextViewText(R.id.widget_schedule_title, "Error loading item")
         }
         return views
+    }
+
+    /**
+     * Set default color based on item type
+     * - task: no color indicator (invisible)
+     * - event: blue (device calendar events)
+     * - schedule_event: purple (ROCIs-Schedule classes/exams)
+     * - assignment: orange (ROCIs-Schedule assignments)
+     */
+    private fun setDefaultColorForType(views: RemoteViews, type: String) {
+        when (type) {
+            "event" -> {
+                // Device calendar events - blue
+                views.setInt(R.id.widget_schedule_category_color, "setBackgroundColor", android.graphics.Color.parseColor("#4285F4"))
+                views.setViewVisibility(R.id.widget_schedule_category_color, android.view.View.VISIBLE)
+            }
+            "schedule_event" -> {
+                // ROCIs-Schedule events (classes, exams, labs) - purple
+                views.setInt(R.id.widget_schedule_category_color, "setBackgroundColor", android.graphics.Color.parseColor("#9C27B0"))
+                views.setViewVisibility(R.id.widget_schedule_category_color, android.view.View.VISIBLE)
+            }
+            "assignment" -> {
+                // ROCIs-Schedule assignments - orange
+                views.setInt(R.id.widget_schedule_category_color, "setBackgroundColor", android.graphics.Color.parseColor("#FF9800"))
+                views.setViewVisibility(R.id.widget_schedule_category_color, android.view.View.VISIBLE)
+            }
+            else -> {
+                // Tasks - no color indicator
+                views.setViewVisibility(R.id.widget_schedule_category_color, android.view.View.INVISIBLE)
+            }
+        }
     }
 
     /**

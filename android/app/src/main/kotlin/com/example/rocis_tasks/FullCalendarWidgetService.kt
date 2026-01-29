@@ -17,6 +17,9 @@ class FullCalendarWidgetService : RemoteViewsService() {
 
 class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsService.RemoteViewsFactory {
     private var days = ArrayList<JSONObject>()
+    private var showTasks = true
+    private var showGoogle = true
+    private var showRocis = true
 
     override fun onCreate() {
         onDataSetChanged()
@@ -27,12 +30,46 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
         days.clear()
         try {
             val widgetData = HomeWidgetPlugin.getData(context)
+            
+            // Read filter settings
+            showTasks = widgetData.getBoolean(FullCalendarWidgetProvider.PREF_SHOW_TASKS, true)
+            showGoogle = widgetData.getBoolean(FullCalendarWidgetProvider.PREF_SHOW_GOOGLE, true)
+            showRocis = widgetData.getBoolean(FullCalendarWidgetProvider.PREF_SHOW_ROCIS, true)
+            android.util.Log.d("FullCalendarWidget", "Filter settings - Tasks: $showTasks, Google: $showGoogle, ROCIs: $showRocis")
+            
             val gridDataJson = widgetData.getString("full_calendar_grid_data", "[]")
             val gridData = JSONArray(gridDataJson)
             for (i in 0 until gridData.length()) {
-                days.add(gridData.getJSONObject(i))
+                val day = gridData.getJSONObject(i)
+                
+                // Filter summaries based on filter settings
+                if (!day.optBoolean("isWeekNumber", false)) {
+                    val summaries = day.optJSONArray("summaries")
+                    if (summaries != null) {
+                        val filteredSummaries = JSONArray()
+                        for (j in 0 until summaries.length()) {
+                            val summary = summaries.getJSONObject(j)
+                            val type = summary.optString("type", "")
+                            
+                            val shouldInclude = when (type) {
+                                "task" -> showTasks
+                                "google" -> showGoogle
+                                "schedule", "schedule_event", "assignment" -> showRocis
+                                else -> true // Include unknown types
+                            }
+                            
+                            if (shouldInclude) {
+                                filteredSummaries.put(summary)
+                            }
+                        }
+                        // Replace summaries with filtered version
+                        day.put("summaries", filteredSummaries)
+                    }
+                }
+                
+                days.add(day)
             }
-            android.util.Log.d("FullCalendarWidget", "Parsed ${days.size} grid days")
+            android.util.Log.d("FullCalendarWidget", "Parsed ${days.size} grid days with filtering applied")
         } catch (e: Exception) {
             android.util.Log.e("FullCalendarWidget", "Error loading grid data", e)
         }
@@ -97,8 +134,24 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
                     // Populate up to 3 summaries
                     for (j in 0 until minOf(3, summaries.length())) {
                         val summary = summaries.getJSONObject(j)
-                        val title = summary.optString("text", "")
+                        var title = summary.optString("text", "")
+                        val time = summary.optString("time", "")
+                        val subtitle = summary.optString("subtitle", "")
+                        val priority = summary.optString("priority", "")
                         val colorHex = summary.optString("color", "")
+                        val type = summary.optString("type", "")
+
+                        // Enhance title with details (Priority only, no time)
+                        var displayTitle = title
+                        if (priority.isNotEmpty()) {
+                            val prioritySymbol = when (priority.lowercase()) {
+                                "high" -> "!!!"
+                                "medium" -> "!!"
+                                "low" -> "!"
+                                else -> ""
+                            }
+                            displayTitle = "$prioritySymbol $displayTitle"
+                        }
                         
                         val viewId = when(j) {
                             0 -> R.id.widget_full_calendar_summary_1
@@ -107,14 +160,16 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
                         }
                         
                         cellViews.setViewVisibility(viewId, android.view.View.VISIBLE)
-                        cellViews.setTextViewText(viewId, title)
-                        cellViews.setTextColor(viewId, android.graphics.Color.WHITE)
-                        cellViews.setTextViewTextSize(viewId, android.util.TypedValue.COMPLEX_UNIT_SP, 10f)
+                        cellViews.setTextViewText(viewId, displayTitle)
+                        cellViews.setTextColor(viewId, android.graphics.Color.parseColor("#CCFFFFFF"))
+                        cellViews.setTextViewTextSize(viewId, android.util.TypedValue.COMPLEX_UNIT_SP, 9f)
                         
                         if (colorHex.isNotEmpty()) {
                             try {
                                 val color = android.graphics.Color.parseColor(colorHex)
-                                cellViews.setInt(viewId, "setBackgroundColor", color)
+                                // Apply some alpha to the background color (60% = 0x99)
+                                val alphaColor = (color and 0x00FFFFFF) or (0x99 shl 24)
+                                cellViews.setInt(viewId, "setBackgroundColor", alphaColor)
                             } catch (e: Exception) {}
                         }
                     }
@@ -122,9 +177,13 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
                     // Click Intent to open app to specific date
                     if (date.isNotEmpty()) {
                         val fillInIntent = Intent().apply {
-                            data = Uri.parse("rocistasks://calendar/day/$date")
+                            action = Intent.ACTION_VIEW
+                            // Use host-only deep link to avoid GoRouter "route not found" errors.
+                            // The app handles host-based widget links and navigates to the calendar tab.
+                            data = Uri.parse("rocistasks://calendar")
                         }
                         cellViews.setOnClickFillInIntent(R.id.widget_full_calendar_day_container, fillInIntent)
+                        android.util.Log.d("FullCalendarWidget", "Set fill-in intent for date: $date with URI: rocistasks://calendar")
                     }
                 }
                 rowViews.addView(R.id.widget_full_calendar_row_container, cellViews)

@@ -776,4 +776,27 @@ When adapting this theme, the easiest customization points are:
 
 ---
 
+## Pages Layout & Settings
+
+### Home Page
+
+- **App Bar**: Displays the app title with centered alignment, uses the primary color for background.
+- **Task List**: Scrollable list of task cards, respects the spacing and layout guidelines defined earlier.
+- **Floating Action Button**: Positioned at bottom‑right, uses the primary color and opens the task creation dialog.
+
+### Settings Page
+
+- **Theme Switch**: Toggle between System, Light, and Dark modes. Persists selection via `SharedPreferences` (`theme_mode` key).
+- **Dynamic Color Toggle**: Enables/disables Material You dynamic colors (`use_material_theme` key).
+- **AMOLED Mode Toggle**: Enables pure black background for dark mode (`use_amoled_theme` key).
+- **24‑Hour Clock Toggle**: Switches time format (`use_24h_format` key).
+- **Language Selector**: Chooses between English and Hebrew, updates `locale` and triggers RTL layout when Hebrew is selected.
+
+### About Page
+
+- Displays app version, author information, and a link to the repository.
+- Uses the same card styling and typography as other pages.
+
+All pages respect the global **spacing scale**, **border radius**, and **animation guidelines** defined in the Layout & Spacing and Animations sections.
+
 _This theme documentation was created for the ROCIs Tasks application. Last updated: January 2026_

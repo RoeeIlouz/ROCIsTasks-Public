@@ -1,6 +1,6 @@
-# Roci's Tasks
+# ROCIs Tasks
 
-**Roci's Tasks** is a modern, feature-rich task management application built with Flutter. It combines robust task tracking with seamless calendar integration, real-time synchronization, and native Android home screen widgets to help you stay organized.
+**ROCIs Tasks** is a modern, feature-rich task management application built with Flutter. It combines robust task tracking with seamless calendar integration, real-time synchronization, and native Android home screen widgets to help you stay organized.
 
 ## ✨ Key Features
 
@@ -28,7 +28,7 @@
 
 ## 🏗️ Architecture
 
-Roci's Tasks follows a **Feature-First Clean Architecture** to ensure scalability and maintainability.
+ROCIs Tasks follows a **Feature-First Clean Architecture** to ensure scalability and maintainability.
 
 - **State Management**: Uses `Provider` for dependency injection and state management.
 - **Data Layer**: A hybrid approach using **Hive** for local persistence/caching and **Firebase Firestore** as the remote source of truth.
@@ -46,12 +46,14 @@ For a deep dive into the system design, check out [ARCHITECTURE.md](docs/ARCHITE
 ### Installation
 
 1.  **Clone the repository**:
+
     ```bash
     git clone https://github.com/yourusername/rocis-tasks.git
     cd rocis_tasks
     ```
 
 2.  **Install dependencies**:
+
     ```bash
     flutter pub get
     ```
@@ -65,6 +67,7 @@ For a deep dive into the system design, check out [ARCHITECTURE.md](docs/ARCHITE
 
 1.  **Environment Setup**:
     Copy the example environment file and fill in your details:
+
     ```bash
     cp .env.example .env
     ```
@@ -105,6 +108,8 @@ lib/
 └── main.dart               # App entry point
 ```
 
-## 📄 License
+## 📄 License & Versioning
 
-This project is intended for private use.
+- **License**: This project is licensed under the [MIT License](LICENSE).
+- **History**: See [CHANGELOG.md](CHANGELOG.md) for version history and updates.
+- **Privacy**: See [PRIVACY_POLICY.md](PRIVACY_POLICY.md) for our data handling practices.
