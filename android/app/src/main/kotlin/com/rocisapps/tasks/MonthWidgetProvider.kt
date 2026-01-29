@@ -1,4 +1,4 @@
-package com.example.rocis_tasks
+package com.rocisapps.tasks
 
 import android.appwidget.AppWidgetManager
 import android.content.Context
@@ -15,7 +15,6 @@ class MonthWidgetProvider : HomeWidgetProvider() {
         appWidgetIds: IntArray,
         widgetData: SharedPreferences
     ) {
-        android.util.Log.d("MonthWidget", "onUpdate started for ${appWidgetIds.size} widgets")
         appWidgetIds.forEach { appWidgetId ->
             try {
                 val views = RemoteViews(context.packageName, R.layout.widget_month_layout)
@@ -54,9 +53,7 @@ class MonthWidgetProvider : HomeWidgetProvider() {
 
                 appWidgetManager.updateAppWidget(appWidgetId, views)
                 appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_month_grid)
-                android.util.Log.d("MonthWidget", "Widget $appWidgetId updated with month $monthName")
             } catch (e: Exception) {
-                android.util.Log.e("MonthWidget", "Error updating widget $appWidgetId", e)
             }
         }
     }

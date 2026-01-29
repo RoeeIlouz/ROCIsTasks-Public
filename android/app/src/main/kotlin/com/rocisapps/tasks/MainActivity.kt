@@ -1,18 +1,16 @@
-package com.example.rocis_tasks
+package com.rocisapps.tasks
 
-import android.util.Log
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
 class MainActivity : FlutterActivity() {
-    private val CHANNEL = "com.example.rocis_tasks/notifications"
-    private val WIDGET_CHANNEL = "com.example.rocis_tasks/widget"
+    private val CHANNEL = "com.rocisapps.tasks/notifications"
+    private val WIDGET_CHANNEL = "com.rocisapps.tasks/widget"
     private lateinit var notificationHelper: NotificationHelper
     private var widgetChannel: MethodChannel? = null
 
     companion object {
-        private const val TAG = "MainActivity"
     }
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
@@ -35,7 +33,6 @@ class MainActivity : FlutterActivity() {
 
         // Set up widget channel for deep link communication BEFORE handling intent
         widgetChannel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, WIDGET_CHANNEL)
-        Log.d(TAG, "Widget channel initialized")
 
         // Handle initial intent after channels are set up
         handleIntent(intent, channel)
@@ -49,14 +46,8 @@ class MainActivity : FlutterActivity() {
     }
 
     private fun handleIntent(intent: android.content.Intent?, channel: MethodChannel) {
-        Log.d(TAG, "handleIntent called")
-        Log.d(TAG, "  action: ${intent?.action}")
-        Log.d(TAG, "  data: ${intent?.data}")
-        Log.d(TAG, "  flags: ${intent?.flags}")
-        Log.d(TAG, "  widgetChannel is null: ${widgetChannel == null}")
         
         if (intent?.action == NotificationHelper.ACTION_ADD_TASK) {
-            Log.d(TAG, "Handling notification add_task action")
             channel.invokeMethod("onNotificationAction", "add_task")
             return
         }
@@ -64,18 +55,12 @@ class MainActivity : FlutterActivity() {
         // Handle widget deep links
         val data = intent?.data
         if (data != null && data.scheme == "rocistasks") {
-            Log.d(TAG, "Widget deep link detected: $data")
-            Log.d(TAG, "  host: ${data.host}")
-            Log.d(TAG, "  path: ${data.path}")
             // Send the URI to Flutter via the widget channel
             if (widgetChannel != null) {
-                Log.d(TAG, "Invoking onWidgetClick with: ${data.toString()}")
                 widgetChannel?.invokeMethod("onWidgetClick", data.toString())
             } else {
-                Log.e(TAG, "widgetChannel is null, cannot send deep link to Flutter")
             }
         } else {
-            Log.d(TAG, "No rocistasks deep link in intent")
         }
     }
 }

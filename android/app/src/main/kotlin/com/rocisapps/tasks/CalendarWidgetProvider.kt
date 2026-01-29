@@ -1,4 +1,4 @@
-package com.example.rocis_tasks
+package com.rocisapps.tasks
 
 import android.appwidget.AppWidgetManager
 import android.content.Context
@@ -13,10 +13,8 @@ class CalendarWidgetProvider : HomeWidgetProvider() {
         appWidgetIds: IntArray,
         widgetData: SharedPreferences
     ) {
-        android.util.Log.d("CalendarWidget", "onUpdate started for ${appWidgetIds.size} widgets")
         appWidgetIds.forEach { appWidgetId ->
             try {
-                android.util.Log.d("CalendarWidget", "Updating widget ID: $appWidgetId")
                 val views = RemoteViews(context.packageName, R.layout.widget_calendar_layout)
 
                 // Set up the intent that starts the CalendarWidgetService
@@ -38,7 +36,6 @@ class CalendarWidgetProvider : HomeWidgetProvider() {
                     val weekLabel = if (context.resources.configuration.locales[0].language == "he") "שבוע" else "Week"
                     views.setTextViewText(R.id.widget_calendar_title, "$weekLabel $weekNumber • $dateText")
                 } catch (e: Exception) {
-                    android.util.Log.e("CalendarWidget", "Error updating header", e)
                 }
 
                 // Bind the remote adapter
@@ -57,9 +54,7 @@ class CalendarWidgetProvider : HomeWidgetProvider() {
 
                 appWidgetManager.updateAppWidget(appWidgetId, views)
                 appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_calendar_list_view)
-                android.util.Log.d("CalendarWidget", "Widget ID $appWidgetId update finished")
             } catch (e: Exception) {
-                android.util.Log.e("CalendarWidget", "Error in onUpdate for ID $appWidgetId", e)
             }
         }
     }

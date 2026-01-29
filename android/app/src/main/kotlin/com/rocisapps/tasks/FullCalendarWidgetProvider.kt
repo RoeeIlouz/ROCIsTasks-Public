@@ -1,4 +1,4 @@
-package com.example.rocis_tasks
+package com.rocisapps.tasks
 
 import android.appwidget.AppWidgetManager
 import android.content.Context
@@ -13,9 +13,9 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
 
     companion object {
         // Filter toggle actions
-        const val ACTION_FILTER_TASKS = "com.example.rocis_tasks.ACTION_FILTER_TASKS"
-        const val ACTION_FILTER_GOOGLE = "com.example.rocis_tasks.ACTION_FILTER_GOOGLE"
-        const val ACTION_FILTER_ROCIS = "com.example.rocis_tasks.ACTION_FILTER_ROCIS"
+        const val ACTION_FILTER_TASKS = "com.rocisapps.tasks.ACTION_FILTER_TASKS"
+        const val ACTION_FILTER_GOOGLE = "com.rocisapps.tasks.ACTION_FILTER_GOOGLE"
+        const val ACTION_FILTER_ROCIS = "com.rocisapps.tasks.ACTION_FILTER_ROCIS"
         
         // Preference keys
         const val PREF_SHOW_TASKS = "full_calendar_show_tasks"
@@ -35,7 +35,6 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
         appWidgetIds: IntArray,
         widgetData: SharedPreferences
     ) {
-        android.util.Log.d("FullCalendarWidget", "onUpdate started for ${appWidgetIds.size} widgets")
         
         appWidgetIds.forEach { appWidgetId ->
             try {
@@ -46,18 +45,15 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
                 views.setTextViewText(R.id.widget_full_calendar_title, monthName)
 
                 // 2. Navigation Buttons - use direct background intent
-                android.util.Log.d("FullCalendarWidget", "Setting up navigation buttons for widget $appWidgetId")
                 val prevIntent = es.antonborri.home_widget.HomeWidgetBackgroundIntent.getBroadcast(
                     context, Uri.parse("rocistasks://full_calendar_prev")
                 )
                 views.setOnClickPendingIntent(R.id.widget_full_calendar_prev, prevIntent)
-                android.util.Log.d("FullCalendarWidget", "Prev button intent set: ${prevIntent != null}")
 
                 val nextIntent = es.antonborri.home_widget.HomeWidgetBackgroundIntent.getBroadcast(
                     context, Uri.parse("rocistasks://full_calendar_next")
                 )
                 views.setOnClickPendingIntent(R.id.widget_full_calendar_next, nextIntent)
-                android.util.Log.d("FullCalendarWidget", "Next button intent set: ${nextIntent != null}")
 
                 // 3. Add Task Button - Use HomeWidgetLaunchIntent for proper Flutter handling
                 val addTaskPendingIntent = HomeWidgetLaunchIntent.getActivity(
@@ -66,14 +62,11 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
                     Uri.parse("rocistasks://add_task")
                 )
                 views.setOnClickPendingIntent(R.id.widget_add_task_btn, addTaskPendingIntent)
-                android.util.Log.d("FullCalendarWidget", "Add task button configured with HomeWidgetLaunchIntent")
 
                 // 4. Filter Buttons - read state and setup click handlers
                 val showTasks = widgetData.getBoolean(PREF_SHOW_TASKS, true)
                 val showGoogle = widgetData.getBoolean(PREF_SHOW_GOOGLE, true)
                 val showRocis = widgetData.getBoolean(PREF_SHOW_ROCIS, true)
-                
-                android.util.Log.d("FullCalendarWidget", "Filter states - Tasks: $showTasks, Google: $showGoogle, ROCIs: $showRocis")
 
                 // Update filter button appearance based on state (alpha for enabled/disabled)
                 // Tasks filter
@@ -87,8 +80,6 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
 
                 // Filter button click handlers - broadcast to this widget provider
                 setupFilterButtonIntents(context, views, appWidgetId)
-                
-                android.util.Log.d("FullCalendarWidget", "Filter click handlers set up")
 
                 // 5. List Adapter
                 val serviceIntent = Intent(context, FullCalendarWidgetService::class.java).apply {
@@ -111,14 +102,11 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
                     android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_MUTABLE
                 )
                 views.setPendingIntentTemplate(R.id.widget_full_calendar_list, appPendingIntent)
-                android.util.Log.d("FullCalendarWidget", "List pending intent template configured")
 
                 // 6. Finalize Update
                 appWidgetManager.updateAppWidget(appWidgetId, views)
                 appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_full_calendar_list)
-                android.util.Log.d("FullCalendarWidget", "Widget $appWidgetId updated successfully")
             } catch (e: Exception) {
-                android.util.Log.e("FullCalendarWidget", "Error updating widget $appWidgetId", e)
             }
         }
     }
@@ -163,7 +151,6 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
         val action = intent.action
         
         if (action == ACTION_FILTER_TASKS || action == ACTION_FILTER_GOOGLE || action == ACTION_FILTER_ROCIS) {
-            android.util.Log.d("FullCalendarWidget", "Received filter action: $action")
             
             val widgetData = es.antonborri.home_widget.HomeWidgetPlugin.getData(context)
             val editor = widgetData.edit()
@@ -172,29 +159,22 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
                 ACTION_FILTER_TASKS -> {
                     val current = widgetData.getBoolean(PREF_SHOW_TASKS, true)
                     editor.putBoolean(PREF_SHOW_TASKS, !current)
-                    android.util.Log.d("FullCalendarWidget", "Toggled Tasks filter: $current -> ${!current}")
                 }
                 ACTION_FILTER_GOOGLE -> {
                     val current = widgetData.getBoolean(PREF_SHOW_GOOGLE, true)
                     editor.putBoolean(PREF_SHOW_GOOGLE, !current)
-                    android.util.Log.d("FullCalendarWidget", "Toggled Google filter: $current -> ${!current}")
                 }
                 ACTION_FILTER_ROCIS -> {
                     val current = widgetData.getBoolean(PREF_SHOW_ROCIS, true)
                     editor.putBoolean(PREF_SHOW_ROCIS, !current)
-                    android.util.Log.d("FullCalendarWidget", "Toggled ROCIs filter: $current -> ${!current}")
                 }
             }
             editor.apply()
-            
-            android.util.Log.d("FullCalendarWidget", "Applied filter preference changes")
             
             // Update all widgets to reflect the new filter state
             val appWidgetManager = AppWidgetManager.getInstance(context)
             val thisAppWidget = android.content.ComponentName(context, FullCalendarWidgetProvider::class.java)
             val appWidgetIds = appWidgetManager.getAppWidgetIds(thisAppWidget)
-            
-            android.util.Log.d("FullCalendarWidget", "Updating ${appWidgetIds.size} widgets after filter change")
             onUpdate(context, appWidgetManager, appWidgetIds, widgetData)
         }
     }

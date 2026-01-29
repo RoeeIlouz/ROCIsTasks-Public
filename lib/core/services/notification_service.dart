@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
@@ -32,9 +31,7 @@ class NotificationService {
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
-  static const _platform = MethodChannel(
-    'com.example.rocis_tasks/notifications',
-  );
+  static const _platform = MethodChannel('com.rocisapps.tasks/notifications');
 
   final _actionController = StreamController<String>.broadcast();
   Stream<String> get onAction => _actionController.stream;
@@ -58,11 +55,17 @@ class NotificationService {
     tz.initializeTimeZones();
     final String timeZoneName = await FlutterTimezone.getLocalTimezone();
     tz.setLocalLocation(tz.getLocation(timeZoneName));
-    AppLogger.info('NotificationService initialized with timezone: $timeZoneName', tag: 'Notifications');
-    
+    AppLogger.info(
+      'NotificationService initialized with timezone: $timeZoneName',
+      tag: 'Notifications',
+    );
+
     final now = DateTime.now();
     final tzNow = tz.TZDateTime.now(tz.local);
-    AppLogger.info('Timing info - Now: $now, TZNow: $tzNow, Offset: ${tzNow.timeZoneOffset}', tag: 'Notifications');
+    AppLogger.info(
+      'Timing info - Now: $now, TZNow: $tzNow, Offset: ${tzNow.timeZoneOffset}',
+      tag: 'Notifications',
+    );
 
     final androidPlugin = flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<
@@ -71,7 +74,10 @@ class NotificationService {
     if (androidPlugin != null) {
       final canScheduleExact = await androidPlugin
           .canScheduleExactNotifications();
-      AppLogger.info('Can schedule exact notifications: $canScheduleExact', tag: 'Notifications');
+      AppLogger.info(
+        'Can schedule exact notifications: $canScheduleExact',
+        tag: 'Notifications',
+      );
     }
 
     const AndroidInitializationSettings initializationSettingsAndroid =
@@ -105,7 +111,10 @@ class NotificationService {
   }) async {
     if (scheduledDate.isBefore(DateTime.now())) return;
 
-    AppLogger.info('Scheduling notification - ID: $id, Title: $title, Date: $scheduledDate', tag: 'Notifications');
+    AppLogger.info(
+      'Scheduling notification - ID: $id, Title: $title, Date: $scheduledDate',
+      tag: 'Notifications',
+    );
 
     await flutterLocalNotificationsPlugin
         .zonedSchedule(
@@ -145,15 +154,22 @@ class NotificationService {
           payload: taskId,
         )
         .then((_) {
-          AppLogger.info('Successfully scheduled notification $id', tag: 'Notifications');
+          AppLogger.info(
+            'Successfully scheduled notification $id',
+            tag: 'Notifications',
+          );
         })
         .catchError((e) {
-          AppLogger.error('Error scheduling notification $id', error: e, tag: 'Notifications');
+          AppLogger.error(
+            'Error scheduling notification $id',
+            error: e,
+            tag: 'Notifications',
+          );
         });
   }
 
   Future<void> testImmediateNotification() async {
-    debugPrint('[NotificationService] Sending test IMMEDIATE notification...');
+    // Sending test IMMEDIATE notification...
     const androidDetails = AndroidNotificationDetails(
       'rocis_reminders_v4',
       'Task Reminders',
@@ -171,14 +187,11 @@ class NotificationService {
   }
 
   Future<void> testScheduledNotification() async {
-    debugPrint(
-      '[NotificationService] Testing SCHEDULED notification (1 min from now)...',
-    );
+    // Testing SCHEDULED notification (1 min from now)...
     final now = tz.TZDateTime.now(tz.local);
     final scheduledDate = now.add(const Duration(minutes: 1));
 
-    debugPrint('  - Now: $now');
-    debugPrint('  - Scheduled: $scheduledDate');
+    // Now: $now, Scheduled: $scheduledDate
 
     const androidDetails = AndroidNotificationDetails(
       'rocis_reminders_v4',
@@ -195,11 +208,8 @@ class NotificationService {
             AndroidFlutterLocalNotificationsPlugin
           >();
       if (androidPlugin != null) {
-        final canScheduleExact = await androidPlugin
-            .canScheduleExactNotifications();
-        debugPrint(
-          '  - (Pre-check) Can schedule exact notifications: $canScheduleExact',
-        );
+        await androidPlugin.canScheduleExactNotifications();
+        // Can schedule exact notifications check
       }
 
       await flutterLocalNotificationsPlugin.zonedSchedule(
@@ -210,13 +220,9 @@ class NotificationService {
         details,
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       );
-      debugPrint(
-        '[NotificationService] Successfully scheduled test notification for $scheduledDate',
-      );
+      // Successfully scheduled test notification
     } catch (e) {
-      debugPrint(
-        '[NotificationService] Error scheduling test notification: $e',
-      );
+      // Error scheduling test notification
     }
   }
 
@@ -234,7 +240,7 @@ class NotificationService {
       try {
         await androidPlugin.requestExactAlarmsPermission();
       } catch (e) {
-        debugPrint('Error requesting exact alarm permission: $e');
+        // Error requesting exact alarm permission
       }
     }
   }
@@ -254,7 +260,7 @@ class NotificationService {
         'isDarkText': isDarkText,
       });
     } catch (e) {
-      debugPrint('Error updating task count icon (falling back): $e');
+      // Error updating task count icon (falling back)
 
       final String body = titles.isEmpty
           ? '$count Uncompleted Tasks'

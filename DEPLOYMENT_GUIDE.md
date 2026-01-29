@@ -5,6 +5,7 @@
 ### 1. Environment Configuration
 
 1. **Copy environment template:**
+
    ```bash
    cp .env.example .env
    ```
@@ -17,16 +18,19 @@
 ### 2. Android Release Signing
 
 1. **Generate a release keystore:**
+
    ```bash
    keytool -genkey -v -keystore ~/upload-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload
    ```
 
 2. **Create `android/key.properties`:**
+
    ```bash
    cp android/key.properties.example android/key.properties
    ```
 
 3. **Fill in your keystore details:**
+
    ```properties
    storePassword=your-store-password
    keyPassword=your-key-password
@@ -48,6 +52,7 @@
    - Analytics (optional)
 
 2. **Configure Firestore security rules:**
+
    ```javascript
    rules_version = '2';
    service cloud.firestore {
@@ -76,11 +81,13 @@ flutter pub get
 ### Android Deployment
 
 1. **Debug build:**
+
    ```bash
    flutter build apk --debug
    ```
 
 2. **Release build:**
+
    ```bash
    flutter build apk --release
    ```
@@ -93,6 +100,7 @@ flutter pub get
 ### iOS Deployment
 
 1. **Build for iOS:**
+
    ```bash
    flutter build ios --release
    ```
@@ -106,6 +114,7 @@ flutter pub get
 ### Web Deployment
 
 1. **Build for web:**
+
    ```bash
    flutter build web --release
    ```
@@ -121,16 +130,19 @@ flutter pub get
 ### 1. Firebase Crashlytics
 
 Crashlytics is automatically configured when you build with the proper Firebase setup. Monitor crashes at:
+
 - [Firebase Console → Crashlytics](https://console.firebase.google.com)
 
 ### 2. Firebase Analytics
 
 Track user behavior and app performance:
+
 - [Firebase Console → Analytics](https://console.firebase.google.com)
 
 ### 3. Performance Monitoring
 
 Monitor app performance metrics:
+
 - App startup time
 - Screen rendering performance
 - Network request performance
@@ -152,21 +164,21 @@ flutter analyze
 
 ### 2. Manual Testing Checklist
 
-- [ ] App launches without crashes
-- [ ] User can sign in with Google
-- [ ] Tasks can be created, edited, deleted
-- [ ] Offline functionality works
-- [ ] Data syncs when back online
-- [ ] Notifications work properly
-- [ ] Home widgets update correctly
-- [ ] App works on different screen sizes
-- [ ] Dark mode functions properly
-- [ ] Localization works (English/Hebrew)
+- [V] App launches without crashes
+- [V] User can sign in with Google
+- [V] Tasks can be created, edited, deleted
+- [V] Offline functionality works
+- [V] Data syncs when back online
+- [V] Notifications work properly
+- [V] Home widgets update correctly
+- [V] App works on different screen sizes
+- [V] Dark mode functions properly
+- [V] Localization works (English/Hebrew)
 
 ### 3. Performance Testing
 
 - [ ] App startup time < 3 seconds
-- [ ] Smooth scrolling in task lists
+- [V] Smooth scrolling in task lists
 - [ ] No memory leaks during extended use
 - [ ] Battery usage is reasonable
 - [ ] Network usage is optimized

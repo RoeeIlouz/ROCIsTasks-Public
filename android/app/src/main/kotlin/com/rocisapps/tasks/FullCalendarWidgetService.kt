@@ -1,4 +1,4 @@
-package com.example.rocis_tasks
+package com.rocisapps.tasks
 
 import android.content.Context
 import android.content.Intent
@@ -26,7 +26,6 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
     }
 
     override fun onDataSetChanged() {
-        android.util.Log.d("FullCalendarWidget", "onDataSetChanged started")
         days.clear()
         try {
             val widgetData = HomeWidgetPlugin.getData(context)
@@ -35,7 +34,6 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
             showTasks = widgetData.getBoolean(FullCalendarWidgetProvider.PREF_SHOW_TASKS, true)
             showGoogle = widgetData.getBoolean(FullCalendarWidgetProvider.PREF_SHOW_GOOGLE, true)
             showRocis = widgetData.getBoolean(FullCalendarWidgetProvider.PREF_SHOW_ROCIS, true)
-            android.util.Log.d("FullCalendarWidget", "Filter settings - Tasks: $showTasks, Google: $showGoogle, ROCIs: $showRocis")
             
             val gridDataJson = widgetData.getString("full_calendar_grid_data", "[]")
             val gridData = JSONArray(gridDataJson)
@@ -69,9 +67,7 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
                 
                 days.add(day)
             }
-            android.util.Log.d("FullCalendarWidget", "Parsed ${days.size} grid days with filtering applied")
         } catch (e: Exception) {
-            android.util.Log.e("FullCalendarWidget", "Error loading grid data", e)
         }
     }
 
@@ -81,12 +77,10 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
 
     override fun getCount(): Int {
         val count = days.size / 8
-        android.util.Log.d("FullCalendarWidget", "=== getCount returning rows: $count ===")
         return count
     }
 
     override fun getViewAt(position: Int): RemoteViews {
-        android.util.Log.d("FullCalendarWidget", "=== getViewAt called for row: $position ===")
         val rowViews = RemoteViews(context.packageName, R.layout.widget_full_calendar_row)
         try {
             rowViews.removeAllViews(R.id.widget_full_calendar_row_container)
@@ -183,13 +177,11 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
                             data = Uri.parse("rocistasks://calendar")
                         }
                         cellViews.setOnClickFillInIntent(R.id.widget_full_calendar_day_container, fillInIntent)
-                        android.util.Log.d("FullCalendarWidget", "Set fill-in intent for date: $date with URI: rocistasks://calendar")
                     }
                 }
                 rowViews.addView(R.id.widget_full_calendar_row_container, cellViews)
             }
         } catch (e: Exception) {
-            android.util.Log.e("FullCalendarWidget", "Error in getViewAt rows", e)
         }
 
         return rowViews

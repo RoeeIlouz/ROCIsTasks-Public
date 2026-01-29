@@ -1,4 +1,4 @@
-package com.example.rocis_tasks
+package com.rocisapps.tasks
 
 import android.content.Context
 import android.content.Intent
@@ -11,7 +11,6 @@ import org.json.JSONObject
 
 class ScheduleWidgetService : RemoteViewsService() {
     override fun onGetViewFactory(intent: Intent): RemoteViewsFactory {
-        android.util.Log.d("ScheduleWidget", "onGetViewFactory called")
         return ScheduleWidgetFactory(this.applicationContext)
     }
 }
@@ -24,24 +23,19 @@ class ScheduleWidgetFactory(private val context: Context) : RemoteViewsService.R
     }
 
     override fun onDataSetChanged() {
-        android.util.Log.d("ScheduleWidget", "=== onDataSetChanged STARTED ===")
         items.clear()
         try {
             val widgetData = HomeWidgetPlugin.getData(context)
             val scheduleJson = widgetData.getString("schedule_list", "[]") ?: "[]"
-            android.util.Log.d("ScheduleWidget", "scheduleJson length: ${scheduleJson.length}")
             
             val jsonArray = JSONArray(scheduleJson)
             for (i in 0 until jsonArray.length()) {
                 try {
                     items.add(jsonArray.getJSONObject(i))
                 } catch (e: Exception) {
-                    android.util.Log.w("ScheduleWidget", "Error parsing item at index $i: ${e.message}")
                 }
             }
-            android.util.Log.d("ScheduleWidget", "=== Parsed ${items.size} schedule items ===")
         } catch (e: Exception) {
-            android.util.Log.e("ScheduleWidget", "=== ERROR in onDataSetChanged ===", e)
             items.clear()
         }
     }
@@ -52,12 +46,10 @@ class ScheduleWidgetFactory(private val context: Context) : RemoteViewsService.R
 
     override fun getCount(): Int {
         val count = items.size
-        android.util.Log.d("ScheduleWidget", "=== getCount returning: $count ===")
         return count
     }
 
     override fun getViewAt(position: Int): RemoteViews {
-        android.util.Log.d("ScheduleWidget", "=== getViewAt called for position: $position ===")
         val views = RemoteViews(context.packageName, R.layout.widget_schedule_item)
         if (position < 0 || position >= items.size) {
             return views
@@ -96,10 +88,8 @@ class ScheduleWidgetFactory(private val context: Context) : RemoteViewsService.R
                         val dayFormatter = java.time.format.DateTimeFormatter.ofPattern("MMM d")
                         views.setTextViewText(R.id.widget_schedule_time, date.format(timeFormatter))
                         views.setTextViewText(R.id.widget_schedule_date, date.format(dayFormatter))
-                        android.util.Log.d("ScheduleWidget", "Parsed date: $dateStr -> ${date.format(dayFormatter)}")
                     }
                 } catch (e: Exception) {
-                    android.util.Log.w("ScheduleWidget", "Failed to parse date: $dateStr - ${e.message}")
                     views.setTextViewText(R.id.widget_schedule_time, "")
                     views.setTextViewText(R.id.widget_schedule_date, "")
                 }
@@ -113,7 +103,6 @@ class ScheduleWidgetFactory(private val context: Context) : RemoteViewsService.R
                     views.setInt(R.id.widget_schedule_category_color, "setBackgroundColor", color)
                     views.setViewVisibility(R.id.widget_schedule_category_color, android.view.View.VISIBLE)
                 } catch (e: Exception) {
-                    android.util.Log.w("ScheduleWidget", "Failed to parse color: $colorHex", e)
                     // Use default color based on type
                     setDefaultColorForType(views, type)
                 }
@@ -130,7 +119,6 @@ class ScheduleWidgetFactory(private val context: Context) : RemoteViewsService.R
             views.setOnClickFillInIntent(R.id.widget_schedule_item_container, fillInIntent)
 
         } catch (e: Exception) {
-            android.util.Log.e("ScheduleWidget", "=== ERROR in getViewAt $position ===", e)
             // Set fallback content
             views.setTextViewText(R.id.widget_schedule_title, "Error loading item")
         }

@@ -34,7 +34,7 @@ class LocalTaskSource {
   }
 
   Future<void> _performMigration() async {
-    debugPrint('LocalTaskSource: Starting encryption migration...');
+    // Starting encryption migration...
     try {
       // 1. Open Unencrypted
       final tempTaskBox = await Hive.openBox<Task>(boxName);
@@ -83,13 +83,13 @@ class LocalTaskSource {
           await encryptedCatBox.put(newCat.id, newCat);
         }
       } catch (e) {
-        debugPrint('Error writing encrypted data: $e');
+        // Error writing encrypted data
         rethrow;
       }
 
-      debugPrint('LocalTaskSource: Migration completed successfully.');
+      // Migration completed successfully.
     } catch (e) {
-      debugPrint('LocalTaskSource: Migration failed: $e');
+      // Migration failed
       // If failed, we might be in a mixed state.
       // But since we didn't delete until we had data, we might just crash here
       // and on next run try again or need manual intervention.
@@ -106,7 +106,7 @@ class LocalTaskSource {
         encryptionCipher: HiveAesCipher(key),
       );
     } catch (e) {
-      debugPrint('Error opening encrypted box: $e');
+      // Error opening encrypted box
       // Potential key mismatch or corrupted file.
       // Extreme fallback: delete and recreate? No, safer to throw.
     }

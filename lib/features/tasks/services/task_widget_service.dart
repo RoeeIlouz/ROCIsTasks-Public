@@ -27,7 +27,7 @@ class TaskWidgetService {
         'isCompleted': task.isCompleted,
       };
     } catch (e) {
-      debugPrint('Error serializing task ${task.id} for widget: $e');
+      // Silent error handling - return fallback data
       // Return fallback data structure
       return {
         'id': task.id,
@@ -48,7 +48,7 @@ class TaskWidgetService {
         return !task.isCompleted && !(task.isDeleted ?? false);
       }).toList();
     } catch (e) {
-      debugPrint('Error filtering pending tasks: $e');
+      // Silent error handling - return empty list
       return [];
     }
   }
@@ -63,7 +63,7 @@ class TaskWidgetService {
         return a.dueDate!.compareTo(b.dueDate!);
       });
     } catch (e) {
-      debugPrint('Error sorting tasks by due date: $e');
+      // Silent error handling
     }
   }
 
@@ -75,7 +75,7 @@ class TaskWidgetService {
   }) async {
     String? chartPath;
     try {
-      debugPrint('TaskWidgetService: Starting widget update');
+      // Starting widget update
 
       // Calculate priority stats for pending tasks
       int high = 0;
@@ -127,14 +127,12 @@ class TaskWidgetService {
           logicalSize: const Size(200, 200),
         );
       } catch (e) {
-        debugPrint('Error generating chart widget: $e');
+        // Error generating chart widget
       }
 
       // Filter to get only pending tasks
       final pendingTasks = filterPendingTasks(allTasks);
-      debugPrint(
-        'TaskWidgetService: Found ${pendingTasks.length} pending tasks',
-      );
+      // Found pending tasks
 
       // Sort by due date
       sortTasksByDueDate(pendingTasks);
@@ -147,7 +145,7 @@ class TaskWidgetService {
           final serializedTask = _serializeTaskForWidget(task, category);
           tasksJson.add(serializedTask);
         } catch (e) {
-          debugPrint('Error processing task ${task.id}: $e');
+          // Error processing task - continue with others
           // Continue with other tasks instead of failing completely
         }
       }
@@ -155,15 +153,13 @@ class TaskWidgetService {
       // Save widget data with error handling
       try {
         final jsonString = jsonEncode(tasksJson);
-        debugPrint(
-          'TaskWidgetService: Saving ${tasksJson.length} tasks, payload size: ${jsonString.length}',
-        );
+        // Saving tasks to widget
         await HomeWidget.saveWidgetData<String>(
           'pending_tasks_list',
           jsonString,
         );
       } catch (e) {
-        debugPrint('Error serializing tasks for widget: $e');
+        // Error serializing tasks - using fallback
         // Provide fallback empty data to prevent widget crashes
         await HomeWidget.saveWidgetData<String>('pending_tasks_list', '[]');
       }
@@ -174,10 +170,10 @@ class TaskWidgetService {
         iOSName: 'TaskWidget',
       );
 
-      debugPrint('TaskWidgetService: Widget update completed successfully');
+      // Widget update completed
       return chartPath;
     } catch (e) {
-      debugPrint('TaskWidgetService: Critical error during widget update: $e');
+      // Critical error during widget update
       // Ensure widget has some data even if update fails
       try {
         await HomeWidget.saveWidgetData<String>('pending_tasks_list', '[]');
@@ -186,9 +182,7 @@ class TaskWidgetService {
           iOSName: 'TaskWidget',
         );
       } catch (fallbackError) {
-        debugPrint(
-          'TaskWidgetService: Fallback update also failed: $fallbackError',
-        );
+        // Fallback update also failed
       }
       return null;
     }
@@ -199,7 +193,7 @@ class TaskWidgetService {
     try {
       return '#${colorValue.toRadixString(16).padLeft(8, '0')}';
     } catch (e) {
-      debugPrint('Error formatting color $colorValue: $e');
+      // Error formatting color
       return ''; // Return empty string as fallback
     }
   }
@@ -211,7 +205,7 @@ class TaskWidgetService {
           '${date.month.toString().padLeft(2, '0')}-'
           '${date.day.toString().padLeft(2, '0')}';
     } catch (e) {
-      debugPrint('Error formatting date $date: $e');
+      // Error formatting date
       return ''; // Return empty string as fallback
     }
   }

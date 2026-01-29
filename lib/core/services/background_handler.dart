@@ -9,7 +9,6 @@ import 'package:rocis_tasks/core/services/calendar_service.dart';
 import 'package:rocis_tasks/core/services/firestore_service.dart';
 import 'package:rocis_tasks/core/services/notification_service.dart';
 import 'package:rocis_tasks/features/categories/domain/models/category.dart';
-import 'package:rocis_tasks/features/home/services/month_widget_service.dart';
 import 'package:rocis_tasks/features/home/services/full_calendar_widget_service.dart';
 import 'package:rocis_tasks/features/tasks/data/datasources/local_task_source.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
@@ -37,47 +36,17 @@ class BackgroundHandler {
       if (taskId != null) {
         await _completeTaskInBackground(taskId);
       }
-    } else if (host == 'prev_month' || host == 'next_month') {
-      await _handleMonthNavigation(host == 'next_month');
     } else if (host == 'full_calendar_prev' || host == 'full_calendar_next') {
-      final timestamp = DateTime.now().toIso8601String();
-      AppLogger.info(
-        '[$timestamp] FULL_CALENDAR NAV CLICKED: $host',
-        tag: 'Background',
-      );
-      print('DEBUG: Full calendar navigation triggered: $host at $timestamp');
       await _handleFullCalendarNavigation(host == 'full_calendar_next');
-      AppLogger.info('[$timestamp] Navigation completed', tag: 'Background');
     } else if (host == 'full_calendar_filter_tasks') {
-      AppLogger.info('Handling filter_tasks toggle', tag: 'Background');
       await _handleFullCalendarFilterToggle('tasks');
     } else if (host == 'full_calendar_filter_google') {
-      AppLogger.info('Handling filter_google toggle', tag: 'Background');
       await _handleFullCalendarFilterToggle('google');
     } else if (host == 'full_calendar_filter_rocis') {
-      AppLogger.info('Handling filter_rocis toggle', tag: 'Background');
       await _handleFullCalendarFilterToggle('rocis');
     } else {
       AppLogger.warning('Unknown host: $host', tag: 'Background');
     }
-  }
-
-  static Future<void> _handleMonthNavigation(bool isNext) async {
-    await AppInitializer.initialize(isBackground: true);
-
-    final prefs = await SharedPreferences.getInstance();
-    int offset = prefs.getInt('month_widget_offset') ?? 0;
-    offset = isNext ? offset + 1 : offset - 1;
-    await prefs.setInt('month_widget_offset', offset);
-
-    final calendarService = CalendarService();
-    await calendarService.init();
-
-    final taskSource = LocalTaskSource();
-    await taskSource.init();
-
-    final monthService = MonthWidgetService(calendarService, taskSource);
-    await monthService.updateMonthWidget(monthOffset: offset);
   }
 
   static Future<void> _handleFullCalendarNavigation(bool isNext) async {
@@ -113,13 +82,8 @@ class BackgroundHandler {
   }
 
   static Future<void> _handleFullCalendarFilterToggle(String filterName) async {
-    AppLogger.info(
-      '_handleFullCalendarFilterToggle started for $filterName',
-      tag: 'Background',
-    );
     try {
       await AppInitializer.initialize(isBackground: true);
-      AppLogger.info('AppInitializer completed', tag: 'Background');
 
       final calendarService = CalendarService();
       await calendarService.init();
@@ -133,7 +97,6 @@ class BackgroundHandler {
       );
 
       // Toggle the filter
-      AppLogger.info('Toggling filter $filterName', tag: 'Background');
       await fullCalendarService.toggleFilter(filterName);
 
       // Initialize schedule service and set user email for ROCIs-Schedule integration
@@ -147,12 +110,10 @@ class BackgroundHandler {
       final prefs = await SharedPreferences.getInstance();
       final offset = prefs.getInt('full_calendar_offset') ?? 0;
 
-      AppLogger.info('Updating widget with offset $offset', tag: 'Background');
       await fullCalendarService.updateFullCalendarWidget(
         monthOffset: offset,
         userId: currentUser?.uid,
       );
-      AppLogger.info('Filter toggle completed successfully', tag: 'Background');
     } catch (e, stackTrace) {
       AppLogger.error(
         'Error in filter toggle',
@@ -203,11 +164,7 @@ class BackgroundHandler {
         jsonEncode(tasksJson),
       );
 
-      final widgetNames = [
-        'CalendarWidgetProvider',
-        'ScheduleWidgetProvider',
-        'TaskWidgetProvider',
-      ];
+      final widgetNames = ['TaskWidgetProvider'];
 
       for (final name in widgetNames) {
         await HomeWidget.updateWidget(name: name);

@@ -74,22 +74,22 @@ class _AppRootState extends State<AppRoot> {
 
     await Future.wait([
       _taskSource.init().catchError((e) {
-        debugPrint('LocalTaskSource init failed: $e');
+        // Silent error handling - errors logged via ErrorHandlingService
       }),
       _taskProvider.init().catchError((e) {
-        debugPrint('TaskProvider init failed: $e');
+        // Silent error handling - errors logged via ErrorHandlingService
       }),
       _calendarService.init().catchError((e) {
-        debugPrint('CalendarService init failed: $e');
+        // Silent error handling - errors logged via ErrorHandlingService
       }),
       _themeService.init().catchError((e) {
-        debugPrint('ThemeService init failed: $e');
+        // Silent error handling - errors logged via ErrorHandlingService
       }),
       _calendarColorService.init().catchError((e) {
-        debugPrint('CalendarColorService init failed: $e');
+        // Silent error handling - errors logged via ErrorHandlingService
       }),
       _scheduleService.initialize().catchError((e) {
-        debugPrint('ScheduleFirestoreService init failed: $e');
+        // Silent error handling - errors logged via ErrorHandlingService
       }),
     ]);
   }

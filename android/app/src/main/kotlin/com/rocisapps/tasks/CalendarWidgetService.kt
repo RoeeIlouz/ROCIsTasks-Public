@@ -1,4 +1,4 @@
-package com.example.rocis_tasks
+package com.rocisapps.tasks
 
 import android.content.Context
 import android.content.Intent
@@ -7,7 +7,6 @@ import android.widget.RemoteViewsService
 import es.antonborri.home_widget.HomeWidgetPlugin
 import org.json.JSONArray
 import org.json.JSONObject
-import android.util.Log
 
 class CalendarWidgetService : RemoteViewsService() {
     override fun onGetViewFactory(intent: Intent): RemoteViewsFactory {
@@ -32,7 +31,6 @@ class CalendarWidgetFactory(private val context: Context) : RemoteViewsService.R
         try {
             if (!eventsJson.isNullOrEmpty() && eventsJson != "null") {
                 val events = JSONArray(eventsJson)
-                Log.d(TAG, "Loading ${events.length()} calendar events")
                 
                 for (i in 0 until events.length()) {
                     try {
@@ -44,18 +42,14 @@ class CalendarWidgetFactory(private val context: Context) : RemoteViewsService.R
                             val standardizedEvent = standardizeEventData(event)
                             items.add(standardizedEvent)
                         } else {
-                            Log.w(TAG, "Skipping event with missing required fields at index $i")
                         }
                     } catch (e: Exception) {
-                        Log.e(TAG, "Error processing event at index $i", e)
                         // Continue processing other events instead of failing completely
                     }
                 }
             } else {
-                Log.d(TAG, "No calendar events data available")
             }
         } catch (e: Exception) {
-            Log.e(TAG, "Error parsing calendar events JSON: $eventsJson", e)
             // Continue with empty events list instead of crashing
         }
 
@@ -64,7 +58,6 @@ class CalendarWidgetFactory(private val context: Context) : RemoteViewsService.R
         try {
             if (!tasksJson.isNullOrEmpty() && tasksJson != "null") {
                 val tasks = JSONArray(tasksJson)
-                Log.d(TAG, "Loading ${tasks.length()} pending tasks")
                 
                 for (i in 0 until tasks.length()) {
                     try {
@@ -76,18 +69,14 @@ class CalendarWidgetFactory(private val context: Context) : RemoteViewsService.R
                             val standardizedTask = standardizeTaskDataForCalendar(task)
                             items.add(standardizedTask)
                         } else {
-                            Log.w(TAG, "Skipping task with missing required fields or no due date at index $i")
                         }
                     } catch (e: Exception) {
-                        Log.e(TAG, "Error processing task at index $i", e)
                         // Continue processing other tasks instead of failing completely
                     }
                 }
             } else {
-                Log.d(TAG, "No pending tasks data available")
             }
         } catch (e: Exception) {
-            Log.e(TAG, "Error parsing pending tasks JSON: $tasksJson", e)
             // Continue with empty tasks list instead of crashing
         }
 
@@ -110,20 +99,16 @@ class CalendarWidgetFactory(private val context: Context) : RemoteViewsService.R
                                 val parsedDateB = parseIsoDate(dateB)
                                 parsedDateA.compareTo(parsedDateB)
                             } catch (e: Exception) {
-                                Log.w(TAG, "Error comparing dates: $dateA vs $dateB", e)
                                 dateA.compareTo(dateB) // Fallback to string comparison
                             }
                         }
                     }
                 } catch (e: Exception) {
-                    Log.w(TAG, "Error in sort comparison", e)
                     0 // Treat as equal if comparison fails
                 }
             }
             
-            Log.d(TAG, "Successfully sorted ${items.size} calendar items")
         } catch (e: Exception) {
-            Log.e(TAG, "Error sorting calendar items", e)
             // Continue with unsorted items instead of crashing
         }
     }
@@ -139,7 +124,6 @@ class CalendarWidgetFactory(private val context: Context) : RemoteViewsService.R
         
         try {
             if (position >= items.size) {
-                Log.w(TAG, "Position $position out of bounds for ${items.size} items")
                 return createErrorView("Invalid position")
             }
             
@@ -166,12 +150,10 @@ class CalendarWidgetFactory(private val context: Context) : RemoteViewsService.R
                 }
                 views.setOnClickFillInIntent(R.id.widget_calendar_item_container, fillInIntent)
             } catch (e: Exception) {
-                Log.w(TAG, "Error setting click intent for item at position $position", e)
                 // Continue without click functionality rather than crashing
             }
 
         } catch (e: Exception) {
-            Log.e(TAG, "Error creating view for position $position", e)
             return createErrorView("Error loading item")
         }
 
@@ -238,7 +220,6 @@ class CalendarWidgetFactory(private val context: Context) : RemoteViewsService.R
             standardized.put("is_task", false)
             
         } catch (e: Exception) {
-            Log.e(TAG, "Error standardizing event data", e)
             // Return minimal valid structure
             standardized.put("type", "event")
             standardized.put("id", "error_event")
@@ -273,7 +254,6 @@ class CalendarWidgetFactory(private val context: Context) : RemoteViewsService.R
                     standardized.put("start", parsedDate.toIso8601String())
                     standardized.put("sortDate", parsedDate.toIso8601String())
                 } catch (e: Exception) {
-                    Log.w(TAG, "Could not parse task due date: $dueDate", e)
                     standardized.put("start", "")
                     standardized.put("sortDate", "9999-12-31T23:59:59Z") // Push to end
                 }
@@ -294,7 +274,6 @@ class CalendarWidgetFactory(private val context: Context) : RemoteViewsService.R
             standardized.put("is_task", true)
             
         } catch (e: Exception) {
-            Log.e(TAG, "Error standardizing task data", e)
             // Return minimal valid structure
             standardized.put("type", "task")
             standardized.put("id", "error_task")
@@ -315,14 +294,12 @@ class CalendarWidgetFactory(private val context: Context) : RemoteViewsService.R
                     views.setInt(R.id.widget_event_category_color, "setBackgroundColor", color)
                     views.setViewVisibility(R.id.widget_event_category_color, android.view.View.VISIBLE)
                 } else {
-                    Log.w(TAG, "Invalid color format: $colorHex, using transparent")
                     setTransparentColor(views)
                 }
             } else {
                 setTransparentColor(views)
             }
         } catch (e: Exception) {
-            Log.w(TAG, "Error parsing color: $colorHex", e)
             setTransparentColor(views)
         }
     }
@@ -347,10 +324,8 @@ class CalendarWidgetFactory(private val context: Context) : RemoteViewsService.R
             
             // For now, we only show the title in the current layout
             // Future enhancement could add date/time display to the layout
-            Log.d(TAG, "${if (isTask) "Task" else "Event"}: ${item.optString("title", "")} - $dateDisplay $startDisplay")
             
         } catch (e: Exception) {
-            Log.w(TAG, "Error setting date/time display", e)
         }
     }
 
@@ -379,7 +354,6 @@ class CalendarWidgetFactory(private val context: Context) : RemoteViewsService.R
             val date = parseIsoDate(isoString)
             java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault()).format(date)
         } catch (e: Exception) {
-            Log.w(TAG, "Error formatting time: $isoString", e)
             ""
         }
     }
@@ -390,7 +364,6 @@ class CalendarWidgetFactory(private val context: Context) : RemoteViewsService.R
             val date = parseIsoDate(isoString)
             java.text.SimpleDateFormat("MMM d", java.util.Locale.getDefault()).format(date)
         } catch (e: Exception) {
-            Log.w(TAG, "Error formatting date: $isoString", e)
             ""
         }
     }

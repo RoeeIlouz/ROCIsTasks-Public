@@ -31,7 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
   StreamSubscription? _notificationActionSubscription;
 
   // Widget channel for receiving deep links from Android
-  static const _widgetChannel = MethodChannel('com.example.rocis_tasks/widget');
+  static const _widgetChannel = MethodChannel('com.rocisapps.tasks/widget');
 
   // Track last handled URI to prevent duplicate handling
   String? _lastHandledUri;
@@ -66,9 +66,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<dynamic> _handleWidgetMethodCall(MethodCall call) async {
-    debugPrint(
-      'HomeScreen: Widget method call: ${call.method}, args: ${call.arguments}',
-    );
+    // Widget method call handled
     if (call.method == 'onWidgetClick') {
       final uriString = call.arguments as String?;
       if (uriString != null) {
@@ -100,16 +98,13 @@ class _HomeScreenState extends State<HomeScreen> {
     if (_lastHandledUri == uriString &&
         _lastHandledTime != null &&
         now.difference(_lastHandledTime!).inMilliseconds < 1000) {
-      debugPrint('HomeScreen: Ignoring duplicate widget launch: $uri');
+      // Ignoring duplicate widget launch
       return;
     }
     _lastHandledUri = uriString;
     _lastHandledTime = now;
 
-    debugPrint('HomeScreen: Widget launch with uri: $uri');
-    debugPrint(
-      'HomeScreen: host=${uri.host}, path=${uri.path}, pathSegments=${uri.pathSegments}',
-    );
+    // Widget launch with uri handled
 
     if (uri.host == 'add_task') {
       _navigateToAddTask();
@@ -119,7 +114,7 @@ class _HomeScreenState extends State<HomeScreen> {
     // Handle calendar/day/$date path format from FullCalendarWidget
     // Just navigate to calendar page without setting a specific date
     if (uri.host == 'calendar') {
-      debugPrint('HomeScreen: Navigating to calendar page');
+      // Navigating to calendar page
       _onItemTapped(1);
       return;
     }
@@ -139,7 +134,7 @@ class _HomeScreenState extends State<HomeScreen> {
           calendarProvider.setSelectedDate(date);
         });
       } catch (e) {
-        debugPrint('Error parsing date from widget: $e');
+        // Error parsing date from widget
       }
     }
   }

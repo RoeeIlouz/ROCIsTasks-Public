@@ -1,4 +1,4 @@
-package com.example.rocis_tasks
+package com.rocisapps.tasks
 
 import android.content.Context
 import android.content.Intent
@@ -11,7 +11,6 @@ import org.json.JSONObject
 
 class TaskWidgetService : RemoteViewsService() {
     override fun onGetViewFactory(intent: Intent): RemoteViewsFactory {
-        android.util.Log.d("TaskWidget", "=== onGetViewFactory CALLED ===")
         return TaskWidgetFactory(this.applicationContext)
     }
 }
@@ -20,16 +19,13 @@ class TaskWidgetFactory(private val context: Context) : RemoteViewsService.Remot
     private var tasks = ArrayList<JSONObject>()
 
     override fun onCreate() {
-        android.util.Log.d("TaskWidget", "=== onCreate CALLED ===")
         onDataSetChanged()
     }
 
     override fun onDataSetChanged() {
-        android.util.Log.d("TaskWidget", "=== onDataSetChanged STARTED ===")
         tasks.clear()
         try {
             val widgetData = HomeWidgetPlugin.getData(context)
-            android.util.Log.d("TaskWidget", "Got widgetData")
             
             val tasksJson = widgetData.getString("pending_tasks_list", "[]") ?: "[]"
             val parsedTasks = parseTasksJsonSafely(tasksJson)
@@ -38,7 +34,6 @@ class TaskWidgetFactory(private val context: Context) : RemoteViewsService.Remot
             val sortMode = widgetData.getInt(TaskWidgetProvider.PREF_SORT_KEY, 0)
             val filterMode = widgetData.getInt(TaskWidgetProvider.PREF_FILTER_KEY, 0)
             
-            android.util.Log.d("TaskWidget", "Applying Filter: $filterMode, Sort: $sortMode")
             
             // Filter
             var processedList = parsedTasks.filter { task ->
@@ -77,10 +72,8 @@ class TaskWidgetFactory(private val context: Context) : RemoteViewsService.Remot
             }
 
             tasks.addAll(processedList)
-            android.util.Log.d("TaskWidget", "=== Showing ${tasks.size} tasks after filter/sort ===")
             
         } catch (e: Exception) {
-            android.util.Log.e("TaskWidget", "=== ERROR in onDataSetChanged ===", e)
             tasks.clear()
         }
     }
@@ -116,12 +109,10 @@ class TaskWidgetFactory(private val context: Context) : RemoteViewsService.Remot
         try {
             // Handle empty, null, or invalid JSON strings
             if (tasksJson.isEmpty() || tasksJson == "null" || tasksJson == "undefined") {
-                android.util.Log.w("TaskWidget", "Empty or null tasks JSON, returning empty list")
                 return parsedTasks
             }
             
             val jsonArray = JSONArray(tasksJson)
-            android.util.Log.d("TaskWidget", "JSONArray length: ${jsonArray.length()}")
             
             for (i in 0 until jsonArray.length()) {
                 try {
@@ -132,15 +123,12 @@ class TaskWidgetFactory(private val context: Context) : RemoteViewsService.Remot
                     if (validatedTask != null) {
                         parsedTasks.add(validatedTask)
                     } else {
-                        android.util.Log.w("TaskWidget", "Skipping invalid task at index $i: validation failed")
                     }
                 } catch (e: Exception) {
-                    android.util.Log.w("TaskWidget", "Error parsing task at index $i: ${e.message}")
                     // Continue with other tasks instead of failing completely
                 }
             }
         } catch (e: Exception) {
-            android.util.Log.e("TaskWidget", "Error parsing tasks JSON: ${e.message}", e)
             // Return empty list on any JSON parsing error
             return emptyList()
         }
@@ -156,7 +144,6 @@ class TaskWidgetFactory(private val context: Context) : RemoteViewsService.Remot
         try {
             // Check for required fields
             if (!taskObj.has("id") || !taskObj.has("title")) {
-                android.util.Log.w("TaskWidget", "Task missing required fields (id or title)")
                 return null
             }
             
@@ -165,7 +152,6 @@ class TaskWidgetFactory(private val context: Context) : RemoteViewsService.Remot
             
             // Ensure required fields are not empty
             if (id.isEmpty() || title.isEmpty()) {
-                android.util.Log.w("TaskWidget", "Task has empty required fields")
                 return null
             }
             
@@ -181,7 +167,6 @@ class TaskWidgetFactory(private val context: Context) : RemoteViewsService.Remot
             
             return standardizedTask
         } catch (e: Exception) {
-            android.util.Log.w("TaskWidget", "Error validating task: ${e.message}")
             return null
         }
     }
@@ -198,7 +183,6 @@ class TaskWidgetFactory(private val context: Context) : RemoteViewsService.Remot
                 else -> value.toString()
             }
         } catch (e: Exception) {
-            android.util.Log.w("TaskWidget", "Error extracting string for key '$key': ${e.message}")
             fallback
         }
     }
@@ -217,7 +201,6 @@ class TaskWidgetFactory(private val context: Context) : RemoteViewsService.Remot
                 else -> fallback
             }
         } catch (e: Exception) {
-            android.util.Log.w("TaskWidget", "Error extracting boolean for key '$key': ${e.message}")
             fallback
         }
     }
@@ -239,14 +222,12 @@ class TaskWidgetFactory(private val context: Context) : RemoteViewsService.Remot
             
             // Validate color format
             if (!colorStr.startsWith("#")) {
-                android.util.Log.w("TaskWidget", "Invalid color format (missing #): $colorStr")
                 return fallback
             }
             
             // Check hex format (6 or 8 characters after #)
             val hexPart = colorStr.substring(1)
             if (hexPart.length != 6 && hexPart.length != 8) {
-                android.util.Log.w("TaskWidget", "Invalid color format (wrong length): $colorStr")
                 return fallback
             }
             
@@ -255,29 +236,24 @@ class TaskWidgetFactory(private val context: Context) : RemoteViewsService.Remot
             
             return colorStr
         } catch (e: Exception) {
-            android.util.Log.w("TaskWidget", "Error extracting color for key '$key': ${e.message}")
             fallback
         }
     }
 
     override fun onDestroy() {
-        android.util.Log.d("TaskWidget", "=== onDestroy CALLED ===")
         tasks.clear()
     }
 
     override fun getCount(): Int {
-        android.util.Log.d("TaskWidget", "=== getCount returning: ${tasks.size} ===")
         return tasks.size
     }
 
     override fun getViewAt(position: Int): RemoteViews {
-        android.util.Log.d("TaskWidget", "=== getViewAt called for position: $position ===")
         
         val views = RemoteViews(context.packageName, R.layout.widget_task_item)
         
         // Improved bounds checking and error handling
         if (position < 0 || position >= tasks.size) {
-            android.util.Log.w("TaskWidget", "Position out of bounds: $position, size: ${tasks.size}")
             return createFallbackView(views, "No tasks available")
         }
 
@@ -285,7 +261,6 @@ class TaskWidgetFactory(private val context: Context) : RemoteViewsService.Remot
             val task = tasks[position]
             populateTaskView(views, task)
         } catch (e: Exception) {
-            android.util.Log.e("TaskWidget", "=== ERROR in getViewAt $position ===", e)
             // Provide fallback content instead of crashing
             return createFallbackView(views, "Error loading task")
         }
@@ -307,7 +282,6 @@ class TaskWidgetFactory(private val context: Context) : RemoteViewsService.Remot
             val displayDate = if (dueDate.isEmpty()) "No due date" else dueDate
             views.setTextViewText(R.id.widget_task_date, displayDate)
             
-            android.util.Log.d("TaskWidget", "Setting title: $title, dueDate: $displayDate")
             
             // Handle category color with improved error handling
             val colorHex = extractStringSafely(task, "category_color", "")
@@ -316,9 +290,7 @@ class TaskWidgetFactory(private val context: Context) : RemoteViewsService.Remot
                     val color = android.graphics.Color.parseColor(colorHex)
                     views.setInt(R.id.widget_task_category_color, "setBackgroundColor", color)
                     views.setViewVisibility(R.id.widget_task_category_color, android.view.View.VISIBLE)
-                    android.util.Log.d("TaskWidget", "Applied color: $colorHex")
                 } catch (e: Exception) {
-                    android.util.Log.w("TaskWidget", "Invalid color format: $colorHex, error: ${e.message}")
                     views.setViewVisibility(R.id.widget_task_category_color, android.view.View.INVISIBLE)
                 }
             } else {
@@ -334,11 +306,9 @@ class TaskWidgetFactory(private val context: Context) : RemoteViewsService.Remot
                     }
                     views.setOnClickFillInIntent(R.id.widget_task_container, fillInIntent)
                 } catch (e: Exception) {
-                    android.util.Log.w("TaskWidget", "Error setting click intent for task $taskId: ${e.message}")
                 }
             }
         } catch (e: Exception) {
-            android.util.Log.e("TaskWidget", "Error populating task view: ${e.message}", e)
             // If we can't populate the view, create a fallback
             createFallbackView(views, "Error displaying task")
         }
@@ -353,13 +323,11 @@ class TaskWidgetFactory(private val context: Context) : RemoteViewsService.Remot
             views.setTextViewText(R.id.widget_task_date, "")
             views.setViewVisibility(R.id.widget_task_category_color, android.view.View.INVISIBLE)
         } catch (e: Exception) {
-            android.util.Log.e("TaskWidget", "Error creating fallback view: ${e.message}")
         }
         return views
     }
 
     override fun getLoadingView(): RemoteViews? {
-        android.util.Log.d("TaskWidget", "=== getLoadingView CALLED ===")
         return null
     }
     

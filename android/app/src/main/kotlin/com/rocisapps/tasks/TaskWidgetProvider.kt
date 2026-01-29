@@ -1,4 +1,4 @@
-package com.example.rocis_tasks
+package com.rocisapps.tasks
 
 import android.appwidget.AppWidgetManager
 import android.content.Context
@@ -11,8 +11,8 @@ import es.antonborri.home_widget.HomeWidgetProvider
 class TaskWidgetProvider : HomeWidgetProvider() {
 
     companion object {
-        const val ACTION_SORT_CHANGE = "com.example.rocis_tasks.ACTION_SORT_CHANGE"
-        const val ACTION_FILTER_CHANGE = "com.example.rocis_tasks.ACTION_FILTER_CHANGE"
+        const val ACTION_SORT_CHANGE = "com.rocisapps.tasks.ACTION_SORT_CHANGE"
+        const val ACTION_FILTER_CHANGE = "com.rocisapps.tasks.ACTION_FILTER_CHANGE"
         const val PREF_SORT_KEY = "widget_sort_mode" // 0: Date, 1: Priority
         const val PREF_FILTER_KEY = "widget_filter_mode" // 0: All, 1: Today, 2: High Priority
     }
@@ -23,12 +23,10 @@ class TaskWidgetProvider : HomeWidgetProvider() {
         appWidgetIds: IntArray,
         widgetData: SharedPreferences
     ) {
-        android.util.Log.d("TaskWidget", "onUpdate started for ${appWidgetIds.size} widgets")
         appWidgetIds.forEach { appWidgetId ->
             try {
                 updateWidget(context, appWidgetManager, appWidgetId, widgetData)
             } catch (e: Exception) {
-                android.util.Log.e("TaskWidget", "=== ERROR updating widget $appWidgetId ===", e)
             }
         }
     }
@@ -39,7 +37,6 @@ class TaskWidgetProvider : HomeWidgetProvider() {
         appWidgetId: Int,
         widgetData: SharedPreferences
     ) {
-        android.util.Log.d("TaskWidget", "Processing widget ID: $appWidgetId")
         val views = RemoteViews(context.packageName, R.layout.widget_layout)
         
         // Setup List Adapter
@@ -66,7 +63,6 @@ class TaskWidgetProvider : HomeWidgetProvider() {
 
         appWidgetManager.updateAppWidget(appWidgetId, views)
         appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_list_view)
-        android.util.Log.d("TaskWidget", "=== Widget $appWidgetId updated successfully ===")
     }
 
     private fun updateButtonState(views: RemoteViews, prefs: SharedPreferences) {
@@ -114,7 +110,6 @@ class TaskWidgetProvider : HomeWidgetProvider() {
         super.onReceive(context, intent)
         val action = intent.action
         if (action == ACTION_SORT_CHANGE || action == ACTION_FILTER_CHANGE) {
-            android.util.Log.d("TaskWidget", "Received action: $action")
             val widgetData = es.antonborri.home_widget.HomeWidgetPlugin.getData(context)
             val editor = widgetData.edit()
 

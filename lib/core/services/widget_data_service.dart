@@ -13,7 +13,8 @@ class WidgetDataService {
   final ScheduleFirestoreService _scheduleService;
   bool _scheduleServiceInitialized = false;
 
-  WidgetDataService(this._calendarService) : _scheduleService = ScheduleFirestoreService();
+  WidgetDataService(this._calendarService)
+    : _scheduleService = ScheduleFirestoreService();
 
   /// Initialize the schedule service (call once after Firebase is ready)
   Future<void> initScheduleService() async {
@@ -21,7 +22,7 @@ class WidgetDataService {
     await _scheduleService.initialize();
     _scheduleServiceInitialized = true;
   }
-  
+
   /// Set the user email for cross-app schedule data lookup
   void setUserEmail(String? email) {
     _scheduleService.setUserEmail(email);
@@ -95,18 +96,26 @@ class WidgetDataService {
     // Fetch ROCIs-Schedule data if user is logged in and authenticated in secondary Firebase
     if (userId != null && _scheduleService.isReady) {
       if (!_scheduleService.isAuthenticated) {
-        debugPrint('WidgetDataService: User not authenticated in secondary Firebase (rocis-schedule)');
-        debugPrint('WidgetDataService: Schedule integration requires signing in with Google');
+        debugPrint(
+          'WidgetDataService: User not authenticated in secondary Firebase (rocis-schedule)',
+        );
+        debugPrint(
+          'WidgetDataService: Schedule integration requires signing in with Google',
+        );
       } else {
         try {
-          debugPrint('WidgetDataService: Fetching ROCIs-Schedule data for user $userId');
-          debugPrint('WidgetDataService: Authenticated as ${_scheduleService.authenticatedUserId} in rocis-schedule');
+          debugPrint(
+            'WidgetDataService: Fetching ROCIs-Schedule data for user $userId',
+          );
+          debugPrint(
+            'WidgetDataService: Authenticated as ${_scheduleService.authenticatedUserId} in rocis-schedule',
+          );
           final scheduleData = await _scheduleService.getScheduleDataForWidget(
             userId,
             scheduleStart,
             scheduleEnd,
           );
-          
+
           // Add schedule events and assignments
           for (var item in scheduleData) {
             final date = DateTime.parse(item['date'] as String);
@@ -127,15 +136,21 @@ class WidgetDataService {
               'eventType': item['eventType'] ?? '',
             });
           }
-          debugPrint('WidgetDataService: Added ${scheduleData.length} items from ROCIs-Schedule');
+          debugPrint(
+            'WidgetDataService: Added ${scheduleData.length} items from ROCIs-Schedule',
+          );
         } catch (e) {
           debugPrint('Error fetching ROCIs-Schedule data: $e');
         }
       }
     } else if (userId == null) {
-      debugPrint('WidgetDataService: No userId provided, skipping ROCIs-Schedule data');
+      debugPrint(
+        'WidgetDataService: No userId provided, skipping ROCIs-Schedule data',
+      );
     } else if (!_scheduleService.isReady) {
-      debugPrint('WidgetDataService: Schedule service not ready, skipping ROCIs-Schedule data');
+      debugPrint(
+        'WidgetDataService: Schedule service not ready, skipping ROCIs-Schedule data',
+      );
     }
 
     scheduleItems.sort(
@@ -206,14 +221,16 @@ class WidgetDataService {
       }
 
       // Fetch ROCIs-Schedule data if user is logged in and authenticated
-      if (userId != null && _scheduleService.isReady && _scheduleService.isAuthenticated) {
+      if (userId != null &&
+          _scheduleService.isReady &&
+          _scheduleService.isAuthenticated) {
         try {
           final scheduleData = await _scheduleService.getScheduleDataForWidget(
             userId,
             listStart,
             listEnd,
           );
-          
+
           for (var item in scheduleData) {
             final date = DateTime.parse(item['date'] as String);
             calendarListEvents.add({
@@ -229,7 +246,9 @@ class WidgetDataService {
             });
           }
         } catch (e) {
-          debugPrint('Error fetching ROCIs-Schedule data for calendar list: $e');
+          debugPrint(
+            'Error fetching ROCIs-Schedule data for calendar list: $e',
+          );
         }
       }
 
@@ -243,7 +262,7 @@ class WidgetDataService {
         jsonEncode(calendarListEvents),
       );
       await HomeWidget.updateWidget(
-        name: 'CalendarListWidgetProvider',
+        name: 'CalendarWidgetProvider',
         iOSName: 'CalendarListWidget',
       );
     } catch (e) {
@@ -283,7 +302,9 @@ class WidgetDataService {
     }
 
     // Add ROCIs-Schedule events to the month map
-    if (userId != null && _scheduleService.isReady && _scheduleService.isAuthenticated) {
+    if (userId != null &&
+        _scheduleService.isReady &&
+        _scheduleService.isAuthenticated) {
       try {
         final scheduleEvents = await _scheduleService.getScheduleEvents(
           userId,

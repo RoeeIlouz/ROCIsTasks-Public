@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:flutter/material.dart';
+
 import 'package:home_widget/home_widget.dart';
 import 'package:intl/intl.dart';
 import 'package:rocis_tasks/core/services/calendar_service.dart';
@@ -145,7 +145,7 @@ class MonthWidgetService {
         iOSName: 'MonthWidget',
       );
     } catch (e) {
-      debugPrint('Error updating Month Widget: $e');
+      // Error updating Month Widget - silent handling
     }
   }
 

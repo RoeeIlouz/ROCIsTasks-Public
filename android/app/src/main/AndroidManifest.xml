@@ -49,7 +49,18 @@
         <service android:name=".TaskWidgetService"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
 
-        <receiver android:name=".CalendarWidgetProvider" android:exported="true" android:label="Agenda View">
+        <receiver android:name=".FullCalendarWidgetProvider" android:exported="true" android:label="Full Calendar">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/full_calendar_widget_info" />
+        </receiver>
+
+        <service android:name=".FullCalendarWidgetService"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
+
+        <receiver android:name=".CalendarWidgetProvider" android:exported="true" android:label="Calendar Events">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -60,18 +71,7 @@
         <service android:name=".CalendarWidgetService"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
 
-        <receiver android:name=".ScheduleWidgetProvider" android:exported="true" android:label="Tasks &amp; Calendar">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-            <meta-data android:name="android.appwidget.provider"
-                android:resource="@xml/schedule_widget_info" />
-        </receiver>
-
-        <service android:name=".ScheduleWidgetService"
-            android:permission="android.permission.BIND_REMOTEVIEWS" />
-
-        <receiver android:name=".MonthWidgetProvider" android:exported="true" android:label="Month View">
+        <receiver android:name=".MonthWidgetProvider" android:exported="true" android:label="Month Calendar">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -82,16 +82,15 @@
         <service android:name=".MonthWidgetService"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
 
-
-        <receiver android:name=".FullCalendarWidgetProvider" android:exported="true" android:label="Full Calendar">
+        <receiver android:name=".ScheduleWidgetProvider" android:exported="true" android:label="Schedule">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
             <meta-data android:name="android.appwidget.provider"
-                android:resource="@xml/full_calendar_widget_info" />
+                android:resource="@xml/schedule_widget_info" />
         </receiver>
 
-        <service android:name=".FullCalendarWidgetService"
+        <service android:name=".ScheduleWidgetService"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
 
 

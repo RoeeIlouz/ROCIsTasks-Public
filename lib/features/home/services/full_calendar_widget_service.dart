@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:flutter/material.dart';
+
 import 'package:home_widget/home_widget.dart';
 import 'package:intl/intl.dart';
 import 'package:rocis_tasks/core/services/calendar_service.dart';
@@ -118,13 +118,9 @@ class FullCalendarWidgetService {
 
   /// Toggle a specific filter
   Future<FullCalendarFilters> toggleFilter(String filterName) async {
-    debugPrint(
-      'FullCalendarWidgetService: toggleFilter called for $filterName',
-    );
+    // Toggle filter called
     final current = await getFilters();
-    debugPrint(
-      'FullCalendarWidgetService: Current filters - tasks: ${current.showTasks}, google: ${current.showGoogleCalendar}, rocis: ${current.showRocisSchedule}',
-    );
+    // Current filters retrieved
     FullCalendarFilters updated;
 
     switch (filterName) {
@@ -142,17 +138,13 @@ class FullCalendarWidgetService {
         );
         break;
       default:
-        debugPrint(
-          'FullCalendarWidgetService: Unknown filter name: $filterName',
-        );
+        // Unknown filter name
         updated = current;
     }
 
-    debugPrint(
-      'FullCalendarWidgetService: Updated filters - tasks: ${updated.showTasks}, google: ${updated.showGoogleCalendar}, rocis: ${updated.showRocisSchedule}',
-    );
+    // Updated filters applied
     await saveFilters(updated);
-    debugPrint('FullCalendarWidgetService: Filters saved');
+    // Filters saved
     return updated;
   }
 
@@ -160,15 +152,13 @@ class FullCalendarWidgetService {
     int? monthOffset,
     String? userId,
   }) async {
-    debugPrint(
-      'FullCalendarWidget: updateFullCalendarWidget started with offset: $monthOffset',
-    );
+    // updateFullCalendarWidget started
     try {
       final prefs = await SharedPreferences.getInstance();
       final int offset =
           monthOffset ?? (prefs.getInt('full_calendar_offset') ?? 0);
 
-      debugPrint('FullCalendarWidget: Using offset: $offset');
+      // Using offset
 
       // Save offset if provided
       if (monthOffset != null) {
@@ -177,9 +167,7 @@ class FullCalendarWidgetService {
 
       // Get filter settings
       final filters = await getFilters();
-      debugPrint(
-        'FullCalendarWidget: Filters - tasks: ${filters.showTasks}, google: ${filters.showGoogleCalendar}, rocis: ${filters.showRocisSchedule}',
-      );
+      // Filters loaded
 
       // Get custom colors (stored as int values)
       final taskColorInt =
@@ -207,7 +195,7 @@ class FullCalendarWidgetService {
       final now = DateTime.now();
       final targetMonth = DateTime(now.year, now.month + offset, 1);
       final monthName = DateFormat('MMMM yyyy').format(targetMonth);
-      debugPrint('FullCalendarWidget: Target month: $monthName');
+      // Target month calculated
 
       // Calculate calendar grid (5 weeks)
       final firstDayOfMonth = targetMonth;
@@ -217,7 +205,7 @@ class FullCalendarWidgetService {
         const Duration(days: 34),
       ); // 35 days (5 weeks)
 
-      debugPrint('FullCalendarWidget: Date range: $startDate to $endDate');
+      // Date range calculated
 
       // Fetch Google Calendar events (if filter enabled)
       final events = filters.showGoogleCalendar
@@ -253,19 +241,13 @@ class FullCalendarWidgetService {
             startDate,
             endDate,
           );
-          debugPrint(
-            'FullCalendarWidget: Fetched ${scheduleData.length} ROCIs-Schedule items',
-          );
+          // Fetched ROCIs-Schedule items
         } catch (e) {
-          debugPrint(
-            'FullCalendarWidget: Error fetching ROCIs-Schedule data: $e',
-          );
+          // Error fetching ROCIs-Schedule data
         }
       }
 
-      debugPrint(
-        'FullCalendarWidget: Found ${events.length} Google events, ${tasks.length} tasks, ${scheduleData.length} schedule items',
-      );
+      // Found events, tasks, and schedule items
 
       final gridData = <Map<String, dynamic>>[];
 
@@ -377,20 +359,18 @@ class FullCalendarWidgetService {
         }
       }
 
-      debugPrint('FullCalendarWidget: Generated ${gridData.length} grid cells');
+      // Generated grid cells
 
       // Save Data
       final gridDataJson = jsonEncode(gridData);
-      debugPrint(
-        'FullCalendarWidget: Saving grid data (length: ${gridDataJson.length})',
-      );
+      // Saving grid data
       await HomeWidget.saveWidgetData<String>(
         'full_calendar_grid_data',
         gridDataJson,
       );
 
       // Save Month Name
-      debugPrint('FullCalendarWidget: Saving month name: $monthName');
+      // Saving month name
       await HomeWidget.saveWidgetData<String>(
         'full_calendar_month_name',
         monthName,
@@ -410,20 +390,16 @@ class FullCalendarWidgetService {
         filters.showRocisSchedule,
       );
 
-      debugPrint(
-        'FullCalendarWidget: Signaling update for FullCalendarWidgetProvider',
-      );
+      // Signaling update for widget
 
       await HomeWidget.updateWidget(
         name: 'FullCalendarWidgetProvider',
         iOSName: 'FullCalendarWidget',
       );
 
-      debugPrint('FullCalendarWidget: updateWidget call successfully signaled');
-    } catch (e, stack) {
-      debugPrint(
-        'FullCalendarWidget: CRITICAL ERROR in updateFullCalendarWidget: $e\n$stack',
-      );
+      // updateWidget call successfully signaled
+    } catch (e) {
+      // CRITICAL ERROR in updateFullCalendarWidget
     }
   }
 

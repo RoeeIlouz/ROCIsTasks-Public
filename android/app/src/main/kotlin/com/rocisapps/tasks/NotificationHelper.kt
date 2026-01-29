@@ -1,4 +1,4 @@
-package com.example.rocis_tasks
+package com.rocisapps.tasks
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -18,7 +18,7 @@ class NotificationHelper(private val context: Context) {
     private val notificationId = 888
     
     companion object {
-        const val ACTION_ADD_TASK = "com.example.rocis_tasks.ACTION_ADD_TASK"
+        const val ACTION_ADD_TASK = "com.rocisapps.tasks.ACTION_ADD_TASK"
     }
 
     init {
@@ -42,14 +42,12 @@ class NotificationHelper(private val context: Context) {
     }
 
     fun showTaskCountNotification(count: Int, titles: List<String>, largeIconPath: String?, isDarkText: Boolean = false) {
-        android.util.Log.d("NotificationHelper", "showTaskCountNotification called with count: $count, path: $largeIconPath, isDarkText: $isDarkText")
         try {
             var bitmap: Bitmap? = null
             if (largeIconPath != null) {
                 try {
                     bitmap = android.graphics.BitmapFactory.decodeFile(largeIconPath)
                 } catch (e: Exception) {
-                    android.util.Log.e("NotificationHelper", "Error loading bitmap from path: $largeIconPath", e)
                 }
             }
             
@@ -135,7 +133,6 @@ class NotificationHelper(private val context: Context) {
                 notificationManager.notify(notificationId, builder.build())
             }
         } catch (e: Exception) {
-            android.util.Log.e("NotificationHelper", "Error showing notification: ${e.message}", e)
         }
     }
 

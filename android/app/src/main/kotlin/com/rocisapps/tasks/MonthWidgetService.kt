@@ -1,4 +1,4 @@
-package com.example.rocis_tasks
+package com.rocisapps.tasks
 
 import android.content.Context
 import android.content.Intent
@@ -23,7 +23,6 @@ class MonthWidgetFactory(private val context: Context) : RemoteViewsService.Remo
     }
 
     override fun onDataSetChanged() {
-        android.util.Log.d("MonthWidget", "onDataSetChanged started")
         days.clear()
         try {
             val widgetData = HomeWidgetPlugin.getData(context)
@@ -32,9 +31,7 @@ class MonthWidgetFactory(private val context: Context) : RemoteViewsService.Remo
             for (i in 0 until jsonArray.length()) {
                 days.add(jsonArray.getJSONObject(i))
             }
-            android.util.Log.d("MonthWidget", "Parsed ${days.size} grid cells")
         } catch (e: Exception) {
-            android.util.Log.e("MonthWidget", "Error in onDataSetChanged", e)
         }
     }
 
@@ -118,7 +115,6 @@ class MonthWidgetFactory(private val context: Context) : RemoteViewsService.Remo
             }
 
         } catch (e: Exception) {
-            android.util.Log.e("MonthWidget", "Error in getViewAt $position", e)
         }
         return views
     }

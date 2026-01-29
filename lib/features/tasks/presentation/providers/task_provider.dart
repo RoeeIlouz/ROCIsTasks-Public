@@ -25,7 +25,7 @@ import 'package:rocis_tasks/core/services/error_handling_service.dart';
 enum TaskSortOption { dueDate, priority, title, dateCreated }
 
 /// Main provider for task management and synchronization.
-/// 
+///
 /// This class handles local persistence via Hive, cloud synchronization via Firestore,
 /// and coordination between various services (notifications, widgets, etc.).
 class TaskProvider extends ChangeNotifier {
@@ -88,7 +88,7 @@ class TaskProvider extends ChangeNotifier {
   }
 
   /// Initialize the provider and its dependencies.
-  /// 
+  ///
   /// Sets up listeners for authentication changes, connectivity, and Firestore streams.
   Future<void> init() async {
     final prefs = await SharedPreferences.getInstance();
@@ -171,7 +171,7 @@ class TaskProvider extends ChangeNotifier {
         _connectivityService.addListener(() {
               if (_connectivityService.isOnline &&
                   _authService.currentUser != null) {
-                debugPrint('Network restored - attempting sync');
+                // Network restored - attempting sync
                 syncWithCloud();
               }
             })
@@ -187,7 +187,7 @@ class TaskProvider extends ChangeNotifier {
           await uploadLocalDataToCloud();
           await syncWithCloud();
         } else {
-          debugPrint('User signed in but offline - will sync when online');
+          // User signed in but offline - will sync when online
         }
       } else {
         _firestoreService.setUserId(null);
@@ -219,7 +219,7 @@ class TaskProvider extends ChangeNotifier {
               _errorHandlingService.logError(e, s, reason: 'Initial sync');
             });
       } else {
-        debugPrint('App started offline - will sync when online');
+        // App started offline - will sync when online
       }
     }
 
@@ -274,7 +274,7 @@ class TaskProvider extends ChangeNotifier {
     }
 
     if (needsUpdate) {
-      debugPrint('Repaired encrypted tasks in local storage');
+      // Repaired encrypted tasks in local storage
     }
   }
 
@@ -351,7 +351,7 @@ class TaskProvider extends ChangeNotifier {
       for (var task in tasks) {
         await _firestoreService.addTask(task);
       }
-      debugPrint('Successfully uploaded local data to cloud');
+      // Successfully uploaded local data to cloud
     } catch (e, s) {
       _errorHandlingService.logError(
         e,
@@ -366,7 +366,7 @@ class TaskProvider extends ChangeNotifier {
 
     // Don't attempt to sync if offline
     if (!_connectivityService.isOnline) {
-      debugPrint('Skipping cloud sync - offline');
+      // Skipping cloud sync - offline
       return;
     }
 
@@ -421,7 +421,7 @@ class TaskProvider extends ChangeNotifier {
         },
       );
 
-      debugPrint('Cloud sync started successfully');
+      // Cloud sync started successfully
     } catch (e, s) {
       _errorHandlingService.logError(e, s, reason: 'Starting cloud sync');
     }
@@ -622,7 +622,7 @@ class TaskProvider extends ChangeNotifier {
           // Get current user ID and email for ROCIs-Schedule integration
           final userId = _authService.currentUser?.uid;
           final userEmail = _authService.currentUser?.email;
-          
+
           // Set user email for cross-app schedule data lookup
           _widgetDataService.setUserEmail(userEmail);
           _fullCalendarWidgetService.setUserEmail(userEmail);
@@ -642,7 +642,9 @@ class TaskProvider extends ChangeNotifier {
           );
 
           await _monthWidgetService.updateMonthWidget();
-          await _fullCalendarWidgetService.updateFullCalendarWidget(userId: userId);
+          await _fullCalendarWidgetService.updateFullCalendarWidget(
+            userId: userId,
+          );
         } catch (e, s) {
           _errorHandlingService.logError(e, s, reason: 'Updating home widgets');
         } finally {
