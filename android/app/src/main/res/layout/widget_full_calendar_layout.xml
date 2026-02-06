@@ -53,6 +53,18 @@
             android:background="?android:attr/selectableItemBackgroundBorderless" />
 
         <TextView
+            android:id="@+id/widget_full_calendar_today"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:gravity="center"
+            android:text="⦿"
+            android:textColor="@color/widget_primary"
+            android:textSize="18sp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?android:attr/selectableItemBackgroundBorderless" />
+
+        <TextView
             android:id="@+id/widget_add_task_btn"
             android:layout_width="48dp"
             android:layout_height="48dp"

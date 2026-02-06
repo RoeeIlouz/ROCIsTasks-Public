@@ -36,8 +36,14 @@ class BackgroundHandler {
       if (taskId != null) {
         await _completeTaskInBackground(taskId);
       }
-    } else if (host == 'full_calendar_prev' || host == 'full_calendar_next') {
-      await _handleFullCalendarNavigation(host == 'full_calendar_next');
+    } else if (host == 'full_calendar_prev' ||
+        host == 'full_calendar_next' ||
+        host == 'prev_month' ||
+        host == 'next_month') {
+      final isNext = host == 'full_calendar_next' || host == 'next_month';
+      await _handleFullCalendarNavigation(isNext: isNext);
+    } else if (host == 'full_calendar_today') {
+      await _handleFullCalendarNavigation(targetOffset: 0);
     } else if (host == 'full_calendar_filter_tasks') {
       await _handleFullCalendarFilterToggle('tasks');
     } else if (host == 'full_calendar_filter_google') {
@@ -49,36 +55,69 @@ class BackgroundHandler {
     }
   }
 
-  static Future<void> _handleFullCalendarNavigation(bool isNext) async {
-    await AppInitializer.initialize(isBackground: true);
+  static Future<void> _handleFullCalendarNavigation({
+    bool? isNext,
+    int? targetOffset,
+  }) async {
+    try {
+      AppLogger.info(
+        'Handling calendar navigation: isNext=$isNext, targetOffset=$targetOffset',
+        tag: 'Background',
+      );
+      await AppInitializer.initialize(isBackground: true);
 
-    final prefs = await SharedPreferences.getInstance();
-    int offset = prefs.getInt('full_calendar_offset') ?? 0;
-    offset = isNext ? offset + 1 : offset - 1;
-    await prefs.setInt('full_calendar_offset', offset);
+      int offset =
+          await HomeWidget.getWidgetData<int>('full_calendar_offset') ?? 0;
+      final oldOffset = offset;
 
-    final calendarService = CalendarService();
-    await calendarService.init();
+      if (targetOffset != null) {
+        offset = targetOffset;
+      } else if (isNext != null) {
+        offset = isNext ? offset + 1 : offset - 1;
+      }
 
-    final taskSource = LocalTaskSource();
-    await taskSource.init();
+      await HomeWidget.saveWidgetData<int>('full_calendar_offset', offset);
 
-    final fullCalendarService = FullCalendarWidgetService(
-      calendarService,
-      taskSource,
-    );
+      AppLogger.info(
+        'Offset updated: $oldOffset -> $offset',
+        tag: 'Background',
+      );
 
-    // Initialize schedule service and set user email for ROCIs-Schedule integration
-    await fullCalendarService.initScheduleService();
-    final currentUser = FirebaseAuth.instance.currentUser;
-    if (currentUser != null) {
-      fullCalendarService.setUserEmail(currentUser.email);
+      final calendarService = CalendarService();
+      await calendarService.init();
+
+      final taskSource = LocalTaskSource();
+      await taskSource.init();
+
+      final fullCalendarService = FullCalendarWidgetService(
+        calendarService,
+        taskSource,
+      );
+
+      // Initialize schedule service and set user email for ROCIs-Schedule integration
+      await fullCalendarService.initScheduleService();
+      final currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser != null) {
+        fullCalendarService.setUserEmail(currentUser.email);
+      }
+
+      await fullCalendarService.updateFullCalendarWidget(
+        monthOffset: offset,
+        userId: currentUser?.uid,
+      );
+
+      AppLogger.info(
+        'Full calendar widget updated successfully with offset $offset',
+        tag: 'Background',
+      );
+    } catch (e, stackTrace) {
+      AppLogger.error(
+        'Error in full calendar navigation',
+        error: e,
+        stack: stackTrace,
+        tag: 'Background',
+      );
     }
-
-    await fullCalendarService.updateFullCalendarWidget(
-      monthOffset: offset,
-      userId: currentUser?.uid,
-    );
   }
 
   static Future<void> _handleFullCalendarFilterToggle(String filterName) async {

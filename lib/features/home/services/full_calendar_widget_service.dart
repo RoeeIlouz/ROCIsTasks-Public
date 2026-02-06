@@ -156,13 +156,18 @@ class FullCalendarWidgetService {
     try {
       final prefs = await SharedPreferences.getInstance();
       final int offset =
-          monthOffset ?? (prefs.getInt('full_calendar_offset') ?? 0);
+          monthOffset ??
+          (await HomeWidget.getWidgetData<int>('full_calendar_offset') ?? 0);
+
+      print(
+        'Updating FullCalendarWidget with offset: $offset (requested: $monthOffset)',
+      );
 
       // Using offset
 
       // Save offset if provided
       if (monthOffset != null) {
-        await prefs.setInt('full_calendar_offset', offset);
+        await HomeWidget.saveWidgetData<int>('full_calendar_offset', offset);
       }
 
       // Get filter settings
@@ -208,33 +213,43 @@ class FullCalendarWidgetService {
       // Date range calculated
 
       // Fetch Google Calendar events (if filter enabled)
-      final events = filters.showGoogleCalendar
-          ? await _calendarService.getEvents(
-              startDate: startDate,
-              endDate: endDate,
-              calendarIds: filters.selectedCalendarIds,
-            )
-          : [];
+      var events = [];
+      try {
+        if (filters.showGoogleCalendar) {
+          events = await _calendarService.getEvents(
+            startDate: startDate,
+            endDate: endDate,
+            calendarIds: filters.selectedCalendarIds,
+          );
+        }
+      } catch (e) {
+        print('Error fetching Google Calendar events: $e');
+      }
 
       // Fetch tasks (if filter enabled)
-      final allTasks = _taskSource.getTasks();
-      final tasks = filters.showTasks
-          ? allTasks
-                .where(
-                  (t) =>
-                      !(t.isDeleted ?? false) &&
-                      !t.isCompleted &&
-                      t.dueDate != null,
-                )
-                .toList()
-          : [];
+      var tasks = <dynamic>[];
+      try {
+        final allTasks = _taskSource.getTasks();
+        if (filters.showTasks) {
+          tasks = allTasks
+              .where(
+                (t) =>
+                    !(t.isDeleted ?? false) &&
+                    !t.isCompleted &&
+                    t.dueDate != null,
+              )
+              .toList();
+        }
+      } catch (e) {
+        print('Error fetching tasks: $e');
+      }
 
       // Fetch ROCIs-Schedule events (if filter enabled and user is authenticated)
       List<Map<String, dynamic>> scheduleData = [];
-      if (filters.showRocisSchedule &&
-          _scheduleService.isReady &&
-          _scheduleService.isAuthenticated) {
-        try {
+      try {
+        if (filters.showRocisSchedule &&
+            _scheduleService.isReady &&
+            _scheduleService.isAuthenticated) {
           final effectiveUserId = userId ?? 'default';
           scheduleData = await _scheduleService.getScheduleDataForWidget(
             effectiveUserId,
@@ -242,9 +257,9 @@ class FullCalendarWidgetService {
             endDate,
           );
           // Fetched ROCIs-Schedule items
-        } catch (e) {
-          // Error fetching ROCIs-Schedule data
         }
+      } catch (e) {
+        print('Error fetching ROCIs-Schedule data: $e');
       }
 
       // Found events, tasks, and schedule items
@@ -278,9 +293,24 @@ class FullCalendarWidgetService {
 
           // Find ROCIs-Schedule items for this day
           final dayScheduleItems = scheduleData.where((item) {
-            final itemDate = DateTime.parse(item['date'] as String);
-            final itemDateKey = DateFormat('yyyy-MM-dd').format(itemDate);
-            return itemDateKey == dateKey;
+            try {
+              final dateObj = item['date'];
+              if (dateObj == null) return false;
+
+              DateTime itemDate;
+              if (dateObj is DateTime) {
+                itemDate = dateObj;
+              } else if (dateObj is String) {
+                itemDate = DateTime.parse(dateObj);
+              } else {
+                return false;
+              }
+
+              final itemDateKey = DateFormat('yyyy-MM-dd').format(itemDate);
+              return itemDateKey == dateKey;
+            } catch (e) {
+              return false;
+            }
           }).toList();
 
           // Create summaries (up to 3 items)
@@ -291,10 +321,18 @@ class FullCalendarWidgetService {
             final timeStr = e.start != null
                 ? DateFormat('HH:mm').format(e.start!)
                 : '';
+
+            final title = (e.title ?? 'Event').length > 30
+                ? '${(e.title ?? 'Event').substring(0, 27)}...'
+                : (e.title ?? 'Event');
+            final location = (e.location ?? '').length > 30
+                ? '${(e.location ?? '').substring(0, 27)}...'
+                : (e.location ?? '');
+
             summaries.add({
-              'text': e.title ?? 'Event',
+              'text': title,
               'time': timeStr,
-              'subtitle': e.location ?? '',
+              'subtitle': location,
               'color': googleColorHex,
               'type': 'google',
             });
@@ -303,25 +341,43 @@ class FullCalendarWidgetService {
           // Add ROCIs-Schedule events and assignments (custom colors)
           for (var item in dayScheduleItems) {
             if (summaries.length >= 3) break;
-            final type = item['type'] as String;
-            final color = type == 'assignment'
-                ? assignmentColorHex
-                : scheduleColorHex;
-            // Normalize type for filtering - both schedule_event and assignment should be filtered by 'rocis' filter
-            final itemDateStr = item['date'] as String;
-            final itemDate = DateTime.parse(itemDateStr);
-            final startTime = item['startTime'] != null
-                ? DateFormat('HH:mm').format(itemDate)
-                : '';
+            try {
+              final type = (item['type'] as String?) ?? 'schedule_event';
+              final color = type == 'assignment'
+                  ? assignmentColorHex
+                  : scheduleColorHex;
 
-            // Normalize type for filtering - both schedule_event and assignment should be filtered by 'rocis' filter
-            summaries.add({
-              'text': item['title'] as String,
-              'time': startTime,
-              'subtitle': item['location'] ?? '',
-              'color': color,
-              'type': type, // Keep original type (schedule_event or assignment)
-            });
+              final itemDateStr = item['date'] as String?;
+              if (itemDateStr == null) continue;
+
+              final itemDate = DateTime.parse(itemDateStr);
+              // Use the event date for time if startTime key is missing or null
+              // schedule_event usually has a specific time, assignments usually don't (or are all day)
+              final startTime = type == 'schedule_event'
+                  ? DateFormat('HH:mm').format(itemDate)
+                  : '';
+
+              final rawTitle = (item['title'] as String?) ?? 'Event';
+              final rawLocation = (item['location'] as String?) ?? '';
+
+              final title = rawTitle.length > 30
+                  ? '${rawTitle.substring(0, 27)}...'
+                  : rawTitle;
+              final location = rawLocation.length > 30
+                  ? '${rawLocation.substring(0, 27)}...'
+                  : rawLocation;
+
+              summaries.add({
+                'text': title,
+                'time': startTime,
+                'subtitle': location,
+                'color': color,
+                'type': type,
+              });
+            } catch (e) {
+              // Ignore individual item errors to prevent widget crash
+              continue;
+            }
           }
 
           for (var t in dayTasks) {
@@ -335,9 +391,13 @@ class FullCalendarWidgetService {
               colorVal = cat.colorValue;
             } catch (_) {}
 
+            final title = t.title.length > 30
+                ? '${t.title.substring(0, 27)}...'
+                : t.title;
+
             summaries.add({
-              'text': t.title,
-              'priority': t.priority.name,
+              'text': title,
+              'priority': t.priority.toString().split('.').last,
               'color': colorVal != null
                   ? '#${colorVal.toRadixString(16).padLeft(8, '0')}'
                   : taskColorHex,
@@ -359,24 +419,35 @@ class FullCalendarWidgetService {
         }
       }
 
-      // Generated grid cells
+      // Created grid
+      print(
+        'Grid generation complete. Target month offset: $offset, Items: ${gridData.length}',
+      );
 
       // Save Data
       final gridDataJson = jsonEncode(gridData);
+      print('JSON encoded. Length: ${gridDataJson.length}');
+
+      if (gridDataJson.length > 500000) {
+        print(
+          'WARNING: Widget data payload is very large (${gridDataJson.length} bytes)',
+        );
+      }
+
       // Saving grid data
       await HomeWidget.saveWidgetData<String>(
         'full_calendar_grid_data',
         gridDataJson,
       );
+      print('Widget data saved to HomeWidget');
 
       // Save Month Name
-      // Saving month name
       await HomeWidget.saveWidgetData<String>(
         'full_calendar_month_name',
         monthName,
       );
 
-      // Save filter states for widget display
+      // Save filter states
       await HomeWidget.saveWidgetData<bool>(
         'full_calendar_show_tasks',
         filters.showTasks,
@@ -391,15 +462,76 @@ class FullCalendarWidgetService {
       );
 
       // Signaling update for widget
+      await HomeWidget.updateWidget(
+        name: 'FullCalendarWidgetProvider',
+        iOSName: 'FullCalendarWidget',
+      );
+      print('Widget update signaled');
+    } catch (e, stackTrace) {
+      print('CRITICAL ERROR in updateFullCalendarWidget: $e\n$stackTrace');
+      // Attempt fallback to at least show the dates
+      await _generateFallbackGrid(monthOffset, userId);
+    }
+  }
+
+  /// Generates a grid with just dates (no events) to prevent blank widget
+  Future<void> _generateFallbackGrid(int? monthOffset, String? userId) async {
+    try {
+      final int offset =
+          monthOffset ??
+          (await HomeWidget.getWidgetData<int>('full_calendar_offset') ?? 0);
+
+      final now = DateTime.now();
+      final targetMonth = DateTime(now.year, now.month + offset, 1);
+      final monthName = DateFormat('MMMM yyyy').format(targetMonth);
+
+      final firstDayOfMonth = targetMonth;
+      final difference = firstDayOfMonth.weekday % 7;
+      final startDate = firstDayOfMonth.subtract(Duration(days: difference));
+
+      final gridData = <Map<String, dynamic>>[];
+
+      for (int row = 0; row < 5; row++) {
+        final rowStartDate = startDate.add(Duration(days: row * 7));
+        final weekNumber = _getWeekNumber(rowStartDate);
+
+        gridData.add({'isWeekNumber': true, 'weekNumber': weekNumber});
+
+        for (int col = 0; col < 7; col++) {
+          final date = rowStartDate.add(Duration(days: col));
+          final dateKey = DateFormat('yyyy-MM-dd').format(date);
+
+          gridData.add({
+            'isWeekNumber': false,
+            'date': dateKey,
+            'day': date.day,
+            'isCurrentMonth': date.month == targetMonth.month,
+            'isToday':
+                date.year == now.year &&
+                date.month == now.month &&
+                date.day == now.day,
+            'summaries': [], // Empty summaries
+          });
+        }
+      }
+
+      final gridDataJson = jsonEncode(gridData);
+      await HomeWidget.saveWidgetData<String>(
+        'full_calendar_grid_data',
+        gridDataJson,
+      );
+      await HomeWidget.saveWidgetData<String>(
+        'full_calendar_month_name',
+        monthName,
+      );
 
       await HomeWidget.updateWidget(
         name: 'FullCalendarWidgetProvider',
         iOSName: 'FullCalendarWidget',
       );
-
-      // updateWidget call successfully signaled
+      print('Fallback grid updated successfully');
     } catch (e) {
-      // CRITICAL ERROR in updateFullCalendarWidget
+      print('Even fallback grid generation failed: $e');
     }
   }
 

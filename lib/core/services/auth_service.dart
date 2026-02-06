@@ -4,24 +4,32 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter/foundation.dart';
 import 'package:rocis_tasks/core/services/error_handling_service.dart';
 import 'package:rocis_tasks/core/services/logger_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:rocis_tasks/core/services/encryption_service.dart';
 
 class AuthService extends ChangeNotifier {
   final ErrorHandlingService _errorHandlingService;
   FirebaseAuth get _auth => FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
-  
+
   // Secondary Firebase Auth for ROCIs-Schedule
   FirebaseAuth? _scheduleAuth;
 
-  AuthService(this._errorHandlingService);
+  AuthService(this._errorHandlingService) {
+    _auth.authStateChanges().listen((User? user) {
+      if (user != null) {
+        _syncEncryptionKey(user.uid);
+      }
+    });
+  }
 
   User? get currentUser => _auth.currentUser;
 
   Stream<User?> get authStateChanges => _auth.authStateChanges();
-  
+
   /// Get the secondary Firebase Auth instance for ROCIs-Schedule
   FirebaseAuth? get scheduleAuth => _scheduleAuth;
-  
+
   /// Check if user is authenticated in the secondary Firebase app
   bool get isAuthenticatedInSchedule => _scheduleAuth?.currentUser != null;
 
@@ -32,7 +40,7 @@ class AuthService extends ChangeNotifier {
 
       final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;
-      
+
       final AuthCredential credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
@@ -41,10 +49,20 @@ class AuthService extends ChangeNotifier {
       final UserCredential userCredential = await _auth.signInWithCredential(
         credential,
       );
-      
+
+      // Sync encryption key immediately after sign in and WAIT for it
+      if (userCredential.user != null) {
+        AppLogger.info(
+          'Sign in successful. Starting critical key sync...',
+          tag: 'Auth',
+        );
+        await _syncEncryptionKey(userCredential.user!.uid);
+        AppLogger.info('Key sync complete.', tag: 'Auth');
+      }
+
       // Also sign in to the secondary Firebase app (ROCIs-Schedule)
       await _signInToSecondaryFirebase(credential);
-      
+
       notifyListeners();
       return userCredential;
     } catch (e, s) {
@@ -52,28 +70,77 @@ class AuthService extends ChangeNotifier {
       return null;
     }
   }
-  
+
+  /// Sync encryption key with Cloud Firestore to prevent data loss on reinstall
+  Future<void> _syncEncryptionKey(String userId) async {
+    try {
+      final userSettingsRef = FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .collection('settings')
+          .doc('security');
+
+      final doc = await userSettingsRef.get();
+      final localKey = await EncryptionService.getKey();
+
+      if (doc.exists &&
+          doc.data() != null &&
+          doc.data()!.containsKey('encryptionKey')) {
+        final cloudKey = doc.data()!['encryptionKey'] as String;
+
+        // If cloud has a key, and it differs from local, RESTORE it
+        // This fixes the "DECRYPTION_ERROR" after reinstall
+        if (localKey != cloudKey) {
+          AppLogger.info(
+            'Restoring encryption key from cloud backup',
+            tag: 'Auth',
+          );
+          await EncryptionService.setKey(cloudKey);
+        }
+      } else {
+        // If cloud has no key, backup the current local key
+        if (localKey != null) {
+          AppLogger.info('Backing up encryption key to cloud', tag: 'Auth');
+          await userSettingsRef.set({
+            'encryptionKey': localKey,
+            'updatedAt': FieldValue.serverTimestamp(),
+          }, SetOptions(merge: true));
+        }
+      }
+    } catch (e) {
+      // Don't block auth if this fails, but log it
+      AppLogger.error('Key sync failed', error: e, tag: 'Auth');
+    }
+  }
+
   /// Sign in to the secondary Firebase app (ROCIs-Schedule) using the same credentials
   Future<void> _signInToSecondaryFirebase(AuthCredential credential) async {
     try {
       // Get the secondary Firebase app
       final scheduleApp = Firebase.app('rocis-schedule');
       _scheduleAuth = FirebaseAuth.instanceFor(app: scheduleApp);
-      
+
       // Sign in with the same Google credential
       await _scheduleAuth!.signInWithCredential(credential);
-      AppLogger.info('Signed in to secondary Firebase (rocis-schedule) successfully', tag: 'Auth');
+      AppLogger.info(
+        'Signed in to secondary Firebase (rocis-schedule) successfully',
+        tag: 'Auth',
+      );
     } catch (e) {
-      AppLogger.warning('Failed to sign in to secondary Firebase', error: e, tag: 'Auth');
+      AppLogger.warning(
+        'Failed to sign in to secondary Firebase',
+        error: e,
+        tag: 'Auth',
+      );
       // Non-critical - schedule integration will just be unavailable
       _scheduleAuth = null;
     }
   }
-  
+
   /// Re-authenticate to secondary Firebase if needed (e.g., after app restart)
   Future<void> ensureSecondaryAuth() async {
     if (_scheduleAuth?.currentUser != null) return;
-    
+
     // If user is signed in to primary but not secondary, try to sign in
     if (_auth.currentUser != null) {
       try {
@@ -88,7 +155,11 @@ class AuthService extends ChangeNotifier {
           await _signInToSecondaryFirebase(credential);
         }
       } catch (e) {
-        AppLogger.warning('Failed to re-authenticate to secondary Firebase', error: e, tag: 'Auth');
+        AppLogger.warning(
+          'Failed to re-authenticate to secondary Firebase',
+          error: e,
+          tag: 'Auth',
+        );
       }
     }
   }
@@ -98,7 +169,7 @@ class AuthService extends ChangeNotifier {
       // Sign out from secondary Firebase first
       await _scheduleAuth?.signOut();
       _scheduleAuth = null;
-      
+
       await _googleSignIn.signOut();
       await _auth.signOut();
       notifyListeners();

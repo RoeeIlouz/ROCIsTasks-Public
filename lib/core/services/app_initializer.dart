@@ -31,20 +31,25 @@ class AppInitializer {
       // 1. Core Binding (Required first)
       WidgetsFlutterBinding.ensureInitialized();
 
-      // 2. Initialize error handling
+      // 2. Initialize Core Firebase (Required for ErrorService if Crashlytics/Analytics enabled)
+      await _initFirebase();
+
+      // 3. Initialize error handling
       ErrorService.initialize();
 
-      // 3. Parallel initialization of independent heavy services with timeout
+      // 4. Parallel initialization of independent heavy services with timeout
       await Future.wait([
         _initHive(),
         _initEnvironment(),
-        _initFirebase(),
         _initEncryption(),
         _initTimezone(),
+        _initSecondaryFirebase(), // Moved here to be parallel with other services
       ]).timeout(
         Duration(seconds: AppConfig.syncTimeoutSeconds),
         onTimeout: () {
-          AppLogger.critical('SECURITY ALERT: Initialization timeout. Potential compromised environment.');
+          AppLogger.critical(
+            'SECURITY ALERT: Initialization timeout. Potential compromised environment.',
+          );
           throw Exception('Security initialization timeout');
         },
       );
@@ -56,13 +61,20 @@ class AppInitializer {
         await NotificationService().init();
       }
     } catch (e, stack) {
-      AppLogger.critical('Critical error during initialization', error: e, stack: stack);
-      // Don't rethrow - allow app to continue with degraded functionality
+      AppLogger.critical(
+        'Critical error during initialization',
+        error: e,
+        stack: stack,
+      );
+      // Rethrow critical errors to prevent the app from starting in a broken state
+      rethrow;
     }
 
     _isInitialized = true;
     if (AppConfig.enableDebugLogging) {
-      AppLogger.info('Initialization took ${stopwatch.elapsedMilliseconds}ms (isBackground: $isBackground)');
+      AppLogger.info(
+        'Initialization took ${stopwatch.elapsedMilliseconds}ms (isBackground: $isBackground)',
+      );
     }
     stopwatch.stop();
   }
@@ -118,13 +130,17 @@ class AppInitializer {
         );
         AppLogger.info('Firestore offline persistence enabled');
       } catch (e) {
-        AppLogger.warning('Firestore persistence setup failed (non-critical)', error: e);
+        AppLogger.warning(
+          'Firestore persistence setup failed (non-critical)',
+          error: e,
+        );
       }
-
-      // Initialize secondary Firebase app for ROCIs-Schedule data
-      await _initSecondaryFirebase();
     } catch (e, stack) {
-      AppLogger.critical('CRITICAL - Firebase initialization failed', error: e, stack: stack);
+      AppLogger.critical(
+        'CRITICAL - Firebase initialization failed',
+        error: e,
+        stack: stack,
+      );
 
       // This is a critical error - rethrow to show error screen
       throw Exception('Firebase initialization failed: $e');
@@ -152,7 +168,10 @@ class AppInitializer {
 
       AppLogger.info('Secondary Firebase app initialized successfully');
     } catch (e) {
-      AppLogger.warning('Secondary Firebase initialization failed (non-critical)', error: e);
+      AppLogger.warning(
+        'Secondary Firebase initialization failed (non-critical)',
+        error: e,
+      );
       AppLogger.info('ROCIs-Schedule integration will be unavailable');
     }
   }
@@ -162,8 +181,13 @@ class AppInitializer {
       await EncryptionService.init();
       AppLogger.info('Encryption initialized successfully');
     } catch (e) {
-      AppLogger.critical('CRITICAL SECURITY FAILURE: Encryption initialization failed', error: e);
-      throw Exception('Critical security initialization failed. Please restart the app.');
+      AppLogger.critical(
+        'CRITICAL SECURITY FAILURE: Encryption initialization failed',
+        error: e,
+      );
+      throw Exception(
+        'Critical security initialization failed. Please restart the app.',
+      );
     }
   }
 

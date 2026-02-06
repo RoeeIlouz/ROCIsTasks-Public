@@ -68,6 +68,7 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
                 days.add(day)
             }
         } catch (e: Exception) {
+            android.util.Log.e("FullCalendarWidget", "Error parsing widget data", e)
         }
     }
 

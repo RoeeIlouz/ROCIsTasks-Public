@@ -16,6 +16,9 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
         const val ACTION_FILTER_TASKS = "com.rocisapps.tasks.ACTION_FILTER_TASKS"
         const val ACTION_FILTER_GOOGLE = "com.rocisapps.tasks.ACTION_FILTER_GOOGLE"
         const val ACTION_FILTER_ROCIS = "com.rocisapps.tasks.ACTION_FILTER_ROCIS"
+        const val ACTION_PREV_MONTH = "com.rocisapps.tasks.ACTION_PREV_MONTH"
+        const val ACTION_NEXT_MONTH = "com.rocisapps.tasks.ACTION_NEXT_MONTH"
+        const val ACTION_TODAY = "com.rocisapps.tasks.ACTION_TODAY"
         
         // Preference keys
         const val PREF_SHOW_TASKS = "full_calendar_show_tasks"
@@ -27,6 +30,9 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
         private const val REQUEST_CODE_FILTER_TASKS = 301
         private const val REQUEST_CODE_FILTER_GOOGLE = 302
         private const val REQUEST_CODE_FILTER_ROCIS = 303
+        private const val REQUEST_CODE_PREV_MONTH = 304
+        private const val REQUEST_CODE_NEXT_MONTH = 305
+        private const val REQUEST_CODE_TODAY = 306
     }
 
     override fun onUpdate(
@@ -44,16 +50,36 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
                 val monthName = widgetData.getString("full_calendar_month_name", "Calendar")
                 views.setTextViewText(R.id.widget_full_calendar_title, monthName)
 
-                // 2. Navigation Buttons - use direct background intent
-                val prevIntent = es.antonborri.home_widget.HomeWidgetBackgroundIntent.getBroadcast(
-                    context, Uri.parse("rocistasks://full_calendar_prev")
+                // 2. Navigation Buttons - use direct broadcast for more reliability
+                val prevIntent = Intent(context, FullCalendarWidgetProvider::class.java).apply {
+                    action = ACTION_PREV_MONTH
+                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+                }
+                val prevPendingIntent = android.app.PendingIntent.getBroadcast(
+                    context, REQUEST_CODE_PREV_MONTH, prevIntent,
+                    android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_MUTABLE
                 )
-                views.setOnClickPendingIntent(R.id.widget_full_calendar_prev, prevIntent)
-
-                val nextIntent = es.antonborri.home_widget.HomeWidgetBackgroundIntent.getBroadcast(
-                    context, Uri.parse("rocistasks://full_calendar_next")
+                views.setOnClickPendingIntent(R.id.widget_full_calendar_prev, prevPendingIntent)
+                
+                val nextIntent = Intent(context, FullCalendarWidgetProvider::class.java).apply {
+                    action = ACTION_NEXT_MONTH
+                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+                }
+                val nextPendingIntent = android.app.PendingIntent.getBroadcast(
+                    context, REQUEST_CODE_NEXT_MONTH, nextIntent,
+                    android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_MUTABLE
                 )
-                views.setOnClickPendingIntent(R.id.widget_full_calendar_next, nextIntent)
+                views.setOnClickPendingIntent(R.id.widget_full_calendar_next, nextPendingIntent)
+                
+                val todayIntent = Intent(context, FullCalendarWidgetProvider::class.java).apply {
+                    action = ACTION_TODAY
+                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+                }
+                val todayPendingIntent = android.app.PendingIntent.getBroadcast(
+                    context, REQUEST_CODE_TODAY, todayIntent,
+                    android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_MUTABLE
+                )
+                views.setOnClickPendingIntent(R.id.widget_full_calendar_today, todayPendingIntent)
 
                 // 3. Add Task Button - Use HomeWidgetLaunchIntent for proper Flutter handling
                 val addTaskPendingIntent = HomeWidgetLaunchIntent.getActivity(
@@ -150,7 +176,8 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
         super.onReceive(context, intent)
         val action = intent.action
         
-        if (action == ACTION_FILTER_TASKS || action == ACTION_FILTER_GOOGLE || action == ACTION_FILTER_ROCIS) {
+        if (action == ACTION_FILTER_TASKS || action == ACTION_FILTER_GOOGLE || 
+            action == ACTION_FILTER_ROCIS || action == ACTION_PREV_MONTH || action == ACTION_NEXT_MONTH) {
             
             val widgetData = es.antonborri.home_widget.HomeWidgetPlugin.getData(context)
             val editor = widgetData.edit()
@@ -168,10 +195,40 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
                     val current = widgetData.getBoolean(PREF_SHOW_ROCIS, true)
                     editor.putBoolean(PREF_SHOW_ROCIS, !current)
                 }
+                ACTION_PREV_MONTH -> {
+                    // Trigger Dart background update
+                    val backgroundIntent = es.antonborri.home_widget.HomeWidgetBackgroundIntent.getBroadcast(
+                        context, Uri.parse("rocistasks://full_calendar_prev")
+                    )
+                    try {
+                        backgroundIntent.send()
+                    } catch (e: Exception) {}
+                }
+                ACTION_NEXT_MONTH -> {
+                    // Trigger Dart background update
+                    val backgroundIntent = es.antonborri.home_widget.HomeWidgetBackgroundIntent.getBroadcast(
+                        context, Uri.parse("rocistasks://full_calendar_next")
+                    )
+                    try {
+                        backgroundIntent.send()
+                    } catch (e: Exception) {}
+                }
+                ACTION_TODAY -> {
+                    // Reset offset in widget data
+                    editor.putInt(PREF_OFFSET, 0)
+                    
+                    // Trigger Dart background update
+                    val backgroundIntent = es.antonborri.home_widget.HomeWidgetBackgroundIntent.getBroadcast(
+                        context, Uri.parse("rocistasks://full_calendar_today")
+                    )
+                    try {
+                        backgroundIntent.send()
+                    } catch (e: Exception) {}
+                }
             }
             editor.apply()
             
-            // Update all widgets to reflect the new filter state
+            // Update all widgets to reflect the new state
             val appWidgetManager = AppWidgetManager.getInstance(context)
             val thisAppWidget = android.content.ComponentName(context, FullCalendarWidgetProvider::class.java)
             val appWidgetIds = appWidgetManager.getAppWidgetIds(thisAppWidget)
