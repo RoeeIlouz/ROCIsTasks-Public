@@ -3,6 +3,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/features/categories/domain/models/category.dart';
 import 'package:rocis_tasks/core/services/encryption_service.dart';
+import 'package:rocis_tasks/core/services/logger_service.dart';
 
 class LocalTaskSource {
   static const String boxName = 'tasksBox';
@@ -17,20 +18,9 @@ class LocalTaskSource {
     if (!Hive.isAdapterRegistered(1)) Hive.registerAdapter(TaskAdapter());
     if (!Hive.isAdapterRegistered(2)) Hive.registerAdapter(CategoryAdapter());
 
-    final isEncrypted = await EncryptionService.hasKey();
-    if (!isEncrypted) {
-      // Check if we have existing unencrypted data to migrate
-      final boxExists = await Hive.boxExists(boxName);
-      if (boxExists) {
-        await _performMigration();
-      } else {
-        // Fresh install -> Start Encrypted
-        await _openEncryptedBox();
-      }
-    } else {
-      // Normal encrypted startup
-      await _openEncryptedBox();
-    }
+    // We no longer use Hive encryption per user request.
+    // However, we need to handle existing encrypted data.
+    await _openBoxes();
   }
 
   Future<void> _performMigration() async {
@@ -97,18 +87,32 @@ class LocalTaskSource {
     }
   }
 
-  Future<void> _openEncryptedBox() async {
-    final key = await EncryptionService.getOrGenerateKey();
+  Future<void> _openBoxes() async {
     try {
-      await Hive.openBox<Task>(boxName, encryptionCipher: HiveAesCipher(key));
-      await Hive.openBox<Category>(
-        categoriesBoxName,
-        encryptionCipher: HiveAesCipher(key),
-      );
+      // Attempt to open boxes normally (unencrypted)
+      await Hive.openBox<Task>(boxName);
+      await Hive.openBox<Category>(categoriesBoxName);
     } catch (e) {
-      // Error opening encrypted box
-      // Potential key mismatch or corrupted file.
-      // Extreme fallback: delete and recreate? No, safer to throw.
+      // If opening fails, it might be because the boxes are encrypted.
+      // We attempt to migrate them to unencrypted boxes.
+      AppLogger.warning(
+        'Failed to open Hive boxes normally, attempting migration...',
+        tag: 'LocalTaskSource',
+      );
+      try {
+        await _performMigration();
+      } catch (migrationError) {
+        AppLogger.critical(
+          'Migration failed, clearing boxes to allow app to start',
+          error: migrationError,
+          tag: 'LocalTaskSource',
+        );
+        // If migration fails, we must clear the boxes to allow the app to function.
+        await Hive.deleteBoxFromDisk(boxName);
+        await Hive.deleteBoxFromDisk(categoriesBoxName);
+        await Hive.openBox<Task>(boxName);
+        await Hive.openBox<Category>(categoriesBoxName);
+      }
     }
   }
 

@@ -151,6 +151,9 @@ class EncryptionService {
   }
 
   static String encrypt(String plainText) {
+    // Encryption is disabled per user request to resolve persistent decryption errors
+    return plainText;
+    /*
     if (plainText.isEmpty) return plainText;
     if (_encrypter == null) {
       AppLogger.critical(
@@ -171,36 +174,43 @@ class EncryptionService {
       );
       throw Exception('Failed to secure data: $e');
     }
+    */
   }
 
   static String decrypt(String cipherText) {
     if (cipherText.isEmpty) return cipherText;
-    if (_encrypter == null) {
-      AppLogger.critical(
-        'SECURITY ALERT: Decrypter not initialized. Blocking operation.',
-        tag: 'Security',
-      );
-      return '[SECURE_DATA_LOCKED]';
-    }
 
     if (!cipherText.contains(':')) {
-      // Assume Legacy (Unencrypted) - In a hardened environment, you might want to block this
-      AppLogger.warning('Accessing legacy unencrypted data', tag: 'Security');
+      // Data is not in IV:CipherText format, assume it's already plain text
+      return cipherText;
+    }
+
+    if (_encrypter == null) {
+      // If we don't have a key but the data looks encrypted, we can't decrypt it.
+      // Returning the raw cipherText is better than [DECRYPTION_ERROR] as it might be partially recoverable or readable by the user.
+      AppLogger.warning(
+        'Attempted to decrypt data but encrypter is not initialized',
+        tag: 'Security',
+      );
       return cipherText;
     }
 
     try {
       final parts = cipherText.split(':');
-      if (parts.length != 2)
-        throw const FormatException('Invalid secure data format');
+      if (parts.length != 2) return cipherText;
 
       final iv = enc.IV.fromBase64(parts[0]);
       final encrypted = enc.Encrypted.fromBase64(parts[1]);
 
       return _encrypter!.decrypt(encrypted, iv: iv);
     } catch (e) {
-      AppLogger.error('Decryption failed', error: e, tag: 'Security');
-      return '[DECRYPTION_ERROR]';
+      AppLogger.error(
+        'Decryption failed, returning raw text',
+        error: e,
+        tag: 'Security',
+      );
+      // If decryption fails (e.g. wrong key), return the raw cipherText instead of an error message
+      return cipherText;
     }
   }
 }

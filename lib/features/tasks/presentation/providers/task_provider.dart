@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart' hide Category;
 import 'dart:async';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rocis_tasks/core/services/notification_service.dart';
-import 'package:rocis_tasks/core/services/encryption_service.dart';
 import 'package:rocis_tasks/features/tasks/data/datasources/local_task_source.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/core/services/firestore_service.dart';
@@ -124,12 +123,6 @@ class TaskProvider extends ChangeNotifier {
       _setError('Failed to initialize app data. Please restart.');
     }
 
-    try {
-      await _repairEncryptedData();
-    } catch (e, s) {
-      _errorHandlingService.logError(e, s, reason: 'Repairing encrypted data');
-      // Non-critical, don't show user error
-    }
     _refreshPagination();
 
     await _notificationService.cancelAllNotifications();
@@ -237,54 +230,6 @@ class TaskProvider extends ChangeNotifier {
         }
       }
     });
-  }
-
-  Future<void> _repairEncryptedData() async {
-    // Only run this repair if encryption service is ready
-    if (!await EncryptionService.hasKey()) return;
-
-    final allTasks = _source.getTasks();
-    bool needsUpdate = false;
-
-    for (var task in allTasks) {
-      bool changed = false;
-      // Check if title looks like it's encrypted (contains exactly one ':')
-      // and isn't just a normal string that happens to have a colon
-      if (_isLikelyEncrypted(task.title)) {
-        final decryptedInfo = EncryptionService.decrypt(task.title);
-        // Only update if it actually changed
-        if (decryptedInfo != task.title) {
-          task.title = decryptedInfo;
-          changed = true;
-        }
-      }
-
-      if (_isLikelyEncrypted(task.description)) {
-        final decryptedDesc = EncryptionService.decrypt(task.description);
-        if (decryptedDesc != task.description) {
-          task.description = decryptedDesc;
-          changed = true;
-        }
-      }
-
-      if (changed) {
-        await _source.updateTask(task);
-        needsUpdate = true;
-      }
-    }
-
-    if (needsUpdate) {
-      // Repaired encrypted tasks in local storage
-    }
-  }
-
-  bool _isLikelyEncrypted(String text) {
-    if (text.isEmpty) return false;
-    // Basic check for our encryption format IV:CipherText
-    // IV is 16 bytes base64 (~24 chars), CipherText is base64
-    if (!text.contains(':')) return false;
-    final parts = text.split(':');
-    return parts.length == 2 && parts[0].length >= 20;
   }
 
   void _navigateToTask(String taskId) {

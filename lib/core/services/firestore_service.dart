@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/features/categories/domain/models/category.dart';
-import 'package:rocis_tasks/core/services/encryption_service.dart';
 import 'package:rocis_tasks/core/services/connectivity_service.dart';
 import 'package:rocis_tasks/core/services/retry_service.dart';
 import 'package:rocis_tasks/core/services/logger_service.dart';
@@ -48,7 +47,11 @@ class FirestoreService {
       });
     } catch (e) {
       // Log error but don't throw - local data is source of truth
-      AppLogger.error('Firestore addCategory failed after retries', error: e, tag: 'Firestore');
+      AppLogger.error(
+        'Firestore addCategory failed after retries',
+        error: e,
+        tag: 'Firestore',
+      );
     }
   }
 
@@ -63,7 +66,11 @@ class FirestoreService {
         'iconCode': category.iconCode,
       });
     } catch (e) {
-      AppLogger.warning('Firestore updateCategory skipped (offline or error)', error: e, tag: 'Firestore');
+      AppLogger.warning(
+        'Firestore updateCategory skipped (offline or error)',
+        error: e,
+        tag: 'Firestore',
+      );
     }
   }
 
@@ -74,7 +81,11 @@ class FirestoreService {
     try {
       await collection.doc(id).delete();
     } catch (e) {
-      AppLogger.warning('Firestore deleteCategory skipped (offline or error)', error: e, tag: 'Firestore');
+      AppLogger.warning(
+        'Firestore deleteCategory skipped (offline or error)',
+        error: e,
+        tag: 'Firestore',
+      );
     }
   }
 
@@ -102,8 +113,8 @@ class FirestoreService {
     try {
       await collection.doc(task.id).set({
         'id': task.id,
-        'title': EncryptionService.encrypt(task.title),
-        'description': EncryptionService.encrypt(task.description),
+        'title': task.title,
+        'description': task.description,
         'isCompleted': task.isCompleted,
         'dueDate': task.dueDate?.toIso8601String(),
         'priority': task.priority.index,
@@ -113,7 +124,11 @@ class FirestoreService {
         'updatedAt': FieldValue.serverTimestamp(),
       });
     } catch (e) {
-      AppLogger.warning('Firestore addTask skipped (offline or error)', error: e, tag: 'Firestore');
+      AppLogger.warning(
+        'Firestore addTask skipped (offline or error)',
+        error: e,
+        tag: 'Firestore',
+      );
     }
   }
 
@@ -123,8 +138,8 @@ class FirestoreService {
 
     try {
       await collection.doc(task.id).update({
-        'title': EncryptionService.encrypt(task.title),
-        'description': EncryptionService.encrypt(task.description),
+        'title': task.title,
+        'description': task.description,
         'isCompleted': task.isCompleted,
         'dueDate': task.dueDate?.toIso8601String(),
         'priority': task.priority.index,
@@ -134,7 +149,11 @@ class FirestoreService {
         'updatedAt': FieldValue.serverTimestamp(),
       });
     } catch (e) {
-      AppLogger.warning('Firestore updateTask skipped (offline or error)', error: e, tag: 'Firestore');
+      AppLogger.warning(
+        'Firestore updateTask skipped (offline or error)',
+        error: e,
+        tag: 'Firestore',
+      );
     }
   }
 
@@ -145,7 +164,11 @@ class FirestoreService {
     try {
       await collection.doc(id).delete();
     } catch (e) {
-      AppLogger.warning('Firestore deleteTask skipped (offline or error)', error: e, tag: 'Firestore');
+      AppLogger.warning(
+        'Firestore deleteTask skipped (offline or error)',
+        error: e,
+        tag: 'Firestore',
+      );
     }
   }
 
@@ -158,8 +181,8 @@ class FirestoreService {
         final data = doc.data();
         return Task(
           id: data['id'],
-          title: EncryptionService.decrypt(data['title'] ?? ''),
-          description: EncryptionService.decrypt(data['description'] ?? ''),
+          title: data['title'] ?? '',
+          description: data['description'] ?? '',
           isCompleted: data['isCompleted'] ?? false,
           dueDate: data['dueDate'] != null
               ? DateTime.tryParse(data['dueDate'])
