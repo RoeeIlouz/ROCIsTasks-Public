@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:rocis_tasks/core/services/auth_service.dart';
 import 'package:rocis_tasks/shared/ui/ui_kit.dart';
 import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
+import 'package:rocis_tasks/features/calendar/presentation/providers/calendar_provider.dart';
 import 'package:rocis_tasks/features/tasks/presentation/screens/trash_screen.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -15,6 +16,10 @@ class SettingsScreen extends StatelessWidget {
     final themeService = Provider.of<ThemeService>(context);
     final authService = Provider.of<AuthService>(context, listen: false);
     final taskProvider = Provider.of<TaskProvider>(context, listen: false);
+    final calendarProvider = Provider.of<CalendarProvider>(
+      context,
+      listen: false,
+    );
     final l10n = AppLocalizations.of(context)!;
     final user = authService.currentUser;
     return ListView(
@@ -23,7 +28,9 @@ class SettingsScreen extends StatelessWidget {
         if (user != null)
           ListTile(
             leading: CircleAvatar(
-              backgroundColor: themeService.isDarkMode ? Colors.grey[800] : Colors.grey[200],
+              backgroundColor: themeService.isDarkMode
+                  ? Colors.grey[800]
+                  : Colors.grey[200],
               backgroundImage: user.photoURL != null
                   ? CachedNetworkImageProvider(user.photoURL!)
                   : null,
@@ -133,7 +140,18 @@ class SettingsScreen extends StatelessWidget {
             ScaffoldMessenger.of(
               context,
             ).showSnackBar(SnackBar(content: Text(l10n.syncingTasks)));
-            await taskProvider.syncWithCloud();
+
+            await Future.wait([
+              taskProvider.performFullSync(),
+              calendarProvider.loadEvents(),
+            ]);
+
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(const SnackBar(content: Text('Sync complete')));
+            }
           },
         ),
         ListTile(

@@ -372,6 +372,46 @@ class TaskProvider extends ChangeNotifier {
     }
   }
 
+  /// Performs a comprehensive sync:
+  /// 1. Forces cloud sync for tasks and categories
+  /// 2. Updates all home widgets with current data
+  /// 3. Updates the global task count notification
+  /// 4. Reschedules all task reminders to ensure they are up-to-date
+  Future<void> performFullSync() async {
+    try {
+      // 1. Refresh data from cloud
+      await syncWithCloud();
+
+      // 2. Force widget updates and global notification refresh
+      await updateHomeWidgetWithNotification();
+
+      // 3. Reschedule all task notifications
+      final allTasks = _source.getTasks();
+      // First cancel existing to avoid duplicates or orphans
+      await _notificationService.cancelAllNotifications();
+
+      for (var task in allTasks) {
+        if (!task.isCompleted &&
+            !(task.isDeleted ?? false) &&
+            task.dueDate != null &&
+            task.dueDate!.isAfter(DateTime.now())) {
+          await _notificationService.scheduleNotification(
+            id: NotificationService.getNotificationId(task.id),
+            title: 'Task Reminder: ${task.title}',
+            body: task.description.isNotEmpty
+                ? task.description
+                : 'You have a task due now!',
+            scheduledDate: task.dueDate!,
+            taskId: task.id,
+          );
+        }
+      }
+    } catch (e, s) {
+      _errorHandlingService.logError(e, s, reason: 'Performing full sync');
+      rethrow;
+    }
+  }
+
   TaskSortOption _currentSortOption = TaskSortOption.dueDate;
   List<String> _selectedCategoryIds = [];
   bool _showCompleted = true;

@@ -19,7 +19,9 @@ class AuthService extends ChangeNotifier {
     _auth.authStateChanges().listen((User? user) {
       if (user != null) {
         _syncEncryptionKey(user.uid);
+        ensureSecondaryAuth();
       }
+      notifyListeners();
     });
   }
 
