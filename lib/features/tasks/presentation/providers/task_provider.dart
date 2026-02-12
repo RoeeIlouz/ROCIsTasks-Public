@@ -45,6 +45,7 @@ class TaskProvider extends ChangeNotifier {
   StreamSubscription? _categoriesSubscription;
   StreamSubscription? _authSubscription;
   StreamSubscription? _connectivitySubscription;
+  StreamSubscription? _notificationSubscription;
 
   TaskProvider(
     this._authService,
@@ -216,20 +217,21 @@ class TaskProvider extends ChangeNotifier {
       }
     }
 
-    _notificationService.onNotificationResponse.listen((response) {
-      final payload = response.payload;
-      if (payload != null) {
-        final taskId = payload;
-        final actionId = response.actionId;
-        if (actionId == 'snooze') {
-          _snoozeTask(taskId);
-        } else if (actionId == 'complete') {
-          _completeTaskFromNotification(taskId);
-        } else {
-          _navigateToTask(taskId);
-        }
-      }
-    });
+    _notificationSubscription = _notificationService.onNotificationResponse
+        .listen((response) {
+          final payload = response.payload;
+          if (payload != null) {
+            final taskId = payload;
+            final actionId = response.actionId;
+            if (actionId == 'snooze') {
+              _snoozeTask(taskId);
+            } else if (actionId == 'complete') {
+              _completeTaskFromNotification(taskId);
+            } else {
+              _navigateToTask(taskId);
+            }
+          }
+        });
   }
 
   void _navigateToTask(String taskId) {
@@ -280,6 +282,8 @@ class TaskProvider extends ChangeNotifier {
   void dispose() {
     _authSubscription?.cancel();
     _connectivitySubscription?.cancel();
+    _notificationSubscription?.cancel();
+    _widgetDebounce?.cancel();
     _cancelSubscriptions();
     super.dispose();
   }

@@ -22,8 +22,8 @@ void main() {
       dotenv.testLoad(
         fileInput: '''
 FIREBASE_PROJECT_ID=test-project
-FIREBASE_ANDROID_API_KEY=test-android-key
-FIREBASE_ANDROID_APP_ID=test-android-app-id
+FIREBASE_ANDROID_API_KEY=AIzatestandroidkey
+FIREBASE_ANDROID_APP_ID=1:12345:android:test
 FIREBASE_WEB_MESSAGING_SENDER_ID=test-sender-id
 FIREBASE_WEB_STORAGE_BUCKET=test-bucket
 ''',
@@ -44,8 +44,8 @@ FIREBASE_WEB_STORAGE_BUCKET=test-bucket
       dotenv.testLoad(
         fileInput: '''
 FIREBASE_PROJECT_ID=test-project
-FIREBASE_ANDROID_API_KEY=test-key
-FIREBASE_ANDROID_APP_ID=test-app-id
+FIREBASE_ANDROID_API_KEY=AIzatestkey
+FIREBASE_ANDROID_APP_ID=1:12345:android:test
 ''',
       );
       expect(FirebaseConfig.validateConfig(), true);

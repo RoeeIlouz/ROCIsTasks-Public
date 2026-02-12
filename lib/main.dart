@@ -20,6 +20,7 @@ import 'package:rocis_tasks/core/services/schedule_firestore_service.dart';
 import 'package:rocis_tasks/features/home/services/full_calendar_widget_service.dart';
 import 'package:rocis_tasks/features/tasks/data/datasources/local_task_source.dart';
 import 'package:rocis_tasks/core/services/calendar_color_service.dart';
+import 'package:rocis_tasks/core/services/logger_service.dart';
 
 Future<void> main() async {
   // Initialize App (Core, Firebase, Hive)
@@ -72,27 +73,60 @@ class _AppRootState extends State<AppRoot> {
     _onboardingService = OnboardingService(prefs);
     _appRouter = AppRouter(_authService, _onboardingService);
 
-    await Future.wait([
-      _taskSource.init().catchError((e) {
-        // Silent error handling - errors logged via ErrorHandlingService
-      }),
-      _taskProvider.init().catchError((e) {
-        // Silent error handling - errors logged via ErrorHandlingService
-      }),
-      _calendarService.init().catchError((e) {
-        // Silent error handling - errors logged via ErrorHandlingService
-      }),
-      _themeService.init().catchError((e) {
-        // Silent error handling - errors logged via ErrorHandlingService
-      }),
-      _calendarColorService.init().catchError((e) {
-        // Silent error handling - errors logged via ErrorHandlingService
-      }),
-      _scheduleService.initialize().catchError((e) {
-        // Silent error handling - errors logged via ErrorHandlingService
-      }),
-      _authService.initialized,
-    ]);
+    try {
+      await Future.wait([
+        _taskSource.init().catchError(
+          (e, stack) => AppLogger.error(
+            'Failed to init task source',
+            error: e,
+            stack: stack,
+          ),
+        ),
+        _taskProvider.init().catchError(
+          (e, stack) => AppLogger.error(
+            'Failed to init task provider',
+            error: e,
+            stack: stack,
+          ),
+        ),
+        _calendarService.init().catchError(
+          (e, stack) => AppLogger.error(
+            'Failed to init calendar service',
+            error: e,
+            stack: stack,
+          ),
+        ),
+        _themeService.init().catchError(
+          (e, stack) => AppLogger.error(
+            'Failed to init theme service',
+            error: e,
+            stack: stack,
+          ),
+        ),
+        _calendarColorService.init().catchError(
+          (e, stack) => AppLogger.error(
+            'Failed to init calendar color service',
+            error: e,
+            stack: stack,
+          ),
+        ),
+        _scheduleService.initialize().catchError(
+          (e, stack) => AppLogger.error(
+            'Failed to init schedule service',
+            error: e,
+            stack: stack,
+          ),
+        ),
+        _authService.initialized,
+      ]);
+    } catch (e, stackTrace) {
+      AppLogger.critical(
+        'Critical app initialization failure',
+        error: e,
+        stack: stackTrace,
+      );
+      rethrow;
+    }
   }
 
   @override
@@ -139,35 +173,64 @@ class _AppRootState extends State<AppRoot> {
           return MaterialApp(
             debugShowCheckedModeBanner: false,
             home: Scaffold(
-              backgroundColor: Colors.black,
+              backgroundColor: const Color(0xFF121212),
               body: Center(
                 child: Padding(
                   padding: const EdgeInsets.all(32.0),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(
-                        Icons.error_outline,
-                        color: Colors.red,
-                        size: 80,
+                      Container(
+                        padding: const EdgeInsets.all(24),
+                        decoration: BoxDecoration(
+                          color: Colors.red.withValues(alpha: 0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.error_outline_rounded,
+                          color: Colors.redAccent,
+                          size: 64,
+                        ),
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 32),
                       const Text(
                         'CRITICAL ERROR',
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 22,
+                          fontSize: 24,
                           fontWeight: FontWeight.bold,
+                          letterSpacing: 1.5,
                         ),
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'Failed to initialize app: ${snapshot.error}',
+                        'ROCI\'s Tasks encountered a problem during startup. Our team has been notified.',
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: Colors.redAccent,
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.7),
                           fontSize: 16,
+                          height: 1.5,
                         ),
+                      ),
+                      const SizedBox(height: 32),
+                      ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            _initFuture = _initServices();
+                          });
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: Colors.black,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 32,
+                            vertical: 16,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text('Retry Initialization'),
                       ),
                     ],
                   ),

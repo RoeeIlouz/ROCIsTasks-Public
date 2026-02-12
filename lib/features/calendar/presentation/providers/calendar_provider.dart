@@ -6,6 +6,7 @@ import 'package:rocis_tasks/core/services/schedule_firestore_service.dart';
 import 'package:rocis_tasks/core/models/schedule_data.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rocis_tasks/features/home/services/full_calendar_widget_service.dart';
+import 'package:rocis_tasks/core/services/logger_service.dart';
 
 /// Wrapper class to represent schedule events from ROCIs-Schedule
 class ScheduleEventWrapper {
@@ -226,8 +227,12 @@ class CalendarProvider extends ChangeNotifier {
       await _loadScheduleData();
 
       _processEventsToMap();
-    } catch (e) {
-      debugPrint('Error loading events in provider: $e');
+    } catch (e, s) {
+      AppLogger.error(
+        'Error loading events in calendar provider',
+        error: e,
+        stack: s,
+      );
       _events = [];
       _scheduleEvents = [];
       _assignments = [];
@@ -246,7 +251,7 @@ class CalendarProvider extends ChangeNotifier {
     if (_userId == null ||
         !_scheduleService.isReady ||
         !_scheduleService.isAuthenticated) {
-      debugPrint(
+      AppLogger.info(
         'CalendarProvider: Skipping schedule data load (userId=$_userId, isReady=${_scheduleService.isReady}, isAuthenticated=${_scheduleService.isAuthenticated})',
       );
       _scheduleEvents = [];
@@ -259,7 +264,7 @@ class CalendarProvider extends ChangeNotifier {
       final startDate = DateTime(now.year, now.month - 1, 1);
       final endDate = DateTime(now.year, now.month + 2, 0);
 
-      debugPrint(
+      AppLogger.info(
         'CalendarProvider: Subscribing to schedule data for user $_userId',
       );
 
@@ -274,16 +279,18 @@ class CalendarProvider extends ChangeNotifier {
               _scheduleEvents = events
                   .map((e) => ScheduleEventWrapper(e))
                   .toList();
-              debugPrint(
+              AppLogger.info(
                 'CalendarProvider: Received ${_scheduleEvents.length} schedule events from stream',
               );
               _processEventsToMap();
               notifyListeners();
               if (!eventsCompleter.isCompleted) eventsCompleter.complete();
             },
-            onError: (e) {
-              debugPrint(
-                'CalendarProvider: Error in schedule events stream: $e',
+            onError: (e, s) {
+              AppLogger.error(
+                'CalendarProvider: Error in schedule events stream',
+                error: e,
+                stack: s,
               );
               if (!eventsCompleter.isCompleted) eventsCompleter.complete();
             },
@@ -297,7 +304,7 @@ class CalendarProvider extends ChangeNotifier {
               _assignments = assignmentData
                   .map((a) => AssignmentWrapper(a))
                   .toList();
-              debugPrint(
+              AppLogger.info(
                 'CalendarProvider: Received ${_assignments.length} assignments from stream',
               );
               _processEventsToMap();
@@ -306,8 +313,12 @@ class CalendarProvider extends ChangeNotifier {
                 assignmentsCompleter.complete();
               }
             },
-            onError: (e) {
-              debugPrint('CalendarProvider: Error in assignments stream: $e');
+            onError: (e, s) {
+              AppLogger.error(
+                'CalendarProvider: Error in assignments stream',
+                error: e,
+                stack: s,
+              );
               if (!assignmentsCompleter.isCompleted) {
                 assignmentsCompleter.complete();
               }
@@ -321,15 +332,17 @@ class CalendarProvider extends ChangeNotifier {
       ]).timeout(
         const Duration(seconds: 5),
         onTimeout: () {
-          debugPrint(
+          AppLogger.warning(
             'CalendarProvider: Timeout waiting for initial schedule data',
           );
           return [];
         },
       );
-    } catch (e) {
-      debugPrint(
-        'CalendarProvider: Error setting up schedule data streams: $e',
+    } catch (e, s) {
+      AppLogger.error(
+        'CalendarProvider: Error setting up schedule data streams',
+        error: e,
+        stack: s,
       );
       _scheduleEvents = [];
       _assignments = [];

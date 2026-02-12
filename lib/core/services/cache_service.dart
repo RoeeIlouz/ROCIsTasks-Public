@@ -1,5 +1,5 @@
-import 'package:flutter/foundation.dart';
 import 'package:rocis_tasks/core/config/app_config.dart';
+import 'package:rocis_tasks/core/services/logger_service.dart';
 
 /// Cache entry with TTL
 class _CacheEntry {
@@ -29,7 +29,7 @@ class CacheService {
     final entry = _memoryCache[key];
     if (entry != null && !entry.isExpired) {
       if (AppConfig.enableDebugLogging) {
-        debugPrint('Cache HIT: $key');
+        AppLogger.info('Cache HIT: $key', tag: 'Cache');
       }
       return entry.data as T?;
     }
@@ -40,7 +40,7 @@ class CacheService {
     }
 
     if (AppConfig.enableDebugLogging) {
-      debugPrint('Cache MISS: $key');
+      AppLogger.info('Cache MISS: $key', tag: 'Cache');
     }
     return null;
   }
@@ -56,7 +56,7 @@ class CacheService {
     }
 
     if (AppConfig.enableDebugLogging) {
-      debugPrint('Cache SET: $key');
+      AppLogger.info('Cache SET: $key', tag: 'Cache');
     }
   }
 

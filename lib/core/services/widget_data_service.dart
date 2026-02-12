@@ -7,6 +7,7 @@ import 'package:rocis_tasks/core/services/schedule_firestore_service.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/features/categories/domain/models/category.dart';
 import 'package:rocis_tasks/features/tasks/services/task_widget_service.dart';
+import 'package:rocis_tasks/core/services/logger_service.dart';
 
 class WidgetDataService {
   final CalendarService _calendarService;
@@ -89,26 +90,24 @@ class WidgetDataService {
           });
         }
       }
-    } catch (e) {
-      debugPrint('Error fetching calendar events for schedule: $e');
+    } catch (e, s) {
+      AppLogger.error(
+        'Error fetching calendar events for schedule widget',
+        error: e,
+        stack: s,
+      );
     }
 
     // Fetch ROCIs-Schedule data if user is logged in and authenticated in secondary Firebase
     if (userId != null && _scheduleService.isReady) {
       if (!_scheduleService.isAuthenticated) {
-        debugPrint(
-          'WidgetDataService: User not authenticated in secondary Firebase (rocis-schedule)',
-        );
-        debugPrint(
-          'WidgetDataService: Schedule integration requires signing in with Google',
+        AppLogger.warning(
+          'WidgetDataService: User not authenticated in secondary Firebase (rocis-schedule). Schedule integration requires signing in with Google.',
         );
       } else {
         try {
-          debugPrint(
-            'WidgetDataService: Fetching ROCIs-Schedule data for user $userId',
-          );
-          debugPrint(
-            'WidgetDataService: Authenticated as ${_scheduleService.authenticatedUserId} in rocis-schedule',
+          AppLogger.info(
+            'WidgetDataService: Fetching ROCIs-Schedule data for user $userId (Auth ID: ${_scheduleService.authenticatedUserId})',
           );
           final scheduleData = await _scheduleService.getScheduleDataForWidget(
             userId,
@@ -136,11 +135,15 @@ class WidgetDataService {
               'eventType': item['eventType'] ?? '',
             });
           }
-          debugPrint(
+          AppLogger.info(
             'WidgetDataService: Added ${scheduleData.length} items from ROCIs-Schedule',
           );
-        } catch (e) {
-          debugPrint('Error fetching ROCIs-Schedule data: $e');
+        } catch (e, s) {
+          AppLogger.error(
+            'Error fetching ROCIs-Schedule data',
+            error: e,
+            stack: s,
+          );
         }
       }
     } else if (userId == null) {
@@ -148,7 +151,7 @@ class WidgetDataService {
         'WidgetDataService: No userId provided, skipping ROCIs-Schedule data',
       );
     } else if (!_scheduleService.isReady) {
-      debugPrint(
+      AppLogger.info(
         'WidgetDataService: Schedule service not ready, skipping ROCIs-Schedule data',
       );
     }
@@ -245,9 +248,11 @@ class WidgetDataService {
               'category_color': item['category_color'] ?? '#4285F4',
             });
           }
-        } catch (e) {
-          debugPrint(
-            'Error fetching ROCIs-Schedule data for calendar list: $e',
+        } catch (e, s) {
+          AppLogger.error(
+            'Error fetching ROCIs-Schedule data for calendar list',
+            error: e,
+            stack: s,
           );
         }
       }
@@ -265,8 +270,12 @@ class WidgetDataService {
         name: 'CalendarWidgetProvider',
         iOSName: 'CalendarListWidget',
       );
-    } catch (e) {
-      debugPrint('Error updating calendar list widget: $e');
+    } catch (e, s) {
+      AppLogger.error(
+        'Error updating calendar list widget',
+        error: e,
+        stack: s,
+      );
     }
   }
 
@@ -297,8 +306,12 @@ class WidgetDataService {
           eventsByDay[dateKey] = true;
         }
       }
-    } catch (e) {
-      debugPrint('Error fetching calendar events for map: $e');
+    } catch (e, s) {
+      AppLogger.error(
+        'Error fetching calendar events for month map',
+        error: e,
+        stack: s,
+      );
     }
 
     // Add ROCIs-Schedule events to the month map
@@ -325,8 +338,12 @@ class WidgetDataService {
           final dateKey = DateFormat('yyyy-MM-dd').format(assignment.dueDate);
           eventsByDay[dateKey] = true;
         }
-      } catch (e) {
-        debugPrint('Error fetching ROCIs-Schedule data for month map: $e');
+      } catch (e, s) {
+        AppLogger.error(
+          'Error fetching ROCIs-Schedule data for month map',
+          error: e,
+          stack: s,
+        );
       }
     }
 

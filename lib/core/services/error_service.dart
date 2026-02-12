@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:rocis_tasks/core/config/app_config.dart';
+import 'package:rocis_tasks/core/services/logger_service.dart';
+import 'package:rocis_tasks/shared/ui/widgets/snackbars.dart';
 
 /// Global error handling service
 class ErrorService {
@@ -22,7 +24,10 @@ class ErrorService {
         _analytics = FirebaseAnalytics.instance;
       }
     } catch (e) {
-      debugPrint('Firebase services not available: $e');
+      AppLogger.warning(
+        'Firebase services not available during ErrorService init',
+        error: e,
+      );
     }
 
     // Catch Flutter framework errors
@@ -50,13 +55,8 @@ class ErrorService {
     StackTrace? stack, [
     String? context,
   ]) {
-    if (AppConfig.enableDebugLogging) {
-      debugPrint('=== $type ===');
-      debugPrint('Error: $error');
-      if (context != null) debugPrint('Context: $context');
-      if (stack != null) debugPrint('Stack: $stack');
-      debugPrint('================');
-    }
+    final reason = context != null ? '[$type] $context' : type;
+    AppLogger.error(reason, error: error, stack: stack);
 
     // Send to crash reporting service in production
     if (AppConfig.enableCrashReporting && _crashlytics != null) {
@@ -68,7 +68,7 @@ class ErrorService {
           information: context != null ? <Object>[context] : <Object>[],
         );
       } catch (e) {
-        debugPrint('Failed to record error to Crashlytics: $e');
+        AppLogger.warning('Failed to record error to Crashlytics', error: e);
       }
     }
 
@@ -84,7 +84,7 @@ class ErrorService {
           },
         );
       } catch (e) {
-        debugPrint('Failed to log error to Analytics: $e');
+        AppLogger.warning('Failed to log error to Analytics', error: e);
       }
     }
   }
@@ -101,19 +101,7 @@ class ErrorService {
 
     // Show user-friendly error message
     if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(message),
-          backgroundColor: Theme.of(context).colorScheme.error,
-          action: onRetry != null
-              ? SnackBarAction(
-                  label: 'Retry',
-                  textColor: Colors.white,
-                  onPressed: onRetry,
-                )
-              : null,
-        ),
-      );
+      showErrorSnackBar(context, message);
     }
   }
 

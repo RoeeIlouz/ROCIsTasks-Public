@@ -6,6 +6,7 @@ import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
 import 'package:rocis_tasks/core/services/validation_service.dart';
 import 'package:rocis_tasks/core/services/error_service.dart';
+import 'package:rocis_tasks/core/validation/validators.dart';
 
 import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:rocis_tasks/shared/ui/ui_kit.dart';
@@ -204,7 +205,10 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                 ),
                 validator: (value) {
                   final sanitized = ValidationService.sanitizeText(value ?? '');
-                  final error = ValidationService.validateTaskTitle(sanitized);
+                  final error = Validators.validateTaskTitle(
+                    sanitized,
+                    context,
+                  );
                   if (error != null) return error;
 
                   if (ValidationService.containsHarmfulContent(sanitized)) {
@@ -289,11 +293,15 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                           _selectedDate == null
                               ? l10n.noDateSelected
                               : themeService.use24HourFormat
-                              ? DateFormat.yMMMd().add_Hm().format(_selectedDate!)
+                              ? DateFormat.yMMMd().add_Hm().format(
+                                  _selectedDate!,
+                                )
                               : DateFormat.yMMMd().add_jm().format(
                                   _selectedDate!,
                                 ),
-                          style: GoogleFonts.outfit(fontWeight: FontWeight.w500),
+                          style: GoogleFonts.outfit(
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                         const Spacer(),
                         if (_selectedDate != null)

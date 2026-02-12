@@ -31,19 +31,17 @@ class AppInitializer {
       // 1. Core Binding (Required first)
       WidgetsFlutterBinding.ensureInitialized();
 
-      // 2. Initialize Core Firebase (Required for ErrorService if Crashlytics/Analytics enabled)
-      await _initFirebase();
-
-      // 3. Initialize error handling
-      ErrorService.initialize();
-
-      // 4. Parallel initialization of independent heavy services with timeout
+      // 2. Parallel initialization of independent heavy services with timeout
       await Future.wait([
-        _initHive(),
         _initEnvironment(),
-        _initEncryption(),
+        _initHive().then(
+          (_) => _initEncryption(),
+        ), // Encryption needs Hive for key gen fallback
         _initTimezone(),
-        _initSecondaryFirebase(), // Moved here to be parallel with other services
+        _initFirebase().then(
+          (_) => ErrorService.initialize(),
+        ), // ErrorService needs Firebase
+        _initSecondaryFirebase(),
       ]).timeout(
         Duration(seconds: AppConfig.syncTimeoutSeconds),
         onTimeout: () {
@@ -109,8 +107,6 @@ class AppInitializer {
       // Check if already initialized (common in hot restart or mixed environments)
       if (Firebase.apps.isNotEmpty) {
         AppLogger.info('Firebase already initialized');
-        // Still try to initialize secondary app if not present
-        await _initSecondaryFirebase();
         return;
       }
 

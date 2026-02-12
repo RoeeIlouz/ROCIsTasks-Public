@@ -1,5 +1,5 @@
-import 'package:flutter/foundation.dart';
 import 'package:device_calendar/device_calendar.dart';
+import 'package:rocis_tasks/core/services/logger_service.dart';
 
 class CalendarService {
   final DeviceCalendarPlugin _deviceCalendarPlugin = DeviceCalendarPlugin();
@@ -18,8 +18,12 @@ class CalendarService {
 
       permissionsGranted = await _deviceCalendarPlugin.requestPermissions();
       return permissionsGranted.isSuccess && permissionsGranted.data!;
-    } catch (e) {
-      debugPrint('Error requesting permissions: $e');
+    } catch (e, s) {
+      AppLogger.error(
+        'Error requesting calendar permissions',
+        error: e,
+        stack: s,
+      );
       return false;
     }
   }
@@ -33,8 +37,8 @@ class CalendarService {
       if (calendarsResult.isSuccess && calendarsResult.data != null) {
         return calendarsResult.data!;
       }
-    } catch (e) {
-      debugPrint('Error retrieving calendars: $e');
+    } catch (e, s) {
+      AppLogger.error('Error retrieving calendars', error: e, stack: s);
     }
     return [];
   }
@@ -46,7 +50,7 @@ class CalendarService {
   }) async {
     final hasPermission = await requestPermissions();
     if (!hasPermission) {
-      debugPrint('Calendar permissions not granted');
+      AppLogger.warning('Calendar permissions not granted');
       return [];
     }
 
@@ -67,8 +71,12 @@ class CalendarService {
             if (eventsResult.isSuccess && eventsResult.data != null) {
               allEvents.addAll(eventsResult.data!);
             }
-          } catch (e) {
-            debugPrint('Error accessing calendar $calendarId: $e');
+          } catch (e, s) {
+            AppLogger.error(
+              'Error accessing calendar $calendarId',
+              error: e,
+              stack: s,
+            );
           }
         }
       } else {
@@ -85,14 +93,18 @@ class CalendarService {
               if (eventsResult.isSuccess && eventsResult.data != null) {
                 allEvents.addAll(eventsResult.data!);
               }
-            } catch (e) {
-              debugPrint('Error accessing calendar ${calendar.id}: $e');
+            } catch (e, s) {
+              AppLogger.error(
+                'Error accessing calendar ${calendar.id}',
+                error: e,
+                stack: s,
+              );
             }
           }
         }
       }
-    } catch (e) {
-      debugPrint('Calendar retrieval error: $e');
+    } catch (e, s) {
+      AppLogger.error('Calendar retrieval error', error: e, stack: s);
     }
 
     return allEvents;

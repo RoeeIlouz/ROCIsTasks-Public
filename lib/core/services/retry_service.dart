@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:math';
-import 'package:flutter/foundation.dart';
 import 'package:rocis_tasks/core/config/app_config.dart';
+import 'package:rocis_tasks/core/services/logger_service.dart';
 
 /// Service for handling retry logic with exponential backoff
 class RetryService {
@@ -24,7 +24,10 @@ class RetryService {
         attempt++;
 
         if (AppConfig.enableDebugLogging) {
-          debugPrint('Retry attempt $attempt/$maxAttempts failed: $error');
+          AppLogger.warning(
+            'Retry attempt $attempt/$maxAttempts failed',
+            error: error,
+          );
         }
 
         // Check if we should retry this error
