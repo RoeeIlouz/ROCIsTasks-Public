@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -11,6 +12,10 @@ class AuthService extends ChangeNotifier {
   final ErrorHandlingService _errorHandlingService;
   FirebaseAuth get _auth => FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final Completer<void> _initCompleter = Completer<void>();
+
+  /// Future that completes when the first auth state has been determined
+  Future<void> get initialized => _initCompleter.future;
 
   // Secondary Firebase Auth for ROCIs-Schedule
   FirebaseAuth? _scheduleAuth;
@@ -21,6 +26,12 @@ class AuthService extends ChangeNotifier {
         _syncEncryptionKey(user.uid);
         ensureSecondaryAuth();
       }
+
+      // Complete init on first event
+      if (!_initCompleter.isCompleted) {
+        _initCompleter.complete();
+      }
+
       notifyListeners();
     });
   }

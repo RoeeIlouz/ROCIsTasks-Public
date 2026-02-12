@@ -91,6 +91,7 @@ class _AppRootState extends State<AppRoot> {
       _scheduleService.initialize().catchError((e) {
         // Silent error handling - errors logged via ErrorHandlingService
       }),
+      _authService.initialized,
     ]);
   }
 

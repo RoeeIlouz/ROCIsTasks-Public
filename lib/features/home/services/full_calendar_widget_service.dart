@@ -159,10 +159,6 @@ class FullCalendarWidgetService {
           monthOffset ??
           (await HomeWidget.getWidgetData<int>('full_calendar_offset') ?? 0);
 
-      print(
-        'Updating FullCalendarWidget with offset: $offset (requested: $monthOffset)',
-      );
-
       // Using offset
 
       // Save offset if provided
@@ -222,9 +218,7 @@ class FullCalendarWidgetService {
             calendarIds: filters.selectedCalendarIds,
           );
         }
-      } catch (e) {
-        print('Error fetching Google Calendar events: $e');
-      }
+      } catch (e) {}
 
       // Fetch tasks (if filter enabled)
       var tasks = <dynamic>[];
@@ -240,9 +234,7 @@ class FullCalendarWidgetService {
               )
               .toList();
         }
-      } catch (e) {
-        print('Error fetching tasks: $e');
-      }
+      } catch (e) {}
 
       // Fetch ROCIs-Schedule events (if filter enabled and user is authenticated)
       List<Map<String, dynamic>> scheduleData = [];
@@ -258,9 +250,7 @@ class FullCalendarWidgetService {
           );
           // Fetched ROCIs-Schedule items
         }
-      } catch (e) {
-        print('Error fetching ROCIs-Schedule data: $e');
-      }
+      } catch (e) {}
 
       // Found events, tasks, and schedule items
 
@@ -420,26 +410,17 @@ class FullCalendarWidgetService {
       }
 
       // Created grid
-      print(
-        'Grid generation complete. Target month offset: $offset, Items: ${gridData.length}',
-      );
 
       // Save Data
       final gridDataJson = jsonEncode(gridData);
-      print('JSON encoded. Length: ${gridDataJson.length}');
 
-      if (gridDataJson.length > 500000) {
-        print(
-          'WARNING: Widget data payload is very large (${gridDataJson.length} bytes)',
-        );
-      }
+      if (gridDataJson.length > 500000) {}
 
       // Saving grid data
       await HomeWidget.saveWidgetData<String>(
         'full_calendar_grid_data',
         gridDataJson,
       );
-      print('Widget data saved to HomeWidget');
 
       // Save Month Name
       await HomeWidget.saveWidgetData<String>(
@@ -466,9 +447,7 @@ class FullCalendarWidgetService {
         name: 'FullCalendarWidgetProvider',
         iOSName: 'FullCalendarWidget',
       );
-      print('Widget update signaled');
-    } catch (e, stackTrace) {
-      print('CRITICAL ERROR in updateFullCalendarWidget: $e\n$stackTrace');
+    } catch (e) {
       // Attempt fallback to at least show the dates
       await _generateFallbackGrid(monthOffset, userId);
     }
@@ -529,10 +508,7 @@ class FullCalendarWidgetService {
         name: 'FullCalendarWidgetProvider',
         iOSName: 'FullCalendarWidget',
       );
-      print('Fallback grid updated successfully');
-    } catch (e) {
-      print('Even fallback grid generation failed: $e');
-    }
+    } catch (e) {}
   }
 
   int _getWeekNumber(DateTime date) {
