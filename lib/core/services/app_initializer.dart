@@ -11,6 +11,7 @@ import 'package:rocis_tasks/core/services/notification_service.dart';
 import 'package:rocis_tasks/core/services/error_service.dart';
 import 'package:rocis_tasks/core/config/app_config.dart';
 import 'package:rocis_tasks/core/services/logger_service.dart';
+import 'package:rocis_tasks/core/services/analytics_service.dart';
 
 import 'package:rocis_tasks/core/services/encryption_service.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
@@ -38,9 +39,11 @@ class AppInitializer {
           (_) => _initEncryption(),
         ), // Encryption needs Hive for key gen fallback
         _initTimezone(),
-        _initFirebase().then(
-          (_) => ErrorService.initialize(),
-        ), // ErrorService needs Firebase
+        _initFirebase().then((_) {
+          ErrorService.initialize();
+          // Analytics doesn't explicit init but good to access instance once
+          AnalyticsService();
+        }), // ErrorService needs Firebase
         _initSecondaryFirebase(),
       ]).timeout(
         Duration(seconds: AppConfig.syncTimeoutSeconds),

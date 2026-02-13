@@ -250,4 +250,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deselectAll => 'Deselect All';
+
+  @override
+  String get offlineMode => 'Offline Mode';
 }

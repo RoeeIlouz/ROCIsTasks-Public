@@ -20,6 +20,7 @@ import 'package:rocis_tasks/features/tasks/services/task_widget_service.dart';
 import 'package:rocis_tasks/core/services/widget_data_service.dart';
 
 import 'package:rocis_tasks/core/services/error_handling_service.dart';
+import 'package:rocis_tasks/core/services/analytics_service.dart';
 
 enum TaskSortOption { dueDate, priority, title, dateCreated }
 
@@ -32,6 +33,7 @@ class TaskProvider extends ChangeNotifier {
   final NotificationService _notificationService;
   final FirestoreService _firestoreService;
   final ConnectivityService _connectivityService;
+  final AnalyticsService _analyticsService;
   final AuthService _authService;
   final CalendarService _calendarService;
   final ThemeService _themeService;
@@ -56,10 +58,12 @@ class TaskProvider extends ChangeNotifier {
     NotificationService? notificationService,
     FirestoreService? firestoreService,
     ConnectivityService? connectivityService,
+    AnalyticsService? analyticsService,
   }) : _source = source ?? LocalTaskSource(),
        _notificationService = notificationService ?? NotificationService(),
        _firestoreService = firestoreService ?? FirestoreService(),
-       _connectivityService = connectivityService ?? ConnectivityService();
+       _connectivityService = connectivityService ?? ConnectivityService(),
+       _analyticsService = analyticsService ?? AnalyticsService();
   Timer? _widgetDebounce;
   bool _widgetUpdateInProgress = false;
   bool get isLoading => _isLoading;
@@ -689,6 +693,12 @@ class TaskProvider extends ChangeNotifier {
     _refreshPagination();
     notifyListeners();
     updateHomeWidgetWithNotification(); // Show notification when task is added
+
+    // Log analytics
+    await _analyticsService.logTaskCreated(
+      categoryId: category ?? 'none',
+      hasDueDate: dueDate != null,
+    );
   }
 
   Future<void> toggleTaskCompletion(Task task) async {
@@ -723,6 +733,10 @@ class TaskProvider extends ChangeNotifier {
     _refreshPagination();
     notifyListeners();
     updateHomeWidgetWithNotification(); // Show notification when task is completed/uncompleted
+
+    if (task.isCompleted) {
+      await _analyticsService.logTaskCompleted(taskId: task.id);
+    }
   }
 
   Future<void> updateTask(
@@ -805,6 +819,8 @@ class TaskProvider extends ChangeNotifier {
     _refreshPagination();
     notifyListeners();
     updateHomeWidgetWithNotification(); // Show notification when task is deleted
+
+    await _analyticsService.logTaskDeleted(taskId: id);
   }
 
   Future<void> restoreTask(Task task) async {
@@ -846,6 +862,8 @@ class TaskProvider extends ChangeNotifier {
     _refreshPagination();
     notifyListeners();
     updateHomeWidgetWithNotification(); // Show notification when task is permanently deleted
+
+    await _analyticsService.logTaskDeleted(taskId: id);
   }
 
   Future<void> addCategory(String name, int colorValue, int iconCode) async {
@@ -865,6 +883,8 @@ class TaskProvider extends ChangeNotifier {
       );
     }
     notifyListeners();
+
+    await _analyticsService.logCategoryCreated(name: name);
   }
 
   Future<void> updateCategory(

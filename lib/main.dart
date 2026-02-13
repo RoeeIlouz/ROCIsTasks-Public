@@ -9,6 +9,7 @@ import 'package:rocis_tasks/core/services/auth_service.dart';
 import 'package:rocis_tasks/core/services/calendar_service.dart';
 import 'package:rocis_tasks/core/services/app_initializer.dart';
 import 'package:rocis_tasks/core/services/background_handler.dart';
+import 'package:rocis_tasks/core/services/connectivity_service.dart';
 import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
 import 'package:rocis_tasks/features/calendar/presentation/providers/calendar_provider.dart';
 import 'package:rocis_tasks/features/onboarding/data/services/onboarding_service.dart';
@@ -59,6 +60,7 @@ class _AppRootState extends State<AppRoot> {
     _themeService,
     _errorHandlingService,
   );
+  final _connectivityService = ConnectivityService();
   late final OnboardingService _onboardingService;
   AppRouter? _appRouter;
 
@@ -259,6 +261,7 @@ class _AppRootState extends State<AppRoot> {
             ChangeNotifierProvider.value(value: _onboardingService),
             Provider.value(value: _appRouter!),
             Provider.value(value: _errorHandlingService),
+            Provider.value(value: _connectivityService),
           ],
           child: const MyApp(),
         );

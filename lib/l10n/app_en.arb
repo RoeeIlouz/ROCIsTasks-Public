@@ -78,5 +78,6 @@
   "selectColor": "Select Color",
   "selectGoogleCalendars": "Select Google Calendars",
   "selectAll": "Select All",
-  "deselectAll": "Deselect All"
+  "deselectAll": "Deselect All",
+  "offlineMode": "Offline Mode"
 }

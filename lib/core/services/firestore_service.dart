@@ -60,11 +60,11 @@ class FirestoreService {
     if (collection == null || !_shouldSync) return;
 
     try {
-      await collection.doc(category.id).update({
+      await collection.doc(category.id).set({
         'name': category.name,
         'colorValue': category.colorValue,
         'iconCode': category.iconCode,
-      });
+      }, SetOptions(merge: true));
     } catch (e) {
       AppLogger.warning(
         'Firestore updateCategory skipped (offline or error)',
@@ -137,7 +137,7 @@ class FirestoreService {
     if (collection == null || !_shouldSync) return;
 
     try {
-      await collection.doc(task.id).update({
+      await collection.doc(task.id).set({
         'title': task.title,
         'description': task.description,
         'isCompleted': task.isCompleted,
@@ -147,7 +147,7 @@ class FirestoreService {
         'isDeleted': task.isDeleted ?? false,
         'isPinned': task.isPinned,
         'updatedAt': FieldValue.serverTimestamp(),
-      });
+      }, SetOptions(merge: true));
     } catch (e) {
       AppLogger.warning(
         'Firestore updateTask skipped (offline or error)',

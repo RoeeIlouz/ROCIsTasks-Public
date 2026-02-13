@@ -249,4 +249,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get deselectAll => 'בטל בחירת הכל';
+
+  @override
+  String get offlineMode => 'מצב לא מקוון';
 }
