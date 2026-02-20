@@ -60,39 +60,6 @@
         <service android:name=".FullCalendarWidgetService"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
 
-        <receiver android:name=".CalendarWidgetProvider" android:exported="true" android:label="Calendar Events">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-            <meta-data android:name="android.appwidget.provider"
-                android:resource="@xml/calendar_widget_info" />
-        </receiver>
-
-        <service android:name=".CalendarWidgetService"
-            android:permission="android.permission.BIND_REMOTEVIEWS" />
-
-        <receiver android:name=".MonthWidgetProvider" android:exported="true" android:label="Month Calendar">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-            <meta-data android:name="android.appwidget.provider"
-                android:resource="@xml/widget_month_info" />
-        </receiver>
-
-        <service android:name=".MonthWidgetService"
-            android:permission="android.permission.BIND_REMOTEVIEWS" />
-
-        <receiver android:name=".ScheduleWidgetProvider" android:exported="true" android:label="Schedule">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-            <meta-data android:name="android.appwidget.provider"
-                android:resource="@xml/schedule_widget_info" />
-        </receiver>
-
-        <service android:name=".ScheduleWidgetService"
-            android:permission="android.permission.BIND_REMOTEVIEWS" />
-
 
         <!-- HomeWidget Background Interactivity -->
         <receiver android:name="es.antonborri.home_widget.HomeWidgetBackgroundReceiver"

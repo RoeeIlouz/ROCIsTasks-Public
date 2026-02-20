@@ -55,7 +55,9 @@ class FirebaseDebug {
   }
 
   /// Test Firebase initialization without actually initializing
+  /// Only runs in debug mode.
   static Future<bool> testFirebaseConfig() async {
+    if (!kDebugMode) return true;
     try {
       final options = FirebaseConfig.currentPlatform;
 

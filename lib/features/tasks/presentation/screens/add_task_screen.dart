@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
+import 'package:rocis_tasks/features/tasks/domain/models/sub_task.dart';
+import 'package:rocis_tasks/core/services/subscription_service.dart';
 import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
 import 'package:rocis_tasks/core/services/validation_service.dart';
 import 'package:rocis_tasks/core/services/error_service.dart';
@@ -31,6 +33,8 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   String? _category;
   ui.TextDirection _titleDirection = ui.TextDirection.ltr;
   ui.TextDirection _descriptionDirection = ui.TextDirection.ltr;
+  List<SubTask> _subTasks = [];
+  String? _recurrenceRule;
 
   @override
   void initState() {
@@ -44,6 +48,9 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     _category = widget.task?.categoryId;
     _titleDirection = _getTextDirection(_titleController.text);
     _descriptionDirection = _getTextDirection(_descriptionController.text);
+    _subTasks =
+        widget.task?.subTasks?.map((st) => st.copyWith()).toList() ?? [];
+    _recurrenceRule = widget.task?.recurrenceRule;
   }
 
   @override
@@ -135,6 +142,8 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
             dueDate: _selectedDate,
             priority: _priority,
             categoryId: _category,
+            subTasks: _subTasks,
+            recurrenceRule: _recurrenceRule,
           );
         } else {
           Provider.of<TaskProvider>(context, listen: false).addTask(
@@ -143,6 +152,8 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
             _selectedDate,
             _priority,
             _category,
+            subTasks: _subTasks,
+            recurrenceRule: _recurrenceRule,
           );
         }
         Navigator.pop(context);
@@ -203,6 +214,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   prefixIcon: Icons.title,
                   theme: theme,
                 ),
+                maxLength: 100,
                 validator: (value) {
                   final sanitized = ValidationService.sanitizeText(value ?? '');
                   final error = Validators.validateTaskTitle(
@@ -234,6 +246,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   theme: theme,
                 ),
                 maxLines: 4,
+                maxLength: 500,
                 validator: (value) {
                   final error = ValidationService.validateTaskDescription(
                     value,
@@ -426,6 +439,10 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   }
                 },
               ),
+              const SizedBox(height: 24),
+              _buildSubTasksSection(context, l10n),
+              const SizedBox(height: 24),
+              _buildRecurrenceSection(context, l10n),
               const SizedBox(height: 40),
               Semantics(
                 label: isEditing ? l10n.updateTask : l10n.saveTask,
@@ -459,6 +476,186 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildSubTasksSection(BuildContext context, AppLocalizations l10n) {
+    final theme = Theme.of(context);
+    final subscriptionService = Provider.of<SubscriptionService>(
+      context,
+      listen: true,
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              "Subtasks",
+              style: GoogleFonts.outfit(
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+                color: theme.colorScheme.primary,
+              ),
+            ),
+            if (!subscriptionService.isPremium)
+              Container(
+                margin: const EdgeInsets.only(left: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.amber.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  "PRO",
+                  style: GoogleFonts.outfit(
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.amber[800],
+                  ),
+                ),
+              ),
+            const Spacer(),
+            IconButton(
+              icon: const Icon(Icons.add_circle_outline, size: 20),
+              onPressed: () {
+                if (!subscriptionService.isPremium) {
+                  subscriptionService.showPaywall();
+                  return;
+                }
+                setState(() {
+                  _subTasks.add(SubTask(title: ''));
+                });
+              },
+            ),
+          ],
+        ),
+        if (_subTasks.isEmpty)
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Text("No subtasks added", style: theme.textTheme.bodySmall),
+          ),
+        ...List.generate(_subTasks.length, (index) {
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 8.0),
+            child: Row(
+              children: [
+                Checkbox(
+                  value: _subTasks[index].isCompleted,
+                  onChanged: (value) {
+                    setState(() {
+                      _subTasks[index].isCompleted = value ?? false;
+                    });
+                  },
+                ),
+                Expanded(
+                  child: TextField(
+                    controller:
+                        TextEditingController(text: _subTasks[index].title)
+                          ..selection = TextSelection.fromPosition(
+                            TextPosition(offset: _subTasks[index].title.length),
+                          ),
+                    onChanged: (value) {
+                      _subTasks[index].title = value;
+                    },
+                    decoration: const InputDecoration(
+                      hintText: "Enter subtask...",
+                      border: InputBorder.none,
+                    ),
+                    style: GoogleFonts.outfit(fontSize: 14),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.remove_circle_outline, size: 18),
+                  onPressed: () {
+                    setState(() {
+                      _subTasks.removeAt(index);
+                    });
+                  },
+                ),
+              ],
+            ),
+          );
+        }),
+      ],
+    );
+  }
+
+  Widget _buildRecurrenceSection(BuildContext context, AppLocalizations l10n) {
+    final theme = Theme.of(context);
+    final subscriptionService = Provider.of<SubscriptionService>(
+      context,
+      listen: true,
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Text(
+              "Recurrence",
+              style: GoogleFonts.outfit(
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+                color: theme.colorScheme.primary,
+              ),
+            ),
+            if (!subscriptionService.isPremium)
+              Container(
+                margin: const EdgeInsets.only(left: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.amber.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  "PRO",
+                  style: GoogleFonts.outfit(
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.amber[800],
+                  ),
+                ),
+              ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        DropdownButtonFormField<String?>(
+          initialValue: _recurrenceRule,
+          decoration: SharedInputDecorations.getFieldDecoration(
+            label: "Repeat",
+            prefixIcon: Icons.repeat_rounded,
+            theme: theme,
+          ),
+          items: const [
+            DropdownMenuItem(value: null, child: Text("None")),
+            DropdownMenuItem(
+              value: "FREQ=DAILY;INTERVAL=1",
+              child: Text("Daily"),
+            ),
+            DropdownMenuItem(
+              value: "FREQ=WEEKLY;INTERVAL=1",
+              child: Text("Weekly"),
+            ),
+            DropdownMenuItem(
+              value: "FREQ=MONTHLY;INTERVAL=1",
+              child: Text("Monthly"),
+            ),
+          ],
+          onChanged: (value) {
+            if (!subscriptionService.isPremium && value != null) {
+              subscriptionService.showPaywall();
+              return;
+            }
+            setState(() {
+              _recurrenceRule = value;
+            });
+          },
+        ),
+      ],
     );
   }
 }

@@ -47,5 +47,16 @@
 	<true/>
 	<key>NSCalendarsUsageDescription</key>
 	<string>This app needs access to your calendar to sync tasks with your schedule.</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.867477199658-f79j3ag3fj8dcpmmfpaljactnfcqvfov</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>

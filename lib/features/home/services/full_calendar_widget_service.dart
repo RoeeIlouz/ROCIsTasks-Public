@@ -218,7 +218,9 @@ class FullCalendarWidgetService {
             calendarIds: filters.selectedCalendarIds,
           );
         }
-      } catch (e) {}
+      } catch (e) {
+        // Ignore Google Calendar fetch errors to prevent widget crash
+      }
 
       // Fetch tasks (if filter enabled)
       var tasks = <dynamic>[];
@@ -234,7 +236,9 @@ class FullCalendarWidgetService {
               )
               .toList();
         }
-      } catch (e) {}
+      } catch (e) {
+        // Ignore task fetch errors
+      }
 
       // Fetch ROCIs-Schedule events (if filter enabled and user is authenticated)
       List<Map<String, dynamic>> scheduleData = [];
@@ -250,7 +254,9 @@ class FullCalendarWidgetService {
           );
           // Fetched ROCIs-Schedule items
         }
-      } catch (e) {}
+      } catch (e) {
+        // Ignore schedule fetch errors
+      }
 
       // Found events, tasks, and schedule items
 
@@ -508,7 +514,9 @@ class FullCalendarWidgetService {
         name: 'FullCalendarWidgetProvider',
         iOSName: 'FullCalendarWidget',
       );
-    } catch (e) {}
+    } catch (e) {
+      // Ignore fallback grid generation errors
+    }
   }
 
   int _getWeekNumber(DateTime date) {

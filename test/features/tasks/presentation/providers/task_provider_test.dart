@@ -10,6 +10,8 @@ import 'package:rocis_tasks/core/services/auth_service.dart';
 import 'package:rocis_tasks/core/services/calendar_service.dart';
 import 'package:rocis_tasks/shared/ui/ui_kit.dart';
 import 'package:rocis_tasks/core/services/error_handling_service.dart';
+import 'package:rocis_tasks/core/services/subscription_service.dart';
+import 'package:rocis_tasks/core/services/analytics_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MockLocalTaskSource extends Mock implements LocalTaskSource {}
@@ -28,6 +30,10 @@ class MockThemeService extends Mock implements ThemeService {}
 
 class MockErrorHandlingService extends Mock implements ErrorHandlingService {}
 
+class MockSubscriptionService extends Mock implements SubscriptionService {}
+
+class MockAnalyticsService extends Mock implements AnalyticsService {}
+
 class TaskFake extends Fake implements Task {}
 
 class StackTraceFake extends Fake implements StackTrace {}
@@ -42,6 +48,8 @@ void main() {
   late MockCalendarService mockCalendarService;
   late MockThemeService mockThemeService;
   late MockErrorHandlingService mockErrorHandlingService;
+  late MockSubscriptionService mockSubscriptionService;
+  late MockAnalyticsService mockAnalyticsService;
 
   setUpAll(() {
     registerFallbackValue(TaskFake());
@@ -59,6 +67,8 @@ void main() {
     mockCalendarService = MockCalendarService();
     mockThemeService = MockThemeService();
     mockErrorHandlingService = MockErrorHandlingService();
+    mockSubscriptionService = MockSubscriptionService();
+    mockAnalyticsService = MockAnalyticsService();
 
     // Default stubs
     when(() => mockSource.init()).thenAnswer((_) async => {});
@@ -70,6 +80,12 @@ void main() {
     ).thenAnswer((_) async => true);
     when(
       () => mockNotificationService.cancelAllNotifications(),
+    ).thenAnswer((_) async => {});
+    when(
+      () => mockNotificationService.showInfoNotification(
+        title: any(named: 'title'),
+        body: any(named: 'body'),
+      ),
     ).thenAnswer((_) async => {});
     when(
       () => mockNotificationService.onNotificationResponse,
@@ -91,16 +107,25 @@ void main() {
     ).thenAnswer((_) async => {});
     when(() => mockThemeService.init()).thenAnswer((_) async => {});
     when(() => mockThemeService.isDarkMode).thenReturn(false);
+    when(() => mockSubscriptionService.isPremium).thenReturn(true);
+    when(
+      () => mockAnalyticsService.logTaskCreated(
+        categoryId: any(named: 'categoryId'),
+        hasDueDate: any(named: 'hasDueDate'),
+      ),
+    ).thenAnswer((_) async => {});
 
     taskProvider = TaskProvider(
       mockAuthService,
       mockCalendarService,
       mockThemeService,
       mockErrorHandlingService,
+      mockSubscriptionService,
       source: mockSource,
       notificationService: mockNotificationService,
       firestoreService: mockFirestoreService,
       connectivityService: mockConnectivityService,
+      analyticsService: mockAnalyticsService,
     );
   });
 

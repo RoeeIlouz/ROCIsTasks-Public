@@ -20,8 +20,14 @@ class AuthService extends ChangeNotifier {
   // Secondary Firebase Auth for ROCIs-Schedule
   FirebaseAuth? _scheduleAuth;
 
+  /// Exposes secondary auth errors so UI can show a non-blocking banner.
+  /// null means no error.
+  final ValueNotifier<String?> scheduleAuthError = ValueNotifier<String?>(null);
+
+  StreamSubscription<User?>? _authStateSubscription;
+
   AuthService(this._errorHandlingService) {
-    _auth.authStateChanges().listen((User? user) {
+    _authStateSubscription = _auth.authStateChanges().listen((User? user) {
       if (user != null) {
         _syncEncryptionKey(user.uid);
         ensureSecondaryAuth();
@@ -34,6 +40,13 @@ class AuthService extends ChangeNotifier {
 
       notifyListeners();
     });
+  }
+
+  @override
+  void dispose() {
+    _authStateSubscription?.cancel();
+    scheduleAuthError.dispose();
+    super.dispose();
   }
 
   User? get currentUser => _auth.currentUser;
@@ -145,8 +158,9 @@ class AuthService extends ChangeNotifier {
         error: e,
         tag: 'Auth',
       );
-      // Non-critical - schedule integration will just be unavailable
       _scheduleAuth = null;
+      scheduleAuthError.value =
+          'Schedule sync unavailable. Some features may be limited.';
     }
   }
 
@@ -173,6 +187,8 @@ class AuthService extends ChangeNotifier {
           error: e,
           tag: 'Auth',
         );
+        scheduleAuthError.value =
+            'Schedule sync unavailable. Some features may be limited.';
       }
     }
   }
@@ -188,6 +204,69 @@ class AuthService extends ChangeNotifier {
       notifyListeners();
     } catch (e, s) {
       _errorHandlingService.logError(e, s, reason: 'Sign out');
+    }
+  }
+
+  /// Delete account and all associated data (GDPR requirement)
+  Future<bool> deleteAccount() async {
+    final user = currentUser;
+    if (user == null) return false;
+
+    try {
+      final userId = user.uid;
+      final firestore = FirebaseFirestore.instance;
+
+      // 1. Delete Firestore data
+      AppLogger.info(
+        'Starting GDPR data deletion for user: $userId',
+        tag: 'Auth',
+      );
+
+      // Delete tasks subcollection
+      final tasks = await firestore
+          .collection('users')
+          .doc(userId)
+          .collection('tasks')
+          .get();
+      for (var doc in tasks.docs) {
+        await doc.reference.delete();
+      }
+
+      // Delete categories subcollection
+      final categories = await firestore
+          .collection('users')
+          .doc(userId)
+          .collection('categories')
+          .get();
+      for (var doc in categories.docs) {
+        await doc.reference.delete();
+      }
+
+      // Delete settings subcollection
+      final settings = await firestore
+          .collection('users')
+          .doc(userId)
+          .collection('settings')
+          .get();
+      for (var doc in settings.docs) {
+        await doc.reference.delete();
+      }
+
+      // Delete the main user document
+      await firestore.collection('users').doc(userId).delete();
+
+      // 2. Delete Auth Account
+      // Note: This may fail if the user hasn't signed in recently.
+      // In production, you'd trigger a re-auth flow here.
+      await user.delete();
+
+      await signOut();
+      AppLogger.info('Account and data deleted successfully', tag: 'Auth');
+      return true;
+    } catch (e, s) {
+      _errorHandlingService.logError(e, s, reason: 'Delete account');
+      // If it's a "recent-login-required" error, we should ideally handle it
+      return false;
     }
   }
 }

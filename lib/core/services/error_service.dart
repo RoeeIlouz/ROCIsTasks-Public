@@ -79,8 +79,10 @@ class ErrorService {
           name: 'app_error',
           parameters: {
             'error_type': type,
-            'error_message': error.toString().substring(0, 100), // Limit length
-            'has_stack_trace': stack != null,
+            'error_message': error.toString().substring(0, 100),
+            'has_stack_trace': stack != null ? 1 : 0,
+            'context': context?.substring(0, 100) ?? 'none',
+            'is_production': AppConfig.isProduction ? 1 : 0,
           },
         );
       } catch (e) {

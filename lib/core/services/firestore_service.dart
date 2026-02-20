@@ -4,11 +4,18 @@ import 'package:rocis_tasks/features/categories/domain/models/category.dart';
 import 'package:rocis_tasks/core/services/connectivity_service.dart';
 import 'package:rocis_tasks/core/services/retry_service.dart';
 import 'package:rocis_tasks/core/services/logger_service.dart';
+import 'package:rocis_tasks/core/services/sync_status_service.dart';
+import 'package:firebase_performance/firebase_performance.dart';
 
 class FirestoreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final ConnectivityService _connectivityService = ConnectivityService();
+  final SyncStatusService _syncStatus = SyncStatusService();
   String? _userId;
+
+  // Throttling for writes
+  DateTime _lastWriteTime = DateTime.fromMillisecondsSinceEpoch(0);
+  static const _minWriteInterval = Duration(milliseconds: 500);
 
   // Singleton pattern
   static final FirestoreService _instance = FirestoreService._internal();
@@ -17,6 +24,16 @@ class FirestoreService {
 
   void setUserId(String? userId) {
     _userId = userId;
+  }
+
+  /// Ensure at least [_minWriteInterval] between write operations
+  Future<void> _throttle() async {
+    final now = DateTime.now();
+    final intervalSinceLastWrite = now.difference(_lastWriteTime);
+    if (intervalSinceLastWrite < _minWriteInterval) {
+      await Future.delayed(_minWriteInterval - intervalSinceLastWrite);
+    }
+    _lastWriteTime = DateTime.now();
   }
 
   /// Check if we should attempt Firestore operations
@@ -36,6 +53,12 @@ class FirestoreService {
     final collection = _categoriesCollection;
     if (collection == null || !_shouldSync) return;
 
+    await _throttle();
+    _syncStatus.setSyncing();
+    final trace = FirebasePerformance.instance.newTrace(
+      'firestore_add_category',
+    );
+    await trace.start();
     try {
       await RetryService.retryFirestoreOperation(() async {
         await collection.doc(category.id).set({
@@ -45,13 +68,16 @@ class FirestoreService {
           'iconCode': category.iconCode,
         });
       });
+      _syncStatus.setSuccess();
     } catch (e) {
-      // Log error but don't throw - local data is source of truth
       AppLogger.error(
         'Firestore addCategory failed after retries',
         error: e,
         tag: 'Firestore',
       );
+      _syncStatus.setError('Failed to sync category. Changes saved locally.');
+    } finally {
+      await trace.stop();
     }
   }
 
@@ -59,18 +85,30 @@ class FirestoreService {
     final collection = _categoriesCollection;
     if (collection == null || !_shouldSync) return;
 
+    await _throttle();
+    _syncStatus.setSyncing();
+    final trace = FirebasePerformance.instance.newTrace(
+      'firestore_update_category',
+    );
+    await trace.start();
     try {
       await collection.doc(category.id).set({
         'name': category.name,
         'colorValue': category.colorValue,
         'iconCode': category.iconCode,
       }, SetOptions(merge: true));
+      _syncStatus.setSuccess();
     } catch (e) {
-      AppLogger.warning(
-        'Firestore updateCategory skipped (offline or error)',
+      AppLogger.error(
+        'Firestore updateCategory failed',
         error: e,
         tag: 'Firestore',
       );
+      _syncStatus.setError(
+        'Failed to sync category update. Changes saved locally.',
+      );
+    } finally {
+      await trace.stop();
     }
   }
 
@@ -78,14 +116,26 @@ class FirestoreService {
     final collection = _categoriesCollection;
     if (collection == null || !_shouldSync) return;
 
+    await _throttle();
+    _syncStatus.setSyncing();
+    final trace = FirebasePerformance.instance.newTrace(
+      'firestore_delete_category',
+    );
+    await trace.start();
     try {
       await collection.doc(id).delete();
+      _syncStatus.setSuccess();
     } catch (e) {
-      AppLogger.warning(
-        'Firestore deleteCategory skipped (offline or error)',
+      AppLogger.error(
+        'Firestore deleteCategory failed',
         error: e,
         tag: 'Firestore',
       );
+      _syncStatus.setError(
+        'Failed to sync category deletion. Will retry later.',
+      );
+    } finally {
+      await trace.stop();
     }
   }
 
@@ -93,7 +143,17 @@ class FirestoreService {
     final collection = _categoriesCollection;
     if (collection == null) return const Stream.empty();
 
+    final trace = FirebasePerformance.instance.newTrace(
+      'firestore_get_categories_initial',
+    );
+    bool firstEvent = true;
+    trace.start();
+
     return collection.snapshots().map((snapshot) {
+      if (firstEvent) {
+        trace.stop();
+        firstEvent = false;
+      }
       return snapshot.docs.map((doc) {
         final data = doc.data();
         return Category(
@@ -110,25 +170,22 @@ class FirestoreService {
     final collection = _tasksCollection;
     if (collection == null || !_shouldSync) return;
 
+    await _throttle();
+    _syncStatus.setSyncing();
+    final trace = FirebasePerformance.instance.newTrace('firestore_add_task');
+    await trace.start();
     try {
-      await collection.doc(task.id).set({
-        'id': task.id,
-        'title': task.title,
-        'description': task.description,
-        'isCompleted': task.isCompleted,
-        'dueDate': task.dueDate?.toIso8601String(),
-        'priority': task.priority.index,
-        'categoryId': task.categoryId,
-        'isDeleted': task.isDeleted ?? false,
-        'isPinned': task.isPinned,
-        'updatedAt': FieldValue.serverTimestamp(),
+      await RetryService.retryFirestoreOperation(() async {
+        final data = task.toMap();
+        data['updatedAt'] = FieldValue.serverTimestamp();
+        await collection.doc(task.id).set(data);
       });
+      _syncStatus.setSuccess();
     } catch (e) {
-      AppLogger.warning(
-        'Firestore addTask skipped (offline or error)',
-        error: e,
-        tag: 'Firestore',
-      );
+      AppLogger.error('Firestore addTask failed', error: e, tag: 'Firestore');
+      _syncStatus.setError('Failed to sync task. Changes saved locally.');
+    } finally {
+      await trace.stop();
     }
   }
 
@@ -136,24 +193,28 @@ class FirestoreService {
     final collection = _tasksCollection;
     if (collection == null || !_shouldSync) return;
 
+    await _throttle();
+    _syncStatus.setSyncing();
+    final trace = FirebasePerformance.instance.newTrace(
+      'firestore_update_task',
+    );
+    await trace.start();
     try {
-      await collection.doc(task.id).set({
-        'title': task.title,
-        'description': task.description,
-        'isCompleted': task.isCompleted,
-        'dueDate': task.dueDate?.toIso8601String(),
-        'priority': task.priority.index,
-        'categoryId': task.categoryId,
-        'isDeleted': task.isDeleted ?? false,
-        'isPinned': task.isPinned,
-        'updatedAt': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true));
+      final data = task.toMap();
+      data['updatedAt'] = FieldValue.serverTimestamp();
+      await collection.doc(task.id).set(data, SetOptions(merge: true));
+      _syncStatus.setSuccess();
     } catch (e) {
-      AppLogger.warning(
-        'Firestore updateTask skipped (offline or error)',
+      AppLogger.error(
+        'Firestore updateTask failed',
         error: e,
         tag: 'Firestore',
       );
+      _syncStatus.setError(
+        'Failed to sync task update. Changes saved locally.',
+      );
+    } finally {
+      await trace.stop();
     }
   }
 
@@ -161,14 +222,24 @@ class FirestoreService {
     final collection = _tasksCollection;
     if (collection == null || !_shouldSync) return;
 
+    await _throttle();
+    _syncStatus.setSyncing();
+    final trace = FirebasePerformance.instance.newTrace(
+      'firestore_delete_task',
+    );
+    await trace.start();
     try {
       await collection.doc(id).delete();
+      _syncStatus.setSuccess();
     } catch (e) {
-      AppLogger.warning(
-        'Firestore deleteTask skipped (offline or error)',
+      AppLogger.error(
+        'Firestore deleteTask failed',
         error: e,
         tag: 'Firestore',
       );
+      _syncStatus.setError('Failed to sync task deletion. Will retry later.');
+    } finally {
+      await trace.stop();
     }
   }
 
@@ -176,22 +247,19 @@ class FirestoreService {
     final collection = _tasksCollection;
     if (collection == null) return const Stream.empty();
 
+    final trace = FirebasePerformance.instance.newTrace(
+      'firestore_get_tasks_initial',
+    );
+    bool firstEvent = true;
+    trace.start();
+
     return collection.snapshots().map((snapshot) {
+      if (firstEvent) {
+        trace.stop();
+        firstEvent = false;
+      }
       return snapshot.docs.map((doc) {
-        final data = doc.data();
-        return Task(
-          id: data['id'],
-          title: data['title'] ?? '',
-          description: data['description'] ?? '',
-          isCompleted: data['isCompleted'] ?? false,
-          dueDate: data['dueDate'] != null
-              ? DateTime.tryParse(data['dueDate'])
-              : null,
-          priority: TaskPriority.values[data['priority'] ?? 0],
-          categoryId: data['categoryId'],
-          isDeleted: data['isDeleted'] ?? false,
-          isPinned: data['isPinned'] ?? false,
-        );
+        return Task.fromMap(doc.data());
       }).toList();
     });
   }

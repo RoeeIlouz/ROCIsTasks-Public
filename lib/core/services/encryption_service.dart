@@ -7,14 +7,7 @@ import 'package:rocis_tasks/core/services/logger_service.dart';
 
 class EncryptionService {
   // Use EncryptedSharedPreferences for better persistence on Android
-  static const _secureStorage = FlutterSecureStorage(
-    aOptions: AndroidOptions(encryptedSharedPreferences: true),
-  );
-
-  // Legacy storage for migration
-  static const _legacyStorage = FlutterSecureStorage(
-    aOptions: AndroidOptions(encryptedSharedPreferences: false),
-  );
+  static const _secureStorage = FlutterSecureStorage();
 
   static const _keyName = 'hive_encryption_key_v1';
 
@@ -34,7 +27,6 @@ class EncryptionService {
         tag: 'EncryptionService',
       );
 
-      // 1. Try reading from robust storage
       String? keyString = await _secureStorage.read(key: _keyName);
       if (keyString != null) {
         AppLogger.info(
@@ -43,27 +35,10 @@ class EncryptionService {
         );
       }
 
-      // 2. If not found, try migrating from legacy storage
-      if (keyString == null) {
-        AppLogger.info(
-          'Key not found in secure storage. Checking legacy...',
-          tag: 'EncryptionService',
-        );
-        keyString = await _legacyStorage.read(key: _keyName);
-        if (keyString != null) {
-          AppLogger.info(
-            'Key found in legacy storage. Migrating...',
-            tag: 'EncryptionService',
-          );
-          await _secureStorage.write(key: _keyName, value: keyString);
-        }
-      }
-
       List<int> keyBytes;
       if (keyString == null) {
-        // 3. Generate new key if absolutely no key found
         AppLogger.warning(
-          'No existing encryption key found anywhere. Generating NEW key.',
+          'No existing encryption key found. Generating NEW key.',
           tag: 'EncryptionService',
         );
         keyBytes = Hive.generateSecureKey();
@@ -95,7 +70,6 @@ class EncryptionService {
         tag: 'EncryptionService',
       );
       await _secureStorage.delete(key: _keyName);
-      await _legacyStorage.delete(key: _keyName);
       _encrypter = null;
       _key = null;
     } catch (e) {
@@ -134,9 +108,7 @@ class EncryptionService {
 
   /// Checks if a key exists without generating one.
   static Future<bool> hasKey() async {
-    final keyString =
-        await _secureStorage.read(key: _keyName) ??
-        await _legacyStorage.read(key: _keyName);
+    final keyString = await _secureStorage.read(key: _keyName);
     if (keyString != null) {
       _initEncrypter(base64Url.decode(keyString));
       return true;
@@ -151,30 +123,8 @@ class EncryptionService {
   }
 
   static String encrypt(String plainText) {
-    // Encryption is disabled per user request to resolve persistent decryption errors
+    // Encryption is disabled per user request to ensure data reliability.
     return plainText;
-    /*
-    if (plainText.isEmpty) return plainText;
-    if (_encrypter == null) {
-      AppLogger.critical(
-        'SECURITY ALERT: Encrypter not initialized. Blocking operation.',
-        tag: 'Security',
-      );
-      throw StateError('Encryption service not initialized');
-    }
-    try {
-      final iv = enc.IV.fromLength(16);
-      final encrypted = _encrypter!.encrypt(plainText, iv: iv);
-      return '${iv.base64}:${encrypted.base64}'; // Format: IV:CipherText
-    } catch (e) {
-      AppLogger.critical(
-        'SECURITY ALERT: Encryption failed',
-        error: e,
-        tag: 'Security',
-      );
-      throw Exception('Failed to secure data: $e');
-    }
-    */
   }
 
   static String decrypt(String cipherText) {
@@ -186,8 +136,6 @@ class EncryptionService {
     }
 
     if (_encrypter == null) {
-      // If we don't have a key but the data looks encrypted, we can't decrypt it.
-      // Returning the raw cipherText is better than [DECRYPTION_ERROR] as it might be partially recoverable or readable by the user.
       AppLogger.warning(
         'Attempted to decrypt data but encrypter is not initialized',
         tag: 'Security',
@@ -209,7 +157,6 @@ class EncryptionService {
         error: e,
         tag: 'Security',
       );
-      // If decryption fails (e.g. wrong key), return the raw cipherText instead of an error message
       return cipherText;
     }
   }

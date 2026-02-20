@@ -301,6 +301,22 @@ class NotificationService {
     }
   }
 
+  Future<void> showInfoNotification({
+    required String title,
+    required String body,
+    int id = 777,
+  }) async {
+    const androidDetails = AndroidNotificationDetails(
+      'rocis_tasks_info',
+      'Task Information',
+      channelDescription: 'General information and feedback',
+      importance: Importance.defaultImportance,
+      priority: Priority.defaultPriority,
+    );
+    const details = NotificationDetails(android: androidDetails);
+    await flutterLocalNotificationsPlugin.show(id, title, body, details);
+  }
+
   Future<void> cancelAllNotifications() async {
     await flutterLocalNotificationsPlugin.cancelAll();
   }

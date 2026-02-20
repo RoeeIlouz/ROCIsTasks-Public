@@ -1,6 +1,8 @@
+import 'dart:io';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:rocis_tasks/core/config/app_config.dart';
 import 'package:rocis_tasks/core/services/logger_service.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 
 class AnalyticsService {
   static final AnalyticsService _instance = AnalyticsService._internal();
@@ -80,5 +82,78 @@ class AnalyticsService {
   /// Log task deleted event
   Future<void> logTaskDeleted({required String taskId}) async {
     await logEvent(name: 'task_deleted', parameters: {'task_id': taskId});
+  }
+
+  /// Log theme changed event
+  Future<void> logThemeChanged({required String themeMode}) async {
+    await logEvent(
+      name: 'theme_changed',
+      parameters: {'theme_mode': themeMode},
+    );
+  }
+
+  /// Log language changed event
+  Future<void> logLanguageChanged({required String locale}) async {
+    await logEvent(name: 'language_changed', parameters: {'locale': locale});
+  }
+
+  /// Log onboarding completed event
+  Future<void> logOnboardingCompleted() async {
+    await logEvent(name: 'onboarding_completed');
+  }
+
+  /// Log subscription management clicked event
+  Future<void> logSubscriptionManagementClicked() async {
+    await logEvent(name: 'subscription_management_clicked');
+  }
+
+  /// Log session start with device info
+  Future<void> logSessionStart() async {
+    final deviceInfo = DeviceInfoPlugin();
+    String? platform;
+    String? model;
+    String? osVersion;
+
+    try {
+      if (Platform.isAndroid) {
+        final androidInfo = await deviceInfo.androidInfo;
+        platform = 'android';
+        model = androidInfo.model;
+        osVersion = androidInfo.version.release;
+      } else if (Platform.isIOS) {
+        final iosInfo = await deviceInfo.iosInfo;
+        platform = 'ios';
+        model = iosInfo.utsname.machine;
+        osVersion = iosInfo.systemVersion;
+      }
+    } catch (e) {
+      AppLogger.warning('Failed to get device info for analytics', error: e);
+    }
+
+    await logEvent(
+      name: 'app_session_start',
+      parameters: {
+        'platform': platform ?? 'unknown',
+        'device_model': model ?? 'unknown',
+        'os_version': osVersion ?? 'unknown',
+        'is_production': AppConfig.isProduction ? 1 : 0,
+      },
+    );
+  }
+
+  /// Log feature limit reached
+  Future<void> logFeatureLimitReached({required String featureName}) async {
+    await logEvent(
+      name: 'feature_limit_reached',
+      parameters: {'feature': featureName},
+    );
+  }
+
+  /// Log premium feature interaction
+  Future<void> logPremiumFeatureClicked({required String featureName}) async {
+    await logEvent(
+      name: 'premium_feature_clicked',
+      parameters: {'feature': featureName},
+    );
   }
 }

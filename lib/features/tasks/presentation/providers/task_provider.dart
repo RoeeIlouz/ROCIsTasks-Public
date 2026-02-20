@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart' hide Category;
 import 'dart:async';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rocis_tasks/core/services/notification_service.dart';
 import 'package:rocis_tasks/features/tasks/data/datasources/local_task_source.dart';
@@ -12,7 +13,10 @@ import 'package:rocis_tasks/core/services/calendar_service.dart';
 import 'package:rocis_tasks/core/services/connectivity_service.dart';
 import 'package:rocis_tasks/core/config/app_config.dart';
 import 'package:rocis_tasks/core/services/pagination_service.dart';
+import 'package:rocis_tasks/core/services/subscription_service.dart';
+import 'package:rrule/rrule.dart';
 
+import 'package:rocis_tasks/features/tasks/domain/models/sub_task.dart';
 import 'package:rocis_tasks/features/categories/domain/models/category.dart';
 import 'package:rocis_tasks/features/home/services/month_widget_service.dart';
 import 'package:rocis_tasks/features/home/services/full_calendar_widget_service.dart';
@@ -21,6 +25,7 @@ import 'package:rocis_tasks/core/services/widget_data_service.dart';
 
 import 'package:rocis_tasks/core/services/error_handling_service.dart';
 import 'package:rocis_tasks/core/services/analytics_service.dart';
+import 'package:rocis_tasks/core/services/validation_service.dart';
 
 enum TaskSortOption { dueDate, priority, title, dateCreated }
 
@@ -38,6 +43,7 @@ class TaskProvider extends ChangeNotifier {
   final CalendarService _calendarService;
   final ThemeService _themeService;
   final ErrorHandlingService _errorHandlingService;
+  final SubscriptionService _subscriptionService;
   late final MonthWidgetService _monthWidgetService;
   late final FullCalendarWidgetService _fullCalendarWidgetService;
   late final WidgetDataService _widgetDataService;
@@ -53,7 +59,8 @@ class TaskProvider extends ChangeNotifier {
     this._authService,
     this._calendarService,
     this._themeService,
-    this._errorHandlingService, {
+    this._errorHandlingService,
+    this._subscriptionService, {
     LocalTaskSource? source,
     NotificationService? notificationService,
     FirestoreService? firestoreService,
@@ -131,6 +138,9 @@ class TaskProvider extends ChangeNotifier {
     _refreshPagination();
 
     await _notificationService.cancelAllNotifications();
+
+    // Listen to subscription changes
+    _subscriptionService.addListener(notifyListeners);
 
     // Defer notification rescheduling to not block startup
     Future.delayed(const Duration(seconds: 2), () async {
@@ -653,14 +663,18 @@ class TaskProvider extends ChangeNotifier {
     String description,
     DateTime? dueDate,
     TaskPriority priority,
-    String? category,
-  ) async {
+    String? category, {
+    List<SubTask>? subTasks,
+    String? recurrenceRule,
+  }) async {
     final task = Task(
       title: title,
       description: description,
       dueDate: dueDate,
       priority: priority,
       categoryId: category,
+      subTasks: subTasks,
+      recurrenceRule: recurrenceRule,
     );
     await _source.addTask(task);
     try {
@@ -703,6 +717,14 @@ class TaskProvider extends ChangeNotifier {
 
   Future<void> toggleTaskCompletion(Task task) async {
     task.isCompleted = !task.isCompleted;
+
+    // Handle Recurrence if marking as completed
+    if (task.isCompleted &&
+        task.recurrenceRule != null &&
+        task.recurrenceRule!.isNotEmpty) {
+      await _handleRecurringTask(task);
+    }
+
     notifyListeners();
     await _source.updateTask(task);
     await _firestoreService.updateTask(task);
@@ -746,12 +768,16 @@ class TaskProvider extends ChangeNotifier {
     DateTime? dueDate,
     TaskPriority? priority,
     String? categoryId,
+    List<SubTask>? subTasks,
+    String? recurrenceRule,
   }) async {
     if (title != null) task.title = title;
     if (description != null) task.description = description;
     if (dueDate != null) task.dueDate = dueDate;
     if (priority != null) task.priority = priority;
     if (categoryId != null) task.categoryId = categoryId;
+    if (subTasks != null) task.subTasks = subTasks;
+    if (recurrenceRule != null) task.recurrenceRule = recurrenceRule;
 
     await _source.updateTask(task);
     try {
@@ -792,6 +818,19 @@ class TaskProvider extends ChangeNotifier {
     _refreshPagination();
     notifyListeners();
     updateHomeWidget();
+  }
+
+  Future<void> toggleSubTask(Task task, String subTaskId) async {
+    if (task.subTasks == null) return;
+
+    final index = task.subTasks!.indexWhere((st) => st.id == subTaskId);
+    if (index != -1) {
+      task.subTasks![index].isCompleted = !task.subTasks![index].isCompleted;
+      notifyListeners();
+      await _source.updateTask(task);
+      await _firestoreService.updateTask(task);
+      updateHomeWidget();
+    }
   }
 
   Future<void> toggleTaskPin(Task task) async {
@@ -866,9 +905,19 @@ class TaskProvider extends ChangeNotifier {
     await _analyticsService.logTaskDeleted(taskId: id);
   }
 
+  bool get canAddCategory {
+    if (_subscriptionService.isPremium) return true;
+    return categories.length < AppConfig.freeCategoryLimit;
+  }
+
   Future<void> addCategory(String name, int colorValue, int iconCode) async {
+    if (!canAddCategory) {
+      throw Exception('Category limit reached');
+    }
+
+    final sanitizedName = ValidationService.sanitizeText(name);
     final category = Category(
-      name: name,
+      name: sanitizedName,
       colorValue: colorValue,
       iconCode: iconCode,
     );
@@ -893,7 +942,7 @@ class TaskProvider extends ChangeNotifier {
     int? colorValue,
     int? iconCode,
   }) async {
-    if (name != null) category.name = name;
+    if (name != null) category.name = ValidationService.sanitizeText(name);
     if (colorValue != null) category.colorValue = colorValue;
     if (iconCode != null) category.iconCode = iconCode;
     await _source.updateCategory(category);
@@ -937,5 +986,50 @@ class TaskProvider extends ChangeNotifier {
       );
       return null;
     }
+  }
+
+  Future<void> _handleRecurringTask(Task task) async {
+    if (task.dueDate == null) return;
+
+    // Only premium users get recurrence
+    if (!_subscriptionService.isPremium) return;
+
+    DateTime? nextDate;
+    try {
+      final rrule = RecurrenceRule.fromString(task.recurrenceRule!);
+      // Find the next instance after the current due date
+      final instances = rrule.getInstances(start: task.dueDate!.toUtc());
+
+      // getInstances includes the start date if it matches the rule.
+      // We want the VERY NEXT one.
+      nextDate = instances
+          .firstWhere(
+            (date) => date.isAfter(task.dueDate!.toUtc()),
+            orElse: () => task.dueDate!.add(const Duration(days: 1)).toUtc(),
+          )
+          .toLocal();
+    } catch (e) {
+      // Fallback to daily if parsing fails
+      nextDate = task.dueDate!.add(const Duration(days: 1));
+    }
+
+    await addTask(
+      task.title,
+      task.description,
+      nextDate,
+      task.priority,
+      task.categoryId,
+      subTasks: task.subTasks
+          ?.map((st) => st.copyWith(isCompleted: false))
+          .toList(),
+      recurrenceRule: task.recurrenceRule,
+    );
+
+    // Show feedback notification
+    await _notificationService.showInfoNotification(
+      title: 'Recurring Task Scheduled',
+      body:
+          'Next occurrence of "${task.title}" set for ${DateFormat.yMd().format(nextDate)}',
+    );
   }
 }

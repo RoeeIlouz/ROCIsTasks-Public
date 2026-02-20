@@ -1,6 +1,8 @@
 import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
 
+import 'package:rocis_tasks/features/tasks/domain/models/sub_task.dart';
+
 part 'task.g.dart';
 
 @HiveType(typeId: 0)
@@ -42,6 +44,12 @@ class Task extends HiveObject {
   @HiveField(8)
   bool? isPinned;
 
+  @HiveField(9)
+  List<SubTask>? subTasks;
+
+  @HiveField(10)
+  String? recurrenceRule; // iCal format (e.g. "FREQ=DAILY;INTERVAL=1")
+
   Task({
     String? id,
     required this.title,
@@ -52,6 +60,8 @@ class Task extends HiveObject {
     this.categoryId,
     this.isDeleted = false,
     this.isPinned = false,
+    this.subTasks,
+    this.recurrenceRule,
   }) : id = id ?? const Uuid().v4();
 
   Task copyWith({
@@ -63,6 +73,8 @@ class Task extends HiveObject {
     String? categoryId,
     bool? isDeleted,
     bool? isPinned,
+    List<SubTask>? subTasks,
+    String? recurrenceRule,
   }) {
     return Task(
       id: id,
@@ -74,6 +86,44 @@ class Task extends HiveObject {
       categoryId: categoryId ?? this.categoryId,
       isDeleted: isDeleted ?? this.isDeleted,
       isPinned: isPinned ?? this.isPinned,
+      subTasks: subTasks ?? this.subTasks,
+      recurrenceRule: recurrenceRule ?? this.recurrenceRule,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'title': title,
+      'description': description,
+      'isCompleted': isCompleted,
+      'dueDate': dueDate?.toIso8601String(),
+      'priority': priority.index,
+      'categoryId': categoryId,
+      'isDeleted': isDeleted,
+      'isPinned': isPinned,
+      'subTasks': subTasks?.map((st) => st.toMap()).toList(),
+      'recurrenceRule': recurrenceRule,
+    };
+  }
+
+  factory Task.fromMap(Map<String, dynamic> map) {
+    return Task(
+      id: map['id'],
+      title: map['title'] ?? '',
+      description: map['description'] ?? '',
+      isCompleted: map['isCompleted'] ?? false,
+      dueDate: map['dueDate'] != null
+          ? DateTime.tryParse(map['dueDate'])
+          : null,
+      priority: TaskPriority.values[map['priority'] ?? 1],
+      categoryId: map['categoryId'],
+      isDeleted: map['isDeleted'] ?? false,
+      isPinned: map['isPinned'] ?? false,
+      subTasks: (map['subTasks'] as List?)
+          ?.map((st) => SubTask.fromMap(st as Map<String, dynamic>))
+          .toList(),
+      recurrenceRule: map['recurrenceRule'],
     );
   }
 }

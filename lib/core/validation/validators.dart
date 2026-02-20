@@ -21,4 +21,16 @@ class Validators {
     }
     return null;
   }
+
+  /// Sanitizes text by removing control characters and HTML-like tags
+  static String sanitizeText(String text) {
+    // Remove control characters except newline and tab
+    String sanitized = text.replaceAll(
+      RegExp(r'[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]'),
+      '',
+    );
+    // Basic HTML tag stripping for primitive XSS protection
+    sanitized = sanitized.replaceAll(RegExp(r'<[^>]*>'), '');
+    return sanitized.trim();
+  }
 }

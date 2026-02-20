@@ -6,12 +6,15 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:rocis_tasks/firebase_options.dart' as default_options;
 import 'package:rocis_tasks/firebase_schedule_options.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
+import 'package:rocis_tasks/features/tasks/domain/models/sub_task.dart';
 import 'package:rocis_tasks/features/categories/domain/models/category.dart';
 import 'package:rocis_tasks/core/services/notification_service.dart';
 import 'package:rocis_tasks/core/services/error_service.dart';
 import 'package:rocis_tasks/core/config/app_config.dart';
 import 'package:rocis_tasks/core/services/logger_service.dart';
 import 'package:rocis_tasks/core/services/analytics_service.dart';
+import 'package:firebase_performance/firebase_performance.dart';
+import 'package:firebase_remote_config/firebase_remote_config.dart';
 
 import 'package:rocis_tasks/core/services/encryption_service.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
@@ -32,28 +35,36 @@ class AppInitializer {
       // 1. Core Binding (Required first)
       WidgetsFlutterBinding.ensureInitialized();
 
-      // 2. Parallel initialization of independent heavy services with timeout
+      // 2. Initialize DEFAULT Firebase first sequentially
+      // This prevents race conditions where loggers or other services
+      // try to access Firebase before it is ready.
+      await _initFirebase();
+
+      // 3. Parallel initialization of independent heavy services with timeout
       await Future.wait([
-        _initEnvironment(),
-        _initHive().then(
-          (_) => _initEncryption(),
-        ), // Encryption needs Hive for key gen fallback
-        _initTimezone(),
-        _initFirebase().then((_) {
-          ErrorService.initialize();
-          // Analytics doesn't explicit init but good to access instance once
-          AnalyticsService();
-        }), // ErrorService needs Firebase
-        _initSecondaryFirebase(),
-      ]).timeout(
-        Duration(seconds: AppConfig.syncTimeoutSeconds),
-        onTimeout: () {
-          AppLogger.critical(
-            'SECURITY ALERT: Initialization timeout. Potential compromised environment.',
+            _initEnvironment(),
+            _initHive().then(
+              (_) => _initEncryption(),
+            ), // Encryption needs Hive for key gen fallback
+            _initTimezone(),
+            _initSecondaryFirebase(),
+            _initPerformance(),
+            _initRemoteConfig(),
+          ])
+          .then((_) {
+            // Services that depend on Firebase but can run after it's ready
+            ErrorService.initialize();
+            AnalyticsService();
+          })
+          .timeout(
+            Duration(seconds: AppConfig.syncTimeoutSeconds),
+            onTimeout: () {
+              AppLogger.critical(
+                'SECURITY ALERT: Initialization timeout. Potential compromised environment.',
+              );
+              throw Exception('Security initialization timeout');
+            },
           );
-          throw Exception('Security initialization timeout');
-        },
-      );
 
       // 4. Dependent services (NotificationService might need Context or other things, but usually safe here)
       // In background, we might need explicitly notification channels
@@ -103,6 +114,7 @@ class AppInitializer {
     }
     if (!Hive.isAdapterRegistered(1)) Hive.registerAdapter(TaskAdapter());
     if (!Hive.isAdapterRegistered(2)) Hive.registerAdapter(CategoryAdapter());
+    if (!Hive.isAdapterRegistered(3)) Hive.registerAdapter(SubTaskAdapter());
   }
 
   static Future<void> _initFirebase() async {
@@ -198,6 +210,40 @@ class AppInitializer {
       AppLogger.info('Timezone initialized: $timeZoneName');
     } catch (e) {
       AppLogger.error('Timezone initialization failed', error: e);
+    }
+  }
+
+  static Future<void> _initPerformance() async {
+    if (!AppConfig.enablePerformanceMonitoring) return;
+    try {
+      FirebasePerformance.instance.setPerformanceCollectionEnabled(true);
+      AppLogger.info('Firebase Performance Monitoring initialized');
+    } catch (e) {
+      AppLogger.warning(
+        'Performance Monitoring initialization failed',
+        error: e,
+      );
+    }
+  }
+
+  static Future<void> _initRemoteConfig() async {
+    if (!AppConfig.enableRemoteConfig) return;
+    try {
+      final remoteConfig = FirebaseRemoteConfig.instance;
+      await remoteConfig.setConfigSettings(
+        RemoteConfigSettings(
+          fetchTimeout: const Duration(minutes: 1),
+          minimumFetchInterval: const Duration(hours: 1),
+        ),
+      );
+      await remoteConfig.setDefaults({
+        'free_category_limit': AppConfig.freeCategoryLimit,
+        'enable_premium_ui': true,
+      });
+      await remoteConfig.fetchAndActivate();
+      AppLogger.info('Firebase Remote Config initialized');
+    } catch (e) {
+      AppLogger.warning('Remote Config initialization failed', error: e);
     }
   }
 }

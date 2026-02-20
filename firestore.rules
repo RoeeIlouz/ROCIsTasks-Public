@@ -11,15 +11,34 @@ service cloud.firestore {
     }
 
     match /users/{userId} {
-      // Allow user to read/write their own user doc (if needed)
+      // Allow user to read/write their own user doc
       allow read, write: if isOwner(userId);
+
+      // Settings sub-collection
+      match /settings/{settingId} {
+        allow read, write: if isOwner(userId);
+      }
 
       // Tasks collection
       match /tasks/{taskId} {
         allow read, delete: if isOwner(userId);
         allow create, update: if isOwner(userId) 
           && request.resource.data.title is string
-          && request.resource.data.title.size() > 0;
+          && request.resource.data.title.size() > 0
+          && request.resource.data.title.size() <= 100
+          && (!request.resource.data.keys().hasAny(['description']) 
+              || request.resource.data.description is string 
+              && request.resource.data.description.size() <= 1000)
+          && request.resource.data.priority is int
+          && request.resource.data.priority >= 0
+          && request.resource.data.priority <= 3
+          && request.resource.data.isCompleted is bool
+          && request.resource.data.isDeleted is bool
+          && request.resource.data.isPinned is bool
+          && (!request.resource.data.keys().hasAny(['dueDate'])
+              || request.resource.data.dueDate is timestamp || request.resource.data.dueDate == null)
+          && (!request.resource.data.keys().hasAny(['categoryIds'])
+              || request.resource.data.categoryIds is list);
       }
 
       // Categories collection
@@ -27,7 +46,13 @@ service cloud.firestore {
         allow read, delete: if isOwner(userId);
         allow create, update: if isOwner(userId)
           && request.resource.data.name is string
-          && request.resource.data.name.size() > 0;
+          && request.resource.data.name.size() > 0
+          && request.resource.data.name.size() <= 50
+          && request.resource.data.colorValue is int
+          && request.resource.data.iconCode is int
+          && (!request.resource.data.keys().hasAny(['description'])
+              || request.resource.data.description is string
+              && request.resource.data.description.size() <= 200);
       }
     }
   }

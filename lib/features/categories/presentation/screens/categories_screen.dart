@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
+import 'package:rocis_tasks/core/services/subscription_service.dart';
 import 'package:rocis_tasks/features/categories/domain/models/category.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
+import 'package:rocis_tasks/core/services/validation_service.dart';
 import 'package:rocis_tasks/core/utils/icon_utils.dart';
-
 import 'package:google_fonts/google_fonts.dart';
 
 class CategoriesScreen extends StatelessWidget {
@@ -99,11 +100,14 @@ class CategoriesScreen extends StatelessWidget {
                       horizontal: 16,
                       vertical: 4,
                     ),
-                    onTap: () => _showCategorySheet(context, category: category),
+                    onTap: () =>
+                        _showCategorySheet(context, category: category),
                     leading: Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: Color(category.colorValue).withValues(alpha: 0.1),
+                        color: Color(
+                          category.colorValue,
+                        ).withValues(alpha: 0.1),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
@@ -139,19 +143,64 @@ class CategoriesScreen extends StatelessWidget {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showCategorySheet(context),
-        icon: const Icon(Icons.add_rounded),
-        label: Text(
-          l10n.addCategory,
-          style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
-        ),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      floatingActionButton: Consumer<TaskProvider>(
+        builder: (context, provider, child) {
+          final isAtLimit = !provider.canAddCategory;
+          return FloatingActionButton.extended(
+            onPressed: () => _showCategorySheet(context),
+            icon: isAtLimit
+                ? const Icon(Icons.lock_rounded, size: 18)
+                : const Icon(Icons.add_rounded),
+            label: Row(
+              children: [
+                Text(
+                  l10n.addCategory,
+                  style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
+                ),
+                if (isAtLimit)
+                  Container(
+                    margin: const EdgeInsets.only(left: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.amber.withValues(alpha: 0.3),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: const Text(
+                      "PRO",
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+          );
+        },
       ),
     );
   }
 
   void _showCategorySheet(BuildContext context, {Category? category}) {
+    final provider = Provider.of<TaskProvider>(context, listen: false);
+
+    // Check limit only if creating new category (not editing)
+    if (category == null && !provider.canAddCategory) {
+      final subscriptionService = Provider.of<SubscriptionService>(
+        context,
+        listen: false,
+      );
+      subscriptionService.showPaywall();
+      return;
+    }
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -171,6 +220,7 @@ class _CategorySheet extends StatefulWidget {
 }
 
 class _CategorySheetState extends State<_CategorySheet> {
+  final _formKey = GlobalKey<FormState>();
   late TextEditingController _nameController;
   late int _selectedColor;
   late int _selectedIcon;
@@ -275,23 +325,30 @@ class _CategorySheetState extends State<_CategorySheet> {
             ),
             const SizedBox(height: 32),
 
-            TextField(
-              controller: _nameController,
-              onChanged: (value) => setState(() {}),
-              style: GoogleFonts.outfit(fontWeight: FontWeight.w600),
-              decoration: InputDecoration(
-                labelText: l10n.name,
-                labelStyle: GoogleFonts.outfit(),
-                prefixIcon: const Icon(Icons.edit_rounded, size: 22),
-                filled: true,
-                fillColor: theme.brightness == Brightness.light
-                    ? Colors.grey.withValues(alpha: 0.05)
-                    : Colors.white.withValues(alpha: 0.05),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide.none,
+            Form(
+              key: _formKey,
+              child: TextFormField(
+                controller: _nameController,
+                onChanged: (value) => setState(() {}),
+                style: GoogleFonts.outfit(fontWeight: FontWeight.w600),
+                decoration: InputDecoration(
+                  labelText: l10n.name,
+                  labelStyle: GoogleFonts.outfit(),
+                  prefixIcon: const Icon(Icons.edit_rounded, size: 22),
+                  filled: true,
+                  fillColor: theme.brightness == Brightness.light
+                      ? Colors.grey.withValues(alpha: 0.05)
+                      : Colors.white.withValues(alpha: 0.05),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: BorderSide.none,
+                  ),
+                  contentPadding: const EdgeInsets.all(18),
                 ),
-                contentPadding: const EdgeInsets.all(18),
+                maxLength: 30,
+                validator: (value) {
+                  return ValidationService.validateCategoryName(value);
+                },
               ),
             ),
             const SizedBox(height: 28),
@@ -431,7 +488,7 @@ class _CategorySheetState extends State<_CategorySheet> {
                 Expanded(
                   child: FilledButton(
                     onPressed: () {
-                      if (_nameController.text.isNotEmpty) {
+                      if (_formKey.currentState!.validate()) {
                         final taskProvider = Provider.of<TaskProvider>(
                           context,
                           listen: false,
@@ -440,13 +497,13 @@ class _CategorySheetState extends State<_CategorySheet> {
                         if (widget.category != null) {
                           taskProvider.updateCategory(
                             widget.category!,
-                            name: _nameController.text,
+                            name: _nameController.text.trim(),
                             colorValue: _selectedColor,
                             iconCode: _selectedIcon,
                           );
                         } else {
                           taskProvider.addCategory(
-                            _nameController.text,
+                            _nameController.text.trim(),
                             _selectedColor,
                             _selectedIcon,
                           );

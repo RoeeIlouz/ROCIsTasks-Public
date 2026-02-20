@@ -187,6 +187,11 @@ class TaskTile extends StatelessWidget {
                                           ),
                                     ),
                                   ],
+                                  if (task.subTasks != null &&
+                                      task.subTasks!.isNotEmpty) ...[
+                                    const SizedBox(height: 8),
+                                    _buildSubTasksList(context),
+                                  ],
                                   const SizedBox(height: 12),
                                   Row(
                                     children: [
@@ -261,7 +266,10 @@ class TaskTile extends StatelessWidget {
                               height: 10,
                               margin: const EdgeInsets.only(bottom: 4),
                               decoration: BoxDecoration(
-                                color: _getPriorityColor(context, task.priority),
+                                color: _getPriorityColor(
+                                  context,
+                                  task.priority,
+                                ),
                                 shape: BoxShape.circle,
                                 boxShadow: [
                                   BoxShadow(
@@ -316,6 +324,53 @@ class TaskTile extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildSubTasksList(BuildContext context) {
+    final theme = Theme.of(context);
+    final provider = Provider.of<TaskProvider>(context, listen: false);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: task.subTasks!.map((subTask) {
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 4),
+          child: InkWell(
+            onTap: () => provider.toggleSubTask(task, subTask.id),
+            borderRadius: BorderRadius.circular(8),
+            child: Row(
+              children: [
+                Icon(
+                  subTask.isCompleted
+                      ? Icons.check_box_rounded
+                      : Icons.check_box_outline_blank_rounded,
+                  size: 16,
+                  color: subTask.isCompleted
+                      ? (category != null
+                            ? Color(category!.colorValue)
+                            : theme.colorScheme.primary)
+                      : theme.disabledColor,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    subTask.title,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: subTask.isCompleted
+                          ? theme.disabledColor
+                          : theme.colorScheme.onSurface,
+                      decoration: subTask.isCompleted
+                          ? TextDecoration.lineThrough
+                          : null,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      }).toList(),
     );
   }
 }

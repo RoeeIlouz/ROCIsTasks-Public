@@ -1,62 +1,82 @@
-# Privacy Policy for ROCI's Tasks
+# Privacy Policy for ROCI\'s Tasks
 
-Last Updated: January 29, 2026
+**Last Updated:** February 21, 2026
 
-ROCI's Apps ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy explains how your information is collected, used, and disclosed by ROCI's Tasks.
+Thank you for choosing to be part of our community at ROCI\'s Apps ("**we**", "**us**", or "**our**"). We are committed to protecting your personal information and your right to privacy. If you have any questions or concerns about this privacy notice, or our practices with regards to your personal information, please contact us at our support email.
 
-## 1. Information We Collect
+This Privacy Policy applies to all information collected through our application, **ROCI\'s Tasks**, and/or any related services, sales, marketing or events.
 
-### 1.1 Personal Data
+Please read this privacy notice carefully as it will help you understand what we do with the information that we collect.
 
-When you sign in using Google Authentication, we collect:
+---
 
-- Your name
-- Your email address
-- Your profile picture URL
+## 1. WHAT INFORMATION DO WE COLLECT?
 
-This information is used solely to identify you across your devices and to link your tasks and schedule data.
+### Personal Information You Disclose to Us
 
-### 1.2 Application Data
+We collect personal information that you provide to us when you register on the App, express an interest in obtaining information about us or our products and services, or otherwise when you contact us.
 
-We store your tasks, categories, and settings. This data is stored:
+- **Account Data:** When you sign in using Google or email, we collect your name, email address, and profile picture (if available from your provider).
+- **Task and Usage Data:** We collect the tasks, categories, configuration settings, and related content that you input into the app in order to sync and back up your data across your devices.
 
-- **Locally**: On your device using encrypted storage.
-- **Remotely**: On Google Firebase servers as encrypted data to enable synchronization between devices.
+### Information Collected Automatically
 
-### 1.3 Schedule Data
+Like many apps, we also automatically collect information when you use our app:
 
-If you opt-in to sync with ROCIs-Schedule, we access your course and lecture data from that specific database using your email as a common identifier.
+- **Device and Usage Data:** We collect device information (such as your mobile device ID, model, and manufacturer), operating system, version information, and system activity via analytics services.
+- **Diagnostics and Crash Data:** We collect crash instances and performance metrics to help us fix bugs and improve the application\'s stability.
 
-## 2. How We Use Your Information
+### Information from Device Capabilities
 
-- To provide and maintain our Service.
-- To sync your data across multiple devices.
-- To provide notifications and reminders for your tasks.
-- To monitor the performance of the application (via Firebase Crashlytics).
+With your permission, we may access certain features on your mobile device:
 
-## 3. Data Storage and Security
+- **Calendar Access:** If you enable the calendar integration, the app requests permission to read and write to your device\'s local calendar to schedule events related to your tasks. We do not transmit your full calendar data to our servers; it is only used locally to create and sync events with the ROCI\'s Tasks app.
 
-We use industry-standard security measures, including:
+---
 
-- **Encryption at rest**: Data stored on your device and in Firestore is encrypted.
-- **Encryption in transit**: All communication between the app and Firebase happens over secure HTTPS connections.
-- **Authentication**: Access to your data is restricted to you via Google Sign-In.
+## 2. HOW DO WE USE YOUR INFORMATION?
 
-## 4. Third-Party Services
+We use personal information collected via our App for a variety of business purposes described below. We process your personal information for these purposes in reliance on our legitimate business interests, in order to enter into or perform a contract with you, with your consent, and/or for compliance with our legal obligations.
 
-We use the following third-party services:
+- **To facilitate account creation and logon process:** We use your information to create and secure your account.
+- **To provide and run the application services:** We use your data to synchronize tasks across devices, maintain backups, and serve your daily schedules.
+- **To improve our application:** Diagnostic data helps us identify crashes, manage performance, and optimize the user experience.
+- **To process payments or subscriptions:** We use third-party services like RevenueCat to handle in-app purchases and subscriptions securely. We do not directly store your payment card details.
 
-- **Google Firebase**: For authentication, database storage, and crash reporting.
-- **Google Calendar API**: If you enable Google Calendar integration, we read your calendar events locally to display them in our calendar view. We do not store your Google Calendar events on our servers.
+---
 
-## 5. Your Choices
+## 3. WILL YOUR INFORMATION BE SHARED WITH ANYONE?
 
-You can:
+We only share information with your consent, to comply with laws, to provide you with services, to protect your rights, or to fulfill business obligations.
 
-- Sign out of the app at any time.
-- Delete your account and all associated data by contacting us or using the in-app delete functionality (where available).
-- Manage app permissions (like Calendar or Notifications) via your device settings.
+We use the following third-party service providers and may share some of your data with them to provide the application\'s functionality:
 
-## 6. Contact Us
+- **Google LLC (Firebase Cloud Firestore, Firebase Auth):** For user authentication and securely storing your tasks and configurations in the cloud.
+- **Google LLC (Firebase Crashlytics, Firebase Analytics, Firebase Performance):** To monitor app usage, performance, and diagnose crashes.
+- **RevenueCat:** For managing in-app subscription and purchases.
 
-If you have any questions about this Privacy Policy, please contact us at support@ilouz.xyz.
+These services have their own Privacy Policies addressing how they use such information.
+
+---
+
+## 4. HOW DO WE KEEP YOUR INFORMATION SAFE?
+
+We have implemented appropriate technical and organizational security measures (including secure network connections and encrypted local storage) designed to protect the security of any personal information we process. For example, your data in transit and at rest on Google\'s Firebase infrastructure is encrypted. However, despite our safeguards and efforts to secure your information, no electronic transmission over the Internet or information storage technology can be guaranteed to be 100% secure.
+
+---
+
+## 5. WHAT ARE YOUR PRIVACY RIGHTS?
+
+### Account Deletion
+
+You can delete your account and all associated data at any time from within the App\'s Settings menu under "Privacy & GDPR" -> "Delete My Account & Data." Doing this will permanently delete your authentication record and all your stored tasks, categories, and settings from our servers.
+
+### Revoking Permissions
+
+You can revoke permissions (such as Calendar access) at any time through your device\'s system settings.
+
+---
+
+## 6. HOW CAN YOU CONTACT US ABOUT THIS NOTICE?
+
+If you have questions or comments about this notice, you may email us through the "Contact Support" link found in the App\'s Settings menu under "About ROCI\'s Tasks".

@@ -170,4 +170,25 @@
         android:textColor="@color/widget_body_text"
         android:visibility="gone" />
 
+    <!-- Premium Overlay -->
+    <RelativeLayout
+        android:id="@+id/widget_premium_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#D9000000"
+        android:visibility="gone"
+        android:clickable="true"
+        android:focusable="true">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="Premium Feature"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:gravity="center" />
+    </RelativeLayout>
+
 </RelativeLayout>

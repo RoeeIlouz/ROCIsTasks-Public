@@ -46,15 +46,15 @@ subprojects {
                 // Force Compile SDK (to support Java 17)
                 try {
                     val setCompileSdkVersion = android.javaClass.getMethod("setCompileSdkVersion", Int::class.javaPrimitiveType)
-                    setCompileSdkVersion.invoke(android, 35)
+                    setCompileSdkVersion.invoke(android, 36)
                 } catch(e: Exception) {
                      try {
                         val setCompileSdkVersion = android.javaClass.getMethod("setCompileSdkVersion", Int::class.java)
-                        setCompileSdkVersion.invoke(android, 35)
+                        setCompileSdkVersion.invoke(android, 36)
                      } catch(e2: Exception) {
                         try {
                              // Try property access if method fails (unlikely in KTS/Groovy mix but via reflection it's method)
-                             android.javaClass.getMethod("setCompileSdk", Int::class.javaPrimitiveType).invoke(android, 35)
+                             android.javaClass.getMethod("setCompileSdk", Int::class.javaPrimitiveType).invoke(android, 36)
                         } catch(e3: Exception) { }
                      }
                 }

@@ -1,10 +1,10 @@
 package com.rocisapps.tasks
 
-import io.flutter.embedding.android.FlutterActivity
+import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
-class MainActivity : FlutterActivity() {
+class MainActivity : FlutterFragmentActivity() {
     private val CHANNEL = "com.rocisapps.tasks/notifications"
     private val WIDGET_CHANNEL = "com.rocisapps.tasks/widget"
     private lateinit var notificationHelper: NotificationHelper

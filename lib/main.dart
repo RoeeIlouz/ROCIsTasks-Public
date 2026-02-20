@@ -18,10 +18,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rocis_tasks/core/config/router.dart';
 import 'package:rocis_tasks/core/services/error_handling_service.dart';
 import 'package:rocis_tasks/core/services/schedule_firestore_service.dart';
+import 'package:rocis_tasks/core/services/subscription_service.dart';
 import 'package:rocis_tasks/features/home/services/full_calendar_widget_service.dart';
 import 'package:rocis_tasks/features/tasks/data/datasources/local_task_source.dart';
 import 'package:rocis_tasks/core/services/calendar_color_service.dart';
 import 'package:rocis_tasks/core/services/logger_service.dart';
+import 'package:rocis_tasks/core/services/analytics_service.dart';
+import 'package:rocis_tasks/core/services/backup_service.dart';
 
 Future<void> main() async {
   // Initialize App (Core, Firebase, Hive)
@@ -44,6 +47,7 @@ class AppRoot extends StatefulWidget {
 class _AppRootState extends State<AppRoot> {
   late Future<void> _initFuture;
   final _errorHandlingService = ErrorHandlingService();
+  late final _subscriptionService = SubscriptionService(_errorHandlingService);
   late final _authService = AuthService(_errorHandlingService);
   final _calendarService = CalendarService();
   final _themeService = ThemeService();
@@ -59,6 +63,7 @@ class _AppRootState extends State<AppRoot> {
     _calendarService,
     _themeService,
     _errorHandlingService,
+    _subscriptionService,
   );
   final _connectivityService = ConnectivityService();
   late final OnboardingService _onboardingService;
@@ -119,8 +124,25 @@ class _AppRootState extends State<AppRoot> {
             stack: stack,
           ),
         ),
+        _subscriptionService.init().catchError(
+          (e, stack) => AppLogger.error(
+            'Failed to init subscription service',
+            error: e,
+            stack: stack,
+          ),
+        ),
+        _connectivityService.init().catchError(
+          (e, stack) => AppLogger.error(
+            'Failed to init connectivity service',
+            error: e,
+            stack: stack,
+          ),
+        ),
         _authService.initialized,
       ]);
+
+      // Log session start
+      AnalyticsService().logSessionStart();
     } catch (e, stackTrace) {
       AppLogger.critical(
         'Critical app initialization failure',
@@ -129,6 +151,17 @@ class _AppRootState extends State<AppRoot> {
       );
       rethrow;
     }
+  }
+
+  @override
+  void dispose() {
+    _taskProvider.dispose();
+    _authService.dispose();
+    _subscriptionService.dispose();
+    _connectivityService.dispose();
+    _themeService.dispose();
+    _calendarColorService.dispose();
+    super.dispose();
   }
 
   @override
@@ -261,7 +294,10 @@ class _AppRootState extends State<AppRoot> {
             ChangeNotifierProvider.value(value: _onboardingService),
             Provider.value(value: _appRouter!),
             Provider.value(value: _errorHandlingService),
-            Provider.value(value: _connectivityService),
+            ChangeNotifierProvider.value(value: _connectivityService),
+            ChangeNotifierProvider.value(value: _subscriptionService),
+            Provider.value(value: AnalyticsService()),
+            Provider(create: (_) => BackupService()),
           ],
           child: const MyApp(),
         );

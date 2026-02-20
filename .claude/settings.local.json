@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "Bash(dart run build_runner build:*)",
+      "Bash(find:*)"
     ]
   }
 }

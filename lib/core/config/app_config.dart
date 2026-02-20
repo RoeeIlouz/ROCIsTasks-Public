@@ -10,11 +10,18 @@ class AppConfig {
   // App information
   static const String appName = 'ROCI\'s Tasks';
   static const String appVersion = '1.0.0';
+  static const String supportEmail = 'support@ilouz.xyz';
+  static const String privacyPolicyUrl =
+      'https://rocisapps.ilouz.xyz/privacy.html';
+  static const String websiteUrl = 'https://rocisapps.ilouz.xyz';
 
   // Feature flags
   static const bool enableAnalytics = isProduction;
   static const bool enableCrashReporting = isProduction;
   static const bool enableDebugLogging = isDevelopment;
+  static const bool enablePerformanceMonitoring = isProduction;
+  static const bool enableRemoteConfig =
+      true; // Enabled for both to allow overrides
 
   // API Configuration
   static const String firebaseProjectId = 'rocis-todo';
@@ -31,6 +38,11 @@ class AppConfig {
   // UI settings
   static const int maxDescriptionLength = 500;
   static const int maxTitleLength = 100;
+
+  // Monetization Limits
+  static const int freeCategoryLimit = 5;
+  static const int freeWidgetLimit =
+      1; // For future use if we restrict widget count
 
   /// Get configuration summary for debugging
   static Map<String, dynamic> getConfigSummary() {

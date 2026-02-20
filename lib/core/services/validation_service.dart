@@ -53,9 +53,30 @@ class ValidationService {
     return null;
   }
 
+  /// Validate subtask title
+  static String? validateSubTaskTitle(String? title) {
+    if (title == null || title.trim().isEmpty) {
+      return 'Subtask title cannot be empty';
+    }
+
+    if (title.trim().length > 100) {
+      return 'Subtask title cannot exceed 100 characters';
+    }
+
+    return null;
+  }
+
   /// Sanitize text input
   static String sanitizeText(String input) {
-    return input.trim().replaceAll(RegExp(r'\s+'), ' ');
+    // Trim, replace multiple spaces with single space,
+    // and remove common non-printable control characters that could break UI
+    return input
+        .trim()
+        .replaceAll(
+          RegExp(r'[\x00-\x1F\x7F-\x9F]'),
+          '',
+        ) // Remove control characters
+        .replaceAll(RegExp(r'\s+'), ' ');
   }
 
   /// Check if text contains potentially harmful content

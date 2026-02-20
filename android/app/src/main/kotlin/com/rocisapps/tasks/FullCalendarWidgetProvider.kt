@@ -130,6 +130,22 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
                 views.setPendingIntentTemplate(R.id.widget_full_calendar_list, appPendingIntent)
 
                 // 6. Finalize Update
+                // Check Premium Status
+                val isPremium = widgetData.getBoolean("is_premium", false)
+                if (!isPremium) {
+                    views.setViewVisibility(R.id.widget_premium_overlay, android.view.View.VISIBLE)
+                    views.setViewVisibility(R.id.widget_full_calendar_list, android.view.View.GONE)
+                    views.setViewVisibility(R.id.widget_full_calendar_header, android.view.View.GONE)
+                    views.setViewVisibility(R.id.widget_full_calendar_filters, android.view.View.GONE)
+                    views.setViewVisibility(R.id.widget_full_calendar_weekdays, android.view.View.GONE)
+                } else {
+                    views.setViewVisibility(R.id.widget_premium_overlay, android.view.View.GONE)
+                    views.setViewVisibility(R.id.widget_full_calendar_list, android.view.View.VISIBLE)
+                    views.setViewVisibility(R.id.widget_full_calendar_header, android.view.View.VISIBLE)
+                    views.setViewVisibility(R.id.widget_full_calendar_filters, android.view.View.VISIBLE)
+                    views.setViewVisibility(R.id.widget_full_calendar_weekdays, android.view.View.VISIBLE)
+                }
+
                 appWidgetManager.updateAppWidget(appWidgetId, views)
                 appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_full_calendar_list)
             } catch (e: Exception) {
