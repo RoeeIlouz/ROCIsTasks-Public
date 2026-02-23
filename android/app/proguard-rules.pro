@@ -59,3 +59,6 @@
 
 # Device Calendar rules
 -keep class com.builttoroam.devicecalendar.** { *; }
+
+# RevenueCat rules
+-keep class com.revenuecat.purchases.** { *; }

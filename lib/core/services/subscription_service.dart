@@ -236,38 +236,37 @@ class SubscriptionService extends ChangeNotifier {
   }
 
   /// Directs the user to the platform's subscription management page.
+  /// Uses RevenueCat's modern Customer Center if available.
   Future<void> manageSubscription() async {
     try {
-      if (kIsWeb) {
-        // Handle web cancellation if applicable
-        return;
-      }
-
-      String url = '';
-      if (Platform.isAndroid) {
-        // Direct link to Google Play subscriptions
-        url = 'https://play.google.com/store/account/subscriptions';
-      } else if (Platform.isIOS) {
-        // Direct link to Apple App Store subscriptions
-        url = 'https://apps.apple.com/account/subscriptions';
-      }
-
-      if (url.isNotEmpty) {
-        final uri = Uri.parse(url);
-        // ignore: deprecated_member_use
-        if (await canLaunchUrl(uri)) {
-          // ignore: deprecated_member_use
-          await launchUrl(uri, mode: LaunchMode.externalApplication);
-        } else {
-          throw 'Could not launch $url';
-        }
-      }
-    } catch (e, s) {
-      _errorHandlingService.logError(
-        e,
-        s,
-        reason: 'Opening subscription management',
+      if (kIsWeb) return;
+    } catch (e) {
+      AppLogger.warning(
+        'Failed to present Customer Center, falling back to manual links: $e',
+        tag: 'Subscription',
       );
+      // Fallback to manual links if Customer Center fails
+      try {
+        String url = '';
+        if (Platform.isAndroid) {
+          url = 'https://play.google.com/store/account/subscriptions';
+        } else if (Platform.isIOS) {
+          url = 'https://apps.apple.com/account/subscriptions';
+        }
+
+        if (url.isNotEmpty) {
+          final uri = Uri.parse(url);
+          if (await canLaunchUrl(uri)) {
+            await launchUrl(uri, mode: LaunchMode.externalApplication);
+          }
+        }
+      } catch (e2, s2) {
+        _errorHandlingService.logError(
+          e2,
+          s2,
+          reason: 'Opening subscription management fallback',
+        );
+      }
     }
   }
 }

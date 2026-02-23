@@ -12,8 +12,10 @@ class AppConfig {
   static const String appVersion = '1.0.0';
   static const String supportEmail = 'support@ilouz.xyz';
   static const String privacyPolicyUrl =
-      'https://rocisapps.ilouz.xyz/privacy.html';
-  static const String websiteUrl = 'https://rocisapps.ilouz.xyz';
+      'http://rocisapps.ilouz.xyz/privacy.html';
+  static const String termsOfServiceUrl =
+      'http://rocisapps.ilouz.xyz/terms.html';
+  static const String websiteUrl = 'http://rocisapps.ilouz.xyz';
 
   // Feature flags
   static const bool enableAnalytics = isProduction;

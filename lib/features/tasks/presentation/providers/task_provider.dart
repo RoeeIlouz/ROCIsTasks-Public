@@ -139,6 +139,9 @@ class TaskProvider extends ChangeNotifier {
 
     await _notificationService.cancelAllNotifications();
 
+    // Initialize RevenueCat SDK
+    await _subscriptionService.init();
+
     // Listen to subscription changes
     _subscriptionService.addListener(notifyListeners);
 
