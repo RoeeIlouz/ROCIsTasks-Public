@@ -4,7 +4,7 @@ description: "A new Flutter project."
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
-version: 1.0.0+2
+version: 1.0.1+8
 
 environment:
   sdk: ^3.10.0
@@ -64,14 +64,13 @@ dependencies:
 
 dependency_overrides:
   timezone: ^0.10.1
-  sqflite: 2.4.1
-  sqflite_android: 2.4.1
+  sqflite: ^2.4.2+1
+  sqflite_android: ^2.4.2+3
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_launcher_icons: ^0.13.1
-  test: ^1.25.8
 
   # rules and activating additional ones.
   flutter_lints: ^6.0.0

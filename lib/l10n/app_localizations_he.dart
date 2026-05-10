@@ -93,6 +93,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get english => 'אנגלית';
 
   @override
+  String get spanish => 'ספרדית';
+
+  @override
   String get tasks => 'משימות';
 
   @override
@@ -252,4 +255,241 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get offlineMode => 'מצב לא מקוון';
+
+  @override
+  String get syncComplete => 'הסנכרון הושלם';
+
+  @override
+  String get backupAndRestore => 'גיבוי ושחזור';
+
+  @override
+  String get exportData => 'ייצוא נתונים (JSON)';
+
+  @override
+  String get exportDataSubtitle => 'גבה את המשימות והקטגוריות שלך';
+
+  @override
+  String get backupCopied => 'הגיבוי הועתק ללוח!';
+
+  @override
+  String exportFailed(String error) {
+    return 'הייצוא נכשל: $error';
+  }
+
+  @override
+  String get importData => 'ייבוא נתונים (JSON)';
+
+  @override
+  String get importDataSubtitle => 'שחזר מגיבוי JSON';
+
+  @override
+  String get importBackup => 'ייבוא גיבוי';
+
+  @override
+  String get pasteJsonHint => 'הדבק גיבוי JSON כאן...';
+
+  @override
+  String get import => 'ייבא';
+
+  @override
+  String get importComplete => 'הייבוא הושלם!';
+
+  @override
+  String importFailed(String error) {
+    return 'הייבוא נכשל: $error';
+  }
+
+  @override
+  String get privacyAndGdpr => 'פרטיות ו-GDPR';
+
+  @override
+  String get privacyPolicy => 'מדיניות פרטיות';
+
+  @override
+  String get privacyPolicySubtitle => 'קרא את תנאי אבטחת הנתונים שלנו';
+
+  @override
+  String get deleteAccountTitle => 'מחק את החשבון והנתונים שלי';
+
+  @override
+  String get deleteAccountSubtitle => 'הסר לצמיתות את כל הנתונים שלך';
+
+  @override
+  String get deleteAccountConfirmTitle => 'למחוק חשבון?';
+
+  @override
+  String get deleteAccountConfirmBody =>
+      'פעולה זו הינה קבועה ותסיר את כל המשימות, הקטגוריות וההגדרות שלך מהשרתים שלנו.';
+
+  @override
+  String get deleteEverything => 'מחק הכל';
+
+  @override
+  String get deletionFailed =>
+      'המחיקה נכשלה. ייתכן שתצטרך להתנתק ולהתחבר מחדש מסיבות אבטחה.';
+
+  @override
+  String get about => 'אודות';
+
+  @override
+  String get aboutApp => 'אודות ROCIs Tasks';
+
+  @override
+  String get aboutAppSubtitle => 'גרסת אפליקציה, תמיכה ומידע';
+
+  @override
+  String get aboutAppDescription =>
+      'ROCIs Tasks נועד לעזור לך להישאר מאורגן ופרודוקטיבי. בנוי עם Flutter, הוא מספק חוויה חלקה לניהול המשימות, הקטגוריות והלוח הזמנים היומי שלך.';
+
+  @override
+  String get visitWebsite => 'בקר באתר שלנו';
+
+  @override
+  String get contactSupport => 'צור קשר עם התמיכה';
+
+  @override
+  String get rocisTasksPro => 'ROCIs Tasks Pro';
+
+  @override
+  String get youAreProUser => 'אתה משתמש Pro!';
+
+  @override
+  String get unlockPremiumFeatures => 'גלה תכונות פרמיום';
+
+  @override
+  String get manageSubscription => 'נהל מנוי';
+
+  @override
+  String get manageSubscriptionSubtitle => 'בטל או שנה את התכנית שלך';
+
+  @override
+  String get upgradeToPro => 'שדרג ל-Pro';
+
+  @override
+  String get unlockFullPotential => 'שחרר את הפוטנציאל המלא שלך';
+
+  @override
+  String get unlimitedCategories => 'קטגוריות ללא הגבלה';
+
+  @override
+  String get unlimitedCategoriesDesc =>
+      'צור כמה קטגוריות שתרצה כדי להישאר מאורגן.';
+
+  @override
+  String get premiumWidgets => 'ווידג\'טים פרמיום';
+
+  @override
+  String get premiumWidgetsDesc =>
+      'גישה לווידג\'טי מסך הבית של חודש ולוח שנה מלא.';
+
+  @override
+  String get subtasksAndChecklists => 'משימות משנה ורשימות תיוג';
+
+  @override
+  String get subtasksAndChecklistsDesc =>
+      'פרק משימות מורכבות לצעדים קטנים וניתנים לניהול.';
+
+  @override
+  String get recurringTasks => 'משימות חוזרות';
+
+  @override
+  String get recurringTasksDesc => 'אוטומט את השגרה שלך עם כללי חזרה גמישים.';
+
+  @override
+  String get viewPricingPlans => 'צפה בתוכניות תמחור';
+
+  @override
+  String get proSubscriptionActive => 'מנוי Pro פעיל';
+
+  @override
+  String get purchasesRestored => 'הרכישות שוחזרו בהצלחה!';
+
+  @override
+  String get noActiveSubscription => 'לא נמצא מנוי פעיל עבור חשבון זה.';
+
+  @override
+  String get failedToRestore => 'שחזור הרכישות נכשל.';
+
+  @override
+  String get restorePurchases => 'שחזר רכישות';
+
+  @override
+  String get subtasks => 'משימות משנה';
+
+  @override
+  String get noSubtasksAdded => 'לא נוספו משימות משנה';
+
+  @override
+  String get enterSubtask => 'הזן משימת משנה...';
+
+  @override
+  String get recurrence => 'חזרה';
+
+  @override
+  String get repeat => 'חזור';
+
+  @override
+  String get repeatNone => 'ללא';
+
+  @override
+  String get repeatDaily => 'יומי';
+
+  @override
+  String get repeatWeekly => 'שבועי';
+
+  @override
+  String get repeatMonthly => 'חודשי';
+
+  @override
+  String get titleInvalidContent => 'הכותרת מכילה תוכן לא תקין';
+
+  @override
+  String get descriptionInvalidContent => 'התיאור מכיל תוכן לא תקין';
+
+  @override
+  String get failedToSaveTask => 'שמירת המשימה נכשלה. אנא נסה שוב.';
+
+  @override
+  String get welcomeToApp => 'ברוך הבא ל-ROCIs Tasks';
+
+  @override
+  String get signInToSync => 'התחבר כדי לסנכרן את המשימות שלך בין מכשירים';
+
+  @override
+  String get signInWithGoogle => 'התחבר עם Google';
+
+  @override
+  String get signInFailed => 'ההתחברות נכשלה';
+
+  @override
+  String get onboardingWelcomeTitle => 'ברוך הבא ל-ROCIs Tasks';
+
+  @override
+  String get onboardingWelcomeDesc => 'ארגן את חייך ביעילות ובסגנון.';
+
+  @override
+  String get onboardingSyncTitle => 'סנכרון ומצב לא מקוון';
+
+  @override
+  String get onboardingSyncDesc =>
+      'המשימות שלך עוקבות אחריך לכל מקום. גש אליהן גם ללא חיבור לאינטרנט.';
+
+  @override
+  String get onboardingGesturesTitle => 'מחוות חכמות';
+
+  @override
+  String get onboardingGesturesDesc =>
+      'החלק שמאלה למחיקה, ימינה להשלמה. לחץ לחיצה ארוכה לאפשרויות נוספות.';
+
+  @override
+  String get getStarted => 'בוא נתחיל';
+
+  @override
+  String get next => 'הבא';
+
+  @override
+  String get searchTasksHint => 'חפש משימות...';
+
+  @override
+  String get emptyTrash => 'רוקן אשפה';
 }

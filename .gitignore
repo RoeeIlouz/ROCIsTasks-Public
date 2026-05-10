@@ -11,6 +11,9 @@
 .svn/
 .swiftpm/
 migrate_working_dir/
+.kilo/
+.claude/
+.kilocode/
 
 # IntelliJ related
 *.iml

@@ -24,7 +24,7 @@ class LocalTaskSource {
   Future<void> _openBoxes() async {
     try {
       await Hive.openBox<Task>(boxName);
-      Hive.box<Category>(categoriesBoxName);
+      await Hive.openBox<Category>(categoriesBoxName);
     } catch (e) {
       // If opening fails (e.g. corrupted file or unexpected encryption), clear and restart
       AppLogger.warning(

@@ -64,6 +64,7 @@ class _AppRootState extends State<AppRoot> {
     _themeService,
     _errorHandlingService,
     _subscriptionService,
+    source: _taskSource,
   );
   final _connectivityService = ConnectivityService();
   late final OnboardingService _onboardingService;
@@ -333,7 +334,7 @@ class MyApp extends StatelessWidget {
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
           ],
-          supportedLocales: const [Locale('en'), Locale('he')],
+          supportedLocales: const [Locale('en'), Locale('he'), Locale('es')],
           locale: themeService.locale,
           routerConfig: appRouter.router,
         );

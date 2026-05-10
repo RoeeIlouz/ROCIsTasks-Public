@@ -26,6 +26,7 @@ import 'package:rocis_tasks/core/services/widget_data_service.dart';
 import 'package:rocis_tasks/core/services/error_handling_service.dart';
 import 'package:rocis_tasks/core/services/analytics_service.dart';
 import 'package:rocis_tasks/core/services/validation_service.dart';
+import 'package:rocis_tasks/core/services/logger_service.dart';
 
 enum TaskSortOption { dueDate, priority, title, dateCreated }
 
@@ -54,6 +55,7 @@ class TaskProvider extends ChangeNotifier {
   StreamSubscription? _authSubscription;
   StreamSubscription? _connectivitySubscription;
   StreamSubscription? _notificationSubscription;
+  String? _lastUserId;
 
   TaskProvider(
     this._authService,
@@ -109,6 +111,7 @@ class TaskProvider extends ChangeNotifier {
     }
     _selectedCategoryIds = prefs.getStringList('category_filters') ?? [];
     _showCompleted = prefs.getBool('show_completed') ?? true;
+    _searchQuery = '';
 
     _monthWidgetService = MonthWidgetService(_calendarService, _source);
     _fullCalendarWidgetService = FullCalendarWidgetService(
@@ -188,23 +191,30 @@ class TaskProvider extends ChangeNotifier {
             })
             as StreamSubscription?;
 
+    _lastUserId = _authService.currentUser?.uid;
     _authSubscription = _authService.authStateChanges.listen((
       User? user,
     ) async {
       if (user != null) {
+        _lastUserId = user.uid;
         _firestoreService.setUserId(user.uid);
-        // Only sync if online
-        if (_connectivityService.isOnline) {
-          await uploadLocalDataToCloud();
-          await syncWithCloud();
-        } else {
-          // User signed in but offline - will sync when online
-        }
+        
+        // Refresh pagination to show Hive data for the user
+        _refreshPagination();
+        
+        // Always attempt sync - Firestore handles offline state
+        uploadLocalDataToCloud();
+        syncWithCloud();
       } else {
-        _firestoreService.setUserId(null);
-        await _cancelSubscriptions();
-        await _source.clearAll();
-        updateHomeWidget();
+        // Only clear if we were previously logged in (_lastUserId was set)
+        if (_lastUserId != null) {
+          AppLogger.info('User signed out, clearing local data...', tag: 'Tasks');
+          _firestoreService.setUserId(null);
+          await _cancelSubscriptions();
+          await _source.clearAll();
+          updateHomeWidget();
+          _lastUserId = null;
+        }
       }
       notifyListeners();
     });
@@ -220,18 +230,15 @@ class TaskProvider extends ChangeNotifier {
 
     if (_authService.currentUser != null) {
       _firestoreService.setUserId(_authService.currentUser!.uid);
-      // Only sync if online
-      if (_connectivityService.isOnline) {
-        // Don't await sync in init to unblock startup
-        uploadLocalDataToCloud()
-            .then((_) => syncWithCloud())
-            .then((_) => updateHomeWidget())
-            .catchError((e, s) {
-              _errorHandlingService.logError(e, s, reason: 'Initial sync');
-            });
-      } else {
-        // App started offline - will sync when online
-      }
+      _refreshPagination();
+      
+      // Attempt sync in background - Firestore handles offline state
+      uploadLocalDataToCloud()
+          .then((_) => syncWithCloud())
+          .then((_) => updateHomeWidget())
+          .catchError((e, s) {
+            _errorHandlingService.logError(e, s, reason: 'Initial sync');
+          });
     }
 
     _notificationSubscription = _notificationService.onNotificationResponse
@@ -330,36 +337,47 @@ class TaskProvider extends ChangeNotifier {
   Future<void> syncWithCloud() async {
     if (_authService.currentUser == null) return;
 
-    // Don't attempt to sync if offline
-    if (!_connectivityService.isOnline) {
-      // Skipping cloud sync - offline
-      return;
-    }
+    // Remove isOnline check to allow Firestore cache to provide data
 
     await _cancelSubscriptions();
     try {
-      _tasksSubscription = _firestoreService.getTasksStream().listen(
-        (cloudTasks) async {
-          for (var cloudTask in cloudTasks) {
-            await _source.addTask(cloudTask);
-            if (!cloudTask.isCompleted &&
-                !(cloudTask.isDeleted ?? false) &&
-                cloudTask.dueDate != null &&
-                cloudTask.dueDate!.isAfter(DateTime.now())) {
-              await _notificationService.scheduleNotification(
-                id: NotificationService.getNotificationId(cloudTask.id),
-                title: 'Task Reminder: ${cloudTask.title}',
-                body: cloudTask.description.isNotEmpty
-                    ? cloudTask.description
-                    : 'You have a task due now!',
-                scheduledDate: cloudTask.dueDate!,
-                taskId: cloudTask.id,
-              );
+      _tasksSubscription = _firestoreService.getActiveTasksStream().listen(
+        (events) async {
+          bool needsUpdate = false;
+          for (var event in events) {
+            final cloudTask = event.task;
+            
+            if (event.type == SyncEventType.removed) {
+              // If it's removed from active, it might be completed or deleted.
+              // We update local DB to reflect the new state (completed/deleted).
+              await _source.addTask(cloudTask);
+            } else {
+              // Added or modified
+              await _source.addTask(cloudTask);
+              
+              if (!cloudTask.isCompleted &&
+                  !(cloudTask.isDeleted ?? false) &&
+                  cloudTask.dueDate != null &&
+                  cloudTask.dueDate!.isAfter(DateTime.now())) {
+                await _notificationService.scheduleNotification(
+                  id: NotificationService.getNotificationId(cloudTask.id),
+                  title: 'Task Reminder: ${cloudTask.title}',
+                  body: cloudTask.description.isNotEmpty
+                      ? cloudTask.description
+                      : 'You have a task due now!',
+                  scheduledDate: cloudTask.dueDate!,
+                  taskId: cloudTask.id,
+                );
+              }
             }
+            needsUpdate = true;
           }
-          _refreshPagination();
-          notifyListeners();
-          updateHomeWidget();
+          
+          if (needsUpdate) {
+            _refreshPagination();
+            notifyListeners();
+            updateHomeWidget();
+          }
         },
         onError: (error, stackTrace) {
           _errorHandlingService.logError(
@@ -486,6 +504,15 @@ class TaskProvider extends ChangeNotifier {
         });
   }
 
+  String _searchQuery = '';
+  String get searchQuery => _searchQuery;
+
+  void setSearchQuery(String query) {
+    _searchQuery = query.toLowerCase();
+    _refreshPagination();
+    notifyListeners();
+  }
+
   void toggleShowCompleted(bool value) {
     _showCompleted = value;
     _refreshPagination();
@@ -514,6 +541,16 @@ class TaskProvider extends ChangeNotifier {
         .getTasks()
         .where((t) => !(t.isDeleted ?? false))
         .toList();
+
+    if (_searchQuery.isNotEmpty) {
+      tasks = tasks
+          .where(
+            (t) =>
+                t.title.toLowerCase().contains(_searchQuery) ||
+                t.description.toLowerCase().contains(_searchQuery),
+          )
+          .toList();
+    }
 
     if (_selectedCategoryIds.isNotEmpty) {
       tasks = tasks
@@ -569,6 +606,21 @@ class TaskProvider extends ChangeNotifier {
   /// Load more tasks (for infinite scroll)
   Future<void> loadMoreTasks() async {
     await _taskPagination.loadNextPage();
+    
+    // If we've exhausted local tasks and are showing completed tasks, fetch more from Firestore
+    if (!_taskPagination.hasMoreItems && 
+        _showCompleted && 
+        _authService.currentUser != null) {
+      
+      final moreTasks = await _firestoreService.getNextCompletedTasksBatch();
+      if (moreTasks.isNotEmpty) {
+        for (var task in moreTasks) {
+          await _source.addTask(task);
+        }
+        _refreshPagination();
+      }
+    }
+    
     notifyListeners();
   }
 
@@ -680,12 +732,10 @@ class TaskProvider extends ChangeNotifier {
       recurrenceRule: recurrenceRule,
     );
     await _source.addTask(task);
-    try {
-      await _firestoreService.addTask(task);
-    } catch (e, s) {
-      _errorHandlingService.logError(e, s, reason: 'Adding task to firestore');
-      _setError('Failed to sync task to cloud');
-    }
+    // Sync to cloud - Firestore handles offline state and buffering
+    _firestoreService.addTask(task).catchError((e, s) {
+      _errorHandlingService.logError(e, s, reason: 'Background cloud addTask failed');
+    });
 
     if (dueDate != null && dueDate.isAfter(DateTime.now())) {
       try {
@@ -729,8 +779,11 @@ class TaskProvider extends ChangeNotifier {
     }
 
     notifyListeners();
-    await _source.updateTask(task);
-    await _firestoreService.updateTask(task);
+    await _source.addTask(task);
+    _firestoreService.updateTask(task).catchError((e, s) {
+      _errorHandlingService.logError(e, s, reason: 'Background cloud updateTask failed');
+    });
+
 
     if (task.isCompleted) {
       await _notificationService.cancelNotification(
@@ -782,17 +835,10 @@ class TaskProvider extends ChangeNotifier {
     if (subTasks != null) task.subTasks = subTasks;
     if (recurrenceRule != null) task.recurrenceRule = recurrenceRule;
 
-    await _source.updateTask(task);
-    try {
-      await _firestoreService.updateTask(task);
-    } catch (e, s) {
-      _errorHandlingService.logError(
-        e,
-        s,
-        reason: 'Updating task in firestore',
-      );
-      _setError('Failed to sync changes to cloud');
-    }
+    await _source.addTask(task);
+    _firestoreService.updateTask(task).catchError((e, s) {
+      _errorHandlingService.logError(e, s, reason: 'Background cloud updateTask failed');
+    });
 
     await _notificationService.cancelNotification(
       NotificationService.getNotificationId(task.id),
@@ -829,9 +875,15 @@ class TaskProvider extends ChangeNotifier {
     final index = task.subTasks!.indexWhere((st) => st.id == subTaskId);
     if (index != -1) {
       task.subTasks![index].isCompleted = !task.subTasks![index].isCompleted;
+      await _source.addTask(task);
+      _refreshPagination();
       notifyListeners();
-      await _source.updateTask(task);
-      await _firestoreService.updateTask(task);
+
+      // Sync to cloud in background - no isOnline check needed as Firestore handles buffering
+      _firestoreService.addTask(task).catchError((e, s) {
+        _errorHandlingService.logError(e, s, reason: 'Cloud addTask failed');
+      });
+      
       updateHomeWidget();
     }
   }
@@ -839,8 +891,10 @@ class TaskProvider extends ChangeNotifier {
   Future<void> toggleTaskPin(Task task) async {
     task.isPinned = !(task.isPinned ?? false);
     notifyListeners();
-    await _source.updateTask(task);
-    await _firestoreService.updateTask(task);
+    await _source.addTask(task);
+    _firestoreService.updateTask(task).catchError((e, s) {
+      _errorHandlingService.logError(e, s, reason: 'Background cloud updateTask failed');
+    });
     _refreshPagination();
     notifyListeners();
     updateHomeWidget();
@@ -850,8 +904,10 @@ class TaskProvider extends ChangeNotifier {
     try {
       final task = _source.getTasks().firstWhere((t) => t.id == id);
       task.isDeleted = true;
-      await _source.updateTask(task);
-      await _firestoreService.updateTask(task);
+      await _source.addTask(task);
+      _firestoreService.updateTask(task).catchError((e, s) {
+        _errorHandlingService.logError(e, s, reason: 'Background cloud updateTask failed');
+      });
       await _notificationService.cancelNotification(
         NotificationService.getNotificationId(id),
       );
@@ -867,8 +923,10 @@ class TaskProvider extends ChangeNotifier {
 
   Future<void> restoreTask(Task task) async {
     task.isDeleted = false;
-    await _source.updateTask(task);
-    await _firestoreService.updateTask(task);
+    await _source.addTask(task);
+    _firestoreService.updateTask(task).catchError((e, s) {
+      _errorHandlingService.logError(e, s, reason: 'Background cloud updateTask failed');
+    });
     if (!task.isCompleted &&
         task.dueDate != null &&
         task.dueDate!.isAfter(DateTime.now())) {
@@ -897,7 +955,9 @@ class TaskProvider extends ChangeNotifier {
 
   Future<void> deleteTaskPermanently(String id) async {
     await _source.deleteTask(id);
-    await _firestoreService.deleteTask(id);
+    _firestoreService.deleteTask(id).catchError((e, s) {
+      _errorHandlingService.logError(e, s, reason: 'Background cloud deleteTask failed');
+    });
     await _notificationService.cancelNotification(
       NotificationService.getNotificationId(id),
     );
@@ -906,6 +966,22 @@ class TaskProvider extends ChangeNotifier {
     updateHomeWidgetWithNotification(); // Show notification when task is permanently deleted
 
     await _analyticsService.logTaskDeleted(taskId: id);
+  }
+
+  Future<void> clearTrash() async {
+    final tasksToDelete = deletedTasks;
+    for (var task in tasksToDelete) {
+      await _source.deleteTask(task.id);
+      _firestoreService.deleteTask(task.id).catchError((e, s) {
+        _errorHandlingService.logError(e, s, reason: 'Background cloud bulk deleteTask failed');
+      });
+      await _notificationService.cancelNotification(
+        NotificationService.getNotificationId(task.id),
+      );
+    }
+    _refreshPagination();
+    notifyListeners();
+    updateHomeWidgetWithNotification();
   }
 
   bool get canAddCategory {

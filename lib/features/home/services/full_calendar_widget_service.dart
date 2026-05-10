@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:home_widget/home_widget.dart';
 import 'package:intl/intl.dart';
+import 'package:rocis_tasks/core/services/logger_service.dart';
 import 'package:rocis_tasks/core/services/calendar_service.dart';
 import 'package:rocis_tasks/core/services/calendar_color_service.dart';
 import 'package:rocis_tasks/core/services/schedule_firestore_service.dart';
@@ -73,31 +74,37 @@ class FullCalendarWidgetService {
 
   /// Get current filter settings
   Future<FullCalendarFilters> getFilters() async {
-    final prefs = await SharedPreferences.getInstance();
+    final showTasks =
+        await HomeWidget.getWidgetData<bool>('full_calendar_show_tasks') ??
+        true;
+    final showGoogle =
+        await HomeWidget.getWidgetData<bool>('full_calendar_show_google') ??
+        true;
+    final showRocis =
+        await HomeWidget.getWidgetData<bool>('full_calendar_show_rocis') ??
+        true;
+
+    final selectedIdsJson = await HomeWidget.getWidgetData<String>(
+      'full_calendar_selected_ids',
+    );
+    List<String> selectedCalendarIds = [];
+    if (selectedIdsJson != null) {
+      try {
+        selectedCalendarIds = List<String>.from(jsonDecode(selectedIdsJson));
+      } catch (_) {}
+    }
+
     return FullCalendarFilters(
-      showTasks: prefs.getBool('full_calendar_show_tasks') ?? true,
-      showGoogleCalendar: prefs.getBool('full_calendar_show_google') ?? true,
-      showRocisSchedule: prefs.getBool('full_calendar_show_rocis') ?? true,
-      selectedCalendarIds:
-          prefs.getStringList('full_calendar_selected_ids') ?? [],
+      showTasks: showTasks,
+      showGoogleCalendar: showGoogle,
+      showRocisSchedule: showRocis,
+      selectedCalendarIds: selectedCalendarIds,
     );
   }
 
   /// Save filter settings
   Future<void> saveFilters(FullCalendarFilters filters) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('full_calendar_show_tasks', filters.showTasks);
-    await prefs.setBool(
-      'full_calendar_show_google',
-      filters.showGoogleCalendar,
-    );
-    await prefs.setBool('full_calendar_show_rocis', filters.showRocisSchedule);
-    await prefs.setStringList(
-      'full_calendar_selected_ids',
-      filters.selectedCalendarIds,
-    );
-
-    // Also save to widget data for native access
+    // Save to widget data for native and Dart access
     await HomeWidget.saveWidgetData<bool>(
       'full_calendar_show_tasks',
       filters.showTasks,
@@ -113,6 +120,19 @@ class FullCalendarWidgetService {
     await HomeWidget.saveWidgetData<String>(
       'full_calendar_selected_ids',
       jsonEncode(filters.selectedCalendarIds),
+    );
+
+    // Also save to SharedPreferences as backup
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('full_calendar_show_tasks', filters.showTasks);
+    await prefs.setBool(
+      'full_calendar_show_google',
+      filters.showGoogleCalendar,
+    );
+    await prefs.setBool('full_calendar_show_rocis', filters.showRocisSchedule);
+    await prefs.setStringList(
+      'full_calendar_selected_ids',
+      filters.selectedCalendarIds,
     );
   }
 
@@ -203,13 +223,14 @@ class FullCalendarWidgetService {
       final difference = firstDayOfMonth.weekday % 7;
       final startDate = firstDayOfMonth.subtract(Duration(days: difference));
       final endDate = startDate.add(
-        const Duration(days: 34),
-      ); // 35 days (5 weeks)
+        const Duration(days: 41),
+      ); // 42 days (6 weeks) to ensure all months fit
 
       // Date range calculated
 
       // Fetch Google Calendar events (if filter enabled)
       var events = [];
+      Map<String, String> calendarColors = {};
       try {
         if (filters.showGoogleCalendar) {
           events = await _calendarService.getEvents(
@@ -217,6 +238,7 @@ class FullCalendarWidgetService {
             endDate: endDate,
             calendarIds: filters.selectedCalendarIds,
           );
+          calendarColors = await _calendarService.getCalendarColors();
         }
       } catch (e) {
         // Ignore Google Calendar fetch errors to prevent widget crash
@@ -262,7 +284,7 @@ class FullCalendarWidgetService {
 
       final gridData = <Map<String, dynamic>>[];
 
-      for (int row = 0; row < 5; row++) {
+      for (int row = 0; row < 6; row++) {
         // First cell of each row is the Week Number
         final rowStartDate = startDate.add(Duration(days: row * 7));
         final weekNumber = _getWeekNumber(rowStartDate);
@@ -273,11 +295,24 @@ class FullCalendarWidgetService {
           final date = rowStartDate.add(Duration(days: col));
           final dateKey = DateFormat('yyyy-MM-dd').format(date);
 
-          // Find Google Calendar events for this day
+          // Find Google Calendar events for this day (including multi-day events)
           final dayEvents = events.where((e) {
             if (e.start == null) return false;
-            final eDate = DateFormat('yyyy-MM-dd').format(e.start!);
-            return eDate == dateKey;
+
+            final startDate = DateTime(
+              e.start!.year,
+              e.start!.month,
+              e.start!.day,
+            );
+            final endDate = e.end != null
+                ? DateTime(e.end!.year, e.end!.month, e.end!.day)
+                : startDate;
+
+            final currentDate = date;
+            return (currentDate.isAfter(
+                  startDate.subtract(const Duration(seconds: 1)),
+                ) &&
+                currentDate.isBefore(endDate.add(const Duration(seconds: 1))));
           }).toList();
 
           // Find tasks for this day
@@ -312,24 +347,57 @@ class FullCalendarWidgetService {
           // Create summaries (up to 3 items)
           final summaries = <Map<String, dynamic>>[];
 
+          // 1. Prioritize tasks
+          for (var t in dayTasks) {
+            if (summaries.length >= 3) break;
+            // Lookup category color
+            int? colorVal;
+            try {
+              final cat = _taskSource.getCategories().firstWhere(
+                (c) => c.id == t.categoryId,
+              );
+              colorVal = cat.colorValue;
+            } catch (_) {}
+
+            final title = t.title.length > 25
+                ? '${t.title.substring(0, 22)}...'
+                : t.title;
+
+            summaries.add({
+              'text': title,
+              'priority': t.priority.toString().split('.').last,
+              'color': colorVal != null
+                  ? '#${colorVal.toRadixString(16).padLeft(8, '0')}'
+                  : taskColorHex,
+              'type': 'task',
+            });
+          }
+
           for (var e in dayEvents) {
             if (summaries.length >= 3) break;
             final timeStr = e.start != null
-                ? DateFormat('HH:mm').format(e.start!)
+                ? _formatEventTime(e.start, e.end)
                 : '';
 
-            final title = (e.title ?? 'Event').length > 30
-                ? '${(e.title ?? 'Event').substring(0, 27)}...'
+            // Truncate title more aggressively for better fit in widget
+            final title = (e.title ?? 'Event').length > 25
+                ? '${(e.title ?? 'Event').substring(0, 22)}...'
                 : (e.title ?? 'Event');
-            final location = (e.location ?? '').length > 30
-                ? '${(e.location ?? '').substring(0, 27)}...'
+            final location = (e.location ?? '').length > 20
+                ? '${(e.location ?? '').substring(0, 17)}...'
                 : (e.location ?? '');
+
+            // Use calendar color if available, fallback to global google color
+            final eventColor =
+                e.calendarId != null && calendarColors.containsKey(e.calendarId)
+                ? calendarColors[e.calendarId]
+                : googleColorHex;
 
             summaries.add({
               'text': title,
               'time': timeStr,
               'subtitle': location,
-              'color': googleColorHex,
+              'color': eventColor,
               'type': 'google',
             });
           }
@@ -347,11 +415,62 @@ class FullCalendarWidgetService {
               if (itemDateStr == null) continue;
 
               final itemDate = DateTime.parse(itemDateStr);
-              // Use the event date for time if startTime key is missing or null
-              // schedule_event usually has a specific time, assignments usually don't (or are all day)
-              final startTime = type == 'schedule_event'
-                  ? DateFormat('HH:mm').format(itemDate)
-                  : '';
+
+              // Extract start and end times if available
+              DateTime? startTime;
+              DateTime? endTime;
+
+              if (type == 'schedule_event') {
+                // For schedule events, try to get start and end times
+                final startStr = item['startTime'] as String?;
+                final endStr = item['endTime'] as String?;
+
+                if (startStr != null) {
+                  try {
+                    startTime = DateTime.parse(startStr);
+                    // Combine with date if only time was provided
+                    if (startTime.year == 1970) {
+                      startTime = DateTime(
+                        itemDate.year,
+                        itemDate.month,
+                        itemDate.day,
+                        startTime.hour,
+                        startTime.minute,
+                      );
+                    }
+                  } catch (e) {
+                    // Fall back to using just the date
+                    startTime = itemDate;
+                  }
+                } else {
+                  startTime = itemDate;
+                }
+
+                if (endStr != null) {
+                  try {
+                    endTime = DateTime.parse(endStr);
+                    // Combine with date if only time was provided
+                    if (endTime.year == 1970) {
+                      endTime = DateTime(
+                        itemDate.year,
+                        itemDate.month,
+                        itemDate.day,
+                        endTime.hour,
+                        endTime.minute,
+                      );
+                    }
+                  } catch (e) {
+                    // Fall back to using just the date
+                    endTime = itemDate;
+                  }
+                } else {
+                  endTime = itemDate;
+                }
+              } else {
+                // Assignments - treat as all-day events on the date
+                startTime = itemDate;
+                endTime = itemDate;
+              }
 
               final rawTitle = (item['title'] as String?) ?? 'Event';
               final rawLocation = (item['location'] as String?) ?? '';
@@ -365,7 +484,7 @@ class FullCalendarWidgetService {
 
               summaries.add({
                 'text': title,
-                'time': startTime,
+                'time': _formatEventTime(startTime, endTime),
                 'subtitle': location,
                 'color': color,
                 'type': type,
@@ -374,31 +493,6 @@ class FullCalendarWidgetService {
               // Ignore individual item errors to prevent widget crash
               continue;
             }
-          }
-
-          for (var t in dayTasks) {
-            if (summaries.length >= 3) break;
-            // Lookup category color
-            int? colorVal;
-            try {
-              final cat = _taskSource.getCategories().firstWhere(
-                (c) => c.id == t.categoryId,
-              );
-              colorVal = cat.colorValue;
-            } catch (_) {}
-
-            final title = t.title.length > 30
-                ? '${t.title.substring(0, 27)}...'
-                : t.title;
-
-            summaries.add({
-              'text': title,
-              'priority': t.priority.toString().split('.').last,
-              'color': colorVal != null
-                  ? '#${colorVal.toRadixString(16).padLeft(8, '0')}'
-                  : taskColorHex,
-              'type': 'task',
-            });
           }
 
           gridData.add({
@@ -420,7 +514,12 @@ class FullCalendarWidgetService {
       // Save Data
       final gridDataJson = jsonEncode(gridData);
 
-      if (gridDataJson.length > 500000) {}
+      if (gridDataJson.length > 500000) {
+        // Log warning if data is too large for SharedPreferences/WidgetData
+        AppLogger.warning(
+          'FullCalendar widget data is very large: ${gridDataJson.length} bytes',
+        );
+      }
 
       // Saving grid data
       await HomeWidget.saveWidgetData<String>(
@@ -476,7 +575,7 @@ class FullCalendarWidgetService {
 
       final gridData = <Map<String, dynamic>>[];
 
-      for (int row = 0; row < 5; row++) {
+      for (int row = 0; row < 6; row++) {
         final rowStartDate = startDate.add(Duration(days: row * 7));
         final weekNumber = _getWeekNumber(rowStartDate);
 
@@ -517,6 +616,37 @@ class FullCalendarWidgetService {
     } catch (e) {
       // Ignore fallback grid generation errors
     }
+  }
+
+  String _formatEventTime(DateTime? start, DateTime? end) {
+    if (start == null) return '';
+
+    // Handle all-day events (when end is null or same day start/end with no time difference)
+    if (end == null) {
+      return DateFormat('HH:mm').format(start);
+    }
+
+    // Check if it's an all-day event (same date, start at midnight, end at midnight next day)
+    final startOnly = DateTime(start.year, start.month, start.day);
+    final endOnly = DateTime(end.year, end.month, end.day);
+
+    if (startOnly == endOnly &&
+        start.hour == 0 &&
+        start.minute == 0 &&
+        end.hour == 0 &&
+        end.minute == 0) {
+      return 'All Day';
+    }
+
+    // Same day event
+    if (start.year == end.year &&
+        start.month == end.month &&
+        start.day == end.day) {
+      return '${DateFormat('HH:mm').format(start)}-${DateFormat('HH:mm').format(end)}';
+    }
+
+    // Multi-day event
+    return '${DateFormat('MM/dd HH:mm').format(start)}-${DateFormat('MM/dd HH:mm').format(end)}';
   }
 
   int _getWeekNumber(DateTime date) {

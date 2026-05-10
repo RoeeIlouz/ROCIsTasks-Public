@@ -27,15 +27,33 @@ class AuthService extends ChangeNotifier {
   StreamSubscription<User?>? _authStateSubscription;
 
   AuthService(this._errorHandlingService) {
+    // Check initial state synchronously
+    if (_auth.currentUser != null) {
+      if (!_initCompleter.isCompleted) {
+        _initCompleter.complete();
+      }
+    }
+
     _authStateSubscription = _auth.authStateChanges().listen((User? user) {
       if (user != null) {
         _syncEncryptionKey(user.uid);
         ensureSecondaryAuth();
       }
 
-      // Complete init on first event
+      // Complete init on first event if not already completed
       if (!_initCompleter.isCompleted) {
-        _initCompleter.complete();
+        if (user != null) {
+          // If we have a user, we can complete immediately
+          _initCompleter.complete();
+        } else {
+          // If user is null, give it more time to be sure it's not a loading state.
+          // 1.5s is a safe middle ground for session restoration.
+          Future.delayed(const Duration(milliseconds: 1500), () {
+            if (!_initCompleter.isCompleted) {
+              _initCompleter.complete();
+            }
+          });
+        }
       }
 
       notifyListeners();

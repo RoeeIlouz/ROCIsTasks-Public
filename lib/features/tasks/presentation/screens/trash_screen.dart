@@ -10,8 +10,47 @@ class TrashScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.trashTitle)),
+      appBar: AppBar(
+        title: Text(l10n.trashTitle),
+        actions: [
+          Consumer<TaskProvider>(
+            builder: (context, provider, child) {
+              if (provider.deletedTasks.isEmpty) return const SizedBox.shrink();
+              return IconButton(
+                icon: const Icon(Icons.delete_sweep_outlined),
+                tooltip: l10n.emptyTrash,
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (ctx) => AlertDialog(
+                      title: Text(l10n.emptyTrash),
+                      content: Text(l10n.actionUndone),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(ctx),
+                          child: Text(l10n.cancel),
+                        ),
+                        FilledButton(
+                          onPressed: () {
+                            provider.clearTrash();
+                            Navigator.pop(ctx);
+                          },
+                          style: FilledButton.styleFrom(
+                            backgroundColor: theme.colorScheme.error,
+                          ),
+                          child: Text(l10n.delete),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+        ],
+      ),
       body: Consumer<TaskProvider>(
         builder: (context, provider, child) {
           final deletedTasks = provider.deletedTasks;

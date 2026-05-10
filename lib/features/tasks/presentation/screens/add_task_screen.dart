@@ -158,9 +158,10 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
         }
         Navigator.pop(context);
       } catch (e) {
+        final l10n = AppLocalizations.of(context)!;
         ErrorService.handleUserError(
           context,
-          'Failed to save task. Please try again.',
+          l10n.failedToSaveTask,
           error: e,
         );
       }
@@ -224,7 +225,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   if (error != null) return error;
 
                   if (ValidationService.containsHarmfulContent(sanitized)) {
-                    return 'Title contains invalid content';
+                    return l10n.titleInvalidContent;
                   }
 
                   return null;
@@ -255,7 +256,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
 
                   if (value != null &&
                       ValidationService.containsHarmfulContent(value)) {
-                    return 'Description contains invalid content';
+                    return l10n.descriptionInvalidContent;
                   }
 
                   return null;
@@ -493,7 +494,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              "Subtasks",
+              l10n.subtasks,
               style: GoogleFonts.outfit(
                 fontWeight: FontWeight.bold,
                 fontSize: 14,
@@ -535,7 +536,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
         if (_subTasks.isEmpty)
           Padding(
             padding: const EdgeInsets.only(top: 8.0),
-            child: Text("No subtasks added", style: theme.textTheme.bodySmall),
+            child: Text(l10n.noSubtasksAdded, style: theme.textTheme.bodySmall),
           ),
         ...List.generate(_subTasks.length, (index) {
           return Padding(
@@ -560,8 +561,8 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                     onChanged: (value) {
                       _subTasks[index].title = value;
                     },
-                    decoration: const InputDecoration(
-                      hintText: "Enter subtask...",
+                    decoration: InputDecoration(
+                      hintText: l10n.enterSubtask,
                       border: InputBorder.none,
                     ),
                     style: GoogleFonts.outfit(fontSize: 14),
@@ -596,7 +597,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
         Row(
           children: [
             Text(
-              "Recurrence",
+              l10n.recurrence,
               style: GoogleFonts.outfit(
                 fontWeight: FontWeight.bold,
                 fontSize: 14,
@@ -626,23 +627,23 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
         DropdownButtonFormField<String?>(
           initialValue: _recurrenceRule,
           decoration: SharedInputDecorations.getFieldDecoration(
-            label: "Repeat",
+            label: l10n.repeat,
             prefixIcon: Icons.repeat_rounded,
             theme: theme,
           ),
-          items: const [
-            DropdownMenuItem(value: null, child: Text("None")),
+          items: [
+            DropdownMenuItem(value: null, child: Text(l10n.repeatNone)),
             DropdownMenuItem(
               value: "FREQ=DAILY;INTERVAL=1",
-              child: Text("Daily"),
+              child: Text(l10n.repeatDaily),
             ),
             DropdownMenuItem(
               value: "FREQ=WEEKLY;INTERVAL=1",
-              child: Text("Weekly"),
+              child: Text(l10n.repeatWeekly),
             ),
             DropdownMenuItem(
               value: "FREQ=MONTHLY;INTERVAL=1",
-              child: Text("Monthly"),
+              child: Text(l10n.repeatMonthly),
             ),
           ],
           onChanged: (value) {

@@ -36,6 +36,13 @@ class SettingsScreen extends StatelessWidget {
       listen: false,
     );
 
+    String _currentLanguageLabel() {
+      final code = themeService.locale?.languageCode;
+      if (code == 'he') return l10n.hebrew;
+      if (code == 'es') return l10n.spanish;
+      return l10n.english;
+    }
+
     return ListView(
       children: [
         _buildSectionHeader(context, l10n.account),
@@ -57,11 +64,11 @@ class SettingsScreen extends StatelessWidget {
           ),
         ListTile(
           leading: const Icon(Icons.stars_rounded, color: Colors.amber),
-          title: const Text("ROCIs Tasks Pro"),
+          title: Text(l10n.rocisTasksPro),
           subtitle: Text(
             subscriptionService.isPremium
-                ? "You are a Pro user!"
-                : "Unlock premium features",
+                ? l10n.youAreProUser
+                : l10n.unlockPremiumFeatures,
           ),
           trailing: const Icon(Icons.chevron_right),
           onTap: () {
@@ -74,8 +81,8 @@ class SettingsScreen extends StatelessWidget {
         if (subscriptionService.isPremium)
           ListTile(
             leading: const Icon(Icons.settings_suggest_rounded),
-            title: const Text("Manage Subscription"),
-            subtitle: const Text("Cancel or change your plan"),
+            title: Text(l10n.manageSubscription),
+            subtitle: Text(l10n.manageSubscriptionSubtitle),
             onTap: () async {
               await analyticsService.logSubscriptionManagementClicked();
               await subscriptionService.manageSubscription();
@@ -134,7 +141,7 @@ class SettingsScreen extends StatelessWidget {
                     themeMode: value ? 'amoled_on' : 'amoled_off',
                   );
                 }
-              : null, // Disable if not dark mode
+              : null,
         ),
         SwitchListTile(
           secondary: const Icon(Icons.access_time),
@@ -145,11 +152,7 @@ class SettingsScreen extends StatelessWidget {
         ListTile(
           leading: const Icon(Icons.language),
           title: Text(l10n.language),
-          subtitle: Text(
-            themeService.locale?.languageCode == 'he'
-                ? l10n.hebrew
-                : l10n.english,
-          ),
+          subtitle: Text(_currentLanguageLabel()),
           trailing: const Icon(Icons.chevron_right),
           onTap: () {
             showModalBottomSheet(
@@ -165,7 +168,8 @@ class SettingsScreen extends StatelessWidget {
                       analyticsService.logLanguageChanged(locale: 'en');
                       Navigator.pop(context);
                     },
-                    trailing: themeService.locale?.languageCode != 'he'
+                    trailing: themeService.locale?.languageCode == 'en' ||
+                            themeService.locale == null
                         ? const Icon(Icons.check)
                         : null,
                   ),
@@ -177,6 +181,17 @@ class SettingsScreen extends StatelessWidget {
                       Navigator.pop(context);
                     },
                     trailing: themeService.locale?.languageCode == 'he'
+                        ? const Icon(Icons.check)
+                        : null,
+                  ),
+                  ListTile(
+                    title: Text(l10n.spanish),
+                    onTap: () {
+                      themeService.setLocale(const Locale('es'));
+                      analyticsService.logLanguageChanged(locale: 'es');
+                      Navigator.pop(context);
+                    },
+                    trailing: themeService.locale?.languageCode == 'es'
                         ? const Icon(Icons.check)
                         : null,
                   ),
@@ -205,7 +220,7 @@ class SettingsScreen extends StatelessWidget {
               ScaffoldMessenger.of(context).hideCurrentSnackBar();
               ScaffoldMessenger.of(
                 context,
-              ).showSnackBar(const SnackBar(content: Text('Sync complete')));
+              ).showSnackBar(SnackBar(content: Text(l10n.syncComplete)));
             }
           },
         ),
@@ -221,11 +236,11 @@ class SettingsScreen extends StatelessWidget {
           },
         ),
         const Divider(),
-        _buildSectionHeader(context, "Backup & Restore"),
+        _buildSectionHeader(context, l10n.backupAndRestore),
         ListTile(
           leading: const Icon(Icons.upload_file),
-          title: const Text("Export Data (JSON)"),
-          subtitle: const Text("Backup your tasks and categories"),
+          title: Text(l10n.exportData),
+          subtitle: Text(l10n.exportDataSubtitle),
           onTap: () async {
             try {
               final backupService = Provider.of<BackupService>(
@@ -236,22 +251,24 @@ class SettingsScreen extends StatelessWidget {
               await Clipboard.setData(ClipboardData(text: json));
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Backup copied to clipboard!')),
+                  SnackBar(content: Text(l10n.backupCopied)),
                 );
               }
             } catch (e) {
               if (context.mounted) {
                 ScaffoldMessenger.of(
                   context,
-                ).showSnackBar(SnackBar(content: Text('Export failed: $e')));
+                ).showSnackBar(
+                  SnackBar(content: Text(l10n.exportFailed(e.toString()))),
+                );
               }
             }
           },
         ),
         ListTile(
           leading: const Icon(Icons.download),
-          title: const Text("Import Data (JSON)"),
-          subtitle: const Text("Restore from a JSON backup"),
+          title: Text(l10n.importData),
+          subtitle: Text(l10n.importDataSubtitle),
           onTap: () async {
             final controller = TextEditingController();
             final backupService = Provider.of<BackupService>(
@@ -261,23 +278,23 @@ class SettingsScreen extends StatelessWidget {
             final confirmed = await showDialog<bool>(
               context: context,
               builder: (context) => AlertDialog(
-                title: const Text('Import Backup'),
+                title: Text(l10n.importBackup),
                 content: TextField(
                   controller: controller,
                   maxLines: 5,
-                  decoration: const InputDecoration(
-                    hintText: 'Paste JSON backup here...',
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    hintText: l10n.pasteJsonHint,
+                    border: const OutlineInputBorder(),
                   ),
                 ),
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.pop(context, false),
-                    child: const Text('Cancel'),
+                    child: Text(l10n.cancel),
                   ),
                   TextButton(
                     onPressed: () => Navigator.pop(context, true),
-                    child: const Text('Import'),
+                    child: Text(l10n.import),
                   ),
                 ],
               ),
@@ -288,25 +305,27 @@ class SettingsScreen extends StatelessWidget {
                 await backupService.importData(controller.text);
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Import complete!')),
+                    SnackBar(content: Text(l10n.importComplete)),
                   );
                 }
               } catch (e) {
                 if (context.mounted) {
                   ScaffoldMessenger.of(
                     context,
-                  ).showSnackBar(SnackBar(content: Text('Import failed: $e')));
+                  ).showSnackBar(
+                    SnackBar(content: Text(l10n.importFailed(e.toString()))),
+                  );
                 }
               }
             }
           },
         ),
         const Divider(),
-        _buildSectionHeader(context, "Privacy & GDPR"),
+        _buildSectionHeader(context, l10n.privacyAndGdpr),
         ListTile(
           leading: const Icon(Icons.privacy_tip_outlined),
-          title: const Text("Privacy Policy"),
-          subtitle: const Text("Read our data security terms"),
+          title: Text(l10n.privacyPolicy),
+          subtitle: Text(l10n.privacyPolicySubtitle),
           trailing: const Icon(Icons.open_in_new, size: 16),
           onTap: () async {
             final Uri url = Uri.parse(AppConfig.privacyPolicyUrl);
@@ -318,27 +337,25 @@ class SettingsScreen extends StatelessWidget {
         ListTile(
           leading: Icon(Icons.person_remove_outlined, color: Colors.red[700]),
           title: Text(
-            "Delete My Account & Data",
+            l10n.deleteAccountTitle,
             style: TextStyle(color: Colors.red[700]),
           ),
-          subtitle: const Text("Permanently remove all your data"),
+          subtitle: Text(l10n.deleteAccountSubtitle),
           onTap: () async {
             final confirmed = await showDialog<bool>(
               context: context,
               builder: (context) => AlertDialog(
-                title: const Text('Delete Account?'),
-                content: const Text(
-                  'This action is permanent and will remove all your tasks, categories, and settings from our servers.',
-                ),
+                title: Text(l10n.deleteAccountConfirmTitle),
+                content: Text(l10n.deleteAccountConfirmBody),
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.pop(context, false),
-                    child: const Text('Cancel'),
+                    child: Text(l10n.cancel),
                   ),
                   TextButton(
                     style: TextButton.styleFrom(foregroundColor: Colors.red),
                     onPressed: () => Navigator.pop(context, true),
-                    child: const Text('Delete Everything'),
+                    child: Text(l10n.deleteEverything),
                   ),
                 ],
               ),
@@ -353,11 +370,7 @@ class SettingsScreen extends StatelessWidget {
               } else {
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        'Deletion failed. You may need to sign out and back in first for security.',
-                      ),
-                    ),
+                    SnackBar(content: Text(l10n.deletionFailed)),
                   );
                 }
               }
@@ -365,11 +378,11 @@ class SettingsScreen extends StatelessWidget {
           },
         ),
         const Divider(),
-        _buildSectionHeader(context, "About"),
+        _buildSectionHeader(context, l10n.about),
         ListTile(
           leading: const Icon(Icons.info_outline),
-          title: const Text("About ROCI's Tasks"),
-          subtitle: const Text("App version, support, and info"),
+          title: Text(l10n.aboutApp),
+          subtitle: Text(l10n.aboutAppSubtitle),
           onTap: () {
             showAboutDialog(
               context: context,
@@ -381,14 +394,12 @@ class SettingsScreen extends StatelessWidget {
               ),
               children: [
                 const SizedBox(height: 16),
-                const Text(
-                  "ROCI's Tasks is designed to help you stay organized and productive. Built with Flutter, it provides a seamless experience for managing your daily tasks, categories, and schedule.",
-                ),
+                Text(l10n.aboutAppDescription),
                 const SizedBox(height: 16),
                 ListTile(
                   contentPadding: EdgeInsets.zero,
                   leading: const Icon(Icons.language),
-                  title: const Text("Visit our Website"),
+                  title: Text(l10n.visitWebsite),
                   subtitle: const Text("rocisapps.ilouz.xyz"),
                   onTap: () async {
                     final Uri url = Uri.parse(AppConfig.websiteUrl);
@@ -403,7 +414,7 @@ class SettingsScreen extends StatelessWidget {
                 ListTile(
                   contentPadding: EdgeInsets.zero,
                   leading: const Icon(Icons.mail_outline),
-                  title: const Text("Contact Support"),
+                  title: Text(l10n.contactSupport),
                   subtitle: const Text(AppConfig.supportEmail),
                   onTap: () async {
                     final Uri emailLaunchUri = Uri(

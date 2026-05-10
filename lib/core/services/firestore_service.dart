@@ -1,15 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/features/categories/domain/models/category.dart';
-import 'package:rocis_tasks/core/services/connectivity_service.dart';
 import 'package:rocis_tasks/core/services/retry_service.dart';
 import 'package:rocis_tasks/core/services/logger_service.dart';
 import 'package:rocis_tasks/core/services/sync_status_service.dart';
 import 'package:firebase_performance/firebase_performance.dart';
 
+enum SyncEventType { added, modified, removed }
+
+class TaskSyncEvent {
+  final SyncEventType type;
+  final Task task;
+  TaskSyncEvent(this.type, this.task);
+}
+
 class FirestoreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final ConnectivityService _connectivityService = ConnectivityService();
   final SyncStatusService _syncStatus = SyncStatusService();
   String? _userId;
 
@@ -23,7 +29,10 @@ class FirestoreService {
   FirestoreService._internal();
 
   void setUserId(String? userId) {
-    _userId = userId;
+    if (_userId != userId) {
+      _userId = userId;
+      resetCompletedTasksCursor();
+    }
   }
 
   /// Ensure at least [_minWriteInterval] between write operations
@@ -37,7 +46,7 @@ class FirestoreService {
   }
 
   /// Check if we should attempt Firestore operations
-  bool get _shouldSync => _userId != null && _connectivityService.isOnline;
+  bool get _shouldSync => _userId != null;
 
   CollectionReference<Map<String, dynamic>>? get _tasksCollection {
     if (_userId == null) return null;
@@ -243,24 +252,91 @@ class FirestoreService {
     }
   }
 
-  Stream<List<Task>> getTasksStream() {
+  Stream<List<TaskSyncEvent>> getActiveTasksStream() {
     final collection = _tasksCollection;
     if (collection == null) return const Stream.empty();
 
     final trace = FirebasePerformance.instance.newTrace(
-      'firestore_get_tasks_initial',
+      'firestore_get_active_tasks_initial',
     );
     bool firstEvent = true;
     trace.start();
 
-    return collection.snapshots().map((snapshot) {
+    // Only stream tasks that are NOT completed and NOT deleted.
+    // When a task is completed or deleted on another device, it will drop out of this query
+    // and trigger a 'removed' DocumentChange event.
+    return collection
+        .where('isCompleted', isEqualTo: false)
+        .where('isDeleted', isEqualTo: false)
+        .snapshots()
+        .map((snapshot) {
       if (firstEvent) {
         trace.stop();
         firstEvent = false;
       }
-      return snapshot.docs.map((doc) {
-        return Task.fromMap(doc.data());
+      
+      return snapshot.docChanges.map((change) {
+        final task = Task.fromMap(change.doc.data()!);
+        SyncEventType type;
+        switch (change.type) {
+          case DocumentChangeType.added:
+            type = SyncEventType.added;
+            break;
+          case DocumentChangeType.modified:
+            type = SyncEventType.modified;
+            break;
+          case DocumentChangeType.removed:
+            type = SyncEventType.removed;
+            break;
+        }
+        return TaskSyncEvent(type, task);
       }).toList();
     });
+  }
+
+  DocumentSnapshot? _lastCompletedTaskDoc;
+  bool _hasMoreCompletedTasks = true;
+
+  void resetCompletedTasksCursor() {
+    _lastCompletedTaskDoc = null;
+    _hasMoreCompletedTasks = true;
+  }
+
+  /// Fetches the next paginated batch of completed tasks for lazy loading
+  Future<List<Task>> getNextCompletedTasksBatch({int limit = 20}) async {
+    final collection = _tasksCollection;
+    if (collection == null || !_hasMoreCompletedTasks) return [];
+
+    var query = collection
+        .where('isCompleted', isEqualTo: true)
+        .where('isDeleted', isEqualTo: false)
+        .orderBy('updatedAt', descending: true)
+        .limit(limit);
+
+    if (_lastCompletedTaskDoc != null) {
+      query = query.startAfterDocument(_lastCompletedTaskDoc!);
+    }
+
+    final trace = FirebasePerformance.instance.newTrace('firestore_get_completed_tasks');
+    await trace.start();
+    try {
+      final snapshot = await query.get();
+      if (snapshot.docs.isEmpty) {
+        _hasMoreCompletedTasks = false;
+        return [];
+      }
+      
+      if (snapshot.docs.length < limit) {
+        _hasMoreCompletedTasks = false;
+      }
+      
+      _lastCompletedTaskDoc = snapshot.docs.last;
+      return snapshot.docs.map((doc) => Task.fromMap(doc.data())).toList();
+    } catch (e) {
+      AppLogger.error('Failed to fetch completed tasks', error: e, tag: 'Firestore');
+      return [];
+    } finally {
+      await trace.stop();
+    }
   }
 }

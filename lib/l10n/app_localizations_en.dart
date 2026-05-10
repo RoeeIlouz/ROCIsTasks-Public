@@ -93,6 +93,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get english => 'English';
 
   @override
+  String get spanish => 'Spanish';
+
+  @override
   String get tasks => 'Tasks';
 
   @override
@@ -253,4 +256,245 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get offlineMode => 'Offline Mode';
+
+  @override
+  String get syncComplete => 'Sync complete';
+
+  @override
+  String get backupAndRestore => 'Backup & Restore';
+
+  @override
+  String get exportData => 'Export Data (JSON)';
+
+  @override
+  String get exportDataSubtitle => 'Backup your tasks and categories';
+
+  @override
+  String get backupCopied => 'Backup copied to clipboard!';
+
+  @override
+  String exportFailed(String error) {
+    return 'Export failed: $error';
+  }
+
+  @override
+  String get importData => 'Import Data (JSON)';
+
+  @override
+  String get importDataSubtitle => 'Restore from a JSON backup';
+
+  @override
+  String get importBackup => 'Import Backup';
+
+  @override
+  String get pasteJsonHint => 'Paste JSON backup here...';
+
+  @override
+  String get import => 'Import';
+
+  @override
+  String get importComplete => 'Import complete!';
+
+  @override
+  String importFailed(String error) {
+    return 'Import failed: $error';
+  }
+
+  @override
+  String get privacyAndGdpr => 'Privacy & GDPR';
+
+  @override
+  String get privacyPolicy => 'Privacy Policy';
+
+  @override
+  String get privacyPolicySubtitle => 'Read our data security terms';
+
+  @override
+  String get deleteAccountTitle => 'Delete My Account & Data';
+
+  @override
+  String get deleteAccountSubtitle => 'Permanently remove all your data';
+
+  @override
+  String get deleteAccountConfirmTitle => 'Delete Account?';
+
+  @override
+  String get deleteAccountConfirmBody =>
+      'This action is permanent and will remove all your tasks, categories, and settings from our servers.';
+
+  @override
+  String get deleteEverything => 'Delete Everything';
+
+  @override
+  String get deletionFailed =>
+      'Deletion failed. You may need to sign out and back in first for security.';
+
+  @override
+  String get about => 'About';
+
+  @override
+  String get aboutApp => 'About ROCI\'s Tasks';
+
+  @override
+  String get aboutAppSubtitle => 'App version, support, and info';
+
+  @override
+  String get aboutAppDescription =>
+      'ROCI\'s Tasks is designed to help you stay organized and productive. Built with Flutter, it provides a seamless experience for managing your daily tasks, categories, and schedule.';
+
+  @override
+  String get visitWebsite => 'Visit our Website';
+
+  @override
+  String get contactSupport => 'Contact Support';
+
+  @override
+  String get rocisTasksPro => 'ROCIs Tasks Pro';
+
+  @override
+  String get youAreProUser => 'You are a Pro user!';
+
+  @override
+  String get unlockPremiumFeatures => 'Unlock premium features';
+
+  @override
+  String get manageSubscription => 'Manage Subscription';
+
+  @override
+  String get manageSubscriptionSubtitle => 'Cancel or change your plan';
+
+  @override
+  String get upgradeToPro => 'Upgrade to Pro';
+
+  @override
+  String get unlockFullPotential => 'Unlock your full potential';
+
+  @override
+  String get unlimitedCategories => 'Unlimited Categories';
+
+  @override
+  String get unlimitedCategoriesDesc =>
+      'Create as many categories as you need to stay organized.';
+
+  @override
+  String get premiumWidgets => 'Premium Widgets';
+
+  @override
+  String get premiumWidgetsDesc =>
+      'Access to Month and Full Calendar home screen widgets.';
+
+  @override
+  String get subtasksAndChecklists => 'Subtasks & Checklists';
+
+  @override
+  String get subtasksAndChecklistsDesc =>
+      'Break down complex tasks into smaller, manageable steps.';
+
+  @override
+  String get recurringTasks => 'Recurring Tasks';
+
+  @override
+  String get recurringTasksDesc =>
+      'Automate your routine with flexible repetition rules.';
+
+  @override
+  String get viewPricingPlans => 'View Pricing Plans';
+
+  @override
+  String get proSubscriptionActive => 'Pro Subscription Active';
+
+  @override
+  String get purchasesRestored => 'Purchases restored successfully!';
+
+  @override
+  String get noActiveSubscription =>
+      'No active subscription found for this account.';
+
+  @override
+  String get failedToRestore => 'Failed to restore purchases.';
+
+  @override
+  String get restorePurchases => 'Restore Purchases';
+
+  @override
+  String get subtasks => 'Subtasks';
+
+  @override
+  String get noSubtasksAdded => 'No subtasks added';
+
+  @override
+  String get enterSubtask => 'Enter subtask...';
+
+  @override
+  String get recurrence => 'Recurrence';
+
+  @override
+  String get repeat => 'Repeat';
+
+  @override
+  String get repeatNone => 'None';
+
+  @override
+  String get repeatDaily => 'Daily';
+
+  @override
+  String get repeatWeekly => 'Weekly';
+
+  @override
+  String get repeatMonthly => 'Monthly';
+
+  @override
+  String get titleInvalidContent => 'Title contains invalid content';
+
+  @override
+  String get descriptionInvalidContent =>
+      'Description contains invalid content';
+
+  @override
+  String get failedToSaveTask => 'Failed to save task. Please try again.';
+
+  @override
+  String get welcomeToApp => 'Welcome to ROCI\'s Tasks';
+
+  @override
+  String get signInToSync => 'Sign in to sync your tasks across devices';
+
+  @override
+  String get signInWithGoogle => 'Sign in with Google';
+
+  @override
+  String get signInFailed => 'Sign in failed';
+
+  @override
+  String get onboardingWelcomeTitle => 'Welcome to ROCI\'s Tasks';
+
+  @override
+  String get onboardingWelcomeDesc =>
+      'Organize your life with efficiency and style.';
+
+  @override
+  String get onboardingSyncTitle => 'Sync & Offline';
+
+  @override
+  String get onboardingSyncDesc =>
+      'Your tasks follow you everywhere. Access them even without an internet connection.';
+
+  @override
+  String get onboardingGesturesTitle => 'Smart Gestures';
+
+  @override
+  String get onboardingGesturesDesc =>
+      'Swipe left to delete, swipe right to complete. Long press for more options.';
+
+  @override
+  String get getStarted => 'Get Started';
+
+  @override
+  String get next => 'Next';
+
+  @override
+  String get searchTasksHint => 'Search tasks...';
+
+  @override
+  String get emptyTrash => 'Empty Trash';
 }

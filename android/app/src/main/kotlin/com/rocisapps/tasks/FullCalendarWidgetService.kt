@@ -99,24 +99,32 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
                     cellViews = RemoteViews(context.packageName, R.layout.widget_full_calendar_week_num_item)
                     val weekNum = day.optInt("weekNumber", 0)
                     cellViews.setTextViewText(R.id.widget_full_calendar_day_text, weekNum.toString())
-                } else {
-                    cellViews = RemoteViews(context.packageName, R.layout.widget_full_calendar_day_item)
-                    val dayNum = day.optInt("day", 1)
-                    val isToday = day.optBoolean("isToday", false)
-                    val isCurrentMonth = day.optBoolean("isCurrentMonth", true)
-                    val date = day.optString("date", "")
-
-                    cellViews.setTextViewText(R.id.widget_full_calendar_day_text, dayNum.toString())
-                    cellViews.setViewVisibility(R.id.widget_full_calendar_today_indicator, if (isToday) android.view.View.VISIBLE else android.view.View.GONE)
-                    
-                    val textColor = if (isToday) {
-                        android.graphics.Color.WHITE
-                    } else if (isCurrentMonth) {
-                        context.getColor(R.color.widget_title_text)
-                    } else {
-                        context.getColor(R.color.widget_secondary_text)
-                    }
-                    cellViews.setTextColor(R.id.widget_full_calendar_day_text, textColor)
+                 } else {
+                     cellViews = RemoteViews(context.packageName, R.layout.widget_full_calendar_day_item)
+                     val dayNum = day.optInt("day", 1)
+                     val dateStr = day.optString("date", "")
+                     val isCurrentMonth = day.optBoolean("isCurrentMonth", true)
+                     
+                     // Dynamically calculate isToday to ensure it's accurate even if data is cached
+                     val today = java.util.Calendar.getInstance()
+                     val currentTodayStr = String.format("%04d-%02d-%02d", 
+                         today.get(java.util.Calendar.YEAR),
+                         today.get(java.util.Calendar.MONTH) + 1,
+                         today.get(java.util.Calendar.DAY_OF_MONTH))
+                     
+                     val isToday = dateStr == currentTodayStr
+ 
+                     cellViews.setTextViewText(R.id.widget_full_calendar_day_text, dayNum.toString())
+                     cellViews.setViewVisibility(R.id.widget_full_calendar_today_indicator, if (isToday) android.view.View.VISIBLE else android.view.View.GONE)
+                     
+                     val textColor = if (isToday) {
+                         android.graphics.Color.WHITE
+                     } else if (isCurrentMonth) {
+                         context.getColor(R.color.widget_title_text)
+                     } else {
+                         context.getColor(R.color.widget_secondary_text)
+                     }
+                     cellViews.setTextColor(R.id.widget_full_calendar_day_text, textColor)
 
                     // Summaries (event/task titles)
                     val summaries = day.optJSONArray("summaries") ?: JSONArray()
@@ -129,15 +137,16 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
                     // Populate up to 3 summaries
                     for (j in 0 until minOf(3, summaries.length())) {
                         val summary = summaries.getJSONObject(j)
-                        var title = summary.optString("text", "")
+                        val title = summary.optString("text", "")
                         val time = summary.optString("time", "")
-                        val subtitle = summary.optString("subtitle", "")
                         val priority = summary.optString("priority", "")
                         val colorHex = summary.optString("color", "")
-                        val type = summary.optString("type", "")
 
-                        // Enhance title with details (Priority only, no time)
+                        // Enhance title with details (time and priority) - Title First
                         var displayTitle = title
+                        if (time.isNotEmpty()) {
+                            displayTitle = "$displayTitle $time"
+                        }
                         if (priority.isNotEmpty()) {
                             val prioritySymbol = when (priority.lowercase()) {
                                 "high" -> "!!!"
@@ -145,9 +154,9 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
                                 "low" -> "!"
                                 else -> ""
                             }
-                            displayTitle = "$prioritySymbol $displayTitle"
+                            displayTitle = "$displayTitle $prioritySymbol"
                         }
-                        
+
                         val viewId = when(j) {
                             0 -> R.id.widget_full_calendar_summary_1
                             1 -> R.id.widget_full_calendar_summary_2
@@ -169,16 +178,16 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
                         }
                     }
 
-                    // Click Intent to open app to specific date
-                    if (date.isNotEmpty()) {
-                        val fillInIntent = Intent().apply {
-                            action = Intent.ACTION_VIEW
-                            // Use host-only deep link to avoid GoRouter "route not found" errors.
-                            // The app handles host-based widget links and navigates to the calendar tab.
-                            data = Uri.parse("rocistasks://calendar")
-                        }
-                        cellViews.setOnClickFillInIntent(R.id.widget_full_calendar_day_container, fillInIntent)
-                    }
+                     // Click Intent to open app to specific date
+                     if (dateStr.isNotEmpty()) {
+                         val fillInIntent = Intent().apply {
+                             action = Intent.ACTION_VIEW
+                             // Use host-only deep link to avoid GoRouter "route not found" errors.
+                             // The app handles host-based widget links and navigates to the calendar tab.
+                             data = Uri.parse("rocistasks://calendar")
+                         }
+                         cellViews.setOnClickFillInIntent(R.id.widget_full_calendar_day_container, fillInIntent)
+                     }
                 }
                 rowViews.addView(R.id.widget_full_calendar_row_container, cellViews)
             }

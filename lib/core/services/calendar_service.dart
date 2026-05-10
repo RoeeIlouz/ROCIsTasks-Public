@@ -43,6 +43,17 @@ class CalendarService {
     return [];
   }
 
+  Future<Map<String, String>> getCalendarColors() async {
+    final calendars = await getAvailableCalendars();
+    final Map<String, String> colorMap = {};
+    for (var calendar in calendars) {
+      if (calendar.id != null && calendar.color != null) {
+        colorMap[calendar.id!] = '#${calendar.color!.toRadixString(16).padLeft(8, '0')}';
+      }
+    }
+    return colorMap;
+  }
+
   Future<List<Event>> getEvents({
     DateTime? startDate,
     DateTime? endDate,

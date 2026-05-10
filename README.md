@@ -24,7 +24,7 @@
 - **🎨 Modern UI/UX**
   - **Material You**: Dynamic color themes derived from your device's wallpaper (Android).
   - **Dark Mode**: Fully supported, eye-friendly dark theme.
-  - **Localization**: Support for English and Hebrew.
+  - **Localization**: Support for English, Hebrew, and Spanish.
 
 ## 🏗️ Architecture
 

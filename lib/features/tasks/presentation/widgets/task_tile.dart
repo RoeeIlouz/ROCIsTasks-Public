@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/features/categories/domain/models/category.dart';
@@ -107,7 +108,10 @@ class TaskTile extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.only(top: 2),
                         child: GestureDetector(
-                          onTap: onToggle,
+                        onTap: () {
+                          HapticFeedback.lightImpact();
+                          onToggle();
+                        },
                           child: Semantics(
                             label: task.isCompleted
                                 ? 'Mark task as incomplete'
@@ -217,7 +221,12 @@ class TaskTile extends StatelessWidget {
                                               : _timeFormat12.format(
                                                   task.dueDate!,
                                                 ),
-                                          color: theme.colorScheme.primary,
+                                          color: (!task.isCompleted &&
+                                                  task.dueDate!.isBefore(
+                                                    DateTime.now(),
+                                                  ))
+                                              ? theme.colorScheme.error
+                                              : theme.colorScheme.primary,
                                         ),
                                     ],
                                   ),
@@ -248,6 +257,7 @@ class TaskTile extends StatelessWidget {
                                       : theme.disabledColor,
                                 ),
                                 onPressed: () {
+                                  HapticFeedback.lightImpact();
                                   Provider.of<TaskProvider>(
                                     context,
                                     listen: false,

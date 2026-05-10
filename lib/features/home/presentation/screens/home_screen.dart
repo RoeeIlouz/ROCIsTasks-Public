@@ -30,6 +30,8 @@ class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
   late final PageController _pageController;
   StreamSubscription? _notificationActionSubscription;
+  bool _isSearching = false;
+  final TextEditingController _searchController = TextEditingController();
 
   // Widget channel for receiving deep links from Android
   static const _widgetChannel = MethodChannel('com.rocisapps.tasks/widget');
@@ -143,6 +145,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void dispose() {
     _pageController.dispose();
+    _searchController.dispose();
     _notificationActionSubscription?.cancel();
     super.dispose();
   }
@@ -154,6 +157,13 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _onItemTapped(int index) {
+    if (_isSearching) {
+      setState(() {
+        _isSearching = false;
+        _searchController.clear();
+      });
+      Provider.of<TaskProvider>(context, listen: false).setSearchQuery('');
+    }
     _pageController.animateToPage(
       index,
       duration: const Duration(milliseconds: 400),
@@ -164,6 +174,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
     final taskProvider = Provider.of<TaskProvider>(context);
 
     if (taskProvider.taskToEdit != null) {
@@ -179,16 +190,44 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          _currentIndex == 0
-              ? l10n.myTasks
-              : _currentIndex == 1
-              ? l10n.calendar
-              : l10n.settings,
-          style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
-        ),
+        title: _isSearching && _currentIndex == 0
+            ? TextField(
+                controller: _searchController,
+                autofocus: true,
+                style: GoogleFonts.outfit(fontSize: 16),
+                decoration: InputDecoration(
+                  hintText: l10n.searchTasksHint,
+                  border: InputBorder.none,
+                  hintStyle: GoogleFonts.outfit(
+                    color: theme.disabledColor.withValues(alpha: 0.5),
+                  ),
+                ),
+                onChanged: (value) {
+                  Provider.of<TaskProvider>(context, listen: false).setSearchQuery(value);
+                },
+              )
+            : Text(
+                _currentIndex == 0
+                    ? l10n.myTasks
+                    : _currentIndex == 1
+                    ? l10n.calendar
+                    : l10n.settings,
+                style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
+              ),
         actions: [
           if (_currentIndex == 0) ...[
+            IconButton(
+              icon: Icon(_isSearching ? Icons.close : Icons.search),
+              onPressed: () {
+                setState(() {
+                  if (_isSearching) {
+                    _searchController.clear();
+                    Provider.of<TaskProvider>(context, listen: false).setSearchQuery('');
+                  }
+                  _isSearching = !_isSearching;
+                });
+              },
+            ),
             IconButton(
               icon: const Icon(Icons.dashboard_customize_outlined),
               tooltip: l10n.categories,

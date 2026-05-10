@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:rocis_tasks/features/onboarding/data/services/onboarding_service.dart';
 import 'package:rocis_tasks/features/home/presentation/screens/home_screen.dart';
+import 'package:rocis_tasks/l10n/app_localizations.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -15,31 +16,32 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
-  final List<_OnboardingPage> _pages = [
-    const _OnboardingPage(
-      title: "Welcome to ROCI's Tasks",
-      description: "Organize your life with efficiency and style.",
-      icon: Icons.check_circle_outline,
-      color: Color(0xFF6C63FF),
-    ),
-    const _OnboardingPage(
-      title: "Sync & Offline",
-      description:
-          "Your tasks follow you everywhere. Access them even without an internet connection.",
-      icon: Icons.cloud_sync_outlined,
-      color: Color(0xFF00BFA5),
-    ),
-    const _OnboardingPage(
-      title: "Smart Gestures",
-      description:
-          "Swipe left to delete, swipe right to complete. Long press for more options.",
-      icon: Icons.touch_app_outlined,
-      color: Color(0xFFFF6D00),
-    ),
-  ];
+  List<_OnboardingPage> _buildPages(AppLocalizations l10n) => [
+        _OnboardingPage(
+          title: l10n.onboardingWelcomeTitle,
+          description: l10n.onboardingWelcomeDesc,
+          icon: Icons.check_circle_outline,
+          color: const Color(0xFF6C63FF),
+        ),
+        _OnboardingPage(
+          title: l10n.onboardingSyncTitle,
+          description: l10n.onboardingSyncDesc,
+          icon: Icons.cloud_sync_outlined,
+          color: const Color(0xFF00BFA5),
+        ),
+        _OnboardingPage(
+          title: l10n.onboardingGesturesTitle,
+          description: l10n.onboardingGesturesDesc,
+          icon: Icons.touch_app_outlined,
+          color: const Color(0xFFFF6D00),
+        ),
+      ];
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final pages = _buildPages(l10n);
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: SafeArea(
@@ -48,14 +50,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             Expanded(
               child: PageView.builder(
                 controller: _pageController,
-                itemCount: _pages.length,
+                itemCount: pages.length,
                 onPageChanged: (index) {
                   setState(() {
                     _currentPage = index;
                   });
                 },
                 itemBuilder: (context, index) {
-                  final page = _pages[index];
+                  final page = pages[index];
                   return Padding(
                     padding: const EdgeInsets.all(32.0),
                     child: Column(
@@ -67,7 +69,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             color: page.color.withValues(alpha: 0.1),
                             shape: BoxShape.circle,
                           ),
-                          child: Icon(page.icon, size: 100, color: page.color),
+                          child: Icon(
+                            page.icon,
+                            size: 100,
+                            color: page.color,
+                          ),
                         ),
                         const SizedBox(height: 48),
                         Text(
@@ -102,7 +108,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: List.generate(
-                      _pages.length,
+                      pages.length,
                       (index) => AnimatedContainer(
                         duration: const Duration(milliseconds: 300),
                         margin: const EdgeInsets.symmetric(horizontal: 4),
@@ -110,7 +116,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         width: _currentPage == index ? 24 : 8,
                         decoration: BoxDecoration(
                           color: _currentPage == index
-                              ? _pages[index].color
+                              ? pages[index].color
                               : Colors.grey[800],
                           borderRadius: BorderRadius.circular(4),
                         ),
@@ -123,7 +129,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     height: 56,
                     child: ElevatedButton(
                       onPressed: () async {
-                        if (_currentPage < _pages.length - 1) {
+                        if (_currentPage < pages.length - 1) {
                           _pageController.nextPage(
                             duration: const Duration(milliseconds: 300),
                             curve: Curves.easeInOut,
@@ -144,7 +150,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         }
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: _pages[_currentPage].color,
+                        backgroundColor: pages[_currentPage].color,
                         foregroundColor: Colors.white,
                         elevation: 0,
                         shape: RoundedRectangleBorder(
@@ -152,9 +158,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         ),
                       ),
                       child: Text(
-                        _currentPage == _pages.length - 1
-                            ? "Get Started"
-                            : "Next",
+                        _currentPage == pages.length - 1
+                            ? l10n.getStarted
+                            : l10n.next,
                         style: GoogleFonts.outfit(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,

@@ -6,6 +6,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
 import 'app_localizations_en.dart';
+import 'app_localizations_es.dart';
 import 'app_localizations_he.dart';
 
 // ignore_for_file: type=lint
@@ -95,6 +96,7 @@ abstract class AppLocalizations {
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
     Locale('en'),
+    Locale('es'),
     Locale('he'),
   ];
 
@@ -265,6 +267,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'English'**
   String get english;
+
+  /// No description provided for @spanish.
+  ///
+  /// In en, this message translates to:
+  /// **'Spanish'**
+  String get spanish;
 
   /// No description provided for @tasks.
   ///
@@ -583,6 +591,456 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Offline Mode'**
   String get offlineMode;
+
+  /// No description provided for @syncComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync complete'**
+  String get syncComplete;
+
+  /// No description provided for @backupAndRestore.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup & Restore'**
+  String get backupAndRestore;
+
+  /// No description provided for @exportData.
+  ///
+  /// In en, this message translates to:
+  /// **'Export Data (JSON)'**
+  String get exportData;
+
+  /// No description provided for @exportDataSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup your tasks and categories'**
+  String get exportDataSubtitle;
+
+  /// No description provided for @backupCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup copied to clipboard!'**
+  String get backupCopied;
+
+  /// No description provided for @exportFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Export failed: {error}'**
+  String exportFailed(String error);
+
+  /// No description provided for @importData.
+  ///
+  /// In en, this message translates to:
+  /// **'Import Data (JSON)'**
+  String get importData;
+
+  /// No description provided for @importDataSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore from a JSON backup'**
+  String get importDataSubtitle;
+
+  /// No description provided for @importBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'Import Backup'**
+  String get importBackup;
+
+  /// No description provided for @pasteJsonHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste JSON backup here...'**
+  String get pasteJsonHint;
+
+  /// No description provided for @import.
+  ///
+  /// In en, this message translates to:
+  /// **'Import'**
+  String get import;
+
+  /// No description provided for @importComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Import complete!'**
+  String get importComplete;
+
+  /// No description provided for @importFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Import failed: {error}'**
+  String importFailed(String error);
+
+  /// No description provided for @privacyAndGdpr.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy & GDPR'**
+  String get privacyAndGdpr;
+
+  /// No description provided for @privacyPolicy.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy Policy'**
+  String get privacyPolicy;
+
+  /// No description provided for @privacyPolicySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Read our data security terms'**
+  String get privacyPolicySubtitle;
+
+  /// No description provided for @deleteAccountTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete My Account & Data'**
+  String get deleteAccountTitle;
+
+  /// No description provided for @deleteAccountSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Permanently remove all your data'**
+  String get deleteAccountSubtitle;
+
+  /// No description provided for @deleteAccountConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Account?'**
+  String get deleteAccountConfirmTitle;
+
+  /// No description provided for @deleteAccountConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This action is permanent and will remove all your tasks, categories, and settings from our servers.'**
+  String get deleteAccountConfirmBody;
+
+  /// No description provided for @deleteEverything.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Everything'**
+  String get deleteEverything;
+
+  /// No description provided for @deletionFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Deletion failed. You may need to sign out and back in first for security.'**
+  String get deletionFailed;
+
+  /// No description provided for @about.
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get about;
+
+  /// No description provided for @aboutApp.
+  ///
+  /// In en, this message translates to:
+  /// **'About ROCI\'s Tasks'**
+  String get aboutApp;
+
+  /// No description provided for @aboutAppSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'App version, support, and info'**
+  String get aboutAppSubtitle;
+
+  /// No description provided for @aboutAppDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'ROCI\'s Tasks is designed to help you stay organized and productive. Built with Flutter, it provides a seamless experience for managing your daily tasks, categories, and schedule.'**
+  String get aboutAppDescription;
+
+  /// No description provided for @visitWebsite.
+  ///
+  /// In en, this message translates to:
+  /// **'Visit our Website'**
+  String get visitWebsite;
+
+  /// No description provided for @contactSupport.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact Support'**
+  String get contactSupport;
+
+  /// No description provided for @rocisTasksPro.
+  ///
+  /// In en, this message translates to:
+  /// **'ROCIs Tasks Pro'**
+  String get rocisTasksPro;
+
+  /// No description provided for @youAreProUser.
+  ///
+  /// In en, this message translates to:
+  /// **'You are a Pro user!'**
+  String get youAreProUser;
+
+  /// No description provided for @unlockPremiumFeatures.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock premium features'**
+  String get unlockPremiumFeatures;
+
+  /// No description provided for @manageSubscription.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage Subscription'**
+  String get manageSubscription;
+
+  /// No description provided for @manageSubscriptionSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel or change your plan'**
+  String get manageSubscriptionSubtitle;
+
+  /// No description provided for @upgradeToPro.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade to Pro'**
+  String get upgradeToPro;
+
+  /// No description provided for @unlockFullPotential.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock your full potential'**
+  String get unlockFullPotential;
+
+  /// No description provided for @unlimitedCategories.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlimited Categories'**
+  String get unlimitedCategories;
+
+  /// No description provided for @unlimitedCategoriesDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Create as many categories as you need to stay organized.'**
+  String get unlimitedCategoriesDesc;
+
+  /// No description provided for @premiumWidgets.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium Widgets'**
+  String get premiumWidgets;
+
+  /// No description provided for @premiumWidgetsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Access to Month and Full Calendar home screen widgets.'**
+  String get premiumWidgetsDesc;
+
+  /// No description provided for @subtasksAndChecklists.
+  ///
+  /// In en, this message translates to:
+  /// **'Subtasks & Checklists'**
+  String get subtasksAndChecklists;
+
+  /// No description provided for @subtasksAndChecklistsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Break down complex tasks into smaller, manageable steps.'**
+  String get subtasksAndChecklistsDesc;
+
+  /// No description provided for @recurringTasks.
+  ///
+  /// In en, this message translates to:
+  /// **'Recurring Tasks'**
+  String get recurringTasks;
+
+  /// No description provided for @recurringTasksDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Automate your routine with flexible repetition rules.'**
+  String get recurringTasksDesc;
+
+  /// No description provided for @viewPricingPlans.
+  ///
+  /// In en, this message translates to:
+  /// **'View Pricing Plans'**
+  String get viewPricingPlans;
+
+  /// No description provided for @proSubscriptionActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Pro Subscription Active'**
+  String get proSubscriptionActive;
+
+  /// No description provided for @purchasesRestored.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchases restored successfully!'**
+  String get purchasesRestored;
+
+  /// No description provided for @noActiveSubscription.
+  ///
+  /// In en, this message translates to:
+  /// **'No active subscription found for this account.'**
+  String get noActiveSubscription;
+
+  /// No description provided for @failedToRestore.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to restore purchases.'**
+  String get failedToRestore;
+
+  /// No description provided for @restorePurchases.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore Purchases'**
+  String get restorePurchases;
+
+  /// No description provided for @subtasks.
+  ///
+  /// In en, this message translates to:
+  /// **'Subtasks'**
+  String get subtasks;
+
+  /// No description provided for @noSubtasksAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'No subtasks added'**
+  String get noSubtasksAdded;
+
+  /// No description provided for @enterSubtask.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter subtask...'**
+  String get enterSubtask;
+
+  /// No description provided for @recurrence.
+  ///
+  /// In en, this message translates to:
+  /// **'Recurrence'**
+  String get recurrence;
+
+  /// No description provided for @repeat.
+  ///
+  /// In en, this message translates to:
+  /// **'Repeat'**
+  String get repeat;
+
+  /// No description provided for @repeatNone.
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get repeatNone;
+
+  /// No description provided for @repeatDaily.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily'**
+  String get repeatDaily;
+
+  /// No description provided for @repeatWeekly.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly'**
+  String get repeatWeekly;
+
+  /// No description provided for @repeatMonthly.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly'**
+  String get repeatMonthly;
+
+  /// No description provided for @titleInvalidContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Title contains invalid content'**
+  String get titleInvalidContent;
+
+  /// No description provided for @descriptionInvalidContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Description contains invalid content'**
+  String get descriptionInvalidContent;
+
+  /// No description provided for @failedToSaveTask.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save task. Please try again.'**
+  String get failedToSaveTask;
+
+  /// No description provided for @welcomeToApp.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to ROCI\'s Tasks'**
+  String get welcomeToApp;
+
+  /// No description provided for @signInToSync.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to sync your tasks across devices'**
+  String get signInToSync;
+
+  /// No description provided for @signInWithGoogle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with Google'**
+  String get signInWithGoogle;
+
+  /// No description provided for @signInFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in failed'**
+  String get signInFailed;
+
+  /// No description provided for @onboardingWelcomeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to ROCI\'s Tasks'**
+  String get onboardingWelcomeTitle;
+
+  /// No description provided for @onboardingWelcomeDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Organize your life with efficiency and style.'**
+  String get onboardingWelcomeDesc;
+
+  /// No description provided for @onboardingSyncTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync & Offline'**
+  String get onboardingSyncTitle;
+
+  /// No description provided for @onboardingSyncDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Your tasks follow you everywhere. Access them even without an internet connection.'**
+  String get onboardingSyncDesc;
+
+  /// No description provided for @onboardingGesturesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Smart Gestures'**
+  String get onboardingGesturesTitle;
+
+  /// No description provided for @onboardingGesturesDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Swipe left to delete, swipe right to complete. Long press for more options.'**
+  String get onboardingGesturesDesc;
+
+  /// No description provided for @getStarted.
+  ///
+  /// In en, this message translates to:
+  /// **'Get Started'**
+  String get getStarted;
+
+  /// No description provided for @next.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get next;
+
+  /// No description provided for @searchTasksHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search tasks...'**
+  String get searchTasksHint;
+
+  /// No description provided for @emptyTrash.
+  ///
+  /// In en, this message translates to:
+  /// **'Empty Trash'**
+  String get emptyTrash;
 }
 
 class _AppLocalizationsDelegate
@@ -596,7 +1054,7 @@ class _AppLocalizationsDelegate
 
   @override
   bool isSupported(Locale locale) =>
-      <String>['en', 'he'].contains(locale.languageCode);
+      <String>['en', 'es', 'he'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
@@ -607,6 +1065,8 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
   switch (locale.languageCode) {
     case 'en':
       return AppLocalizationsEn();
+    case 'es':
+      return AppLocalizationsEs();
     case 'he':
       return AppLocalizationsHe();
   }

@@ -167,7 +167,7 @@ class BackgroundHandler {
     try {
       await AppInitializer.initialize(isBackground: true);
 
-      final box = await Hive.openBox<Task>('tasks');
+      final box = await Hive.openBox<Task>(LocalTaskSource.boxName);
       final task = box.values.firstWhere((t) => t.id == taskId);
       task.isCompleted = true;
       await task.save();

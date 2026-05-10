@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rocis_tasks/core/services/subscription_service.dart';
+import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:rocis_tasks/features/premium/presentation/screens/paywall_screen.dart';
@@ -18,13 +19,14 @@ class _PremiumScreenState extends State<PremiumScreen> {
   @override
   Widget build(BuildContext context) {
     final subscriptionService = Provider.of<SubscriptionService>(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return Stack(
       children: [
         Scaffold(
           appBar: AppBar(
             title: Text(
-              "ROCIs Tasks Pro",
+              l10n.rocisTasksPro,
               style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
             ),
           ),
@@ -41,39 +43,39 @@ class _PremiumScreenState extends State<PremiumScreen> {
                       child: FadeInAnimation(child: widget),
                     ),
                     children: [
-                      _buildHero(context),
+                      _buildHero(context, l10n),
                       const SizedBox(height: 32),
                       _buildFeature(
                         context,
                         Icons.dashboard_customize_rounded,
-                        "Unlimited Categories",
-                        "Create as many categories as you need to stay organized.",
+                        l10n.unlimitedCategories,
+                        l10n.unlimitedCategoriesDesc,
                       ),
                       _buildFeature(
                         context,
                         Icons.widgets_rounded,
-                        "Premium Widgets",
-                        "Access to Month and Full Calendar home screen widgets.",
+                        l10n.premiumWidgets,
+                        l10n.premiumWidgetsDesc,
                       ),
                       _buildFeature(
                         context,
                         Icons.checklist_rounded,
-                        "Subtasks & Checklists",
-                        "Break down complex tasks into smaller, manageable steps.",
+                        l10n.subtasksAndChecklists,
+                        l10n.subtasksAndChecklistsDesc,
                       ),
                       _buildFeature(
                         context,
                         Icons.repeat_rounded,
-                        "Recurring Tasks",
-                        "Automate your routine with flexible repetition rules.",
+                        l10n.recurringTasks,
+                        l10n.recurringTasksDesc,
                       ),
                       const SizedBox(height: 48),
                       if (subscriptionService.isPremium)
-                        _buildActiveStatus(context)
+                        _buildActiveStatus(context, l10n)
                       else
-                        _buildSubscribeButton(context, subscriptionService),
+                        _buildSubscribeButton(context, subscriptionService, l10n),
                       const SizedBox(height: 16),
-                      _buildRestoreButton(context, subscriptionService),
+                      _buildRestoreButton(context, subscriptionService, l10n),
                     ],
                   ),
                 ),
@@ -90,7 +92,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
     );
   }
 
-  Widget _buildHero(BuildContext context) {
+  Widget _buildHero(BuildContext context, AppLocalizations l10n) {
     final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 40),
@@ -107,7 +109,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
           const Icon(Icons.stars_rounded, size: 64, color: Colors.white),
           const SizedBox(height: 16),
           Text(
-            "Upgrade to Pro",
+            l10n.upgradeToPro,
             style: GoogleFonts.outfit(
               fontSize: 28,
               fontWeight: FontWeight.bold,
@@ -116,7 +118,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            "Unlock your full potential",
+            l10n.unlockFullPotential,
             style: GoogleFonts.outfit(
               fontSize: 16,
               color: Colors.white.withValues(alpha: 0.8),
@@ -180,6 +182,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
   Widget _buildSubscribeButton(
     BuildContext context,
     SubscriptionService subscriptionService,
+    AppLocalizations l10n,
   ) {
     return FilledButton(
       onPressed: () {
@@ -195,13 +198,13 @@ class _PremiumScreenState extends State<PremiumScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
       child: Text(
-        "View Pricing Plans",
+        l10n.viewPricingPlans,
         style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold),
       ),
     );
   }
 
-  Widget _buildActiveStatus(BuildContext context) {
+  Widget _buildActiveStatus(BuildContext context, AppLocalizations l10n) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -215,7 +218,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
           const Icon(Icons.check_circle_rounded, color: Colors.green),
           const SizedBox(width: 12),
           Text(
-            "Pro Subscription Active",
+            l10n.proSubscriptionActive,
             style: GoogleFonts.outfit(
               color: Colors.green,
               fontWeight: FontWeight.bold,
@@ -230,6 +233,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
   Widget _buildRestoreButton(
     BuildContext context,
     SubscriptionService subscriptionService,
+    AppLocalizations l10n,
   ) {
     return TextButton(
       onPressed: _isLoading
@@ -239,18 +243,20 @@ class _PremiumScreenState extends State<PremiumScreen> {
               try {
                 await subscriptionService.restorePurchases();
                 if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text("Purchases restored successfully!"),
-                    ),
-                  );
+                  if (subscriptionService.isPremium) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(l10n.purchasesRestored)),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(l10n.noActiveSubscription)),
+                    );
+                  }
                 }
               } catch (e) {
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text("Failed to restore purchases."),
-                    ),
+                    SnackBar(content: Text(l10n.failedToRestore)),
                   );
                 }
               } finally {
@@ -258,7 +264,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
               }
             },
       child: Text(
-        "Restore Purchases",
+        l10n.restorePurchases,
         style: GoogleFonts.outfit(fontWeight: FontWeight.w500),
       ),
     );
