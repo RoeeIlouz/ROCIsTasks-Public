@@ -14,6 +14,8 @@ import 'package:rocis_tasks/features/tasks/data/datasources/local_task_source.da
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/features/tasks/services/task_widget_service.dart';
 import 'package:rocis_tasks/core/services/logger_service.dart';
+import 'package:rocis_tasks/l10n/app_localizations.dart';
+import 'dart:ui';
 
 @pragma('vm:entry-point')
 class BackgroundHandler {
@@ -233,11 +235,20 @@ class BackgroundHandler {
         isDarkText: isDarkText,
       );
 
+      final l10n = lookupAppLocalizations(PlatformDispatcher.instance.locale);
+
       await notificationService.showTaskCountNotification(
         pendingTasks.length,
         pendingTasks.map((t) => t.title).toList(),
         largeIconPath: chartPath,
         isDarkText: isDarkText,
+        uncompletedTasksLabel: l10n.notificationUncompletedTasks(
+          pendingTasks.length,
+        ),
+        tasksRemainingLabel: l10n.notificationTasksRemaining,
+        tasksSummaryLabel: l10n.notificationTasksSummary(
+          pendingTasks.length,
+        ),
       );
     } catch (e) {
       AppLogger.error('Background task error', error: e, tag: 'Background');

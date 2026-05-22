@@ -24,6 +24,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appearance => 'Appearance';
 
   @override
+  String get theme => 'Theme';
+
+  @override
+  String get systemDefault => 'System Default';
+
+  @override
+  String get lightMode => 'Light Mode';
+
+  @override
   String get darkMode => 'Dark Mode';
 
   @override
@@ -186,7 +195,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get trashEmpty => 'Trash is empty';
 
   @override
-  String restoredTask(Object title) {
+  String restoredTask(String title) {
     return 'Restored $title';
   }
 
@@ -404,6 +413,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get proSubscriptionActive => 'Pro Subscription Active';
 
   @override
+  String get welcomeToPro => 'Welcome to Pro!';
+
+  @override
+  String get pickAPlan => 'Pick a Plan';
+
+  @override
+  String get byContinuingAgreement => 'By continuing, you agree to our';
+
+  @override
   String get purchasesRestored => 'Purchases restored successfully!';
 
   @override
@@ -493,8 +511,263 @@ class AppLocalizationsEn extends AppLocalizations {
   String get next => 'Next';
 
   @override
+  String get insights => 'Insights';
+
+  @override
   String get searchTasksHint => 'Search tasks...';
 
   @override
   String get emptyTrash => 'Empty Trash';
+
+  @override
+  String get productivityTrend => 'Productivity Trend';
+
+  @override
+  String get categoryBreakdown => 'Category Breakdown';
+
+  @override
+  String get completed => 'Completed';
+
+  @override
+  String get pending => 'Pending';
+
+  @override
+  String taskReminderTitle(String title) {
+    return 'Task Reminder: $title';
+  }
+
+  @override
+  String get taskDueNowBody => 'You have a task due now!';
+
+  @override
+  String get createFirstTask => 'Create your first task';
+
+  @override
+  String get filterToday => 'Today';
+
+  @override
+  String get filterThisWeek => 'This Week';
+
+  @override
+  String get filterOverdue => 'Overdue';
+
+  @override
+  String get filterNoDate => 'No Date';
+
+  @override
+  String get dateRange => 'Date Filter';
+
+  @override
+  String get recurringTaskScheduled => 'Recurring Task Scheduled';
+
+  @override
+  String nextOccurrenceSet(String title, String date) {
+    return 'Next occurrence of \"$title\" set for $date';
+  }
+
+  @override
+  String get initializationFailedError =>
+      'Failed to initialize app data. Please restart.';
+
+  @override
+  String get noTaskDataAvailable => 'No task data available';
+
+  @override
+  String get retryInitialization => 'Retry Initialization';
+
+  @override
+  String get criticalErrorTitle => 'CRITICAL ERROR';
+
+  @override
+  String get appStartupErrorBody =>
+      'ROCI\'s Tasks encountered a problem during startup. Our team has been notified.';
+
+  @override
+  String get appTagline => 'Dotting the i\'s and crossing the t\'s';
+
+  @override
+  String get termsOfService => 'Terms of Service';
+
+  @override
+  String get allDay => 'All Day';
+
+  @override
+  String get event => 'Event';
+
+  @override
+  String get markAsIncomplete => 'Mark as incomplete';
+
+  @override
+  String get markAsComplete => 'Mark as complete';
+
+  @override
+  String get editTaskDetailsHint => 'Double tap to edit task details';
+
+  @override
+  String get pinTask => 'Pin task';
+
+  @override
+  String get unpinTask => 'Unpin task';
+
+  @override
+  String get notificationSnooze => 'Snooze 15m';
+
+  @override
+  String get notificationMarkCompleted => 'Mark Completed';
+
+  @override
+  String get notificationOpenTask => 'Open Task';
+
+  @override
+  String notificationUncompletedTasks(int count) {
+    return '$count Uncompleted Tasks';
+  }
+
+  @override
+  String get notificationTasksRemaining => 'Tasks Remaining';
+
+  @override
+  String notificationTasksSummary(int count) {
+    return '$count Tasks';
+  }
+
+  @override
+  String get skip => 'Skip';
+
+  @override
+  String get productivity => 'Productivity';
+
+  @override
+  String get smartAdd => 'Smart Add (NLP)';
+
+  @override
+  String get autoRemoveNlpDates => 'Clean Title';
+
+  @override
+  String get autoRemoveNlpDatesSubtitle =>
+      'Remove date/time from title when suggested';
+
+  @override
+  String get email => 'Email';
+
+  @override
+  String get password => 'Password';
+
+  @override
+  String get signIn => 'Sign In';
+
+  @override
+  String get register => 'Register';
+
+  @override
+  String get createAccount => 'Create Account';
+
+  @override
+  String get forgotPassword => 'Forgot Password?';
+
+  @override
+  String get resetPassword => 'Reset Password';
+
+  @override
+  String get dontHaveAccount => 'Don\'t have an account?';
+
+  @override
+  String get alreadyHaveAccount => 'Already have an account?';
+
+  @override
+  String get invalidEmail => 'Please enter a valid email';
+
+  @override
+  String get passwordTooShort => 'Password must be at least 6 characters';
+
+  @override
+  String get passwordsDoNotMatch => 'Passwords do not match';
+
+  @override
+  String get confirmPassword => 'Confirm Password';
+
+  @override
+  String get passwordResetEmailSent => 'Password reset email sent';
+
+  @override
+  String get showTaskCounterNotification => 'Show Task Counter';
+
+  @override
+  String get showTaskCounterNotificationSubtitle =>
+      'Display a persistent notification with your task count';
+
+  @override
+  String get appGuide => 'App Guide';
+
+  @override
+  String get appGuideSubtitle => 'Learn how to use ROCI\'s Tasks';
+
+  @override
+  String get appGuideTitle => 'App Guide';
+
+  @override
+  String get features => 'Features';
+
+  @override
+  String get howToUse => 'How to Use';
+
+  @override
+  String get guideTaskDesc =>
+      'Create, edit, and organize your daily tasks with ease.';
+
+  @override
+  String get guideCalendarDesc =>
+      'View your tasks and events in a beautiful calendar view.';
+
+  @override
+  String get guideCategoriesDesc =>
+      'Organize tasks into custom categories with unique icons and colors.';
+
+  @override
+  String get guideNotificationsTitle => 'Notifications';
+
+  @override
+  String get guideNotificationsDesc =>
+      'Stay on top of your schedule with smart reminders and a persistent task counter.';
+
+  @override
+  String get guideCloudSyncTitle => 'Cloud Sync';
+
+  @override
+  String get guideCloudSyncDesc =>
+      'Access your tasks from any device with secure cloud synchronization.';
+
+  @override
+  String get guideAddingTasksTitle => 'Adding Tasks';
+
+  @override
+  String get guideAddingTasksDesc =>
+      'Tap the + button to add a new task. Use natural language (e.g., \"Lunch tomorrow at 1pm\") for quick entry.';
+
+  @override
+  String get guideGesturesTitle => 'Gestures';
+
+  @override
+  String get guideGesturesDesc =>
+      'Swipe right to complete a task, swipe left to delete it. Long-press for more options.';
+
+  @override
+  String get guideWidgetsTitle => 'Home Widgets';
+
+  @override
+  String get guideWidgetsDesc =>
+      'Add ROCI\'s Tasks widgets to your home screen for quick access and status updates.';
+
+  @override
+  String get guideCustomizationTitle => 'Customization';
+
+  @override
+  String get guideCustomizationDesc =>
+      'Personalize your experience in Settings with themes, language options, and more.';
+
+  @override
+  String get guideHappyOrganizing => 'Happy Organizing!';
+
+  @override
+  String get notificationRefreshed => 'Task counter notification refreshed';
 }

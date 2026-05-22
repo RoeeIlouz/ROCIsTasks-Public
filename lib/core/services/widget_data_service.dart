@@ -302,8 +302,27 @@ class WidgetDataService {
       );
       for (var event in calendarEvents) {
         if (event.start != null) {
-          final dateKey = DateFormat('yyyy-MM-dd').format(event.start!);
-          eventsByDay[dateKey] = true;
+          final eventStart = DateTime(event.start!.year, event.start!.month, event.start!.day);
+          final end = event.end ?? event.start!.add(const Duration(hours: 1));
+          final eventEnd = DateTime(end.year, end.month, end.day);
+          
+          var current = eventStart;
+          while (current.isBefore(eventEnd) || _isSameDay(current, eventEnd)) {
+            // Exclusive end check - skip for all-day events
+            if (current == eventEnd &&
+                event.allDay != true &&
+                end.hour == 0 &&
+                end.minute == 0 &&
+                end.second == 0 &&
+                end.millisecond == 0 &&
+                current != eventStart) {
+              break;
+            }
+            
+            final dateKey = DateFormat('yyyy-MM-dd').format(current);
+            eventsByDay[dateKey] = true;
+            current = current.add(const Duration(days: 1));
+          }
         }
       }
     } catch (e, s) {
@@ -325,8 +344,27 @@ class WidgetDataService {
           end,
         );
         for (var event in scheduleEvents) {
-          final dateKey = DateFormat('yyyy-MM-dd').format(event.startTime);
-          eventsByDay[dateKey] = true;
+          final eventStart = DateTime(event.startTime.year, event.startTime.month, event.startTime.day);
+          final eventEnd = DateTime(event.endTime.year, event.endTime.month, event.endTime.day);
+          
+          var current = eventStart;
+          while (current.isBefore(eventEnd) || _isSameDay(current, eventEnd)) {
+            // For ROCIs-Schedule events, we treat the end date as inclusive to match the provider
+            // unless it's a specific timed event that ends exactly at midnight.
+            // However, most schedule events are classes/exams with specific times.
+            if (current == eventEnd &&
+                event.endTime.hour == 0 &&
+                event.endTime.minute == 0 &&
+                event.endTime.second == 0 &&
+                event.endTime.millisecond == 0 &&
+                current != eventStart) {
+              // We'll keep the break for now but note that Schedule events are usually timed
+              break;
+            }
+            final dateKey = DateFormat('yyyy-MM-dd').format(current);
+            eventsByDay[dateKey] = true;
+            current = current.add(const Duration(days: 1));
+          }
         }
 
         final assignments = await _scheduleService.getAssignments(
@@ -365,5 +403,9 @@ class WidgetDataService {
   /// Clear the schedule service cache (call when user logs out)
   void clearScheduleCache() {
     _scheduleService.clearCache();
+  }
+
+  bool _isSameDay(DateTime a, DateTime b) {
+    return a.year == b.year && a.month == b.month && a.day == b.day;
   }
 }

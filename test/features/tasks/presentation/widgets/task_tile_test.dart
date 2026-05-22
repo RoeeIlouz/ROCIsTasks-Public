@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:provider/provider.dart';
 import 'package:rocis_tasks/features/tasks/presentation/widgets/task_tile.dart';
@@ -7,6 +8,7 @@ import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
 import 'package:rocis_tasks/shared/ui/theme/theme_service.dart';
 import 'package:rocis_tasks/shared/ui/theme/app_theme.dart';
+import 'package:rocis_tasks/l10n/app_localizations.dart';
 
 class MockTaskProvider extends Mock implements TaskProvider {}
 
@@ -32,6 +34,15 @@ void main() {
       ],
       child: MaterialApp(
         theme: AppTheme.lightTheme,
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [
+          Locale('en', ''),
+        ],
         home: Scaffold(
           body: TaskTile(
             task: task,

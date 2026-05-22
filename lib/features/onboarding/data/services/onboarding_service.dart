@@ -1,19 +1,21 @@
 import 'package:flutter/foundation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:rocis_tasks/core/services/analytics_service.dart';
 
 class OnboardingService extends ChangeNotifier {
   static const String _onboardingCompleteKey = 'onboarding_complete';
-  final SharedPreferences _prefs;
   final AnalyticsService _analyticsService;
+  late final Box _settingsBox;
 
-  OnboardingService(this._prefs, {AnalyticsService? analyticsService})
-    : _analyticsService = analyticsService ?? AnalyticsService();
+  OnboardingService({AnalyticsService? analyticsService})
+    : _analyticsService = analyticsService ?? AnalyticsService() {
+    _settingsBox = Hive.box('settings');
+  }
 
-  bool get hasSeenOnboarding => _prefs.getBool(_onboardingCompleteKey) ?? false;
+  bool get hasSeenOnboarding => _settingsBox.get(_onboardingCompleteKey, defaultValue: false);
 
   Future<void> completeOnboarding() async {
-    await _prefs.setBool(_onboardingCompleteKey, true);
+    await _settingsBox.put(_onboardingCompleteKey, true);
     await _analyticsService.logOnboardingCompleted();
     notifyListeners();
   }

@@ -7,12 +7,14 @@ class ThemeService extends ChangeNotifier {
   bool _useMaterialTheme = true;
   bool _useAmoledTheme = false;
   bool _use24HourFormat = false;
+  bool _autoRemoveNlpDates = true;
   Locale? _locale;
 
   ThemeMode get themeMode => _themeMode;
   bool get useMaterialTheme => _useMaterialTheme;
   bool get useAmoledTheme => _useAmoledTheme;
   bool get use24HourFormat => _use24HourFormat;
+  bool get autoRemoveNlpDates => _autoRemoveNlpDates;
   Locale? get locale => _locale;
 
   Future<void> init() async {
@@ -28,6 +30,8 @@ class ThemeService extends ChangeNotifier {
     _useAmoledTheme = prefs.getBool('use_amoled_theme') ?? false;
     // Load 24h format
     _use24HourFormat = prefs.getBool('use_24h_format') ?? false;
+    // Load NLP settings
+    _autoRemoveNlpDates = prefs.getBool('auto_remove_nlp_dates') ?? true;
     // Load Locale
     final languageCode = prefs.getString('language_code');
     if (languageCode != null) {
@@ -82,6 +86,13 @@ class ThemeService extends ChangeNotifier {
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('use_24h_format', _use24HourFormat);
+  }
+
+  Future<void> toggleAutoRemoveNlpDates(bool value) async {
+    _autoRemoveNlpDates = value;
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('auto_remove_nlp_dates', _autoRemoveNlpDates);
   }
 
   Future<void> setLocale(Locale? locale) async {

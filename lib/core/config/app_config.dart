@@ -9,13 +9,13 @@ class AppConfig {
 
   // App information
   static const String appName = 'ROCI\'s Tasks';
-  static const String appVersion = '1.0.0';
+  static const String appVersion = '1.0.1';
   static const String supportEmail = 'support@ilouz.xyz';
   static const String privacyPolicyUrl =
-      'http://rocisapps.ilouz.xyz/privacy.html';
+      'https://rocisapps.ilouz.xyz/privacy.html';
   static const String termsOfServiceUrl =
-      'http://rocisapps.ilouz.xyz/terms.html';
-  static const String websiteUrl = 'http://rocisapps.ilouz.xyz';
+      'https://rocisapps.ilouz.xyz/terms.html';
+  static const String websiteUrl = 'https://rocisapps.ilouz.xyz';
 
   // Feature flags
   static const bool enableAnalytics = isProduction;
@@ -30,7 +30,6 @@ class AppConfig {
 
   // Security settings
   static const bool enableCertificatePinning = isProduction;
-  static const int sessionTimeoutMinutes = 30;
 
   // Performance settings
   static const int maxTasksPerPage = 50;
@@ -46,6 +45,9 @@ class AppConfig {
   static const int freeWidgetLimit =
       1; // For future use if we restrict widget count
 
+  // RevenueCat
+  static const String entitlementId = 'ROCIsApps Pro';
+
   /// Get configuration summary for debugging
   static Map<String, dynamic> getConfigSummary() {
     return {
@@ -58,7 +60,6 @@ class AppConfig {
       'enableDebugLogging': enableDebugLogging,
       'firebaseProjectId': firebaseProjectId,
       'enableCertificatePinning': enableCertificatePinning,
-      'sessionTimeoutMinutes': sessionTimeoutMinutes,
     };
   }
 }

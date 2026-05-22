@@ -1,5 +1,6 @@
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
@@ -9,6 +10,7 @@ import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.
 import 'package:rocis_tasks/core/services/validation_service.dart';
 import 'package:rocis_tasks/core/services/error_service.dart';
 import 'package:rocis_tasks/core/validation/validators.dart';
+import 'package:rocis_tasks/features/tasks/services/nlp_service.dart';
 
 import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:rocis_tasks/shared/ui/ui_kit.dart';
@@ -34,7 +36,9 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   ui.TextDirection _titleDirection = ui.TextDirection.ltr;
   ui.TextDirection _descriptionDirection = ui.TextDirection.ltr;
   List<SubTask> _subTasks = [];
+  List<TextEditingController> _subTaskControllers = [];
   String? _recurrenceRule;
+  NlpResult? _nlpSuggestion;
 
   @override
   void initState() {
@@ -50,6 +54,9 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     _descriptionDirection = _getTextDirection(_descriptionController.text);
     _subTasks =
         widget.task?.subTasks?.map((st) => st.copyWith()).toList() ?? [];
+    _subTaskControllers = _subTasks
+        .map((st) => TextEditingController(text: st.title))
+        .toList();
     _recurrenceRule = widget.task?.recurrenceRule;
   }
 
@@ -57,6 +64,9 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   void dispose() {
     _titleController.dispose();
     _descriptionController.dispose();
+    for (var controller in _subTaskControllers) {
+      controller.dispose();
+    }
     super.dispose();
   }
 
@@ -156,6 +166,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
             recurrenceRule: _recurrenceRule,
           );
         }
+        HapticFeedback.mediumImpact();
         Navigator.pop(context);
       } catch (e) {
         final l10n = AppLocalizations.of(context)!;
@@ -172,6 +183,22 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     return Bidi.detectRtlDirectionality(text)
         ? ui.TextDirection.rtl
         : ui.TextDirection.ltr;
+  }
+
+  void _applyNlpSuggestion() {
+    if (_nlpSuggestion == null || _nlpSuggestion!.dueDate == null) return;
+    
+    final themeService = Provider.of<ThemeService>(context, listen: false);
+    
+    setState(() {
+      _selectedDate = _nlpSuggestion!.dueDate;
+      if (themeService.autoRemoveNlpDates) {
+        _titleController.text = _nlpSuggestion!.title;
+        // Reset suggestion after applying and removing from title
+        _nlpSuggestion = null;
+      }
+    });
+    HapticFeedback.lightImpact();
   }
 
   String _getPriorityLabel(TaskPriority priority, AppLocalizations l10n) {
@@ -233,9 +260,29 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                 onChanged: (value) {
                   setState(() {
                     _titleDirection = _getTextDirection(value);
+                    _nlpSuggestion = NlpService.parse(value);
+                    // Clear suggestion if it doesn't have a date or matches current
+                    if (_nlpSuggestion?.dueDate == null || _nlpSuggestion?.dueDate == _selectedDate) {
+                      _nlpSuggestion = null;
+                    }
                   });
                 },
               ),
+              if (_nlpSuggestion != null) ...[
+                const SizedBox(height: 8),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: ActionChip(
+                    avatar: const Icon(Icons.auto_awesome, size: 16),
+                    label: Text(
+                      'Suggest: ${DateFormat.yMMMd().add_jm().format(_nlpSuggestion!.dueDate!)}',
+                      style: GoogleFonts.outfit(fontSize: 12),
+                    ),
+                    onPressed: _applyNlpSuggestion,
+                    backgroundColor: theme.colorScheme.primaryContainer.withValues(alpha: 0.5),
+                  ),
+                ),
+              ],
               const SizedBox(height: 20),
               TextFormField(
                 controller: _descriptionController,
@@ -526,8 +573,10 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   subscriptionService.showPaywall();
                   return;
                 }
+                HapticFeedback.lightImpact();
                 setState(() {
                   _subTasks.add(SubTask(title: ''));
+                  _subTaskControllers.add(TextEditingController());
                 });
               },
             ),
@@ -553,11 +602,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                 ),
                 Expanded(
                   child: TextField(
-                    controller:
-                        TextEditingController(text: _subTasks[index].title)
-                          ..selection = TextSelection.fromPosition(
-                            TextPosition(offset: _subTasks[index].title.length),
-                          ),
+                    controller: _subTaskControllers[index],
                     onChanged: (value) {
                       _subTasks[index].title = value;
                     },
@@ -573,6 +618,8 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   onPressed: () {
                     setState(() {
                       _subTasks.removeAt(index);
+                      _subTaskControllers[index].dispose();
+                      _subTaskControllers.removeAt(index);
                     });
                   },
                 ),

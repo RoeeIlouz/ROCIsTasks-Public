@@ -3,13 +3,18 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:rocis_tasks/core/config/app_config.dart';
 
-enum LogLevel { info, warning, error, critical }
+enum LogLevel { debug, info, warning, error, critical }
 
 /// Structured logging service for production monitoring
 class AppLogger {
   static final AppLogger _instance = AppLogger._internal();
   factory AppLogger() => _instance;
   AppLogger._internal();
+  
+  /// Log a debug message (only shown in debug mode or if enabled)
+  static void debug(String message, {String? tag}) {
+    _log(LogLevel.debug, message, tag: tag);
+  }
 
   /// Log an info message
   static void info(String message, {String? tag}) {

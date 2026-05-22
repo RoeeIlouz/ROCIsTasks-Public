@@ -58,3 +58,15 @@ _Implementation: `core/theme`_
 - **Material You**: The app creates a custom `ColorScheme` derived from the user's OS wallaper (using `dynamic_color`).
 - **Dark Mode**: Fully supported with a dedicated dark color scheme.
 - **Customization**: Custom widget shapes and typography integration (Google Fonts) ensure a modern look.
+
+## 📊 Productivity Analytics & Insights
+
+_Implementation: `features/analytics`_
+
+Helping users understand their work patterns and improve efficiency:
+
+- **Insights Dashboard**: A dedicated tab for visualizing productivity metrics.
+- **Completion Trends**: Line charts showing task completion volume over the last 7 days, helping identify peak productivity periods.
+- **Category Distribution**: Pie charts visualizing the balance of effort across different categories (e.g., Work, Personal, Education).
+- **Stat Summaries**: Instant visibility into total completed and pending tasks.
+- **Historical Tracking**: Automatically records completion timestamps (`completedAt`) for all tasks to enable precise trend analysis.

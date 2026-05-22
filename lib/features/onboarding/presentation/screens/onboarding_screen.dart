@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:rocis_tasks/features/onboarding/data/services/onboarding_service.dart';
-import 'package:rocis_tasks/features/home/presentation/screens/home_screen.dart';
+
 import 'package:rocis_tasks/l10n/app_localizations.dart';
+import 'package:go_router/go_router.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -47,6 +48,31 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       body: SafeArea(
         child: Column(
           children: [
+            Align(
+              alignment: Alignment.topRight,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: TextButton(
+                  onPressed: () async {
+                    await Provider.of<OnboardingService>(
+                      context,
+                      listen: false,
+                    ).completeOnboarding();
+                    if (context.mounted) {
+                      context.go('/');
+                    }
+                  },
+                  child: Text(
+                    l10n.skip,
+                    style: GoogleFonts.outfit(
+                      color: Colors.grey[400],
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ),
+            ),
             Expanded(
               child: PageView.builder(
                 controller: _pageController,
@@ -141,11 +167,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           ).completeOnboarding();
 
                           if (context.mounted) {
-                            Navigator.of(context).pushReplacement(
-                              MaterialPageRoute(
-                                builder: (_) => const HomeScreen(),
-                              ),
-                            );
+                            context.go('/');
                           }
                         }
                       },

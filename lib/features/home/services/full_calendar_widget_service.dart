@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 
 import 'package:home_widget/home_widget.dart';
 import 'package:intl/intl.dart';
@@ -8,6 +9,7 @@ import 'package:rocis_tasks/core/services/calendar_color_service.dart';
 import 'package:rocis_tasks/core/services/schedule_firestore_service.dart';
 import 'package:rocis_tasks/features/tasks/data/datasources/local_task_source.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:rocis_tasks/l10n/app_localizations.dart';
 
 /// Filter options for the full calendar widget
 class FullCalendarFilters {
@@ -240,8 +242,8 @@ class FullCalendarWidgetService {
           );
           calendarColors = await _calendarService.getCalendarColors();
         }
-      } catch (e) {
-        // Ignore Google Calendar fetch errors to prevent widget crash
+      } catch (e, stack) {
+        AppLogger.error('Failed to fetch Google Calendar events for widget', error: e, stack: stack);
       }
 
       // Fetch tasks (if filter enabled)
@@ -258,8 +260,8 @@ class FullCalendarWidgetService {
               )
               .toList();
         }
-      } catch (e) {
-        // Ignore task fetch errors
+      } catch (e, stack) {
+        AppLogger.error('Failed to fetch tasks for widget', error: e, stack: stack);
       }
 
       // Fetch ROCIs-Schedule events (if filter enabled and user is authenticated)
@@ -274,13 +276,19 @@ class FullCalendarWidgetService {
             startDate,
             endDate,
           );
-          // Fetched ROCIs-Schedule items
         }
-      } catch (e) {
-        // Ignore schedule fetch errors
+      } catch (e, stack) {
+        AppLogger.error('Failed to fetch schedule data for widget', error: e, stack: stack);
       }
 
-      // Found events, tasks, and schedule items
+      // Load localization for background strings
+      AppLocalizations? l10n;
+      try {
+        final localeCode = prefs.getString('language_code') ?? 'en';
+        l10n = await AppLocalizations.delegate.load(Locale(localeCode));
+      } catch (e) {
+        AppLogger.debug('Failed to load l10n for widget service: $e');
+      }
 
       final gridData = <Map<String, dynamic>>[];
 
@@ -299,20 +307,37 @@ class FullCalendarWidgetService {
           final dayEvents = events.where((e) {
             if (e.start == null) return false;
 
-            final startDate = DateTime(
+            // Normalize to dates (midnight)
+            final eventStart = DateTime(
               e.start!.year,
               e.start!.month,
               e.start!.day,
             );
-            final endDate = e.end != null
-                ? DateTime(e.end!.year, e.end!.month, e.end!.day)
-                : startDate;
+            
+            // Handle null end by assuming 1 hour duration
+            final end = e.end ?? e.start!.add(const Duration(hours: 1));
+            final endDay = DateTime(end.year, end.month, end.day);
 
             final currentDate = date;
-            return (currentDate.isAfter(
-                  startDate.subtract(const Duration(seconds: 1)),
-                ) &&
-                currentDate.isBefore(endDate.add(const Duration(seconds: 1))));
+            
+            // Standard inclusive-start, exclusive-end check
+            if (currentDate.isBefore(eventStart) || currentDate.isAfter(endDay)) {
+              return false;
+            }
+            
+            // Special case: if end is exactly midnight and it is not the start day,
+            // we don't include that day, unless it's an all-day event.
+            if (currentDate == endDay &&
+                e.allDay != true &&
+                end.hour == 0 &&
+                end.minute == 0 &&
+                end.second == 0 &&
+                end.millisecond == 0 &&
+                currentDate != eventStart) {
+              return false;
+            }
+            
+            return true;
           }).toList();
 
           // Find tasks for this day
@@ -322,23 +347,55 @@ class FullCalendarWidgetService {
             return tDate == dateKey;
           }).toList();
 
-          // Find ROCIs-Schedule items for this day
+          // Find ROCIs-Schedule items for this day (including multi-day events)
           final dayScheduleItems = scheduleData.where((item) {
             try {
               final dateObj = item['date'];
               if (dateObj == null) return false;
 
-              DateTime itemDate;
+              DateTime startTime;
               if (dateObj is DateTime) {
-                itemDate = dateObj;
+                startTime = dateObj;
               } else if (dateObj is String) {
-                itemDate = DateTime.parse(dateObj);
+                startTime = DateTime.parse(dateObj);
               } else {
                 return false;
               }
 
-              final itemDateKey = DateFormat('yyyy-MM-dd').format(itemDate);
-              return itemDateKey == dateKey;
+              // Try to get end date if available
+              final endDateObj = item['endDate'];
+              DateTime endTime;
+              if (endDateObj != null) {
+                if (endDateObj is DateTime) {
+                  endTime = endDateObj;
+                } else {
+                  endTime = DateTime.parse(endDateObj.toString());
+                }
+              } else {
+                // If no end date, treat as 1-day event
+                endTime = startTime;
+              }
+
+              final startDay = DateTime(startTime.year, startTime.month, startTime.day);
+              final endDay = DateTime(endTime.year, endTime.month, endTime.day);
+              final currentDate = date;
+
+              if (currentDate.isBefore(startDay) || currentDate.isAfter(endDay)) {
+                return false;
+              }
+
+              // Special case for midnight end (exclusive) - only for timed events
+              if (currentDate == endDay &&
+                  item['isAllDay'] != true &&
+                  endTime.hour == 0 &&
+                  endTime.minute == 0 &&
+                  endTime.second == 0 &&
+                  endTime.millisecond == 0 &&
+                  currentDate != startDay) {
+                return false;
+              }
+
+              return true;
             } catch (e) {
               return false;
             }
@@ -376,13 +433,14 @@ class FullCalendarWidgetService {
           for (var e in dayEvents) {
             if (summaries.length >= 3) break;
             final timeStr = e.start != null
-                ? _formatEventTime(e.start, e.end)
+                ? _formatEventTime(e.start, e.end, l10n)
                 : '';
 
             // Truncate title more aggressively for better fit in widget
-            final title = (e.title ?? 'Event').length > 25
-                ? '${(e.title ?? 'Event').substring(0, 22)}...'
-                : (e.title ?? 'Event');
+            final displayTitle = (e.title ?? l10n?.event ?? 'Event');
+            final title = displayTitle.length > 25
+                ? '${displayTitle.substring(0, 22)}...'
+                : displayTitle;
             final location = (e.location ?? '').length > 20
                 ? '${(e.location ?? '').substring(0, 17)}...'
                 : (e.location ?? '');
@@ -472,7 +530,7 @@ class FullCalendarWidgetService {
                 endTime = itemDate;
               }
 
-              final rawTitle = (item['title'] as String?) ?? 'Event';
+              final rawTitle = (item['title'] as String?) ?? l10n?.event ?? 'Event';
               final rawLocation = (item['location'] as String?) ?? '';
 
               final title = rawTitle.length > 30
@@ -484,7 +542,7 @@ class FullCalendarWidgetService {
 
               summaries.add({
                 'text': title,
-                'time': _formatEventTime(startTime, endTime),
+                'time': _formatEventTime(startTime, endTime, l10n),
                 'subtitle': location,
                 'color': color,
                 'type': type,
@@ -552,7 +610,8 @@ class FullCalendarWidgetService {
         name: 'FullCalendarWidgetProvider',
         iOSName: 'FullCalendarWidget',
       );
-    } catch (e) {
+    } catch (e, stack) {
+      AppLogger.error('Error in FullCalendarWidgetService.updateFullCalendarWidget', error: e, stack: stack);
       // Attempt fallback to at least show the dates
       await _generateFallbackGrid(monthOffset, userId);
     }
@@ -613,12 +672,12 @@ class FullCalendarWidgetService {
         name: 'FullCalendarWidgetProvider',
         iOSName: 'FullCalendarWidget',
       );
-    } catch (e) {
-      // Ignore fallback grid generation errors
+    } catch (e, stack) {
+      AppLogger.error('Critical failure in widget fallback', error: e, stack: stack);
     }
   }
 
-  String _formatEventTime(DateTime? start, DateTime? end) {
+  String _formatEventTime(DateTime? start, DateTime? end, AppLocalizations? l10n) {
     if (start == null) return '';
 
     // Handle all-day events (when end is null or same day start/end with no time difference)
@@ -635,7 +694,7 @@ class FullCalendarWidgetService {
         start.minute == 0 &&
         end.hour == 0 &&
         end.minute == 0) {
-      return 'All Day';
+      return l10n?.allDay ?? 'All Day';
     }
 
     // Same day event

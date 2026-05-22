@@ -24,6 +24,15 @@ class AppLocalizationsEs extends AppLocalizations {
   String get appearance => 'Apariencia';
 
   @override
+  String get theme => 'Tema';
+
+  @override
+  String get systemDefault => 'Predeterminado del sistema';
+
+  @override
+  String get lightMode => 'Modo claro';
+
+  @override
   String get darkMode => 'Modo oscuro';
 
   @override
@@ -186,7 +195,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get trashEmpty => 'La papelera está vacía';
 
   @override
-  String restoredTask(Object title) {
+  String restoredTask(String title) {
     return 'Tarea \"$title\" restaurada';
   }
 
@@ -407,6 +416,15 @@ class AppLocalizationsEs extends AppLocalizations {
   String get proSubscriptionActive => 'Suscripción Pro activa';
 
   @override
+  String get welcomeToPro => '¡Bienvenido a Pro!';
+
+  @override
+  String get pickAPlan => 'Elige un plan';
+
+  @override
+  String get byContinuingAgreement => 'Al continuar, aceptas nuestros';
+
+  @override
   String get purchasesRestored => '¡Compras restauradas correctamente!';
 
   @override
@@ -498,8 +516,268 @@ class AppLocalizationsEs extends AppLocalizations {
   String get next => 'Siguiente';
 
   @override
+  String get insights => 'Estadísticas';
+
+  @override
   String get searchTasksHint => 'Buscar tareas...';
 
   @override
   String get emptyTrash => 'Vaciar papelera';
+
+  @override
+  String get productivityTrend => 'Tendencia de productividad';
+
+  @override
+  String get categoryBreakdown => 'Desglose por categoría';
+
+  @override
+  String get completed => 'Completadas';
+
+  @override
+  String get pending => 'Pendientes';
+
+  @override
+  String taskReminderTitle(String title) {
+    return 'Recordatorio de tarea: $title';
+  }
+
+  @override
+  String get taskDueNowBody => '¡Tienes una tarea que vence ahora!';
+
+  @override
+  String get createFirstTask => 'Crea tu primera tarea';
+
+  @override
+  String get filterToday => 'Hoy';
+
+  @override
+  String get filterThisWeek => 'Esta semana';
+
+  @override
+  String get filterOverdue => 'Atrasado';
+
+  @override
+  String get filterNoDate => 'Sin fecha';
+
+  @override
+  String get dateRange => 'Filtro de fecha';
+
+  @override
+  String get recurringTaskScheduled => 'Tarea recurrente programada';
+
+  @override
+  String nextOccurrenceSet(String title, String date) {
+    return 'Siguiente ocurrencia de \"$title\" establecida para $date';
+  }
+
+  @override
+  String get initializationFailedError =>
+      'Error al inicializar los datos de la aplicación. Por favor, reinicie.';
+
+  @override
+  String get noTaskDataAvailable => 'No hay datos de tareas disponibles';
+
+  @override
+  String get retryInitialization => 'Reintentar inicialización';
+
+  @override
+  String get criticalErrorTitle => 'ERROR CRÍTICO';
+
+  @override
+  String get appStartupErrorBody =>
+      'ROCI\'s Tasks encontró un problema durante el inicio. Nuestro equipo ha sido notificado.';
+
+  @override
+  String get appTagline => 'Cuidando cada detalle';
+
+  @override
+  String get termsOfService => 'Términos de servicio';
+
+  @override
+  String get allDay => 'Todo el día';
+
+  @override
+  String get event => 'Evento';
+
+  @override
+  String get markAsIncomplete => 'Marcar como incompleta';
+
+  @override
+  String get markAsComplete => 'Marcar como completa';
+
+  @override
+  String get editTaskDetailsHint =>
+      'Toca dos veces para editar los detalles de la tarea';
+
+  @override
+  String get pinTask => 'Fijar tarea';
+
+  @override
+  String get unpinTask => 'Desfijar tarea';
+
+  @override
+  String get notificationSnooze => 'Posponer 15m';
+
+  @override
+  String get notificationMarkCompleted => 'Marcar como completado';
+
+  @override
+  String get notificationOpenTask => 'Abrir tarea';
+
+  @override
+  String notificationUncompletedTasks(int count) {
+    return '$count tareas sin completar';
+  }
+
+  @override
+  String get notificationTasksRemaining => 'Tareas restantes';
+
+  @override
+  String notificationTasksSummary(int count) {
+    return '$count tareas';
+  }
+
+  @override
+  String get skip => 'Omitir';
+
+  @override
+  String get productivity => 'Productividad';
+
+  @override
+  String get smartAdd => 'Añadido inteligente (NLP)';
+
+  @override
+  String get autoRemoveNlpDates => 'Limpiar título';
+
+  @override
+  String get autoRemoveNlpDatesSubtitle =>
+      'Eliminar fecha/hora del título cuando se sugiera';
+
+  @override
+  String get email => 'Correo electrónico';
+
+  @override
+  String get password => 'Contraseña';
+
+  @override
+  String get signIn => 'Iniciar sesión';
+
+  @override
+  String get register => 'Registrarse';
+
+  @override
+  String get createAccount => 'Crear cuenta';
+
+  @override
+  String get forgotPassword => '¿Olvidaste tu contraseña?';
+
+  @override
+  String get resetPassword => 'Restablecer contraseña';
+
+  @override
+  String get dontHaveAccount => '¿No tienes una cuenta?';
+
+  @override
+  String get alreadyHaveAccount => '¿Ya tienes una cuenta?';
+
+  @override
+  String get invalidEmail =>
+      'Por favor, introduce un correo electrónico válido';
+
+  @override
+  String get passwordTooShort =>
+      'La contraseña debe tener al menos 6 caracteres';
+
+  @override
+  String get passwordsDoNotMatch => 'Las contraseñas no coinciden';
+
+  @override
+  String get confirmPassword => 'Confirmar contraseña';
+
+  @override
+  String get passwordResetEmailSent =>
+      'Correo de restablecimiento de contraseña enviado';
+
+  @override
+  String get showTaskCounterNotification => 'Mostrar contador de tareas';
+
+  @override
+  String get showTaskCounterNotificationSubtitle =>
+      'Muestra una notificación persistente con tu recuento de tareas';
+
+  @override
+  String get appGuide => 'Guía de la aplicación';
+
+  @override
+  String get appGuideSubtitle => 'Aprende a usar ROCI\'s Tasks';
+
+  @override
+  String get appGuideTitle => 'Guía de la aplicación';
+
+  @override
+  String get features => 'Características';
+
+  @override
+  String get howToUse => 'Cómo usar';
+
+  @override
+  String get guideTaskDesc =>
+      'Crea, edita y organiza tus tareas diarias con facilidad.';
+
+  @override
+  String get guideCalendarDesc =>
+      'Visualiza tus tareas y eventos en una hermosa vista de calendario.';
+
+  @override
+  String get guideCategoriesDesc =>
+      'Organiza tareas en categorías personalizadas con iconos y colores únicos.';
+
+  @override
+  String get guideNotificationsTitle => 'Notificaciones';
+
+  @override
+  String get guideNotificationsDesc =>
+      'Mantente al tanto de tu horario con recordatorios inteligentes y un contador de tareas persistente.';
+
+  @override
+  String get guideCloudSyncTitle => 'Sincronización en la nube';
+
+  @override
+  String get guideCloudSyncDesc =>
+      'Accede a tus tareas desde cualquier dispositivo con sincronización segura en la nube.';
+
+  @override
+  String get guideAddingTasksTitle => 'Añadir tareas';
+
+  @override
+  String get guideAddingTasksDesc =>
+      'Toca el botón + para añadir una nueva tarea. Usa lenguaje natural (p. ej., \"Almuerzo mañana a la 1 pm\") para una entrada rápida.';
+
+  @override
+  String get guideGesturesTitle => 'Gestos';
+
+  @override
+  String get guideGesturesDesc =>
+      'Desliza a la derecha para completar una tarea, desliza a la izquierda para eliminarla. Mantén presionado para más opciones.';
+
+  @override
+  String get guideWidgetsTitle => 'Widgets de inicio';
+
+  @override
+  String get guideWidgetsDesc =>
+      'Añade widgets de ROCI\'s Tasks a tu pantalla de inicio para un acceso rápido y actualizaciones de estado.';
+
+  @override
+  String get guideCustomizationTitle => 'Personalización';
+
+  @override
+  String get guideCustomizationDesc =>
+      'Personalizar tu experiencia en Ajustes con temas, opciones de idioma y más.';
+
+  @override
+  String get guideHappyOrganizing => '¡Feliz organización!';
+
+  @override
+  String get notificationRefreshed =>
+      'Notificación del contador de tareas actualizada';
 }

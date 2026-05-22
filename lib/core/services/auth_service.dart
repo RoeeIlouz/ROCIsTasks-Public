@@ -27,33 +27,31 @@ class AuthService extends ChangeNotifier {
   StreamSubscription<User?>? _authStateSubscription;
 
   AuthService(this._errorHandlingService) {
-    // Check initial state synchronously
-    if (_auth.currentUser != null) {
-      if (!_initCompleter.isCompleted) {
-        _initCompleter.complete();
-      }
+    _initAuth();
+  }
+
+  Future<void> _initAuth() async {
+    // On Web, explicitly set persistence so the session survives page refresh.
+    // Android/iOS handle persistence natively — no extra config needed.
+    if (kIsWeb) {
+      // No need to set persistence explicitly — Firebase Auth uses local
+      // persistence (indexedDB) by default on web, and native persistence
+      // on mobile. The old setPersistence() method was removed from the SDK.
     }
 
     _authStateSubscription = _auth.authStateChanges().listen((User? user) {
       if (user != null) {
-        _syncEncryptionKey(user.uid);
-        ensureSecondaryAuth();
+        unawaited(_syncEncryptionKey(user.uid));
+        unawaited(ensureSecondaryAuth());
       }
 
-      // Complete init on first event if not already completed
+      // Complete init on the FIRST auth state event.
+      // On Android/iOS, the first event from authStateChanges() IS the
+      // persisted auth state — either the restored user or truly null.
+      // Using a timer here caused a race: the timer could fire before
+      // Firebase emitted the restored session, flashing the login screen.
       if (!_initCompleter.isCompleted) {
-        if (user != null) {
-          // If we have a user, we can complete immediately
-          _initCompleter.complete();
-        } else {
-          // If user is null, give it more time to be sure it's not a loading state.
-          // 1.5s is a safe middle ground for session restoration.
-          Future.delayed(const Duration(milliseconds: 1500), () {
-            if (!_initCompleter.isCompleted) {
-              _initCompleter.complete();
-            }
-          });
-        }
+        _initCompleter.complete();
       }
 
       notifyListeners();
@@ -112,6 +110,69 @@ class AuthService extends ChangeNotifier {
     } catch (e, s) {
       _errorHandlingService.logError(e, s, reason: 'Sign in with Google');
       return null;
+    }
+  }
+
+  Future<UserCredential?> signInWithEmailAndPassword(
+    String email,
+    String password,
+  ) async {
+    try {
+      final UserCredential userCredential = await _auth
+          .signInWithEmailAndPassword(email: email, password: password);
+
+      if (userCredential.user != null) {
+        AppLogger.info(
+          'Email sign in successful. Starting critical key sync...',
+          tag: 'Auth',
+        );
+        await _syncEncryptionKey(userCredential.user!.uid);
+        AppLogger.info('Key sync complete.', tag: 'Auth');
+      }
+
+      await _signInToSecondaryFirebaseWithEmail(email, password);
+
+      notifyListeners();
+      return userCredential;
+    } catch (e, s) {
+      _errorHandlingService.logError(e, s, reason: 'Sign in with Email');
+      rethrow;
+    }
+  }
+
+  Future<UserCredential?> signUpWithEmailAndPassword(
+    String email,
+    String password,
+  ) async {
+    try {
+      final UserCredential userCredential = await _auth
+          .createUserWithEmailAndPassword(email: email, password: password);
+
+      if (userCredential.user != null) {
+        AppLogger.info(
+          'Email sign up successful. Starting critical key sync...',
+          tag: 'Auth',
+        );
+        await _syncEncryptionKey(userCredential.user!.uid);
+        AppLogger.info('Key sync complete.', tag: 'Auth');
+      }
+
+      await _signUpToSecondaryFirebaseWithEmail(email, password);
+
+      notifyListeners();
+      return userCredential;
+    } catch (e, s) {
+      _errorHandlingService.logError(e, s, reason: 'Sign up with Email');
+      rethrow;
+    }
+  }
+
+  Future<void> sendPasswordResetEmail(String email) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+    } catch (e, s) {
+      _errorHandlingService.logError(e, s, reason: 'Send password reset email');
+      rethrow;
     }
   }
 
@@ -179,6 +240,51 @@ class AuthService extends ChangeNotifier {
       _scheduleAuth = null;
       scheduleAuthError.value =
           'Schedule sync unavailable. Some features may be limited.';
+    }
+  }
+
+  Future<void> _signInToSecondaryFirebaseWithEmail(
+    String email,
+    String password,
+  ) async {
+    try {
+      final scheduleApp = Firebase.app('rocis-schedule');
+      _scheduleAuth = FirebaseAuth.instanceFor(app: scheduleApp);
+      await _scheduleAuth!.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      AppLogger.info('Signed in to secondary Firebase with Email', tag: 'Auth');
+    } catch (e) {
+      AppLogger.warning(
+        'Failed to sign in to secondary Firebase with Email',
+        error: e,
+        tag: 'Auth',
+      );
+      _scheduleAuth = null;
+      scheduleAuthError.value =
+          'Schedule sync unavailable. Some features may be limited.';
+    }
+  }
+
+  Future<void> _signUpToSecondaryFirebaseWithEmail(
+    String email,
+    String password,
+  ) async {
+    try {
+      final scheduleApp = Firebase.app('rocis-schedule');
+      _scheduleAuth = FirebaseAuth.instanceFor(app: scheduleApp);
+      await _scheduleAuth!.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      AppLogger.info('Signed up to secondary Firebase with Email', tag: 'Auth');
+    } catch (e) {
+      AppLogger.warning(
+        'Failed to sign up to secondary Firebase with Email',
+        error: e,
+        tag: 'Auth',
+      );
     }
   }
 

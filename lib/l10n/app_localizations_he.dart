@@ -24,6 +24,15 @@ class AppLocalizationsHe extends AppLocalizations {
   String get appearance => 'מראה';
 
   @override
+  String get theme => 'ערכת נושא';
+
+  @override
+  String get systemDefault => 'ברירת מחדל של המערכת';
+
+  @override
+  String get lightMode => 'מצב בהיר';
+
+  @override
   String get darkMode => 'מצב כהה';
 
   @override
@@ -186,7 +195,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get trashEmpty => 'האשפה ריקה';
 
   @override
-  String restoredTask(Object title) {
+  String restoredTask(String title) {
     return 'המשימה \"$title\" שוחזרה';
   }
 
@@ -283,7 +292,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get importDataSubtitle => 'שחזר מגיבוי JSON';
 
   @override
-  String get importBackup => 'ייבוא גיבוי';
+  String get importBackup => 'ייבא גיבוי';
 
   @override
   String get pasteJsonHint => 'הדבק גיבוי JSON כאן...';
@@ -402,6 +411,15 @@ class AppLocalizationsHe extends AppLocalizations {
   String get proSubscriptionActive => 'מנוי Pro פעיל';
 
   @override
+  String get welcomeToPro => 'ברוך הבא ל-Pro!';
+
+  @override
+  String get pickAPlan => 'בחר תכנית';
+
+  @override
+  String get byContinuingAgreement => 'בהמשך השימוש, הינך מסכים ל';
+
+  @override
   String get purchasesRestored => 'הרכישות שוחזרו בהצלחה!';
 
   @override
@@ -444,7 +462,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get titleInvalidContent => 'הכותרת מכילה תוכן לא תקין';
 
   @override
-  String get descriptionInvalidContent => 'התיאור מכיל תוכן לא תקין';
+  String get descriptionInvalidContent => 'התיאור מכילה תוכן לא תקין';
 
   @override
   String get failedToSaveTask => 'שמירת המשימה נכשלה. אנא נסה שוב.';
@@ -488,8 +506,261 @@ class AppLocalizationsHe extends AppLocalizations {
   String get next => 'הבא';
 
   @override
+  String get insights => 'תובנות';
+
+  @override
   String get searchTasksHint => 'חפש משימות...';
 
   @override
   String get emptyTrash => 'רוקן אשפה';
+
+  @override
+  String get productivityTrend => 'מגמת פרודוקטיביות';
+
+  @override
+  String get categoryBreakdown => 'חלוקה לפי קטגוריות';
+
+  @override
+  String get completed => 'הושלמו';
+
+  @override
+  String get pending => 'ממתינות';
+
+  @override
+  String taskReminderTitle(String title) {
+    return 'תזכורת למשימה: $title';
+  }
+
+  @override
+  String get taskDueNowBody => 'יש לך משימה שמועדה הגיע!';
+
+  @override
+  String get createFirstTask => 'צור את המשימה הראשונה שלך';
+
+  @override
+  String get filterToday => 'היום';
+
+  @override
+  String get filterThisWeek => 'השבוע';
+
+  @override
+  String get filterOverdue => 'פג תוקף';
+
+  @override
+  String get filterNoDate => 'ללא תאריך';
+
+  @override
+  String get dateRange => 'סינון תאריך';
+
+  @override
+  String get recurringTaskScheduled => 'משימה חוזרת תוכננה';
+
+  @override
+  String nextOccurrenceSet(String title, String date) {
+    return 'המופע הבא של \"$title\" נקבע ל-$date';
+  }
+
+  @override
+  String get initializationFailedError =>
+      'נכשל באתחול נתוני האפליקציה. אנא הפעל מחדש.';
+
+  @override
+  String get noTaskDataAvailable => 'אין נתוני משימות זמינים';
+
+  @override
+  String get retryInitialization => 'נסה שוב אתחול';
+
+  @override
+  String get criticalErrorTitle => 'שגיאה קריטית';
+
+  @override
+  String get appStartupErrorBody =>
+      'ROCI\'s Tasks נתקלה בבעיה במהלך ההפעלה. הצוות שלנו קיבל הודעה.';
+
+  @override
+  String get appTagline => 'שמים לב לכל הפרטים';
+
+  @override
+  String get termsOfService => 'תנאי שימוש';
+
+  @override
+  String get allDay => 'יום שלם';
+
+  @override
+  String get event => 'אירוע';
+
+  @override
+  String get markAsIncomplete => 'סמן כמשימה שלא הושלמה';
+
+  @override
+  String get markAsComplete => 'סמן כמשימה שהושלמה';
+
+  @override
+  String get editTaskDetailsHint => 'לחץ פעמיים כדי לערוך את פרטי המשימה';
+
+  @override
+  String get pinTask => 'נעץ משימה';
+
+  @override
+  String get unpinTask => 'בטל נעץ';
+
+  @override
+  String get notificationSnooze => 'נודניק 15 דק\'';
+
+  @override
+  String get notificationMarkCompleted => 'סמן כבוצע';
+
+  @override
+  String get notificationOpenTask => 'פתח משימה';
+
+  @override
+  String notificationUncompletedTasks(int count) {
+    return '$count משימות שטרם הושלמו';
+  }
+
+  @override
+  String get notificationTasksRemaining => 'משימות שנותרו';
+
+  @override
+  String notificationTasksSummary(int count) {
+    return '$count משימות';
+  }
+
+  @override
+  String get skip => 'דלג';
+
+  @override
+  String get productivity => 'פרודוקטיביות';
+
+  @override
+  String get smartAdd => 'הוספה חכמה (NLP)';
+
+  @override
+  String get autoRemoveNlpDates => 'ניקוי כותרת';
+
+  @override
+  String get autoRemoveNlpDatesSubtitle => 'הסר תאריך/שעה מהכותרת כאשר מוצע';
+
+  @override
+  String get email => 'דוא\"ל';
+
+  @override
+  String get password => 'סיסמה';
+
+  @override
+  String get signIn => 'התחבר';
+
+  @override
+  String get register => 'הרשמה';
+
+  @override
+  String get createAccount => 'צור חשבון';
+
+  @override
+  String get forgotPassword => 'שכחת סיסמה?';
+
+  @override
+  String get resetPassword => 'אפס סיסמה';
+
+  @override
+  String get dontHaveAccount => 'אין לך חשבון?';
+
+  @override
+  String get alreadyHaveAccount => 'יש לך כבר חשבון?';
+
+  @override
+  String get invalidEmail => 'אנא הזן דוא\"ל תקין';
+
+  @override
+  String get passwordTooShort => 'הסיסמה חייבת להכיל לפחות 6 תווים';
+
+  @override
+  String get passwordsDoNotMatch => 'הסיסמאות אינן תואמות';
+
+  @override
+  String get confirmPassword => 'אימות סיסמה';
+
+  @override
+  String get passwordResetEmailSent => 'אימייל לשחזור סיסמה נשלח';
+
+  @override
+  String get showTaskCounterNotification => 'הצג מונה משימות';
+
+  @override
+  String get showTaskCounterNotificationSubtitle =>
+      'הצג התראה קבועה עם מספר המשימות שלך';
+
+  @override
+  String get appGuide => 'מדריך למשתמש';
+
+  @override
+  String get appGuideSubtitle => 'למד איך להשתמש ב-ROCI\'s Tasks';
+
+  @override
+  String get appGuideTitle => 'מדריך למשתמש';
+
+  @override
+  String get features => 'תכונות';
+
+  @override
+  String get howToUse => 'איך להשתמש';
+
+  @override
+  String get guideTaskDesc => 'צור, ערוך ונהל את המשימות היומיות שלך בקלות.';
+
+  @override
+  String get guideCalendarDesc =>
+      'צפה במשימות ובאירועים שלך בתצוגת לוח שנה מרהיבה.';
+
+  @override
+  String get guideCategoriesDesc =>
+      'ארגן משימות בקטגוריות מותאמות אישית עם אייקונים וצבעים ייחודיים.';
+
+  @override
+  String get guideNotificationsTitle => 'התראות';
+
+  @override
+  String get guideNotificationsDesc =>
+      'הישאר מעודכן בלוח הזמנים שלך עם תזכורות חכמות ומונה משימות קבוע.';
+
+  @override
+  String get guideCloudSyncTitle => 'סנכרון ענן';
+
+  @override
+  String get guideCloudSyncDesc =>
+      'גש למשימות שלך מכל מכשיר עם סנכרון ענן מאובטח.';
+
+  @override
+  String get guideAddingTasksTitle => 'הוספת משימות';
+
+  @override
+  String get guideAddingTasksDesc =>
+      'לחץ על כפתור ה-+ כדי להוסיף משימה חדשה. השתמש בשפה חופשית (למשל, \"ארוחת צהריים מחר ב-1\") להזנה מהירה.';
+
+  @override
+  String get guideGesturesTitle => 'מחוות';
+
+  @override
+  String get guideGesturesDesc =>
+      'החלק ימינה כדי להשלים משימה, שמאלה כדי למחוק. לחיצה ארוכה לאפשרויות נוספות.';
+
+  @override
+  String get guideWidgetsTitle => 'ווידג\'טים למסך הבית';
+
+  @override
+  String get guideWidgetsDesc =>
+      'הוסף ווידג\'טים של ROCI\'s Tasks למסך הבית שלך לגישה מהירה ועדכוני סטטוס.';
+
+  @override
+  String get guideCustomizationTitle => 'התאמה אישית';
+
+  @override
+  String get guideCustomizationDesc =>
+      'התאם אישית את החוויה שלך בהגדרות עם ערכות נושא, שפות ועוד.';
+
+  @override
+  String get guideHappyOrganizing => 'ארגון מהנה!';
+
+  @override
+  String get notificationRefreshed => 'התראת מונה המשימות רועננה';
 }

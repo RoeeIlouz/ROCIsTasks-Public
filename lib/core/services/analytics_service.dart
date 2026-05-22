@@ -67,8 +67,8 @@ class AnalyticsService {
   }
 
   /// Log task completed event
-  Future<void> logTaskCompleted({required String taskId}) async {
-    await logEvent(name: 'task_completed', parameters: {'task_id': taskId});
+  Future<void> logTaskCompleted() async {
+    await logEvent(name: 'task_completed');
   }
 
   /// Log category created event
@@ -80,8 +80,8 @@ class AnalyticsService {
   }
 
   /// Log task deleted event
-  Future<void> logTaskDeleted({required String taskId}) async {
-    await logEvent(name: 'task_deleted', parameters: {'task_id': taskId});
+  Future<void> logTaskDeleted() async {
+    await logEvent(name: 'task_deleted');
   }
 
   /// Log theme changed event

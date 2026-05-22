@@ -108,6 +108,9 @@ class NotificationService {
     required String body,
     required DateTime scheduledDate,
     required String taskId,
+    String? snoozeLabel,
+    String? markCompletedLabel,
+    String? openTaskLabel,
   }) async {
     if (scheduledDate.isBefore(DateTime.now())) return;
 
@@ -132,21 +135,24 @@ class NotificationService {
               fullScreenIntent: true,
               category: AndroidNotificationCategory.reminder,
               actions: [
-                const AndroidNotificationAction(
-                  'snooze',
-                  'Snooze 15m',
-                  showsUserInterface: true,
-                ),
-                const AndroidNotificationAction(
-                  'complete',
-                  'Mark Completed',
-                  showsUserInterface: true,
-                ),
-                const AndroidNotificationAction(
-                  'reschedule',
-                  'Reschedule',
-                  showsUserInterface: true,
-                ),
+                if (snoozeLabel != null)
+                  AndroidNotificationAction(
+                    'snooze',
+                    snoozeLabel,
+                    showsUserInterface: true,
+                  ),
+                if (markCompletedLabel != null)
+                  AndroidNotificationAction(
+                    'complete',
+                    markCompletedLabel,
+                    showsUserInterface: true,
+                  ),
+                if (openTaskLabel != null)
+                  AndroidNotificationAction(
+                    'open_task',
+                    openTaskLabel,
+                    showsUserInterface: true,
+                  ),
               ],
             ),
           ),
@@ -168,63 +174,7 @@ class NotificationService {
         });
   }
 
-  Future<void> testImmediateNotification() async {
-    // Sending test IMMEDIATE notification...
-    const androidDetails = AndroidNotificationDetails(
-      'rocis_reminders_v4',
-      'Task Reminders',
-      channelDescription: 'Notifications for task reminders',
-      importance: Importance.max,
-      priority: Priority.high,
-    );
-    const details = NotificationDetails(android: androidDetails);
-    await flutterLocalNotificationsPlugin.show(
-      999,
-      'Test Immediate',
-      'If you see this, basic notifications are working!',
-      details,
-    );
-  }
 
-  Future<void> testScheduledNotification() async {
-    // Testing SCHEDULED notification (1 min from now)...
-    final now = tz.TZDateTime.now(tz.local);
-    final scheduledDate = now.add(const Duration(minutes: 1));
-
-    // Now: $now, Scheduled: $scheduledDate
-
-    const androidDetails = AndroidNotificationDetails(
-      'rocis_reminders_v4',
-      'Task Reminders',
-      channelDescription: 'Notifications for task reminders',
-      importance: Importance.max,
-      priority: Priority.high,
-    );
-    const details = NotificationDetails(android: androidDetails);
-
-    try {
-      final androidPlugin = flutterLocalNotificationsPlugin
-          .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin
-          >();
-      if (androidPlugin != null) {
-        await androidPlugin.canScheduleExactNotifications();
-        // Can schedule exact notifications check
-      }
-
-      await flutterLocalNotificationsPlugin.zonedSchedule(
-        998,
-        'Test Scheduled',
-        'This was scheduled 1 minute ago!',
-        scheduledDate,
-        details,
-        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      );
-      // Successfully scheduled test notification
-    } catch (e) {
-      // Error scheduling test notification
-    }
-  }
 
   Future<void> cancelNotification(int id) async {
     await flutterLocalNotificationsPlugin.cancel(id);
@@ -251,6 +201,9 @@ class NotificationService {
     List<String> titles, {
     String? largeIconPath,
     bool isDarkText = false,
+    String? uncompletedTasksLabel,
+    String? tasksRemainingLabel,
+    String? tasksSummaryLabel,
   }) async {
     try {
       await _platform.invokeMethod('updateTaskCountIcon', {
@@ -263,7 +216,7 @@ class NotificationService {
       // Error updating task count icon (falling back)
 
       final String body = titles.isEmpty
-          ? '$count Uncompleted Tasks'
+          ? (uncompletedTasksLabel ?? '$count Uncompleted Tasks')
           : titles.join('\n');
 
       final androidDetails = AndroidNotificationDetails(
@@ -277,8 +230,8 @@ class NotificationService {
         showWhen: false,
         styleInformation: BigTextStyleInformation(
           body,
-          contentTitle: 'Tasks Remaining',
-          summaryText: '$count Tasks',
+          contentTitle: tasksRemainingLabel ?? 'Tasks Remaining',
+          summaryText: tasksSummaryLabel ?? '$count Tasks',
         ),
         actions: [
           AndroidNotificationAction(

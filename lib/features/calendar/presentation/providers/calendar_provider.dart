@@ -373,7 +373,9 @@ class CalendarProvider extends ChangeNotifier {
         // Special case: if end is exactly midnight and it is not the start time (i.e. not a 0-duration event at midnight),
         // we might not want to include that day depending on interpretation.
         // But for "overlap", if it ends at 00:00 of Day 2, it does not overlap Day 2's 00:00-23:59.
+        // For all-day events, we treat the end date as inclusive if it's the last day.
         if (currentDay == endDay &&
+            event.allDay != true &&
             end.hour == 0 &&
             end.minute == 0 &&
             end.second == 0 &&
@@ -387,21 +389,31 @@ class CalendarProvider extends ChangeNotifier {
         }
         _eventsMap[currentDay]!.add(event);
 
-        currentDay = currentDay.add(const Duration(days: 1));
+        currentDay = DateTime(currentDay.year, currentDay.month, currentDay.day + 1);
       }
     }
 
     // Process ROCIs-Schedule events
     for (final scheduleEvent in _scheduleEvents) {
-      final normalizedDay = DateTime(
-        scheduleEvent.start.year,
-        scheduleEvent.start.month,
-        scheduleEvent.start.day,
-      );
-      if (_eventsMap[normalizedDay] == null) {
-        _eventsMap[normalizedDay] = [];
+      final start = scheduleEvent.start;
+      final end = scheduleEvent.end;
+      
+      DateTime currentDay = DateTime(start.year, start.month, start.day);
+      final endDay = DateTime(end.year, end.month, end.day);
+
+      while (currentDay.isBefore(endDay) || _isSameDay(currentDay, endDay)) {
+        // Special case: if end is exactly midnight and it is not the start time
+        // For ROCIs-Schedule events, we do NOT break here. If the user created a multi-day
+        // event ending on a specific day, they expect it to be inclusive of that day,
+        // even if the time is 00:00:00.
+        
+        if (_eventsMap[currentDay] == null) {
+          _eventsMap[currentDay] = [];
+        }
+        _eventsMap[currentDay]!.add(scheduleEvent);
+
+        currentDay = DateTime(currentDay.year, currentDay.month, currentDay.day + 1);
       }
-      _eventsMap[normalizedDay]!.add(scheduleEvent);
     }
 
     // Process ROCIs-Schedule assignments

@@ -14,6 +14,8 @@ migrate_working_dir/
 .kilo/
 .claude/
 .kilocode/
+.antigravitycli/
+.claude/
 
 # IntelliJ related
 *.iml
@@ -62,6 +64,7 @@ android/app/google-services.json
 # Firebase and API Keys
 firebase_options.dart.backup
 **/firebase_options_backup.dart
+.firebaserc
 
 # Sensitive Configuration
 secrets/

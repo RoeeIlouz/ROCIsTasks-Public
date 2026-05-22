@@ -107,6 +107,7 @@ void main() {
     ).thenAnswer((_) async => {});
     when(() => mockThemeService.init()).thenAnswer((_) async => {});
     when(() => mockThemeService.isDarkMode).thenReturn(false);
+    when(() => mockSubscriptionService.init()).thenAnswer((_) async => {});
     when(() => mockSubscriptionService.isPremium).thenReturn(true);
     when(
       () => mockAnalyticsService.logTaskCreated(

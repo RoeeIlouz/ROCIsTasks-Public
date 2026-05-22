@@ -12,6 +12,7 @@ lib/
 │   ├── services/           # Global services (Auth, Calendar, etc.)
 │   └── theme/              # App theming and styling logic
 ├── features/               # Feature modules
+│   ├── analytics/          # Productivity charts and insights
 │   ├── auth/               # Authentication (Login, User Session)
 │   ├── calendar/           # Calendar view and logic
 │   ├── home/               # Home screen container

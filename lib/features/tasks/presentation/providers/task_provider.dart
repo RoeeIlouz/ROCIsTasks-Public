@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart' hide Category;
+import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'dart:async';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -30,11 +31,17 @@ import 'package:rocis_tasks/core/services/logger_service.dart';
 
 enum TaskSortOption { dueDate, priority, title, dateCreated }
 
+enum DateTimeFilterOption { all, today, thisWeek, overdue, noDate }
+
 /// Main provider for task management and synchronization.
 ///
 /// This class handles local persistence via Hive, cloud synchronization via Firestore,
 /// and coordination between various services (notifications, widgets, etc.).
 class TaskProvider extends ChangeNotifier {
+  AppLocalizations get _l10n {
+    return lookupAppLocalizations(PlatformDispatcher.instance.locale);
+  }
+
   final LocalTaskSource _source;
   final NotificationService _notificationService;
   final FirestoreService _firestoreService;
@@ -57,6 +64,14 @@ class TaskProvider extends ChangeNotifier {
   StreamSubscription? _notificationSubscription;
   String? _lastUserId;
 
+  // Bulk Selection State
+  bool _isSelectionMode = false;
+  final List<String> _selectedTaskIds = [];
+
+  bool get isSelectionMode => _isSelectionMode;
+  List<String> get selectedTaskIds => _selectedTaskIds;
+  int get selectedCount => _selectedTaskIds.length;
+
   TaskProvider(
     this._authService,
     this._calendarService,
@@ -75,6 +90,7 @@ class TaskProvider extends ChangeNotifier {
        _analyticsService = analyticsService ?? AnalyticsService();
   Timer? _widgetDebounce;
   bool _widgetUpdateInProgress = false;
+  bool _pendingWidgetUpdate = false;
   bool get isLoading => _isLoading;
 
   Task? _taskToEdit;
@@ -109,6 +125,11 @@ class TaskProvider extends ChangeNotifier {
     if (sortIndex != null && sortIndex < TaskSortOption.values.length) {
       _currentSortOption = TaskSortOption.values[sortIndex];
     }
+    final dateFilterIndex = prefs.getInt('date_filter');
+    if (dateFilterIndex != null &&
+        dateFilterIndex < DateTimeFilterOption.values.length) {
+      _currentDateFilter = DateTimeFilterOption.values[dateFilterIndex];
+    }
     _selectedCategoryIds = prefs.getStringList('category_filters') ?? [];
     _showCompleted = prefs.getBool('show_completed') ?? true;
     _searchQuery = '';
@@ -135,7 +156,7 @@ class TaskProvider extends ChangeNotifier {
       await _notificationService.requestPermissions();
     } catch (e, s) {
       _errorHandlingService.logError(e, s, reason: 'Initialization failed');
-      _setError('Failed to initialize app data. Please restart.');
+      _setError(_l10n.initializationFailedError);
     }
 
     _refreshPagination();
@@ -159,12 +180,15 @@ class TaskProvider extends ChangeNotifier {
           try {
             await _notificationService.scheduleNotification(
               id: NotificationService.getNotificationId(task.id),
-              title: 'Task Reminder: ${task.title}',
+              title: _l10n.taskReminderTitle(task.title),
               body: task.description.isNotEmpty
                   ? task.description
-                  : 'You have a task due now!',
+                  : _l10n.taskDueNowBody,
               scheduledDate: task.dueDate!,
               taskId: task.id,
+              snoozeLabel: _l10n.notificationSnooze,
+              markCompletedLabel: _l10n.notificationMarkCompleted,
+              openTaskLabel: _l10n.notificationOpenTask,
             );
           } catch (e, s) {
             _errorHandlingService.logError(
@@ -251,6 +275,8 @@ class TaskProvider extends ChangeNotifier {
               _snoozeTask(taskId);
             } else if (actionId == 'complete') {
               _completeTaskFromNotification(taskId);
+            } else if (actionId == 'open_task') {
+              _navigateToTask(taskId);
             } else {
               _navigateToTask(taskId);
             }
@@ -361,12 +387,15 @@ class TaskProvider extends ChangeNotifier {
                   cloudTask.dueDate!.isAfter(DateTime.now())) {
                 await _notificationService.scheduleNotification(
                   id: NotificationService.getNotificationId(cloudTask.id),
-                  title: 'Task Reminder: ${cloudTask.title}',
+                  title: _l10n.taskReminderTitle(cloudTask.title),
                   body: cloudTask.description.isNotEmpty
                       ? cloudTask.description
-                      : 'You have a task due now!',
+                      : _l10n.taskDueNowBody,
                   scheduledDate: cloudTask.dueDate!,
                   taskId: cloudTask.id,
+                  snoozeLabel: _l10n.notificationSnooze,
+                  markCompletedLabel: _l10n.notificationMarkCompleted,
+                  openTaskLabel: _l10n.notificationOpenTask,
                 );
               }
             }
@@ -436,12 +465,15 @@ class TaskProvider extends ChangeNotifier {
             task.dueDate!.isAfter(DateTime.now())) {
           await _notificationService.scheduleNotification(
             id: NotificationService.getNotificationId(task.id),
-            title: 'Task Reminder: ${task.title}',
+            title: _l10n.taskReminderTitle(task.title),
             body: task.description.isNotEmpty
                 ? task.description
-                : 'You have a task due now!',
+                : _l10n.taskDueNowBody,
             scheduledDate: task.dueDate!,
             taskId: task.id,
+            snoozeLabel: _l10n.notificationSnooze,
+            markCompletedLabel: _l10n.notificationMarkCompleted,
+            openTaskLabel: _l10n.notificationOpenTask,
           );
         }
       }
@@ -452,10 +484,12 @@ class TaskProvider extends ChangeNotifier {
   }
 
   TaskSortOption _currentSortOption = TaskSortOption.dueDate;
+  DateTimeFilterOption _currentDateFilter = DateTimeFilterOption.all;
   List<String> _selectedCategoryIds = [];
   bool _showCompleted = true;
 
   TaskSortOption get currentSortOption => _currentSortOption;
+  DateTimeFilterOption get currentDateFilter => _currentDateFilter;
   List<String> get selectedCategoryIds => _selectedCategoryIds;
   bool get showCompleted => _showCompleted;
 
@@ -469,6 +503,19 @@ class TaskProvider extends ChangeNotifier {
         })
         .catchError((e, s) {
           _errorHandlingService.logError(e, s, reason: 'Saving sort option');
+        });
+  }
+
+  void setDateFilter(DateTimeFilterOption option) {
+    _currentDateFilter = option;
+    _refreshPagination();
+    notifyListeners();
+    SharedPreferences.getInstance()
+        .then((prefs) {
+          prefs.setInt('date_filter', option.index);
+        })
+        .catchError((e, s) {
+          _errorHandlingService.logError(e, s, reason: 'Saving date filter');
         });
   }
 
@@ -535,6 +582,12 @@ class TaskProvider extends ChangeNotifier {
     return _taskPagination.items;
   }
 
+  /// Get all tasks for analytics (unfiltered, unpaginated)
+  List<Task> get allTasks {
+    if (_isLoading) return [];
+    return _source.getTasks();
+  }
+
   /// Get all tasks without pagination (for internal use)
   List<Task> _getFilteredAndSortedTasks() {
     var tasks = _source
@@ -562,6 +615,39 @@ class TaskProvider extends ChangeNotifier {
       tasks = tasks.where((t) => !t.isCompleted).toList();
     }
 
+    // Apply Date Filter
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final weekEnd = today.add(const Duration(days: 7));
+
+    switch (_currentDateFilter) {
+      case DateTimeFilterOption.today:
+        tasks = tasks.where((t) {
+          if (t.dueDate == null) return false;
+          final d = t.dueDate!;
+          return d.year == today.year && d.month == today.month && d.day == today.day;
+        }).toList();
+        break;
+      case DateTimeFilterOption.thisWeek:
+        tasks = tasks.where((t) {
+          if (t.dueDate == null) return false;
+          return t.dueDate!.isAfter(today.subtract(const Duration(seconds: 1))) && 
+                 t.dueDate!.isBefore(weekEnd);
+        }).toList();
+        break;
+      case DateTimeFilterOption.overdue:
+        tasks = tasks.where((t) {
+          if (t.dueDate == null || t.isCompleted) return false;
+          return t.dueDate!.isBefore(now);
+        }).toList();
+        break;
+      case DateTimeFilterOption.noDate:
+        tasks = tasks.where((t) => t.dueDate == null).toList();
+        break;
+      case DateTimeFilterOption.all:
+        break;
+    }
+
     tasks.sort((a, b) {
       if ((a.isPinned ?? false) != (b.isPinned ?? false)) {
         return (a.isPinned ?? false) ? -1 : 1;
@@ -580,7 +666,7 @@ class TaskProvider extends ChangeNotifier {
         case TaskSortOption.title:
           return a.title.toLowerCase().compareTo(b.title.toLowerCase());
         case TaskSortOption.dateCreated:
-          return a.title.compareTo(b.title);
+          return a.createdAt.compareTo(b.createdAt);
       }
     });
     return tasks;
@@ -648,11 +734,20 @@ class TaskProvider extends ChangeNotifier {
 
   /// Internal method to update widgets with optional notification
   Future<void> _updateWidgets({required bool showNotification}) async {
+    if (_widgetUpdateInProgress) {
+      _pendingWidgetUpdate = true;
+      return;
+    }
+
     _widgetDebounce?.cancel();
     _widgetDebounce = Timer(
       Duration(milliseconds: AppConfig.notificationDebounceMs),
       () async {
-        if (_widgetUpdateInProgress) return;
+        if (_widgetUpdateInProgress) {
+          _pendingWidgetUpdate = true;
+          return;
+        }
+        
         _widgetUpdateInProgress = true;
         try {
           final chartPath = await TaskWidgetService.updateTaskWidget(
@@ -674,6 +769,13 @@ class TaskProvider extends ChangeNotifier {
               uncompletedTasks.map((t) => t.title).toList(),
               largeIconPath: chartPath,
               isDarkText: !_themeService.isDarkMode,
+              uncompletedTasksLabel: _l10n.notificationUncompletedTasks(
+                uncompletedTasks.length,
+              ),
+              tasksRemainingLabel: _l10n.notificationTasksRemaining,
+              tasksSummaryLabel: _l10n.notificationTasksSummary(
+                uncompletedTasks.length,
+              ),
             );
           }
 
@@ -707,6 +809,10 @@ class TaskProvider extends ChangeNotifier {
           _errorHandlingService.logError(e, s, reason: 'Updating home widgets');
         } finally {
           _widgetUpdateInProgress = false;
+          if (_pendingWidgetUpdate) {
+            _pendingWidgetUpdate = false;
+            _updateWidgets(showNotification: false);
+          }
         }
       },
     );
@@ -741,12 +847,15 @@ class TaskProvider extends ChangeNotifier {
       try {
         await _notificationService.scheduleNotification(
           id: NotificationService.getNotificationId(task.id),
-          title: 'Task Reminder: $title',
+          title: _l10n.taskReminderTitle(title),
           body: description.isNotEmpty
               ? description
-              : 'You have a task due now!',
+              : _l10n.taskDueNowBody,
           scheduledDate: dueDate,
           taskId: task.id,
+          snoozeLabel: _l10n.notificationSnooze,
+          markCompletedLabel: _l10n.notificationMarkCompleted,
+          openTaskLabel: _l10n.notificationOpenTask,
         );
       } catch (e, s) {
         _errorHandlingService.logError(
@@ -770,6 +879,7 @@ class TaskProvider extends ChangeNotifier {
 
   Future<void> toggleTaskCompletion(Task task) async {
     task.isCompleted = !task.isCompleted;
+    task.completedAt = task.isCompleted ? DateTime.now() : null;
 
     // Handle Recurrence if marking as completed
     if (task.isCompleted &&
@@ -793,12 +903,15 @@ class TaskProvider extends ChangeNotifier {
       try {
         await _notificationService.scheduleNotification(
           id: NotificationService.getNotificationId(task.id),
-          title: 'Task Reminder: ${task.title}',
+          title: _l10n.taskReminderTitle(task.title),
           body: task.description.isNotEmpty
               ? task.description
-              : 'You have a task due now!',
+              : _l10n.taskDueNowBody,
           scheduledDate: task.dueDate!,
           taskId: task.id,
+          snoozeLabel: _l10n.notificationSnooze,
+          markCompletedLabel: _l10n.notificationMarkCompleted,
+          openTaskLabel: _l10n.notificationOpenTask,
         );
       } catch (e, s) {
         _errorHandlingService.logError(
@@ -813,7 +926,7 @@ class TaskProvider extends ChangeNotifier {
     updateHomeWidgetWithNotification(); // Show notification when task is completed/uncompleted
 
     if (task.isCompleted) {
-      await _analyticsService.logTaskCompleted(taskId: task.id);
+      await _analyticsService.logTaskCompleted();
     }
   }
 
@@ -849,12 +962,15 @@ class TaskProvider extends ChangeNotifier {
       try {
         await _notificationService.scheduleNotification(
           id: NotificationService.getNotificationId(task.id),
-          title: 'Task Reminder: ${task.title}',
+          title: _l10n.taskReminderTitle(task.title),
           body: task.description.isNotEmpty
               ? task.description
-              : 'You have a task due now!',
+              : _l10n.taskDueNowBody,
           scheduledDate: task.dueDate!,
           taskId: task.id,
+          snoozeLabel: _l10n.notificationSnooze,
+          markCompletedLabel: _l10n.notificationMarkCompleted,
+          openTaskLabel: _l10n.notificationOpenTask,
         );
       } catch (e, s) {
         _errorHandlingService.logError(
@@ -918,7 +1034,7 @@ class TaskProvider extends ChangeNotifier {
     notifyListeners();
     updateHomeWidgetWithNotification(); // Show notification when task is deleted
 
-    await _analyticsService.logTaskDeleted(taskId: id);
+    await _analyticsService.logTaskDeleted();
   }
 
   Future<void> restoreTask(Task task) async {
@@ -933,12 +1049,15 @@ class TaskProvider extends ChangeNotifier {
       try {
         await _notificationService.scheduleNotification(
           id: NotificationService.getNotificationId(task.id),
-          title: 'Task Reminder: ${task.title}',
+          title: _l10n.taskReminderTitle(task.title),
           body: task.description.isNotEmpty
               ? task.description
-              : 'You have a task due now!',
+              : _l10n.taskDueNowBody,
           scheduledDate: task.dueDate!,
           taskId: task.id,
+          snoozeLabel: _l10n.notificationSnooze,
+          markCompletedLabel: _l10n.notificationMarkCompleted,
+          openTaskLabel: _l10n.notificationOpenTask,
         );
       } catch (e, s) {
         _errorHandlingService.logError(
@@ -965,7 +1084,7 @@ class TaskProvider extends ChangeNotifier {
     notifyListeners();
     updateHomeWidgetWithNotification(); // Show notification when task is permanently deleted
 
-    await _analyticsService.logTaskDeleted(taskId: id);
+    await _analyticsService.logTaskDeleted();
   }
 
   Future<void> clearTrash() async {
@@ -987,6 +1106,70 @@ class TaskProvider extends ChangeNotifier {
   bool get canAddCategory {
     if (_subscriptionService.isPremium) return true;
     return categories.length < AppConfig.freeCategoryLimit;
+  }
+
+  // --- Bulk Action Methods ---
+
+  void toggleSelectionMode() {
+    _isSelectionMode = !_isSelectionMode;
+    if (!_isSelectionMode) {
+      _selectedTaskIds.clear();
+    }
+    notifyListeners();
+  }
+
+  void toggleTaskSelection(String taskId) {
+    if (_selectedTaskIds.contains(taskId)) {
+      _selectedTaskIds.remove(taskId);
+      if (_selectedTaskIds.isEmpty) {
+        _isSelectionMode = false;
+      }
+    } else {
+      _selectedTaskIds.add(taskId);
+      _isSelectionMode = true;
+    }
+    notifyListeners();
+  }
+
+  void clearSelection() {
+    _selectedTaskIds.clear();
+    _isSelectionMode = false;
+    notifyListeners();
+  }
+
+  Future<void> deleteSelectedTasks() async {
+    final idsToDelete = List<String>.from(_selectedTaskIds);
+    clearSelection();
+    
+    for (final id in idsToDelete) {
+      await deleteTask(id);
+    }
+  }
+
+  Future<void> toggleSelectedTasksPin() async {
+    final idsToToggle = List<String>.from(_selectedTaskIds);
+    final tasksToToggle = _source.getTasks().where((t) => idsToToggle.contains(t.id)).toList();
+    
+    // Determine the target state (pin if most are unpinned, or vice versa)
+    final pinnedCount = tasksToToggle.where((t) => t.isPinned ?? false).length;
+    final targetPin = pinnedCount < (tasksToToggle.length / 2);
+
+    for (final task in tasksToToggle) {
+      if ((task.isPinned ?? false) != targetPin) {
+        await toggleTaskPin(task);
+      }
+    }
+    clearSelection();
+  }
+
+  Future<void> moveSelectedTasksToCategory(String? categoryId) async {
+    final idsToMove = List<String>.from(_selectedTaskIds);
+    final tasksToMove = _source.getTasks().where((t) => idsToMove.contains(t.id)).toList();
+
+    for (final task in tasksToMove) {
+      await updateTask(task, categoryId: categoryId);
+    }
+    clearSelection();
   }
 
   Future<void> addCategory(String name, int colorValue, int iconCode) async {
@@ -1067,6 +1250,14 @@ class TaskProvider extends ChangeNotifier {
     }
   }
 
+  Task? getTaskById(String id) {
+    try {
+      return _source.getTasks().firstWhere((t) => t.id == id);
+    } catch (e) {
+      return null;
+    }
+  }
+
   Future<void> _handleRecurringTask(Task task) async {
     if (task.dueDate == null) return;
 
@@ -1106,9 +1297,11 @@ class TaskProvider extends ChangeNotifier {
 
     // Show feedback notification
     await _notificationService.showInfoNotification(
-      title: 'Recurring Task Scheduled',
-      body:
-          'Next occurrence of "${task.title}" set for ${DateFormat.yMd().format(nextDate)}',
+      title: _l10n.recurringTaskScheduled,
+      body: _l10n.nextOccurrenceSet(
+        task.title,
+        DateFormat.yMd().format(nextDate),
+      ),
     );
   }
 }

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
 import 'package:rocis_tasks/features/tasks/presentation/widgets/task_tile.dart';
 import 'package:rocis_tasks/features/tasks/presentation/screens/add_task_screen.dart';
+import 'package:rocis_tasks/features/tasks/presentation/screens/task_detail_screen.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
@@ -77,6 +79,20 @@ class _TaskListViewState extends State<TaskListView> {
                       color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                     ),
                   ),
+                  const SizedBox(height: 24),
+                  FilledButton.icon(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const AddTaskScreen(),
+                          fullscreenDialog: true,
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.add),
+                    label: Text(l10n.createFirstTask),
+                  ),
                 ],
               ),
             ),
@@ -90,40 +106,52 @@ class _TaskListViewState extends State<TaskListView> {
             itemCount: tasks.length,
             itemBuilder: (context, index) {
               final task = tasks[index];
-              // Since category might change, we still need it,
-              // but let's see if we can get it from the provider efficiently.
-              final taskProvider = Provider.of<TaskProvider>(
-                context,
-                listen: false,
-              );
-              final category = taskProvider.getCategoryById(task.categoryId);
+              return Consumer<TaskProvider>(
+                builder: (context, provider, _) {
+                  final category = provider.getCategoryById(task.categoryId);
+                  final isSelectionMode = provider.isSelectionMode;
+                  final isSelected = provider.selectedTaskIds.contains(task.id);
 
-              return AnimationConfiguration.staggeredList(
-                position: index,
-                duration: const Duration(milliseconds: 375),
-                child: SlideAnimation(
-                  verticalOffset: 50.0,
-                  child: FadeInAnimation(
-                    child: Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
-                      child: TaskTile(
-                        task: task,
-                        category: category,
-                        onToggle: () => taskProvider.toggleTaskCompletion(task),
-                        onDelete: () => taskProvider.deleteTask(task.id),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => AddTaskScreen(task: task),
-                              fullscreenDialog: true,
-                            ),
-                          );
-                        },
+                  return AnimationConfiguration.staggeredList(
+                    position: index,
+                    duration: const Duration(milliseconds: 375),
+                    child: SlideAnimation(
+                      verticalOffset: 50.0,
+                      child: FadeInAnimation(
+                        child: Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: TaskTile(
+                            task: task,
+                            category: category,
+                            isSelected: isSelected,
+                            isSelectionMode: isSelectionMode,
+                            onToggle: () => provider.toggleTaskCompletion(task),
+                            onDelete: () => provider.deleteTask(task.id),
+                            onLongPress: () {
+                              HapticFeedback.mediumImpact();
+                              provider.toggleTaskSelection(task.id);
+                            },
+                            onTap: () {
+                              if (isSelectionMode) {
+                                provider.toggleTaskSelection(task.id);
+                              } else {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => TaskDetailScreen(
+                                      task: task,
+                                      category: category,
+                                    ),
+                                  ),
+                                );
+                              }
+                            },
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ),
+                  );
+                },
               );
             },
           ),

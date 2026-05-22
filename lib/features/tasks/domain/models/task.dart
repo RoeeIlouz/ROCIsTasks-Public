@@ -50,6 +50,12 @@ class Task extends HiveObject {
   @HiveField(10)
   String? recurrenceRule; // iCal format (e.g. "FREQ=DAILY;INTERVAL=1")
 
+  @HiveField(11)
+  DateTime? completedAt;
+
+  @HiveField(12)
+  DateTime createdAt;
+
   Task({
     String? id,
     required this.title,
@@ -62,7 +68,10 @@ class Task extends HiveObject {
     this.isPinned = false,
     this.subTasks,
     this.recurrenceRule,
-  }) : id = id ?? const Uuid().v4();
+    this.completedAt,
+    DateTime? createdAt,
+  }) : id = id ?? const Uuid().v4(),
+       createdAt = createdAt ?? DateTime.now();
 
   Task copyWith({
     String? title,
@@ -75,6 +84,8 @@ class Task extends HiveObject {
     bool? isPinned,
     List<SubTask>? subTasks,
     String? recurrenceRule,
+    DateTime? completedAt,
+    DateTime? createdAt,
   }) {
     return Task(
       id: id,
@@ -88,6 +99,8 @@ class Task extends HiveObject {
       isPinned: isPinned ?? this.isPinned,
       subTasks: subTasks ?? this.subTasks,
       recurrenceRule: recurrenceRule ?? this.recurrenceRule,
+      completedAt: completedAt ?? this.completedAt,
+      createdAt: createdAt ?? this.createdAt,
     );
   }
 
@@ -104,6 +117,8 @@ class Task extends HiveObject {
       'isPinned': isPinned,
       'subTasks': subTasks?.map((st) => st.toMap()).toList(),
       'recurrenceRule': recurrenceRule,
+      'completedAt': completedAt?.toIso8601String(),
+      'createdAt': createdAt.toIso8601String(),
     };
   }
 
@@ -124,6 +139,12 @@ class Task extends HiveObject {
           ?.map((st) => SubTask.fromMap(st as Map<String, dynamic>))
           .toList(),
       recurrenceRule: map['recurrenceRule'],
+      completedAt: map['completedAt'] != null
+          ? DateTime.tryParse(map['completedAt'])
+          : null,
+      createdAt: map['createdAt'] != null
+          ? DateTime.tryParse(map['createdAt'])
+          : null,
     );
   }
 }

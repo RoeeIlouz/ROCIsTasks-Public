@@ -8,6 +8,7 @@ import 'package:rocis_tasks/shared/ui/ui_kit.dart';
 import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
 import 'package:rocis_tasks/core/utils/icon_utils.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:rocis_tasks/l10n/app_localizations.dart';
 
 class TaskTile extends StatelessWidget {
   final Task task;
@@ -15,8 +16,11 @@ class TaskTile extends StatelessWidget {
   final VoidCallback onToggle;
   final VoidCallback onDelete;
   final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
   final bool enableSwipeToDelete;
   final bool enablePin;
+  final bool isSelected;
+  final bool isSelectionMode;
 
   const TaskTile({
     super.key,
@@ -25,8 +29,11 @@ class TaskTile extends StatelessWidget {
     required this.onToggle,
     required this.onDelete,
     this.onTap,
+    this.onLongPress,
     this.enableSwipeToDelete = true,
     this.enablePin = true,
+    this.isSelected = false,
+    this.isSelectionMode = false,
   });
 
   Color _getPriorityColor(BuildContext context, TaskPriority priority) {
@@ -47,6 +54,7 @@ class TaskTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final themeService = Provider.of<ThemeService>(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return Dismissible(
       key: Key(task.id),
@@ -62,27 +70,41 @@ class TaskTile extends StatelessWidget {
         ),
         alignment: Alignment.centerLeft,
         padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: Row(
+        child: const Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Icon(Icons.delete_outline, color: Colors.white, size: 28),
-            const Icon(Icons.delete_outline, color: Colors.white, size: 28),
+            Icon(Icons.delete_outline, color: Colors.white, size: 28),
+            Icon(Icons.delete_outline, color: Colors.white, size: 28),
           ],
         ),
       ),
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
         decoration: BoxDecoration(
-          color: theme.cardTheme.color,
+          color: isSelected
+              ? (category != null
+                  ? Color(category!.colorValue).withValues(alpha: 0.1)
+                  : theme.colorScheme.primaryContainer)
+              : theme.cardTheme.color,
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: theme.brightness == Brightness.light
-                ? Colors.grey.withValues(alpha: 0.1)
-                : Colors.white.withValues(alpha: 0.05),
+            color: isSelected
+                ? (category != null
+                    ? Color(category!.colorValue)
+                    : theme.colorScheme.primary)
+                : (theme.brightness == Brightness.light
+                    ? Colors.grey.withValues(alpha: 0.1)
+                    : Colors.white.withValues(alpha: 0.05)),
+            width: isSelected ? 2 : 1,
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.03),
+              color: isSelected
+                  ? (category != null
+                          ? Color(category!.colorValue)
+                          : theme.colorScheme.primary)
+                      .withValues(alpha: 0.05)
+                  : Colors.black.withValues(alpha: 0.03),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -108,37 +130,41 @@ class TaskTile extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.only(top: 2),
                         child: GestureDetector(
-                        onTap: () {
-                          HapticFeedback.lightImpact();
-                          onToggle();
-                        },
+                          onTap: isSelectionMode
+                              ? () => onLongPress?.call()
+                              : () {
+                                  HapticFeedback.lightImpact();
+                                  onToggle();
+                                },
                           child: Semantics(
-                            label: task.isCompleted
-                                ? 'Mark task as incomplete'
-                                : 'Mark task as complete',
-                            checked: task.isCompleted,
+                            label: isSelectionMode
+                                ? (isSelected ? 'Selected' : 'Not selected')
+                                : (task.isCompleted
+                                    ? l10n.markAsIncomplete
+                                    : l10n.markAsComplete),
+                            checked: isSelectionMode ? isSelected : task.isCompleted,
                             child: AnimatedContainer(
                               duration: const Duration(milliseconds: 300),
                               width: 28,
                               height: 28,
                               decoration: BoxDecoration(
-                                color: task.isCompleted
+                                color: (isSelectionMode ? isSelected : task.isCompleted)
                                     ? (category != null
-                                          ? Color(category!.colorValue)
-                                          : theme.colorScheme.primary)
+                                        ? Color(category!.colorValue)
+                                        : theme.colorScheme.primary)
                                     : Colors.transparent,
                                 borderRadius: BorderRadius.circular(10),
                                 border: Border.all(
-                                  color: task.isCompleted
+                                  color: (isSelectionMode ? isSelected : task.isCompleted)
                                       ? Colors.transparent
                                       : (category != null
-                                                ? Color(category!.colorValue)
-                                                : theme.colorScheme.primary)
-                                            .withValues(alpha: 0.5),
+                                              ? Color(category!.colorValue)
+                                              : theme.colorScheme.primary)
+                                          .withValues(alpha: 0.5),
                                   width: 2,
                                 ),
                               ),
-                              child: task.isCompleted
+                              child: (isSelectionMode ? isSelected : task.isCompleted)
                                   ? const Icon(
                                       Icons.check,
                                       color: Colors.white,
@@ -152,11 +178,12 @@ class TaskTile extends StatelessWidget {
                       const SizedBox(width: 16),
                       Expanded(
                         child: InkWell(
-                          onTap: onTap,
+                          onTap: isSelectionMode ? onLongPress : onTap,
+                          onLongPress: onLongPress,
                           borderRadius: BorderRadius.circular(12),
                           child: Semantics(
-                            label: 'Task: ${task.title}',
-                            hint: 'Double tap to edit task details',
+                            label: '${l10n.tasks}: ${task.title}',
+                            hint: l10n.editTaskDetailsHint,
                             container: true,
                             child: Padding(
                               padding: const EdgeInsets.all(4.0),
@@ -243,8 +270,8 @@ class TaskTile extends StatelessWidget {
                           if (enablePin)
                             Semantics(
                               label: (task.isPinned ?? false)
-                                  ? 'Unpin task'
-                                  : 'Pin task',
+                                  ? l10n.unpinTask
+                                  : l10n.pinTask,
                               button: true,
                               child: IconButton(
                                 icon: Icon(
@@ -270,7 +297,7 @@ class TaskTile extends StatelessWidget {
                           else
                             const SizedBox(height: 40),
                           Semantics(
-                            label: 'Priority: ${task.priority.name}',
+                            label: '${l10n.priority}: ${task.priority.name}',
                             child: Container(
                               width: 10,
                               height: 10,

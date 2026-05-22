@@ -109,6 +109,28 @@ class TaskSortFilterSheet extends StatelessWidget {
                   ),
 
                   const SizedBox(height: 24),
+                  
+                  // Date Filtering Section
+                  Text(
+                    l10n.dateRange,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      _buildDateFilterChip(context, l10n.all, DateTimeFilterOption.all, provider),
+                      _buildDateFilterChip(context, l10n.filterToday, DateTimeFilterOption.today, provider),
+                      _buildDateFilterChip(context, l10n.filterThisWeek, DateTimeFilterOption.thisWeek, provider),
+                      _buildDateFilterChip(context, l10n.filterOverdue, DateTimeFilterOption.overdue, provider),
+                      _buildDateFilterChip(context, l10n.filterNoDate, DateTimeFilterOption.noDate, provider),
+                    ],
+                  ),
+
+                  const SizedBox(height: 24),
 
                   // Filtering Section
                   Text(
@@ -189,6 +211,20 @@ class TaskSortFilterSheet extends StatelessWidget {
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
       title: Text(title),
       value: option,
+    );
+  }
+
+  Widget _buildDateFilterChip(
+    BuildContext context,
+    String label,
+    DateTimeFilterOption option,
+    TaskProvider provider,
+  ) {
+    final isSelected = provider.currentDateFilter == option;
+    return FilterChip(
+      label: Text(label),
+      selected: isSelected,
+      onSelected: (_) => provider.setDateFilter(option),
     );
   }
 }

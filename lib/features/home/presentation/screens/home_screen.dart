@@ -8,6 +8,7 @@ import 'package:rocis_tasks/features/tasks/presentation/screens/add_task_screen.
 import 'package:rocis_tasks/features/tasks/presentation/screens/task_list_screen.dart';
 import 'package:rocis_tasks/features/tasks/presentation/widgets/task_sort_filter_sheet.dart';
 import 'package:rocis_tasks/features/home/presentation/screens/settings_screen.dart';
+import 'package:rocis_tasks/features/analytics/presentation/screens/insights_screen.dart';
 import 'package:home_widget/home_widget.dart' as hw;
 import 'package:provider/provider.dart';
 import 'package:rocis_tasks/features/calendar/presentation/providers/calendar_provider.dart';
@@ -16,7 +17,7 @@ import 'dart:async';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
 import 'package:rocis_tasks/core/services/connectivity_service.dart';
-
+import 'package:rocis_tasks/core/utils/icon_utils.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -43,6 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<Widget> _screens = const [
     TaskListView(),
     CalendarScreen(),
+    InsightsScreen(),
     SettingsScreen(),
   ];
 
@@ -188,8 +190,45 @@ class _HomeScreenState extends State<HomeScreen> {
       });
     }
 
+    final isSelectionMode = taskProvider.isSelectionMode && _currentIndex == 0;
+
     return Scaffold(
-      appBar: AppBar(
+      appBar: isSelectionMode
+          ? AppBar(
+              backgroundColor: theme.colorScheme.primaryContainer,
+              leading: IconButton(
+                icon: const Icon(Icons.close),
+                onPressed: () => taskProvider.clearSelection(),
+              ),
+              title: Text(
+                '${taskProvider.selectedCount} ${l10n.tasks}',
+                style: GoogleFonts.outfit(
+                  fontWeight: FontWeight.bold,
+                  color: theme.colorScheme.onPrimaryContainer,
+                ),
+              ),
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.push_pin_outlined),
+                  tooltip: l10n.pinTask,
+                  onPressed: () => taskProvider.toggleSelectedTasksPin(),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.dashboard_customize_outlined),
+                  tooltip: l10n.category,
+                  onPressed: () {
+                    _showBulkCategoryPicker(context, taskProvider);
+                  },
+                ),
+                IconButton(
+                  icon: const Icon(Icons.delete_outline),
+                  tooltip: l10n.delete,
+                  onPressed: () => _showBulkDeleteConfirmation(context, taskProvider, l10n),
+                ),
+                const SizedBox(width: 8),
+              ],
+            )
+          : AppBar(
         title: _isSearching && _currentIndex == 0
             ? TextField(
                 controller: _searchController,
@@ -211,6 +250,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     ? l10n.myTasks
                     : _currentIndex == 1
                     ? l10n.calendar
+                    : _currentIndex == 2
+                    ? l10n.insights
                     : l10n.settings,
                 style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
               ),
@@ -363,9 +404,87 @@ class _HomeScreenState extends State<HomeScreen> {
               label: l10n.calendar,
             ),
             NavigationDestination(
+              icon: const Icon(Icons.analytics_outlined),
+              selectedIcon: const Icon(Icons.analytics),
+              label: l10n.insights,
+            ),
+            NavigationDestination(
               icon: const Icon(Icons.settings_outlined),
               selectedIcon: const Icon(Icons.settings),
               label: l10n.settings,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showBulkDeleteConfirmation(BuildContext context, TaskProvider provider, AppLocalizations l10n) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.deleteTaskTitle),
+        content: Text('${l10n.deleteTaskConfirmation} (${provider.selectedCount} ${l10n.tasks})'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.cancel),
+          ),
+          TextButton(
+            onPressed: () {
+              provider.deleteSelectedTasks();
+              Navigator.pop(context);
+            },
+            style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.error),
+            child: Text(l10n.delete),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showBulkCategoryPicker(BuildContext context, TaskProvider provider) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              AppLocalizations.of(context)!.filterByCategory,
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            const SizedBox(height: 16),
+            Flexible(
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: provider.categories.length + 1,
+                itemBuilder: (context, index) {
+                  if (index == 0) {
+                    return ListTile(
+                      leading: const Icon(Icons.no_accounts_outlined),
+                      title: Text(AppLocalizations.of(context)!.noCategory),
+                      onTap: () {
+                        provider.moveSelectedTasksToCategory(null);
+                        Navigator.pop(context);
+                      },
+                    );
+                  }
+                  final category = provider.categories[index - 1];
+                  return ListTile(
+                    leading: Icon(
+                      IconUtils.getIconData(category.iconCode),
+                      color: Color(category.colorValue),
+                    ),
+                    title: Text(category.name),
+                    onTap: () {
+                      provider.moveSelectedTasksToCategory(category.id);
+                      Navigator.pop(context);
+                    },
+                  );
+                },
+              ),
             ),
           ],
         ),

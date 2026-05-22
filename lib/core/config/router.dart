@@ -5,6 +5,7 @@ import 'package:rocis_tasks/features/auth/presentation/screens/login_screen.dart
 import 'package:rocis_tasks/features/home/presentation/screens/home_screen.dart';
 import 'package:rocis_tasks/features/onboarding/data/services/onboarding_service.dart';
 import 'package:rocis_tasks/features/onboarding/presentation/screens/onboarding_screen.dart';
+import 'package:rocis_tasks/shared/ui/widgets/global_error_boundary.dart';
 
 class AppRouter {
   final AuthService authService;
@@ -15,7 +16,7 @@ class AppRouter {
   late final GoRouter router = GoRouter(
     refreshListenable: Listenable.merge([authService, onboardingService]),
     initialLocation: '/',
-    debugLogDiagnostics: true,
+    debugLogDiagnostics: kDebugMode,
     routes: [
       GoRoute(path: '/', builder: (context, state) => const HomeScreen()),
       GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
@@ -30,12 +31,12 @@ class AppRouter {
       final isLoggingIn = state.uri.path == '/login';
       final isOnboarding = state.uri.path == '/onboarding';
 
-      if (!isLoggedIn) {
-        return isLoggingIn ? null : '/login';
-      }
-
       if (!isOnboardingComplete) {
         return isOnboarding ? null : '/onboarding';
+      }
+
+      if (!isLoggedIn) {
+        return isLoggingIn ? null : '/login';
       }
 
       if (isLoggingIn || isOnboarding) {

@@ -316,12 +316,10 @@ class ScheduleFirestoreService {
           if (event.recurring && event.daysOfWeek.isNotEmpty) {
             events.addAll(_expandRecurringEvent(event, startDate, endDate));
           } else {
-            if (event.startTime.isAfter(
-                  startDate.subtract(const Duration(days: 1)),
-                ) &&
-                event.startTime.isBefore(
-                  endDate.add(const Duration(days: 1)),
-                )) {
+            // Check for event overlap with the range [startDate, endDate]
+            // An event overlaps if it starts before endDate AND ends after startDate
+            if (event.startTime.isBefore(endDate) && 
+                event.endTime.isAfter(startDate)) {
               events.add(event);
             }
           }
@@ -411,12 +409,9 @@ class ScheduleFirestoreService {
                     _expandRecurringEvent(event, startDate, endDate),
                   );
                 } else {
-                  if (event.startTime.isAfter(
-                        startDate.subtract(const Duration(days: 1)),
-                      ) &&
-                      event.startTime.isBefore(
-                        endDate.add(const Duration(days: 1)),
-                      )) {
+                  // Check for event overlap with the range [startDate, endDate]
+                  if (event.startTime.isBefore(endDate) && 
+                      event.endTime.isAfter(startDate)) {
                     events.add(event);
                   }
                 }
@@ -488,12 +483,8 @@ class ScheduleFirestoreService {
                 );
 
                 if (!assignment.isCompleted &&
-                    assignment.dueDate.isAfter(
-                      startDate.subtract(const Duration(days: 1)),
-                    ) &&
-                    assignment.dueDate.isBefore(
-                      endDate.add(const Duration(days: 1)),
-                    )) {
+                    assignment.dueDate.isAfter(startDate.subtract(const Duration(seconds: 1))) &&
+                    assignment.dueDate.isBefore(endDate.add(const Duration(seconds: 1)))) {
                   assignments.add(assignment);
                 }
               } catch (e) {
@@ -655,12 +646,8 @@ class ScheduleFirestoreService {
           );
 
           if (!assignment.isCompleted &&
-              assignment.dueDate.isAfter(
-                startDate.subtract(const Duration(days: 1)),
-              ) &&
-              assignment.dueDate.isBefore(
-                endDate.add(const Duration(days: 1)),
-              )) {
+              assignment.dueDate.isAfter(startDate.subtract(const Duration(seconds: 1))) &&
+              assignment.dueDate.isBefore(endDate.add(const Duration(seconds: 1)))) {
             assignments.add(assignment);
           }
         } catch (e) {

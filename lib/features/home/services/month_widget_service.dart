@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:rocis_tasks/core/services/calendar_service.dart';
 import 'package:rocis_tasks/features/tasks/data/datasources/local_task_source.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:rocis_tasks/core/services/logger_service.dart';
 
 class MonthWidgetService {
   final CalendarService _calendarService;
@@ -67,11 +68,41 @@ class MonthWidgetService {
           final date = rowStartDate.add(Duration(days: col));
           final dateKey = DateFormat('yyyy-MM-dd').format(date);
 
-          // Find events for this day
+          // Find events for this day (including multi-day events)
           final dayEvents = events.where((e) {
             if (e.start == null) return false;
-            final eDate = DateFormat('yyyy-MM-dd').format(e.start!);
-            return eDate == dateKey;
+
+            // Normalize to dates (midnight)
+            final eventStart = DateTime(
+              e.start!.year,
+              e.start!.month,
+              e.start!.day,
+            );
+
+            // Handle null end by assuming 1 hour duration
+            final end = e.end ?? e.start!.add(const Duration(hours: 1));
+            final endDay = DateTime(end.year, end.month, end.day);
+
+            final currentDate = date;
+
+            // Standard inclusive-start, exclusive-end check
+            if (currentDate.isBefore(eventStart) || currentDate.isAfter(endDay)) {
+              return false;
+            }
+
+            // Special case: if end is exactly midnight and it is not the start day,
+            // we don't include that day, unless it's an all-day event.
+            if (currentDate == endDay &&
+                e.allDay != true &&
+                end.hour == 0 &&
+                end.minute == 0 &&
+                end.second == 0 &&
+                end.millisecond == 0 &&
+                currentDate != eventStart) {
+              return false;
+            }
+
+            return true;
           }).toList();
 
           // Find tasks for this day
@@ -100,7 +131,9 @@ class MonthWidgetService {
                 (c) => c.id == t.categoryId,
               );
               colorVal = cat.colorValue;
-            } catch (_) {}
+            } catch (e) {
+              AppLogger.debug('Category not found for task in widget: ${t.title}');
+            }
 
             summaries.add({
               'text': t.title,
@@ -144,8 +177,8 @@ class MonthWidgetService {
         name: 'MonthWidgetProvider',
         iOSName: 'MonthWidget',
       );
-    } catch (e) {
-      // Error updating Month Widget - silent handling
+    } catch (e, stack) {
+      AppLogger.error('Error updating Month Widget', error: e, stack: stack);
     }
   }
 

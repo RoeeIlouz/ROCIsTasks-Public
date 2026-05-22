@@ -8,6 +8,7 @@ import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:purchases_ui_flutter/purchases_ui_flutter.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:rocis_tasks/core/config/app_config.dart';
 import 'package:rocis_tasks/core/services/error_handling_service.dart';
 import 'package:rocis_tasks/core/services/logger_service.dart' hide LogLevel;
 
@@ -96,7 +97,7 @@ class SubscriptionService extends ChangeNotifier {
   void _updateCustomerStatus(CustomerInfo customerInfo) async {
     // Check for "premium" entitlement.
     // Make sure to match this entitlement identifier in RevenueCat dashboard.
-    const entitlementId = 'ROCIsApps Pro';
+    const entitlementId = AppConfig.entitlementId;
 
     final wasPremium = _isPremium;
     _isPremium =
@@ -240,6 +241,7 @@ class SubscriptionService extends ChangeNotifier {
   Future<void> manageSubscription() async {
     try {
       if (kIsWeb) return;
+      await RevenueCatUI.presentCustomerCenter();
     } catch (e) {
       AppLogger.warning(
         'Failed to present Customer Center, falling back to manual links: $e',

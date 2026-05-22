@@ -9,12 +9,15 @@ import 'package:rocis_tasks/core/services/subscription_service.dart';
 import 'package:rocis_tasks/core/services/analytics_service.dart';
 import 'package:rocis_tasks/shared/ui/theme/theme_service.dart';
 import 'package:rocis_tasks/features/premium/presentation/screens/premium_screen.dart';
+import 'package:rocis_tasks/features/categories/presentation/screens/categories_screen.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:rocis_tasks/core/services/backup_service.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:rocis_tasks/core/config/app_config.dart';
+import 'package:rocis_tasks/shared/ui/widgets/snackbars.dart';
+import 'package:rocis_tasks/features/home/presentation/screens/app_guide_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -106,14 +109,63 @@ class SettingsScreen extends StatelessWidget {
         ),
         const Divider(),
         _buildSectionHeader(context, l10n.appearance),
-        SwitchListTile(
-          secondary: const Icon(Icons.dark_mode),
-          title: Text(l10n.darkMode),
-          value: themeService.isDarkMode,
-          onChanged: (value) {
-            themeService.setThemeMode(value ? ThemeMode.dark : ThemeMode.light);
-            analyticsService.logThemeChanged(
-              themeMode: value ? 'dark' : 'light',
+        ListTile(
+          leading: const Icon(Icons.brightness_medium),
+          title: Text(l10n.theme),
+          subtitle: Text(
+            themeService.themeMode == ThemeMode.system
+                ? l10n.systemDefault
+                : themeService.themeMode == ThemeMode.dark
+                    ? l10n.darkMode
+                    : l10n.lightMode,
+          ),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () {
+            showModalBottomSheet(
+              useSafeArea: true,
+              context: context,
+              builder: (context) => Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.brightness_auto),
+                    title: Text(l10n.systemDefault),
+                    onTap: () {
+                      themeService.setThemeMode(ThemeMode.system);
+                      analyticsService.logThemeChanged(themeMode: 'system');
+                      Navigator.pop(context);
+                    },
+                    trailing: themeService.themeMode == ThemeMode.system
+                        ? const Icon(Icons.check)
+                        : null,
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.light_mode),
+                    title: Text(l10n.lightMode),
+                    onTap: () {
+                      themeService.setThemeMode(ThemeMode.light);
+                      analyticsService.logThemeChanged(themeMode: 'light');
+                      Navigator.pop(context);
+                    },
+                    trailing: themeService.themeMode == ThemeMode.light
+                        ? const Icon(Icons.check)
+                        : null,
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.dark_mode),
+                    title: Text(l10n.darkMode),
+                    onTap: () {
+                      themeService.setThemeMode(ThemeMode.dark);
+                      analyticsService.logThemeChanged(themeMode: 'dark');
+                      Navigator.pop(context);
+                    },
+                    trailing: themeService.themeMode == ThemeMode.dark
+                        ? const Icon(Icons.check)
+                        : null,
+                  ),
+                  const SizedBox(height: 24),
+                ],
+              ),
             );
           },
         ),
@@ -202,6 +254,26 @@ class SettingsScreen extends StatelessWidget {
           },
         ),
         const Divider(),
+        _buildSectionHeader(context, l10n.productivity),
+        SwitchListTile(
+          secondary: const Icon(Icons.auto_awesome),
+          title: Text(l10n.smartAdd),
+          subtitle: Text(l10n.autoRemoveNlpDatesSubtitle),
+          value: themeService.autoRemoveNlpDates,
+          onChanged: (value) => themeService.toggleAutoRemoveNlpDates(value),
+        ),
+        ListTile(
+          leading: const Icon(Icons.notifications_active_outlined),
+          title: Text(l10n.showTaskCounterNotification),
+          subtitle: Text(l10n.showTaskCounterNotificationSubtitle),
+          onTap: () async {
+            await taskProvider.updateHomeWidgetWithNotification();
+            if (context.mounted) {
+              showSuccessSnackBar(context, l10n.notificationRefreshed);
+            }
+          },
+        ),
+        const Divider(),
         _buildSectionHeader(context, l10n.dataAndSync),
         ListTile(
           leading: const Icon(Icons.sync),
@@ -222,6 +294,17 @@ class SettingsScreen extends StatelessWidget {
                 context,
               ).showSnackBar(SnackBar(content: Text(l10n.syncComplete)));
             }
+          },
+        ),
+        ListTile(
+          leading: const Icon(Icons.dashboard_customize_outlined),
+          title: Text(l10n.categories),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const CategoriesScreen()),
+            );
           },
         ),
         ListTile(
@@ -379,6 +462,18 @@ class SettingsScreen extends StatelessWidget {
         ),
         const Divider(),
         _buildSectionHeader(context, l10n.about),
+        ListTile(
+          leading: const Icon(Icons.help_outline_rounded),
+          title: Text(l10n.appGuide),
+          subtitle: Text(l10n.appGuideSubtitle),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const AppGuideScreen()),
+            );
+          },
+        ),
         ListTile(
           leading: const Icon(Icons.info_outline),
           title: Text(l10n.aboutApp),

@@ -14,7 +14,6 @@ import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.
 import 'package:rocis_tasks/features/calendar/presentation/providers/calendar_provider.dart';
 import 'package:rocis_tasks/features/onboarding/data/services/onboarding_service.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rocis_tasks/core/config/router.dart';
 import 'package:rocis_tasks/core/services/error_handling_service.dart';
 import 'package:rocis_tasks/core/services/schedule_firestore_service.dart';
@@ -25,6 +24,7 @@ import 'package:rocis_tasks/core/services/calendar_color_service.dart';
 import 'package:rocis_tasks/core/services/logger_service.dart';
 import 'package:rocis_tasks/core/services/analytics_service.dart';
 import 'package:rocis_tasks/core/services/backup_service.dart';
+import 'package:rocis_tasks/core/services/quick_actions_service.dart';
 
 Future<void> main() async {
   // Initialize App (Core, Firebase, Hive)
@@ -77,8 +77,7 @@ class _AppRootState extends State<AppRoot> {
   }
 
   Future<void> _initServices() async {
-    final prefs = await SharedPreferences.getInstance();
-    _onboardingService = OnboardingService(prefs);
+    _onboardingService = OnboardingService();
     _appRouter = AppRouter(_authService, _onboardingService);
 
     try {
@@ -171,35 +170,48 @@ class _AppRootState extends State<AppRoot> {
       future: _initFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const MaterialApp(
+          return MaterialApp(
             debugShowCheckedModeBanner: false,
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [Locale('en'), Locale('he'), Locale('es')],
             home: Scaffold(
               backgroundColor: Colors.black,
-              body: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    CircularProgressIndicator(color: Colors.white),
-                    SizedBox(height: 24),
-                    Text(
-                      "ROCI's Tasks",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 28,
-                        letterSpacing: 1.2,
-                      ),
+              body: Builder(
+                builder: (context) {
+                  final l10n = AppLocalizations.of(context);
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const CircularProgressIndicator(color: Colors.white),
+                        const SizedBox(height: 24),
+                        Text(
+                          "ROCI's Tasks",
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 28,
+                            letterSpacing: 1.2,
+                          ),
+                        ),
+                        if (l10n != null)
+                          Text(
+                            l10n.appTagline,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              letterSpacing: 1.2,
+                            ),
+                          ),
+                      ],
                     ),
-                    Text(
-                      "Dotting the i's and crossing the t's",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        letterSpacing: 1.2,
-                      ),
-                    ),
-                  ],
-                ),
+                  );
+                },
               ),
             ),
           );
@@ -208,69 +220,85 @@ class _AppRootState extends State<AppRoot> {
         if (snapshot.hasError) {
           return MaterialApp(
             debugShowCheckedModeBanner: false,
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [Locale('en'), Locale('he'), Locale('es')],
             home: Scaffold(
               backgroundColor: const Color(0xFF121212),
-              body: Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(32.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(24),
-                        decoration: BoxDecoration(
-                          color: Colors.red.withValues(alpha: 0.1),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.error_outline_rounded,
-                          color: Colors.redAccent,
-                          size: 64,
-                        ),
-                      ),
-                      const SizedBox(height: 32),
-                      const Text(
-                        'CRITICAL ERROR',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1.5,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'ROCI\'s Tasks encountered a problem during startup. Our team has been notified.',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.7),
-                          fontSize: 16,
-                          height: 1.5,
-                        ),
-                      ),
-                      const SizedBox(height: 32),
-                      ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            _initFuture = _initServices();
-                          });
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: Colors.black,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 32,
-                            vertical: 16,
+              body: Builder(
+                builder: (context) {
+                  final l10n = AppLocalizations.of(context);
+                  return Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(32.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(24),
+                            decoration: BoxDecoration(
+                              color: Colors.red.withValues(alpha: 0.1),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.error_outline_rounded,
+                              color: Colors.redAccent,
+                              size: 64,
+                            ),
                           ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                          const SizedBox(height: 32),
+                          Text(
+                            l10n?.criticalErrorTitle ?? 'CRITICAL ERROR',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 1.5,
+                            ),
                           ),
-                        ),
-                        child: const Text('Retry Initialization'),
+                          const SizedBox(height: 16),
+                          Text(
+                            l10n?.appStartupErrorBody ??
+                                'ROCI\'s Tasks encountered a problem during startup. Our team has been notified.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.7),
+                              fontSize: 16,
+                              height: 1.5,
+                            ),
+                          ),
+                          const SizedBox(height: 32),
+                          ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                _initFuture = _initServices();
+                              });
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              foregroundColor: Colors.black,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 32,
+                                vertical: 16,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: Text(
+                              l10n?.retryInitialization ??
+                                  'Retry Initialization',
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                ),
+                    ),
+                  );
+                },
               ),
             ),
           );
@@ -307,8 +335,21 @@ class _AppRootState extends State<AppRoot> {
   }
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      QuickActionsService().initialize(context);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

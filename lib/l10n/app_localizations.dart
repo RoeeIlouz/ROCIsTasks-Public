@@ -130,6 +130,24 @@ abstract class AppLocalizations {
   /// **'Appearance'**
   String get appearance;
 
+  /// No description provided for @theme.
+  ///
+  /// In en, this message translates to:
+  /// **'Theme'**
+  String get theme;
+
+  /// No description provided for @systemDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'System Default'**
+  String get systemDefault;
+
+  /// No description provided for @lightMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Light Mode'**
+  String get lightMode;
+
   /// No description provided for @darkMode.
   ///
   /// In en, this message translates to:
@@ -458,7 +476,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Restored {title}'**
-  String restoredTask(Object title);
+  String restoredTask(String title);
 
   /// No description provided for @deletePermanently.
   ///
@@ -862,6 +880,24 @@ abstract class AppLocalizations {
   /// **'Pro Subscription Active'**
   String get proSubscriptionActive;
 
+  /// No description provided for @welcomeToPro.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to Pro!'**
+  String get welcomeToPro;
+
+  /// No description provided for @pickAPlan.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a Plan'**
+  String get pickAPlan;
+
+  /// No description provided for @byContinuingAgreement.
+  ///
+  /// In en, this message translates to:
+  /// **'By continuing, you agree to our'**
+  String get byContinuingAgreement;
+
   /// No description provided for @purchasesRestored.
   ///
   /// In en, this message translates to:
@@ -1030,6 +1066,12 @@ abstract class AppLocalizations {
   /// **'Next'**
   String get next;
 
+  /// No description provided for @insights.
+  ///
+  /// In en, this message translates to:
+  /// **'Insights'**
+  String get insights;
+
   /// No description provided for @searchTasksHint.
   ///
   /// In en, this message translates to:
@@ -1041,6 +1083,468 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Empty Trash'**
   String get emptyTrash;
+
+  /// No description provided for @productivityTrend.
+  ///
+  /// In en, this message translates to:
+  /// **'Productivity Trend'**
+  String get productivityTrend;
+
+  /// No description provided for @categoryBreakdown.
+  ///
+  /// In en, this message translates to:
+  /// **'Category Breakdown'**
+  String get categoryBreakdown;
+
+  /// No description provided for @completed.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get completed;
+
+  /// No description provided for @pending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get pending;
+
+  /// No description provided for @taskReminderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Task Reminder: {title}'**
+  String taskReminderTitle(String title);
+
+  /// No description provided for @taskDueNowBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You have a task due now!'**
+  String get taskDueNowBody;
+
+  /// No description provided for @createFirstTask.
+  ///
+  /// In en, this message translates to:
+  /// **'Create your first task'**
+  String get createFirstTask;
+
+  /// No description provided for @filterToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get filterToday;
+
+  /// No description provided for @filterThisWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'This Week'**
+  String get filterThisWeek;
+
+  /// No description provided for @filterOverdue.
+  ///
+  /// In en, this message translates to:
+  /// **'Overdue'**
+  String get filterOverdue;
+
+  /// No description provided for @filterNoDate.
+  ///
+  /// In en, this message translates to:
+  /// **'No Date'**
+  String get filterNoDate;
+
+  /// No description provided for @dateRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Date Filter'**
+  String get dateRange;
+
+  /// No description provided for @recurringTaskScheduled.
+  ///
+  /// In en, this message translates to:
+  /// **'Recurring Task Scheduled'**
+  String get recurringTaskScheduled;
+
+  /// No description provided for @nextOccurrenceSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Next occurrence of \"{title}\" set for {date}'**
+  String nextOccurrenceSet(String title, String date);
+
+  /// No description provided for @initializationFailedError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to initialize app data. Please restart.'**
+  String get initializationFailedError;
+
+  /// No description provided for @noTaskDataAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No task data available'**
+  String get noTaskDataAvailable;
+
+  /// No description provided for @retryInitialization.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry Initialization'**
+  String get retryInitialization;
+
+  /// No description provided for @criticalErrorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'CRITICAL ERROR'**
+  String get criticalErrorTitle;
+
+  /// No description provided for @appStartupErrorBody.
+  ///
+  /// In en, this message translates to:
+  /// **'ROCI\'s Tasks encountered a problem during startup. Our team has been notified.'**
+  String get appStartupErrorBody;
+
+  /// No description provided for @appTagline.
+  ///
+  /// In en, this message translates to:
+  /// **'Dotting the i\'s and crossing the t\'s'**
+  String get appTagline;
+
+  /// No description provided for @termsOfService.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms of Service'**
+  String get termsOfService;
+
+  /// No description provided for @allDay.
+  ///
+  /// In en, this message translates to:
+  /// **'All Day'**
+  String get allDay;
+
+  /// No description provided for @event.
+  ///
+  /// In en, this message translates to:
+  /// **'Event'**
+  String get event;
+
+  /// No description provided for @markAsIncomplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as incomplete'**
+  String get markAsIncomplete;
+
+  /// No description provided for @markAsComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as complete'**
+  String get markAsComplete;
+
+  /// No description provided for @editTaskDetailsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Double tap to edit task details'**
+  String get editTaskDetailsHint;
+
+  /// No description provided for @pinTask.
+  ///
+  /// In en, this message translates to:
+  /// **'Pin task'**
+  String get pinTask;
+
+  /// No description provided for @unpinTask.
+  ///
+  /// In en, this message translates to:
+  /// **'Unpin task'**
+  String get unpinTask;
+
+  /// No description provided for @notificationSnooze.
+  ///
+  /// In en, this message translates to:
+  /// **'Snooze 15m'**
+  String get notificationSnooze;
+
+  /// No description provided for @notificationMarkCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark Completed'**
+  String get notificationMarkCompleted;
+
+  /// No description provided for @notificationOpenTask.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Task'**
+  String get notificationOpenTask;
+
+  /// No description provided for @notificationUncompletedTasks.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} Uncompleted Tasks'**
+  String notificationUncompletedTasks(int count);
+
+  /// No description provided for @notificationTasksRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'Tasks Remaining'**
+  String get notificationTasksRemaining;
+
+  /// No description provided for @notificationTasksSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} Tasks'**
+  String notificationTasksSummary(int count);
+
+  /// No description provided for @skip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get skip;
+
+  /// No description provided for @productivity.
+  ///
+  /// In en, this message translates to:
+  /// **'Productivity'**
+  String get productivity;
+
+  /// No description provided for @smartAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Smart Add (NLP)'**
+  String get smartAdd;
+
+  /// No description provided for @autoRemoveNlpDates.
+  ///
+  /// In en, this message translates to:
+  /// **'Clean Title'**
+  String get autoRemoveNlpDates;
+
+  /// No description provided for @autoRemoveNlpDatesSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove date/time from title when suggested'**
+  String get autoRemoveNlpDatesSubtitle;
+
+  /// No description provided for @email.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get email;
+
+  /// No description provided for @password.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get password;
+
+  /// No description provided for @signIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign In'**
+  String get signIn;
+
+  /// No description provided for @register.
+  ///
+  /// In en, this message translates to:
+  /// **'Register'**
+  String get register;
+
+  /// No description provided for @createAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Account'**
+  String get createAccount;
+
+  /// No description provided for @forgotPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot Password?'**
+  String get forgotPassword;
+
+  /// No description provided for @resetPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset Password'**
+  String get resetPassword;
+
+  /// No description provided for @dontHaveAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t have an account?'**
+  String get dontHaveAccount;
+
+  /// No description provided for @alreadyHaveAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Already have an account?'**
+  String get alreadyHaveAccount;
+
+  /// No description provided for @invalidEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid email'**
+  String get invalidEmail;
+
+  /// No description provided for @passwordTooShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Password must be at least 6 characters'**
+  String get passwordTooShort;
+
+  /// No description provided for @passwordsDoNotMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords do not match'**
+  String get passwordsDoNotMatch;
+
+  /// No description provided for @confirmPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Password'**
+  String get confirmPassword;
+
+  /// No description provided for @passwordResetEmailSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Password reset email sent'**
+  String get passwordResetEmailSent;
+
+  /// No description provided for @showTaskCounterNotification.
+  ///
+  /// In en, this message translates to:
+  /// **'Show Task Counter'**
+  String get showTaskCounterNotification;
+
+  /// No description provided for @showTaskCounterNotificationSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Display a persistent notification with your task count'**
+  String get showTaskCounterNotificationSubtitle;
+
+  /// No description provided for @appGuide.
+  ///
+  /// In en, this message translates to:
+  /// **'App Guide'**
+  String get appGuide;
+
+  /// No description provided for @appGuideSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Learn how to use ROCI\'s Tasks'**
+  String get appGuideSubtitle;
+
+  /// No description provided for @appGuideTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'App Guide'**
+  String get appGuideTitle;
+
+  /// No description provided for @features.
+  ///
+  /// In en, this message translates to:
+  /// **'Features'**
+  String get features;
+
+  /// No description provided for @howToUse.
+  ///
+  /// In en, this message translates to:
+  /// **'How to Use'**
+  String get howToUse;
+
+  /// No description provided for @guideTaskDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Create, edit, and organize your daily tasks with ease.'**
+  String get guideTaskDesc;
+
+  /// No description provided for @guideCalendarDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'View your tasks and events in a beautiful calendar view.'**
+  String get guideCalendarDesc;
+
+  /// No description provided for @guideCategoriesDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Organize tasks into custom categories with unique icons and colors.'**
+  String get guideCategoriesDesc;
+
+  /// No description provided for @guideNotificationsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get guideNotificationsTitle;
+
+  /// No description provided for @guideNotificationsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Stay on top of your schedule with smart reminders and a persistent task counter.'**
+  String get guideNotificationsDesc;
+
+  /// No description provided for @guideCloudSyncTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud Sync'**
+  String get guideCloudSyncTitle;
+
+  /// No description provided for @guideCloudSyncDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Access your tasks from any device with secure cloud synchronization.'**
+  String get guideCloudSyncDesc;
+
+  /// No description provided for @guideAddingTasksTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Adding Tasks'**
+  String get guideAddingTasksTitle;
+
+  /// No description provided for @guideAddingTasksDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the + button to add a new task. Use natural language (e.g., \"Lunch tomorrow at 1pm\") for quick entry.'**
+  String get guideAddingTasksDesc;
+
+  /// No description provided for @guideGesturesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Gestures'**
+  String get guideGesturesTitle;
+
+  /// No description provided for @guideGesturesDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Swipe right to complete a task, swipe left to delete it. Long-press for more options.'**
+  String get guideGesturesDesc;
+
+  /// No description provided for @guideWidgetsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Home Widgets'**
+  String get guideWidgetsTitle;
+
+  /// No description provided for @guideWidgetsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Add ROCI\'s Tasks widgets to your home screen for quick access and status updates.'**
+  String get guideWidgetsDesc;
+
+  /// No description provided for @guideCustomizationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Customization'**
+  String get guideCustomizationTitle;
+
+  /// No description provided for @guideCustomizationDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Personalize your experience in Settings with themes, language options, and more.'**
+  String get guideCustomizationDesc;
+
+  /// No description provided for @guideHappyOrganizing.
+  ///
+  /// In en, this message translates to:
+  /// **'Happy Organizing!'**
+  String get guideHappyOrganizing;
+
+  /// No description provided for @notificationRefreshed.
+  ///
+  /// In en, this message translates to:
+  /// **'Task counter notification refreshed'**
+  String get notificationRefreshed;
 }
 
 class _AppLocalizationsDelegate
