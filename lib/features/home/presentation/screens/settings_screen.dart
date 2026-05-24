@@ -815,8 +815,59 @@ class SettingsScreen extends StatelessWidget {
               ),
             );
 
+            if (!context.mounted) {
+              return;
+            }
+
             if (confirmed == true) {
-              final success = await authService.deleteAccount();
+              String? password;
+              final providerIds =
+                  user?.providerData.map((p) => p.providerId).toSet() ?? {};
+              if (providerIds.contains('password')) {
+                final controller = TextEditingController();
+                password = await showDialog<String>(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: Text(l10n.password),
+                    content: TextField(
+                      controller: controller,
+                      obscureText: true,
+                      autofillHints: const [AutofillHints.password],
+                      decoration: InputDecoration(
+                        labelText: l10n.password,
+                      ),
+                      onSubmitted: (value) =>
+                          Navigator.pop(context, value.trim()),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: Text(l10n.cancel),
+                      ),
+                      TextButton(
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.red,
+                        ),
+                        onPressed: () => Navigator.pop(
+                          context,
+                          controller.text.trim(),
+                        ),
+                        child: Text(l10n.deleteEverything),
+                      ),
+                    ],
+                  ),
+                );
+                if (!context.mounted) {
+                  return;
+                }
+                if (password?.isEmpty ?? true) {
+                  return;
+                }
+              }
+
+              final success = await authService.deleteAccount(
+                password: password,
+              );
               if (success) {
                 if (context.mounted) {
                   Navigator.popUntil(context, (route) => route.isFirst);

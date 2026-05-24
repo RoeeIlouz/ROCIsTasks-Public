@@ -290,7 +290,17 @@ class AuthService extends ChangeNotifier {
 
   /// Re-authenticate to secondary Firebase if needed (e.g., after app restart)
   Future<void> ensureSecondaryAuth() async {
-    if (_scheduleAuth?.currentUser != null) return;
+    try {
+      final scheduleApp = Firebase.app('rocis-schedule');
+      _scheduleAuth ??= FirebaseAuth.instanceFor(app: scheduleApp);
+    } catch (_) {
+      _scheduleAuth = null;
+    }
+
+    if (_scheduleAuth?.currentUser != null) {
+      scheduleAuthError.value = null;
+      return;
+    }
 
     // If user is signed in to primary but not secondary, try to sign in
     if (_auth.currentUser != null) {
@@ -304,6 +314,9 @@ class AuthService extends ChangeNotifier {
             idToken: googleAuth.idToken,
           );
           await _signInToSecondaryFirebase(credential);
+          if (_scheduleAuth?.currentUser != null) {
+            scheduleAuthError.value = null;
+          }
         }
       } catch (e) {
         AppLogger.warning(
@@ -332,13 +345,21 @@ class AuthService extends ChangeNotifier {
   }
 
   /// Delete account and all associated data (GDPR requirement)
-  Future<bool> deleteAccount() async {
+  Future<bool> deleteAccount({String? password}) async {
     final user = currentUser;
     if (user == null) return false;
 
     try {
       final userId = user.uid;
       final firestore = FirebaseFirestore.instance;
+
+      final recentLoginOk = await _ensureRecentLoginForDestructiveAction(
+        user,
+        password: password,
+      );
+      if (!recentLoginOk) {
+        return false;
+      }
 
       // 1. Delete Firestore data
       AppLogger.info(
@@ -380,9 +401,20 @@ class AuthService extends ChangeNotifier {
       await firestore.collection('users').doc(userId).delete();
 
       // 2. Delete Auth Account
-      // Note: This may fail if the user hasn't signed in recently.
-      // In production, you'd trigger a re-auth flow here.
-      await user.delete();
+      try {
+        await user.delete();
+      } on FirebaseAuthException catch (e) {
+        if (_isRecentLoginRequired(e)) {
+          final reauthed = await _ensureRecentLoginForDestructiveAction(
+            user,
+            password: password,
+          );
+          if (!reauthed) return false;
+          await user.delete();
+        } else {
+          rethrow;
+        }
+      }
 
       await signOut();
       AppLogger.info('Account and data deleted successfully', tag: 'Auth');
@@ -392,5 +424,61 @@ class AuthService extends ChangeNotifier {
       // If it's a "recent-login-required" error, we should ideally handle it
       return false;
     }
+  }
+
+  bool _isRecentLoginRequired(FirebaseAuthException e) {
+    final code = e.code.toLowerCase();
+    return code == 'requires-recent-login' || code == 'recent-login-required';
+  }
+
+  Future<bool> _ensureRecentLoginForDestructiveAction(
+    User user, {
+    String? password,
+  }) async {
+    final providerIds = user.providerData.map((p) => p.providerId).toSet();
+    if (providerIds.contains('google.com')) {
+      try {
+        final googleUser = await _googleSignIn.signInSilently();
+        if (googleUser == null) return false;
+        final googleAuth = await googleUser.authentication;
+        final credential = GoogleAuthProvider.credential(
+          accessToken: googleAuth.accessToken,
+          idToken: googleAuth.idToken,
+        );
+        await user.reauthenticateWithCredential(credential);
+        return true;
+      } catch (e) {
+        AppLogger.warning(
+          'Google re-authentication failed for destructive action',
+          error: e,
+          tag: 'Auth',
+        );
+        return false;
+      }
+    }
+
+    if (providerIds.contains('password')) {
+      final email = user.email;
+      final normalizedPassword = password?.trim();
+      if (email == null || email.isEmpty) return false;
+      if (normalizedPassword == null || normalizedPassword.isEmpty) return false;
+      try {
+        final credential = EmailAuthProvider.credential(
+          email: email,
+          password: normalizedPassword,
+        );
+        await user.reauthenticateWithCredential(credential);
+        return true;
+      } catch (e) {
+        AppLogger.warning(
+          'Password re-authentication failed for destructive action',
+          error: e,
+          tag: 'Auth',
+        );
+        return false;
+      }
+    }
+
+    return false;
   }
 }

@@ -18,10 +18,12 @@ class SubscriptionService extends ChangeNotifier {
   bool _isPremium = false;
   bool _isInitialized = false;
   bool _isConfigured = false;
+  String? _configurationError;
   String? _syncedAuthUserId;
 
   bool get isPremium => _isPremium;
   bool get isInitialized => _isInitialized;
+  String? get configurationError => _configurationError;
 
   SubscriptionService(this._errorHandlingService);
 
@@ -39,17 +41,31 @@ class SubscriptionService extends ChangeNotifier {
 
       String? apiKey;
       if (Platform.isAndroid) {
+        final fromDefine = const String.fromEnvironment(
+          'REVENUECAT_API_KEY_ANDROID',
+        );
+        apiKey = fromDefine.isNotEmpty ? fromDefine : null;
+      } else if (Platform.isIOS) {
+        final fromDefine = const String.fromEnvironment('REVENUECAT_API_KEY_IOS');
+        apiKey = fromDefine.isNotEmpty ? fromDefine : null;
+      }
+
+      if (apiKey == null) {
+      if (Platform.isAndroid) {
         apiKey = dotenv.env['REVENUECAT_API_KEY_ANDROID'];
       } else if (Platform.isIOS) {
         apiKey = dotenv.env['REVENUECAT_API_KEY_IOS'];
       }
+      }
 
       if (apiKey == null || apiKey.isEmpty) {
-        // Fallback for development/testing if keys aren't set
-        AppLogger.warning(
-          'RevenueCat API key not found in .env',
-          tag: 'Subscription',
-        );
+        _configurationError =
+            'Subscriptions are not configured. RevenueCat API key missing.';
+        if (AppConfig.isProduction) {
+          AppLogger.critical(_configurationError!, tag: 'Subscription');
+        } else {
+          AppLogger.warning(_configurationError!, tag: 'Subscription');
+        }
         _isInitialized = true;
         notifyListeners();
         return;
@@ -63,6 +79,7 @@ class SubscriptionService extends ChangeNotifier {
 
       Purchases.addCustomerInfoUpdateListener(_updateCustomerStatus);
 
+      _configurationError = null;
       _isInitialized = true;
       notifyListeners();
     } catch (e, s) {
@@ -73,6 +90,7 @@ class SubscriptionService extends ChangeNotifier {
       );
       // Even if init fails, we mark as initialized so app doesn't hang,
       // but premium will be false.
+      _configurationError ??= 'Subscriptions failed to initialize.';
       _isInitialized = true;
       notifyListeners();
     }
@@ -181,6 +199,8 @@ class SubscriptionService extends ChangeNotifier {
   }
 
   Future<void> restorePurchases() async {
+    if (kIsWeb) return;
+    if (!_isConfigured) return;
     try {
       CustomerInfo customerInfo = await Purchases.restorePurchases();
       _updateCustomerStatus(customerInfo);
@@ -198,6 +218,8 @@ class SubscriptionService extends ChangeNotifier {
   /// Shows the paywall using RevenueCat's UI library.
   /// returns true if a purchase was made (and thus premium is likely active)
   Future<bool> showPaywall() async {
+    if (kIsWeb) return false;
+    if (!_isConfigured) return false;
     try {
       // Only show if not already premium
       if (_isPremium) {
@@ -238,6 +260,8 @@ class SubscriptionService extends ChangeNotifier {
 
   /// Fetches the current offerings from RevenueCat.
   Future<Offerings?> getOfferings() async {
+    if (kIsWeb) return null;
+    if (!_isConfigured) return null;
     try {
       return await Purchases.getOfferings();
     } catch (e, s) {
@@ -248,6 +272,8 @@ class SubscriptionService extends ChangeNotifier {
 
   /// Purchases a specific package.
   Future<bool> purchasePackage(Package package) async {
+    if (kIsWeb) return false;
+    if (!_isConfigured) return false;
     try {
       AppLogger.info(
         'Purchasing package: ${package.identifier}',
@@ -280,6 +306,7 @@ class SubscriptionService extends ChangeNotifier {
   Future<void> manageSubscription() async {
     try {
       if (kIsWeb) return;
+      if (!_isConfigured) return;
       await RevenueCatUI.presentCustomerCenter();
     } catch (e) {
       AppLogger.warning(

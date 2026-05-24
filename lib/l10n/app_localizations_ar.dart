@@ -30,67 +30,67 @@ class AppLocalizationsAr extends AppLocalizations {
   String get systemDefault => 'إعدادات النظام';
 
   @override
-  String get lightMode => 'وضع فاتح';
+  String get lightMode => 'الوضع الفاتح';
 
   @override
-  String get darkMode => 'وضع داكن';
+  String get darkMode => 'الوضع الداكن';
 
   @override
-  String get materialTheme => 'Material Theme';
+  String get materialTheme => 'سمة ماتيريال';
 
   @override
-  String get useSystemColors => 'Use system colors';
+  String get useSystemColors => 'استخدام ألوان النظام';
 
   @override
-  String get amoledDarkMode => 'AMOLED Dark Mode';
+  String get amoledDarkMode => 'وضع AMOLED الداكن';
 
   @override
-  String get pureBlackBackground => 'Pure black background';
+  String get pureBlackBackground => 'خلفية سوداء بالكامل';
 
   @override
-  String get dataAndSync => 'Data & Sync';
+  String get dataAndSync => 'البيانات والمزامنة';
 
   @override
-  String get syncNow => 'Sync Now';
+  String get syncNow => 'مزامنة الآن';
 
   @override
-  String get syncingTasks => 'Syncing tasks...';
+  String get syncingTasks => 'جاري مزامنة المهام...';
 
   @override
-  String get trash => 'Trash';
+  String get trash => 'سلة المهملات';
 
   @override
-  String get sortAndFilter => 'Sort & Filter';
+  String get sortAndFilter => 'الفرز والتصفية';
 
   @override
-  String get sortBy => 'Sort By';
+  String get sortBy => 'فرز حسب';
 
   @override
-  String get date => 'Date';
+  String get date => 'التاريخ';
 
   @override
-  String get priority => 'Priority';
+  String get priority => 'الأولوية';
 
   @override
-  String get title => 'Title';
+  String get title => 'العنوان';
 
   @override
-  String get createdDate => 'Created Date';
+  String get createdDate => 'تاريخ الإنشاء';
 
   @override
-  String get filterByCategory => 'Filter by Category';
+  String get filterByCategory => 'تصفية حسب الفئة';
 
   @override
-  String get all => 'All';
+  String get all => 'الكل';
 
   @override
-  String get showCompletedTasks => 'Show Completed Tasks';
+  String get showCompletedTasks => 'إظهار المهام المكتملة';
 
   @override
-  String get done => 'Done';
+  String get done => 'تم';
 
   @override
-  String get timeFormat24h => '24h Time Format';
+  String get timeFormat24h => 'تنسيق الوقت 24 ساعة';
 
   @override
   String get language => 'اللغة';
@@ -108,780 +108,771 @@ class AppLocalizationsAr extends AppLocalizations {
   String get arabic => 'العربية';
 
   @override
-  String get tasks => 'Tasks';
+  String get tasks => 'المهام';
 
   @override
-  String get editTask => 'Edit Task';
+  String get editTask => 'تعديل المهمة';
 
   @override
-  String get newTask => 'New Task';
+  String get newTask => 'مهمة جديدة';
 
   @override
-  String get description => 'Description';
+  String get description => 'الوصف';
 
   @override
-  String get dueDateAndTime => 'Due Date & Time';
+  String get dueDateAndTime => 'تاريخ ووقت الاستحقاق';
 
   @override
-  String get noDateSelected => 'No Date Selected';
+  String get noDateSelected => 'لم يتم اختيار تاريخ';
 
   @override
-  String get category => 'Category';
+  String get category => 'الفئة';
 
   @override
-  String get noCategory => 'No Category';
+  String get noCategory => 'بدون فئة';
 
   @override
-  String get saveTask => 'Save Task';
+  String get saveTask => 'حفظ المهمة';
 
   @override
-  String get updateTask => 'Update Task';
+  String get updateTask => 'تحديث المهمة';
 
   @override
-  String get pleaseEnterATitle => 'Please enter a title';
+  String get pleaseEnterATitle => 'يرجى إدخال عنوان';
 
   @override
-  String get high => 'High';
+  String get high => 'عالية';
 
   @override
-  String get medium => 'Medium';
+  String get medium => 'متوسطة';
 
   @override
-  String get low => 'Low';
+  String get low => 'منخفضة';
 
   @override
-  String get priorityLabel => 'Priority';
+  String get priorityLabel => 'الأولوية';
 
   @override
-  String get myTasks => 'My Tasks';
+  String get myTasks => 'مهامي';
 
   @override
-  String get calendar => 'Calendar';
+  String get calendar => 'التقويم';
 
   @override
-  String get categories => 'Categories';
+  String get categories => 'الفئات';
 
   @override
-  String get noCategoriesYet => 'No categories yet';
+  String get noCategoriesYet => 'لا توجد فئات بعد';
 
   @override
-  String get addCategory => 'Add Category';
+  String get addCategory => 'إضافة فئة';
 
   @override
-  String get newCategory => 'New Category';
+  String get newCategory => 'فئة جديدة';
 
   @override
-  String get editCategory => 'Edit Category';
+  String get editCategory => 'تعديل الفئة';
 
   @override
-  String get name => 'Name';
+  String get name => 'الاسم';
 
   @override
-  String get color => 'Color';
+  String get color => 'اللون';
 
   @override
-  String get icon => 'Icon';
+  String get icon => 'الأيقونة';
 
   @override
-  String get cancel => 'Cancel';
+  String get cancel => 'إلغاء';
 
   @override
-  String get add => 'Add';
+  String get add => 'إضافة';
 
   @override
-  String get save => 'Save';
+  String get save => 'حفظ';
 
   @override
-  String get trashTitle => 'Trash';
+  String get trashTitle => 'سلة المهملات';
 
   @override
-  String get trashEmpty => 'Trash is empty';
+  String get trashEmpty => 'سلة المهملات فارغة';
 
   @override
   String restoredTask(String title) {
-    return 'Restored $title';
+    return 'تمت استعادة $title';
   }
 
   @override
-  String get deletePermanently => 'Delete Permanently?';
+  String get deletePermanently => 'حذف نهائيًا؟';
 
   @override
-  String get actionUndone => 'This action cannot be undone.';
+  String get actionUndone => 'لا يمكن التراجع عن هذا الإجراء.';
 
   @override
-  String get delete => 'Delete';
+  String get delete => 'حذف';
 
   @override
-  String get noTasksYet => 'No tasks yet';
+  String get noTasksYet => 'لا توجد مهام بعد';
 
   @override
-  String get duePrefix => 'Due: ';
+  String get duePrefix => 'الاستحقاق: ';
 
   @override
-  String get deleteTaskTitle => 'Delete Task';
+  String get deleteTaskTitle => 'حذف المهمة';
 
   @override
-  String get deleteTaskConfirmation =>
-      'Are you sure you want to delete this task?';
+  String get deleteTaskConfirmation => 'هل أنت متأكد أنك تريد حذف هذه المهمة؟';
 
   @override
-  String get calendarColors => 'Calendar Colors';
+  String get calendarColors => 'ألوان التقويم';
 
   @override
-  String get calendarFiltersTitle => 'Calendar Filters';
+  String get calendarFiltersTitle => 'فلاتر التقويم';
 
   @override
-  String get showCalendarTasks => 'Show Tasks';
+  String get showCalendarTasks => 'إظهار المهام';
 
   @override
-  String get showGoogleCalendar => 'Show Google Calendar';
+  String get showGoogleCalendar => 'إظهار تقويم Google';
 
   @override
-  String get showRocisSchedule => 'Show ROCIs Schedule';
+  String get showRocisSchedule => 'إظهار جدول ROCIs';
 
   @override
-  String get taskColor => 'Task Color';
+  String get taskColor => 'لون المهمة';
 
   @override
-  String get googleCalendarColor => 'Google Calendar Color';
+  String get googleCalendarColor => 'لون تقويم Google';
 
   @override
-  String get scheduleColor => 'ROCIs Schedule Color';
+  String get scheduleColor => 'لون جدول ROCIs';
 
   @override
-  String get assignmentColor => 'Assignment Color';
+  String get assignmentColor => 'لون الواجب';
 
   @override
-  String get resetColors => 'Reset to Defaults';
+  String get resetColors => 'إعادة الضبط إلى الافتراضي';
 
   @override
-  String get selectColor => 'Select Color';
+  String get selectColor => 'اختر لونًا';
 
   @override
-  String get selectGoogleCalendars => 'Select Google Calendars';
+  String get selectGoogleCalendars => 'اختر تقاويم Google';
 
   @override
-  String get selectAll => 'Select All';
+  String get selectAll => 'تحديد الكل';
 
   @override
-  String get deselectAll => 'Deselect All';
+  String get deselectAll => 'إلغاء تحديد الكل';
 
   @override
-  String get offlineMode => 'Offline Mode';
+  String get offlineMode => 'وضع عدم الاتصال';
 
   @override
-  String get syncComplete => 'Sync complete';
+  String get syncComplete => 'اكتملت المزامنة';
 
   @override
-  String get backupAndRestore => 'Backup & Restore';
+  String get backupAndRestore => 'النسخ الاحتياطي والاستعادة';
 
   @override
-  String get exportData => 'Export Data (JSON)';
+  String get exportData => 'تصدير البيانات (JSON)';
 
   @override
-  String get exportDataSubtitle => 'Backup your tasks and categories';
+  String get exportDataSubtitle => 'انسخ مهامك وفئاتك احتياطيًا';
 
   @override
-  String get backupCopied => 'Backup copied to clipboard!';
+  String get backupCopied => 'تم نسخ النسخة الاحتياطية إلى الحافظة!';
 
   @override
   String exportFailed(String error) {
-    return 'Export failed: $error';
+    return 'فشل التصدير: $error';
   }
 
   @override
-  String get importData => 'Import Data (JSON)';
+  String get importData => 'استيراد البيانات (JSON)';
 
   @override
-  String get importDataSubtitle => 'Restore from a JSON backup';
+  String get importDataSubtitle => 'استعادة من نسخة احتياطية JSON';
 
   @override
-  String get importBackup => 'Import Backup';
+  String get importBackup => 'استيراد نسخة احتياطية';
 
   @override
-  String get pasteJsonHint => 'Paste JSON backup here...';
+  String get pasteJsonHint => 'الصق نسخة JSON الاحتياطية هنا...';
 
   @override
-  String get import => 'Import';
+  String get import => 'استيراد';
 
   @override
-  String get importComplete => 'Import complete!';
+  String get importComplete => 'اكتمل الاستيراد!';
 
   @override
   String importFailed(String error) {
-    return 'Import failed: $error';
+    return 'فشل الاستيراد: $error';
   }
 
   @override
-  String get privacyAndGdpr => 'Privacy & GDPR';
+  String get privacyAndGdpr => 'الخصوصية وGDPR';
 
   @override
-  String get privacyPolicy => 'Privacy Policy';
+  String get privacyPolicy => 'سياسة الخصوصية';
 
   @override
-  String get privacyPolicySubtitle => 'Read our data security terms';
+  String get privacyPolicySubtitle => 'اقرأ شروط أمان البيانات';
 
   @override
-  String get deleteAccountTitle => 'Delete My Account & Data';
+  String get deleteAccountTitle => 'حذف حسابي وبياناتي';
 
   @override
-  String get deleteAccountSubtitle => 'Permanently remove all your data';
+  String get deleteAccountSubtitle => 'إزالة جميع بياناتك نهائيًا';
 
   @override
-  String get deleteAccountConfirmTitle => 'Delete Account?';
+  String get deleteAccountConfirmTitle => 'حذف الحساب؟';
 
   @override
   String get deleteAccountConfirmBody =>
-      'This action is permanent and will remove all your tasks, categories, and settings from our servers.';
+      'هذا الإجراء نهائي وسيؤدي إلى إزالة جميع مهامك وفئاتك وإعداداتك من خوادمنا.';
 
   @override
-  String get deleteEverything => 'Delete Everything';
+  String get deleteEverything => 'حذف كل شيء';
 
   @override
   String get deletionFailed =>
-      'Deletion failed. You may need to sign out and back in first for security.';
+      'فشل الحذف. قد تحتاج إلى تسجيل الخروج ثم تسجيل الدخول مرة أخرى لأسباب أمنية.';
 
   @override
-  String get about => 'About';
+  String get about => 'حول';
 
   @override
-  String get aboutApp => 'About ROCI\'s Tasks';
+  String get aboutApp => 'حول مهام ROCI';
 
   @override
-  String get aboutAppSubtitle => 'App version, support, and info';
+  String get aboutAppSubtitle => 'إصدار التطبيق والدعم والمعلومات';
 
   @override
   String get aboutAppDescription =>
-      'ROCI\'s Tasks is designed to help you stay organized and productive. Built with Flutter, it provides a seamless experience for managing your daily tasks, categories, and schedule.';
+      'تم تصميم مهام ROCI لمساعدتك على التنظيم وزيادة الإنتاجية. بُني باستخدام Flutter ويوفر تجربة سلسة لإدارة مهامك اليومية وفئاتك وجدولك.';
 
   @override
-  String get visitWebsite => 'Visit our Website';
+  String get visitWebsite => 'زيارة موقعنا';
 
   @override
-  String get contactSupport => 'Contact Support';
+  String get contactSupport => 'اتصل بالدعم';
 
   @override
-  String get rocisTasksPro => 'ROCIs Tasks Pro';
+  String get rocisTasksPro => 'مهام ROCIs برو';
 
   @override
-  String get youAreProUser => 'You are a Pro user!';
+  String get youAreProUser => 'أنت مستخدم Pro!';
 
   @override
-  String get unlockPremiumFeatures => 'Unlock premium features';
+  String get unlockPremiumFeatures => 'افتح الميزات المدفوعة';
 
   @override
-  String get manageSubscription => 'Manage Subscription';
+  String get manageSubscription => 'إدارة الاشتراك';
 
   @override
-  String get manageSubscriptionSubtitle => 'Cancel or change your plan';
+  String get manageSubscriptionSubtitle => 'إلغاء أو تغيير خطتك';
 
   @override
-  String get upgradeToPro => 'Upgrade to Pro';
+  String get upgradeToPro => 'الترقية إلى Pro';
 
   @override
-  String get unlockFullPotential => 'Unlock your full potential';
+  String get unlockFullPotential => 'افتح كامل إمكانياتك';
 
   @override
-  String get unlimitedCategories => 'Unlimited Categories';
+  String get unlimitedCategories => 'فئات غير محدودة';
 
   @override
   String get unlimitedCategoriesDesc =>
-      'Create as many categories as you need to stay organized.';
+      'أنشئ عددًا غير محدود من الفئات لتنظيم أفضل.';
 
   @override
-  String get premiumWidgets => 'Premium Widgets';
+  String get premiumWidgets => 'ويدجت مميزة';
 
   @override
   String get premiumWidgetsDesc =>
-      'Access to Month and Full Calendar home screen widgets.';
+      'الوصول إلى ويدجت الشهر والتقويم الكامل على الشاشة الرئيسية.';
 
   @override
-  String get subtasksAndChecklists => 'Subtasks & Checklists';
+  String get subtasksAndChecklists => 'مهام فرعية وقوائم تحقق';
 
   @override
   String get subtasksAndChecklistsDesc =>
-      'Break down complex tasks into smaller, manageable steps.';
+      'قسّم المهام المعقدة إلى خطوات أصغر يمكن إدارتها.';
 
   @override
-  String get recurringTasks => 'Recurring Tasks';
+  String get recurringTasks => 'مهام متكررة';
 
   @override
-  String get recurringTasksDesc =>
-      'Automate your routine with flexible repetition rules.';
+  String get recurringTasksDesc => 'أتمتة روتينك بقواعد تكرار مرنة.';
 
   @override
-  String get viewPricingPlans => 'View Pricing Plans';
+  String get viewPricingPlans => 'عرض خطط الأسعار';
 
   @override
-  String get proSubscriptionActive => 'Pro Subscription Active';
+  String get proSubscriptionActive => 'اشتراك Pro نشط';
 
   @override
-  String get welcomeToPro => 'Welcome to Pro!';
+  String get welcomeToPro => 'مرحبًا بك في Pro!';
 
   @override
-  String get pickAPlan => 'Pick a Plan';
+  String get pickAPlan => 'اختر خطة';
 
   @override
-  String get byContinuingAgreement => 'By continuing, you agree to our';
+  String get byContinuingAgreement => 'بالمتابعة، فإنك توافق على';
 
   @override
-  String get purchasesRestored => 'Purchases restored successfully!';
+  String get purchasesRestored => 'تمت استعادة المشتريات بنجاح!';
 
   @override
-  String get noActiveSubscription =>
-      'No active subscription found for this account.';
+  String get noActiveSubscription => 'لا يوجد اشتراك نشط لهذا الحساب.';
 
   @override
-  String get failedToRestore => 'Failed to restore purchases.';
+  String get failedToRestore => 'فشل استعادة المشتريات.';
 
   @override
-  String get restorePurchases => 'Restore Purchases';
+  String get restorePurchases => 'استعادة المشتريات';
 
   @override
-  String get subtasks => 'Subtasks';
+  String get subtasks => 'مهام فرعية';
 
   @override
-  String get noSubtasksAdded => 'No subtasks added';
+  String get noSubtasksAdded => 'لم تتم إضافة مهام فرعية';
 
   @override
-  String get enterSubtask => 'Enter subtask...';
+  String get enterSubtask => 'أدخل مهمة فرعية...';
 
   @override
-  String get recurrence => 'Recurrence';
+  String get recurrence => 'التكرار';
 
   @override
-  String get repeat => 'Repeat';
+  String get repeat => 'تكرار';
 
   @override
-  String get repeatNone => 'None';
+  String get repeatNone => 'بدون';
 
   @override
-  String get repeatDaily => 'Daily';
+  String get repeatDaily => 'يوميًا';
 
   @override
-  String get repeatWeekly => 'Weekly';
+  String get repeatWeekly => 'أسبوعيًا';
 
   @override
-  String get repeatMonthly => 'Monthly';
+  String get repeatMonthly => 'شهريًا';
 
   @override
-  String get titleInvalidContent => 'Title contains invalid content';
+  String get titleInvalidContent => 'العنوان يحتوي على محتوى غير صالح';
 
   @override
-  String get descriptionInvalidContent =>
-      'Description contains invalid content';
+  String get descriptionInvalidContent => 'الوصف يحتوي على محتوى غير صالح';
 
   @override
-  String get failedToSaveTask => 'Failed to save task. Please try again.';
+  String get failedToSaveTask => 'فشل حفظ المهمة. يرجى المحاولة مرة أخرى.';
 
   @override
-  String get welcomeToApp => 'Welcome to ROCI\'s Tasks';
+  String get welcomeToApp => 'مرحبًا بك في مهام ROCI';
 
   @override
-  String get signInToSync => 'Sign in to sync your tasks across devices';
+  String get signInToSync => 'سجّل الدخول لمزامنة مهامك عبر الأجهزة';
 
   @override
-  String get signInWithGoogle => 'Sign in with Google';
+  String get signInWithGoogle => 'تسجيل الدخول باستخدام Google';
 
   @override
-  String get signInFailed => 'Sign in failed';
+  String get signInFailed => 'فشل تسجيل الدخول';
 
   @override
-  String get onboardingWelcomeTitle => 'Welcome to ROCI\'s Tasks';
+  String get onboardingWelcomeTitle => 'مرحبًا بك في مهام ROCI';
 
   @override
-  String get onboardingWelcomeDesc =>
-      'Organize your life with efficiency and style.';
+  String get onboardingWelcomeDesc => 'نظّم حياتك بكفاءة وأسلوب.';
 
   @override
-  String get onboardingSyncTitle => 'Sync & Offline';
+  String get onboardingSyncTitle => 'المزامنة وعدم الاتصال';
 
   @override
   String get onboardingSyncDesc =>
-      'Your tasks follow you everywhere. Access them even without an internet connection.';
+      'مهامك معك أينما ذهبت. يمكنك الوصول إليها حتى بدون إنترنت.';
 
   @override
-  String get onboardingGesturesTitle => 'Smart Gestures';
+  String get onboardingGesturesTitle => 'إيماءات ذكية';
 
   @override
   String get onboardingGesturesDesc =>
-      'Swipe left to delete, swipe right to complete. Long press for more options.';
+      'اسحب لليسار للحذف، ولليمين للإكمال. اضغط مطولًا لمزيد من الخيارات.';
 
   @override
-  String get getStarted => 'Get Started';
+  String get getStarted => 'ابدأ';
 
   @override
-  String get next => 'Next';
+  String get next => 'التالي';
 
   @override
-  String get insights => 'Insights';
+  String get insights => 'الإحصاءات';
 
   @override
-  String get searchTasksHint => 'Search tasks...';
+  String get searchTasksHint => 'ابحث عن المهام...';
 
   @override
-  String get emptyTrash => 'Empty Trash';
+  String get emptyTrash => 'إفراغ سلة المهملات';
 
   @override
-  String get productivityTrend => 'Productivity Trend';
+  String get productivityTrend => 'اتجاه الإنتاجية';
 
   @override
-  String get categoryBreakdown => 'Category Breakdown';
+  String get categoryBreakdown => 'توزيع الفئات';
 
   @override
-  String get completed => 'Completed';
+  String get completed => 'مكتملة';
 
   @override
-  String get pending => 'Pending';
+  String get pending => 'قيد الانتظار';
 
   @override
   String taskReminderTitle(String title) {
-    return 'Task Reminder: $title';
+    return 'تذكير بالمهمة: $title';
   }
 
   @override
-  String get taskDueNowBody => 'You have a task due now!';
+  String get taskDueNowBody => 'لديك مهمة مستحقة الآن!';
 
   @override
-  String get createFirstTask => 'Create your first task';
+  String get createFirstTask => 'أنشئ أول مهمة لك';
 
   @override
-  String get filterToday => 'Today';
+  String get filterToday => 'اليوم';
 
   @override
-  String get filterThisWeek => 'This Week';
+  String get filterThisWeek => 'هذا الأسبوع';
 
   @override
-  String get filterOverdue => 'Overdue';
+  String get filterOverdue => 'متأخرة';
 
   @override
-  String get filterNoDate => 'No Date';
+  String get filterNoDate => 'بدون تاريخ';
 
   @override
-  String get dateRange => 'Date Filter';
+  String get dateRange => 'تصفية التاريخ';
 
   @override
-  String get recurringTaskScheduled => 'Recurring Task Scheduled';
+  String get recurringTaskScheduled => 'تمت جدولة مهمة متكررة';
 
   @override
   String nextOccurrenceSet(String title, String date) {
-    return 'Next occurrence of \"$title\" set for $date';
+    return 'تم تحديد المرة التالية لـ \"$title\" في $date';
   }
 
   @override
   String get initializationFailedError =>
-      'Failed to initialize app data. Please restart.';
+      'فشل تهيئة بيانات التطبيق. يرجى إعادة التشغيل.';
 
   @override
-  String get noTaskDataAvailable => 'No task data available';
+  String get noTaskDataAvailable => 'لا توجد بيانات مهام متاحة';
 
   @override
-  String get retryInitialization => 'Retry Initialization';
+  String get retryInitialization => 'إعادة المحاولة';
 
   @override
-  String get criticalErrorTitle => 'CRITICAL ERROR';
+  String get criticalErrorTitle => 'خطأ حرج';
 
   @override
   String get appStartupErrorBody =>
-      'ROCI\'s Tasks encountered a problem during startup. Our team has been notified.';
+      'واجهت مهام ROCI مشكلة أثناء بدء التشغيل. تم إبلاغ فريقنا.';
 
   @override
-  String get appTagline => 'Dotting the i\'s and crossing the t\'s';
+  String get appTagline => 'نضع النقاط على الحروف';
 
   @override
-  String get termsOfService => 'Terms of Service';
+  String get termsOfService => 'شروط الخدمة';
 
   @override
-  String get allDay => 'All Day';
+  String get allDay => 'طوال اليوم';
 
   @override
-  String get event => 'Event';
+  String get event => 'حدث';
 
   @override
-  String get markAsIncomplete => 'Mark as incomplete';
+  String get markAsIncomplete => 'وضع كغير مكتملة';
 
   @override
-  String get markAsComplete => 'Mark as complete';
+  String get markAsComplete => 'وضع كمكتملة';
 
   @override
-  String get editTaskDetailsHint => 'Double tap to edit task details';
+  String get editTaskDetailsHint => 'انقر مرتين لتعديل تفاصيل المهمة';
 
   @override
-  String get pinTask => 'Pin task';
+  String get pinTask => 'تثبيت المهمة';
 
   @override
-  String get unpinTask => 'Unpin task';
+  String get unpinTask => 'إلغاء تثبيت المهمة';
 
   @override
-  String get notificationSnooze => 'Snooze 15m';
+  String get notificationSnooze => 'غفوة 15د';
 
   @override
-  String get notificationMarkCompleted => 'Mark Completed';
+  String get notificationMarkCompleted => 'وضع كمكتملة';
 
   @override
-  String get notificationOpenTask => 'Open Task';
+  String get notificationOpenTask => 'فتح المهمة';
 
   @override
   String notificationUncompletedTasks(int count) {
-    return '$count Uncompleted Tasks';
+    return '$count مهام غير مكتملة';
   }
 
   @override
-  String get notificationTasksRemaining => 'Tasks Remaining';
+  String get notificationTasksRemaining => 'المهام المتبقية';
 
   @override
   String notificationTasksSummary(int count) {
-    return '$count Tasks';
+    return '$count مهام';
   }
 
   @override
-  String get skip => 'Skip';
+  String get skip => 'تخطي';
 
   @override
-  String get productivity => 'Productivity';
+  String get productivity => 'الإنتاجية';
 
   @override
-  String get smartAdd => 'Smart Add (NLP)';
+  String get smartAdd => 'إضافة ذكية (NLP)';
 
   @override
-  String get autoRemoveNlpDates => 'Clean Title';
+  String get autoRemoveNlpDates => 'تنظيف العنوان';
 
   @override
   String get autoRemoveNlpDatesSubtitle =>
-      'Remove date/time from title when suggested';
+      'إزالة التاريخ/الوقت من العنوان عند الاقتراح';
 
   @override
-  String get email => 'Email';
+  String get email => 'البريد الإلكتروني';
 
   @override
-  String get password => 'Password';
+  String get password => 'كلمة المرور';
 
   @override
-  String get signIn => 'Sign In';
+  String get signIn => 'تسجيل الدخول';
 
   @override
-  String get register => 'Register';
+  String get register => 'تسجيل';
 
   @override
-  String get createAccount => 'Create Account';
+  String get createAccount => 'إنشاء حساب';
 
   @override
-  String get forgotPassword => 'Forgot Password?';
+  String get forgotPassword => 'نسيت كلمة المرور؟';
 
   @override
-  String get resetPassword => 'Reset Password';
+  String get resetPassword => 'إعادة تعيين كلمة المرور';
 
   @override
-  String get dontHaveAccount => 'Don\'t have an account?';
+  String get dontHaveAccount => 'ليس لديك حساب؟';
 
   @override
-  String get alreadyHaveAccount => 'Already have an account?';
+  String get alreadyHaveAccount => 'لديك حساب بالفعل؟';
 
   @override
-  String get invalidEmail => 'Please enter a valid email';
+  String get invalidEmail => 'يرجى إدخال بريد إلكتروني صالح';
 
   @override
-  String get passwordTooShort => 'Password must be at least 6 characters';
+  String get passwordTooShort => 'يجب ألا تقل كلمة المرور عن 6 أحرف';
 
   @override
-  String get passwordsDoNotMatch => 'Passwords do not match';
+  String get passwordsDoNotMatch => 'كلمتا المرور غير متطابقتين';
 
   @override
-  String get confirmPassword => 'Confirm Password';
+  String get confirmPassword => 'تأكيد كلمة المرور';
 
   @override
-  String get passwordResetEmailSent => 'Password reset email sent';
+  String get passwordResetEmailSent => 'تم إرسال رسالة إعادة تعيين كلمة المرور';
 
   @override
-  String get showTaskCounterNotification => 'Show Task Counter';
+  String get showTaskCounterNotification => 'إظهار عدّاد المهام';
 
   @override
-  String get showTaskCounterNotificationSubtitle =>
-      'Display a persistent notification with your task count';
+  String get showTaskCounterNotificationSubtitle => 'عرض إشعار دائم بعدد مهامك';
 
   @override
-  String get appGuide => 'App Guide';
+  String get appGuide => 'دليل التطبيق';
 
   @override
-  String get appGuideSubtitle => 'Learn how to use ROCI\'s Tasks';
+  String get appGuideSubtitle => 'تعلّم كيفية استخدام مهام ROCI';
 
   @override
-  String get appGuideTitle => 'App Guide';
+  String get appGuideTitle => 'دليل التطبيق';
 
   @override
-  String get features => 'Features';
+  String get features => 'الميزات';
 
   @override
-  String get howToUse => 'How to Use';
+  String get howToUse => 'طريقة الاستخدام';
 
   @override
-  String get guideTaskDesc =>
-      'Create, edit, and organize your daily tasks with ease.';
+  String get guideTaskDesc => 'أنشئ وحرر ونظّم مهامك اليومية بسهولة.';
 
   @override
-  String get guideCalendarDesc =>
-      'View your tasks and events in a beautiful calendar view.';
+  String get guideCalendarDesc => 'اعرض مهامك وأحداثك في عرض تقويم جميل.';
 
   @override
   String get guideCategoriesDesc =>
-      'Organize tasks into custom categories with unique icons and colors.';
+      'نظّم المهام ضمن فئات مخصصة بأيقونات وألوان فريدة.';
 
   @override
-  String get guideNotificationsTitle => 'Notifications';
+  String get guideNotificationsTitle => 'الإشعارات';
 
   @override
   String get guideNotificationsDesc =>
-      'Stay on top of your schedule with smart reminders and a persistent task counter.';
+      'ابقَ على اطلاع بجدولك مع تذكيرات ذكية وعدّاد مهام دائم.';
 
   @override
-  String get guideCloudSyncTitle => 'Cloud Sync';
+  String get guideCloudSyncTitle => 'المزامنة السحابية';
 
   @override
   String get guideCloudSyncDesc =>
-      'Access your tasks from any device with secure cloud synchronization.';
+      'ادخل إلى مهامك من أي جهاز مع مزامنة سحابية آمنة.';
 
   @override
-  String get guideAddingTasksTitle => 'Adding Tasks';
+  String get guideAddingTasksTitle => 'إضافة المهام';
 
   @override
   String get guideAddingTasksDesc =>
-      'Tap the + button to add a new task. Use natural language (e.g., \"Lunch tomorrow at 1pm\") for quick entry.';
+      'اضغط زر + لإضافة مهمة جديدة. استخدم اللغة الطبيعية (مثل \"غداء غدًا الساعة 1\") للإدخال السريع.';
 
   @override
-  String get guideGesturesTitle => 'Gestures';
+  String get guideGesturesTitle => 'الإيماءات';
 
   @override
   String get guideGesturesDesc =>
-      'Swipe right to complete a task, swipe left to delete it. Long-press for more options.';
+      'اسحب لليمين لإكمال مهمة، ولليسار لحذفها. اضغط مطولًا لمزيد من الخيارات.';
 
   @override
-  String get guideWidgetsTitle => 'Home Widgets';
+  String get guideWidgetsTitle => 'ويدجت الشاشة الرئيسية';
 
   @override
   String get guideWidgetsDesc =>
-      'Add ROCI\'s Tasks widgets to your home screen for quick access and status updates.';
+      'أضف ويدجت مهام ROCI إلى الشاشة الرئيسية للوصول السريع وتحديثات الحالة.';
 
   @override
-  String get guideCustomizationTitle => 'Customization';
+  String get guideCustomizationTitle => 'التخصيص';
 
   @override
   String get guideCustomizationDesc =>
-      'Personalize your experience in Settings with themes, language options, and more.';
+      'خصص تجربتك من الإعدادات باستخدام السمات واللغة والمزيد.';
 
   @override
-  String get guideHappyOrganizing => 'Happy Organizing!';
+  String get guideHappyOrganizing => 'تنظيم سعيد!';
 
   @override
-  String get notificationRefreshed => 'Task counter notification refreshed';
+  String get notificationRefreshed => 'تم تحديث إشعار عدّاد المهام';
 
   @override
-  String get privateLabel => 'Private';
+  String get privateLabel => 'خاص';
 
   @override
-  String get privateCategory => 'Private category';
+  String get privateCategory => 'فئة خاصة';
 
   @override
   String get privateCategorySubtitle =>
-      'Hide tasks from widgets and previews when locked';
+      'إخفاء المهام من الويدجت والمعاينات عند القفل';
 
   @override
-  String get privateMode => 'Private mode';
+  String get privateMode => 'الوضع الخاص';
 
   @override
-  String get privateModeSubtitle => 'Hide private categories when locked';
+  String get privateModeSubtitle => 'إخفاء الفئات الخاصة عند القفل';
 
   @override
-  String get lockPrivate => 'Lock private';
+  String get lockPrivate => 'قفل الخاص';
 
   @override
-  String get unlockPrivate => 'Unlock private';
+  String get unlockPrivate => 'فتح الخاص';
 
   @override
-  String get hidePrivateCategories => 'Hide private categories';
+  String get hidePrivateCategories => 'إخفاء الفئات الخاصة';
 
   @override
-  String get showPrivateCategories => 'Show private categories';
+  String get showPrivateCategories => 'إظهار الفئات الخاصة';
 
   @override
-  String get setPinTitle => 'Set PIN';
+  String get setPinTitle => 'تعيين رقم PIN';
 
   @override
-  String get pinMinDigits => 'PIN (min 4 digits)';
+  String get pinMinDigits => 'PIN (4 أرقام على الأقل)';
 
   @override
-  String get confirmPin => 'Confirm PIN';
+  String get confirmPin => 'تأكيد PIN';
 
   @override
-  String get enterPinTitle => 'Enter PIN';
+  String get enterPinTitle => 'أدخل PIN';
 
   @override
   String get pinLabel => 'PIN';
 
   @override
-  String get unlock => 'Unlock';
+  String get unlock => 'فتح';
 
   @override
-  String get wrongPin => 'Wrong PIN';
+  String get wrongPin => 'PIN غير صحيح';
 
   @override
-  String get pinsDoNotMatch => 'PINs do not match';
+  String get pinsDoNotMatch => 'رمزا PIN غير متطابقين';
 
   @override
-  String get advancedReminders => 'Advanced reminders';
+  String get advancedReminders => 'تذكيرات متقدمة';
 
   @override
-  String get advancedRemindersSubtitle =>
-      'Extra snooze buttons on task reminders';
+  String get advancedRemindersSubtitle => 'أزرار غفوة إضافية في تذكيرات المهام';
 
   @override
-  String get nagReminders => 'Nag reminders';
+  String get nagReminders => 'تذكيرات متكررة';
 
   @override
-  String get nagRemindersSubtitle => 'Repeat reminders after a task is due';
+  String get nagRemindersSubtitle => 'تكرار التذكيرات بعد موعد استحقاق المهمة';
 
   @override
-  String get quietHours => 'Quiet hours';
+  String get quietHours => 'ساعات الهدوء';
 
   @override
-  String get quietHoursSubtitle => 'Delay reminders during quiet hours';
+  String get quietHoursSubtitle => 'تأجيل التذكيرات خلال ساعات الهدوء';
 
   @override
-  String get quietHoursStart => 'Quiet hours start';
+  String get quietHoursStart => 'بداية ساعات الهدوء';
 
   @override
-  String get quietHoursEnd => 'Quiet hours end';
+  String get quietHoursEnd => 'نهاية ساعات الهدوء';
 
   @override
-  String get nagInterval => 'Nag interval';
+  String get nagInterval => 'فاصل التكرار';
 
   @override
-  String get nagCount => 'Nag count';
+  String get nagCount => 'عدد التكرار';
 
   @override
-  String get snooze10m => 'Snooze 10m';
+  String get snooze10m => 'غفوة 10د';
 
   @override
-  String get snooze1h => 'Snooze 1h';
+  String get snooze1h => 'غفوة 1س';
 
   @override
-  String get tomorrowAtNine => 'Tomorrow 9:00';
+  String get tomorrowAtNine => 'غدًا 9:00';
 
   @override
-  String get privateTask => 'Private task';
+  String get privateTask => 'مهمة خاصة';
 
   @override
-  String get privateTaskSubtitle => 'Unlock private mode to view details.';
+  String get privateTaskSubtitle => 'افتح الوضع الخاص لعرض التفاصيل.';
 
   @override
-  String get accentColor => 'Accent color';
+  String get accentColor => 'لون التمييز';
 
   @override
-  String get accentColorSubtitle => 'Customize the app colors (Pro)';
+  String get accentColorSubtitle => 'تخصيص ألوان التطبيق (Pro)';
 
   @override
-  String get requireSubTasksBeforeReminders => 'Subtasks required';
+  String get requireSubTasksBeforeReminders => 'المهام الفرعية مطلوبة';
 
   @override
   String get requireSubTasksBeforeRemindersSubtitle =>
-      'Don’t send reminders until all subtasks are completed';
+      'لا ترسل تذكيرات حتى تكتمل جميع المهام الفرعية';
 }

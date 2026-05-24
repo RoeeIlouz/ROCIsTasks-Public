@@ -16,6 +16,8 @@ migrate_working_dir/
 .kilocode/
 .antigravitycli/
 .claude/
+.dbg/
+.kilocode/
 
 # IntelliJ related
 *.iml
