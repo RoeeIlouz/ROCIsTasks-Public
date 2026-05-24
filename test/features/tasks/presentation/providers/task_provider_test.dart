@@ -13,6 +13,8 @@ import 'package:rocis_tasks/core/services/error_handling_service.dart';
 import 'package:rocis_tasks/core/services/subscription_service.dart';
 import 'package:rocis_tasks/core/services/analytics_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:rocis_tasks/features/categories/domain/models/category.dart';
 
 class MockLocalTaskSource extends Mock implements LocalTaskSource {}
 
@@ -38,6 +40,10 @@ class TaskFake extends Fake implements Task {}
 
 class StackTraceFake extends Fake implements StackTrace {}
 
+class MockUser extends Mock implements User {}
+
+class CategoryFake extends Fake implements Category {}
+
 void main() {
   late TaskProvider taskProvider;
   late MockLocalTaskSource mockSource;
@@ -54,6 +60,7 @@ void main() {
   setUpAll(() {
     registerFallbackValue(TaskFake());
     registerFallbackValue(StackTraceFake());
+    registerFallbackValue(CategoryFake());
   });
 
   setUp(() async {
@@ -171,6 +178,43 @@ void main() {
 
       expect(taskProvider.tasks[0].id, '1'); // Pinned first
       expect(taskProvider.tasks[1].id, '2');
+    });
+  });
+
+  group('TaskProvider Completed Prefetch', () {
+    test('fetches completed tasks after login when showCompleted is enabled', () async {
+      final user = MockUser();
+      when(() => user.uid).thenReturn('u1');
+
+      when(() => mockAuthService.authStateChanges).thenAnswer(
+        (_) => Stream.value(user),
+      );
+      when(() => mockAuthService.currentUser).thenReturn(user);
+
+      when(() => mockFirestoreService.setUserId(any())).thenReturn(null);
+      when(() => mockFirestoreService.getActiveTasksStream()).thenAnswer(
+        (_) => const Stream.empty(),
+      );
+      when(() => mockFirestoreService.getCategoriesStream()).thenAnswer(
+        (_) => const Stream.empty(),
+      );
+      when(() => mockFirestoreService.addTask(any())).thenAnswer((_) async => {});
+      when(() => mockFirestoreService.addCategory(any())).thenAnswer((_) async => {});
+
+      final completedTask = Task(
+        id: 'c1',
+        title: 'Completed',
+        isCompleted: true,
+      );
+      when(() => mockFirestoreService.getNextCompletedTasksBatch()).thenAnswer(
+        (_) async => [completedTask],
+      );
+      when(() => mockSource.addTask(any())).thenAnswer((_) async => {});
+
+      await taskProvider.init();
+
+      await untilCalled(() => mockFirestoreService.getNextCompletedTasksBatch());
+      verify(() => mockSource.addTask(completedTask)).called(1);
     });
   });
 }

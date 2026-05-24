@@ -66,6 +66,8 @@ class TaskProvider extends ChangeNotifier {
   StreamSubscription? _connectivitySubscription;
   StreamSubscription? _notificationSubscription;
   String? _lastUserId;
+  String? _completedPrefetchUserId;
+  bool _completedPrefetchInFlight = false;
 
   // Bulk Selection State
   bool _isSelectionMode = false;
@@ -227,6 +229,7 @@ class TaskProvider extends ChangeNotifier {
         // Always attempt sync - Firestore handles offline state
         uploadLocalDataToCloud();
         syncWithCloud();
+        unawaited(_prefetchCompletedTasksIfNeeded());
       } else {
         // Only clear if we were previously logged in (_lastUserId was set)
         if (_lastUserId != null) {
@@ -261,6 +264,7 @@ class TaskProvider extends ChangeNotifier {
           .catchError((e, s) {
             _errorHandlingService.logError(e, s, reason: 'Initial sync');
           });
+      unawaited(_prefetchCompletedTasksIfNeeded());
     }
 
     _notificationSubscription = _notificationService.onNotificationResponse
@@ -532,6 +536,40 @@ class TaskProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> _prefetchCompletedTasksIfNeeded() async {
+    if (!_showCompleted) return;
+    final user = _authService.currentUser;
+    if (user == null) return;
+    if (_completedPrefetchInFlight) return;
+
+    final hasAnyCompletedLocally = _source
+        .getTasks()
+        .any((t) => t.isCompleted && !(t.isDeleted ?? false));
+    if (_completedPrefetchUserId == user.uid && hasAnyCompletedLocally) {
+      return;
+    }
+
+    _completedPrefetchInFlight = true;
+    try {
+      final completed = await _firestoreService.getNextCompletedTasksBatch();
+      if (completed.isEmpty) {
+        _completedPrefetchUserId = user.uid;
+        return;
+      }
+
+      for (final task in completed) {
+        await _source.addTask(task);
+      }
+      _completedPrefetchUserId = user.uid;
+      _refreshPagination();
+      notifyListeners();
+    } catch (e, s) {
+      _errorHandlingService.logError(e, s, reason: 'Prefetch completed tasks');
+    } finally {
+      _completedPrefetchInFlight = false;
+    }
+  }
+
   Future<void> syncWithCloud() async {
     if (_authService.currentUser == null) return;
 
@@ -792,6 +830,9 @@ class TaskProvider extends ChangeNotifier {
     _showCompleted = value;
     _refreshPagination();
     notifyListeners();
+    if (value) {
+      unawaited(_prefetchCompletedTasksIfNeeded());
+    }
     SharedPreferences.getInstance()
         .then((prefs) {
           prefs.setBool('show_completed', value);
