@@ -11,8 +11,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       REVENUECAT_API_KEY_ANDROID: ${{ secrets.REVENUECAT_API_KEY_ANDROID }}
-      REVENUECAT_API_KEY_IOS: ${{ secrets.REVENUECAT_API_KEY_IOS }}
-      
 
     steps:
       - uses: actions/checkout@v4
@@ -59,9 +57,7 @@ jobs:
           ( while true; do echo "Build still running..."; sleep 240; done ) &
           KEEPALIVE_PID=$!
           trap 'kill $KEEPALIVE_PID' EXIT
-          flutter build appbundle --release \
-            --dart-define=REVENUECAT_API_KEY_ANDROID="$REVENUECAT_API_KEY_ANDROID" \
-            --dart-define=REVENUECAT_API_KEY_IOS="$REVENUECAT_API_KEY_IOS"
+          flutter build appbundle --release --dart-define=REVENUECAT_API_KEY_ANDROID="$REVENUECAT_API_KEY_ANDROID"
 
       - name: Upload Android artifact (AAB)
         uses: actions/upload-artifact@v4
