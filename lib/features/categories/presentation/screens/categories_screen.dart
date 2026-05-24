@@ -123,18 +123,33 @@ class CategoriesScreen extends StatelessWidget {
                         fontSize: 16,
                       ),
                     ),
-                    trailing: Semantics(
-                      label: 'Delete category',
-                      button: true,
-                      child: IconButton(
-                        icon: Icon(
-                          Icons.delete_outline_rounded,
-                          color: theme.colorScheme.error.withValues(alpha: 0.7),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (category.isPrivate)
+                          Icon(
+                            Icons.lock_rounded,
+                            color: theme.colorScheme.primary.withValues(
+                              alpha: 0.7,
+                            ),
+                            size: 18,
+                          ),
+                        Semantics(
+                          label: 'Delete category',
+                          button: true,
+                          child: IconButton(
+                            icon: Icon(
+                              Icons.delete_outline_rounded,
+                              color: theme.colorScheme.error.withValues(
+                                alpha: 0.7,
+                              ),
+                            ),
+                            onPressed: () {
+                              provider.deleteCategory(category.id);
+                            },
+                          ),
                         ),
-                        onPressed: () {
-                          provider.deleteCategory(category.id);
-                        },
-                      ),
+                      ],
                     ),
                   ),
                 ),
@@ -224,6 +239,7 @@ class _CategorySheetState extends State<_CategorySheet> {
   late TextEditingController _nameController;
   late int _selectedColor;
   late int _selectedIcon;
+  late bool _isPrivate;
 
   final List<Color> _colors = [
     const Color(0xFF6366F1), // Indigo
@@ -250,6 +266,7 @@ class _CategorySheetState extends State<_CategorySheet> {
     _nameController = TextEditingController(text: widget.category?.name ?? '');
     _selectedColor = widget.category?.colorValue ?? _colors.first.toARGB32();
     _selectedIcon = widget.category?.iconCode ?? Icons.category.codePoint;
+    _isPrivate = widget.category?.isPrivate ?? false;
   }
 
   @override
@@ -262,6 +279,10 @@ class _CategorySheetState extends State<_CategorySheet> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
+    final subscriptionService = Provider.of<SubscriptionService>(
+      context,
+      listen: true,
+    );
 
     return Container(
       decoration: BoxDecoration(
@@ -352,6 +373,30 @@ class _CategorySheetState extends State<_CategorySheet> {
               ),
             ),
             const SizedBox(height: 28),
+
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              secondary: Icon(
+                _isPrivate ? Icons.lock_rounded : Icons.lock_open_rounded,
+              ),
+              title: Text(
+                l10n.privateCategory,
+                style: GoogleFonts.outfit(fontWeight: FontWeight.w600),
+              ),
+              subtitle: Text(
+                l10n.privateCategorySubtitle,
+                style: GoogleFonts.outfit(fontSize: 13),
+              ),
+              value: _isPrivate,
+              onChanged: (value) {
+                if (!subscriptionService.isPremium) {
+                  subscriptionService.showPaywall();
+                  return;
+                }
+                setState(() => _isPrivate = value);
+              },
+            ),
+            const SizedBox(height: 16),
 
             Text(
               l10n.color,
@@ -500,12 +545,14 @@ class _CategorySheetState extends State<_CategorySheet> {
                             name: _nameController.text.trim(),
                             colorValue: _selectedColor,
                             iconCode: _selectedIcon,
+                            isPrivate: _isPrivate,
                           );
                         } else {
                           taskProvider.addCategory(
                             _nameController.text.trim(),
                             _selectedColor,
                             _selectedIcon,
+                            isPrivate: _isPrivate,
                           );
                         }
                         Navigator.pop(context);

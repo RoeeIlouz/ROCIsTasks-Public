@@ -17,11 +17,15 @@ class Category extends HiveObject {
   @HiveField(3)
   int iconCode;
 
+  @HiveField(4)
+  bool isPrivate;
+
   Category({
     String? id,
     required this.name,
     required this.colorValue,
     required this.iconCode,
+    this.isPrivate = false,
   }) : id = id ?? const Uuid().v4();
 
   Map<String, dynamic> toMap() {
@@ -30,6 +34,7 @@ class Category extends HiveObject {
       'name': name,
       'colorValue': colorValue,
       'iconCode': iconCode,
+      'isPrivate': isPrivate,
     };
   }
 
@@ -39,6 +44,7 @@ class Category extends HiveObject {
       name: map['name'] ?? '',
       colorValue: map['colorValue'] ?? 0xFF2196F3,
       iconCode: map['iconCode'] ?? 0,
+      isPrivate: map['isPrivate'] ?? false,
     );
   }
 }

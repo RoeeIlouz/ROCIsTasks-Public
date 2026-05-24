@@ -105,6 +105,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get spanish => 'Español';
 
   @override
+  String get arabic => 'Árabe';
+
+  @override
   String get tasks => 'Tareas';
 
   @override
@@ -780,4 +783,119 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get notificationRefreshed =>
       'Notificación del contador de tareas actualizada';
+
+  @override
+  String get privateLabel => 'Privado';
+
+  @override
+  String get privateCategory => 'Categoría privada';
+
+  @override
+  String get privateCategorySubtitle =>
+      'Oculta tareas en widgets y previsualizaciones cuando está bloqueado';
+
+  @override
+  String get privateMode => 'Modo privado';
+
+  @override
+  String get privateModeSubtitle =>
+      'Oculta categorías privadas cuando está bloqueado';
+
+  @override
+  String get lockPrivate => 'Bloquear privado';
+
+  @override
+  String get unlockPrivate => 'Desbloquear privado';
+
+  @override
+  String get hidePrivateCategories => 'Ocultar categorías privadas';
+
+  @override
+  String get showPrivateCategories => 'Mostrar categorías privadas';
+
+  @override
+  String get setPinTitle => 'Establecer PIN';
+
+  @override
+  String get pinMinDigits => 'PIN (mín. 4 dígitos)';
+
+  @override
+  String get confirmPin => 'Confirmar PIN';
+
+  @override
+  String get enterPinTitle => 'Introducir PIN';
+
+  @override
+  String get pinLabel => 'PIN';
+
+  @override
+  String get unlock => 'Desbloquear';
+
+  @override
+  String get wrongPin => 'PIN incorrecto';
+
+  @override
+  String get pinsDoNotMatch => 'Los PIN no coinciden';
+
+  @override
+  String get advancedReminders => 'Recordatorios avanzados';
+
+  @override
+  String get advancedRemindersSubtitle =>
+      'Botones extra de posponer en recordatorios';
+
+  @override
+  String get nagReminders => 'Recordatorios insistentes';
+
+  @override
+  String get nagRemindersSubtitle =>
+      'Repite recordatorios cuando una tarea vence';
+
+  @override
+  String get quietHours => 'Horas de silencio';
+
+  @override
+  String get quietHoursSubtitle =>
+      'Retrasa recordatorios durante horas de silencio';
+
+  @override
+  String get quietHoursStart => 'Inicio de horas de silencio';
+
+  @override
+  String get quietHoursEnd => 'Fin de horas de silencio';
+
+  @override
+  String get nagInterval => 'Intervalo de insistencia';
+
+  @override
+  String get nagCount => 'Cantidad de insistencias';
+
+  @override
+  String get snooze10m => 'Posponer 10m';
+
+  @override
+  String get snooze1h => 'Posponer 1h';
+
+  @override
+  String get tomorrowAtNine => 'Mañana 9:00';
+
+  @override
+  String get privateTask => 'Tarea privada';
+
+  @override
+  String get privateTaskSubtitle =>
+      'Desbloquea el modo privado para ver los detalles.';
+
+  @override
+  String get accentColor => 'Color de acento';
+
+  @override
+  String get accentColorSubtitle => 'Personaliza los colores de la app (Pro)';
+
+  @override
+  String get requireSubTasksBeforeReminders => 'Subtareas requeridas';
+
+  @override
+  String get requireSubTasksBeforeRemindersSubtitle =>
+      'No envía recordatorios hasta completar todas las subtareas';
 }

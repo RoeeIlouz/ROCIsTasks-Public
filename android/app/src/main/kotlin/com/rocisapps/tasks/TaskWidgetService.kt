@@ -33,6 +33,7 @@ class TaskWidgetFactory(private val context: Context) : RemoteViewsService.Remot
             // Read sort/filter prefs
             val sortMode = widgetData.getInt(TaskWidgetProvider.PREF_SORT_KEY, 0)
             val filterMode = widgetData.getInt(TaskWidgetProvider.PREF_FILTER_KEY, 0)
+            val isPremium = widgetData.getBoolean("is_premium", false)
             
             
             // Filter
@@ -40,6 +41,8 @@ class TaskWidgetFactory(private val context: Context) : RemoteViewsService.Remot
                 when (filterMode) {
                     1 -> isDueToday(task)
                     2 -> isHighPriority(task)
+                    3 -> isPremium && isOverdue(task)
+                    4 -> isPremium && isPinned(task)
                     else -> true
                 }
             }
@@ -88,6 +91,26 @@ class TaskWidgetFactory(private val context: Context) : RemoteViewsService.Remot
 
     private fun isHighPriority(task: JSONObject): Boolean {
         return task.optString("priority", "").equals("high", ignoreCase = true)
+    }
+
+    private fun isPinned(task: JSONObject): Boolean {
+        return task.optBoolean("isPinned", false)
+    }
+
+    private fun isOverdue(task: JSONObject): Boolean {
+        val dueIso = task.optString("dueDateIso", "")
+        if (dueIso.isEmpty()) return false
+        return try {
+            val due = try {
+                java.time.OffsetDateTime.parse(dueIso).toInstant()
+            } catch (e: Exception) {
+                java.time.LocalDateTime.parse(dueIso).atZone(java.time.ZoneId.systemDefault()).toInstant()
+            }
+            val now = java.time.Instant.now()
+            due.isBefore(now)
+        } catch (e: Exception) {
+            false
+        }
     }
 
     private fun getPriorityLevel(task: JSONObject): Int {
@@ -164,6 +187,8 @@ class TaskWidgetFactory(private val context: Context) : RemoteViewsService.Remot
             standardizedTask.put("category_color", extractColorSafely(taskObj, "category_color", ""))
             standardizedTask.put("priority", extractStringSafely(taskObj, "priority", "medium"))
             standardizedTask.put("isCompleted", extractBooleanSafely(taskObj, "isCompleted", false))
+            standardizedTask.put("isPinned", extractBooleanSafely(taskObj, "isPinned", false))
+            standardizedTask.put("categoryId", extractStringSafely(taskObj, "categoryId", ""))
             
             return standardizedTask
         } catch (e: Exception) {

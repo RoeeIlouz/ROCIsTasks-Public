@@ -39,6 +39,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   List<TextEditingController> _subTaskControllers = [];
   String? _recurrenceRule;
   NlpResult? _nlpSuggestion;
+  bool _requireSubTasksBeforeReminders = false;
 
   @override
   void initState() {
@@ -58,6 +59,8 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
         .map((st) => TextEditingController(text: st.title))
         .toList();
     _recurrenceRule = widget.task?.recurrenceRule;
+    _requireSubTasksBeforeReminders =
+        widget.task?.requireSubTasksBeforeReminders ?? false;
   }
 
   @override
@@ -154,6 +157,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
             categoryId: _category,
             subTasks: _subTasks,
             recurrenceRule: _recurrenceRule,
+            requireSubTasksBeforeReminders: _requireSubTasksBeforeReminders,
           );
         } else {
           Provider.of<TaskProvider>(context, listen: false).addTask(
@@ -164,6 +168,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
             _category,
             subTasks: _subTasks,
             recurrenceRule: _recurrenceRule,
+            requireSubTasksBeforeReminders: _requireSubTasksBeforeReminders,
           );
         }
         HapticFeedback.mediumImpact();
@@ -627,6 +632,31 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
             ),
           );
         }),
+        if (_subTasks.isNotEmpty)
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            secondary: Icon(
+              _requireSubTasksBeforeReminders
+                  ? Icons.link_rounded
+                  : Icons.link_off_rounded,
+            ),
+            title: Text(
+              l10n.requireSubTasksBeforeReminders,
+              style: GoogleFonts.outfit(fontWeight: FontWeight.w600),
+            ),
+            subtitle: Text(
+              l10n.requireSubTasksBeforeRemindersSubtitle,
+              style: GoogleFonts.outfit(fontSize: 13),
+            ),
+            value: _requireSubTasksBeforeReminders,
+            onChanged: (value) {
+              if (!subscriptionService.isPremium) {
+                subscriptionService.showPaywall();
+                return;
+              }
+              setState(() => _requireSubTasksBeforeReminders = value);
+            },
+          ),
       ],
     );
   }

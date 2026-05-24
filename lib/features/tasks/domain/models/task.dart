@@ -1,5 +1,6 @@
 import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
+import 'package:cloud_firestore/cloud_firestore.dart' show Timestamp;
 
 import 'package:rocis_tasks/features/tasks/domain/models/sub_task.dart';
 
@@ -56,6 +57,9 @@ class Task extends HiveObject {
   @HiveField(12)
   DateTime createdAt;
 
+  @HiveField(13)
+  bool requireSubTasksBeforeReminders;
+
   Task({
     String? id,
     required this.title,
@@ -70,6 +74,7 @@ class Task extends HiveObject {
     this.recurrenceRule,
     this.completedAt,
     DateTime? createdAt,
+    this.requireSubTasksBeforeReminders = false,
   }) : id = id ?? const Uuid().v4(),
        createdAt = createdAt ?? DateTime.now();
 
@@ -86,6 +91,7 @@ class Task extends HiveObject {
     String? recurrenceRule,
     DateTime? completedAt,
     DateTime? createdAt,
+    bool? requireSubTasksBeforeReminders,
   }) {
     return Task(
       id: id,
@@ -101,6 +107,8 @@ class Task extends HiveObject {
       recurrenceRule: recurrenceRule ?? this.recurrenceRule,
       completedAt: completedAt ?? this.completedAt,
       createdAt: createdAt ?? this.createdAt,
+      requireSubTasksBeforeReminders:
+          requireSubTasksBeforeReminders ?? this.requireSubTasksBeforeReminders,
     );
   }
 
@@ -119,7 +127,35 @@ class Task extends HiveObject {
       'recurrenceRule': recurrenceRule,
       'completedAt': completedAt?.toIso8601String(),
       'createdAt': createdAt.toIso8601String(),
+      'requireSubTasksBeforeReminders': requireSubTasksBeforeReminders,
     };
+  }
+
+  Map<String, dynamic> toFirestoreMap() {
+    return {
+      'id': id,
+      'title': title,
+      'description': description,
+      'isCompleted': isCompleted,
+      'dueDate': dueDate,
+      'priority': priority.index,
+      'categoryId': categoryId,
+      'isDeleted': isDeleted ?? false,
+      'isPinned': isPinned ?? false,
+      'subTasks': subTasks?.map((st) => st.toMap()).toList(),
+      'recurrenceRule': recurrenceRule,
+      'completedAt': completedAt,
+      'createdAt': createdAt,
+      'requireSubTasksBeforeReminders': requireSubTasksBeforeReminders,
+    };
+  }
+
+  static DateTime? _parseDate(dynamic value) {
+    if (value == null) return null;
+    if (value is DateTime) return value;
+    if (value is Timestamp) return value.toDate();
+    if (value is String) return DateTime.tryParse(value);
+    return null;
   }
 
   factory Task.fromMap(Map<String, dynamic> map) {
@@ -128,9 +164,7 @@ class Task extends HiveObject {
       title: map['title'] ?? '',
       description: map['description'] ?? '',
       isCompleted: map['isCompleted'] ?? false,
-      dueDate: map['dueDate'] != null
-          ? DateTime.tryParse(map['dueDate'])
-          : null,
+      dueDate: _parseDate(map['dueDate']),
       priority: TaskPriority.values[map['priority'] ?? 1],
       categoryId: map['categoryId'],
       isDeleted: map['isDeleted'] ?? false,
@@ -139,12 +173,10 @@ class Task extends HiveObject {
           ?.map((st) => SubTask.fromMap(st as Map<String, dynamic>))
           .toList(),
       recurrenceRule: map['recurrenceRule'],
-      completedAt: map['completedAt'] != null
-          ? DateTime.tryParse(map['completedAt'])
-          : null,
-      createdAt: map['createdAt'] != null
-          ? DateTime.tryParse(map['createdAt'])
-          : null,
+      completedAt: _parseDate(map['completedAt']),
+      createdAt: _parseDate(map['createdAt']),
+      requireSubTasksBeforeReminders:
+          map['requireSubTasksBeforeReminders'] ?? false,
     );
   }
 }

@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:home_widget/home_widget.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:rocis_tasks/shared/ui/ui_kit.dart';
 import 'package:rocis_tasks/core/services/auth_service.dart';
@@ -25,6 +28,7 @@ import 'package:rocis_tasks/core/services/logger_service.dart';
 import 'package:rocis_tasks/core/services/analytics_service.dart';
 import 'package:rocis_tasks/core/services/backup_service.dart';
 import 'package:rocis_tasks/core/services/quick_actions_service.dart';
+import 'package:rocis_tasks/core/services/security_service.dart';
 
 Future<void> main() async {
   // Initialize App (Core, Firebase, Hive)
@@ -53,6 +57,7 @@ class _AppRootState extends State<AppRoot> {
   final _themeService = ThemeService();
   final _calendarColorService = CalendarColorService();
   final _scheduleService = ScheduleFirestoreService();
+  final _privateModeService = PrivateModeService();
   late final _taskSource = LocalTaskSource();
   late final _fullCalendarWidgetService = FullCalendarWidgetService(
     _calendarService,
@@ -64,11 +69,13 @@ class _AppRootState extends State<AppRoot> {
     _themeService,
     _errorHandlingService,
     _subscriptionService,
+    privateModeService: _privateModeService,
     source: _taskSource,
   );
   final _connectivityService = ConnectivityService();
   late final OnboardingService _onboardingService;
   AppRouter? _appRouter;
+  StreamSubscription<User?>? _authStateToSubscriptionSync;
 
   @override
   void initState() {
@@ -138,11 +145,29 @@ class _AppRootState extends State<AppRoot> {
             stack: stack,
           ),
         ),
+        _privateModeService.init().catchError(
+          (e, stack) => AppLogger.error(
+            'Failed to init private mode service',
+            error: e,
+            stack: stack,
+          ),
+        ),
         _authService.initialized,
       ]);
 
       // Log session start
       AnalyticsService().logSessionStart();
+
+      _authStateToSubscriptionSync?.cancel();
+      _authStateToSubscriptionSync = _authService.authStateChanges.listen((
+        user,
+      ) {
+        unawaited(_subscriptionService.syncWithAuthUserId(user?.uid));
+      });
+
+      await _subscriptionService.syncWithAuthUserId(
+        _authService.currentUser?.uid,
+      );
     } catch (e, stackTrace) {
       AppLogger.critical(
         'Critical app initialization failure',
@@ -155,6 +180,7 @@ class _AppRootState extends State<AppRoot> {
 
   @override
   void dispose() {
+    _authStateToSubscriptionSync?.cancel();
     _taskProvider.dispose();
     _authService.dispose();
     _subscriptionService.dispose();
@@ -178,7 +204,7 @@ class _AppRootState extends State<AppRoot> {
               GlobalWidgetsLocalizations.delegate,
               GlobalCupertinoLocalizations.delegate,
             ],
-            supportedLocales: const [Locale('en'), Locale('he'), Locale('es')],
+            supportedLocales: AppLocalizations.supportedLocales,
             home: Scaffold(
               backgroundColor: Colors.black,
               body: Builder(
@@ -226,7 +252,7 @@ class _AppRootState extends State<AppRoot> {
               GlobalWidgetsLocalizations.delegate,
               GlobalCupertinoLocalizations.delegate,
             ],
-            supportedLocales: const [Locale('en'), Locale('he'), Locale('es')],
+            supportedLocales: AppLocalizations.supportedLocales,
             home: Scaffold(
               backgroundColor: const Color(0xFF121212),
               body: Builder(
@@ -310,6 +336,7 @@ class _AppRootState extends State<AppRoot> {
             ChangeNotifierProvider.value(value: _calendarColorService),
             ChangeNotifierProvider.value(value: _authService),
             ChangeNotifierProvider.value(value: _taskProvider),
+            ChangeNotifierProvider.value(value: _privateModeService),
             Provider.value(value: _calendarService),
             Provider.value(value: _scheduleService),
             Provider.value(value: _fullCalendarWidgetService),
@@ -354,18 +381,37 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     final themeService = Provider.of<ThemeService>(context);
+    final subscriptionService = Provider.of<SubscriptionService>(context);
     final appRouter = Provider.of<AppRouter>(context);
 
     return DynamicColorBuilder(
       builder: (lightDynamic, darkDynamic) {
+        final bool canUseCustomSeed =
+            subscriptionService.isPremium &&
+            themeService.useCustomSeedColor &&
+            themeService.customSeedColorValue != null;
+        final ColorScheme? lightScheme = canUseCustomSeed
+            ? ColorScheme.fromSeed(
+                seedColor: Color(themeService.customSeedColorValue!),
+                brightness: Brightness.light,
+              )
+            : (themeService.useMaterialTheme ? lightDynamic : null);
+
+        final ColorScheme? darkScheme = canUseCustomSeed
+            ? ColorScheme.fromSeed(
+                seedColor: Color(themeService.customSeedColorValue!),
+                brightness: Brightness.dark,
+              )
+            : (themeService.useMaterialTheme ? darkDynamic : null);
+
         return MaterialApp.router(
           title: "ROCI's Tasks",
           debugShowCheckedModeBanner: false,
           theme: AppTheme.createLightTheme(
-            themeService.useMaterialTheme ? lightDynamic : null,
+            lightScheme,
           ),
           darkTheme: AppTheme.createDarkTheme(
-            themeService.useMaterialTheme ? darkDynamic : null,
+            darkScheme,
             isAmoled: themeService.useAmoledTheme,
           ),
           themeMode: themeService.themeMode,
@@ -375,7 +421,7 @@ class _MyAppState extends State<MyApp> {
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
           ],
-          supportedLocales: const [Locale('en'), Locale('he'), Locale('es')],
+          supportedLocales: AppLocalizations.supportedLocales,
           locale: themeService.locale,
           routerConfig: appRouter.router,
         );

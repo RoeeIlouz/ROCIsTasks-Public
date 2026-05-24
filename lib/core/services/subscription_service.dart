@@ -17,6 +17,8 @@ class SubscriptionService extends ChangeNotifier {
 
   bool _isPremium = false;
   bool _isInitialized = false;
+  bool _isConfigured = false;
+  String? _syncedAuthUserId;
 
   bool get isPremium => _isPremium;
   bool get isInitialized => _isInitialized;
@@ -55,6 +57,7 @@ class SubscriptionService extends ChangeNotifier {
 
       PurchasesConfiguration configuration = PurchasesConfiguration(apiKey);
       await Purchases.configure(configuration);
+      _isConfigured = true;
 
       await _checkSubscriptionStatus();
 
@@ -72,6 +75,33 @@ class SubscriptionService extends ChangeNotifier {
       // but premium will be false.
       _isInitialized = true;
       notifyListeners();
+    }
+  }
+
+  Future<void> syncWithAuthUserId(String? authUserId) async {
+    if (kIsWeb) return;
+    if (!_isConfigured) return;
+
+    final normalized = authUserId?.trim();
+    if (_syncedAuthUserId == normalized) return;
+    _syncedAuthUserId = normalized;
+
+    try {
+      if (normalized == null || normalized.isEmpty) {
+        final customerInfo = await Purchases.logOut();
+        _updateCustomerStatus(customerInfo);
+        return;
+      }
+
+      final result = await Purchases.logIn(normalized);
+      _updateCustomerStatus(result.customerInfo);
+    } catch (e, s) {
+      _errorHandlingService.logError(
+        e,
+        s,
+        reason: 'Syncing subscription user id',
+      );
+      await _checkSubscriptionStatus();
     }
   }
 
@@ -137,6 +167,10 @@ class SubscriptionService extends ChangeNotifier {
           iOSName: 'MonthWidget',
         );
         await HomeWidget.updateWidget(
+          name: 'TaskWidgetProvider',
+          iOSName: 'TaskWidget',
+        );
+        await HomeWidget.updateWidget(
           name: 'FullCalendarWidgetProvider',
           iOSName: 'FullCalendarWidget',
         );
@@ -151,6 +185,11 @@ class SubscriptionService extends ChangeNotifier {
       CustomerInfo customerInfo = await Purchases.restorePurchases();
       _updateCustomerStatus(customerInfo);
     } catch (e, s) {
+      if (e is PlatformException &&
+          e.code ==
+              PurchasesErrorCode.receiptAlreadyInUseError.index.toString()) {
+        return;
+      }
       _errorHandlingService.logError(e, s, reason: 'Restoring purchases');
       rethrow; // Let UI handle error display
     }

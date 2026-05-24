@@ -75,6 +75,7 @@ class FirestoreService {
           'name': category.name,
           'colorValue': category.colorValue,
           'iconCode': category.iconCode,
+          'isPrivate': category.isPrivate,
         });
       });
       _syncStatus.setSuccess();
@@ -105,6 +106,7 @@ class FirestoreService {
         'name': category.name,
         'colorValue': category.colorValue,
         'iconCode': category.iconCode,
+        'isPrivate': category.isPrivate,
       }, SetOptions(merge: true));
       _syncStatus.setSuccess();
     } catch (e) {
@@ -170,6 +172,7 @@ class FirestoreService {
           name: data['name'],
           colorValue: data['colorValue'],
           iconCode: data['iconCode'],
+          isPrivate: data['isPrivate'] ?? false,
         );
       }).toList();
     });
@@ -185,7 +188,7 @@ class FirestoreService {
     await trace.start();
     try {
       await RetryService.retryFirestoreOperation(() async {
-        final data = task.toMap();
+        final data = task.toFirestoreMap();
         data['updatedAt'] = FieldValue.serverTimestamp();
         await collection.doc(task.id).set(data);
       });
@@ -209,7 +212,7 @@ class FirestoreService {
     );
     await trace.start();
     try {
-      final data = task.toMap();
+      final data = task.toFirestoreMap();
       data['updatedAt'] = FieldValue.serverTimestamp();
       await collection.doc(task.id).set(data, SetOptions(merge: true));
       _syncStatus.setSuccess();
@@ -249,6 +252,27 @@ class FirestoreService {
       _syncStatus.setError('Failed to sync task deletion. Will retry later.');
     } finally {
       await trace.stop();
+    }
+  }
+
+  Future<(Task? task, bool isMissing)> fetchTaskById(String id) async {
+    final collection = _tasksCollection;
+    if (collection == null || !_shouldSync) return (null, false);
+
+    try {
+      final doc = await collection.doc(id).get();
+      final data = doc.data();
+      if (!doc.exists || data == null) {
+        return (null, true);
+      }
+      return (Task.fromMap(data), false);
+    } catch (e) {
+      AppLogger.error(
+        'Firestore fetchTaskById failed',
+        error: e,
+        tag: 'Firestore',
+      );
+      return (null, false);
     }
   }
 

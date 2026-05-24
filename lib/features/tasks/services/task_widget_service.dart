@@ -25,6 +25,8 @@ class TaskWidgetService {
             : '',
         'dueDateIso': task.dueDate?.toIso8601String() ?? '',
         'isCompleted': task.isCompleted,
+        'isPinned': task.isPinned ?? false,
+        'categoryId': task.categoryId ?? '',
       };
     } catch (e) {
       // Silent error handling - return fallback data

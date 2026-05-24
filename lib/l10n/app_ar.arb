@@ -1,0 +1,17 @@
+{
+  "@@locale": "ar",
+  "appTitle": "مهام ROCI",
+  "settings": "الإعدادات",
+  "account": "الحساب",
+  "signOut": "تسجيل الخروج",
+  "appearance": "المظهر",
+  "theme": "السمة",
+  "systemDefault": "إعدادات النظام",
+  "lightMode": "وضع فاتح",
+  "darkMode": "وضع داكن",
+  "language": "اللغة",
+  "hebrew": "العبرية",
+  "english": "الإنجليزية",
+  "spanish": "الإسبانية",
+  "arabic": "العربية"
+}

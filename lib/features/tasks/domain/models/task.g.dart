@@ -30,13 +30,14 @@ class TaskAdapter extends TypeAdapter<Task> {
       recurrenceRule: fields[10] as String?,
       completedAt: fields[11] as DateTime?,
       createdAt: fields[12] as DateTime?,
+      requireSubTasksBeforeReminders: fields[13] as bool? ?? false,
     );
   }
 
   @override
   void write(BinaryWriter writer, Task obj) {
     writer
-      ..writeByte(13)
+      ..writeByte(14)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -62,7 +63,9 @@ class TaskAdapter extends TypeAdapter<Task> {
       ..writeByte(11)
       ..write(obj.completedAt)
       ..writeByte(12)
-      ..write(obj.createdAt);
+      ..write(obj.createdAt)
+      ..writeByte(13)
+      ..write(obj.requireSubTasksBeforeReminders);
   }
 
   @override

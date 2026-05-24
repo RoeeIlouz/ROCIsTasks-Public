@@ -18,6 +18,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:rocis_tasks/core/config/app_config.dart';
 import 'package:rocis_tasks/shared/ui/widgets/snackbars.dart';
 import 'package:rocis_tasks/features/home/presentation/screens/app_guide_screen.dart';
+import 'package:rocis_tasks/core/services/security_service.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -26,7 +27,7 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeService = Provider.of<ThemeService>(context);
     final authService = Provider.of<AuthService>(context, listen: false);
-    final taskProvider = Provider.of<TaskProvider>(context, listen: false);
+    final taskProvider = Provider.of<TaskProvider>(context, listen: true);
     final calendarProvider = Provider.of<CalendarProvider>(
       context,
       listen: false,
@@ -34,6 +35,7 @@ class SettingsScreen extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final user = authService.currentUser;
     final subscriptionService = Provider.of<SubscriptionService>(context);
+    final privateModeService = Provider.of<PrivateModeService>(context);
     final analyticsService = Provider.of<AnalyticsService>(
       context,
       listen: false,
@@ -43,7 +45,12 @@ class SettingsScreen extends StatelessWidget {
       final code = themeService.locale?.languageCode;
       if (code == 'he') return l10n.hebrew;
       if (code == 'es') return l10n.spanish;
+      if (code == 'ar') return l10n.arabic;
       return l10n.english;
+    }
+
+    String _formatMinutes(int minutes) {
+      return '${minutes}m';
     }
 
     return ListView(
@@ -181,6 +188,102 @@ class SettingsScreen extends StatelessWidget {
             );
           },
         ),
+        ListTile(
+          leading: const Icon(Icons.color_lens_outlined),
+          title: Text(l10n.accentColor),
+          subtitle: Text(l10n.accentColorSubtitle),
+          trailing: Container(
+            width: 20,
+            height: 20,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: subscriptionService.isPremium &&
+                      themeService.useCustomSeedColor &&
+                      themeService.customSeedColorValue != null
+                  ? Color(themeService.customSeedColorValue!)
+                  : Theme.of(context).colorScheme.primary,
+            ),
+          ),
+          onTap: () async {
+            if (!subscriptionService.isPremium) {
+              await subscriptionService.showPaywall();
+              return;
+            }
+            final colors = <Color>[
+              const Color(0xFF6366F1),
+              const Color(0xFF10B981),
+              const Color(0xFFF59E0B),
+              const Color(0xFFEF4444),
+              const Color(0xFF8B5CF6),
+              const Color(0xFF06B6D4),
+              const Color(0xFF22C55E),
+              const Color(0xFF3B82F6),
+              const Color(0xFFEC4899),
+              const Color(0xFF64748B),
+            ];
+            final selected = await showModalBottomSheet<int>(
+              useSafeArea: true,
+              context: context,
+              builder: (context) {
+                final current = themeService.customSeedColorValue;
+                return Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            l10n.accentColor,
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, -1),
+                            child: Text(l10n.systemDefault),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Wrap(
+                        spacing: 12,
+                        runSpacing: 12,
+                        children: [
+                          for (final c in colors)
+                            InkWell(
+                              onTap: () => Navigator.pop(context, c.toARGB32()),
+                              borderRadius: BorderRadius.circular(999),
+                              child: Container(
+                                width: 44,
+                                height: 44,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: c,
+                                  border: Border.all(
+                                    color: current == c.toARGB32()
+                                        ? Theme.of(context).colorScheme.onSurface
+                                        : Colors.transparent,
+                                    width: 3,
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                    ],
+                  ),
+                );
+              },
+            );
+            if (selected == null) return;
+            if (selected == -1) {
+              await themeService.setCustomSeedColorValue(null);
+            } else {
+              await themeService.setCustomSeedColorValue(selected);
+            }
+          },
+        ),
         SwitchListTile(
           secondary: const Icon(Icons.brightness_2),
           title: Text(l10n.amoledDarkMode),
@@ -247,6 +350,17 @@ class SettingsScreen extends StatelessWidget {
                         ? const Icon(Icons.check)
                         : null,
                   ),
+                  ListTile(
+                    title: Text(l10n.arabic),
+                    onTap: () {
+                      themeService.setLocale(const Locale('ar'));
+                      analyticsService.logLanguageChanged(locale: 'ar');
+                      Navigator.pop(context);
+                    },
+                    trailing: themeService.locale?.languageCode == 'ar'
+                        ? const Icon(Icons.check)
+                        : null,
+                  ),
                   const SizedBox(height: 24),
                 ],
               ),
@@ -262,6 +376,263 @@ class SettingsScreen extends StatelessWidget {
           value: themeService.autoRemoveNlpDates,
           onChanged: (value) => themeService.toggleAutoRemoveNlpDates(value),
         ),
+        if (subscriptionService.isPremium) ...[
+          SwitchListTile(
+            secondary: const Icon(Icons.notifications_active_outlined),
+            title: Text(l10n.advancedReminders),
+            subtitle: Text(l10n.advancedRemindersSubtitle),
+            value: taskProvider.advancedRemindersEnabled,
+            onChanged: (value) async {
+              await taskProvider.setAdvancedRemindersEnabled(value);
+              
+            },
+          ),
+          SwitchListTile(
+            secondary: const Icon(Icons.notification_important_outlined),
+            title: Text(l10n.nagReminders),
+            subtitle: Text(l10n.nagRemindersSubtitle),
+            value: taskProvider.nagRemindersEnabled,
+            onChanged: (value) async {
+              await taskProvider.setNagRemindersEnabled(value);
+              
+            },
+          ),
+          if (taskProvider.nagRemindersEnabled) ...[
+            ListTile(
+              leading: const Icon(Icons.schedule_outlined),
+              title: Text(l10n.nagInterval),
+              subtitle: Text(_formatMinutes(taskProvider.nagIntervalMinutes)),
+              onTap: () async {
+                final selected = await showDialog<int>(
+                  context: context,
+                  builder: (context) => SimpleDialog(
+                    title: Text(l10n.nagInterval),
+                    children: [
+                      SimpleDialogOption(
+                        onPressed: () => Navigator.pop(context, 15),
+                        child: const Text('15m'),
+                      ),
+                      SimpleDialogOption(
+                        onPressed: () => Navigator.pop(context, 30),
+                        child: const Text('30m'),
+                      ),
+                      SimpleDialogOption(
+                        onPressed: () => Navigator.pop(context, 60),
+                        child: const Text('60m'),
+                      ),
+                    ],
+                  ),
+                );
+                if (selected == null) return;
+                await taskProvider.setNagIntervalMinutes(selected);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.format_list_numbered_rounded),
+              title: Text(l10n.nagCount),
+              subtitle: Text('${taskProvider.nagCount}'),
+              onTap: () async {
+                final selected = await showDialog<int>(
+                  context: context,
+                  builder: (context) => SimpleDialog(
+                    title: Text(l10n.nagCount),
+                    children: [
+                      for (final count in [1, 2, 3, 4, 5])
+                        SimpleDialogOption(
+                          onPressed: () => Navigator.pop(context, count),
+                          child: Text('$count'),
+                        ),
+                    ],
+                  ),
+                );
+                if (selected == null) return;
+                await taskProvider.setNagCount(selected);
+              },
+            ),
+          ],
+          SwitchListTile(
+            secondary: const Icon(Icons.bedtime_outlined),
+            title: Text(l10n.quietHours),
+            subtitle: Text(l10n.quietHoursSubtitle),
+            value: taskProvider.quietHoursEnabled,
+            onChanged: (value) async {
+              await taskProvider.setQuietHoursEnabled(value);
+              
+            },
+          ),
+          if (taskProvider.quietHoursEnabled) ...[
+            ListTile(
+              leading: const Icon(Icons.nights_stay_outlined),
+              title: Text(l10n.quietHoursStart),
+              subtitle: Text(
+                MaterialLocalizations.of(context).formatTimeOfDay(
+                  TimeOfDay(
+                    hour: taskProvider.quietStartMinutes ~/ 60,
+                    minute: taskProvider.quietStartMinutes % 60,
+                  ),
+                ),
+              ),
+              onTap: () async {
+                final selected = await showTimePicker(
+                  context: context,
+                  initialTime: TimeOfDay(
+                    hour: taskProvider.quietStartMinutes ~/ 60,
+                    minute: taskProvider.quietStartMinutes % 60,
+                  ),
+                );
+                if (selected == null) return;
+                await taskProvider.setQuietHoursStartMinutes(
+                  selected.hour * 60 + selected.minute,
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.wb_sunny_outlined),
+              title: Text(l10n.quietHoursEnd),
+              subtitle: Text(
+                MaterialLocalizations.of(context).formatTimeOfDay(
+                  TimeOfDay(
+                    hour: taskProvider.quietEndMinutes ~/ 60,
+                    minute: taskProvider.quietEndMinutes % 60,
+                  ),
+                ),
+              ),
+              onTap: () async {
+                final selected = await showTimePicker(
+                  context: context,
+                  initialTime: TimeOfDay(
+                    hour: taskProvider.quietEndMinutes ~/ 60,
+                    minute: taskProvider.quietEndMinutes % 60,
+                  ),
+                );
+                if (selected == null) return;
+                await taskProvider.setQuietHoursEndMinutes(
+                  selected.hour * 60 + selected.minute,
+                );
+              },
+            ),
+          ],
+          SwitchListTile(
+            secondary: const Icon(Icons.lock_rounded),
+            title: Text(l10n.privateMode),
+            subtitle: Text(l10n.privateModeSubtitle),
+            value: privateModeService.isEnabled,
+            onChanged: (value) async {
+              if (value && !privateModeService.hasPin) {
+                final pinController = TextEditingController();
+                final confirmController = TextEditingController();
+                final ok = await showDialog<bool>(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: Text(l10n.setPinTitle),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        TextField(
+                          controller: pinController,
+                          keyboardType: TextInputType.number,
+                          obscureText: true,
+                          decoration: InputDecoration(labelText: l10n.pinMinDigits),
+                        ),
+                        const SizedBox(height: 12),
+                        TextField(
+                          controller: confirmController,
+                          keyboardType: TextInputType.number,
+                          obscureText: true,
+                          decoration: InputDecoration(labelText: l10n.confirmPin),
+                        ),
+                      ],
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, false),
+                        child: Text(l10n.cancel),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, true),
+                        child: Text(l10n.save),
+                      ),
+                    ],
+                  ),
+                );
+                if (ok != true) return;
+                if (pinController.text != confirmController.text) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(l10n.pinsDoNotMatch)),
+                    );
+                  }
+                  return;
+                }
+                final saved = await privateModeService.setPin(
+                  pinController.text,
+                );
+                if (!saved) return;
+              }
+              await privateModeService.setEnabled(value);
+              // await taskProvider.updateHomeWidgetWithNotification();
+            },
+          ),
+          if (privateModeService.isEnabled && privateModeService.hasPin)
+            ListTile(
+              leading: Icon(
+                privateModeService.isUnlocked
+                    ? Icons.lock_open_rounded
+                    : Icons.lock_rounded,
+              ),
+              title: Text(
+                privateModeService.isUnlocked
+                    ? l10n.lockPrivate
+                    : l10n.unlockPrivate,
+              ),
+              subtitle: Text(
+                privateModeService.isUnlocked
+                    ? l10n.hidePrivateCategories
+                    : l10n.showPrivateCategories,
+              ),
+              onTap: () async {
+                if (privateModeService.isUnlocked) {
+                  await privateModeService.lock();
+                  // await taskProvider.updateHomeWidgetWithNotification();
+                  return;
+                }
+                final pinController = TextEditingController();
+                final ok = await showDialog<bool>(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: Text(l10n.enterPinTitle),
+                    content: TextField(
+                      controller: pinController,
+                      keyboardType: TextInputType.number,
+                      obscureText: true,
+                      decoration: InputDecoration(labelText: l10n.pinLabel),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, false),
+                        child: Text(l10n.cancel),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, true),
+                        child: Text(l10n.unlock),
+                      ),
+                    ],
+                  ),
+                );
+                if (ok != true) return;
+                final unlocked = await privateModeService.unlockWithPin(
+                  pinController.text,
+                );
+                if (!unlocked && context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(l10n.wrongPin)),
+                  );
+                  return;
+                }
+                // await taskProvider.updateHomeWidgetWithNotification();
+              },
+            ),
+        ],
         ListTile(
           leading: const Icon(Icons.notifications_active_outlined),
           title: Text(l10n.showTaskCounterNotification),

@@ -9,6 +9,7 @@ import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.
 import 'package:rocis_tasks/features/tasks/presentation/screens/add_task_screen.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:rocis_tasks/core/utils/icon_utils.dart';
+import 'package:rocis_tasks/core/services/security_service.dart';
 
 class TaskDetailScreen extends StatelessWidget {
   final Task task;
@@ -29,6 +30,85 @@ class TaskDetailScreen extends StatelessWidget {
     return Consumer<TaskProvider>(
       builder: (context, provider, child) {
         final updatedTask = provider.getTaskById(task.id) ?? task;
+        final updatedCategory =
+            provider.getCategoryById(updatedTask.categoryId) ?? category;
+        final privateModeService = Provider.of<PrivateModeService>(context);
+
+        if (updatedCategory?.isPrivate == true &&
+            privateModeService.shouldHidePrivateContent) {
+          return Scaffold(
+            appBar: AppBar(),
+            body: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.lock_rounded,
+                      size: 64,
+                      color: theme.colorScheme.primary,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      l10n.privateTask,
+                      style: GoogleFonts.outfit(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      l10n.privateTaskSubtitle,
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.bodyMedium,
+                    ),
+                    const SizedBox(height: 24),
+                    FilledButton(
+                      onPressed: () async {
+                        final pinController = TextEditingController();
+                        final ok = await showDialog<bool>(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: Text(l10n.enterPinTitle),
+                            content: TextField(
+                              controller: pinController,
+                              keyboardType: TextInputType.number,
+                              obscureText: true,
+                              decoration: InputDecoration(labelText: l10n.pinLabel),
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, false),
+                                child: Text(l10n.cancel),
+                              ),
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, true),
+                                child: Text(l10n.unlock),
+                              ),
+                            ],
+                          ),
+                        );
+                        if (ok != true) return;
+                        final unlocked = await privateModeService.unlockWithPin(
+                          pinController.text,
+                        );
+                        if (!unlocked && context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(l10n.wrongPin)),
+                          );
+                          return;
+                        }
+                        await provider.updateHomeWidgetWithNotification();
+                      },
+                      child: Text(l10n.unlock),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        }
 
         return Scaffold(
           appBar: AppBar(
@@ -106,15 +186,16 @@ class TaskDetailScreen extends StatelessWidget {
                   spacing: 12,
                   runSpacing: 12,
                   children: [
-                    if (category != null)
+                    if (updatedCategory != null)
                       Chip(
                         avatar: Icon(
-                          IconUtils.getIconData(category!.iconCode),
-                          color: Color(category!.colorValue),
+                          IconUtils.getIconData(updatedCategory.iconCode),
+                          color: Color(updatedCategory.colorValue),
                           size: 18,
                         ),
-                        label: Text(category!.name),
-                        backgroundColor: Color(category!.colorValue).withValues(alpha: 0.1),
+                        label: Text(updatedCategory.name),
+                        backgroundColor: Color(updatedCategory.colorValue)
+                            .withValues(alpha: 0.1),
                         side: BorderSide.none,
                       ),
                     if (updatedTask.dueDate != null)

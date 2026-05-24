@@ -15,16 +15,23 @@ class CategoryDistributionChart extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     
     final allTasks = taskProvider.allTasks;
+
+    if (allTasks.isEmpty) {
+      return Center(child: Text(l10n.noTaskDataAvailable));
+    }
     
     // Count tasks per category
     final Map<String, int> categoryCounts = {};
     for (var task in allTasks) {
-      final categoryId = task.categoryId ?? 'Uncategorized';
+      const noCategoryKey = '__no_category__';
+      final categoryId = task.categoryId ?? noCategoryKey;
       categoryCounts[categoryId] = (categoryCounts[categoryId] ?? 0) + 1;
     }
 
     final List<PieChartSectionData> sections = categoryCounts.entries.map((entry) {
-      final category = taskProvider.getCategoryById(entry.key);
+      final category = entry.key == '__no_category__'
+          ? null
+          : taskProvider.getCategoryById(entry.key);
       final color = category != null ? Color(category.colorValue) : theme.disabledColor;
       final name = category?.name ?? l10n.noCategory;
       
@@ -42,10 +49,6 @@ class CategoryDistributionChart extends StatelessWidget {
         badgePositionPercentageOffset: 1.3,
       );
     }).toList();
-
-    if (allTasks.isEmpty) {
-      return Center(child: Text(l10n.noTaskDataAvailable));
-    }
 
     return PieChart(
       PieChartData(

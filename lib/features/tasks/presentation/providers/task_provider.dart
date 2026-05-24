@@ -28,6 +28,7 @@ import 'package:rocis_tasks/core/services/error_handling_service.dart';
 import 'package:rocis_tasks/core/services/analytics_service.dart';
 import 'package:rocis_tasks/core/services/validation_service.dart';
 import 'package:rocis_tasks/core/services/logger_service.dart';
+import 'package:rocis_tasks/core/services/security_service.dart';
 
 enum TaskSortOption { dueDate, priority, title, dateCreated }
 
@@ -38,6 +39,7 @@ enum DateTimeFilterOption { all, today, thisWeek, overdue, noDate }
 /// This class handles local persistence via Hive, cloud synchronization via Firestore,
 /// and coordination between various services (notifications, widgets, etc.).
 class TaskProvider extends ChangeNotifier {
+  static const int _maxNagNotifications = 5;
   AppLocalizations get _l10n {
     return lookupAppLocalizations(PlatformDispatcher.instance.locale);
   }
@@ -52,6 +54,7 @@ class TaskProvider extends ChangeNotifier {
   final ThemeService _themeService;
   final ErrorHandlingService _errorHandlingService;
   final SubscriptionService _subscriptionService;
+  final PrivateModeService _privateModeService;
   late final MonthWidgetService _monthWidgetService;
   late final FullCalendarWidgetService _fullCalendarWidgetService;
   late final WidgetDataService _widgetDataService;
@@ -78,12 +81,14 @@ class TaskProvider extends ChangeNotifier {
     this._themeService,
     this._errorHandlingService,
     this._subscriptionService, {
+    PrivateModeService? privateModeService,
     LocalTaskSource? source,
     NotificationService? notificationService,
     FirestoreService? firestoreService,
     ConnectivityService? connectivityService,
     AnalyticsService? analyticsService,
-  }) : _source = source ?? LocalTaskSource(),
+  }) : _privateModeService = privateModeService ?? PrivateModeService(),
+       _source = source ?? LocalTaskSource(),
        _notificationService = notificationService ?? NotificationService(),
        _firestoreService = firestoreService ?? FirestoreService(),
        _connectivityService = connectivityService ?? ConnectivityService(),
@@ -132,6 +137,14 @@ class TaskProvider extends ChangeNotifier {
     }
     _selectedCategoryIds = prefs.getStringList('category_filters') ?? [];
     _showCompleted = prefs.getBool('show_completed') ?? true;
+    _advancedRemindersEnabled =
+        prefs.getBool('advanced_reminders_enabled') ?? false;
+    _nagRemindersEnabled = prefs.getBool('nag_reminders_enabled') ?? false;
+    _nagIntervalMinutes = prefs.getInt('nag_interval_minutes') ?? 15;
+    _nagCount = prefs.getInt('nag_count') ?? 3;
+    _quietHoursEnabled = prefs.getBool('quiet_hours_enabled') ?? false;
+    _quietStartMinutes = prefs.getInt('quiet_start_minutes') ?? (22 * 60);
+    _quietEndMinutes = prefs.getInt('quiet_end_minutes') ?? (7 * 60);
     _searchQuery = '';
 
     _monthWidgetService = MonthWidgetService(_calendarService, _source);
@@ -168,35 +181,20 @@ class TaskProvider extends ChangeNotifier {
 
     // Listen to subscription changes
     _subscriptionService.addListener(notifyListeners);
+    _privateModeService.addListener(_onPrivateModeChanged);
 
     // Defer notification rescheduling to not block startup
     Future.delayed(const Duration(seconds: 2), () async {
       final allTasks = _source.getTasks();
       for (var task in allTasks) {
-        if (!task.isCompleted &&
-            !(task.isDeleted ?? false) &&
-            task.dueDate != null &&
-            task.dueDate!.isAfter(DateTime.now())) {
-          try {
-            await _notificationService.scheduleNotification(
-              id: NotificationService.getNotificationId(task.id),
-              title: _l10n.taskReminderTitle(task.title),
-              body: task.description.isNotEmpty
-                  ? task.description
-                  : _l10n.taskDueNowBody,
-              scheduledDate: task.dueDate!,
-              taskId: task.id,
-              snoozeLabel: _l10n.notificationSnooze,
-              markCompletedLabel: _l10n.notificationMarkCompleted,
-              openTaskLabel: _l10n.notificationOpenTask,
-            );
-          } catch (e, s) {
-            _errorHandlingService.logError(
-              e,
-              s,
-              reason: 'Rescheduling notification',
-            );
-          }
+        try {
+          await _scheduleTaskNotifications(task);
+        } catch (e, s) {
+          _errorHandlingService.logError(
+            e,
+            s,
+            reason: 'Rescheduling notification',
+          );
         }
       }
     });
@@ -271,8 +269,8 @@ class TaskProvider extends ChangeNotifier {
           if (payload != null) {
             final taskId = payload;
             final actionId = response.actionId;
-            if (actionId == 'snooze') {
-              _snoozeTask(taskId);
+            if (actionId != null && actionId.startsWith('snooze')) {
+              _snoozeTask(taskId, actionId);
             } else if (actionId == 'complete') {
               _completeTaskFromNotification(taskId);
             } else if (actionId == 'open_task') {
@@ -294,11 +292,11 @@ class TaskProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> _snoozeTask(String taskId) async {
+  Future<void> _snoozeTask(String taskId, String? actionId) async {
     try {
       final task = _source.getTasks().firstWhere((t) => t.id == taskId);
       if (task.dueDate != null) {
-        final newDate = task.dueDate!.add(const Duration(minutes: 15));
+        final newDate = _getSnoozedDate(task.dueDate!, actionId);
         await updateTask(task, dueDate: newDate);
       }
     } catch (e, s) {
@@ -321,11 +319,184 @@ class TaskProvider extends ChangeNotifier {
     }
   }
 
+  DateTime _getSnoozedDate(DateTime base, String? actionId) {
+    if (actionId == 'snooze_10') {
+      return base.add(const Duration(minutes: 10));
+    }
+    if (actionId == 'snooze_60') {
+      return base.add(const Duration(hours: 1));
+    }
+    if (actionId == 'snooze_tomorrow_morning') {
+      final now = DateTime.now();
+      final tomorrow = DateTime(now.year, now.month, now.day).add(
+        const Duration(days: 1),
+      );
+      return DateTime(tomorrow.year, tomorrow.month, tomorrow.day, 9);
+    }
+    return base.add(const Duration(minutes: 15));
+  }
+
+  DateTime _applyQuietHours(DateTime date) {
+    if (!quietHoursEnabled) return date;
+    final start = _quietStartMinutes;
+    final end = _quietEndMinutes;
+    if (start == end) return date;
+
+    final minutes = date.hour * 60 + date.minute;
+    final spansMidnight = start > end;
+    final inQuiet = spansMidnight
+        ? (minutes >= start || minutes < end)
+        : (minutes >= start && minutes < end);
+
+    if (!inQuiet) return date;
+
+    final endHour = end ~/ 60;
+    final endMinute = end % 60;
+    final endDate = (spansMidnight && minutes >= start)
+        ? date.add(const Duration(days: 1))
+        : date;
+    return DateTime(endDate.year, endDate.month, endDate.day, endHour, endMinute);
+  }
+
+  List<int> _getNotificationIdsForTask(Task task) {
+    final baseId = NotificationService.getNotificationId(task.id);
+    final ids = <int>[baseId];
+    for (var i = 1; i <= _maxNagNotifications; i++) {
+      ids.add(NotificationService.getNotificationId('${task.id}_nag_$i'));
+    }
+    return ids;
+  }
+
+  Future<void> _cancelTaskNotifications(Task task) async {
+    final ids = _getNotificationIdsForTask(task);
+    for (final id in ids) {
+      await _notificationService.cancelNotification(id);
+    }
+  }
+
+  Future<void> _cancelTaskNotificationsById(String taskId) async {
+    final ids = <int>[NotificationService.getNotificationId(taskId)];
+    for (var i = 1; i <= _maxNagNotifications; i++) {
+      ids.add(NotificationService.getNotificationId('${taskId}_nag_$i'));
+    }
+    for (final id in ids) {
+      await _notificationService.cancelNotification(id);
+    }
+  }
+
+  Future<void> _scheduleTaskNotifications(Task task) async {
+    if (task.isCompleted || (task.isDeleted ?? false)) return;
+    if (task.dueDate == null) return;
+    if (!task.dueDate!.isAfter(DateTime.now())) return;
+
+    await _cancelTaskNotifications(task);
+
+    if (_subscriptionService.isPremium &&
+        task.requireSubTasksBeforeReminders &&
+        (task.subTasks?.isNotEmpty ?? false) &&
+        (task.subTasks?.any((st) => !st.isCompleted) ?? false)) {
+      return;
+    }
+
+    final isPrivate = _isPrivateTask(task);
+    final shouldHide =
+        _privateModeService.shouldHidePrivateContent && isPrivate;
+
+    final title = shouldHide
+        ? _l10n.taskReminderTitle(_l10n.privateLabel)
+        : _l10n.taskReminderTitle(task.title);
+    final body = shouldHide
+        ? _l10n.taskDueNowBody
+        : (task.description.isNotEmpty ? task.description : _l10n.taskDueNowBody);
+
+    final actions = <AndroidNotificationAction>[
+      if (advancedRemindersEnabled) ...[
+        AndroidNotificationAction(
+          'snooze_10',
+          _l10n.snooze10m,
+          showsUserInterface: true,
+        ),
+        AndroidNotificationAction(
+          'snooze',
+          _l10n.notificationSnooze,
+          showsUserInterface: true,
+        ),
+        AndroidNotificationAction(
+          'snooze_60',
+          _l10n.snooze1h,
+          showsUserInterface: true,
+        ),
+        AndroidNotificationAction(
+          'snooze_tomorrow_morning',
+          _l10n.tomorrowAtNine,
+          showsUserInterface: true,
+        ),
+      ] else ...[
+        AndroidNotificationAction(
+          'snooze',
+          _l10n.notificationSnooze,
+          showsUserInterface: true,
+        ),
+      ],
+      AndroidNotificationAction(
+        'complete',
+        _l10n.notificationMarkCompleted,
+        showsUserInterface: true,
+      ),
+      AndroidNotificationAction(
+        'open_task',
+        _l10n.notificationOpenTask,
+        showsUserInterface: true,
+      ),
+    ];
+
+    final baseScheduledDate = _applyQuietHours(task.dueDate!);
+    if (!baseScheduledDate.isAfter(DateTime.now())) return;
+
+    await _notificationService.scheduleNotification(
+      id: NotificationService.getNotificationId(task.id),
+      title: title,
+      body: body,
+      scheduledDate: baseScheduledDate,
+      taskId: task.id,
+      androidActions: actions,
+    );
+
+    if (nagRemindersEnabled) {
+      final effectiveCount = _nagCount.clamp(0, _maxNagNotifications);
+      final effectiveInterval = _nagIntervalMinutes.clamp(1, 24 * 60);
+      final scheduledTimes = <int>{baseScheduledDate.millisecondsSinceEpoch};
+
+      for (var i = 1; i <= effectiveCount; i++) {
+        final rawDate = baseScheduledDate.add(
+          Duration(minutes: effectiveInterval * i),
+        );
+        final scheduledDate = _applyQuietHours(rawDate);
+        if (!scheduledDate.isAfter(DateTime.now())) continue;
+        if (!scheduledTimes.add(scheduledDate.millisecondsSinceEpoch)) continue;
+        await _notificationService.scheduleNotification(
+          id: NotificationService.getNotificationId('${task.id}_nag_$i'),
+          title: title,
+          body: body,
+          scheduledDate: scheduledDate,
+          taskId: task.id,
+          androidActions: actions,
+        );
+      }
+    }
+  }
+
   Future<void> _cancelSubscriptions() async {
     await _tasksSubscription?.cancel();
     await _categoriesSubscription?.cancel();
     _tasksSubscription = null;
     _categoriesSubscription = null;
+  }
+
+  void _onPrivateModeChanged() {
+    _refreshPagination();
+    notifyListeners();
+    updateHomeWidget();
   }
 
   @override
@@ -334,6 +505,7 @@ class TaskProvider extends ChangeNotifier {
     _connectivitySubscription?.cancel();
     _notificationSubscription?.cancel();
     _widgetDebounce?.cancel();
+    _privateModeService.removeListener(_onPrivateModeChanged);
     _cancelSubscriptions();
     super.dispose();
   }
@@ -375,28 +547,29 @@ class TaskProvider extends ChangeNotifier {
             
             if (event.type == SyncEventType.removed) {
               // If it's removed from active, it might be completed or deleted.
-              // We update local DB to reflect the new state (completed/deleted).
-              await _source.addTask(cloudTask);
+              // DocumentChange.removed gives the *previous* state (still active),
+              // so we must fetch the latest document to avoid reverting completion/deletion.
+              final (latestTask, isMissing) =
+                  await _firestoreService.fetchTaskById(cloudTask.id);
+              if (latestTask != null) {
+                await _source.addTask(latestTask);
+                if (latestTask.isCompleted || (latestTask.isDeleted ?? false)) {
+                  await _cancelTaskNotificationsById(latestTask.id);
+                }
+              } else if (isMissing) {
+                await _source.deleteTask(cloudTask.id);
+                await _cancelTaskNotificationsById(cloudTask.id);
+              } else {
+                continue;
+              }
             } else {
               // Added or modified
               await _source.addTask(cloudTask);
-              
-              if (!cloudTask.isCompleted &&
-                  !(cloudTask.isDeleted ?? false) &&
-                  cloudTask.dueDate != null &&
-                  cloudTask.dueDate!.isAfter(DateTime.now())) {
-                await _notificationService.scheduleNotification(
-                  id: NotificationService.getNotificationId(cloudTask.id),
-                  title: _l10n.taskReminderTitle(cloudTask.title),
-                  body: cloudTask.description.isNotEmpty
-                      ? cloudTask.description
-                      : _l10n.taskDueNowBody,
-                  scheduledDate: cloudTask.dueDate!,
-                  taskId: cloudTask.id,
-                  snoozeLabel: _l10n.notificationSnooze,
-                  markCompletedLabel: _l10n.notificationMarkCompleted,
-                  openTaskLabel: _l10n.notificationOpenTask,
-                );
+
+              if (cloudTask.isCompleted || (cloudTask.isDeleted ?? false)) {
+                await _cancelTaskNotificationsById(cloudTask.id);
+              } else {
+                await _scheduleTaskNotifications(cloudTask);
               }
             }
             needsUpdate = true;
@@ -459,23 +632,7 @@ class TaskProvider extends ChangeNotifier {
       await _notificationService.cancelAllNotifications();
 
       for (var task in allTasks) {
-        if (!task.isCompleted &&
-            !(task.isDeleted ?? false) &&
-            task.dueDate != null &&
-            task.dueDate!.isAfter(DateTime.now())) {
-          await _notificationService.scheduleNotification(
-            id: NotificationService.getNotificationId(task.id),
-            title: _l10n.taskReminderTitle(task.title),
-            body: task.description.isNotEmpty
-                ? task.description
-                : _l10n.taskDueNowBody,
-            scheduledDate: task.dueDate!,
-            taskId: task.id,
-            snoozeLabel: _l10n.notificationSnooze,
-            markCompletedLabel: _l10n.notificationMarkCompleted,
-            openTaskLabel: _l10n.notificationOpenTask,
-          );
-        }
+        await _scheduleTaskNotifications(task);
       }
     } catch (e, s) {
       _errorHandlingService.logError(e, s, reason: 'Performing full sync');
@@ -487,11 +644,82 @@ class TaskProvider extends ChangeNotifier {
   DateTimeFilterOption _currentDateFilter = DateTimeFilterOption.all;
   List<String> _selectedCategoryIds = [];
   bool _showCompleted = true;
+  bool _advancedRemindersEnabled = false;
+  bool _nagRemindersEnabled = false;
+  int _nagIntervalMinutes = 15;
+  int _nagCount = 3;
+  bool _quietHoursEnabled = false;
+  int _quietStartMinutes = 22 * 60;
+  int _quietEndMinutes = 7 * 60;
 
   TaskSortOption get currentSortOption => _currentSortOption;
   DateTimeFilterOption get currentDateFilter => _currentDateFilter;
   List<String> get selectedCategoryIds => _selectedCategoryIds;
   bool get showCompleted => _showCompleted;
+  bool get advancedRemindersEnabled =>
+      _subscriptionService.isPremium && _advancedRemindersEnabled;
+  bool get nagRemindersEnabled => _subscriptionService.isPremium && _nagRemindersEnabled;
+  int get nagIntervalMinutes => _subscriptionService.isPremium ? _nagIntervalMinutes : 15;
+  int get nagCount => _subscriptionService.isPremium ? _nagCount : 0;
+  bool get quietHoursEnabled => _subscriptionService.isPremium && _quietHoursEnabled;
+  int get quietStartMinutes => _quietStartMinutes;
+  int get quietEndMinutes => _quietEndMinutes;
+
+  Future<void> setAdvancedRemindersEnabled(bool enabled) async {
+    _advancedRemindersEnabled = enabled;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('advanced_reminders_enabled', enabled);
+    await performFullSync();
+    notifyListeners();
+  }
+
+  Future<void> setNagRemindersEnabled(bool enabled) async {
+    _nagRemindersEnabled = enabled;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('nag_reminders_enabled', enabled);
+    await performFullSync();
+    notifyListeners();
+  }
+
+  Future<void> setNagIntervalMinutes(int minutes) async {
+    _nagIntervalMinutes = minutes;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('nag_interval_minutes', minutes);
+    await performFullSync();
+    notifyListeners();
+  }
+
+  Future<void> setNagCount(int count) async {
+    _nagCount = count;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('nag_count', count);
+    await performFullSync();
+    notifyListeners();
+  }
+
+  Future<void> setQuietHoursEnabled(bool enabled) async {
+    _quietHoursEnabled = enabled;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('quiet_hours_enabled', enabled);
+    await performFullSync();
+    notifyListeners();
+  }
+
+  Future<void> setQuietHoursStartMinutes(int minutes) async {
+    _quietStartMinutes = minutes;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('quiet_start_minutes', minutes);
+    await performFullSync();
+    notifyListeners();
+  }
+
+  Future<void> setQuietHoursEndMinutes(int minutes) async {
+    _quietEndMinutes = minutes;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('quiet_end_minutes', minutes);
+    await performFullSync();
+    notifyListeners();
+  }
 
   void setSortOption(TaskSortOption option) {
     _currentSortOption = option;
@@ -585,7 +813,11 @@ class TaskProvider extends ChangeNotifier {
   /// Get all tasks for analytics (unfiltered, unpaginated)
   List<Task> get allTasks {
     if (_isLoading) return [];
-    return _source.getTasks();
+    var tasks = _source.getTasks().where((t) => !(t.isDeleted ?? false)).toList();
+    if (_privateModeService.shouldHidePrivateContent) {
+      tasks = tasks.where((t) => !_isPrivateTask(t)).toList();
+    }
+    return tasks;
   }
 
   /// Get all tasks without pagination (for internal use)
@@ -594,6 +826,10 @@ class TaskProvider extends ChangeNotifier {
         .getTasks()
         .where((t) => !(t.isDeleted ?? false))
         .toList();
+
+    if (_privateModeService.shouldHidePrivateContent) {
+      tasks = tasks.where((t) => !_isPrivateTask(t)).toList();
+    }
 
     if (_searchQuery.isNotEmpty) {
       tasks = tasks
@@ -720,6 +956,14 @@ class TaskProvider extends ChangeNotifier {
     _taskPagination.refresh();
   }
 
+  List<Task> _getTasksForPublicSurfaces() {
+    final all = _source.getTasks();
+    if (!_privateModeService.shouldHidePrivateContent) return all;
+    final privateCategoryIds =
+        _source.getCategories().where((c) => c.isPrivate).map((c) => c.id).toSet();
+    return all.where((t) => !privateCategoryIds.contains(t.categoryId)).toList();
+  }
+
   /// Update home widgets without showing the task count notification
   /// Use this for general widget updates (color changes, pin/unpin, etc.)
   Future<void> updateHomeWidget() async {
@@ -750,8 +994,9 @@ class TaskProvider extends ChangeNotifier {
         
         _widgetUpdateInProgress = true;
         try {
+          final tasksForPublicSurfaces = _getTasksForPublicSurfaces();
           final chartPath = await TaskWidgetService.updateTaskWidget(
-            _source.getTasks(),
+            tasksForPublicSurfaces,
             getCategoryById,
             isDarkText: !_themeService.isDarkMode,
           );
@@ -759,8 +1004,7 @@ class TaskProvider extends ChangeNotifier {
           // Only show notification when explicitly requested
           // (task added, completed, deleted, or app first opened)
           if (showNotification) {
-            final uncompletedTasks = _source
-                .getTasks()
+            final uncompletedTasks = tasksForPublicSurfaces
                 .where((t) => !t.isCompleted && !(t.isDeleted ?? false))
                 .toList();
 
@@ -788,16 +1032,16 @@ class TaskProvider extends ChangeNotifier {
           _fullCalendarWidgetService.setUserEmail(userEmail);
 
           await _widgetDataService.updateMonthEventsMap(
-            _source.getTasks(),
+            tasksForPublicSurfaces,
             userId: userId,
           );
           await _widgetDataService.updateScheduleWidget(
-            _source.getTasks(),
+            tasksForPublicSurfaces,
             getCategoryById,
             userId: userId,
           );
           await _widgetDataService.updateCalendarListWidget(
-            _source.getTasks(),
+            tasksForPublicSurfaces,
             userId: userId,
           );
 
@@ -827,6 +1071,7 @@ class TaskProvider extends ChangeNotifier {
     String? category, {
     List<SubTask>? subTasks,
     String? recurrenceRule,
+    bool requireSubTasksBeforeReminders = false,
   }) async {
     final task = Task(
       title: title,
@@ -836,6 +1081,7 @@ class TaskProvider extends ChangeNotifier {
       categoryId: category,
       subTasks: subTasks,
       recurrenceRule: recurrenceRule,
+      requireSubTasksBeforeReminders: requireSubTasksBeforeReminders,
     );
     await _source.addTask(task);
     // Sync to cloud - Firestore handles offline state and buffering
@@ -845,18 +1091,7 @@ class TaskProvider extends ChangeNotifier {
 
     if (dueDate != null && dueDate.isAfter(DateTime.now())) {
       try {
-        await _notificationService.scheduleNotification(
-          id: NotificationService.getNotificationId(task.id),
-          title: _l10n.taskReminderTitle(title),
-          body: description.isNotEmpty
-              ? description
-              : _l10n.taskDueNowBody,
-          scheduledDate: dueDate,
-          taskId: task.id,
-          snoozeLabel: _l10n.notificationSnooze,
-          markCompletedLabel: _l10n.notificationMarkCompleted,
-          openTaskLabel: _l10n.notificationOpenTask,
-        );
+        await _scheduleTaskNotifications(task);
       } catch (e, s) {
         _errorHandlingService.logError(
           e,
@@ -896,23 +1131,10 @@ class TaskProvider extends ChangeNotifier {
 
 
     if (task.isCompleted) {
-      await _notificationService.cancelNotification(
-        NotificationService.getNotificationId(task.id),
-      );
+      await _cancelTaskNotifications(task);
     } else if (task.dueDate != null && task.dueDate!.isAfter(DateTime.now())) {
       try {
-        await _notificationService.scheduleNotification(
-          id: NotificationService.getNotificationId(task.id),
-          title: _l10n.taskReminderTitle(task.title),
-          body: task.description.isNotEmpty
-              ? task.description
-              : _l10n.taskDueNowBody,
-          scheduledDate: task.dueDate!,
-          taskId: task.id,
-          snoozeLabel: _l10n.notificationSnooze,
-          markCompletedLabel: _l10n.notificationMarkCompleted,
-          openTaskLabel: _l10n.notificationOpenTask,
-        );
+        await _scheduleTaskNotifications(task);
       } catch (e, s) {
         _errorHandlingService.logError(
           e,
@@ -939,6 +1161,7 @@ class TaskProvider extends ChangeNotifier {
     String? categoryId,
     List<SubTask>? subTasks,
     String? recurrenceRule,
+    bool? requireSubTasksBeforeReminders,
   }) async {
     if (title != null) task.title = title;
     if (description != null) task.description = description;
@@ -947,31 +1170,21 @@ class TaskProvider extends ChangeNotifier {
     if (categoryId != null) task.categoryId = categoryId;
     if (subTasks != null) task.subTasks = subTasks;
     if (recurrenceRule != null) task.recurrenceRule = recurrenceRule;
+    if (requireSubTasksBeforeReminders != null) {
+      task.requireSubTasksBeforeReminders = requireSubTasksBeforeReminders;
+    }
 
     await _source.addTask(task);
     _firestoreService.updateTask(task).catchError((e, s) {
       _errorHandlingService.logError(e, s, reason: 'Background cloud updateTask failed');
     });
 
-    await _notificationService.cancelNotification(
-      NotificationService.getNotificationId(task.id),
-    );
+    await _cancelTaskNotifications(task);
     if (!task.isCompleted &&
         task.dueDate != null &&
         task.dueDate!.isAfter(DateTime.now())) {
       try {
-        await _notificationService.scheduleNotification(
-          id: NotificationService.getNotificationId(task.id),
-          title: _l10n.taskReminderTitle(task.title),
-          body: task.description.isNotEmpty
-              ? task.description
-              : _l10n.taskDueNowBody,
-          scheduledDate: task.dueDate!,
-          taskId: task.id,
-          snoozeLabel: _l10n.notificationSnooze,
-          markCompletedLabel: _l10n.notificationMarkCompleted,
-          openTaskLabel: _l10n.notificationOpenTask,
-        );
+        await _scheduleTaskNotifications(task);
       } catch (e, s) {
         _errorHandlingService.logError(
           e,
@@ -992,6 +1205,22 @@ class TaskProvider extends ChangeNotifier {
     if (index != -1) {
       task.subTasks![index].isCompleted = !task.subTasks![index].isCompleted;
       await _source.addTask(task);
+      try {
+        if (!task.isCompleted &&
+            !(task.isDeleted ?? false) &&
+            task.dueDate != null &&
+            task.dueDate!.isAfter(DateTime.now())) {
+          await _scheduleTaskNotifications(task);
+        } else {
+          await _cancelTaskNotifications(task);
+        }
+      } catch (e, s) {
+        _errorHandlingService.logError(
+          e,
+          s,
+          reason: 'Rescheduling notifications after subtask toggle',
+        );
+      }
       _refreshPagination();
       notifyListeners();
 
@@ -1024,9 +1253,7 @@ class TaskProvider extends ChangeNotifier {
       _firestoreService.updateTask(task).catchError((e, s) {
         _errorHandlingService.logError(e, s, reason: 'Background cloud updateTask failed');
       });
-      await _notificationService.cancelNotification(
-        NotificationService.getNotificationId(id),
-      );
+      await _cancelTaskNotifications(task);
     } catch (e, s) {
       _errorHandlingService.logError(e, s, reason: 'Deleting task');
     }
@@ -1047,18 +1274,7 @@ class TaskProvider extends ChangeNotifier {
         task.dueDate != null &&
         task.dueDate!.isAfter(DateTime.now())) {
       try {
-        await _notificationService.scheduleNotification(
-          id: NotificationService.getNotificationId(task.id),
-          title: _l10n.taskReminderTitle(task.title),
-          body: task.description.isNotEmpty
-              ? task.description
-              : _l10n.taskDueNowBody,
-          scheduledDate: task.dueDate!,
-          taskId: task.id,
-          snoozeLabel: _l10n.notificationSnooze,
-          markCompletedLabel: _l10n.notificationMarkCompleted,
-          openTaskLabel: _l10n.notificationOpenTask,
-        );
+        await _scheduleTaskNotifications(task);
       } catch (e, s) {
         _errorHandlingService.logError(
           e,
@@ -1077,9 +1293,7 @@ class TaskProvider extends ChangeNotifier {
     _firestoreService.deleteTask(id).catchError((e, s) {
       _errorHandlingService.logError(e, s, reason: 'Background cloud deleteTask failed');
     });
-    await _notificationService.cancelNotification(
-      NotificationService.getNotificationId(id),
-    );
+    await _cancelTaskNotificationsById(id);
     _refreshPagination();
     notifyListeners();
     updateHomeWidgetWithNotification(); // Show notification when task is permanently deleted
@@ -1094,9 +1308,7 @@ class TaskProvider extends ChangeNotifier {
       _firestoreService.deleteTask(task.id).catchError((e, s) {
         _errorHandlingService.logError(e, s, reason: 'Background cloud bulk deleteTask failed');
       });
-      await _notificationService.cancelNotification(
-        NotificationService.getNotificationId(task.id),
-      );
+      await _cancelTaskNotifications(task);
     }
     _refreshPagination();
     notifyListeners();
@@ -1172,7 +1384,12 @@ class TaskProvider extends ChangeNotifier {
     clearSelection();
   }
 
-  Future<void> addCategory(String name, int colorValue, int iconCode) async {
+  Future<void> addCategory(
+    String name,
+    int colorValue,
+    int iconCode, {
+    bool isPrivate = false,
+  }) async {
     if (!canAddCategory) {
       throw Exception('Category limit reached');
     }
@@ -1182,6 +1399,7 @@ class TaskProvider extends ChangeNotifier {
       name: sanitizedName,
       colorValue: colorValue,
       iconCode: iconCode,
+      isPrivate: isPrivate,
     );
     await _source.addCategory(category);
     try {
@@ -1203,10 +1421,12 @@ class TaskProvider extends ChangeNotifier {
     String? name,
     int? colorValue,
     int? iconCode,
+    bool? isPrivate,
   }) async {
     if (name != null) category.name = ValidationService.sanitizeText(name);
     if (colorValue != null) category.colorValue = colorValue;
     if (iconCode != null) category.iconCode = iconCode;
+    if (isPrivate != null) category.isPrivate = isPrivate;
     await _source.updateCategory(category);
     try {
       await _firestoreService.updateCategory(category);
@@ -1232,6 +1452,13 @@ class TaskProvider extends ChangeNotifier {
       );
     }
     notifyListeners();
+  }
+
+  bool _isPrivateTask(Task task) {
+    final categoryId = task.categoryId;
+    if (categoryId == null) return false;
+    final category = getCategoryById(categoryId);
+    return category?.isPrivate ?? false;
   }
 
   Category? getCategoryById(String? id) {

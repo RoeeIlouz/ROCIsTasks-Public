@@ -9,6 +9,8 @@ class ThemeService extends ChangeNotifier {
   bool _use24HourFormat = false;
   bool _autoRemoveNlpDates = true;
   Locale? _locale;
+  bool _useCustomSeedColor = false;
+  int? _customSeedColorValue;
 
   ThemeMode get themeMode => _themeMode;
   bool get useMaterialTheme => _useMaterialTheme;
@@ -16,6 +18,8 @@ class ThemeService extends ChangeNotifier {
   bool get use24HourFormat => _use24HourFormat;
   bool get autoRemoveNlpDates => _autoRemoveNlpDates;
   Locale? get locale => _locale;
+  bool get useCustomSeedColor => _useCustomSeedColor;
+  int? get customSeedColorValue => _customSeedColorValue;
 
   Future<void> init() async {
     final prefs = await SharedPreferences.getInstance();
@@ -37,6 +41,8 @@ class ThemeService extends ChangeNotifier {
     if (languageCode != null) {
       _locale = Locale(languageCode);
     }
+    _useCustomSeedColor = prefs.getBool('use_custom_seed_color') ?? false;
+    _customSeedColorValue = prefs.getInt('custom_seed_color_value');
     notifyListeners();
   }
 
@@ -104,5 +110,25 @@ class ThemeService extends ChangeNotifier {
     } else {
       await prefs.remove('language_code');
     }
+  }
+
+  Future<void> setUseCustomSeedColor(bool value) async {
+    _useCustomSeedColor = value;
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('use_custom_seed_color', _useCustomSeedColor);
+  }
+
+  Future<void> setCustomSeedColorValue(int? colorValue) async {
+    _customSeedColorValue = colorValue;
+    _useCustomSeedColor = colorValue != null;
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    if (colorValue == null) {
+      await prefs.remove('custom_seed_color_value');
+    } else {
+      await prefs.setInt('custom_seed_color_value', colorValue);
+    }
+    await prefs.setBool('use_custom_seed_color', _useCustomSeedColor);
   }
 }

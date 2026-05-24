@@ -68,12 +68,15 @@ class TaskWidgetProvider : HomeWidgetProvider() {
     private fun updateButtonState(views: RemoteViews, prefs: SharedPreferences) {
         val sortMode = prefs.getInt(PREF_SORT_KEY, 0)
         val filterMode = prefs.getInt(PREF_FILTER_KEY, 0)
+        val isPremium = prefs.getBoolean("is_premium", false)
 
         val sortText = if (sortMode == 0) "Sort: Date" else "Sort: Priority"
         val filterText = when (filterMode) {
             0 -> "Filter: All"
             1 -> "Filter: Today"
             2 -> "Filter: High Prio"
+            3 -> if (isPremium) "Filter: Overdue" else "Filter: PRO"
+            4 -> if (isPremium) "Filter: Pinned" else "Filter: PRO"
             else -> "Filter: All"
         }
 
@@ -112,13 +115,15 @@ class TaskWidgetProvider : HomeWidgetProvider() {
         if (action == ACTION_SORT_CHANGE || action == ACTION_FILTER_CHANGE) {
             val widgetData = es.antonborri.home_widget.HomeWidgetPlugin.getData(context)
             val editor = widgetData.edit()
+            val isPremium = widgetData.getBoolean("is_premium", false)
 
             if (action == ACTION_SORT_CHANGE) {
                 val currentSort = widgetData.getInt(PREF_SORT_KEY, 0)
                 editor.putInt(PREF_SORT_KEY, if (currentSort == 0) 1 else 0)
             } else if (action == ACTION_FILTER_CHANGE) {
                 val currentFilter = widgetData.getInt(PREF_FILTER_KEY, 0)
-                val nextFilter = (currentFilter + 1) % 3
+                val maxFilter = if (isPremium) 5 else 3
+                val nextFilter = (currentFilter + 1) % maxFilter
                 editor.putInt(PREF_FILTER_KEY, nextFilter)
             }
             editor.apply()

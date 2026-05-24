@@ -25,6 +25,8 @@ Streamlining the workflow for advanced users:
 
 - **Bulk Actions**: Multi-select mode to move, delete, or pin multiple tasks at once.
 - **Natural Language Parsing**: "Smart Add" that parses dates and times from text (e.g., "Lunch tomorrow at 2pm").
+- **Sub-task Dependencies (Pro)**: Prevent a task from becoming "Active" (or sending reminders) until prerequisite sub-tasks are completed.
+- **Task Attachments & File Syncing (Pro)**: Attach photos, documents, or voice notes directly to tasks using a cloud storage layer (e.g., Firebase Storage / Supabase Storage).
 - **Quick Actions**: Force-touch/Long-press shortcuts from the home screen icon.
 - **Geofencing**: Location-based reminders (e.g., "Remind me when I get home").
 

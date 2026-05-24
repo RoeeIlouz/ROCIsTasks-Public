@@ -8,7 +8,10 @@ class LocalTaskSource {
   static const String boxName = 'tasksBox';
   static const String categoriesBoxName = 'categoriesBox';
 
-  Box<Category> get _categoriesBox => Hive.box<Category>(categoriesBoxName);
+  String _tasksBoxName = boxName;
+  String _categoriesBoxName = categoriesBoxName;
+
+  Box<Category> get _categoriesBox => Hive.box<Category>(_categoriesBoxName);
 
   Future<void> init() async {
     if (!Hive.isAdapterRegistered(0)) {
@@ -23,22 +26,21 @@ class LocalTaskSource {
 
   Future<void> _openBoxes() async {
     try {
-      await Hive.openBox<Task>(boxName);
-      await Hive.openBox<Category>(categoriesBoxName);
+      await Hive.openBox<Task>(_tasksBoxName);
+      await Hive.openBox<Category>(_categoriesBoxName);
     } catch (e) {
-      // If opening fails (e.g. corrupted file or unexpected encryption), clear and restart
       AppLogger.warning(
-        'Failed to open Hive boxes, clearing and restarting...',
+        'Failed to open Hive boxes, attempting recovery...',
         tag: 'LocalTaskSource',
       );
-      await Hive.deleteBoxFromDisk(boxName);
-      await Hive.deleteBoxFromDisk(categoriesBoxName);
-      await Hive.openBox<Task>(boxName);
-      await Hive.openBox<Category>(categoriesBoxName);
+      _tasksBoxName = '${boxName}_recovered';
+      _categoriesBoxName = '${categoriesBoxName}_recovered';
+      await Hive.openBox<Task>(_tasksBoxName);
+      await Hive.openBox<Category>(_categoriesBoxName);
     }
   }
 
-  Box<Task> get _box => Hive.box<Task>(boxName);
+  Box<Task> get _box => Hive.box<Task>(_tasksBoxName);
 
   List<Task> getTasks() {
     return _box.values.toList();

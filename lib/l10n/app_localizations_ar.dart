@@ -4,36 +4,36 @@ import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
 
-/// The translations for English (`en`).
-class AppLocalizationsEn extends AppLocalizations {
-  AppLocalizationsEn([String locale = 'en']) : super(locale);
+/// The translations for Arabic (`ar`).
+class AppLocalizationsAr extends AppLocalizations {
+  AppLocalizationsAr([String locale = 'ar']) : super(locale);
 
   @override
-  String get appTitle => 'ROCI\'s Tasks';
+  String get appTitle => 'مهام ROCI';
 
   @override
-  String get settings => 'Settings';
+  String get settings => 'الإعدادات';
 
   @override
-  String get account => 'Account';
+  String get account => 'الحساب';
 
   @override
-  String get signOut => 'Sign Out';
+  String get signOut => 'تسجيل الخروج';
 
   @override
-  String get appearance => 'Appearance';
+  String get appearance => 'المظهر';
 
   @override
-  String get theme => 'Theme';
+  String get theme => 'السمة';
 
   @override
-  String get systemDefault => 'System Default';
+  String get systemDefault => 'إعدادات النظام';
 
   @override
-  String get lightMode => 'Light Mode';
+  String get lightMode => 'وضع فاتح';
 
   @override
-  String get darkMode => 'Dark Mode';
+  String get darkMode => 'وضع داكن';
 
   @override
   String get materialTheme => 'Material Theme';
@@ -93,19 +93,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get timeFormat24h => '24h Time Format';
 
   @override
-  String get language => 'Language';
+  String get language => 'اللغة';
 
   @override
-  String get hebrew => 'Hebrew';
+  String get hebrew => 'العبرية';
 
   @override
-  String get english => 'English';
+  String get english => 'الإنجليزية';
 
   @override
-  String get spanish => 'Spanish';
+  String get spanish => 'الإسبانية';
 
   @override
-  String get arabic => 'Arabic';
+  String get arabic => 'العربية';
 
   @override
   String get tasks => 'Tasks';

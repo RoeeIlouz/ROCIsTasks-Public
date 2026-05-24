@@ -5,7 +5,7 @@ import 'package:timezone/data/latest.dart' as tz;
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:rocis_tasks/core/services/logger_service.dart';
 export 'package:flutter_local_notifications/flutter_local_notifications.dart'
-    show NotificationResponse;
+    show NotificationResponse, AndroidNotificationAction;
 
 import 'dart:async';
 
@@ -111,6 +111,7 @@ class NotificationService {
     String? snoozeLabel,
     String? markCompletedLabel,
     String? openTaskLabel,
+    List<AndroidNotificationAction>? androidActions,
   }) async {
     if (scheduledDate.isBefore(DateTime.now())) return;
 
@@ -134,26 +135,28 @@ class NotificationService {
               priority: Priority.high,
               fullScreenIntent: true,
               category: AndroidNotificationCategory.reminder,
-              actions: [
-                if (snoozeLabel != null)
-                  AndroidNotificationAction(
-                    'snooze',
-                    snoozeLabel,
-                    showsUserInterface: true,
-                  ),
-                if (markCompletedLabel != null)
-                  AndroidNotificationAction(
-                    'complete',
-                    markCompletedLabel,
-                    showsUserInterface: true,
-                  ),
-                if (openTaskLabel != null)
-                  AndroidNotificationAction(
-                    'open_task',
-                    openTaskLabel,
-                    showsUserInterface: true,
-                  ),
-              ],
+              actions:
+                  androidActions ??
+                  [
+                    if (snoozeLabel != null)
+                      AndroidNotificationAction(
+                        'snooze',
+                        snoozeLabel,
+                        showsUserInterface: true,
+                      ),
+                    if (markCompletedLabel != null)
+                      AndroidNotificationAction(
+                        'complete',
+                        markCompletedLabel,
+                        showsUserInterface: true,
+                      ),
+                    if (openTaskLabel != null)
+                      AndroidNotificationAction(
+                        'open_task',
+                        openTaskLabel,
+                        showsUserInterface: true,
+                      ),
+                  ],
             ),
           ),
           androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,

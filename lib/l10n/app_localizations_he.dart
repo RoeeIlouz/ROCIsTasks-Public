@@ -105,6 +105,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get spanish => 'ספרדית';
 
   @override
+  String get arabic => 'ערבית';
+
+  @override
   String get tasks => 'משימות';
 
   @override
@@ -763,4 +766,114 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get notificationRefreshed => 'התראת מונה המשימות רועננה';
+
+  @override
+  String get privateLabel => 'פרטי';
+
+  @override
+  String get privateCategory => 'קטגוריה פרטית';
+
+  @override
+  String get privateCategorySubtitle =>
+      'הסתר משימות בווידג׳טים ובתצוגות מקדימות כשהכול נעול';
+
+  @override
+  String get privateMode => 'מצב פרטי';
+
+  @override
+  String get privateModeSubtitle => 'הסתר קטגוריות פרטיות כשהכול נעול';
+
+  @override
+  String get lockPrivate => 'נעל פרטי';
+
+  @override
+  String get unlockPrivate => 'פתח פרטי';
+
+  @override
+  String get hidePrivateCategories => 'הסתר קטגוריות פרטיות';
+
+  @override
+  String get showPrivateCategories => 'הצג קטגוריות פרטיות';
+
+  @override
+  String get setPinTitle => 'הגדר PIN';
+
+  @override
+  String get pinMinDigits => 'PIN (מינ׳ 4 ספרות)';
+
+  @override
+  String get confirmPin => 'אשר PIN';
+
+  @override
+  String get enterPinTitle => 'הזן PIN';
+
+  @override
+  String get pinLabel => 'PIN';
+
+  @override
+  String get unlock => 'פתח';
+
+  @override
+  String get wrongPin => 'PIN שגוי';
+
+  @override
+  String get pinsDoNotMatch => 'ה-PIN אינם תואמים';
+
+  @override
+  String get advancedReminders => 'תזכורות מתקדמות';
+
+  @override
+  String get advancedRemindersSubtitle => 'כפתורי נודניק נוספים בתזכורות';
+
+  @override
+  String get nagReminders => 'תזכורות מתעקשות';
+
+  @override
+  String get nagRemindersSubtitle => 'חזור על תזכורות לאחר שהמשימה הגיעה ליעד';
+
+  @override
+  String get quietHours => 'שעות שקט';
+
+  @override
+  String get quietHoursSubtitle => 'דחה תזכורות במהלך שעות שקט';
+
+  @override
+  String get quietHoursStart => 'תחילת שעות שקט';
+
+  @override
+  String get quietHoursEnd => 'סיום שעות שקט';
+
+  @override
+  String get nagInterval => 'מרווח התעקשות';
+
+  @override
+  String get nagCount => 'כמות התעקשויות';
+
+  @override
+  String get snooze10m => 'נודניק 10 דק׳';
+
+  @override
+  String get snooze1h => 'נודניק שעה';
+
+  @override
+  String get tomorrowAtNine => 'מחר 9:00';
+
+  @override
+  String get privateTask => 'משימה פרטית';
+
+  @override
+  String get privateTaskSubtitle => 'פתח מצב פרטי כדי לראות פרטים.';
+
+  @override
+  String get accentColor => 'צבע הדגשה';
+
+  @override
+  String get accentColorSubtitle => 'התאם את צבעי האפליקציה (Pro)';
+
+  @override
+  String get requireSubTasksBeforeReminders => 'נדרשות תת-משימות';
+
+  @override
+  String get requireSubTasksBeforeRemindersSubtitle =>
+      'לא שולח תזכורות עד שכל תת-המשימות הושלמו';
 }

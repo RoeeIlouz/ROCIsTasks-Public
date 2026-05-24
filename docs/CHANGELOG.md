@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1+19] - 2026-05-24
+
+### Added
+- **Localization**: Added Arabic (`ar`) to the in-app language selector.
+- **Paywall Clarity**: Added a short "What you get with Pro" benefits section to the paywall and premium screens (highlights the main Pro features).
+
+### Fixed
+- **Pro Entitlements Isolation**: RevenueCat subscription state is now synced to the currently signed-in account to prevent Pro status from carrying over between different app accounts on the same device.
+- **Restore Purchases**: Restore attempts that fail due to a receipt already being owned by another account no longer crash the flow and will keep the user non-premium.
+
+### Changed
+- **Subscription Identity**: Added automatic RevenueCat `logIn`/`logOut` handling on authentication state changes for consistent entitlement checks.
+
+## [1.0.1+17] - 2026-05-23
+
+### Added
+- **Premium - Private Categories**: Categories can be marked as Private and hidden from widgets and previews while Private Mode is locked.
+- **Premium - Private Mode (PIN)**: Added Private Mode with PIN lock/unlock to hide private content.
+- **Premium - Advanced Reminders**: Added extra snooze actions for task reminders.
+- **Premium - Nag Reminders**: Added repeating reminders after a task is due, with configurable interval and count.
+- **Premium - Quiet Hours**: Added quiet hours to delay reminders during a user-defined time window.
+- **Premium - Accent Color**: Added a Pro-only accent color picker to customize app theme colors.
+- **Premium - Widget Upgrades**: Added Pro-only widget filters (Overdue, Pinned) for the Tasks home screen widget.
+- **Premium - Sub-task Dependencies**: Added an option to suppress task reminders until all sub-tasks are completed.
+
 ## [1.0.1+13] - 2026-05-21
 
 ### Fixed

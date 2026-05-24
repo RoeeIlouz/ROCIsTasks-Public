@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
+import 'app_localizations_ar.dart';
 import 'app_localizations_en.dart';
 import 'app_localizations_es.dart';
 import 'app_localizations_he.dart';
@@ -95,6 +96,7 @@ abstract class AppLocalizations {
 
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
+    Locale('ar'),
     Locale('en'),
     Locale('es'),
     Locale('he'),
@@ -291,6 +293,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Spanish'**
   String get spanish;
+
+  /// No description provided for @arabic.
+  ///
+  /// In en, this message translates to:
+  /// **'Arabic'**
+  String get arabic;
 
   /// No description provided for @tasks.
   ///
@@ -1545,6 +1553,222 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Task counter notification refreshed'**
   String get notificationRefreshed;
+
+  /// No description provided for @privateLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Private'**
+  String get privateLabel;
+
+  /// No description provided for @privateCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Private category'**
+  String get privateCategory;
+
+  /// No description provided for @privateCategorySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide tasks from widgets and previews when locked'**
+  String get privateCategorySubtitle;
+
+  /// No description provided for @privateMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Private mode'**
+  String get privateMode;
+
+  /// No description provided for @privateModeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide private categories when locked'**
+  String get privateModeSubtitle;
+
+  /// No description provided for @lockPrivate.
+  ///
+  /// In en, this message translates to:
+  /// **'Lock private'**
+  String get lockPrivate;
+
+  /// No description provided for @unlockPrivate.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock private'**
+  String get unlockPrivate;
+
+  /// No description provided for @hidePrivateCategories.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide private categories'**
+  String get hidePrivateCategories;
+
+  /// No description provided for @showPrivateCategories.
+  ///
+  /// In en, this message translates to:
+  /// **'Show private categories'**
+  String get showPrivateCategories;
+
+  /// No description provided for @setPinTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Set PIN'**
+  String get setPinTitle;
+
+  /// No description provided for @pinMinDigits.
+  ///
+  /// In en, this message translates to:
+  /// **'PIN (min 4 digits)'**
+  String get pinMinDigits;
+
+  /// No description provided for @confirmPin.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm PIN'**
+  String get confirmPin;
+
+  /// No description provided for @enterPinTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter PIN'**
+  String get enterPinTitle;
+
+  /// No description provided for @pinLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'PIN'**
+  String get pinLabel;
+
+  /// No description provided for @unlock.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock'**
+  String get unlock;
+
+  /// No description provided for @wrongPin.
+  ///
+  /// In en, this message translates to:
+  /// **'Wrong PIN'**
+  String get wrongPin;
+
+  /// No description provided for @pinsDoNotMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'PINs do not match'**
+  String get pinsDoNotMatch;
+
+  /// No description provided for @advancedReminders.
+  ///
+  /// In en, this message translates to:
+  /// **'Advanced reminders'**
+  String get advancedReminders;
+
+  /// No description provided for @advancedRemindersSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Extra snooze buttons on task reminders'**
+  String get advancedRemindersSubtitle;
+
+  /// No description provided for @nagReminders.
+  ///
+  /// In en, this message translates to:
+  /// **'Nag reminders'**
+  String get nagReminders;
+
+  /// No description provided for @nagRemindersSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Repeat reminders after a task is due'**
+  String get nagRemindersSubtitle;
+
+  /// No description provided for @quietHours.
+  ///
+  /// In en, this message translates to:
+  /// **'Quiet hours'**
+  String get quietHours;
+
+  /// No description provided for @quietHoursSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delay reminders during quiet hours'**
+  String get quietHoursSubtitle;
+
+  /// No description provided for @quietHoursStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Quiet hours start'**
+  String get quietHoursStart;
+
+  /// No description provided for @quietHoursEnd.
+  ///
+  /// In en, this message translates to:
+  /// **'Quiet hours end'**
+  String get quietHoursEnd;
+
+  /// No description provided for @nagInterval.
+  ///
+  /// In en, this message translates to:
+  /// **'Nag interval'**
+  String get nagInterval;
+
+  /// No description provided for @nagCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Nag count'**
+  String get nagCount;
+
+  /// No description provided for @snooze10m.
+  ///
+  /// In en, this message translates to:
+  /// **'Snooze 10m'**
+  String get snooze10m;
+
+  /// No description provided for @snooze1h.
+  ///
+  /// In en, this message translates to:
+  /// **'Snooze 1h'**
+  String get snooze1h;
+
+  /// No description provided for @tomorrowAtNine.
+  ///
+  /// In en, this message translates to:
+  /// **'Tomorrow 9:00'**
+  String get tomorrowAtNine;
+
+  /// No description provided for @privateTask.
+  ///
+  /// In en, this message translates to:
+  /// **'Private task'**
+  String get privateTask;
+
+  /// No description provided for @privateTaskSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock private mode to view details.'**
+  String get privateTaskSubtitle;
+
+  /// No description provided for @accentColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Accent color'**
+  String get accentColor;
+
+  /// No description provided for @accentColorSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Customize the app colors (Pro)'**
+  String get accentColorSubtitle;
+
+  /// No description provided for @requireSubTasksBeforeReminders.
+  ///
+  /// In en, this message translates to:
+  /// **'Subtasks required'**
+  String get requireSubTasksBeforeReminders;
+
+  /// No description provided for @requireSubTasksBeforeRemindersSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Don’t send reminders until all subtasks are completed'**
+  String get requireSubTasksBeforeRemindersSubtitle;
 }
 
 class _AppLocalizationsDelegate
@@ -1558,7 +1782,7 @@ class _AppLocalizationsDelegate
 
   @override
   bool isSupported(Locale locale) =>
-      <String>['en', 'es', 'he'].contains(locale.languageCode);
+      <String>['ar', 'en', 'es', 'he'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
@@ -1567,6 +1791,8 @@ class _AppLocalizationsDelegate
 AppLocalizations lookupAppLocalizations(Locale locale) {
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
+    case 'ar':
+      return AppLocalizationsAr();
     case 'en':
       return AppLocalizationsEn();
     case 'es':

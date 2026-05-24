@@ -69,6 +69,12 @@ class _PremiumScreenState extends State<PremiumScreen> {
                         l10n.recurringTasks,
                         l10n.recurringTasksDesc,
                       ),
+                      _buildFeature(
+                        context,
+                        Icons.lock_rounded,
+                        l10n.privateMode,
+                        l10n.privateModeSubtitle,
+                      ),
                       const SizedBox(height: 48),
                       if (subscriptionService.isPremium)
                         _buildActiveStatus(context, l10n)
