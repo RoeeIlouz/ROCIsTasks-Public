@@ -17,6 +17,7 @@ class TaskWidgetService {
         'id': task.id,
         'title': task.title.isNotEmpty ? task.title : 'Untitled Task',
         'priority': task.priority.name,
+        'category_name': category?.name ?? '',
         'category_color': category != null
             ? _formatColorForWidget(category.colorValue)
             : '',
@@ -35,6 +36,7 @@ class TaskWidgetService {
         'id': task.id,
         'title': 'Error loading task',
         'priority': 'medium',
+        'category_name': '',
         'category_color': '',
         'dueDate': '',
         'dueDateIso': '',

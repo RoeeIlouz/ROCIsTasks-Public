@@ -343,7 +343,6 @@ class _AppRootState extends State<AppRoot> {
             ChangeNotifierProvider(
               create: (_) => CalendarProvider(
                 _calendarService,
-                _scheduleService,
                 _fullCalendarWidgetService,
               )..loadEvents(),
             ),

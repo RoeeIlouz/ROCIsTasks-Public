@@ -1,79 +1,30 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
 import 'package:device_calendar/device_calendar.dart';
 import 'package:rocis_tasks/core/services/calendar_service.dart';
-import 'package:rocis_tasks/core/services/schedule_firestore_service.dart';
-import 'package:rocis_tasks/core/models/schedule_data.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rocis_tasks/features/home/services/full_calendar_widget_service.dart';
 import 'package:rocis_tasks/core/services/logger_service.dart';
 
-/// Wrapper class to represent schedule events from ROCIs-Schedule
-class ScheduleEventWrapper {
-  final ScheduleEventData event;
-
-  ScheduleEventWrapper(this.event);
-
-  String get title => event.title;
-  DateTime get start => event.startTime;
-  DateTime get end => event.endTime;
-  String get location => event.location;
-  String get notes => event.notes;
-  String get eventType => event.eventTypeName;
-  Color? get color => event.courseColor;
-}
-
-/// Wrapper class to represent assignments from ROCIs-Schedule
-class AssignmentWrapper {
-  final AssignmentData assignment;
-
-  AssignmentWrapper(this.assignment);
-
-  String get title => assignment.title;
-  DateTime get dueDate => assignment.dueDate;
-  String get description => assignment.description;
-  String get priority => assignment.priorityName;
-  Color? get color => assignment.courseColor;
-}
-
 class CalendarProvider extends ChangeNotifier {
   final CalendarService _calendarService;
-  final ScheduleFirestoreService _scheduleService;
   final FullCalendarWidgetService _widgetService;
   Map<DateTime, List<dynamic>> _eventsMap = {};
   List<Event> _events = [];
-  List<ScheduleEventWrapper> _scheduleEvents = [];
-  List<AssignmentWrapper> _assignments = [];
   bool _showTasks = true;
   bool _showGoogleCalendar = true;
-  bool _showRocisSchedule = true;
   bool _isLoading = false;
   String? _userId;
   List<Calendar> _availableCalendars = [];
   Set<String> _selectedCalendarIds = {};
 
-  StreamSubscription<List<ScheduleEventData>>? _scheduleEventsSubscription;
-  StreamSubscription<List<AssignmentData>>? _assignmentsSubscription;
-
   CalendarProvider(
     this._calendarService,
-    this._scheduleService,
     this._widgetService,
   );
 
-  @override
-  void dispose() {
-    _scheduleEventsSubscription?.cancel();
-    _assignmentsSubscription?.cancel();
-    super.dispose();
-  }
-
   List<Event> get events => _events;
-  List<ScheduleEventWrapper> get scheduleEvents => _scheduleEvents;
-  List<AssignmentWrapper> get assignments => _assignments;
   bool get showTasks => _showTasks;
   bool get showGoogleCalendar => _showGoogleCalendar;
-  bool get showRocisSchedule => _showRocisSchedule;
   bool get isLoading => _isLoading;
   List<Calendar> get availableCalendars => _availableCalendars;
   Set<String> get selectedCalendarIds => _selectedCalendarIds;
@@ -87,12 +38,6 @@ class CalendarProvider extends ChangeNotifier {
     _userId = userId;
   }
 
-  /// Set the user email for cross-app schedule data lookup
-  /// This is used to find the user's data in the ROCIs-Schedule Firestore
-  void setUserEmail(String? email) {
-    _scheduleService.setUserEmail(email);
-  }
-
   void setSelectedDate(DateTime date) {
     _selectedDate = date;
     notifyListeners();
@@ -103,19 +48,15 @@ class CalendarProvider extends ChangeNotifier {
     final nextShowTasks = prefs.getBool('full_calendar_show_tasks') ?? true;
     final nextShowGoogleCalendar =
         prefs.getBool('full_calendar_show_google') ?? true;
-    final nextShowRocisSchedule =
-        prefs.getBool('full_calendar_show_rocis') ?? true;
     final savedCalendarIds = prefs.getStringList('full_calendar_selected_ids');
 
     final hasChanges =
         nextShowTasks != _showTasks ||
         nextShowGoogleCalendar != _showGoogleCalendar ||
-        nextShowRocisSchedule != _showRocisSchedule ||
         savedCalendarIds != null;
 
     _showTasks = nextShowTasks;
     _showGoogleCalendar = nextShowGoogleCalendar;
-    _showRocisSchedule = nextShowRocisSchedule;
     if (savedCalendarIds != null) {
       _selectedCalendarIds = savedCalendarIds.toSet();
     }
@@ -128,20 +69,16 @@ class CalendarProvider extends ChangeNotifier {
   Future<void> updateFilters({
     bool? showTasks,
     bool? showGoogleCalendar,
-    bool? showRocisSchedule,
   }) async {
     final nextShowTasks = showTasks ?? _showTasks;
     final nextShowGoogleCalendar = showGoogleCalendar ?? _showGoogleCalendar;
-    final nextShowRocisSchedule = showRocisSchedule ?? _showRocisSchedule;
 
     final hasChanges =
         nextShowTasks != _showTasks ||
-        nextShowGoogleCalendar != _showGoogleCalendar ||
-        nextShowRocisSchedule != _showRocisSchedule;
+        nextShowGoogleCalendar != _showGoogleCalendar;
 
     _showTasks = nextShowTasks;
     _showGoogleCalendar = nextShowGoogleCalendar;
-    _showRocisSchedule = nextShowRocisSchedule;
 
     if (hasChanges) {
       notifyListeners();
@@ -151,7 +88,6 @@ class CalendarProvider extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('full_calendar_show_tasks', _showTasks);
     await prefs.setBool('full_calendar_show_google', _showGoogleCalendar);
-    await prefs.setBool('full_calendar_show_rocis', _showRocisSchedule);
   }
 
   Future<void> toggleCalendarSelection(String calendarId) async {
@@ -195,7 +131,6 @@ class CalendarProvider extends ChangeNotifier {
     final filters = FullCalendarFilters(
       showTasks: _showTasks,
       showGoogleCalendar: _showGoogleCalendar,
-      showRocisSchedule: _showRocisSchedule,
       selectedCalendarIds: _selectedCalendarIds.toList(),
     );
     await _widgetService.saveFilters(filters);
@@ -223,9 +158,6 @@ class CalendarProvider extends ChangeNotifier {
         calendarIds: _selectedCalendarIds.toList(),
       );
 
-      // Load ROCIs-Schedule events if user is authenticated
-      await _loadScheduleData();
-
       _processEventsToMap();
     } catch (e, s) {
       AppLogger.error(
@@ -234,118 +166,10 @@ class CalendarProvider extends ChangeNotifier {
         stack: s,
       );
       _events = [];
-      _scheduleEvents = [];
-      _assignments = [];
       _eventsMap = {};
     } finally {
       _isLoading = false;
       notifyListeners();
-    }
-  }
-
-  /// Load schedule data from ROCIs-Schedule Firestore
-  Future<void> _loadScheduleData() async {
-    _scheduleEventsSubscription?.cancel();
-    _assignmentsSubscription?.cancel();
-
-    if (_userId == null ||
-        !_scheduleService.isReady ||
-        !_scheduleService.isAuthenticated) {
-      AppLogger.info(
-        'CalendarProvider: Skipping schedule data load (userId=$_userId, isReady=${_scheduleService.isReady}, isAuthenticated=${_scheduleService.isAuthenticated})',
-      );
-      _scheduleEvents = [];
-      _assignments = [];
-      return;
-    }
-
-    try {
-      final now = DateTime.now();
-      final startDate = DateTime(now.year, now.month - 1, 1);
-      final endDate = DateTime(now.year, now.month + 2, 0);
-
-      AppLogger.info(
-        'CalendarProvider: Subscribing to schedule data for user $_userId',
-      );
-
-      final eventsCompleter = Completer<void>();
-      final assignmentsCompleter = Completer<void>();
-
-      // Subscribe to schedule events
-      _scheduleEventsSubscription = _scheduleService
-          .getScheduleEventsStream(_userId!, startDate, endDate)
-          .listen(
-            (events) {
-              _scheduleEvents = events
-                  .map((e) => ScheduleEventWrapper(e))
-                  .toList();
-              AppLogger.info(
-                'CalendarProvider: Received ${_scheduleEvents.length} schedule events from stream',
-              );
-              _processEventsToMap();
-              notifyListeners();
-              if (!eventsCompleter.isCompleted) eventsCompleter.complete();
-            },
-            onError: (e, s) {
-              AppLogger.error(
-                'CalendarProvider: Error in schedule events stream',
-                error: e,
-                stack: s,
-              );
-              if (!eventsCompleter.isCompleted) eventsCompleter.complete();
-            },
-          );
-
-      // Subscribe to assignments
-      _assignmentsSubscription = _scheduleService
-          .getAssignmentsStream(_userId!, startDate, endDate)
-          .listen(
-            (assignmentData) {
-              _assignments = assignmentData
-                  .map((a) => AssignmentWrapper(a))
-                  .toList();
-              AppLogger.info(
-                'CalendarProvider: Received ${_assignments.length} assignments from stream',
-              );
-              _processEventsToMap();
-              notifyListeners();
-              if (!assignmentsCompleter.isCompleted) {
-                assignmentsCompleter.complete();
-              }
-            },
-            onError: (e, s) {
-              AppLogger.error(
-                'CalendarProvider: Error in assignments stream',
-                error: e,
-                stack: s,
-              );
-              if (!assignmentsCompleter.isCompleted) {
-                assignmentsCompleter.complete();
-              }
-            },
-          );
-
-      // Wait for initial data or timeout
-      await Future.wait([
-        eventsCompleter.future,
-        assignmentsCompleter.future,
-      ]).timeout(
-        const Duration(seconds: 5),
-        onTimeout: () {
-          AppLogger.warning(
-            'CalendarProvider: Timeout waiting for initial schedule data',
-          );
-          return [];
-        },
-      );
-    } catch (e, s) {
-      AppLogger.error(
-        'CalendarProvider: Error setting up schedule data streams',
-        error: e,
-        stack: s,
-      );
-      _scheduleEvents = [];
-      _assignments = [];
     }
   }
 
@@ -392,61 +216,17 @@ class CalendarProvider extends ChangeNotifier {
         currentDay = DateTime(currentDay.year, currentDay.month, currentDay.day + 1);
       }
     }
-
-    // Process ROCIs-Schedule events
-    for (final scheduleEvent in _scheduleEvents) {
-      final start = scheduleEvent.start;
-      final end = scheduleEvent.end;
-      
-      DateTime currentDay = DateTime(start.year, start.month, start.day);
-      final endDay = DateTime(end.year, end.month, end.day);
-
-      while (currentDay.isBefore(endDay) || _isSameDay(currentDay, endDay)) {
-        // Special case: if end is exactly midnight and it is not the start time
-        // For ROCIs-Schedule events, we do NOT break here. If the user created a multi-day
-        // event ending on a specific day, they expect it to be inclusive of that day,
-        // even if the time is 00:00:00.
-        
-        if (_eventsMap[currentDay] == null) {
-          _eventsMap[currentDay] = [];
-        }
-        _eventsMap[currentDay]!.add(scheduleEvent);
-
-        currentDay = DateTime(currentDay.year, currentDay.month, currentDay.day + 1);
-      }
-    }
-
-    // Process ROCIs-Schedule assignments
-    for (final assignment in _assignments) {
-      final normalizedDay = DateTime(
-        assignment.dueDate.year,
-        assignment.dueDate.month,
-        assignment.dueDate.day,
-      );
-      if (_eventsMap[normalizedDay] == null) {
-        _eventsMap[normalizedDay] = [];
-      }
-      _eventsMap[normalizedDay]!.add(assignment);
-    }
   }
 
-  /// Get all events for a specific day (device calendar events, schedule events, and assignments)
+  /// Get all events for a specific day (device calendar events)
   List<dynamic> getEventsForDay(DateTime day) {
     // Normalize day to midnight
     final normalizedDay = DateTime(day.year, day.month, day.day);
     final events = _eventsMap[normalizedDay] ?? [];
-    if (_showGoogleCalendar && _showRocisSchedule) {
+    if (_showGoogleCalendar) {
       return events;
     }
-    return events.where((event) {
-      if (event is Event) {
-        return _showGoogleCalendar;
-      }
-      if (event is ScheduleEventWrapper || event is AssignmentWrapper) {
-        return _showRocisSchedule;
-      }
-      return true;
-    }).toList();
+    return [];
   }
 }
 

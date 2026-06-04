@@ -19,7 +19,6 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
     private var days = ArrayList<JSONObject>()
     private var showTasks = true
     private var showGoogle = true
-    private var showRocis = true
 
     override fun onCreate() {
         onDataSetChanged()
@@ -33,7 +32,6 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
             // Read filter settings
             showTasks = widgetData.getBoolean(FullCalendarWidgetProvider.PREF_SHOW_TASKS, true)
             showGoogle = widgetData.getBoolean(FullCalendarWidgetProvider.PREF_SHOW_GOOGLE, true)
-            showRocis = widgetData.getBoolean(FullCalendarWidgetProvider.PREF_SHOW_ROCIS, true)
             
             val gridDataJson = widgetData.getString("full_calendar_grid_data", "[]")
             val gridData = JSONArray(gridDataJson)
@@ -52,7 +50,6 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
                             val shouldInclude = when (type) {
                                 "task" -> showTasks
                                 "google" -> showGoogle
-                                "schedule", "schedule_event", "assignment" -> showRocis
                                 else -> true // Include unknown types
                             }
                             

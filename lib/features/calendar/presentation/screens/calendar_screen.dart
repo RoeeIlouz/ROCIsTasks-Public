@@ -36,7 +36,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
       // Set user ID and email for schedule data fetching (must be done after build to avoid setState during build)
       final authService = Provider.of<AuthService>(context, listen: false);
       provider.setUserId(authService.currentUser?.uid);
-      provider.setUserEmail(authService.currentUser?.email);
       provider.loadFilters();
       provider.loadEvents();
     });
@@ -128,8 +127,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
               final markers = <Widget>[];
               bool hasTask = false;
               bool hasGoogleEvent = false;
-              bool hasScheduleEvent = false;
-              bool hasAssignment = false;
               
               for (final event in events) {
                 if (event is Task && !hasTask) {
@@ -148,14 +145,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   hasGoogleEvent = true;
                   // Google Calendar marker - custom color
                   markers.add(_buildMarker(colorService.googleColor));
-                } else if (event is ScheduleEventWrapper && !hasScheduleEvent) {
-                  hasScheduleEvent = true;
-                  // ROCIs Schedule event marker - custom color
-                  markers.add(_buildMarker(colorService.scheduleColor));
-                } else if (event is AssignmentWrapper && !hasAssignment) {
-                  hasAssignment = true;
-                  // Assignment marker - custom color
-                  markers.add(_buildMarker(colorService.assignmentColor));
                 }
               }
               
@@ -290,186 +279,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         'Google',
                         style: Theme.of(context).textTheme.labelSmall?.copyWith(
                           color: googleColor,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              );
-            } else if (item is ScheduleEventWrapper) {
-                // ROCIs-Schedule event (class, exam, lab, etc.)
-                final timeFormat = themeService.use24HourFormat
-                    ? DateFormat.Hm()
-                    : DateFormat.jm();
-                final eventColor = colorService.scheduleColor;
-                return Card(
-                  margin: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 6,
-                  ),
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    side: BorderSide(
-                      color: eventColor.withValues(alpha: 0.5),
-                    ),
-                  ),
-                  color: Theme.of(context).colorScheme.surface,
-                  child: Semantics(
-                    label: '${item.eventType}: ${item.title}',
-                    hint: item.location.isNotEmpty ? 'Location: ${item.location}' : null,
-                    child: ListTile(
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
-                      leading: Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: eventColor.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Icon(
-                          Icons.school_rounded,
-                          color: eventColor,
-                          size: 24,
-                        ),
-                      ),
-                    title: Text(
-                      item.title,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: -0.5,
-                      ),
-                    ),
-                    subtitle: Padding(
-                      padding: const EdgeInsets.only(top: 4),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.access_time_rounded,
-                                size: 14,
-                                color: Theme.of(context).colorScheme.onSurfaceVariant,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                '${timeFormat.format(item.start)} - ${timeFormat.format(item.end)}',
-                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
-                          if (item.location.isNotEmpty) ...[
-                            const SizedBox(height: 2),
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.location_on_rounded,
-                                  size: 14,
-                                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  item.location,
-                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                    trailing: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: eventColor.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        item.eventType,
-                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: eventColor,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              );
-            } else if (item is AssignmentWrapper) {
-                // ROCIs-Schedule assignment
-                final assignmentColor = colorService.assignmentColor;
-                return Card(
-                  margin: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 6,
-                  ),
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    side: BorderSide(
-                      color: assignmentColor.withValues(alpha: 0.5),
-                    ),
-                  ),
-                  color: Theme.of(context).colorScheme.surface,
-                  child: Semantics(
-                    label: 'Assignment: ${item.title}',
-                    hint: item.description.isNotEmpty ? item.description : null,
-                    child: ListTile(
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
-                      leading: Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: assignmentColor.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Icon(
-                          Icons.assignment_rounded,
-                          color: assignmentColor,
-                          size: 24,
-                        ),
-                      ),
-                    title: Text(
-                      item.title,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: -0.5,
-                      ),
-                    ),
-                    subtitle: item.description.isNotEmpty
-                        ? Padding(
-                            padding: const EdgeInsets.only(top: 4),
-                            child: Text(
-                              item.description,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: Theme.of(context).colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                          )
-                        : null,
-                    trailing: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: assignmentColor.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        'Due',
-                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: assignmentColor,
                           fontWeight: FontWeight.w600,
                         ),
                       ),

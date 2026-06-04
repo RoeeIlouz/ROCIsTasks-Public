@@ -13,7 +13,7 @@ import 'package:rocis_tasks/core/services/security_service.dart';
 import 'package:rocis_tasks/features/tasks/presentation/widgets/task_unlock_dialog.dart';
 import 'package:rocis_tasks/core/services/subscription_service.dart';
 
-class TaskDetailScreen extends StatelessWidget {
+class TaskDetailScreen extends StatefulWidget {
   final Task task;
   final Category? category;
 
@@ -24,16 +24,57 @@ class TaskDetailScreen extends StatelessWidget {
   });
 
   @override
+  State<TaskDetailScreen> createState() => _TaskDetailScreenState();
+}
+
+class _TaskDetailScreenState extends State<TaskDetailScreen> {
+  bool _authorized = false;
+  bool _promptScheduled = false;
+
+  @override
+  void dispose() {
+    PrivateModeService? privateModeService;
+    try {
+      privateModeService = Provider.of<PrivateModeService>(context, listen: false);
+    } catch (_) {
+      privateModeService = null;
+    }
+    privateModeService?.lock();
+    super.dispose();
+  }
+
+  Future<void> _promptUnlock(
+    TaskProvider provider, {
+    required bool popOnCancel,
+  }) async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (context) => const TaskUnlockDialog(),
+    );
+
+    if (!mounted) return;
+
+    if (ok == true) {
+      setState(() {
+        _authorized = true;
+      });
+      await provider.updateHomeWidgetWithNotification();
+    } else if (popOnCancel) {
+      Navigator.pop(context);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
 
-    // Watch the task from provider to reflect changes (like subtask completion)
     return Consumer<TaskProvider>(
       builder: (context, provider, child) {
-        final updatedTask = provider.getTaskById(task.id) ?? task;
+        final updatedTask = provider.getTaskById(widget.task.id) ?? widget.task;
         final updatedCategory =
-            provider.getCategoryById(updatedTask.categoryId) ?? category;
+            provider.getCategoryById(updatedTask.categoryId) ?? widget.category;
+
         PrivateModeService? privateModeService;
         try {
           privateModeService = Provider.of<PrivateModeService>(context);
@@ -48,9 +89,21 @@ class TaskDetailScreen extends StatelessWidget {
           subscriptionService = null;
         }
 
-        if ((subscriptionService?.isPremium ?? false) &&
-            updatedCategory?.isPrivate == true &&
-            (privateModeService?.shouldHidePrivateContent ?? false)) {
+        final requiresUnlock =
+            (subscriptionService?.isPremium ?? false) &&
+            (updatedCategory?.isPrivate == true) &&
+            (privateModeService?.isEnabled ?? false) &&
+            (privateModeService?.hasPin ?? false);
+
+        if (requiresUnlock && !_authorized) {
+          if (!_promptScheduled) {
+            _promptScheduled = true;
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (!mounted) return;
+              _promptUnlock(provider, popOnCancel: true);
+            });
+          }
+
           return Scaffold(
             appBar: AppBar(),
             body: Center(
@@ -80,15 +133,7 @@ class TaskDetailScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 24),
                     FilledButton(
-                      onPressed: () async {
-                        final ok = await showDialog<bool>(
-                          context: context,
-                          builder: (context) => const TaskUnlockDialog(),
-                        );
-                        if (ok == true) {
-                          await provider.updateHomeWidgetWithNotification();
-                        }
-                      },
+                      onPressed: () => _promptUnlock(provider, popOnCancel: false),
                       child: Text(l10n.unlock),
                     ),
                   ],
@@ -127,7 +172,6 @@ class TaskDetailScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Title and Status
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -169,7 +213,6 @@ class TaskDetailScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 24),
 
-                // Category and Due Date Chips
                 Wrap(
                   spacing: 12,
                   runSpacing: 12,
@@ -223,7 +266,6 @@ class TaskDetailScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 32),
 
-                // Description
                 if (updatedTask.description.isNotEmpty) ...[
                   Text(
                     l10n.description,
@@ -240,7 +282,6 @@ class TaskDetailScreen extends StatelessWidget {
                   const SizedBox(height: 32),
                 ],
 
-                // Subtasks
                 if (updatedTask.subTasks != null && updatedTask.subTasks!.isNotEmpty) ...[
                   Text(
                     l10n.subtasks,
@@ -337,7 +378,7 @@ class TaskDetailScreen extends StatelessWidget {
     );
 
     if (result == true && context.mounted) {
-      provider.deleteTask(task.id);
+      provider.deleteTask(widget.task.id);
       Navigator.pop(context);
     }
   }

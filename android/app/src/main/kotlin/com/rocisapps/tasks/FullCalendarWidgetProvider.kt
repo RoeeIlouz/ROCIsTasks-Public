@@ -15,7 +15,6 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
         // Filter toggle actions
         const val ACTION_FILTER_TASKS = "com.rocisapps.tasks.ACTION_FILTER_TASKS"
         const val ACTION_FILTER_GOOGLE = "com.rocisapps.tasks.ACTION_FILTER_GOOGLE"
-        const val ACTION_FILTER_ROCIS = "com.rocisapps.tasks.ACTION_FILTER_ROCIS"
         const val ACTION_PREV_MONTH = "com.rocisapps.tasks.ACTION_PREV_MONTH"
         const val ACTION_NEXT_MONTH = "com.rocisapps.tasks.ACTION_NEXT_MONTH"
         const val ACTION_TODAY = "com.rocisapps.tasks.ACTION_TODAY"
@@ -23,13 +22,11 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
         // Preference keys
         const val PREF_SHOW_TASKS = "full_calendar_show_tasks"
         const val PREF_SHOW_GOOGLE = "full_calendar_show_google"
-        const val PREF_SHOW_ROCIS = "full_calendar_show_rocis"
         const val PREF_OFFSET = "full_calendar_offset"
         
         // Unique request codes
         private const val REQUEST_CODE_FILTER_TASKS = 301
         private const val REQUEST_CODE_FILTER_GOOGLE = 302
-        private const val REQUEST_CODE_FILTER_ROCIS = 303
         private const val REQUEST_CODE_PREV_MONTH = 304
         private const val REQUEST_CODE_NEXT_MONTH = 305
         private const val REQUEST_CODE_TODAY = 306
@@ -92,7 +89,6 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
                 // 4. Filter Buttons - read state and setup click handlers
                 val showTasks = widgetData.getBoolean(PREF_SHOW_TASKS, true)
                 val showGoogle = widgetData.getBoolean(PREF_SHOW_GOOGLE, true)
-                val showRocis = widgetData.getBoolean(PREF_SHOW_ROCIS, true)
 
                 // Update filter button appearance based on state (alpha for enabled/disabled)
                 // Tasks filter
@@ -101,8 +97,7 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
                 // Google filter
                 views.setFloat(R.id.widget_filter_google, "setAlpha", if (showGoogle) 1.0f else 0.4f)
 
-                // ROCIs Schedule filter
-                views.setFloat(R.id.widget_filter_rocis, "setAlpha", if (showRocis) 1.0f else 0.4f)
+                views.setViewVisibility(R.id.widget_filter_rocis, android.view.View.GONE)
 
                 // Filter button click handlers - broadcast to this widget provider
                 setupFilterButtonIntents(context, views, appWidgetId)
@@ -175,17 +170,6 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
             android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_MUTABLE
         )
         views.setOnClickPendingIntent(R.id.widget_filter_google, filterGooglePendingIntent)
-
-        // ROCIs Schedule filter button
-        val filterRocisIntent = Intent(context, FullCalendarWidgetProvider::class.java).apply {
-            action = ACTION_FILTER_ROCIS
-            putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-        }
-        val filterRocisPendingIntent = android.app.PendingIntent.getBroadcast(
-            context, REQUEST_CODE_FILTER_ROCIS, filterRocisIntent,
-            android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_MUTABLE
-        )
-        views.setOnClickPendingIntent(R.id.widget_filter_rocis, filterRocisPendingIntent)
     }
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -193,7 +177,7 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
         val action = intent.action
         
         if (action == ACTION_FILTER_TASKS || action == ACTION_FILTER_GOOGLE || 
-            action == ACTION_FILTER_ROCIS || action == ACTION_PREV_MONTH || action == ACTION_NEXT_MONTH) {
+            action == ACTION_PREV_MONTH || action == ACTION_NEXT_MONTH) {
             
             val widgetData = es.antonborri.home_widget.HomeWidgetPlugin.getData(context)
             val editor = widgetData.edit()
@@ -206,10 +190,6 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
                 ACTION_FILTER_GOOGLE -> {
                     val current = widgetData.getBoolean(PREF_SHOW_GOOGLE, true)
                     editor.putBoolean(PREF_SHOW_GOOGLE, !current)
-                }
-                ACTION_FILTER_ROCIS -> {
-                    val current = widgetData.getBoolean(PREF_SHOW_ROCIS, true)
-                    editor.putBoolean(PREF_SHOW_ROCIS, !current)
                 }
                 ACTION_PREV_MONTH -> {
                     // Trigger Dart background update

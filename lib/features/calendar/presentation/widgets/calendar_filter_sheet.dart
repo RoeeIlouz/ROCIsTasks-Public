@@ -75,15 +75,6 @@ class CalendarFilterSheet extends StatelessWidget {
                           },
                           secondary: const Icon(Icons.event_note_rounded),
                         ),
-                        const Divider(height: 1),
-                        SwitchListTile(
-                          title: Text(l10n.showRocisSchedule),
-                          value: provider.showRocisSchedule,
-                          onChanged: (value) {
-                            provider.updateFilters(showRocisSchedule: value);
-                          },
-                          secondary: const Icon(Icons.school_rounded),
-                        ),
                         if (provider.showGoogleCalendar &&
                             provider.availableCalendars.isNotEmpty) ...[
                           const Divider(height: 1),

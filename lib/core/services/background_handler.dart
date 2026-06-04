@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -181,35 +180,9 @@ class BackgroundHandler {
         await firestoreService.updateTask(task);
       }
 
-      final pendingTasks = box.values.where((t) => !t.isCompleted).toList();
-      pendingTasks.sort((a, b) {
-        if (a.dueDate == null && b.dueDate == null) return 0;
-        if (a.dueDate == null) return 1;
-        if (b.dueDate == null) return -1;
-        return a.dueDate!.compareTo(b.dueDate!);
-      });
-
-      final tasksJson = pendingTasks
-          .map(
-            (t) => {
-              'id': t.id,
-              'title': t.title,
-              'priority': t.priority.name,
-              'dueDate': t.dueDate?.toString().split(' ')[0] ?? '',
-            },
-          )
+      final pendingTasks = box.values
+          .where((t) => !t.isCompleted && !(t.isDeleted ?? false))
           .toList();
-
-      await HomeWidget.saveWidgetData<String>(
-        'pending_tasks_list',
-        jsonEncode(tasksJson),
-      );
-
-      final widgetNames = ['TaskWidgetProvider'];
-
-      for (final name in widgetNames) {
-        await HomeWidget.updateWidget(name: name);
-      }
 
       final notificationService = NotificationService();
       await notificationService.init();
@@ -229,17 +202,47 @@ class BackgroundHandler {
       final taskSource = LocalTaskSource();
       await taskSource.init();
 
+      final categories = taskSource.getCategories();
+      Category? getCategoryById(String? id) {
+        if (id == null || id.isEmpty) return null;
+        try {
+          return categories.firstWhere((c) => c.id == id);
+        } catch (_) {
+          return null;
+        }
+      }
+
       final chartPath = await TaskWidgetService.updateTaskWidget(
         box.values.toList(),
-        (id) => Hive.box<Category>('categories').get(id),
+        getCategoryById,
         isDarkText: isDarkText,
       );
 
       final l10n = lookupAppLocalizations(PlatformDispatcher.instance.locale);
+      String priorityLabel(TaskPriority p) {
+        switch (p) {
+          case TaskPriority.high:
+            return l10n.high;
+          case TaskPriority.medium:
+            return l10n.medium;
+          case TaskPriority.low:
+            return l10n.low;
+        }
+      }
+
+      String formatTitle(Task t) {
+        final categoryName = getCategoryById(t.categoryId)?.name;
+        final parts = <String>[
+          if (categoryName != null && categoryName.isNotEmpty) categoryName,
+          priorityLabel(t.priority),
+          t.title,
+        ];
+        return parts.join(' • ');
+      }
 
       await notificationService.showTaskCountNotification(
         pendingTasks.length,
-        pendingTasks.map((t) => t.title).toList(),
+        pendingTasks.map(formatTitle).toList(),
         largeIconPath: chartPath,
         isDarkText: isDarkText,
         uncompletedTasksLabel: l10n.notificationUncompletedTasks(

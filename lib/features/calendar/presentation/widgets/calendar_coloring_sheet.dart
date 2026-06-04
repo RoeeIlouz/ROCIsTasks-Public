@@ -81,28 +81,6 @@ class CalendarColoringSheet extends StatelessWidget {
                 }
               },
             ),
-            _buildColorTile(
-              context,
-              l10n.scheduleColor,
-              colorService.scheduleColor,
-              (color) async {
-                await colorService.setScheduleColor(color);
-                if (context.mounted) {
-                  await taskProvider.updateHomeWidget();
-                }
-              },
-            ),
-            _buildColorTile(
-              context,
-              l10n.assignmentColor,
-              colorService.assignmentColor,
-              (color) async {
-                await colorService.setAssignmentColor(color);
-                if (context.mounted) {
-                  await taskProvider.updateHomeWidget();
-                }
-              },
-            ),
           ],
         ),
       ),

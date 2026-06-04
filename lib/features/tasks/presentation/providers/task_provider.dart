@@ -1141,6 +1141,32 @@ class TaskProvider extends ChangeNotifier {
     return _subscriptionService.isPremium && _privateModeService.shouldHidePrivateContent;
   }
 
+  List<Task> _getTasksForTaskWidgetAndCounter() {
+    return _source.getTasks();
+  }
+
+  String _priorityLabel(TaskPriority priority) {
+    switch (priority) {
+      case TaskPriority.high:
+        return _l10n.high;
+      case TaskPriority.medium:
+        return _l10n.medium;
+      case TaskPriority.low:
+        return _l10n.low;
+    }
+  }
+
+  String _formatTaskTitleForCounter(Task task) {
+    final priority = _priorityLabel(task.priority);
+    final categoryName = getCategoryById(task.categoryId)?.name;
+    final parts = <String>[
+      if (categoryName != null && categoryName.isNotEmpty) categoryName,
+      priority,
+      task.title,
+    ];
+    return parts.join(' • ');
+  }
+
   /// Update home widgets without showing the task count notification
   /// Use this for general widget updates (color changes, pin/unpin, etc.)
   Future<void> updateHomeWidget() async {
@@ -1172,8 +1198,9 @@ class TaskProvider extends ChangeNotifier {
         _widgetUpdateInProgress = true;
         try {
           final tasksForPublicSurfaces = _getTasksForPublicSurfaces();
+          final tasksForTaskWidgetAndCounter = _getTasksForTaskWidgetAndCounter();
           final chartPath = await TaskWidgetService.updateTaskWidget(
-            tasksForPublicSurfaces,
+            tasksForTaskWidgetAndCounter,
             getCategoryById,
             isDarkText: !_themeService.isDarkMode,
           );
@@ -1181,13 +1208,13 @@ class TaskProvider extends ChangeNotifier {
           // Only show notification when explicitly requested
           // (task added, completed, deleted, or app first opened)
           if (showNotification) {
-            final uncompletedTasks = tasksForPublicSurfaces
+            final uncompletedTasks = tasksForTaskWidgetAndCounter
                 .where((t) => !t.isCompleted && !(t.isDeleted ?? false))
                 .toList();
 
             await _notificationService.showTaskCountNotification(
               uncompletedTasks.length,
-              uncompletedTasks.map((t) => t.title).toList(),
+              uncompletedTasks.map(_formatTaskTitleForCounter).toList(),
               largeIconPath: chartPath,
               isDarkText: !_themeService.isDarkMode,
               uncompletedTasksLabel: _l10n.notificationUncompletedTasks(

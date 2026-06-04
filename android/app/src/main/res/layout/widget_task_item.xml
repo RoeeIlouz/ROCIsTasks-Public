@@ -48,6 +48,14 @@
                 android:textStyle="bold"/>
 
             <TextView
+                android:id="@+id/widget_task_meta"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Category • High"
+                android:textSize="11sp"
+                android:textColor="@color/widget_body_text"/>
+
+            <TextView
                 android:id="@+id/widget_task_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

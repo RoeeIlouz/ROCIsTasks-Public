@@ -184,6 +184,7 @@ class TaskWidgetFactory(private val context: Context) : RemoteViewsService.Remot
             standardizedTask.put("title", title)
             standardizedTask.put("dueDate", extractStringSafely(taskObj, "dueDate", ""))
             standardizedTask.put("dueDateIso", extractStringSafely(taskObj, "dueDateIso", ""))
+            standardizedTask.put("category_name", extractStringSafely(taskObj, "category_name", ""))
             standardizedTask.put("category_color", extractColorSafely(taskObj, "category_color", ""))
             standardizedTask.put("priority", extractStringSafely(taskObj, "priority", "medium"))
             standardizedTask.put("isCompleted", extractBooleanSafely(taskObj, "isCompleted", false))
@@ -301,6 +302,22 @@ class TaskWidgetFactory(private val context: Context) : RemoteViewsService.Remot
             // Handle title with fallback (already validated, but double-check)
             val title = extractStringSafely(task, "title", "Untitled Task")
             views.setTextViewText(R.id.widget_task_title, title)
+
+            val categoryName = extractStringSafely(task, "category_name", "")
+            val rawPriority = extractStringSafely(task, "priority", "")
+            val priority = if (rawPriority.isNotEmpty()) {
+                rawPriority.substring(0, 1).uppercase() + rawPriority.substring(1).lowercase()
+            } else {
+                ""
+            }
+
+            val metaParts = listOf(categoryName, priority).filter { it.isNotEmpty() }
+            if (metaParts.isNotEmpty()) {
+                views.setTextViewText(R.id.widget_task_meta, metaParts.joinToString(" • "))
+                views.setViewVisibility(R.id.widget_task_meta, android.view.View.VISIBLE)
+            } else {
+                views.setViewVisibility(R.id.widget_task_meta, android.view.View.GONE)
+            }
             
             // Handle due date with fallback and formatting
             val dueDate = extractStringSafely(task, "dueDate", "")

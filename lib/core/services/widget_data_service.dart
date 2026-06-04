@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:flutter/material.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:intl/intl.dart';
 import 'package:rocis_tasks/core/services/calendar_service.dart';
@@ -98,64 +97,6 @@ class WidgetDataService {
       );
     }
 
-    // Fetch ROCIs-Schedule data if user is logged in and authenticated in secondary Firebase
-    if (userId != null && _scheduleService.isReady) {
-      if (!_scheduleService.isAuthenticated) {
-        AppLogger.warning(
-          'WidgetDataService: User not authenticated in secondary Firebase (rocis-schedule). Schedule integration requires signing in with Google.',
-        );
-      } else {
-        try {
-          AppLogger.info(
-            'WidgetDataService: Fetching ROCIs-Schedule data for user $userId (Auth ID: ${_scheduleService.authenticatedUserId})',
-          );
-          final scheduleData = await _scheduleService.getScheduleDataForWidget(
-            userId,
-            scheduleStart,
-            scheduleEnd,
-          );
-
-          // Add schedule events and assignments
-          for (var item in scheduleData) {
-            final date = DateTime.parse(item['date'] as String);
-            scheduleItems.add({
-              'type': item['type'],
-              'id': item['id'],
-              'title': item['title'],
-              'description': item['description'] ?? '',
-              'date': item['date'],
-              'dateDisplay': TaskWidgetService.formatDateForDisplay(date),
-              'timeDisplay': item['isAllDay'] == true
-                  ? (item['type'] == 'assignment' ? 'Due' : 'All Day')
-                  : DateFormat('HH:mm').format(date),
-              'isAllDay': item['isAllDay'] ?? false,
-              'location': item['location'] ?? '',
-              'category_color': item['category_color'] ?? '#4285F4',
-              'priority': item['priority'] ?? '',
-              'eventType': item['eventType'] ?? '',
-            });
-          }
-          AppLogger.info(
-            'WidgetDataService: Added ${scheduleData.length} items from ROCIs-Schedule',
-          );
-        } catch (e, s) {
-          AppLogger.error(
-            'Error fetching ROCIs-Schedule data',
-            error: e,
-            stack: s,
-          );
-        }
-      }
-    } else if (userId == null) {
-      debugPrint(
-        'WidgetDataService: No userId provided, skipping ROCIs-Schedule data',
-      );
-    } else if (!_scheduleService.isReady) {
-      AppLogger.info(
-        'WidgetDataService: Schedule service not ready, skipping ROCIs-Schedule data',
-      );
-    }
-
     scheduleItems.sort(
       (a, b) => DateTime.parse(a['date']).compareTo(DateTime.parse(b['date'])),
     );
@@ -221,40 +162,6 @@ class WidgetDataService {
           'dateDisplay': TaskWidgetService.formatDateForDisplay(t.dueDate!),
           'category_color': '', // Can be improved by passing a lookup if needed
         });
-      }
-
-      // Fetch ROCIs-Schedule data if user is logged in and authenticated
-      if (userId != null &&
-          _scheduleService.isReady &&
-          _scheduleService.isAuthenticated) {
-        try {
-          final scheduleData = await _scheduleService.getScheduleDataForWidget(
-            userId,
-            listStart,
-            listEnd,
-          );
-
-          for (var item in scheduleData) {
-            final date = DateTime.parse(item['date'] as String);
-            calendarListEvents.add({
-              'type': item['type'],
-              'id': item['id'],
-              'title': item['title'],
-              'start': item['date'],
-              'startDisplay': item['isAllDay'] == true
-                  ? (item['type'] == 'assignment' ? 'Due' : 'All Day')
-                  : DateFormat('HH:mm').format(date),
-              'dateDisplay': TaskWidgetService.formatDateForDisplay(date),
-              'category_color': item['category_color'] ?? '#4285F4',
-            });
-          }
-        } catch (e, s) {
-          AppLogger.error(
-            'Error fetching ROCIs-Schedule data for calendar list',
-            error: e,
-            stack: s,
-          );
-        }
       }
 
       calendarListEvents.sort(
@@ -331,58 +238,6 @@ class WidgetDataService {
         error: e,
         stack: s,
       );
-    }
-
-    // Add ROCIs-Schedule events to the month map
-    if (userId != null &&
-        _scheduleService.isReady &&
-        _scheduleService.isAuthenticated) {
-      try {
-        final scheduleEvents = await _scheduleService.getScheduleEvents(
-          userId,
-          start,
-          end,
-        );
-        for (var event in scheduleEvents) {
-          final eventStart = DateTime(event.startTime.year, event.startTime.month, event.startTime.day);
-          final eventEnd = DateTime(event.endTime.year, event.endTime.month, event.endTime.day);
-          
-          var current = eventStart;
-          while (current.isBefore(eventEnd) || _isSameDay(current, eventEnd)) {
-            // For ROCIs-Schedule events, we treat the end date as inclusive to match the provider
-            // unless it's a specific timed event that ends exactly at midnight.
-            // However, most schedule events are classes/exams with specific times.
-            if (current == eventEnd &&
-                event.endTime.hour == 0 &&
-                event.endTime.minute == 0 &&
-                event.endTime.second == 0 &&
-                event.endTime.millisecond == 0 &&
-                current != eventStart) {
-              // We'll keep the break for now but note that Schedule events are usually timed
-              break;
-            }
-            final dateKey = DateFormat('yyyy-MM-dd').format(current);
-            eventsByDay[dateKey] = true;
-            current = current.add(const Duration(days: 1));
-          }
-        }
-
-        final assignments = await _scheduleService.getAssignments(
-          userId,
-          start,
-          end,
-        );
-        for (var assignment in assignments) {
-          final dateKey = DateFormat('yyyy-MM-dd').format(assignment.dueDate);
-          eventsByDay[dateKey] = true;
-        }
-      } catch (e, s) {
-        AppLogger.error(
-          'Error fetching ROCIs-Schedule data for month map',
-          error: e,
-          stack: s,
-        );
-      }
     }
 
     try {

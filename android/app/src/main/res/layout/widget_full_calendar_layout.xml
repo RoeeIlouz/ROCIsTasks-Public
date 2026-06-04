@@ -125,7 +125,8 @@
             android:textSize="11sp"
             android:textColor="@color/widget_body_text"
             android:background="@drawable/widget_filter_button_bg"
-            android:clickable="true" />
+            android:clickable="true"
+            android:visibility="gone" />
     </LinearLayout>
 
     <LinearLayout

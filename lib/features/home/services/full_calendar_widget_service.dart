@@ -6,7 +6,6 @@ import 'package:intl/intl.dart';
 import 'package:rocis_tasks/core/services/logger_service.dart';
 import 'package:rocis_tasks/core/services/calendar_service.dart';
 import 'package:rocis_tasks/core/services/calendar_color_service.dart';
-import 'package:rocis_tasks/core/services/schedule_firestore_service.dart';
 import 'package:rocis_tasks/features/tasks/data/datasources/local_task_source.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
@@ -21,7 +20,7 @@ class FullCalendarFilters {
   const FullCalendarFilters({
     this.showTasks = true,
     this.showGoogleCalendar = true,
-    this.showRocisSchedule = true,
+    this.showRocisSchedule = false,
     this.selectedCalendarIds = const [],
   });
 
@@ -36,7 +35,7 @@ class FullCalendarFilters {
     return FullCalendarFilters(
       showTasks: map['showTasks'] ?? true,
       showGoogleCalendar: map['showGoogleCalendar'] ?? true,
-      showRocisSchedule: map['showRocisSchedule'] ?? true,
+      showRocisSchedule: false,
       selectedCalendarIds: List<String>.from(map['selectedCalendarIds'] ?? []),
     );
   }
@@ -59,19 +58,16 @@ class FullCalendarFilters {
 class FullCalendarWidgetService {
   final CalendarService _calendarService;
   final LocalTaskSource _taskSource;
-  final ScheduleFirestoreService _scheduleService;
 
   FullCalendarWidgetService(this._calendarService, this._taskSource)
-    : _scheduleService = ScheduleFirestoreService();
+    ;
 
   /// Initialize the schedule service
   Future<void> initScheduleService() async {
-    await _scheduleService.initialize();
   }
 
   /// Set the user email for ROCIs-Schedule lookup
   void setUserEmail(String? email) {
-    _scheduleService.setUserEmail(email);
   }
 
   /// Get current filter settings
@@ -81,9 +77,6 @@ class FullCalendarWidgetService {
         true;
     final showGoogle =
         await HomeWidget.getWidgetData<bool>('full_calendar_show_google') ??
-        true;
-    final showRocis =
-        await HomeWidget.getWidgetData<bool>('full_calendar_show_rocis') ??
         true;
 
     final selectedIdsJson = await HomeWidget.getWidgetData<String>(
@@ -99,7 +92,7 @@ class FullCalendarWidgetService {
     return FullCalendarFilters(
       showTasks: showTasks,
       showGoogleCalendar: showGoogle,
-      showRocisSchedule: showRocis,
+      showRocisSchedule: false,
       selectedCalendarIds: selectedCalendarIds,
     );
   }
@@ -117,7 +110,7 @@ class FullCalendarWidgetService {
     );
     await HomeWidget.saveWidgetData<bool>(
       'full_calendar_show_rocis',
-      filters.showRocisSchedule,
+      false,
     );
     await HomeWidget.saveWidgetData<String>(
       'full_calendar_selected_ids',
@@ -131,7 +124,7 @@ class FullCalendarWidgetService {
       'full_calendar_show_google',
       filters.showGoogleCalendar,
     );
-    await prefs.setBool('full_calendar_show_rocis', filters.showRocisSchedule);
+    await prefs.setBool('full_calendar_show_rocis', false);
     await prefs.setStringList(
       'full_calendar_selected_ids',
       filters.selectedCalendarIds,
@@ -152,11 +145,6 @@ class FullCalendarWidgetService {
       case 'google':
         updated = current.copyWith(
           showGoogleCalendar: !current.showGoogleCalendar,
-        );
-        break;
-      case 'rocis':
-        updated = current.copyWith(
-          showRocisSchedule: !current.showRocisSchedule,
         );
         break;
       default:
@@ -199,21 +187,11 @@ class FullCalendarWidgetService {
       final googleColorInt =
           prefs.getInt(CalendarColorService.keyGoogleColor) ??
           CalendarColorService.defaultGoogleColor.toARGB32();
-      final scheduleColorInt =
-          prefs.getInt(CalendarColorService.keyScheduleColor) ??
-          CalendarColorService.defaultScheduleColor.toARGB32();
-      final assignmentColorInt =
-          prefs.getInt(CalendarColorService.keyAssignmentColor) ??
-          CalendarColorService.defaultAssignmentColor.toARGB32();
 
       // Convert to hex strings
       final taskColorHex = '#${taskColorInt.toRadixString(16).padLeft(8, '0')}';
       final googleColorHex =
           '#${googleColorInt.toRadixString(16).padLeft(8, '0')}';
-      final scheduleColorHex =
-          '#${scheduleColorInt.toRadixString(16).padLeft(8, '0')}';
-      final assignmentColorHex =
-          '#${assignmentColorInt.toRadixString(16).padLeft(8, '0')}';
 
       final now = DateTime.now();
       final targetMonth = DateTime(now.year, now.month + offset, 1);
@@ -262,23 +240,6 @@ class FullCalendarWidgetService {
         }
       } catch (e, stack) {
         AppLogger.error('Failed to fetch tasks for widget', error: e, stack: stack);
-      }
-
-      // Fetch ROCIs-Schedule events (if filter enabled and user is authenticated)
-      List<Map<String, dynamic>> scheduleData = [];
-      try {
-        if (filters.showRocisSchedule &&
-            _scheduleService.isReady &&
-            _scheduleService.isAuthenticated) {
-          final effectiveUserId = userId ?? 'default';
-          scheduleData = await _scheduleService.getScheduleDataForWidget(
-            effectiveUserId,
-            startDate,
-            endDate,
-          );
-        }
-      } catch (e, stack) {
-        AppLogger.error('Failed to fetch schedule data for widget', error: e, stack: stack);
       }
 
       // Load localization for background strings
@@ -347,60 +308,6 @@ class FullCalendarWidgetService {
             return tDate == dateKey;
           }).toList();
 
-          // Find ROCIs-Schedule items for this day (including multi-day events)
-          final dayScheduleItems = scheduleData.where((item) {
-            try {
-              final dateObj = item['date'];
-              if (dateObj == null) return false;
-
-              DateTime startTime;
-              if (dateObj is DateTime) {
-                startTime = dateObj;
-              } else if (dateObj is String) {
-                startTime = DateTime.parse(dateObj);
-              } else {
-                return false;
-              }
-
-              // Try to get end date if available
-              final endDateObj = item['endDate'];
-              DateTime endTime;
-              if (endDateObj != null) {
-                if (endDateObj is DateTime) {
-                  endTime = endDateObj;
-                } else {
-                  endTime = DateTime.parse(endDateObj.toString());
-                }
-              } else {
-                // If no end date, treat as 1-day event
-                endTime = startTime;
-              }
-
-              final startDay = DateTime(startTime.year, startTime.month, startTime.day);
-              final endDay = DateTime(endTime.year, endTime.month, endTime.day);
-              final currentDate = date;
-
-              if (currentDate.isBefore(startDay) || currentDate.isAfter(endDay)) {
-                return false;
-              }
-
-              // Special case for midnight end (exclusive) - only for timed events
-              if (currentDate == endDay &&
-                  item['isAllDay'] != true &&
-                  endTime.hour == 0 &&
-                  endTime.minute == 0 &&
-                  endTime.second == 0 &&
-                  endTime.millisecond == 0 &&
-                  currentDate != startDay) {
-                return false;
-              }
-
-              return true;
-            } catch (e) {
-              return false;
-            }
-          }).toList();
-
           // Create summaries (up to 3 items)
           final summaries = <Map<String, dynamic>>[];
 
@@ -460,99 +367,6 @@ class FullCalendarWidgetService {
             });
           }
 
-          // Add ROCIs-Schedule events and assignments (custom colors)
-          for (var item in dayScheduleItems) {
-            if (summaries.length >= 3) break;
-            try {
-              final type = (item['type'] as String?) ?? 'schedule_event';
-              final color = type == 'assignment'
-                  ? assignmentColorHex
-                  : scheduleColorHex;
-
-              final itemDateStr = item['date'] as String?;
-              if (itemDateStr == null) continue;
-
-              final itemDate = DateTime.parse(itemDateStr);
-
-              // Extract start and end times if available
-              DateTime? startTime;
-              DateTime? endTime;
-
-              if (type == 'schedule_event') {
-                // For schedule events, try to get start and end times
-                final startStr = item['startTime'] as String?;
-                final endStr = item['endTime'] as String?;
-
-                if (startStr != null) {
-                  try {
-                    startTime = DateTime.parse(startStr);
-                    // Combine with date if only time was provided
-                    if (startTime.year == 1970) {
-                      startTime = DateTime(
-                        itemDate.year,
-                        itemDate.month,
-                        itemDate.day,
-                        startTime.hour,
-                        startTime.minute,
-                      );
-                    }
-                  } catch (e) {
-                    // Fall back to using just the date
-                    startTime = itemDate;
-                  }
-                } else {
-                  startTime = itemDate;
-                }
-
-                if (endStr != null) {
-                  try {
-                    endTime = DateTime.parse(endStr);
-                    // Combine with date if only time was provided
-                    if (endTime.year == 1970) {
-                      endTime = DateTime(
-                        itemDate.year,
-                        itemDate.month,
-                        itemDate.day,
-                        endTime.hour,
-                        endTime.minute,
-                      );
-                    }
-                  } catch (e) {
-                    // Fall back to using just the date
-                    endTime = itemDate;
-                  }
-                } else {
-                  endTime = itemDate;
-                }
-              } else {
-                // Assignments - treat as all-day events on the date
-                startTime = itemDate;
-                endTime = itemDate;
-              }
-
-              final rawTitle = (item['title'] as String?) ?? l10n?.event ?? 'Event';
-              final rawLocation = (item['location'] as String?) ?? '';
-
-              final title = rawTitle.length > 30
-                  ? '${rawTitle.substring(0, 27)}...'
-                  : rawTitle;
-              final location = rawLocation.length > 30
-                  ? '${rawLocation.substring(0, 27)}...'
-                  : rawLocation;
-
-              summaries.add({
-                'text': title,
-                'time': _formatEventTime(startTime, endTime, l10n),
-                'subtitle': location,
-                'color': color,
-                'type': type,
-              });
-            } catch (e) {
-              // Ignore individual item errors to prevent widget crash
-              continue;
-            }
-          }
-
           gridData.add({
             'isWeekNumber': false,
             'date': dateKey,
@@ -602,7 +416,7 @@ class FullCalendarWidgetService {
       );
       await HomeWidget.saveWidgetData<bool>(
         'full_calendar_show_rocis',
-        filters.showRocisSchedule,
+        false,
       );
 
       // Signaling update for widget
