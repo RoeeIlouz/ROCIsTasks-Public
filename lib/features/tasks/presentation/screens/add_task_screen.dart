@@ -39,7 +39,6 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   ui.TextDirection _descriptionDirection = ui.TextDirection.ltr;
   List<SubTask> _subTasks = [];
   List<TextEditingController> _subTaskControllers = [];
-  String? _recurrenceRule;
   NlpResult? _nlpSuggestion;
   bool _requireSubTasksBeforeReminders = false;
   bool _syncWithGoogleCalendar = false;
@@ -62,7 +61,6 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     _subTaskControllers = _subTasks
         .map((st) => TextEditingController(text: st.title))
         .toList();
-    _recurrenceRule = widget.task?.recurrenceRule;
     _requireSubTasksBeforeReminders =
         widget.task?.requireSubTasksBeforeReminders ?? false;
     _syncWithGoogleCalendar = widget.task?.syncWithGoogleCalendar ?? false;
@@ -172,7 +170,6 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
             priority: _priority,
             categoryId: _category,
             subTasks: _subTasks,
-            recurrenceRule: _recurrenceRule,
             requireSubTasksBeforeReminders: _requireSubTasksBeforeReminders,
             syncWithGoogleCalendar: _syncWithGoogleCalendar,
             attachmentPaths: _attachmentPaths,
@@ -185,7 +182,6 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
             _priority,
             _category,
             subTasks: _subTasks,
-            recurrenceRule: _recurrenceRule,
             requireSubTasksBeforeReminders: _requireSubTasksBeforeReminders,
             syncWithGoogleCalendar: _syncWithGoogleCalendar,
             attachmentPaths: _attachmentPaths,
@@ -530,7 +526,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                       fontWeight: FontWeight.w500,
                     ),
                     decoration: SharedInputDecorations.getFieldDecoration(
-                      label: l10n.category,
+                      label: '',
                       prefixIcon: Icons.category_outlined,
                       theme: theme,
                     ),
@@ -587,7 +583,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   fontWeight: FontWeight.w500,
                 ),
                 decoration: SharedInputDecorations.getFieldDecoration(
-                  label: l10n.priorityLabel,
+                  label: '',
                   prefixIcon: Icons.flag_outlined,
                   theme: theme,
                 ),

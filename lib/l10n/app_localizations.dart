@@ -1464,6 +1464,10 @@ abstract class AppLocalizations {
   /// **'Display a persistent notification with your task count'**
   String get showTaskCounterNotificationSubtitle;
 
+  String get showMyTasksGuideShortcut;
+
+  String get showMyTasksGuideShortcutSubtitle;
+
   /// No description provided for @appGuide.
   ///
   /// In en, this message translates to:
@@ -1511,6 +1515,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Organize tasks into custom categories with unique icons and colors.'**
   String get guideCategoriesDesc;
+
+  String get guidePriorityDesc;
+
+  String get guidePinningDesc;
+
+  String get guideAttachmentsDesc;
 
   /// No description provided for @guideNotificationsTitle.
   ///

@@ -716,6 +716,13 @@ class AppLocalizationsHe extends AppLocalizations {
       'הצג התראה קבועה עם מספר המשימות שלך';
 
   @override
+  String get showMyTasksGuideShortcut => 'הצג כפתור עזרה ב\'המשימות שלי\'';
+
+  @override
+  String get showMyTasksGuideShortcutSubtitle =>
+      'הצג כפתור ? ב\'המשימות שלי\' שפותח את מדריך המשתמש';
+
+  @override
   String get appGuide => 'מדריך למשתמש';
 
   @override
@@ -740,6 +747,17 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get guideCategoriesDesc =>
       'ארגן משימות בקטגוריות מותאמות אישית עם אייקונים וצבעים ייחודיים.';
+
+  @override
+  String get guidePriorityDesc => 'השתמש בעדיפויות כדי להדגיש מה הכי חשוב.';
+
+  @override
+  String get guidePinningDesc =>
+      'נעץ משימות חשובות כדי לשמור אותן בראש הרשימה.';
+
+  @override
+  String get guideAttachmentsDesc =>
+      'צרף קבצים ותמונות כדי לשמור הכול הקשור למשימה במקום אחד.';
 
   @override
   String get guideNotificationsTitle => 'התראות';

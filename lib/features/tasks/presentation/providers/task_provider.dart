@@ -146,6 +146,8 @@ class TaskProvider extends ChangeNotifier {
     _quietHoursEnabled = prefs.getBool('quiet_hours_enabled') ?? false;
     _quietStartMinutes = prefs.getInt('quiet_start_minutes') ?? (22 * 60);
     _quietEndMinutes = prefs.getInt('quiet_end_minutes') ?? (7 * 60);
+    _showMyTasksGuideShortcut =
+        prefs.getBool('show_my_tasks_guide_shortcut') ?? true;
     _searchQuery = '';
 
     _monthWidgetService = MonthWidgetService(_calendarService, _source);
@@ -166,6 +168,7 @@ class TaskProvider extends ChangeNotifier {
     try {
       await _source.init();
       _taskPagination.initialize();
+      await _clearDeprecatedRecurringTaskData();
       await _notificationService.init();
       await _notificationService.requestPermissions();
     } catch (e, s) {
@@ -805,6 +808,7 @@ class TaskProvider extends ChangeNotifier {
   bool _quietHoursEnabled = false;
   int _quietStartMinutes = 22 * 60;
   int _quietEndMinutes = 7 * 60;
+  bool _showMyTasksGuideShortcut = true;
 
   TaskSortOption get currentSortOption => _currentSortOption;
   DateTimeFilterOption get currentDateFilter => _currentDateFilter;
@@ -818,6 +822,14 @@ class TaskProvider extends ChangeNotifier {
   bool get quietHoursEnabled => _subscriptionService.isPremium && _quietHoursEnabled;
   int get quietStartMinutes => _quietStartMinutes;
   int get quietEndMinutes => _quietEndMinutes;
+  bool get showMyTasksGuideShortcut => _showMyTasksGuideShortcut;
+
+  Future<void> setShowMyTasksGuideShortcut(bool enabled) async {
+    _showMyTasksGuideShortcut = enabled;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('show_my_tasks_guide_shortcut', enabled);
+    notifyListeners();
+  }
 
   Future<void> setAdvancedRemindersEnabled(bool enabled) async {
     _advancedRemindersEnabled = enabled;
@@ -1274,7 +1286,6 @@ class TaskProvider extends ChangeNotifier {
     TaskPriority priority,
     String? category, {
     List<SubTask>? subTasks,
-    String? recurrenceRule,
     bool requireSubTasksBeforeReminders = false,
     bool syncWithGoogleCalendar = false,
     List<String>? attachmentPaths,
@@ -1286,7 +1297,6 @@ class TaskProvider extends ChangeNotifier {
       priority: priority,
       categoryId: category,
       subTasks: subTasks,
-      recurrenceRule: recurrenceRule,
       requireSubTasksBeforeReminders: requireSubTasksBeforeReminders,
       syncWithGoogleCalendar: syncWithGoogleCalendar,
       attachmentPaths: attachmentPaths,
@@ -1369,7 +1379,6 @@ class TaskProvider extends ChangeNotifier {
     TaskPriority? priority,
     String? categoryId,
     List<SubTask>? subTasks,
-    String? recurrenceRule,
     bool? requireSubTasksBeforeReminders,
     bool? syncWithGoogleCalendar,
     List<String>? attachmentPaths,
@@ -1380,7 +1389,7 @@ class TaskProvider extends ChangeNotifier {
     if (priority != null) task.priority = priority;
     if (categoryId != null) task.categoryId = categoryId;
     if (subTasks != null) task.subTasks = subTasks;
-    if (recurrenceRule != null) task.recurrenceRule = recurrenceRule;
+    task.recurrenceRule = null;
     if (requireSubTasksBeforeReminders != null) {
       task.requireSubTasksBeforeReminders = requireSubTasksBeforeReminders;
     }
@@ -1416,6 +1425,22 @@ class TaskProvider extends ChangeNotifier {
     _refreshPagination();
     notifyListeners();
     updateHomeWidget();
+  }
+
+  Future<void> _clearDeprecatedRecurringTaskData() async {
+    final tasks = _source.getTasks();
+    var changed = false;
+    for (final task in tasks) {
+      if (task.recurrenceRule != null) {
+        task.recurrenceRule = null;
+        await _source.addTask(task);
+        changed = true;
+      }
+    }
+    if (changed) {
+      _refreshPagination();
+      notifyListeners();
+    }
   }
 
   Future<void> toggleSubTask(Task task, String subTaskId) async {

@@ -723,6 +723,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Display a persistent notification with your task count';
 
   @override
+  String get showMyTasksGuideShortcut => 'Show My Tasks help button';
+
+  @override
+  String get showMyTasksGuideShortcutSubtitle =>
+      'Show a ? button in My Tasks that opens the App Guide';
+
+  @override
   String get appGuide => 'App Guide';
 
   @override
@@ -748,6 +755,17 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get guideCategoriesDesc =>
       'Organize tasks into custom categories with unique icons and colors.';
+
+  @override
+  String get guidePriorityDesc => 'Use priorities to highlight what matters most.';
+
+  @override
+  String get guidePinningDesc =>
+      'Pin important tasks to keep them at the top of your list.';
+
+  @override
+  String get guideAttachmentsDesc =>
+      'Attach files and images to keep everything related to a task in one place.';
 
   @override
   String get guideNotificationsTitle => 'Notifications';

@@ -93,7 +93,8 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
             (subscriptionService?.isPremium ?? false) &&
             (updatedCategory?.isPrivate == true) &&
             (privateModeService?.isEnabled ?? false) &&
-            (privateModeService?.hasPin ?? false);
+            (privateModeService?.hasPin ?? false) &&
+            (privateModeService?.isUnlocked != true);
 
         if (requiresUnlock && !_authorized) {
           if (!_promptScheduled) {

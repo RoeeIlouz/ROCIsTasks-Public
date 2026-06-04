@@ -102,7 +102,10 @@ class TaskTile extends StatelessWidget {
       ),
       child: shouldMaskPrivate
           ? _MaskedPrivateTaskTile(
-              title: task.title,
+              title: l10n.privateTask,
+              category: category,
+              dueDate: task.dueDate,
+              priority: task.priority,
               isSelected: isSelected,
               onTap: onTap,
               onLongPress: onLongPress,
@@ -456,18 +459,38 @@ class TaskTile extends StatelessWidget {
 
 class _MaskedPrivateTaskTile extends StatelessWidget {
   final String title;
+  final Category? category;
+  final DateTime? dueDate;
+  final TaskPriority priority;
   final bool isSelected;
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
   final bool isSelectionMode;
 
+  static final _timeFormat24 = DateFormat.Hm();
+  static final _timeFormat12 = DateFormat.jm();
+
   const _MaskedPrivateTaskTile({
     required this.title,
+    required this.category,
+    required this.dueDate,
+    required this.priority,
     required this.isSelected,
     required this.onTap,
     required this.onLongPress,
     required this.isSelectionMode,
   });
+
+  Color _getPriorityColor(TaskPriority priority) {
+    switch (priority) {
+      case TaskPriority.high:
+        return Colors.redAccent;
+      case TaskPriority.medium:
+        return Colors.orangeAccent;
+      case TaskPriority.low:
+        return Colors.greenAccent;
+    }
+  }
 
   Future<void> _handleTap(BuildContext context) async {
     if (isSelectionMode) {
@@ -488,6 +511,8 @@ class _MaskedPrivateTaskTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final themeService = Provider.of<ThemeService>(context, listen: false);
+    final priorityColor = _getPriorityColor(priority);
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
@@ -528,14 +553,105 @@ class _MaskedPrivateTaskTile extends StatelessWidget {
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: Text(
-                  title,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: theme.colorScheme.onSurface,
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: theme.colorScheme.onSurface,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        if (category != null) ...[
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Color(category!.colorValue).withValues(alpha: 0.10),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  IconUtils.getIconData(category!.iconCode),
+                                  size: 12,
+                                  color: Color(category!.colorValue),
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  category!.name,
+                                  style: GoogleFonts.outfit(
+                                    color: Color(category!.colorValue),
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                        ],
+                        if (dueDate != null)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.primary.withValues(alpha: 0.10),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.access_time_rounded,
+                                  size: 12,
+                                  color: theme.colorScheme.primary,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  themeService.use24HourFormat
+                                      ? _timeFormat24.format(dueDate!)
+                                      : _timeFormat12.format(dueDate!),
+                                  style: GoogleFonts.outfit(
+                                    color: theme.colorScheme.primary,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        const Spacer(),
+                        Container(
+                          width: 10,
+                          height: 10,
+                          decoration: BoxDecoration(
+                            color: priorityColor,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: priorityColor.withValues(alpha: 0.35),
+                                blurRadius: 6,
+                                spreadRadius: 1,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
             ],

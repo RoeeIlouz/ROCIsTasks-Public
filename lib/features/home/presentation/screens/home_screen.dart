@@ -8,6 +8,7 @@ import 'package:rocis_tasks/features/tasks/presentation/screens/add_task_screen.
 import 'package:rocis_tasks/features/tasks/presentation/screens/task_list_screen.dart';
 import 'package:rocis_tasks/features/tasks/presentation/widgets/task_sort_filter_sheet.dart';
 import 'package:rocis_tasks/features/home/presentation/screens/settings_screen.dart';
+import 'package:rocis_tasks/features/home/presentation/screens/app_guide_screen.dart';
 import 'package:home_widget/home_widget.dart' as hw;
 import 'package:provider/provider.dart';
 import 'package:rocis_tasks/features/calendar/presentation/providers/calendar_provider.dart';
@@ -289,6 +290,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
               },
             ),
+            if (taskProvider.showMyTasksGuideShortcut)
+              IconButton(
+                icon: const Icon(Icons.help_outline_rounded),
+                tooltip: l10n.appGuide,
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const AppGuideScreen()),
+                  );
+                },
+              ),
           ],
           if (_currentIndex == 1) ...[
             IconButton(

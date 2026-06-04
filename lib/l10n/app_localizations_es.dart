@@ -734,6 +734,13 @@ class AppLocalizationsEs extends AppLocalizations {
       'Muestra una notificación persistente con tu recuento de tareas';
 
   @override
+  String get showMyTasksGuideShortcut => 'Mostrar botón de ayuda en Mis tareas';
+
+  @override
+  String get showMyTasksGuideShortcutSubtitle =>
+      'Muestra un botón ? en Mis tareas que abre la guía de la aplicación';
+
+  @override
   String get appGuide => 'Guía de la aplicación';
 
   @override
@@ -759,6 +766,18 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get guideCategoriesDesc =>
       'Organiza tareas en categorías personalizadas con iconos y colores únicos.';
+
+  @override
+  String get guidePriorityDesc =>
+      'Usa prioridades para destacar lo más importante.';
+
+  @override
+  String get guidePinningDesc =>
+      'Fija tareas importantes para mantenerlas arriba de tu lista.';
+
+  @override
+  String get guideAttachmentsDesc =>
+      'Adjunta archivos e imágenes para tener todo lo relacionado con una tarea en un solo lugar.';
 
   @override
   String get guideNotificationsTitle => 'Notificaciones';

@@ -380,6 +380,15 @@ class SettingsScreen extends StatelessWidget {
           value: themeService.autoRemoveNlpDates,
           onChanged: (value) => themeService.toggleAutoRemoveNlpDates(value),
         ),
+        SwitchListTile(
+          secondary: const Icon(Icons.help_outline_rounded),
+          title: Text(l10n.showMyTasksGuideShortcut),
+          subtitle: Text(l10n.showMyTasksGuideShortcutSubtitle),
+          value: taskProvider.showMyTasksGuideShortcut,
+          onChanged: (value) async {
+            await taskProvider.setShowMyTasksGuideShortcut(value);
+          },
+        ),
         if (subscriptionService.isPremium) ...[
           SwitchListTile(
             secondary: const Icon(Icons.notifications_active_outlined),

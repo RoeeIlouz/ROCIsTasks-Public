@@ -717,6 +717,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get showTaskCounterNotificationSubtitle => 'عرض إشعار دائم بعدد مهامك';
 
   @override
+  String get showMyTasksGuideShortcut => 'إظهار زر المساعدة في مهامي';
+
+  @override
+  String get showMyTasksGuideShortcutSubtitle =>
+      'إظهار زر ؟ في تبويب مهامي يفتح دليل التطبيق';
+
+  @override
   String get appGuide => 'دليل التطبيق';
 
   @override
@@ -740,6 +747,17 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get guideCategoriesDesc =>
       'نظّم المهام ضمن فئات مخصصة بأيقونات وألوان فريدة.';
+
+  @override
+  String get guidePriorityDesc => 'استخدم الأولويات لإبراز ما هو الأهم.';
+
+  @override
+  String get guidePinningDesc =>
+      'ثبّت المهام المهمة لإبقائها في أعلى القائمة.';
+
+  @override
+  String get guideAttachmentsDesc =>
+      'أرفق ملفات وصورًا لتجميع كل ما يتعلق بالمهمة في مكان واحد.';
 
   @override
   String get guideNotificationsTitle => 'الإشعارات';

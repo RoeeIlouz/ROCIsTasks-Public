@@ -36,6 +36,36 @@ class AppGuideScreen extends StatelessWidget {
                 description: l10n.guideCategoriesDesc,
               ),
               _GuideItem(
+                icon: Icons.flag_outlined,
+                title: l10n.priority,
+                description: l10n.guidePriorityDesc,
+              ),
+              _GuideItem(
+                icon: Icons.push_pin_outlined,
+                title: l10n.pinTask,
+                description: l10n.guidePinningDesc,
+              ),
+              _GuideItem(
+                icon: Icons.checklist_rtl_outlined,
+                title: l10n.subtasksAndChecklists,
+                description: l10n.subtasksAndChecklistsDesc,
+              ),
+              _GuideItem(
+                icon: Icons.attachment_rounded,
+                title: l10n.attachments,
+                description: l10n.guideAttachmentsDesc,
+              ),
+              _GuideItem(
+                icon: Icons.lock_outline_rounded,
+                title: l10n.privateMode,
+                description: l10n.privateModeSubtitle,
+              ),
+              _GuideItem(
+                icon: Icons.event_available_rounded,
+                title: l10n.syncWithGoogleCalendar,
+                description: l10n.syncWithGoogleCalendarSubtitle,
+              ),
+              _GuideItem(
                 icon: Icons.notifications_active,
                 title: l10n.guideNotificationsTitle,
                 description: l10n.guideNotificationsDesc,

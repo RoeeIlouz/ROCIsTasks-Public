@@ -65,12 +65,6 @@ class _PremiumScreenState extends State<PremiumScreen> {
                       ),
                       _buildFeature(
                         context,
-                        Icons.repeat_rounded,
-                        l10n.recurringTasks,
-                        l10n.recurringTasksDesc,
-                      ),
-                      _buildFeature(
-                        context,
                         Icons.lock_rounded,
                         l10n.privateMode,
                         l10n.privateModeSubtitle,
