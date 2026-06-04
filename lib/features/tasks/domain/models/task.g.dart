@@ -31,13 +31,17 @@ class TaskAdapter extends TypeAdapter<Task> {
       completedAt: fields[11] as DateTime?,
       createdAt: fields[12] as DateTime?,
       requireSubTasksBeforeReminders: fields[13] as bool? ?? false,
+      syncWithGoogleCalendar: fields[14] as bool? ?? false,
+      calendarEventId: fields[15] as String?,
+      calendarId: fields[16] as String?,
+      attachmentPaths: (fields[17] as List?)?.cast<String>(),
     );
   }
 
   @override
   void write(BinaryWriter writer, Task obj) {
     writer
-      ..writeByte(14)
+      ..writeByte(18)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -65,7 +69,15 @@ class TaskAdapter extends TypeAdapter<Task> {
       ..writeByte(12)
       ..write(obj.createdAt)
       ..writeByte(13)
-      ..write(obj.requireSubTasksBeforeReminders);
+      ..write(obj.requireSubTasksBeforeReminders)
+      ..writeByte(14)
+      ..write(obj.syncWithGoogleCalendar)
+      ..writeByte(15)
+      ..write(obj.calendarEventId)
+      ..writeByte(16)
+      ..write(obj.calendarId)
+      ..writeByte(17)
+      ..write(obj.attachmentPaths);
   }
 
   @override

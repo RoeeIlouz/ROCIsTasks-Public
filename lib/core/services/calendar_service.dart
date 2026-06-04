@@ -1,5 +1,6 @@
 import 'package:device_calendar/device_calendar.dart';
 import 'package:rocis_tasks/core/services/logger_service.dart';
+import 'package:timezone/timezone.dart' as tz;
 
 class CalendarService {
   final DeviceCalendarPlugin _deviceCalendarPlugin = DeviceCalendarPlugin();
@@ -119,5 +120,72 @@ class CalendarService {
     }
 
     return allEvents;
+  }
+
+  Future<Calendar?> getDefaultWritableCalendar() async {
+    final calendars = await getAvailableCalendars();
+    final writableCalendars = calendars.where((c) => c.isReadOnly != true).toList();
+    if (writableCalendars.isEmpty) return null;
+    return writableCalendars.first;
+  }
+
+  Future<String?> createOrUpdateTaskEvent({
+    required String calendarId,
+    required String title,
+    String? description,
+    required DateTime start,
+    required DateTime end,
+    String? eventId,
+  }) async {
+    final hasPermission = await requestPermissions();
+    if (!hasPermission) {
+      AppLogger.warning('Calendar permissions not granted');
+      return null;
+    }
+
+    try {
+      final tzStart = tz.TZDateTime.from(start, tz.local);
+      final tzEnd = tz.TZDateTime.from(end, tz.local);
+
+      final event = Event(
+        calendarId,
+        eventId: eventId,
+        title: title,
+        description: description,
+        start: tzStart,
+        end: tzEnd,
+      );
+
+      final result = await _deviceCalendarPlugin.createOrUpdateEvent(event);
+      if (result?.isSuccess == true) {
+        return result!.data;
+      }
+    } catch (e, s) {
+      AppLogger.error('Error creating/updating calendar event', error: e, stack: s);
+    }
+
+    return null;
+  }
+
+  Future<bool> deleteEvent({
+    required String calendarId,
+    required String eventId,
+  }) async {
+    final hasPermission = await requestPermissions();
+    if (!hasPermission) {
+      AppLogger.warning('Calendar permissions not granted');
+      return false;
+    }
+
+    try {
+      final result = await _deviceCalendarPlugin.deleteEvent(
+        calendarId,
+        eventId,
+      );
+      return result.isSuccess && (result.data ?? false);
+    } catch (e, s) {
+      AppLogger.error('Error deleting calendar event', error: e, stack: s);
+      return false;
+    }
   }
 }

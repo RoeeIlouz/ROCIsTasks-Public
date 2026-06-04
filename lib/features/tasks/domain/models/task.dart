@@ -60,6 +60,18 @@ class Task extends HiveObject {
   @HiveField(13)
   bool requireSubTasksBeforeReminders;
 
+  @HiveField(14)
+  bool syncWithGoogleCalendar;
+
+  @HiveField(15)
+  String? calendarEventId;
+
+  @HiveField(16)
+  String? calendarId;
+
+  @HiveField(17)
+  List<String> attachmentPaths;
+
   Task({
     String? id,
     required this.title,
@@ -75,8 +87,13 @@ class Task extends HiveObject {
     this.completedAt,
     DateTime? createdAt,
     this.requireSubTasksBeforeReminders = false,
+    this.syncWithGoogleCalendar = false,
+    this.calendarEventId,
+    this.calendarId,
+    List<String>? attachmentPaths,
   }) : id = id ?? const Uuid().v4(),
-       createdAt = createdAt ?? DateTime.now();
+       createdAt = createdAt ?? DateTime.now(),
+       attachmentPaths = attachmentPaths ?? <String>[];
 
   Task copyWith({
     String? title,
@@ -92,6 +109,10 @@ class Task extends HiveObject {
     DateTime? completedAt,
     DateTime? createdAt,
     bool? requireSubTasksBeforeReminders,
+    bool? syncWithGoogleCalendar,
+    String? calendarEventId,
+    String? calendarId,
+    List<String>? attachmentPaths,
   }) {
     return Task(
       id: id,
@@ -109,6 +130,11 @@ class Task extends HiveObject {
       createdAt: createdAt ?? this.createdAt,
       requireSubTasksBeforeReminders:
           requireSubTasksBeforeReminders ?? this.requireSubTasksBeforeReminders,
+      syncWithGoogleCalendar:
+          syncWithGoogleCalendar ?? this.syncWithGoogleCalendar,
+      calendarEventId: calendarEventId ?? this.calendarEventId,
+      calendarId: calendarId ?? this.calendarId,
+      attachmentPaths: attachmentPaths ?? this.attachmentPaths,
     );
   }
 
@@ -128,6 +154,10 @@ class Task extends HiveObject {
       'completedAt': completedAt?.toIso8601String(),
       'createdAt': createdAt.toIso8601String(),
       'requireSubTasksBeforeReminders': requireSubTasksBeforeReminders,
+      'syncWithGoogleCalendar': syncWithGoogleCalendar,
+      'calendarEventId': calendarEventId,
+      'calendarId': calendarId,
+      'attachmentPaths': attachmentPaths,
     };
   }
 
@@ -147,6 +177,7 @@ class Task extends HiveObject {
       'completedAt': completedAt,
       'createdAt': createdAt,
       'requireSubTasksBeforeReminders': requireSubTasksBeforeReminders,
+      'syncWithGoogleCalendar': syncWithGoogleCalendar,
     };
   }
 
@@ -177,6 +208,11 @@ class Task extends HiveObject {
       createdAt: _parseDate(map['createdAt']),
       requireSubTasksBeforeReminders:
           map['requireSubTasksBeforeReminders'] ?? false,
+      syncWithGoogleCalendar: map['syncWithGoogleCalendar'] ?? false,
+      calendarEventId: map['calendarEventId'],
+      calendarId: map['calendarId'],
+      attachmentPaths:
+          (map['attachmentPaths'] as List?)?.whereType<String>().toList(),
     );
   }
 }

@@ -18,7 +18,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:rocis_tasks/core/config/app_config.dart';
 import 'package:rocis_tasks/shared/ui/widgets/snackbars.dart';
 import 'package:rocis_tasks/features/home/presentation/screens/app_guide_screen.dart';
-import 'package:rocis_tasks/core/services/security_service.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:rocis_tasks/features/auth/presentation/screens/security_settings_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -35,7 +36,6 @@ class SettingsScreen extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final user = authService.currentUser;
     final subscriptionService = Provider.of<SubscriptionService>(context);
-    final privateModeService = Provider.of<PrivateModeService>(context);
     final analyticsService = Provider.of<AnalyticsService>(
       context,
       listen: false,
@@ -123,8 +123,8 @@ class SettingsScreen extends StatelessWidget {
             themeService.themeMode == ThemeMode.system
                 ? l10n.systemDefault
                 : themeService.themeMode == ThemeMode.dark
-                    ? l10n.darkMode
-                    : l10n.lightMode,
+                ? l10n.darkMode
+                : l10n.lightMode,
           ),
           trailing: const Icon(Icons.chevron_right),
           onTap: () {
@@ -197,7 +197,8 @@ class SettingsScreen extends StatelessWidget {
             height: 20,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: subscriptionService.isPremium &&
+              color:
+                  subscriptionService.isPremium &&
                       themeService.useCustomSeedColor &&
                       themeService.customSeedColorValue != null
                   ? Color(themeService.customSeedColorValue!)
@@ -261,7 +262,9 @@ class SettingsScreen extends StatelessWidget {
                                   color: c,
                                   border: Border.all(
                                     color: current == c.toARGB32()
-                                        ? Theme.of(context).colorScheme.onSurface
+                                        ? Theme.of(
+                                            context,
+                                          ).colorScheme.onSurface
                                         : Colors.transparent,
                                     width: 3,
                                   ),
@@ -323,7 +326,8 @@ class SettingsScreen extends StatelessWidget {
                       analyticsService.logLanguageChanged(locale: 'en');
                       Navigator.pop(context);
                     },
-                    trailing: themeService.locale?.languageCode == 'en' ||
+                    trailing:
+                        themeService.locale?.languageCode == 'en' ||
                             themeService.locale == null
                         ? const Icon(Icons.check)
                         : null,
@@ -384,7 +388,6 @@ class SettingsScreen extends StatelessWidget {
             value: taskProvider.advancedRemindersEnabled,
             onChanged: (value) async {
               await taskProvider.setAdvancedRemindersEnabled(value);
-              
             },
           ),
           SwitchListTile(
@@ -394,7 +397,6 @@ class SettingsScreen extends StatelessWidget {
             value: taskProvider.nagRemindersEnabled,
             onChanged: (value) async {
               await taskProvider.setNagRemindersEnabled(value);
-              
             },
           ),
           if (taskProvider.nagRemindersEnabled) ...[
@@ -457,7 +459,6 @@ class SettingsScreen extends StatelessWidget {
             value: taskProvider.quietHoursEnabled,
             onChanged: (value) async {
               await taskProvider.setQuietHoursEnabled(value);
-              
             },
           ),
           if (taskProvider.quietHoursEnabled) ...[
@@ -512,126 +513,20 @@ class SettingsScreen extends StatelessWidget {
               },
             ),
           ],
-          SwitchListTile(
-            secondary: const Icon(Icons.lock_rounded),
-            title: Text(l10n.privateMode),
-            subtitle: Text(l10n.privateModeSubtitle),
-            value: privateModeService.isEnabled,
-            onChanged: (value) async {
-              if (value && !privateModeService.hasPin) {
-                final pinController = TextEditingController();
-                final confirmController = TextEditingController();
-                final ok = await showDialog<bool>(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: Text(l10n.setPinTitle),
-                    content: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        TextField(
-                          controller: pinController,
-                          keyboardType: TextInputType.number,
-                          obscureText: true,
-                          decoration: InputDecoration(labelText: l10n.pinMinDigits),
-                        ),
-                        const SizedBox(height: 12),
-                        TextField(
-                          controller: confirmController,
-                          keyboardType: TextInputType.number,
-                          obscureText: true,
-                          decoration: InputDecoration(labelText: l10n.confirmPin),
-                        ),
-                      ],
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context, false),
-                        child: Text(l10n.cancel),
-                      ),
-                      TextButton(
-                        onPressed: () => Navigator.pop(context, true),
-                        child: Text(l10n.save),
-                      ),
-                    ],
-                  ),
-                );
-                if (ok != true) return;
-                if (pinController.text != confirmController.text) {
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(l10n.pinsDoNotMatch)),
-                    );
-                  }
-                  return;
-                }
-                final saved = await privateModeService.setPin(
-                  pinController.text,
-                );
-                if (!saved) return;
-              }
-              await privateModeService.setEnabled(value);
-              // await taskProvider.updateHomeWidgetWithNotification();
+          ListTile(
+            leading: const Icon(Icons.security_rounded),
+            title: Text(l10n.securitySettings),
+            subtitle: Text(l10n.securitySettingsSubtitle),
+            trailing: const Icon(Icons.chevron_right_rounded),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const SecuritySettingsScreen(),
+                ),
+              );
             },
           ),
-          if (privateModeService.isEnabled && privateModeService.hasPin)
-            ListTile(
-              leading: Icon(
-                privateModeService.isUnlocked
-                    ? Icons.lock_open_rounded
-                    : Icons.lock_rounded,
-              ),
-              title: Text(
-                privateModeService.isUnlocked
-                    ? l10n.lockPrivate
-                    : l10n.unlockPrivate,
-              ),
-              subtitle: Text(
-                privateModeService.isUnlocked
-                    ? l10n.hidePrivateCategories
-                    : l10n.showPrivateCategories,
-              ),
-              onTap: () async {
-                if (privateModeService.isUnlocked) {
-                  await privateModeService.lock();
-                  // await taskProvider.updateHomeWidgetWithNotification();
-                  return;
-                }
-                final pinController = TextEditingController();
-                final ok = await showDialog<bool>(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: Text(l10n.enterPinTitle),
-                    content: TextField(
-                      controller: pinController,
-                      keyboardType: TextInputType.number,
-                      obscureText: true,
-                      decoration: InputDecoration(labelText: l10n.pinLabel),
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context, false),
-                        child: Text(l10n.cancel),
-                      ),
-                      TextButton(
-                        onPressed: () => Navigator.pop(context, true),
-                        child: Text(l10n.unlock),
-                      ),
-                    ],
-                  ),
-                );
-                if (ok != true) return;
-                final unlocked = await privateModeService.unlockWithPin(
-                  pinController.text,
-                );
-                if (!unlocked && context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(l10n.wrongPin)),
-                  );
-                  return;
-                }
-                // await taskProvider.updateHomeWidgetWithNotification();
-              },
-            ),
         ],
         ListTile(
           leading: const Icon(Icons.notifications_active_outlined),
@@ -704,15 +599,13 @@ class SettingsScreen extends StatelessWidget {
               final json = await backupService.exportData();
               await Clipboard.setData(ClipboardData(text: json));
               if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(l10n.backupCopied)),
-                );
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text(l10n.backupCopied)));
               }
             } catch (e) {
               if (context.mounted) {
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(
+                ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text(l10n.exportFailed(e.toString()))),
                 );
               }
@@ -758,15 +651,13 @@ class SettingsScreen extends StatelessWidget {
               try {
                 await backupService.importData(controller.text);
                 if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(l10n.importComplete)),
-                  );
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text(l10n.importComplete)));
                 }
               } catch (e) {
                 if (context.mounted) {
-                  ScaffoldMessenger.of(
-                    context,
-                  ).showSnackBar(
+                  ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text(l10n.importFailed(e.toString()))),
                   );
                 }
@@ -833,9 +724,7 @@ class SettingsScreen extends StatelessWidget {
                       controller: controller,
                       obscureText: true,
                       autofillHints: const [AutofillHints.password],
-                      decoration: InputDecoration(
-                        labelText: l10n.password,
-                      ),
+                      decoration: InputDecoration(labelText: l10n.password),
                       onSubmitted: (value) =>
                           Navigator.pop(context, value.trim()),
                     ),
@@ -848,10 +737,8 @@ class SettingsScreen extends StatelessWidget {
                         style: TextButton.styleFrom(
                           foregroundColor: Colors.red,
                         ),
-                        onPressed: () => Navigator.pop(
-                          context,
-                          controller.text.trim(),
-                        ),
+                        onPressed: () =>
+                            Navigator.pop(context, controller.text.trim()),
                         child: Text(l10n.deleteEverything),
                       ),
                     ],
@@ -874,9 +761,9 @@ class SettingsScreen extends StatelessWidget {
                 }
               } else {
                 if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(l10n.deletionFailed)),
-                  );
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text(l10n.deletionFailed)));
                 }
               }
             }
@@ -901,52 +788,144 @@ class SettingsScreen extends StatelessWidget {
           title: Text(l10n.aboutApp),
           subtitle: Text(l10n.aboutAppSubtitle),
           onTap: () {
-            showAboutDialog(
+            int tapCount = 0;
+            bool isDebugUnlocked = false;
+
+            showDialog(
               context: context,
-              applicationName: AppConfig.appName,
-              applicationVersion: AppConfig.appVersion,
-              applicationIcon: ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Image.asset('assets/images/logo.png', width: 60),
-              ),
-              children: [
-                const SizedBox(height: 16),
-                Text(l10n.aboutAppDescription),
-                const SizedBox(height: 16),
-                ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  leading: const Icon(Icons.language),
-                  title: Text(l10n.visitWebsite),
-                  subtitle: const Text("rocisapps.ilouz.xyz"),
-                  onTap: () async {
-                    final Uri url = Uri.parse(AppConfig.websiteUrl);
-                    if (await canLaunchUrl(url)) {
-                      await launchUrl(
-                        url,
-                        mode: LaunchMode.externalApplication,
-                      );
-                    }
-                  },
-                ),
-                ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  leading: const Icon(Icons.mail_outline),
-                  title: Text(l10n.contactSupport),
-                  subtitle: const Text(AppConfig.supportEmail),
-                  onTap: () async {
-                    final Uri emailLaunchUri = Uri(
-                      scheme: 'mailto',
-                      path: AppConfig.supportEmail,
-                      queryParameters: {
-                        'subject': 'Support Request - ROCIs Tasks',
-                      },
+              builder: (context) {
+                return StatefulBuilder(
+                  builder: (context, setState) {
+                    return AlertDialog(
+                      title: Row(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Image.asset(
+                              'assets/images/logo.png',
+                              width: 40,
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(child: Text(AppConfig.appName)),
+                        ],
+                      ),
+                      content: SingleChildScrollView(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                tapCount++;
+                                if (tapCount == 5) {
+                                  setState(() {
+                                    isDebugUnlocked = true;
+                                  });
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(l10n.debugModeUnlocked),
+                                    ),
+                                  );
+                                }
+                              },
+                              child: Text(
+                                AppConfig.appVersion,
+                                style: Theme.of(context).textTheme.bodyMedium
+                                    ?.copyWith(
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurfaceVariant,
+                                    ),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            Text(l10n.aboutAppDescription),
+                            const SizedBox(height: 16),
+                            ListTile(
+                              contentPadding: EdgeInsets.zero,
+                              leading: const Icon(Icons.language),
+                              title: Text(l10n.visitWebsite),
+                              subtitle: const Text("rocisapps.ilouz.xyz"),
+                              onTap: () async {
+                                final Uri url = Uri.parse(AppConfig.websiteUrl);
+                                if (await canLaunchUrl(url)) {
+                                  await launchUrl(
+                                    url,
+                                    mode: LaunchMode.externalApplication,
+                                  );
+                                }
+                              },
+                            ),
+                            ListTile(
+                              contentPadding: EdgeInsets.zero,
+                              leading: const Icon(Icons.mail_outline),
+                              title: Text(l10n.contactSupport),
+                              subtitle: const Text(AppConfig.supportEmail),
+                              onTap: () async {
+                                final Uri emailLaunchUri = Uri(
+                                  scheme: 'mailto',
+                                  path: AppConfig.supportEmail,
+                                  queryParameters: {
+                                    'subject': 'Support Request - ROCIs Tasks',
+                                  },
+                                );
+                                if (await canLaunchUrl(emailLaunchUri)) {
+                                  await launchUrl(emailLaunchUri);
+                                }
+                              },
+                            ),
+                            ListTile(
+                              contentPadding: EdgeInsets.zero,
+                              leading: const Icon(Icons.bug_report_outlined),
+                              title: Text(l10n.submitBugReport),
+                              subtitle: Text(l10n.submitBugReportSubtitle),
+                              onTap: () async {
+                                // Add google form link here
+                                final Uri url = Uri.parse(
+                                  'https://forms.gle/MBakwkX3DpYfDqD26',
+                                );
+                                if (await canLaunchUrl(url)) {
+                                  await launchUrl(
+                                    url,
+                                    mode: LaunchMode.externalApplication,
+                                  );
+                                }
+                              },
+                            ),
+                            if (isDebugUnlocked)
+                              ListTile(
+                                contentPadding: EdgeInsets.zero,
+                                leading: Icon(
+                                  Icons.warning_amber_rounded,
+                                  color: Colors.red[700],
+                                ),
+                                title: Text(
+                                  l10n.testCrash,
+                                  style: TextStyle(color: Colors.red[700]),
+                                ),
+                                subtitle: Text(
+                                  l10n.testCrashSubtitle,
+                                ),
+                                onTap: () {
+                                  FirebaseCrashlytics.instance.crash();
+                                },
+                              ),
+                          ],
+                        ),
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: Text(
+                            MaterialLocalizations.of(context).closeButtonLabel,
+                          ),
+                        ),
+                      ],
                     );
-                    if (await canLaunchUrl(emailLaunchUri)) {
-                      await launchUrl(emailLaunchUri);
-                    }
                   },
-                ),
-              ],
+                );
+              },
             );
           },
         ),

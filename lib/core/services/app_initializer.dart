@@ -40,6 +40,13 @@ class AppInitializer {
       // try to access Firebase before it is ready.
       await _initFirebase();
 
+      // Start custom cold start trace for performance monitoring
+      Trace? coldStartTrace;
+      if (AppConfig.enablePerformanceMonitoring) {
+        coldStartTrace = FirebasePerformance.instance.newTrace('app_cold_start');
+        await coldStartTrace.start();
+      }
+
       // 3. Parallel initialization of independent heavy services with timeout
       await Future.wait([
             _initEnvironment(),
@@ -71,6 +78,10 @@ class AppInitializer {
       if (isBackground) {
         // Reduced init for background
         await NotificationService().init();
+      }
+
+      if (coldStartTrace != null) {
+        await coldStartTrace.stop();
       }
     } catch (e, stack) {
       AppLogger.critical(

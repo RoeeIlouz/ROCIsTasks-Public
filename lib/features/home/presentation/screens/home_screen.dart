@@ -8,7 +8,6 @@ import 'package:rocis_tasks/features/tasks/presentation/screens/add_task_screen.
 import 'package:rocis_tasks/features/tasks/presentation/screens/task_list_screen.dart';
 import 'package:rocis_tasks/features/tasks/presentation/widgets/task_sort_filter_sheet.dart';
 import 'package:rocis_tasks/features/home/presentation/screens/settings_screen.dart';
-import 'package:rocis_tasks/features/analytics/presentation/screens/insights_screen.dart';
 import 'package:home_widget/home_widget.dart' as hw;
 import 'package:provider/provider.dart';
 import 'package:rocis_tasks/features/calendar/presentation/providers/calendar_provider.dart';
@@ -44,7 +43,6 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<Widget> _screens = const [
     TaskListView(),
     CalendarScreen(),
-    InsightsScreen(),
     SettingsScreen(),
   ];
 
@@ -250,8 +248,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     ? l10n.myTasks
                     : _currentIndex == 1
                     ? l10n.calendar
-                    : _currentIndex == 2
-                    ? l10n.insights
                     : l10n.settings,
                 style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
               ),
@@ -402,11 +398,6 @@ class _HomeScreenState extends State<HomeScreen> {
               icon: const Icon(Icons.calendar_month_outlined),
               selectedIcon: const Icon(Icons.calendar_month),
               label: l10n.calendar,
-            ),
-            NavigationDestination(
-              icon: const Icon(Icons.analytics_outlined),
-              selectedIcon: const Icon(Icons.analytics),
-              label: l10n.insights,
             ),
             NavigationDestination(
               icon: const Icon(Icons.settings_outlined),

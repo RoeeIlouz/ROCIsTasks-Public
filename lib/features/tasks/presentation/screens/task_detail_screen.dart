@@ -10,6 +10,8 @@ import 'package:rocis_tasks/features/tasks/presentation/screens/add_task_screen.
 import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:rocis_tasks/core/utils/icon_utils.dart';
 import 'package:rocis_tasks/core/services/security_service.dart';
+import 'package:rocis_tasks/features/tasks/presentation/widgets/task_unlock_dialog.dart';
+import 'package:rocis_tasks/core/services/subscription_service.dart';
 
 class TaskDetailScreen extends StatelessWidget {
   final Task task;
@@ -32,10 +34,23 @@ class TaskDetailScreen extends StatelessWidget {
         final updatedTask = provider.getTaskById(task.id) ?? task;
         final updatedCategory =
             provider.getCategoryById(updatedTask.categoryId) ?? category;
-        final privateModeService = Provider.of<PrivateModeService>(context);
+        PrivateModeService? privateModeService;
+        try {
+          privateModeService = Provider.of<PrivateModeService>(context);
+        } catch (_) {
+          privateModeService = null;
+        }
 
-        if (updatedCategory?.isPrivate == true &&
-            privateModeService.shouldHidePrivateContent) {
+        SubscriptionService? subscriptionService;
+        try {
+          subscriptionService = Provider.of<SubscriptionService>(context);
+        } catch (_) {
+          subscriptionService = null;
+        }
+
+        if ((subscriptionService?.isPremium ?? false) &&
+            updatedCategory?.isPrivate == true &&
+            (privateModeService?.shouldHidePrivateContent ?? false)) {
           return Scaffold(
             appBar: AppBar(),
             body: Center(
@@ -66,40 +81,13 @@ class TaskDetailScreen extends StatelessWidget {
                     const SizedBox(height: 24),
                     FilledButton(
                       onPressed: () async {
-                        final pinController = TextEditingController();
                         final ok = await showDialog<bool>(
                           context: context,
-                          builder: (context) => AlertDialog(
-                            title: Text(l10n.enterPinTitle),
-                            content: TextField(
-                              controller: pinController,
-                              keyboardType: TextInputType.number,
-                              obscureText: true,
-                              decoration: InputDecoration(labelText: l10n.pinLabel),
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context, false),
-                                child: Text(l10n.cancel),
-                              ),
-                              TextButton(
-                                onPressed: () => Navigator.pop(context, true),
-                                child: Text(l10n.unlock),
-                              ),
-                            ],
-                          ),
+                          builder: (context) => const TaskUnlockDialog(),
                         );
-                        if (ok != true) return;
-                        final unlocked = await privateModeService.unlockWithPin(
-                          pinController.text,
-                        );
-                        if (!unlocked && context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(l10n.wrongPin)),
-                          );
-                          return;
+                        if (ok == true) {
+                          await provider.updateHomeWidgetWithNotification();
                         }
-                        await provider.updateHomeWidgetWithNotification();
                       },
                       child: Text(l10n.unlock),
                     ),
@@ -231,16 +219,6 @@ class TaskDetailScreen extends StatelessWidget {
                           .withValues(alpha: 0.1),
                       side: BorderSide.none,
                     ),
-                    if (updatedTask.recurrenceRule != null && updatedTask.recurrenceRule!.isNotEmpty)
-                      Chip(
-                        avatar: const Icon(
-                          Icons.repeat_rounded,
-                          size: 18,
-                        ),
-                        label: Text(l10n.repeat),
-                        backgroundColor: theme.colorScheme.secondaryContainer,
-                        side: BorderSide.none,
-                      ),
                   ],
                 ),
                 const SizedBox(height: 32),

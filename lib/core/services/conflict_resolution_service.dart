@@ -73,6 +73,10 @@ class ConflictResolutionService {
           localTask.categoryId ?? remoteTask.categoryId, // Prefer non-null
       isPinned: localTask.isPinned ?? remoteTask.isPinned ?? false,
       isDeleted: localTask.isDeleted ?? remoteTask.isDeleted ?? false,
+      syncWithGoogleCalendar:
+          localTask.syncWithGoogleCalendar || remoteTask.syncWithGoogleCalendar,
+      calendarEventId: localTask.calendarEventId ?? remoteTask.calendarEventId,
+      calendarId: localTask.calendarId ?? remoteTask.calendarId,
     );
   }
 
@@ -145,7 +149,8 @@ class ConflictResolutionService {
             task1.priority != task2.priority ||
             task1.categoryId != task2.categoryId ||
             task1.isPinned != task2.isPinned ||
-            task1.isDeleted != task2.isDeleted);
+            task1.isDeleted != task2.isDeleted ||
+            task1.syncWithGoogleCalendar != task2.syncWithGoogleCalendar);
   }
 
   /// Check if two categories have conflicts
@@ -174,6 +179,9 @@ class ConflictResolutionService {
           'categoryId': localItem.categoryId != remoteItem.categoryId,
           'isPinned': localItem.isPinned != remoteItem.isPinned,
           'isDeleted': localItem.isDeleted != remoteItem.isDeleted,
+          'syncWithGoogleCalendar':
+              localItem.syncWithGoogleCalendar !=
+              remoteItem.syncWithGoogleCalendar,
         },
       };
     } else if (localItem is cat.Category && remoteItem is cat.Category) {

@@ -120,10 +120,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String get description => 'Description';
 
   @override
+  String get attachments => 'Attachments';
+
+  @override
+  String get noAttachmentsAdded => 'No attachments added';
+
+  @override
+  String get attachmentsPremiumOnly => 'Attachments are available with PRO.';
+
+  @override
   String get dueDateAndTime => 'Due Date & Time';
 
   @override
   String get noDateSelected => 'No Date Selected';
+
+  @override
+  String get syncWithGoogleCalendar => 'Sync with Google Calendar';
+
+  @override
+  String get syncWithGoogleCalendarSubtitle =>
+      'Creates a calendar event for this task';
+
+  @override
+  String get syncWithGoogleCalendarRequiresDueDate =>
+      'Set a due date to sync this task to your calendar.';
+
+  @override
+  String get calendarPermissionNotGranted => 'Calendar permission not granted';
 
   @override
   String get category => 'Category';
@@ -884,4 +907,44 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get requireSubTasksBeforeRemindersSubtitle =>
       'Don’t send reminders until all subtasks are completed';
+
+  @override
+  String get debugModeUnlocked => 'Debug mode unlocked!';
+
+  @override
+  String get submitBugReport => 'Submit Bug Report';
+
+  @override
+  String get submitBugReportSubtitle => 'Fill out our Google Form';
+
+  @override
+  String get testCrash => 'Test Crash';
+
+  @override
+  String get testCrashSubtitle => 'Simulate a crash for Crashlytics';
+
+  @override
+  String get biometricUnlock => 'Biometric Unlock';
+
+  @override
+  String get biometricUnlockSubtitle =>
+      'Unlock private tasks with Face ID or fingerprint';
+
+  @override
+  String get useBiometrics => 'Use Biometrics';
+
+  @override
+  String get biometricNotAvailable => 'Biometrics not available on this device';
+
+  @override
+  String get biometricAuthReason => 'Authenticate to access private tasks';
+
+  @override
+  String get usePinInstead => 'Use PIN instead';
+
+  @override
+  String get securitySettings => 'Security Settings';
+
+  @override
+  String get securitySettingsSubtitle => 'Manage PIN and Biometric access';
 }

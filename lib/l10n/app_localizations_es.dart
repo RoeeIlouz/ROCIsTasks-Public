@@ -120,10 +120,35 @@ class AppLocalizationsEs extends AppLocalizations {
   String get description => 'Descripción';
 
   @override
+  String get attachments => 'Adjuntos';
+
+  @override
+  String get noAttachmentsAdded => 'No se han añadido adjuntos';
+
+  @override
+  String get attachmentsPremiumOnly =>
+      'Los adjuntos están disponibles con PRO.';
+
+  @override
   String get dueDateAndTime => 'Fecha y hora de vencimiento';
 
   @override
   String get noDateSelected => 'Sin fecha seleccionada';
+
+  @override
+  String get syncWithGoogleCalendar => 'Sincronizar con Google Calendar';
+
+  @override
+  String get syncWithGoogleCalendarSubtitle =>
+      'Crea un evento del calendario para esta tarea';
+
+  @override
+  String get syncWithGoogleCalendarRequiresDueDate =>
+      'Establece una fecha de vencimiento para sincronizar esta tarea con tu calendario.';
+
+  @override
+  String get calendarPermissionNotGranted =>
+      'Permiso de calendario no concedido';
 
   @override
   String get category => 'Categoría';
@@ -898,4 +923,47 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get requireSubTasksBeforeRemindersSubtitle =>
       'No envía recordatorios hasta completar todas las subtareas';
+
+  @override
+  String get debugModeUnlocked => '¡Modo de depuración desbloqueado!';
+
+  @override
+  String get submitBugReport => 'Enviar informe de error';
+
+  @override
+  String get submitBugReportSubtitle => 'Completa nuestro formulario de Google';
+
+  @override
+  String get testCrash => 'Probar bloqueo';
+
+  @override
+  String get testCrashSubtitle => 'Simular un bloqueo para Crashlytics';
+
+  @override
+  String get biometricUnlock => 'Desbloqueo Biométrico';
+
+  @override
+  String get biometricUnlockSubtitle =>
+      'Desbloquea tareas privadas con Face ID o huella digital';
+
+  @override
+  String get useBiometrics => 'Usar Biometría';
+
+  @override
+  String get biometricNotAvailable =>
+      'Biometría no disponible en este dispositivo';
+
+  @override
+  String get biometricAuthReason =>
+      'Autentíquese para acceder a tareas privadas';
+
+  @override
+  String get usePinInstead => 'Usar PIN en su lugar';
+
+  @override
+  String get securitySettings => 'Ajustes de Seguridad';
+
+  @override
+  String get securitySettingsSubtitle =>
+      'Administra el acceso con PIN y biometría';
 }

@@ -120,10 +120,33 @@ class AppLocalizationsAr extends AppLocalizations {
   String get description => 'الوصف';
 
   @override
+  String get attachments => 'المرفقات';
+
+  @override
+  String get noAttachmentsAdded => 'لم تتم إضافة مرفقات';
+
+  @override
+  String get attachmentsPremiumOnly => 'المرفقات متاحة مع PRO.';
+
+  @override
   String get dueDateAndTime => 'تاريخ ووقت الاستحقاق';
 
   @override
   String get noDateSelected => 'لم يتم اختيار تاريخ';
+
+  @override
+  String get syncWithGoogleCalendar => 'المزامنة مع تقويم Google';
+
+  @override
+  String get syncWithGoogleCalendarSubtitle =>
+      'ينشئ حدثًا في التقويم لهذه المهمة';
+
+  @override
+  String get syncWithGoogleCalendarRequiresDueDate =>
+      'عيّن تاريخ استحقاق لمزامنة هذه المهمة مع التقويم.';
+
+  @override
+  String get calendarPermissionNotGranted => 'لم يتم منح إذن التقويم';
 
   @override
   String get category => 'الفئة';
@@ -875,4 +898,46 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get requireSubTasksBeforeRemindersSubtitle =>
       'لا ترسل تذكيرات حتى تكتمل جميع المهام الفرعية';
+
+  @override
+  String get debugModeUnlocked => 'تم فتح وضع التصحيح!';
+
+  @override
+  String get submitBugReport => 'الإبلاغ عن خطأ';
+
+  @override
+  String get submitBugReportSubtitle => 'املأ نموذج جوجل الخاص بنا';
+
+  @override
+  String get testCrash => 'اختبار الانهيار';
+
+  @override
+  String get testCrashSubtitle => 'محاكاة انهيار لـ Crashlytics';
+
+  @override
+  String get biometricUnlock => 'فتح بالقفل البيومتري';
+
+  @override
+  String get biometricUnlockSubtitle =>
+      'فتح المهام الخاصة باستخدام بصمة الوجه أو الإصبع';
+
+  @override
+  String get useBiometrics => 'استخدام البصمة البيومترية';
+
+  @override
+  String get biometricNotAvailable =>
+      'البصمة البيومترية غير متوفرة في هذا الجهاز';
+
+  @override
+  String get biometricAuthReason => 'الرجاء تأكيد الهوية للوصول للمهام الخاصة';
+
+  @override
+  String get usePinInstead => 'استخدام رمز PIN بدلاً من ذلك';
+
+  @override
+  String get securitySettings => 'إعدادات الأمان';
+
+  @override
+  String get securitySettingsSubtitle =>
+      'إدارة الوصول عبر رمز PIN والبصمة البيومترية';
 }

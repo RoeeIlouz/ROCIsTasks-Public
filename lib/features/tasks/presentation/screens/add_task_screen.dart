@@ -2,11 +2,13 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/sub_task.dart';
 import 'package:rocis_tasks/core/services/subscription_service.dart';
 import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
+import 'package:rocis_tasks/core/services/calendar_service.dart';
 import 'package:rocis_tasks/core/services/validation_service.dart';
 import 'package:rocis_tasks/core/services/error_service.dart';
 import 'package:rocis_tasks/core/validation/validators.dart';
@@ -40,6 +42,8 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   String? _recurrenceRule;
   NlpResult? _nlpSuggestion;
   bool _requireSubTasksBeforeReminders = false;
+  bool _syncWithGoogleCalendar = false;
+  List<String> _attachmentPaths = [];
 
   @override
   void initState() {
@@ -61,6 +65,8 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     _recurrenceRule = widget.task?.recurrenceRule;
     _requireSubTasksBeforeReminders =
         widget.task?.requireSubTasksBeforeReminders ?? false;
+    _syncWithGoogleCalendar = widget.task?.syncWithGoogleCalendar ?? false;
+    _attachmentPaths = List<String>.from(widget.task?.attachmentPaths ?? const []);
   }
 
   @override
@@ -132,10 +138,20 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   void _saveTask() {
     if (_formKey.currentState!.validate()) {
       try {
+        final l10n = AppLocalizations.of(context)!;
+
         // Validate due date
         final dateError = ValidationService.validateDueDate(_selectedDate);
         if (dateError != null) {
           ErrorService.handleUserError(context, dateError);
+          return;
+        }
+
+        if (_syncWithGoogleCalendar && _selectedDate == null) {
+          ErrorService.handleUserError(
+            context,
+            l10n.syncWithGoogleCalendarRequiresDueDate,
+          );
           return;
         }
 
@@ -158,6 +174,8 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
             subTasks: _subTasks,
             recurrenceRule: _recurrenceRule,
             requireSubTasksBeforeReminders: _requireSubTasksBeforeReminders,
+            syncWithGoogleCalendar: _syncWithGoogleCalendar,
+            attachmentPaths: _attachmentPaths,
           );
         } else {
           Provider.of<TaskProvider>(context, listen: false).addTask(
@@ -169,6 +187,8 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
             subTasks: _subTasks,
             recurrenceRule: _recurrenceRule,
             requireSubTasksBeforeReminders: _requireSubTasksBeforeReminders,
+            syncWithGoogleCalendar: _syncWithGoogleCalendar,
+            attachmentPaths: _attachmentPaths,
           );
         }
         HapticFeedback.mediumImpact();
@@ -182,6 +202,56 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
         );
       }
     }
+  }
+
+  String _attachmentLabel(String path) {
+    final parts = path.split(RegExp(r'[\\/]+'));
+    return parts.isNotEmpty ? parts.last : path;
+  }
+
+  Future<void> _pickAttachments() async {
+    final subscriptionService = Provider.of<SubscriptionService>(
+      context,
+      listen: false,
+    );
+    if (!subscriptionService.isPremium) {
+      subscriptionService.showPaywall();
+      return;
+    }
+
+    final result = await FilePicker.platform.pickFiles(
+      allowMultiple: true,
+      withData: false,
+    );
+    if (!mounted || result == null) return;
+
+    final pickedPaths = result.paths.whereType<String>().where((p) => p.isNotEmpty);
+    if (pickedPaths.isEmpty) return;
+
+    setState(() {
+      for (final path in pickedPaths) {
+        if (!_attachmentPaths.contains(path)) {
+          _attachmentPaths.add(path);
+        }
+      }
+    });
+    HapticFeedback.lightImpact();
+  }
+
+  void _removeAttachmentAt(int index) {
+    final subscriptionService = Provider.of<SubscriptionService>(
+      context,
+      listen: false,
+    );
+    if (!subscriptionService.isPremium) {
+      subscriptionService.showPaywall();
+      return;
+    }
+
+    setState(() {
+      _attachmentPaths.removeAt(index);
+    });
+    HapticFeedback.lightImpact();
   }
 
   ui.TextDirection _getTextDirection(String text) {
@@ -320,6 +390,8 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                 },
               ),
               const SizedBox(height: 24),
+              _buildAttachmentsSection(context, l10n),
+              const SizedBox(height: 24),
               Text(
                 l10n.dueDateAndTime,
                 style: GoogleFonts.outfit(
@@ -391,6 +463,50 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                     ),
                   ),
                 ),
+              ),
+              const SizedBox(height: 24),
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                secondary: Icon(
+                  _syncWithGoogleCalendar
+                      ? Icons.event_available_rounded
+                      : Icons.event_busy_rounded,
+                ),
+                title: Text(
+                  l10n.syncWithGoogleCalendar,
+                  style: GoogleFonts.outfit(fontWeight: FontWeight.w600),
+                ),
+                subtitle: Text(
+                  l10n.syncWithGoogleCalendarSubtitle,
+                  style: GoogleFonts.outfit(fontSize: 13),
+                ),
+                value: _syncWithGoogleCalendar,
+                onChanged: (value) async {
+                  if (!value) {
+                    setState(() => _syncWithGoogleCalendar = false);
+                    return;
+                  }
+
+                  final messenger = ScaffoldMessenger.of(context);
+                  final permissionNotGrantedText =
+                      l10n.calendarPermissionNotGranted;
+                  final calendarService = Provider.of<CalendarService>(
+                    context,
+                    listen: false,
+                  );
+                  final granted = await calendarService.requestPermissions();
+                  if (!context.mounted) return;
+
+                  if (!granted) {
+                    messenger.showSnackBar(
+                      SnackBar(content: Text(permissionNotGrantedText)),
+                    );
+                    setState(() => _syncWithGoogleCalendar = false);
+                    return;
+                  }
+
+                  setState(() => _syncWithGoogleCalendar = true);
+                },
               ),
               const SizedBox(height: 24),
               Text(
@@ -494,8 +610,6 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
               ),
               const SizedBox(height: 24),
               _buildSubTasksSection(context, l10n),
-              const SizedBox(height: 24),
-              _buildRecurrenceSection(context, l10n),
               const SizedBox(height: 40),
               Semantics(
                 label: isEditing ? l10n.updateTask : l10n.saveTask,
@@ -529,6 +643,80 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildAttachmentsSection(BuildContext context, AppLocalizations l10n) {
+    final theme = Theme.of(context);
+    final subscriptionService = Provider.of<SubscriptionService>(
+      context,
+      listen: true,
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Text(
+              l10n.attachments,
+              style: GoogleFonts.outfit(
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+                color: theme.colorScheme.primary,
+              ),
+            ),
+            if (!subscriptionService.isPremium)
+              Container(
+                margin: const EdgeInsets.only(left: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.amber.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  "PRO",
+                  style: GoogleFonts.outfit(
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.amber[800],
+                  ),
+                ),
+              ),
+            const Spacer(),
+            IconButton(
+              icon: const Icon(Icons.attach_file_rounded, size: 20),
+              onPressed: _pickAttachments,
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        if (!subscriptionService.isPremium)
+          Text(
+            l10n.attachmentsPremiumOnly,
+            style: theme.textTheme.bodySmall,
+          )
+        else if (_attachmentPaths.isEmpty)
+          Text(
+            l10n.noAttachmentsAdded,
+            style: theme.textTheme.bodySmall,
+          )
+        else
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: List.generate(_attachmentPaths.length, (index) {
+              final path = _attachmentPaths[index];
+              return InputChip(
+                label: Text(
+                  _attachmentLabel(path),
+                  style: GoogleFonts.outfit(fontSize: 12),
+                ),
+                onDeleted: () => _removeAttachmentAt(index),
+              );
+            }),
+          ),
+      ],
     );
   }
 
@@ -657,82 +845,6 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
               setState(() => _requireSubTasksBeforeReminders = value);
             },
           ),
-      ],
-    );
-  }
-
-  Widget _buildRecurrenceSection(BuildContext context, AppLocalizations l10n) {
-    final theme = Theme.of(context);
-    final subscriptionService = Provider.of<SubscriptionService>(
-      context,
-      listen: true,
-    );
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Text(
-              l10n.recurrence,
-              style: GoogleFonts.outfit(
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
-                color: theme.colorScheme.primary,
-              ),
-            ),
-            if (!subscriptionService.isPremium)
-              Container(
-                margin: const EdgeInsets.only(left: 8),
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
-                  color: Colors.amber.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Text(
-                  "PRO",
-                  style: GoogleFonts.outfit(
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.amber[800],
-                  ),
-                ),
-              ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        DropdownButtonFormField<String?>(
-          initialValue: _recurrenceRule,
-          decoration: SharedInputDecorations.getFieldDecoration(
-            label: l10n.repeat,
-            prefixIcon: Icons.repeat_rounded,
-            theme: theme,
-          ),
-          items: [
-            DropdownMenuItem(value: null, child: Text(l10n.repeatNone)),
-            DropdownMenuItem(
-              value: "FREQ=DAILY;INTERVAL=1",
-              child: Text(l10n.repeatDaily),
-            ),
-            DropdownMenuItem(
-              value: "FREQ=WEEKLY;INTERVAL=1",
-              child: Text(l10n.repeatWeekly),
-            ),
-            DropdownMenuItem(
-              value: "FREQ=MONTHLY;INTERVAL=1",
-              child: Text(l10n.repeatMonthly),
-            ),
-          ],
-          onChanged: (value) {
-            if (!subscriptionService.isPremium && value != null) {
-              subscriptionService.showPaywall();
-              return;
-            }
-            setState(() {
-              _recurrenceRule = value;
-            });
-          },
-        ),
       ],
     );
   }

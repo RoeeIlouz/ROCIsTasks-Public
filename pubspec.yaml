@@ -4,7 +4,7 @@ description: "A new Flutter project."
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
-version: 1.0.2+21
+version: 1.0.3+24
 
 environment:
   sdk: ^3.10.0
@@ -59,10 +59,12 @@ dependencies:
   purchases_flutter: ^9.12.0
   purchases_ui_flutter: ^9.12.0
   url_launcher: ^6.3.2
+  local_auth: ^2.1.8
   firebase_performance: ^0.10.1+10
   firebase_remote_config: ^5.5.0
   device_info_plus: 11.1.0
   quick_actions: ^1.0.9
+  file_picker: ^8.1.2
 
 dependency_overrides:
   timezone: ^0.10.1

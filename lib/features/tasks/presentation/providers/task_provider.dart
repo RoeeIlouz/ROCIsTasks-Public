@@ -15,7 +15,6 @@ import 'package:rocis_tasks/core/services/connectivity_service.dart';
 import 'package:rocis_tasks/core/config/app_config.dart';
 import 'package:rocis_tasks/core/services/pagination_service.dart';
 import 'package:rocis_tasks/core/services/subscription_service.dart';
-import 'package:rrule/rrule.dart';
 
 import 'package:rocis_tasks/features/tasks/domain/models/sub_task.dart';
 import 'package:rocis_tasks/features/categories/domain/models/category.dart';
@@ -404,7 +403,7 @@ class TaskProvider extends ChangeNotifier {
 
     final isPrivate = _isPrivateTask(task);
     final shouldHide =
-        _privateModeService.shouldHidePrivateContent && isPrivate;
+        _shouldMaskPrivateContent() && isPrivate;
 
     final title = shouldHide
         ? _l10n.taskReminderTitle(_l10n.privateLabel)
@@ -661,6 +660,8 @@ class TaskProvider extends ChangeNotifier {
       // 1. Refresh data from cloud
       await syncWithCloud();
 
+      await _processGoogleCalendarUpstreamRocisTasksHook();
+
       // 2. Force widget updates and global notification refresh
       await updateHomeWidgetWithNotification();
 
@@ -676,6 +677,121 @@ class TaskProvider extends ChangeNotifier {
       _errorHandlingService.logError(e, s, reason: 'Performing full sync');
       rethrow;
     }
+  }
+
+  Future<void> _processGoogleCalendarUpstreamRocisTasksHook() async {
+    if (!_subscriptionService.isPremium) return;
+
+    try {
+      final calendars = await _calendarService.getAvailableCalendars();
+      final googleWritableCalendarIds = calendars
+          .where((c) => c.id != null && c.isReadOnly != true)
+          .where(_looksLikeGoogleCalendar)
+          .map((c) => c.id!)
+          .toList();
+      if (googleWritableCalendarIds.isEmpty) return;
+
+      final now = DateTime.now();
+      final events = await _calendarService.getEvents(
+        startDate: now.subtract(const Duration(days: 30)),
+        endDate: now.add(const Duration(days: 365)),
+        calendarIds: googleWritableCalendarIds,
+      );
+      if (events.isEmpty) return;
+
+      var createdAny = false;
+      for (final event in events) {
+        final title = event.title;
+        if (title == null || title.isEmpty) continue;
+
+        final hasMarker =
+            title.contains('(ROCIsTasks)') || title.contains('(RT)');
+        if (!hasMarker) continue;
+
+        final calendarId = event.calendarId;
+        final eventId = event.eventId;
+        final start = event.start;
+        if (calendarId == null || eventId == null || start == null) continue;
+
+        final end = event.end ?? start.add(const Duration(hours: 1));
+        final taskTitle = _stripRocisTasksMarkers(title);
+        final taskDescription = _buildImportedTaskDescription(
+          eventDescription: event.description,
+          start: start,
+          end: end,
+          isAllDay: event.allDay == true,
+        );
+
+        final deleted = await _calendarService.deleteEvent(
+          calendarId: calendarId,
+          eventId: eventId,
+        );
+        if (!deleted) continue;
+
+        final task = Task(
+          title: taskTitle,
+          description: taskDescription,
+          dueDate: start,
+          priority: TaskPriority.medium,
+          syncWithGoogleCalendar: false,
+        );
+        await _source.addTask(task);
+        _firestoreService.addTask(task).catchError((e, s) {
+          _errorHandlingService.logError(
+            e,
+            s,
+            reason: 'Background cloud addTask failed (calendar import)',
+          );
+        });
+        if (task.dueDate != null && task.dueDate!.isAfter(DateTime.now())) {
+          try {
+            await _scheduleTaskNotifications(task);
+          } catch (e, s) {
+            _errorHandlingService.logError(
+              e,
+              s,
+              reason: 'Scheduling notification for imported task',
+            );
+          }
+        }
+
+        createdAny = true;
+      }
+
+      if (createdAny) {
+        _refreshPagination();
+        notifyListeners();
+        updateHomeWidget();
+      }
+    } catch (e, s) {
+      _errorHandlingService.logError(
+        e,
+        s,
+        reason: 'Processing upstream Google Calendar import hook',
+      );
+    }
+  }
+
+  String _stripRocisTasksMarkers(String title) {
+    final stripped = title
+        .replaceAll('(ROCIsTasks)', '')
+        .replaceAll('(RT)', '')
+        .trim();
+    return stripped.isEmpty ? 'Task' : stripped;
+  }
+
+  String _buildImportedTaskDescription({
+    required String? eventDescription,
+    required DateTime start,
+    required DateTime end,
+    required bool isAllDay,
+  }) {
+    final base = (eventDescription ?? '').trim();
+    final range = isAllDay
+        ? '${DateFormat.yMMMd().format(start)} → ${DateFormat.yMMMd().format(end)}'
+        : '${DateFormat.yMMMd().add_Hm().format(start)} → ${DateFormat.yMMMd().add_Hm().format(end)}';
+    if (base.isEmpty) return range;
+    return '$base\n\n$range';
   }
 
   TaskSortOption _currentSortOption = TaskSortOption.dueDate;
@@ -855,7 +971,7 @@ class TaskProvider extends ChangeNotifier {
   List<Task> get allTasks {
     if (_isLoading) return [];
     var tasks = _source.getTasks().where((t) => !(t.isDeleted ?? false)).toList();
-    if (_privateModeService.shouldHidePrivateContent) {
+    if (_shouldMaskPrivateContent()) {
       tasks = tasks.where((t) => !_isPrivateTask(t)).toList();
     }
     return tasks;
@@ -868,16 +984,17 @@ class TaskProvider extends ChangeNotifier {
         .where((t) => !(t.isDeleted ?? false))
         .toList();
 
-    if (_privateModeService.shouldHidePrivateContent) {
-      tasks = tasks.where((t) => !_isPrivateTask(t)).toList();
-    }
+    final maskPrivate = _shouldMaskPrivateContent();
 
     if (_searchQuery.isNotEmpty) {
       tasks = tasks
           .where(
-            (t) =>
-                t.title.toLowerCase().contains(_searchQuery) ||
-                t.description.toLowerCase().contains(_searchQuery),
+            (t) {
+              final titleMatch = t.title.toLowerCase().contains(_searchQuery);
+              if (titleMatch) return true;
+              if (maskPrivate && _isPrivateTask(t)) return false;
+              return t.description.toLowerCase().contains(_searchQuery);
+            },
           )
           .toList();
     }
@@ -889,7 +1006,10 @@ class TaskProvider extends ChangeNotifier {
     }
 
     if (!_showCompleted) {
-      tasks = tasks.where((t) => !t.isCompleted).toList();
+      tasks = tasks.where((t) {
+        if (maskPrivate && _isPrivateTask(t)) return true;
+        return !t.isCompleted;
+      }).toList();
     }
 
     // Apply Date Filter
@@ -900,6 +1020,7 @@ class TaskProvider extends ChangeNotifier {
     switch (_currentDateFilter) {
       case DateTimeFilterOption.today:
         tasks = tasks.where((t) {
+          if (maskPrivate && _isPrivateTask(t)) return true;
           if (t.dueDate == null) return false;
           final d = t.dueDate!;
           return d.year == today.year && d.month == today.month && d.day == today.day;
@@ -907,6 +1028,7 @@ class TaskProvider extends ChangeNotifier {
         break;
       case DateTimeFilterOption.thisWeek:
         tasks = tasks.where((t) {
+          if (maskPrivate && _isPrivateTask(t)) return true;
           if (t.dueDate == null) return false;
           return t.dueDate!.isAfter(today.subtract(const Duration(seconds: 1))) && 
                  t.dueDate!.isBefore(weekEnd);
@@ -914,18 +1036,28 @@ class TaskProvider extends ChangeNotifier {
         break;
       case DateTimeFilterOption.overdue:
         tasks = tasks.where((t) {
+          if (maskPrivate && _isPrivateTask(t)) return true;
           if (t.dueDate == null || t.isCompleted) return false;
           return t.dueDate!.isBefore(now);
         }).toList();
         break;
       case DateTimeFilterOption.noDate:
-        tasks = tasks.where((t) => t.dueDate == null).toList();
+        tasks = tasks.where((t) {
+          if (maskPrivate && _isPrivateTask(t)) return true;
+          return t.dueDate == null;
+        }).toList();
         break;
       case DateTimeFilterOption.all:
         break;
     }
 
     tasks.sort((a, b) {
+      final aPrivate = maskPrivate && _isPrivateTask(a);
+      final bPrivate = maskPrivate && _isPrivateTask(b);
+      if (aPrivate != bPrivate) return aPrivate ? 1 : -1;
+      if (aPrivate && bPrivate) {
+        return a.title.toLowerCase().compareTo(b.title.toLowerCase());
+      }
       if ((a.isPinned ?? false) != (b.isPinned ?? false)) {
         return (a.isPinned ?? false) ? -1 : 1;
       }
@@ -999,10 +1131,14 @@ class TaskProvider extends ChangeNotifier {
 
   List<Task> _getTasksForPublicSurfaces() {
     final all = _source.getTasks();
-    if (!_privateModeService.shouldHidePrivateContent) return all;
+    if (!_shouldMaskPrivateContent()) return all;
     final privateCategoryIds =
         _source.getCategories().where((c) => c.isPrivate).map((c) => c.id).toSet();
     return all.where((t) => !privateCategoryIds.contains(t.categoryId)).toList();
+  }
+
+  bool _shouldMaskPrivateContent() {
+    return _subscriptionService.isPremium && _privateModeService.shouldHidePrivateContent;
   }
 
   /// Update home widgets without showing the task count notification
@@ -1113,6 +1249,8 @@ class TaskProvider extends ChangeNotifier {
     List<SubTask>? subTasks,
     String? recurrenceRule,
     bool requireSubTasksBeforeReminders = false,
+    bool syncWithGoogleCalendar = false,
+    List<String>? attachmentPaths,
   }) async {
     final task = Task(
       title: title,
@@ -1123,6 +1261,8 @@ class TaskProvider extends ChangeNotifier {
       subTasks: subTasks,
       recurrenceRule: recurrenceRule,
       requireSubTasksBeforeReminders: requireSubTasksBeforeReminders,
+      syncWithGoogleCalendar: syncWithGoogleCalendar,
+      attachmentPaths: attachmentPaths,
     );
     await _source.addTask(task);
     // Sync to cloud - Firestore handles offline state and buffering
@@ -1142,6 +1282,9 @@ class TaskProvider extends ChangeNotifier {
         // Not critical enough to show error, but good to know
       }
     }
+
+    await _syncTaskCalendarState(task);
+
     _refreshPagination();
     notifyListeners();
     updateHomeWidgetWithNotification(); // Show notification when task is added
@@ -1157,19 +1300,17 @@ class TaskProvider extends ChangeNotifier {
     task.isCompleted = !task.isCompleted;
     task.completedAt = task.isCompleted ? DateTime.now() : null;
 
-    // Handle Recurrence if marking as completed
-    if (task.isCompleted &&
-        task.recurrenceRule != null &&
-        task.recurrenceRule!.isNotEmpty) {
-      await _handleRecurringTask(task);
-    }
-
     notifyListeners();
     await _source.addTask(task);
     _firestoreService.updateTask(task).catchError((e, s) {
       _errorHandlingService.logError(e, s, reason: 'Background cloud updateTask failed');
     });
 
+    if (task.isCompleted) {
+      await _removeTaskCalendarEvent(task);
+    } else {
+      await _syncTaskCalendarState(task);
+    }
 
     if (task.isCompleted) {
       await _cancelTaskNotifications(task);
@@ -1203,6 +1344,8 @@ class TaskProvider extends ChangeNotifier {
     List<SubTask>? subTasks,
     String? recurrenceRule,
     bool? requireSubTasksBeforeReminders,
+    bool? syncWithGoogleCalendar,
+    List<String>? attachmentPaths,
   }) async {
     if (title != null) task.title = title;
     if (description != null) task.description = description;
@@ -1213,6 +1356,12 @@ class TaskProvider extends ChangeNotifier {
     if (recurrenceRule != null) task.recurrenceRule = recurrenceRule;
     if (requireSubTasksBeforeReminders != null) {
       task.requireSubTasksBeforeReminders = requireSubTasksBeforeReminders;
+    }
+    if (syncWithGoogleCalendar != null) {
+      task.syncWithGoogleCalendar = syncWithGoogleCalendar;
+    }
+    if (attachmentPaths != null) {
+      task.attachmentPaths = attachmentPaths;
     }
 
     await _source.addTask(task);
@@ -1234,6 +1383,9 @@ class TaskProvider extends ChangeNotifier {
         );
       }
     }
+
+    await _syncTaskCalendarState(task);
+
     _refreshPagination();
     notifyListeners();
     updateHomeWidget();
@@ -1295,6 +1447,7 @@ class TaskProvider extends ChangeNotifier {
         _errorHandlingService.logError(e, s, reason: 'Background cloud updateTask failed');
       });
       await _cancelTaskNotifications(task);
+      await _removeTaskCalendarEvent(task);
     } catch (e, s) {
       _errorHandlingService.logError(e, s, reason: 'Deleting task');
     }
@@ -1330,6 +1483,10 @@ class TaskProvider extends ChangeNotifier {
   }
 
   Future<void> deleteTaskPermanently(String id) async {
+    final task = getTaskById(id);
+    if (task != null) {
+      await _removeTaskCalendarEvent(task);
+    }
     await _source.deleteTask(id);
     _firestoreService.deleteTask(id).catchError((e, s) {
       _errorHandlingService.logError(e, s, reason: 'Background cloud deleteTask failed');
@@ -1518,58 +1675,116 @@ class TaskProvider extends ChangeNotifier {
     }
   }
 
+  bool _looksLikeGoogleCalendar(dynamic calendar) {
+    try {
+      final accountType = (calendar.accountType as String?)?.toLowerCase();
+      final accountName = (calendar.accountName as String?)?.toLowerCase();
+      final name = (calendar.name as String?)?.toLowerCase();
+
+      return (accountType?.contains('google') ?? false) ||
+          (accountType?.contains('com.google') ?? false) ||
+          (accountName?.contains('gmail') ?? false) ||
+          (name?.contains('google') ?? false);
+    } catch (_) {
+      return false;
+    }
+  }
+
+  String? _selectWritableCalendarId(
+    List<dynamic> calendars, {
+    String? preferredCalendarId,
+  }) {
+    if (calendars.isEmpty) return null;
+
+    dynamic preferred;
+    if (preferredCalendarId != null) {
+      try {
+        preferred = calendars.firstWhere(
+          (c) => c.id == preferredCalendarId && c.isReadOnly != true,
+        );
+      } catch (_) {}
+    }
+    if (preferred?.id != null) return preferred.id as String?;
+
+    final writable = calendars.where((c) => c.isReadOnly != true).toList();
+    if (writable.isEmpty) return null;
+
+    try {
+      final googleCalendar = writable.firstWhere(_looksLikeGoogleCalendar);
+      return googleCalendar.id as String?;
+    } catch (_) {}
+
+    return writable.first.id as String?;
+  }
+
+  Future<void> _removeTaskCalendarEvent(Task task) async {
+    final calendarId = task.calendarId;
+    final eventId = task.calendarEventId;
+    if (calendarId == null || eventId == null) return;
+
+    await _calendarService.deleteEvent(calendarId: calendarId, eventId: eventId);
+
+    task.calendarEventId = null;
+    task.calendarId = null;
+    await _source.addTask(task);
+  }
+
+  Future<void> _syncTaskCalendarState(Task task) async {
+    if (task.isCompleted || (task.isDeleted ?? false)) {
+      await _removeTaskCalendarEvent(task);
+      return;
+    }
+
+    if (!task.syncWithGoogleCalendar) {
+      await _removeTaskCalendarEvent(task);
+      return;
+    }
+
+    if (task.dueDate == null) {
+      await _removeTaskCalendarEvent(task);
+      return;
+    }
+
+    try {
+      final calendars = await _calendarService.getAvailableCalendars();
+      final calendarId = _selectWritableCalendarId(
+        calendars,
+        preferredCalendarId: task.calendarId,
+      );
+      if (calendarId == null) return;
+
+      final start = task.dueDate!;
+      final end = start.add(const Duration(hours: 1));
+
+      final eventId = await _calendarService.createOrUpdateTaskEvent(
+        calendarId: calendarId,
+        eventId: task.calendarEventId,
+        title: task.title,
+        description: task.description.isEmpty ? null : task.description,
+        start: start,
+        end: end,
+      );
+      if (eventId == null) return;
+
+      if (task.calendarEventId != eventId || task.calendarId != calendarId) {
+        task.calendarEventId = eventId;
+        task.calendarId = calendarId;
+        await _source.addTask(task);
+      }
+    } catch (e, s) {
+      _errorHandlingService.logError(
+        e,
+        s,
+        reason: 'Sync task to calendar failed',
+      );
+    }
+  }
+
   Task? getTaskById(String id) {
     try {
       return _source.getTasks().firstWhere((t) => t.id == id);
     } catch (e) {
       return null;
     }
-  }
-
-  Future<void> _handleRecurringTask(Task task) async {
-    if (task.dueDate == null) return;
-
-    // Only premium users get recurrence
-    if (!_subscriptionService.isPremium) return;
-
-    DateTime? nextDate;
-    try {
-      final rrule = RecurrenceRule.fromString(task.recurrenceRule!);
-      // Find the next instance after the current due date
-      final instances = rrule.getInstances(start: task.dueDate!.toUtc());
-
-      // getInstances includes the start date if it matches the rule.
-      // We want the VERY NEXT one.
-      nextDate = instances
-          .firstWhere(
-            (date) => date.isAfter(task.dueDate!.toUtc()),
-            orElse: () => task.dueDate!.add(const Duration(days: 1)).toUtc(),
-          )
-          .toLocal();
-    } catch (e) {
-      // Fallback to daily if parsing fails
-      nextDate = task.dueDate!.add(const Duration(days: 1));
-    }
-
-    await addTask(
-      task.title,
-      task.description,
-      nextDate,
-      task.priority,
-      task.categoryId,
-      subTasks: task.subTasks
-          ?.map((st) => st.copyWith(isCompleted: false))
-          .toList(),
-      recurrenceRule: task.recurrenceRule,
-    );
-
-    // Show feedback notification
-    await _notificationService.showInfoNotification(
-      title: _l10n.recurringTaskScheduled,
-      body: _l10n.nextOccurrenceSet(
-        task.title,
-        DateFormat.yMd().format(nextDate),
-      ),
-    );
   }
 }

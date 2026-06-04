@@ -120,10 +120,32 @@ class AppLocalizationsHe extends AppLocalizations {
   String get description => 'תיאור';
 
   @override
+  String get attachments => 'קבצים מצורפים';
+
+  @override
+  String get noAttachmentsAdded => 'לא נוספו קבצים מצורפים';
+
+  @override
+  String get attachmentsPremiumOnly => 'קבצים מצורפים זמינים ב‑PRO.';
+
+  @override
   String get dueDateAndTime => 'תאריך ושעה לסיום';
 
   @override
   String get noDateSelected => 'לא נבחר תאריך';
+
+  @override
+  String get syncWithGoogleCalendar => 'סנכרון עם יומן Google';
+
+  @override
+  String get syncWithGoogleCalendarSubtitle => 'יוצר אירוע יומן עבור משימה זו';
+
+  @override
+  String get syncWithGoogleCalendarRequiresDueDate =>
+      'קבע תאריך יעד כדי לסנכרן את המשימה ליומן.';
+
+  @override
+  String get calendarPermissionNotGranted => 'הרשאת יומן לא אושרה';
 
   @override
   String get category => 'קטגוריה';
@@ -876,4 +898,44 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get requireSubTasksBeforeRemindersSubtitle =>
       'לא שולח תזכורות עד שכל תת-המשימות הושלמו';
+
+  @override
+  String get debugModeUnlocked => 'מצב מפתחים פתוח!';
+
+  @override
+  String get submitBugReport => 'דווח על באג';
+
+  @override
+  String get submitBugReportSubtitle => 'מלא את טופס גוגל שלנו';
+
+  @override
+  String get testCrash => 'בדיקת קריסה';
+
+  @override
+  String get testCrashSubtitle => 'הדמיית קריסה עבור Crashlytics';
+
+  @override
+  String get biometricUnlock => 'פתח באמצעות ביומטריה';
+
+  @override
+  String get biometricUnlockSubtitle =>
+      'פתח משימות פרטיות עם Face ID או טביעת אצבע';
+
+  @override
+  String get useBiometrics => 'השתמש בביומטריה';
+
+  @override
+  String get biometricNotAvailable => 'ביומטריה אינה זמינה במכשיר זה';
+
+  @override
+  String get biometricAuthReason => 'הזדהה כדי לגשת למשימות פרטיות';
+
+  @override
+  String get usePinInstead => 'השתמש ב-PIN במקום';
+
+  @override
+  String get securitySettings => 'הגדרות אבטחה';
+
+  @override
+  String get securitySettingsSubtitle => 'נהל גישה עם PIN וביומטריה';
 }

@@ -324,6 +324,24 @@ abstract class AppLocalizations {
   /// **'Description'**
   String get description;
 
+  /// No description provided for @attachments.
+  ///
+  /// In en, this message translates to:
+  /// **'Attachments'**
+  String get attachments;
+
+  /// No description provided for @noAttachmentsAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'No attachments added'**
+  String get noAttachmentsAdded;
+
+  /// No description provided for @attachmentsPremiumOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Attachments are available with PRO.'**
+  String get attachmentsPremiumOnly;
+
   /// No description provided for @dueDateAndTime.
   ///
   /// In en, this message translates to:
@@ -335,6 +353,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No Date Selected'**
   String get noDateSelected;
+
+  /// No description provided for @syncWithGoogleCalendar.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync with Google Calendar'**
+  String get syncWithGoogleCalendar;
+
+  /// No description provided for @syncWithGoogleCalendarSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Creates a calendar event for this task'**
+  String get syncWithGoogleCalendarSubtitle;
+
+  /// No description provided for @syncWithGoogleCalendarRequiresDueDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Set a due date to sync this task to your calendar.'**
+  String get syncWithGoogleCalendarRequiresDueDate;
+
+  /// No description provided for @calendarPermissionNotGranted.
+  ///
+  /// In en, this message translates to:
+  /// **'Calendar permission not granted'**
+  String get calendarPermissionNotGranted;
 
   /// No description provided for @category.
   ///
@@ -1769,6 +1811,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Don’t send reminders until all subtasks are completed'**
   String get requireSubTasksBeforeRemindersSubtitle;
+
+  /// No description provided for @debugModeUnlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Debug mode unlocked!'**
+  String get debugModeUnlocked;
+
+  /// No description provided for @submitBugReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit Bug Report'**
+  String get submitBugReport;
+
+  /// No description provided for @submitBugReportSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill out our Google Form'**
+  String get submitBugReportSubtitle;
+
+  /// No description provided for @testCrash.
+  ///
+  /// In en, this message translates to:
+  /// **'Test Crash'**
+  String get testCrash;
+
+  /// No description provided for @testCrashSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Simulate a crash for Crashlytics'**
+  String get testCrashSubtitle;
+
+  /// No description provided for @biometricUnlock.
+  ///
+  /// In en, this message translates to:
+  /// **'Biometric Unlock'**
+  String get biometricUnlock;
+
+  /// No description provided for @biometricUnlockSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock private tasks with Face ID or fingerprint'**
+  String get biometricUnlockSubtitle;
+
+  /// No description provided for @useBiometrics.
+  ///
+  /// In en, this message translates to:
+  /// **'Use Biometrics'**
+  String get useBiometrics;
+
+  /// No description provided for @biometricNotAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Biometrics not available on this device'**
+  String get biometricNotAvailable;
+
+  /// No description provided for @biometricAuthReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Authenticate to access private tasks'**
+  String get biometricAuthReason;
+
+  /// No description provided for @usePinInstead.
+  ///
+  /// In en, this message translates to:
+  /// **'Use PIN instead'**
+  String get usePinInstead;
+
+  /// No description provided for @securitySettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Security Settings'**
+  String get securitySettings;
+
+  /// No description provided for @securitySettingsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage PIN and Biometric access'**
+  String get securitySettingsSubtitle;
 }
 
 class _AppLocalizationsDelegate
