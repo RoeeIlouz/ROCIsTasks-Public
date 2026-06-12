@@ -13,7 +13,7 @@ import 'package:rocis_tasks/features/tasks/data/datasources/local_task_source.da
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/features/tasks/services/task_widget_service.dart';
 import 'package:rocis_tasks/core/services/logger_service.dart';
-import 'package:rocis_tasks/l10n/app_localizations.dart';
+import 'package:rocis_tasks/l10n/l10n_helper.dart';
 import 'dart:ui';
 
 @pragma('vm:entry-point')
@@ -218,7 +218,11 @@ class BackgroundHandler {
         isDarkText: isDarkText,
       );
 
-      final l10n = lookupAppLocalizations(PlatformDispatcher.instance.locale);
+      final languageCode = prefs.getString('language_code');
+      final currentLocale = languageCode != null
+          ? Locale(languageCode)
+          : PlatformDispatcher.instance.locale;
+      final l10n = getSafeAppLocalizations(currentLocale);
       String priorityLabel(TaskPriority p) {
         switch (p) {
           case TaskPriority.high:
@@ -249,9 +253,7 @@ class BackgroundHandler {
           pendingTasks.length,
         ),
         tasksRemainingLabel: l10n.notificationTasksRemaining,
-        tasksSummaryLabel: l10n.notificationTasksSummary(
-          pendingTasks.length,
-        ),
+        tasksSummaryLabel: l10n.notificationTasksSummary(pendingTasks.length),
       );
     } catch (e) {
       AppLogger.error('Background task error', error: e, tag: 'Background');

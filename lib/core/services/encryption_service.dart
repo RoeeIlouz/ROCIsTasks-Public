@@ -123,8 +123,28 @@ class EncryptionService {
   }
 
   static String encrypt(String plainText) {
-    // Encryption is disabled per user request to ensure data reliability.
-    return plainText;
+    if (plainText.isEmpty) return plainText;
+
+    if (_encrypter == null) {
+      AppLogger.warning(
+        'Attempted to encrypt data but encrypter is not initialized',
+        tag: 'Security',
+      );
+      return plainText;
+    }
+
+    try {
+      final iv = enc.IV.fromSecureRandom(16);
+      final encrypted = _encrypter!.encrypt(plainText, iv: iv);
+      return '${iv.base64}:${encrypted.base64}';
+    } catch (e) {
+      AppLogger.error(
+        'Encryption failed, returning raw text',
+        error: e,
+        tag: 'Security',
+      );
+      return plainText;
+    }
   }
 
   static String decrypt(String cipherText) {

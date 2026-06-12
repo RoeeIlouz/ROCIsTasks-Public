@@ -6,9 +6,12 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
 import 'app_localizations_ar.dart';
+import 'app_localizations_de.dart';
 import 'app_localizations_en.dart';
 import 'app_localizations_es.dart';
+import 'app_localizations_fr.dart';
 import 'app_localizations_he.dart';
+import 'app_localizations_sv.dart';
 
 // ignore_for_file: type=lint
 
@@ -97,9 +100,12 @@ abstract class AppLocalizations {
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
     Locale('ar'),
+    Locale('de'),
     Locale('en'),
     Locale('es'),
+    Locale('fr'),
     Locale('he'),
+    Locale('sv'),
   ];
 
   /// No description provided for @appTitle.
@@ -299,6 +305,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Arabic'**
   String get arabic;
+
+  /// No description provided for @swedish.
+  ///
+  /// In en, this message translates to:
+  /// **'Swedish'**
+  String get swedish;
+
+  /// No description provided for @german.
+  ///
+  /// In en, this message translates to:
+  /// **'German'**
+  String get german;
+
+  /// No description provided for @french.
+  ///
+  /// In en, this message translates to:
+  /// **'French'**
+  String get french;
 
   /// No description provided for @tasks.
   ///
@@ -1464,8 +1488,16 @@ abstract class AppLocalizations {
   /// **'Display a persistent notification with your task count'**
   String get showTaskCounterNotificationSubtitle;
 
+  /// No description provided for @showMyTasksGuideShortcut.
+  ///
+  /// In en, this message translates to:
+  /// **'Show My Tasks help button'**
   String get showMyTasksGuideShortcut;
 
+  /// No description provided for @showMyTasksGuideShortcutSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Show a ? button in My Tasks that opens the App Guide'**
   String get showMyTasksGuideShortcutSubtitle;
 
   /// No description provided for @appGuide.
@@ -1516,10 +1548,22 @@ abstract class AppLocalizations {
   /// **'Organize tasks into custom categories with unique icons and colors.'**
   String get guideCategoriesDesc;
 
+  /// No description provided for @guidePriorityDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Use priorities to highlight what matters most.'**
   String get guidePriorityDesc;
 
+  /// No description provided for @guidePinningDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Pin important tasks to keep them at the top of your list.'**
   String get guidePinningDesc;
 
+  /// No description provided for @guideAttachmentsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Attach files and images to keep everything related to a task in one place.'**
   String get guideAttachmentsDesc;
 
   /// No description provided for @guideNotificationsTitle.
@@ -1911,8 +1955,15 @@ class _AppLocalizationsDelegate
   }
 
   @override
-  bool isSupported(Locale locale) =>
-      <String>['ar', 'en', 'es', 'he'].contains(locale.languageCode);
+  bool isSupported(Locale locale) => <String>[
+    'ar',
+    'de',
+    'en',
+    'es',
+    'fr',
+    'he',
+    'sv',
+  ].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
@@ -1923,12 +1974,18 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
   switch (locale.languageCode) {
     case 'ar':
       return AppLocalizationsAr();
+    case 'de':
+      return AppLocalizationsDe();
     case 'en':
       return AppLocalizationsEn();
     case 'es':
       return AppLocalizationsEs();
+    case 'fr':
+      return AppLocalizationsFr();
     case 'he':
       return AppLocalizationsHe();
+    case 'sv':
+      return AppLocalizationsSv();
   }
 
   throw FlutterError(

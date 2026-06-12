@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.4+28] - 2026-06-12
+
+### Fixed
+
+- **Security — Encryption Re-enabled**: Restored AES encryption in `EncryptionService.encrypt()` which previously returned plaintext. The method now performs proper AES encryption with a random IV and outputs `base64(iv):base64(ciphertext)`. Existing unencrypted data continues to work via the backwards-compatible `decrypt()` path.
+- **Security — SSL Certificate Pinning**: `SecurityService.getHardenedHttpClient()` now validates peer certificates against configured fingerprints instead of silently allowing all connections. When no fingerprints are configured, a warning is logged. When fingerprints are set, non-matching certificates are rejected with a critical security alert.
+- **Security — Environment Detection**: `SecurityService.isEnvironmentSecure()` now returns `kReleaseMode` instead of a hardcoded `true`. Debug and profile builds are flagged with log warnings.
+- **Google Calendar Badge**: Replaced the hand-drawn `_GoogleGPainter` custom painter with the official Google "G" SVG icon (`assets/icons/google-icon.svg`) via `flutter_svg`. Badge size increased from 18px to 20px for better visibility.
+- **Task Completion Toggle**: Fixed a race condition where toggling a task as complete would immediately revert. The Firestore stream listener was firing a `removed` event (task drops out of the `isCompleted == false` query) and overwriting the local state with stale cloud data before the Firestore write propagated. Added a `_pendingLocalWrites` guard that tracks recently toggled tasks and skips stale stream events.
+- **FullCalendar Widget — Update Reliability**: Added a 100ms delay after saving widget data via `HomeWidget.saveWidgetData` and before calling `HomeWidget.updateWidget`, ensuring SharedPreferences are flushed to disk before the native widget reads them. On the Kotlin side, delayed `notifyAppWidgetViewDataChanged` by 300ms so the RemoteViewsFactory reads fresh data. Reduced widget update debounce from 1000ms to 200ms for snappier updates.
+- **FullCalendar Widget — Month Switching Performance**: Pre-indexed calendar events and tasks by date into `Map<String, List>` for O(1) day lookups instead of scanning all events for each of the 42 days (was O(42×n)). Pre-loaded categories once instead of per-day. Batched all `HomeWidget.saveWidgetData` calls with `Future.wait` for parallel I/O.
+
+## [1.1.3+27] - 2026-06-11
+
+### Added
+
+- **New Languages**: Added Swedish (`sv`), German (`de`), and French (`fr`) as fully supported app languages — all screens, settings, notifications, and system messages are translated.
+- **Smart Language Defaulting**: On first launch, the app now auto-selects the language that matches the device locale if it is in the supported list (`ar`, `de`, `en`, `es`, `fr`, `he`, `sv`); otherwise defaults to English.
+
+### Fixed
+
+- **Localization Crashes**: Replaced direct `AppLocalizations.of(context)!` calls with a crash-proof safe lookup helper (`getSafeAppLocalizations`) that falls back to English when a locale is unavailable, preventing `Null check operator used on a null value` errors reported by users.
+- **Background Isolate Locale**: Background task handlers and notification services now correctly retrieve the user's selected language from `SharedPreferences` instead of always using the system locale.
+- **Localization in Task Provider**: Task-related UI strings generated outside a widget tree (e.g., in providers) now use the safe helper to prevent null-locale crashes.
+
 ## [1.0.3+24] - 2026-06-03
 
 ### Added

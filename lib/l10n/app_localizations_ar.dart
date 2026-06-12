@@ -108,6 +108,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get arabic => 'العربية';
 
   @override
+  String get swedish => 'السويدية';
+
+  @override
+  String get german => 'الألمانية';
+
+  @override
+  String get french => 'الفرنسية';
+
+  @override
   String get tasks => 'المهام';
 
   @override
@@ -752,8 +761,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get guidePriorityDesc => 'استخدم الأولويات لإبراز ما هو الأهم.';
 
   @override
-  String get guidePinningDesc =>
-      'ثبّت المهام المهمة لإبقائها في أعلى القائمة.';
+  String get guidePinningDesc => 'ثبّت المهام المهمة لإبقائها في أعلى القائمة.';
 
   @override
   String get guideAttachmentsDesc =>

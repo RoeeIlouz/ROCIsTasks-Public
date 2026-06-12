@@ -40,6 +40,14 @@ class ThemeService extends ChangeNotifier {
     final languageCode = prefs.getString('language_code');
     if (languageCode != null) {
       _locale = Locale(languageCode);
+    } else {
+      final deviceLocale = WidgetsBinding.instance.platformDispatcher.locale;
+      const supportedLanguageCodes = {'ar', 'en', 'es', 'he', 'sv', 'de', 'fr'};
+      if (supportedLanguageCodes.contains(deviceLocale.languageCode)) {
+        _locale = Locale(deviceLocale.languageCode);
+      } else {
+        _locale = const Locale('en');
+      }
     }
     _useCustomSeedColor = prefs.getBool('use_custom_seed_color') ?? false;
     _customSeedColorValue = prefs.getInt('custom_seed_color_value');

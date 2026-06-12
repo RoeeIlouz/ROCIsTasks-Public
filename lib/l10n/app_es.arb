@@ -1,4 +1,4 @@
-{
+﻿{
   "appTitle": "Tareas de ROCI",
   "settings": "Configuración",
   "account": "Cuenta",
@@ -32,6 +32,9 @@
   "english": "Inglés",
   "spanish": "Español",
   "arabic": "Árabe",
+  "swedish": "Sueco",
+  "german": "Alem\u00e1n",
+  "french": "Franc\u00e9s",
   "tasks": "Tareas",
   "editTask": "Editar tarea",
   "newTask": "Nueva tarea",

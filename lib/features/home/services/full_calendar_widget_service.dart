@@ -162,14 +162,11 @@ class FullCalendarWidgetService {
     int? monthOffset,
     String? userId,
   }) async {
-    // updateFullCalendarWidget started
     try {
       final prefs = await SharedPreferences.getInstance();
       final int offset =
           monthOffset ??
           (await HomeWidget.getWidgetData<int>('full_calendar_offset') ?? 0);
-
-      // Using offset
 
       // Save offset if provided
       if (monthOffset != null) {
@@ -178,7 +175,6 @@ class FullCalendarWidgetService {
 
       // Get filter settings
       final filters = await getFilters();
-      // Filters loaded
 
       // Get custom colors (stored as int values)
       final taskColorInt =
@@ -196,20 +192,15 @@ class FullCalendarWidgetService {
       final now = DateTime.now();
       final targetMonth = DateTime(now.year, now.month + offset, 1);
       final monthName = DateFormat('MMMM yyyy').format(targetMonth);
-      // Target month calculated
 
-      // Calculate calendar grid (5 weeks)
+      // Calculate calendar grid (6 weeks)
       final firstDayOfMonth = targetMonth;
       final difference = firstDayOfMonth.weekday % 7;
       final startDate = firstDayOfMonth.subtract(Duration(days: difference));
-      final endDate = startDate.add(
-        const Duration(days: 41),
-      ); // 42 days (6 weeks) to ensure all months fit
-
-      // Date range calculated
+      final endDate = startDate.add(const Duration(days: 41));
 
       // Fetch Google Calendar events (if filter enabled)
-      var events = [];
+      var events = <dynamic>[];
       Map<String, String> calendarColors = {};
       try {
         if (filters.showGoogleCalendar) {
@@ -221,15 +212,47 @@ class FullCalendarWidgetService {
           calendarColors = await _calendarService.getCalendarColors();
         }
       } catch (e, stack) {
-        AppLogger.error('Failed to fetch Google Calendar events for widget', error: e, stack: stack);
+        AppLogger.error('Failed to fetch Google Calendar events for widget',
+            error: e, stack: stack);
       }
 
-      // Fetch tasks (if filter enabled)
-      var tasks = <dynamic>[];
+      // Pre-index events by date for O(1) lookup instead of O(n) per day
+      final eventsByDate = <String, List<dynamic>>{};
+      for (var event in events) {
+        if (event.start == null) continue;
+        final eventStart = DateTime(
+          event.start!.year,
+          event.start!.month,
+          event.start!.day,
+        );
+        final end = event.end ?? event.start!.add(const Duration(hours: 1));
+        final endDay = DateTime(end.year, end.month, end.day);
+
+        // Add event to every day it spans
+        var day = eventStart;
+        while (!day.isAfter(endDay)) {
+          // Skip the end day for non-all-day events ending at midnight
+          if (day == endDay &&
+              event.allDay != true &&
+              end.hour == 0 &&
+              end.minute == 0 &&
+              end.second == 0 &&
+              end.millisecond == 0) {
+            break;
+          }
+          final key = DateFormat('yyyy-MM-dd').format(day);
+          eventsByDate.putIfAbsent(key, () => []).add(event);
+          day = day.add(const Duration(days: 1));
+        }
+      }
+
+      // Pre-index tasks by date for O(1) lookup
+      final tasksByDate = <String, List<dynamic>>{};
+      List<dynamic> filteredTasks = [];
       try {
         final allTasks = _taskSource.getTasks();
         if (filters.showTasks) {
-          tasks = allTasks
+          filteredTasks = allTasks
               .where(
                 (t) =>
                     !(t.isDeleted ?? false) &&
@@ -239,8 +262,17 @@ class FullCalendarWidgetService {
               .toList();
         }
       } catch (e, stack) {
-        AppLogger.error('Failed to fetch tasks for widget', error: e, stack: stack);
+        AppLogger.error('Failed to fetch tasks for widget',
+            error: e, stack: stack);
       }
+
+      for (var t in filteredTasks) {
+        final key = DateFormat('yyyy-MM-dd').format(t.dueDate!);
+        tasksByDate.putIfAbsent(key, () => []).add(t);
+      }
+
+      // Pre-load categories for color lookup
+      final categories = _taskSource.getCategories();
 
       // Load localization for background strings
       AppLocalizations? l10n;
@@ -254,7 +286,6 @@ class FullCalendarWidgetService {
       final gridData = <Map<String, dynamic>>[];
 
       for (int row = 0; row < 6; row++) {
-        // First cell of each row is the Week Number
         final rowStartDate = startDate.add(Duration(days: row * 7));
         final weekNumber = _getWeekNumber(rowStartDate);
 
@@ -264,49 +295,9 @@ class FullCalendarWidgetService {
           final date = rowStartDate.add(Duration(days: col));
           final dateKey = DateFormat('yyyy-MM-dd').format(date);
 
-          // Find Google Calendar events for this day (including multi-day events)
-          final dayEvents = events.where((e) {
-            if (e.start == null) return false;
-
-            // Normalize to dates (midnight)
-            final eventStart = DateTime(
-              e.start!.year,
-              e.start!.month,
-              e.start!.day,
-            );
-            
-            // Handle null end by assuming 1 hour duration
-            final end = e.end ?? e.start!.add(const Duration(hours: 1));
-            final endDay = DateTime(end.year, end.month, end.day);
-
-            final currentDate = date;
-            
-            // Standard inclusive-start, exclusive-end check
-            if (currentDate.isBefore(eventStart) || currentDate.isAfter(endDay)) {
-              return false;
-            }
-            
-            // Special case: if end is exactly midnight and it is not the start day,
-            // we don't include that day, unless it's an all-day event.
-            if (currentDate == endDay &&
-                e.allDay != true &&
-                end.hour == 0 &&
-                end.minute == 0 &&
-                end.second == 0 &&
-                end.millisecond == 0 &&
-                currentDate != eventStart) {
-              return false;
-            }
-            
-            return true;
-          }).toList();
-
-          // Find tasks for this day
-          final dayTasks = tasks.where((t) {
-            if (t.dueDate == null) return false;
-            final tDate = DateFormat('yyyy-MM-dd').format(t.dueDate!);
-            return tDate == dateKey;
-          }).toList();
+          // O(1) lookup instead of O(n) filter
+          final dayEvents = eventsByDate[dateKey] ?? [];
+          final dayTasks = tasksByDate[dateKey] ?? [];
 
           // Create summaries (up to 3 items)
           final summaries = <Map<String, dynamic>>[];
@@ -314,10 +305,9 @@ class FullCalendarWidgetService {
           // 1. Prioritize tasks
           for (var t in dayTasks) {
             if (summaries.length >= 3) break;
-            // Lookup category color
             int? colorVal;
             try {
-              final cat = _taskSource.getCategories().firstWhere(
+              final cat = categories.firstWhere(
                 (c) => c.id == t.categoryId,
               );
               colorVal = cat.colorValue;
@@ -343,7 +333,6 @@ class FullCalendarWidgetService {
                 ? _formatEventTime(e.start, e.end, l10n)
                 : '';
 
-            // Truncate title more aggressively for better fit in widget
             final displayTitle = (e.title ?? l10n?.event ?? 'Event');
             final title = displayTitle.length > 25
                 ? '${displayTitle.substring(0, 22)}...'
@@ -352,7 +341,6 @@ class FullCalendarWidgetService {
                 ? '${(e.location ?? '').substring(0, 17)}...'
                 : (e.location ?? '');
 
-            // Use calendar color if available, fallback to global google color
             final eventColor =
                 e.calendarId != null && calendarColors.containsKey(e.calendarId)
                 ? calendarColors[e.calendarId]
@@ -381,52 +369,53 @@ class FullCalendarWidgetService {
         }
       }
 
-      // Created grid
-
-      // Save Data
+      // Save all widget data atomically
       final gridDataJson = jsonEncode(gridData);
 
       if (gridDataJson.length > 500000) {
-        // Log warning if data is too large for SharedPreferences/WidgetData
         AppLogger.warning(
           'FullCalendar widget data is very large: ${gridDataJson.length} bytes',
         );
       }
 
-      // Saving grid data
-      await HomeWidget.saveWidgetData<String>(
-        'full_calendar_grid_data',
-        gridDataJson,
-      );
+      // Batch all SharedPreferences writes before signaling the widget
+      await Future.wait([
+        HomeWidget.saveWidgetData<String>(
+          'full_calendar_grid_data',
+          gridDataJson,
+        ),
+        HomeWidget.saveWidgetData<String>(
+          'full_calendar_month_name',
+          monthName,
+        ),
+        HomeWidget.saveWidgetData<bool>(
+          'full_calendar_show_tasks',
+          filters.showTasks,
+        ),
+        HomeWidget.saveWidgetData<bool>(
+          'full_calendar_show_google',
+          filters.showGoogleCalendar,
+        ),
+        HomeWidget.saveWidgetData<bool>(
+          'full_calendar_show_rocis',
+          false,
+        ),
+      ]);
 
-      // Save Month Name
-      await HomeWidget.saveWidgetData<String>(
-        'full_calendar_month_name',
-        monthName,
-      );
+      // Small delay to ensure SharedPreferences are flushed to disk
+      // before the native widget reads them
+      await Future.delayed(const Duration(milliseconds: 100));
 
-      // Save filter states
-      await HomeWidget.saveWidgetData<bool>(
-        'full_calendar_show_tasks',
-        filters.showTasks,
-      );
-      await HomeWidget.saveWidgetData<bool>(
-        'full_calendar_show_google',
-        filters.showGoogleCalendar,
-      );
-      await HomeWidget.saveWidgetData<bool>(
-        'full_calendar_show_rocis',
-        false,
-      );
-
-      // Signaling update for widget
+      // Signal update for widget
       await HomeWidget.updateWidget(
         name: 'FullCalendarWidgetProvider',
         iOSName: 'FullCalendarWidget',
       );
     } catch (e, stack) {
-      AppLogger.error('Error in FullCalendarWidgetService.updateFullCalendarWidget', error: e, stack: stack);
-      // Attempt fallback to at least show the dates
+      AppLogger.error(
+          'Error in FullCalendarWidgetService.updateFullCalendarWidget',
+          error: e,
+          stack: stack);
       await _generateFallbackGrid(monthOffset, userId);
     }
   }

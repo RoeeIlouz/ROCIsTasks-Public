@@ -4,7 +4,7 @@ description: "A new Flutter project."
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
-version: 1.1.2+26
+version: 1.1.6+30
 
 environment:
   sdk: ^3.10.0
@@ -56,6 +56,7 @@ dependencies:
   flutter_staggered_animations: ^1.1.1
   fl_chart: ^0.70.2
   cached_network_image: ^3.4.1
+  flutter_svg: ^2.0.10+1
   purchases_flutter: ^9.12.0
   purchases_ui_flutter: ^9.12.0
   url_launcher: ^6.3.2
@@ -96,6 +97,8 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/images/logo.png
+    - assets/icons/
+    - shorebird.yaml
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

@@ -142,7 +142,15 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
                 }
 
                 appWidgetManager.updateAppWidget(appWidgetId, views)
-                appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_full_calendar_list)
+
+                // Delay the data-changed notification to ensure SharedPreferences
+                // writes from Dart have been flushed to disk before the
+                // RemoteViewsFactory reads them in onDataSetChanged().
+                android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                    try {
+                        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_full_calendar_list)
+                    } catch (_: Exception) {}
+                }, 300)
             } catch (e: Exception) {
             }
         }

@@ -1,4 +1,4 @@
-{
+﻿{
   "@@locale": "ar",
   "appTitle": "مهام ROCI",
   "settings": "الإعدادات",
@@ -33,6 +33,9 @@
   "english": "الإنجليزية",
   "spanish": "الإسبانية",
   "arabic": "العربية",
+  "swedish": "السويدية",
+  "german": "الألمانية",
+  "french": "الفرنسية",
   "tasks": "المهام",
   "editTask": "تعديل المهمة",
   "newTask": "مهمة جديدة",

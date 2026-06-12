@@ -46,6 +46,9 @@ class SettingsScreen extends StatelessWidget {
       if (code == 'he') return l10n.hebrew;
       if (code == 'es') return l10n.spanish;
       if (code == 'ar') return l10n.arabic;
+      if (code == 'sv') return l10n.swedish;
+      if (code == 'de') return l10n.german;
+      if (code == 'fr') return l10n.french;
       return l10n.english;
     }
 
@@ -362,6 +365,39 @@ class SettingsScreen extends StatelessWidget {
                       Navigator.pop(context);
                     },
                     trailing: themeService.locale?.languageCode == 'ar'
+                        ? const Icon(Icons.check)
+                        : null,
+                  ),
+                  ListTile(
+                    title: Text(l10n.swedish),
+                    onTap: () {
+                      themeService.setLocale(const Locale('sv'));
+                      analyticsService.logLanguageChanged(locale: 'sv');
+                      Navigator.pop(context);
+                    },
+                    trailing: themeService.locale?.languageCode == 'sv'
+                        ? const Icon(Icons.check)
+                        : null,
+                  ),
+                  ListTile(
+                    title: Text(l10n.german),
+                    onTap: () {
+                      themeService.setLocale(const Locale('de'));
+                      analyticsService.logLanguageChanged(locale: 'de');
+                      Navigator.pop(context);
+                    },
+                    trailing: themeService.locale?.languageCode == 'de'
+                        ? const Icon(Icons.check)
+                        : null,
+                  ),
+                  ListTile(
+                    title: Text(l10n.french),
+                    onTap: () {
+                      themeService.setLocale(const Locale('fr'));
+                      analyticsService.logLanguageChanged(locale: 'fr');
+                      Navigator.pop(context);
+                    },
+                    trailing: themeService.locale?.languageCode == 'fr'
                         ? const Icon(Icons.check)
                         : null,
                   ),

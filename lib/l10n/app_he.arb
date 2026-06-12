@@ -1,4 +1,4 @@
-{
+﻿{
   "appTitle": "המשימות של ROCI",
   "settings": "הגדרות",
   "account": "חשבון",
@@ -32,6 +32,9 @@
   "english": "אנגלית",
   "spanish": "ספרדית",
   "arabic": "ערבית",
+  "swedish": "שוודית",
+  "german": "גרמנית",
+  "french": "צרפתית",
   "tasks": "משימות",
   "editTask": "ערוך משימה",
   "newTask": "משימה חדשה",

@@ -108,6 +108,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get arabic => 'Arabic';
 
   @override
+  String get swedish => 'Swedish';
+
+  @override
+  String get german => 'German';
+
+  @override
+  String get french => 'French';
+
+  @override
   String get tasks => 'Tasks';
 
   @override
@@ -757,7 +766,8 @@ class AppLocalizationsEn extends AppLocalizations {
       'Organize tasks into custom categories with unique icons and colors.';
 
   @override
-  String get guidePriorityDesc => 'Use priorities to highlight what matters most.';
+  String get guidePriorityDesc =>
+      'Use priorities to highlight what matters most.';
 
   @override
   String get guidePinningDesc =>

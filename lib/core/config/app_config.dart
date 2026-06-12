@@ -9,7 +9,7 @@ class AppConfig {
 
   // App information
   static const String appName = 'ROCI\'s Tasks';
-  static const String appVersion = '1.1.2'; 
+  static const String appVersion = '1.1.6';
   static const String supportEmail = 'support@ilouz.xyz';
   static const String privacyPolicyUrl =
       'https://rocisapps.ilouz.xyz/privacy.html';
@@ -34,7 +34,7 @@ class AppConfig {
   // Performance settings
   static const int maxTasksPerPage = 50;
   static const int syncTimeoutSeconds = 30;
-  static const int notificationDebounceMs = 1000; // Increased from 300ms
+  static const int notificationDebounceMs = 200; // Widget update debounce
 
   // UI settings
   static const int maxDescriptionLength = 500;

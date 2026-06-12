@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart' hide Category;
 import 'package:rocis_tasks/l10n/app_localizations.dart';
+import 'package:rocis_tasks/l10n/l10n_helper.dart';
 import 'dart:async';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -40,7 +41,8 @@ enum DateTimeFilterOption { all, today, thisWeek, overdue, noDate }
 class TaskProvider extends ChangeNotifier {
   static const int _maxNagNotifications = 5;
   AppLocalizations get _l10n {
-    return lookupAppLocalizations(PlatformDispatcher.instance.locale);
+    final currentLocale = _themeService.locale ?? PlatformDispatcher.instance.locale;
+    return getSafeAppLocalizations(currentLocale);
   }
 
   final LocalTaskSource _source;
@@ -67,6 +69,10 @@ class TaskProvider extends ChangeNotifier {
   String? _lastUserId;
   String? _completedPrefetchUserId;
   bool _completedPrefetchInFlight = false;
+
+  // Guard against Firestore stream reverting local toggles.
+  // Maps task ID → the isCompleted state we just wrote locally.
+  final Map<String, bool> _pendingLocalWrites = {};
 
   // Bulk Selection State
   bool _isSelectionMode = false;
@@ -585,6 +591,30 @@ class TaskProvider extends ChangeNotifier {
           for (var event in events) {
             final cloudTask = event.task;
             
+            // If we just toggled this task locally, don't let a stale
+            // Firestore snapshot revert our write.
+            final pendingState = _pendingLocalWrites[cloudTask.id];
+            if (pendingState != null) {
+              // For removed events the snapshot may still show the old state;
+              // for added/modified events the snapshot may lag behind.
+              if (event.type == SyncEventType.removed && pendingState) {
+                // We just completed this task — the removed event is expected.
+                // Update Hive to reflect completion.
+                final (latestTask, isMissing) =
+                    await _firestoreService.fetchTaskById(cloudTask.id);
+                if (latestTask != null && latestTask.isCompleted) {
+                  await _source.addTask(latestTask);
+                  await _cancelTaskNotificationsById(latestTask.id);
+                  needsUpdate = true;
+                }
+                continue;
+              }
+              if (event.type != SyncEventType.removed && !pendingState) {
+                // We just uncompleted this task — ignore the stale cloud event.
+                continue;
+              }
+            }
+            
             if (event.type == SyncEventType.removed) {
               // If it's removed from active, it might be completed or deleted.
               // DocumentChange.removed gives the *previous* state (still active),
@@ -708,7 +738,7 @@ class TaskProvider extends ChangeNotifier {
         if (title == null || title.isEmpty) continue;
 
         final hasMarker =
-            title.contains('(ROCIsTasks)') || title.contains('(RT)');
+            title.contains('[ROCIsTasks]') || title.contains('[RT]');
         if (!hasMarker) continue;
 
         final calendarId = event.calendarId;
@@ -777,8 +807,8 @@ class TaskProvider extends ChangeNotifier {
 
   String _stripRocisTasksMarkers(String title) {
     final stripped = title
-        .replaceAll('(ROCIsTasks)', '')
-        .replaceAll('(RT)', '')
+        .replaceAll('[ROCIsTasks]', '')
+        .replaceAll('[RT]', '')
         .trim();
     return stripped.isEmpty ? 'Task' : stripped;
   }
@@ -1337,10 +1367,18 @@ class TaskProvider extends ChangeNotifier {
     task.isCompleted = !task.isCompleted;
     task.completedAt = task.isCompleted ? DateTime.now() : null;
 
+    // Record the intended state so the Firestore stream doesn't revert it
+    _pendingLocalWrites[task.id] = task.isCompleted;
+
     notifyListeners();
     await _source.addTask(task);
     _firestoreService.updateTask(task).catchError((e, s) {
       _errorHandlingService.logError(e, s, reason: 'Background cloud updateTask failed');
+    }).whenComplete(() {
+      // Allow stream to handle this task again after Firestore write settles
+      Future.delayed(const Duration(seconds: 3), () {
+        _pendingLocalWrites.remove(task.id);
+      });
     });
 
     if (task.isCompleted) {

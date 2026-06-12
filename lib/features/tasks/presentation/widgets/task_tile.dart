@@ -1,6 +1,6 @@
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/features/categories/domain/models/category.dart';
@@ -242,8 +242,7 @@ class TaskTile extends StatelessWidget {
                                               ),
                                         ),
                                       ),
-                                      if (task.syncWithGoogleCalendar &&
-                                          task.calendarEventId != null) ...[
+                                      if (task.syncWithGoogleCalendar) ...[
                                         const SizedBox(width: 6),
                                         const _GCalendarBadge(),
                                       ],
@@ -673,8 +672,8 @@ class _GCalendarBadge extends StatelessWidget {
     return Tooltip(
       message: 'Synced with Google Calendar',
       child: Container(
-        width: 18,
-        height: 18,
+        width: 20,
+        height: 20,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           color: isDark
@@ -688,69 +687,15 @@ class _GCalendarBadge extends StatelessWidget {
             ),
           ],
         ),
-        child: const Padding(
-          padding: EdgeInsets.all(2.5),
-          child: CustomPaint(
-            painter: _GoogleGPainter(),
+        child: Padding(
+          padding: const EdgeInsets.all(3),
+          child: SvgPicture.asset(
+            'assets/icons/google-icon.svg',
+            width: 14,
+            height: 14,
           ),
         ),
       ),
     );
   }
-}
-
-class _GoogleGPainter extends CustomPainter {
-  const _GoogleGPainter();
-
-  // Official Google brand palette
-  static const _blue   = Color(0xFF4285F4);
-  static const _red    = Color(0xFFEA4335);
-  static const _yellow = Color(0xFFFBBC04);
-  static const _green  = Color(0xFF34A853);
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final cx = size.width / 2;
-    final cy = size.height / 2;
-    final radius = math.min(cx, cy);
-    final strokeW = radius * 0.42;
-    final arcR = radius - strokeW / 2;
-    final rect = Rect.fromCircle(
-      center: Offset(cx, cy),
-      radius: arcR,
-    );
-
-    Paint arc(Color color) => Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = strokeW
-      ..strokeCap = StrokeCap.butt
-      ..isAntiAlias = true;
-
-    // Angles in radians, measured clockwise from the 3 o'clock position.
-    // Blue  : 225° → 315°  (large left arc, ~270° sweep)
-    // Red   : 315° → 45°   (top-right,       ~90° sweep)
-    // Yellow: 45°  → 135°  (bottom-right,     ~90° sweep)
-    // Green : 135° → 225°  (bottom-left,      ~90° sweep)
-    const deg = math.pi / 180;
-    canvas
-      ..drawArc(rect, 225 * deg, 270 * deg, false, arc(_blue))
-      ..drawArc(rect, 315 * deg,  90 * deg, false, arc(_red))
-      ..drawArc(rect,  45 * deg,  90 * deg, false, arc(_yellow))
-      ..drawArc(rect, 135 * deg,  90 * deg, false, arc(_green));
-
-    // Horizontal bar of the "G" (right half, centred vertically)
-    final barH = strokeW;
-    final barTop = cy - barH / 2;
-    canvas.drawRect(
-      Rect.fromLTRB(cx, barTop, cx + arcR + strokeW / 2, barTop + barH),
-      Paint()
-        ..color = _blue
-        ..style = PaintingStyle.fill
-        ..isAntiAlias = true,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
