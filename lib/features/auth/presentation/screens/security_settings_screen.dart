@@ -167,7 +167,7 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
-                            "PRO",
+                            'PRO',
                             style: GoogleFonts.outfit(
                               fontSize: 10,
                               fontWeight: FontWeight.bold,
@@ -180,7 +180,7 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
                   ),
                   subtitle: Text(
                     _checkingHardware
-                        ? "Checking device capabilities..."
+                        ? 'Checking device capabilities...'
                         : !_deviceSupportsBiometrics
                         ? l10n.biometricNotAvailable
                         : l10n.biometricUnlockSubtitle,
@@ -190,7 +190,7 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
                       _deviceSupportsBiometrics &&
                       privateModeService.isBiometricEnabled,
                   onChanged: (isPremium && _deviceSupportsBiometrics)
-                      ? (value) => privateModeService.setBiometricEnabled(value)
+                      ? privateModeService.setBiometricEnabled
                       : null, // Grayed out/disabled
                 ),
               ),
@@ -319,7 +319,7 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
     if (saved && context.mounted) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text("PIN saved successfully")));
+      ).showSnackBar(SnackBar(content: Text('PIN saved successfully')));
     }
   }
 }

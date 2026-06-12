@@ -53,7 +53,8 @@ class NotificationService {
   Future<void> init() async {
     if (_isInitialized) return;
     tz.initializeTimeZones();
-    final String timeZoneName = await FlutterTimezone.getLocalTimezone();
+    final timezoneInfo = await FlutterTimezone.getLocalTimezone();
+    final timeZoneName = timezoneInfo.identifier;
     tz.setLocalLocation(tz.getLocation(timeZoneName));
     AppLogger.info(
       'NotificationService initialized with timezone: $timeZoneName',
@@ -93,10 +94,8 @@ class NotificationService {
         );
 
     await flutterLocalNotificationsPlugin.initialize(
-      initializationSettings,
-      onDidReceiveNotificationResponse: (NotificationResponse response) {
-        _responseController.add(response);
-      },
+      settings: initializationSettings,
+      onDidReceiveNotificationResponse: _responseController.add,
       onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
     );
     _isInitialized = true;
@@ -122,11 +121,11 @@ class NotificationService {
 
     await flutterLocalNotificationsPlugin
         .zonedSchedule(
-          id,
-          title,
-          body,
-          tz.TZDateTime.from(scheduledDate, tz.local),
-          NotificationDetails(
+          id: id,
+          title: title,
+          body: body,
+          scheduledDate: tz.TZDateTime.from(scheduledDate, tz.local),
+          notificationDetails: NotificationDetails(
             android: AndroidNotificationDetails(
               'rocis_tasks_channel',
               'Rocis Tasks Reminders',
@@ -180,7 +179,7 @@ class NotificationService {
 
 
   Future<void> cancelNotification(int id) async {
-    await flutterLocalNotificationsPlugin.cancel(id);
+    await flutterLocalNotificationsPlugin.cancel(id: id);
   }
 
   Future<void> requestPermissions() async {
@@ -249,10 +248,10 @@ class NotificationService {
       final details = NotificationDetails(android: androidDetails);
 
       await flutterLocalNotificationsPlugin.show(
-        888,
-        'Tasks Remaining',
-        body,
-        details,
+        id: 888,
+        title: 'Tasks Remaining',
+        body: body,
+        notificationDetails: details,
       );
     }
   }
@@ -270,11 +269,21 @@ class NotificationService {
       priority: Priority.defaultPriority,
     );
     const details = NotificationDetails(android: androidDetails);
-    await flutterLocalNotificationsPlugin.show(id, title, body, details);
+    await flutterLocalNotificationsPlugin.show(
+      id: id,
+      title: title,
+      body: body,
+      notificationDetails: details,
+    );
   }
 
   Future<void> cancelAllNotifications() async {
     await flutterLocalNotificationsPlugin.cancelAll();
+  }
+
+  void dispose() {
+    _actionController.close();
+    _responseController.close();
   }
 
   /// separate ID for task count so it is doesn't get cancelled by cancelAll if we were to exclude it (but we won't for now)

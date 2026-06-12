@@ -6,7 +6,7 @@ void main() {
   group('FirebaseConfig', () {
     setUp(() {
       // Clear any existing environment
-      dotenv.testLoad(fileInput: '');
+      dotenv.clean();
     });
 
     test('should use default Firebase options when no .env file', () {
@@ -19,8 +19,8 @@ void main() {
 
     test('should use environment config when valid .env is loaded', () {
       // Load test environment variables
-      dotenv.testLoad(
-        fileInput: '''
+      dotenv.loadFromString(
+        envString: '''
 FIREBASE_PROJECT_ID=test-project
 FIREBASE_ANDROID_API_KEY=AIzatestandroidkey
 FIREBASE_ANDROID_APP_ID=1:12345:android:test
@@ -37,12 +37,12 @@ FIREBASE_WEB_STORAGE_BUCKET=test-bucket
 
     test('should validate config correctly', () {
       // Test with missing required variables
-      dotenv.testLoad(fileInput: 'FIREBASE_PROJECT_ID=test-project');
+      dotenv.loadFromString(envString: 'FIREBASE_PROJECT_ID=test-project');
       expect(FirebaseConfig.validateConfig(), false);
 
       // Test with all required variables
-      dotenv.testLoad(
-        fileInput: '''
+      dotenv.loadFromString(
+        envString: '''
 FIREBASE_PROJECT_ID=test-project
 FIREBASE_ANDROID_API_KEY=AIzatestkey
 FIREBASE_ANDROID_APP_ID=1:12345:android:test

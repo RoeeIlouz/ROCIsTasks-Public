@@ -142,7 +142,7 @@ class SubscriptionService extends ChangeNotifier {
     }
   }
 
-  void _updateCustomerStatus(CustomerInfo customerInfo) async {
+  Future<void> _updateCustomerStatus(CustomerInfo customerInfo) async {
     // Check for "premium" entitlement.
     // Make sure to match this entitlement identifier in RevenueCat dashboard.
     const entitlementId = AppConfig.entitlementId;

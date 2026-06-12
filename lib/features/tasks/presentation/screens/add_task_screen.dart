@@ -71,7 +71,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   void dispose() {
     _titleController.dispose();
     _descriptionController.dispose();
-    for (var controller in _subTaskControllers) {
+    for (final controller in _subTaskControllers) {
       controller.dispose();
     }
     super.dispose();
@@ -671,7 +671,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
-                  "PRO",
+                  'PRO',
                   style: GoogleFonts.outfit(
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
@@ -746,7 +746,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
-                  "PRO",
+                  'PRO',
                   style: GoogleFonts.outfit(
                     fontSize: 10,
                     fontWeight: FontWeight.bold,

@@ -83,7 +83,7 @@ class PaywallScreen extends StatelessWidget {
   }
 
   // ignore: unused_element
-  void _launchURL(String url) async {
+  Future<void> _launchURL(String url) async {
     final uri = Uri.parse(url);
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);

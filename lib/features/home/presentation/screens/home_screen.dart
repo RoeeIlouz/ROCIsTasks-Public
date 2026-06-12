@@ -197,7 +197,7 @@ class _HomeScreenState extends State<HomeScreen> {
               backgroundColor: theme.colorScheme.primaryContainer,
               leading: IconButton(
                 icon: const Icon(Icons.close),
-                onPressed: () => taskProvider.clearSelection(),
+                onPressed: taskProvider.clearSelection,
               ),
               title: Text(
                 '${taskProvider.selectedCount} ${l10n.tasks}',
@@ -210,7 +210,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 IconButton(
                   icon: const Icon(Icons.push_pin_outlined),
                   tooltip: l10n.pinTask,
-                  onPressed: () => taskProvider.toggleSelectedTasksPin(),
+                  onPressed: taskProvider.toggleSelectedTasksPin,
                 ),
                 IconButton(
                   icon: const Icon(Icons.dashboard_customize_outlined),

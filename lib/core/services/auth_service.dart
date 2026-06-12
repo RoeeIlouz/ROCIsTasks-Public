@@ -11,7 +11,7 @@ import 'package:rocis_tasks/core/services/encryption_service.dart';
 class AuthService extends ChangeNotifier {
   final ErrorHandlingService _errorHandlingService;
   FirebaseAuth get _auth => FirebaseAuth.instance;
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
   final Completer<void> _initCompleter = Completer<void>();
 
   /// Future that completes when the first auth state has been determined
@@ -77,14 +77,20 @@ class AuthService extends ChangeNotifier {
 
   Future<UserCredential?> signInWithGoogle() async {
     try {
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      await _googleSignIn.initialize();
+
+      final GoogleSignInAccount? googleUser =
+          await _googleSignIn.attemptLightweightAuthentication();
       if (googleUser == null) return null; // User canceled
 
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth = googleUser.authentication;
+
+      // Obtain access token via authorization client
+      final clientAuth = await googleUser.authorizationClient
+          .authorizationForScopes(['email', 'profile']);
 
       final AuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
+        accessToken: clientAuth?.accessToken,
         idToken: googleAuth.idToken,
       );
 
@@ -306,11 +312,13 @@ class AuthService extends ChangeNotifier {
     if (_auth.currentUser != null) {
       try {
         // Try to get fresh Google credentials
-        final googleUser = await _googleSignIn.signInSilently();
+        final googleUser = await _googleSignIn.attemptLightweightAuthentication();
         if (googleUser != null) {
-          final googleAuth = await googleUser.authentication;
+          final googleAuth = googleUser.authentication;
+          final clientAuth = await googleUser.authorizationClient
+              .authorizationForScopes(['email', 'profile']);
           final credential = GoogleAuthProvider.credential(
-            accessToken: googleAuth.accessToken,
+            accessToken: clientAuth?.accessToken,
             idToken: googleAuth.idToken,
           );
           await _signInToSecondaryFirebase(credential);
@@ -373,7 +381,7 @@ class AuthService extends ChangeNotifier {
           .doc(userId)
           .collection('tasks')
           .get();
-      for (var doc in tasks.docs) {
+      for (final doc in tasks.docs) {
         await doc.reference.delete();
       }
 
@@ -383,7 +391,7 @@ class AuthService extends ChangeNotifier {
           .doc(userId)
           .collection('categories')
           .get();
-      for (var doc in categories.docs) {
+      for (final doc in categories.docs) {
         await doc.reference.delete();
       }
 
@@ -393,7 +401,7 @@ class AuthService extends ChangeNotifier {
           .doc(userId)
           .collection('settings')
           .get();
-      for (var doc in settings.docs) {
+      for (final doc in settings.docs) {
         await doc.reference.delete();
       }
 
@@ -438,11 +446,13 @@ class AuthService extends ChangeNotifier {
     final providerIds = user.providerData.map((p) => p.providerId).toSet();
     if (providerIds.contains('google.com')) {
       try {
-        final googleUser = await _googleSignIn.signInSilently();
+        final googleUser = await _googleSignIn.attemptLightweightAuthentication();
         if (googleUser == null) return false;
-        final googleAuth = await googleUser.authentication;
+        final googleAuth = googleUser.authentication;
+        final clientAuth = await googleUser.authorizationClient
+            .authorizationForScopes(['email', 'profile']);
         final credential = GoogleAuthProvider.credential(
-          accessToken: googleAuth.accessToken,
+          accessToken: clientAuth?.accessToken,
           idToken: googleAuth.idToken,
         );
         await user.reauthenticateWithCredential(credential);

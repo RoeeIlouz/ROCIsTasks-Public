@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.6+30] - 2026-06-12
+
+### Changed
+
+- **Upgraded Firebase to 6.x**: Migrated `firebase_core` to 4.x, `cloud_firestore` to 6.x, `firebase_auth` to 6.x, `firebase_crashlytics` to 5.x, `firebase_analytics` to 12.x, `firebase_performance` to 0.11.x, `firebase_remote_config` to 6.x.
+- **Upgraded device_info_plus** to 12.x.
+- **Upgraded RevenueCat to 10.x**: Migrated `purchases_flutter` and `purchases_ui_flutter` from 9.x to 10.x.
+- **Upgraded remaining packages**: `flutter_timezone` to 5.x, `connectivity_plus` to 7.x, `local_auth` to 3.x, `google_sign_in` to 7.x, `fl_chart` to 1.x, `flutter_dotenv` to 6.x, `flutter_local_notifications` to 22.x, `flutter_launcher_icons` to 0.14.x.
+- **Upgraded timezone** to 0.11.x (required by flutter_local_notifications 22.x).
+- **Enabled Built-in Kotlin**: Removed explicit `kotlin-android` plugin and `kotlinOptions` from `android/app/build.gradle`. Enabled `android.builtInKotlin=true` in `gradle.properties`.
+- **Bumped minSdk** from 21 to 23 for Android Billing Library 8.3.0 compatibility.
+- **Removed stale dependency overrides**: Removed `sqflite` overrides from `pubspec.yaml`.
+- **Updated CI**: Flutter version updated to 3.44.2 in GitHub Actions.
+
+### Fixed
+
+- Adapted `google_sign_in` calls to v7.x singleton API (`initialize()`, `attemptLightweightAuthentication()`, `authorizationClient`).
+- Adapted `flutter_local_notifications` calls to v20.x named-parameter API (`initialize(settings:)`, `zonedSchedule(id:, ...)`, `show(id:, ...)`, `cancel(id:)`).
+- Adapted `local_auth` calls to v3.x API (replaced `AuthenticationOptions` with `persistAcrossBackgrounding` and `biometricOnly` parameters).
+- Adapted `flutter_timezone` calls to v5.x API (`TimezoneInfo.identifier` instead of `String`).
+- Adapted `flutter_dotenv` calls to v6.x API (`loadFromString(envString:)` instead of `testLoad(fileInput:)`, `clean()` for test setup).
+
 ## [1.1.4+28] - 2026-06-12
 
 ### Fixed

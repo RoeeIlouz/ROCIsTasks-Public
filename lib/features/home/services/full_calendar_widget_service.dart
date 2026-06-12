@@ -218,7 +218,7 @@ class FullCalendarWidgetService {
 
       // Pre-index events by date for O(1) lookup instead of O(n) per day
       final eventsByDate = <String, List<dynamic>>{};
-      for (var event in events) {
+      for (final event in events) {
         if (event.start == null) continue;
         final eventStart = DateTime(
           event.start!.year,
@@ -266,7 +266,7 @@ class FullCalendarWidgetService {
             error: e, stack: stack);
       }
 
-      for (var t in filteredTasks) {
+      for (final t in filteredTasks) {
         final key = DateFormat('yyyy-MM-dd').format(t.dueDate!);
         tasksByDate.putIfAbsent(key, () => []).add(t);
       }
@@ -303,7 +303,7 @@ class FullCalendarWidgetService {
           final summaries = <Map<String, dynamic>>[];
 
           // 1. Prioritize tasks
-          for (var t in dayTasks) {
+          for (final t in dayTasks) {
             if (summaries.length >= 3) break;
             int? colorVal;
             try {
@@ -327,13 +327,13 @@ class FullCalendarWidgetService {
             });
           }
 
-          for (var e in dayEvents) {
+          for (final e in dayEvents) {
             if (summaries.length >= 3) break;
             final timeStr = e.start != null
                 ? _formatEventTime(e.start, e.end, l10n)
                 : '';
 
-            final displayTitle = (e.title ?? l10n?.event ?? 'Event');
+            final displayTitle = e.title ?? l10n?.event ?? 'Event';
             final title = displayTitle.length > 25
                 ? '${displayTitle.substring(0, 22)}...'
                 : displayTitle;
@@ -512,7 +512,7 @@ class FullCalendarWidgetService {
   }
 
   int _getWeekNumber(DateTime date) {
-    int dayOfYear = int.parse(DateFormat("D").format(date));
+    int dayOfYear = int.parse(DateFormat('D').format(date));
     int woy = ((dayOfYear - date.weekday + 10) / 7).floor();
     if (woy < 1) {
       woy = _getWeekNumber(DateTime(date.year - 1, 12, 31));

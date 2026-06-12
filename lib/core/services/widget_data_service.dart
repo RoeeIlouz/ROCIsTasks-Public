@@ -45,7 +45,7 @@ class WidgetDataService {
           t.dueDate!.isBefore(scheduleEnd);
     });
 
-    for (var t in scheduleTasks) {
+    for (final t in scheduleTasks) {
       final cat = getCategoryById(t.categoryId);
       scheduleItems.add({
         'type': 'task',
@@ -70,7 +70,7 @@ class WidgetDataService {
         startDate: scheduleStart,
         endDate: scheduleEnd,
       );
-      for (var event in calendarEvents) {
+      for (final event in calendarEvents) {
         if (event.start != null) {
           scheduleItems.add({
             'type': 'event',
@@ -129,7 +129,7 @@ class WidgetDataService {
         startDate: listStart,
         endDate: listEnd,
       );
-      for (var event in events) {
+      for (final event in events) {
         if (event.start != null) {
           calendarListEvents.add({
             'type': 'event',
@@ -152,7 +152,7 @@ class WidgetDataService {
         return t.dueDate!.isAfter(listStart) && t.dueDate!.isBefore(listEnd);
       });
 
-      for (var t in listTasks) {
+      for (final t in listTasks) {
         calendarListEvents.add({
           'type': 'task',
           'id': t.id,
@@ -195,7 +195,7 @@ class WidgetDataService {
     final end = DateTime(now.year, now.month + 2, 0);
     final eventsByDay = <String, bool>{};
 
-    for (var task in allTasks.where((t) => !(t.isDeleted ?? false))) {
+    for (final task in allTasks.where((t) => !(t.isDeleted ?? false))) {
       if (task.dueDate != null) {
         final dateKey = DateFormat('yyyy-MM-dd').format(task.dueDate!);
         eventsByDay[dateKey] = true;
@@ -207,7 +207,7 @@ class WidgetDataService {
         startDate: start,
         endDate: end,
       );
-      for (var event in calendarEvents) {
+      for (final event in calendarEvents) {
         if (event.start != null) {
           final eventStart = DateTime(event.start!.year, event.start!.month, event.start!.day);
           final end = event.end ?? event.start!.add(const Duration(hours: 1));

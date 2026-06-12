@@ -202,7 +202,7 @@ class ScheduleFirestoreService {
           .get();
 
       final courses = <String, CourseData>{};
-      for (var doc in snapshot.docs) {
+      for (final doc in snapshot.docs) {
         final course = CourseData.fromMap(doc.data());
         courses[course.id] = course;
       }
@@ -300,7 +300,7 @@ class ScheduleFirestoreService {
 
       final events = <ScheduleEventData>[];
 
-      for (var doc in snapshot.docs) {
+      for (final doc in snapshot.docs) {
         try {
           final data = doc.data();
           final courseId = data['courseId'] as String?;
@@ -391,7 +391,7 @@ class ScheduleFirestoreService {
             final courses = await getCourses(userId);
             final events = <ScheduleEventData>[];
 
-            for (var doc in snapshot.docs) {
+            for (final doc in snapshot.docs) {
               try {
                 final data = doc.data();
                 final courseId = data['courseId'] as String?;
@@ -469,7 +469,7 @@ class ScheduleFirestoreService {
             final courses = await getCourses(userId);
             final assignments = <AssignmentData>[];
 
-            for (var doc in snapshot.docs) {
+            for (final doc in snapshot.docs) {
               try {
                 final data = doc.data();
                 final courseId = data['courseId'] as String?;
@@ -532,7 +532,7 @@ class ScheduleFirestoreService {
     final widgetData = <Map<String, dynamic>>[];
 
     final events = await getScheduleEvents(userId, startDate, endDate);
-    for (var event in events) {
+    for (final event in events) {
       widgetData.add({
         'type': 'schedule_event',
         'id': event.id,
@@ -551,7 +551,7 @@ class ScheduleFirestoreService {
     }
 
     final assignments = await getAssignments(userId, startDate, endDate);
-    for (var assignment in assignments) {
+    for (final assignment in assignments) {
       widgetData.add({
         'type': 'assignment',
         'id': assignment.id,
@@ -633,7 +633,7 @@ class ScheduleFirestoreService {
 
       final assignments = <AssignmentData>[];
 
-      for (var doc in snapshot.docs) {
+      for (final doc in snapshot.docs) {
         try {
           final data = doc.data();
           final courseId = data['courseId'] as String?;

@@ -1,24 +1,4 @@
-# Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.
-
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
-
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
-
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
-
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+# ROCIs Tasks - ProGuard Rules
 
 # Flutter specific rules
 -keep class io.flutter.app.** { *; }
@@ -28,14 +8,16 @@
 -keep class io.flutter.**  { *; }
 -keep class io.flutter.plugins.**  { *; }
 
-# Firebase rules
--keep class com.google.firebase.** { *; }
--keep class com.google.android.gms.** { *; }
+# Firebase - keep only what's needed
+-keep class com.google.firebase.analytics.** { *; }
+-keep class com.google.firebase.crashlytics.** { *; }
+-keep class com.google.firebase.firestore.** { *; }
+-keep class com.google.firebase.auth.** { *; }
+-keep class com.google.firebase.perf.** { *; }
+-keep class com.google.firebase.remoteconfig.** { *; }
 -dontwarn com.google.firebase.**
--dontwarn com.google.android.gms.**
 
 # Hive database rules
--keep class hive_flutter.** { *; }
 -keep class * extends hive.HiveObject
 -keepclassmembers class * extends hive.HiveObject {
     <fields>;
@@ -53,12 +35,19 @@
     public <init>(android.content.Context,androidx.work.WorkerParameters);
 }
 
-# Play Core rules (fixes missing class errors)
--dontwarn com.google.android.play.core.**
--keep class com.google.android.play.core.** { *; }
-
 # Device Calendar rules
 -keep class com.builttoroam.devicecalendar.** { *; }
 
 # RevenueCat rules
 -keep class com.revenuecat.purchases.** { *; }
+
+# Play Core rules (required by Flutter engine)
+-dontwarn com.google.android.play.core.**
+-keep class com.google.android.play.core.** { *; }
+
+# Remove logging in release builds
+-assumenosideeffects class android.util.Log {
+    public static int v(...);
+    public static int d(...);
+    public static int i(...);
+}

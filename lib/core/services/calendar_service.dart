@@ -47,7 +47,7 @@ class CalendarService {
   Future<Map<String, String>> getCalendarColors() async {
     final calendars = await getAvailableCalendars();
     final Map<String, String> colorMap = {};
-    for (var calendar in calendars) {
+    for (final calendar in calendars) {
       if (calendar.id != null && calendar.color != null) {
         colorMap[calendar.id!] = '#${calendar.color!.toRadixString(16).padLeft(8, '0')}';
       }
@@ -74,7 +74,7 @@ class CalendarService {
     try {
       if (calendarIds != null && calendarIds.isNotEmpty) {
         // Fetch only from specified calendars
-        for (var calendarId in calendarIds) {
+        for (final calendarId in calendarIds) {
           try {
             final eventsResult = await _deviceCalendarPlugin.retrieveEvents(
               calendarId,
@@ -96,7 +96,7 @@ class CalendarService {
         final calendarsResult = await _deviceCalendarPlugin.retrieveCalendars();
 
         if (calendarsResult.isSuccess && calendarsResult.data != null) {
-          for (var calendar in calendarsResult.data!) {
+          for (final calendar in calendarsResult.data!) {
             try {
               final eventsResult = await _deviceCalendarPlugin.retrieveEvents(
                 calendar.id,

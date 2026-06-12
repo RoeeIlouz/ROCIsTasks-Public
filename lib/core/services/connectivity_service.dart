@@ -24,9 +24,7 @@ class ConnectivityService extends ChangeNotifier {
     await _checkConnectivity();
 
     // Listen to connectivity changes
-    _subscription = _connectivity.onConnectivityChanged.listen((results) {
-      _updateConnectivity(results);
-    });
+    _subscription = _connectivity.onConnectivityChanged.listen(_updateConnectivity);
   }
 
   Future<void> _checkConnectivity() async {

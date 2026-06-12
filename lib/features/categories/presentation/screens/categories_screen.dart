@@ -184,7 +184,7 @@ class CategoriesScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: const Text(
-                      "PRO",
+                      'PRO',
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
@@ -367,9 +367,7 @@ class _CategorySheetState extends State<_CategorySheet> {
                   contentPadding: const EdgeInsets.all(18),
                 ),
                 maxLength: 30,
-                validator: (value) {
-                  return ValidationService.validateCategoryName(value);
-                },
+                validator: ValidationService.validateCategoryName,
               ),
             ),
             const SizedBox(height: 28),

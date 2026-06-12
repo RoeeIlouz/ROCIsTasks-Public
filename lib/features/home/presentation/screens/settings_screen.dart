@@ -308,7 +308,7 @@ class SettingsScreen extends StatelessWidget {
           secondary: const Icon(Icons.access_time),
           title: Text(l10n.timeFormat24h),
           value: themeService.use24HourFormat,
-          onChanged: (value) => themeService.toggle24HourFormat(value),
+          onChanged: themeService.toggle24HourFormat,
         ),
         ListTile(
           leading: const Icon(Icons.language),
@@ -414,7 +414,7 @@ class SettingsScreen extends StatelessWidget {
           title: Text(l10n.smartAdd),
           subtitle: Text(l10n.autoRemoveNlpDatesSubtitle),
           value: themeService.autoRemoveNlpDates,
-          onChanged: (value) => themeService.toggleAutoRemoveNlpDates(value),
+          onChanged: themeService.toggleAutoRemoveNlpDates,
         ),
         SwitchListTile(
           secondary: const Icon(Icons.help_outline_rounded),
@@ -891,7 +891,7 @@ class SettingsScreen extends StatelessWidget {
                               contentPadding: EdgeInsets.zero,
                               leading: const Icon(Icons.language),
                               title: Text(l10n.visitWebsite),
-                              subtitle: const Text("rocisapps.ilouz.xyz"),
+                              subtitle: const Text('rocisapps.ilouz.xyz'),
                               onTap: () async {
                                 final Uri url = Uri.parse(AppConfig.websiteUrl);
                                 if (await canLaunchUrl(url)) {

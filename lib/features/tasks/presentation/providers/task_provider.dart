@@ -196,7 +196,7 @@ class TaskProvider extends ChangeNotifier {
     // Defer notification rescheduling to not block startup
     Future.delayed(const Duration(seconds: 2), () async {
       final allTasks = _source.getTasks();
-      for (var task in allTasks) {
+      for (final task in allTasks) {
         try {
           await _scheduleTaskNotifications(task);
         } catch (e, s) {
@@ -528,10 +528,10 @@ class TaskProvider extends ChangeNotifier {
     try {
       final tasks = _source.getTasks();
       final categories = _source.getCategories();
-      for (var category in categories) {
+      for (final category in categories) {
         await _firestoreService.addCategory(category);
       }
-      for (var task in tasks) {
+      for (final task in tasks) {
         await _firestoreService.addTask(task);
       }
       // Successfully uploaded local data to cloud
@@ -588,7 +588,7 @@ class TaskProvider extends ChangeNotifier {
       _tasksSubscription = _firestoreService.getActiveTasksStream().listen(
         (events) async {
           bool needsUpdate = false;
-          for (var event in events) {
+          for (final event in events) {
             final cloudTask = event.task;
             
             // If we just toggled this task locally, don't let a stale
@@ -662,7 +662,7 @@ class TaskProvider extends ChangeNotifier {
 
       _categoriesSubscription = _firestoreService.getCategoriesStream().listen(
         (cloudCategories) async {
-          for (var cloudCategory in cloudCategories) {
+          for (final cloudCategory in cloudCategories) {
             await _source.addCategory(cloudCategory);
           }
           _refreshPagination();
@@ -703,7 +703,7 @@ class TaskProvider extends ChangeNotifier {
       // First cancel existing to avoid duplicates or orphans
       await _notificationService.cancelAllNotifications();
 
-      for (var task in allTasks) {
+      for (final task in allTasks) {
         await _scheduleTaskNotifications(task);
       }
     } catch (e, s) {
@@ -1151,7 +1151,7 @@ class TaskProvider extends ChangeNotifier {
       
       final moreTasks = await _firestoreService.getNextCompletedTasksBatch();
       if (moreTasks.isNotEmpty) {
-        for (var task in moreTasks) {
+        for (final task in moreTasks) {
           await _source.addTask(task);
         }
         _refreshPagination();
@@ -1591,7 +1591,7 @@ class TaskProvider extends ChangeNotifier {
 
   Future<void> clearTrash() async {
     final tasksToDelete = deletedTasks;
-    for (var task in tasksToDelete) {
+    for (final task in tasksToDelete) {
       await _source.deleteTask(task.id);
       _firestoreService.deleteTask(task.id).catchError((e, s) {
         _errorHandlingService.logError(e, s, reason: 'Background cloud bulk deleteTask failed');

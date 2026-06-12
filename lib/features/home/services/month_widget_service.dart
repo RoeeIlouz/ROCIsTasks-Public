@@ -115,14 +115,14 @@ class MonthWidgetService {
           // Create summaries
           final summaries = <Map<String, dynamic>>[];
           // Events usually don't have categories in this app yet, but we'll check
-          for (var e in dayEvents) {
+          for (final e in dayEvents) {
             if (summaries.length >= 3) break;
             summaries.add({
               'text': e.title ?? 'No Title',
               'color': '', // Placeholder for event color if needed
             });
           }
-          for (var t in dayTasks) {
+          for (final t in dayTasks) {
             if (summaries.length >= 3) break;
             // Lookup category color
             int? colorVal;
@@ -183,7 +183,7 @@ class MonthWidgetService {
   }
 
   int _getWeekNumber(DateTime date) {
-    int dayOfYear = int.parse(DateFormat("D").format(date));
+    int dayOfYear = int.parse(DateFormat('D').format(date));
     int woy = ((dayOfYear - date.weekday + 10) / 7).floor();
     if (woy < 1) {
       // Handle edge case for first week of year

@@ -105,7 +105,7 @@ class AppInitializer {
   static Future<void> _initEnvironment() async {
     try {
       AppLogger.info('Attempting to load environment variables...');
-      await dotenv.load(fileName: ".env");
+      await dotenv.load(fileName: '.env');
       AppLogger.info('Environment variables loaded successfully');
     } catch (e) {
       AppLogger.warning('Could not load .env file (this is OK)', error: e);
@@ -217,7 +217,8 @@ class AppInitializer {
   static Future<void> _initTimezone() async {
     try {
       tz.initializeTimeZones();
-      final String timeZoneName = await FlutterTimezone.getLocalTimezone();
+      final timezoneInfo = await FlutterTimezone.getLocalTimezone();
+      final timeZoneName = timezoneInfo.identifier;
       t.setLocalLocation(t.getLocation(timeZoneName));
       AppLogger.info('Timezone initialized: $timeZoneName');
     } catch (e) {

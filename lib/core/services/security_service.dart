@@ -185,10 +185,8 @@ class PrivateModeService extends ChangeNotifier {
     try {
       final bool authenticated = await _localAuth.authenticate(
         localizedReason: reason,
-        options: const AuthenticationOptions(
-          stickyAuth: true,
-          biometricOnly: true,
-        ),
+        persistAcrossBackgrounding: true,
+        biometricOnly: true,
       );
       if (authenticated) {
         _unlocked = true;
