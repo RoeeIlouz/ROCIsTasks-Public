@@ -341,5 +341,16 @@
   "biometricAuthReason": "Autentisera för att komma åt privata uppgifter",
   "usePinInstead": "Använd PIN istället",
   "securitySettings": "Säkerhetsinställningar",
-  "securitySettingsSubtitle": "Hantera PIN och biometrisk åtkomst"
+  "securitySettingsSubtitle": "Hantera PIN och biometrisk åtkomst",
+  "enableSecurity": "Aktivera säkerhet",
+  "enableSecurityDescription": "Du skapade precis en privat uppgift. Ställ in en PIN-kod eller biometri för att skydda ditt privata innehåll.",
+  "notNow": "Inte nu",
+  "setUp": "Konfigurera",
+  "doNotRemind": "Påminn inte",
+  "doNotRemindSubtitle": "Undertryck alla aviseringar för denna uppgift",
+  "glassmorphismEffects": "Glassmorphism-effekter",
+  "glassmorphismEffectsSubtitle": "Använd frostat glas på kort",
+  "noEventsForThisDay": "Inga händelser för denna dag",
+  "searchSymbols": "Sök symboler",
+  "searchSymbolsDesc": "Använd symboler för att filtrera uppgifter: @kategori (t.ex. @arbete), #titel (t.ex. #möte), !prioritet (t.ex. !hög), %datum (t.ex. %2025-06-15), &deluppgift (t.ex. &bugfix), *status (*klar eller *pågående), ? (uppgifter idag). Kombinera flera symboler."
 }

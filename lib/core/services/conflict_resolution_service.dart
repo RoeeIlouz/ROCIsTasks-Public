@@ -71,6 +71,8 @@ class ConflictResolutionService {
       priority: _selectHigherPriority(localTask.priority, remoteTask.priority),
       categoryId:
           localTask.categoryId ?? remoteTask.categoryId, // Prefer non-null
+      categoryIds:
+          localTask.categoryIds.isNotEmpty ? localTask.categoryIds : remoteTask.categoryIds,
       isPinned: localTask.isPinned ?? remoteTask.isPinned ?? false,
       isDeleted: localTask.isDeleted ?? remoteTask.isDeleted ?? false,
       syncWithGoogleCalendar:
@@ -148,6 +150,7 @@ class ConflictResolutionService {
             task1.dueDate != task2.dueDate ||
             task1.priority != task2.priority ||
             task1.categoryId != task2.categoryId ||
+            !listEquals(task1.categoryIds, task2.categoryIds) ||
             task1.isPinned != task2.isPinned ||
             task1.isDeleted != task2.isDeleted ||
             task1.syncWithGoogleCalendar != task2.syncWithGoogleCalendar);
@@ -177,6 +180,7 @@ class ConflictResolutionService {
           'dueDate': localItem.dueDate != remoteItem.dueDate,
           'priority': localItem.priority != remoteItem.priority,
           'categoryId': localItem.categoryId != remoteItem.categoryId,
+          'categoryIds': !listEquals(localItem.categoryIds, remoteItem.categoryIds),
           'isPinned': localItem.isPinned != remoteItem.isPinned,
           'isDeleted': localItem.isDeleted != remoteItem.isDeleted,
           'syncWithGoogleCalendar':

@@ -10,103 +10,83 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:layout_marginTop="1dp"
-        android:gravity="center_horizontal"
-        android:background="@drawable/widget_background">
+        android:layout_marginTop="2dp"
+        android:gravity="center_horizontal">
 
-        <!-- Day Number -->
-        <TextView
-            android:id="@+id/widget_full_calendar_day_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="1"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            android:textColor="@color/widget_title_text"
-            android:paddingTop="1dp" />
-
-        <!-- Today Indicator -->
+        <!-- Top Area: Day Number -->
         <FrameLayout
-            android:id="@+id/widget_full_calendar_today_indicator"
-            android:layout_width="26dp"
-            android:layout_height="4dp"
-            android:background="@color/widget_primary"
-            android:visibility="gone"
-            android:layout_marginTop="0dp" />
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="4dp">
+            
+            <TextView
+                android:id="@+id/widget_full_calendar_day_text"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:text="1"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="@color/widget_title_text"
+                android:gravity="center"
+                android:layout_gravity="center_horizontal" />
+        </FrameLayout>
 
-        <!-- Event/Task Indicators (up to 3) -->
-        <LinearLayout
+        <!-- Bottom Area: Event Indicators or Title -->
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:paddingTop="0dp"
-            android:paddingBottom="0dp">
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            android:paddingTop="1dp">
 
+            <!-- Single Event Title (Visible when count == 1) -->
             <TextView
-                android:id="@+id/widget_full_calendar_summary_1"
+                android:id="@+id/widget_full_calendar_day_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="14dp"
-                android:layout_marginStart="1dp"
-                android:layout_marginEnd="1dp"
-                android:layout_marginBottom="1dp"
-                android:background="@drawable/widget_item_background"
-                android:textSize="8.5sp"
-                android:textColor="#FFFFFF"
-                android:gravity="center_vertical"
-                android:maxLines="1"
+                android:textSize="8sp"
+                android:gravity="center"
+                android:maxLines="2"
                 android:ellipsize="end"
-                android:paddingStart="2dp"
-                android:paddingEnd="2dp"
-                android:paddingTop="0.5dp"
-                android:paddingBottom="0.5dp"
-                android:includeFontPadding="false"
+                android:textColor="@color/widget_title_text"
                 android:visibility="gone" />
 
-            <TextView
-                android:id="@+id/widget_full_calendar_summary_2"
+            <!-- Multiple Event Lines (Visible when count > 1) -->
+            <LinearLayout
+                android:id="@+id/widget_full_calendar_indicators_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="14dp"
-                android:layout_marginStart="1dp"
-                android:layout_marginEnd="1dp"
-                android:layout_marginBottom="1dp"
-                android:background="@drawable/widget_item_background"
-                android:textSize="8.5sp"
-                android:textColor="#FFFFFF"
-                android:gravity="center_vertical"
-                android:maxLines="1"
-                android:ellipsize="end"
-                android:paddingStart="2dp"
-                android:paddingEnd="2dp"
-                android:paddingTop="0.5dp"
-                android:paddingBottom="0.5dp"
-                android:includeFontPadding="false"
-                android:visibility="gone" />
+                android:orientation="vertical"
+                android:gravity="center_horizontal">
+                
+                <ImageView
+                    android:id="@+id/widget_full_calendar_summary_1"
+                    android:layout_width="match_parent"
+                    android:layout_height="3dp"
+                    android:layout_marginBottom="2dp"
+                    android:src="@drawable/widget_item_background"
+                    android:scaleType="fitXY"
+                    android:visibility="gone" />
 
-            <TextView
-                android:id="@+id/widget_full_calendar_summary_3"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="14dp"
-                android:layout_marginStart="1dp"
-                android:layout_marginEnd="1dp"
-                android:background="@drawable/widget_item_background"
-                android:textSize="8.5sp"
-                android:textColor="#FFFFFF"
-                android:gravity="center_vertical"
-                android:maxLines="1"
-                android:ellipsize="end"
-                android:paddingStart="2dp"
-                android:paddingEnd="2dp"
-                android:paddingTop="0.5dp"
-                android:paddingBottom="0.5dp"
-                android:includeFontPadding="false"
-                android:visibility="gone" />
-        </LinearLayout>
+                <ImageView
+                    android:id="@+id/widget_full_calendar_summary_2"
+                    android:layout_width="match_parent"
+                    android:layout_height="3dp"
+                    android:layout_marginBottom="2dp"
+                    android:src="@drawable/widget_item_background"
+                    android:scaleType="fitXY"
+                    android:visibility="gone" />
 
+                <ImageView
+                    android:id="@+id/widget_full_calendar_summary_3"
+                    android:layout_width="match_parent"
+                    android:layout_height="3dp"
+                    android:src="@drawable/widget_item_background"
+                    android:scaleType="fitXY"
+                    android:visibility="gone" />
+            </LinearLayout>
+        </FrameLayout>
     </LinearLayout>
-
 </FrameLayout>

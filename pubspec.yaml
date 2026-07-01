@@ -4,7 +4,7 @@ description: "A new Flutter project."
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
-version: 1.1.6+30
+version: 0.1.19+48
 
 environment:
   sdk: ^3.10.0
@@ -41,6 +41,7 @@ dependencies:
   firebase_crashlytics: ^5.2.3
   firebase_analytics: ^12.4.2
   google_sign_in: ^7.2.0
+  http: ^1.2.1
   device_calendar: ^4.3.2
   permission_handler: ^12.0.1
   dynamic_color: ^1.8.1
@@ -103,6 +104,11 @@ flutter:
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
+  web:
+    generate: true
+    image_path: "assets/images/logo.png"
+    background_color: "#0F172A"
+    theme_color: "#6366F1"
   image_path: "assets/images/logo.png"
   # For details regarding adding assets from package dependencies, see
   # https://flutter.dev/to/asset-from-package

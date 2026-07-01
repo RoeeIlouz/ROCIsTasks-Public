@@ -98,6 +98,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint('LoginScreen: build called');
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       body: Center(

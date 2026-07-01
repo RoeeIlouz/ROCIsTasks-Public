@@ -24,6 +24,7 @@ class TaskAdapter extends TypeAdapter<Task> {
       dueDate: fields[4] as DateTime?,
       priority: fields[5] as TaskPriority,
       categoryId: fields[6] as String?,
+      categoryIds: (fields[19] as List?)?.cast<String>(),
       isDeleted: fields[7] as bool?,
       isPinned: fields[8] as bool?,
       subTasks: (fields[9] as List?)?.cast<SubTask>(),
@@ -35,13 +36,14 @@ class TaskAdapter extends TypeAdapter<Task> {
       calendarEventId: fields[15] as String?,
       calendarId: fields[16] as String?,
       attachmentPaths: (fields[17] as List?)?.cast<String>(),
+      skipReminders: fields[18] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, Task obj) {
     writer
-      ..writeByte(18)
+      ..writeByte(20)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -56,6 +58,8 @@ class TaskAdapter extends TypeAdapter<Task> {
       ..write(obj.priority)
       ..writeByte(6)
       ..write(obj.categoryId)
+      ..writeByte(19)
+      ..write(obj.categoryIds)
       ..writeByte(7)
       ..write(obj.isDeleted)
       ..writeByte(8)
@@ -77,7 +81,9 @@ class TaskAdapter extends TypeAdapter<Task> {
       ..writeByte(16)
       ..write(obj.calendarId)
       ..writeByte(17)
-      ..write(obj.attachmentPaths);
+      ..write(obj.attachmentPaths)
+      ..writeByte(18)
+      ..write(obj.skipReminders);
   }
 
   @override

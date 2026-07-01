@@ -16,7 +16,7 @@ import 'package:rocis_tasks/features/tasks/presentation/widgets/task_unlock_dial
 
 class TaskTile extends StatelessWidget {
   final Task task;
-  final Category? category;
+  final List<Category> categories;
   final VoidCallback onToggle;
   final VoidCallback onDelete;
   final VoidCallback? onTap;
@@ -29,7 +29,7 @@ class TaskTile extends StatelessWidget {
   const TaskTile({
     super.key,
     required this.task,
-    this.category,
+    this.categories = const [],
     required this.onToggle,
     required this.onDelete,
     this.onTap,
@@ -75,8 +75,8 @@ class TaskTile extends StatelessWidget {
 
     final bool shouldMaskPrivate =
         (subscriptionService?.isPremium ?? false) &&
-        (privateModeService?.shouldHidePrivateContent ?? false) &&
-        (category?.isPrivate == true);
+        (privateModeService?.hasPin ?? false) &&
+        (categories.any((c) => c.isPrivate));
 
     return Dismissible(
       key: Key(task.id),
@@ -103,7 +103,7 @@ class TaskTile extends StatelessWidget {
       child: shouldMaskPrivate
           ? _MaskedPrivateTaskTile(
               title: l10n.privateTask,
-              category: category,
+              categories: categories,
               dueDate: task.dueDate,
               priority: task.priority,
               isSelected: isSelected,
@@ -111,265 +111,232 @@ class TaskTile extends StatelessWidget {
               onLongPress: onLongPress,
               isSelectionMode: isSelectionMode,
             )
-          : Container(
+          : GlassContainer(
         margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? (category != null
-                  ? Color(category!.colorValue).withValues(alpha: 0.1)
-                  : theme.colorScheme.primaryContainer)
-              : theme.cardTheme.color,
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(
-            color: isSelected
-                ? (category != null
-                    ? Color(category!.colorValue)
-                    : theme.colorScheme.primary)
-                : (theme.brightness == Brightness.light
-                    ? Colors.grey.withValues(alpha: 0.1)
-                    : Colors.white.withValues(alpha: 0.05)),
-            width: isSelected ? 2 : 1,
+        isSelected: isSelected,
+        selectedBorderColor: categories.isNotEmpty ? Color(categories.first.colorValue) : theme.colorScheme.primary,
+        color: isSelected 
+            ? (categories.isNotEmpty ? Color(categories.first.colorValue) : theme.colorScheme.primary)
+            : null,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 10,
           ),
-          boxShadow: [
-            BoxShadow(
-              color: isSelected
-                  ? (category != null
-                          ? Color(category!.colorValue)
-                          : theme.colorScheme.primary)
-                      .withValues(alpha: 0.05)
-                  : Colors.black.withValues(alpha: 0.03),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: IntrinsicHeight(
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Category Color Edge
-              if (category != null)
-                Container(width: 6, color: Color(category!.colorValue)),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 10,
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 2),
-                        child: GestureDetector(
-                          onTap: isSelectionMode
-                              ? () => onLongPress?.call()
-                              : () {
-                                  HapticFeedback.lightImpact();
-                                  onToggle();
-                                },
-                          child: Semantics(
-                            label: isSelectionMode
-                                ? (isSelected ? 'Selected' : 'Not selected')
-                                : (task.isCompleted
-                                    ? l10n.markAsIncomplete
-                                    : l10n.markAsComplete),
-                            checked: isSelectionMode ? isSelected : task.isCompleted,
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 300),
-                              width: 28,
-                              height: 28,
-                              decoration: BoxDecoration(
-                                color: (isSelectionMode ? isSelected : task.isCompleted)
-                                    ? (category != null
-                                        ? Color(category!.colorValue)
-                                        : theme.colorScheme.primary)
-                                    : Colors.transparent,
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(
-                                  color: (isSelectionMode ? isSelected : task.isCompleted)
-                                      ? Colors.transparent
-                                      : (category != null
-                                              ? Color(category!.colorValue)
-                                              : theme.colorScheme.primary)
-                                          .withValues(alpha: 0.5),
-                                  width: 2,
-                                ),
-                              ),
-                              child: (isSelectionMode ? isSelected : task.isCompleted)
-                                  ? const Icon(
-                                      Icons.check,
-                                      color: Colors.white,
-                                      size: 18,
-                                    )
-                                  : null,
-                            ),
-                          ),
+              Padding(
+                padding: const EdgeInsets.only(top: 2),
+                child: GestureDetector(
+                  onTap: isSelectionMode
+                      ? () => onLongPress?.call()
+                      : () {
+                          if (themeService.taskCompletionFeedback) {
+                            // Stronger impact when completing, lighter when un-completing
+                            if (!task.isCompleted) {
+                              HapticFeedback.mediumImpact();
+                            } else {
+                              HapticFeedback.lightImpact();
+                            }
+                          }
+                          onToggle();
+                        },
+                  child: Semantics(
+                    label: isSelectionMode
+                        ? (isSelected ? 'Selected' : 'Not selected')
+                        : (task.isCompleted
+                            ? l10n.markAsIncomplete
+                            : l10n.markAsComplete),
+                    checked: isSelectionMode ? isSelected : task.isCompleted,
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      width: 28,
+                      height: 28,
+                      decoration: BoxDecoration(
+                        color: (isSelectionMode ? isSelected : task.isCompleted)
+                            ? (categories.isNotEmpty
+                                ? Color(categories.first.colorValue)
+                                : theme.colorScheme.primary)
+                            : Colors.transparent,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: (isSelectionMode ? isSelected : task.isCompleted)
+                              ? Colors.transparent
+                              : (categories.isNotEmpty
+                                      ? Color(categories.first.colorValue)
+                                      : theme.colorScheme.primary)
+                                  .withValues(alpha: 0.5),
+                          width: 2,
                         ),
                       ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: InkWell(
-                          onTap: isSelectionMode ? onLongPress : onTap,
-                          onLongPress: onLongPress,
-                          borderRadius: BorderRadius.circular(12),
-                          child: Semantics(
-                            label: '${l10n.tasks}: ${task.title}',
-                            hint: l10n.editTaskDetailsHint,
-                            container: true,
-                            child: Padding(
-                              padding: const EdgeInsets.all(4.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Row(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      Flexible(
-                                        child: Text(
-                                          task.title,
-                                          style: theme.textTheme.titleMedium
-                                              ?.copyWith(
-                                                fontWeight: FontWeight.bold,
-                                                color: task.isCompleted
-                                                    ? theme.disabledColor
-                                                    : theme.colorScheme.onSurface,
-                                                decoration: task.isCompleted
-                                                    ? TextDecoration.lineThrough
-                                                    : null,
-                                              ),
-                                        ),
-                                      ),
-                                      if (task.syncWithGoogleCalendar) ...[
-                                        const SizedBox(width: 6),
-                                        const _GCalendarBadge(),
-                                      ],
-                                    ],
-                                  ),
-                                  if (task.description.isNotEmpty) ...[
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      task.description,
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: theme.textTheme.bodySmall
-                                          ?.copyWith(
-                                            color: theme.colorScheme.onSurface
-                                                .withValues(alpha: 0.6),
-                                            height: 1.4,
-                                          ),
-                                    ),
-                                  ],
-                                  if (task.subTasks != null &&
-                                      task.subTasks!.isNotEmpty) ...[
-                                    const SizedBox(height: 8),
-                                    _buildSubTasksList(context),
-                                  ],
-                                  const SizedBox(height: 12),
-                                  Row(
-                                    children: [
-                                      if (category != null) ...[
-                                        _buildChip(
-                                          context,
-                                          icon: IconUtils.getIconData(
-                                            category!.iconCode,
-                                          ),
-                                          label: category!.name,
-                                          color: Color(category!.colorValue),
-                                        ),
-                                        const SizedBox(width: 8),
-                                      ],
-                                      if (task.dueDate != null)
-                                        _buildChip(
-                                          context,
-                                          icon: Icons.access_time_rounded,
-                                          label: themeService.use24HourFormat
-                                              ? _timeFormat24.format(
-                                                  task.dueDate!,
-                                                )
-                                              : _timeFormat12.format(
-                                                  task.dueDate!,
-                                                ),
-                                          color: (!task.isCompleted &&
-                                                  task.dueDate!.isBefore(
-                                                    DateTime.now(),
-                                                  ))
-                                              ? theme.colorScheme.error
-                                              : theme.colorScheme.primary,
-                                        ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          if (enablePin)
-                            Semantics(
-                              label: (task.isPinned ?? false)
-                                  ? l10n.unpinTask
-                                  : l10n.pinTask,
-                              button: true,
-                              child: IconButton(
-                                icon: Icon(
-                                  (task.isPinned ?? false)
-                                      ? Icons.push_pin
-                                      : Icons.push_pin_outlined,
-                                  size: 20,
-                                  color: (task.isPinned ?? false)
-                                      ? theme.colorScheme.primary
-                                      : theme.disabledColor,
-                                ),
-                                onPressed: () {
-                                  HapticFeedback.lightImpact();
-                                  Provider.of<TaskProvider>(
-                                    context,
-                                    listen: false,
-                                  ).toggleTaskPin(task);
-                                },
-                                constraints: const BoxConstraints(),
-                                padding: EdgeInsets.zero,
-                              ),
+                      child: (isSelectionMode ? isSelected : task.isCompleted)
+                          ? const Icon(
+                              Icons.check,
+                              color: Colors.white,
+                              size: 18,
                             )
-                          else
-                            const SizedBox(height: 40),
-                          Semantics(
-                            label: '${l10n.priority}: ${task.priority.name}',
-                            child: Container(
-                              width: 10,
-                              height: 10,
-                              margin: const EdgeInsets.only(bottom: 4),
-                              decoration: BoxDecoration(
-                                color: _getPriorityColor(
-                                  context,
-                                  task.priority,
+                          : null,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: InkWell(
+                  onTap: isSelectionMode ? onLongPress : onTap,
+                  onLongPress: onLongPress,
+                  borderRadius: BorderRadius.circular(12),
+                  child: Semantics(
+                    label: '${l10n.tasks}: ${task.title}',
+                    hint: l10n.editTaskDetailsHint,
+                    container: true,
+                    child: Padding(
+                      padding: const EdgeInsets.all(4.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Flexible(
+                                child: Text(
+                                  task.title,
+                                  style: theme.textTheme.titleMedium
+                                      ?.copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        color: task.isCompleted
+                                            ? theme.disabledColor
+                                            : theme.colorScheme.onSurface,
+                                        decoration: task.isCompleted
+                                            ? TextDecoration.lineThrough
+                                            : null,
+                                      ),
                                 ),
-                                shape: BoxShape.circle,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: _getPriorityColor(
-                                      context,
-                                      task.priority,
-                                    ).withValues(alpha: 0.4),
-                                    blurRadius: 6,
-                                    spreadRadius: 1,
-                                  ),
-                                ],
                               ),
+                              if (task.syncWithGoogleCalendar) ...[
+                                const SizedBox(width: 6),
+                                const _GCalendarBadge(),
+                              ],
+                            ],
+                          ),
+                          if (task.description.isNotEmpty) ...[
+                            const SizedBox(height: 8),
+                            Text(
+                              task.description,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: theme.textTheme.bodySmall
+                                  ?.copyWith(
+                                    color: theme.colorScheme.onSurface
+                                        .withValues(alpha: 0.6),
+                                    height: 1.4,
+                                  ),
                             ),
+                          ],
+                          if (task.subTasks != null &&
+                              task.subTasks!.isNotEmpty) ...[
+                            const SizedBox(height: 8),
+                            _buildSubTasksList(context),
+                          ],
+                          const SizedBox(height: 12),
+                          Wrap(
+                            spacing: 6,
+                            runSpacing: 4,
+                            children: [
+                              ...categories.map((c) => _buildChip(
+                                context,
+                                icon: IconUtils.getIconData(c.iconCode),
+                                label: c.name,
+                                color: Color(c.colorValue),
+                              )),
+                              if (task.dueDate != null)
+                                _buildChip(
+                                  context,
+                                  icon: Icons.access_time_rounded,
+                                  label: themeService.use24HourFormat
+                                      ? _timeFormat24.format(
+                                          task.dueDate!,
+                                        )
+                                      : _timeFormat12.format(
+                                          task.dueDate!,
+                                        ),
+                                  color: (!task.isCompleted &&
+                                          task.dueDate!.isBefore(
+                                            DateTime.now(),
+                                          ))
+                                      ? theme.colorScheme.error
+                                      : theme.colorScheme.primary,
+                                ),
+                            ],
                           ),
                         ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
+              ),
+              const SizedBox(width: 16),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (enablePin)
+                    Semantics(
+                      label: (task.isPinned ?? false)
+                          ? l10n.unpinTask
+                          : l10n.pinTask,
+                      button: true,
+                      child: IconButton(
+                        icon: Icon(
+                          (task.isPinned ?? false)
+                              ? Icons.push_pin
+                              : Icons.push_pin_outlined,
+                          size: 20,
+                          color: (task.isPinned ?? false)
+                              ? theme.colorScheme.primary
+                              : theme.disabledColor,
+                        ),
+                        onPressed: () {
+                          HapticFeedback.lightImpact();
+                          Provider.of<TaskProvider>(
+                            context,
+                            listen: false,
+                          ).toggleTaskPin(task);
+                        },
+                        constraints: const BoxConstraints(),
+                        padding: EdgeInsets.zero,
+                      ),
+                    )
+                  else
+                    const SizedBox(height: 40),
+                  const SizedBox(height: 12),
+                  Semantics(
+                    label: '${l10n.priority}: ${task.priority.name}',
+                    child: Container(
+                      width: 10,
+                      height: 10,
+                      decoration: BoxDecoration(
+                        color: _getPriorityColor(
+                          context,
+                          task.priority,
+                        ),
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: _getPriorityColor(
+                              context,
+                              task.priority,
+                            ).withValues(alpha: 0.4),
+                            blurRadius: 6,
+                            spreadRadius: 1,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -428,8 +395,8 @@ class TaskTile extends StatelessWidget {
                       : Icons.check_box_outline_blank_rounded,
                   size: 16,
                   color: subTask.isCompleted
-                      ? (category != null
-                            ? Color(category!.colorValue)
+                      ? (categories.isNotEmpty
+                            ? Color(categories.first.colorValue)
                             : theme.colorScheme.primary)
                       : theme.disabledColor,
                 ),
@@ -458,7 +425,7 @@ class TaskTile extends StatelessWidget {
 
 class _MaskedPrivateTaskTile extends StatelessWidget {
   final String title;
-  final Category? category;
+  final List<Category> categories;
   final DateTime? dueDate;
   final TaskPriority priority;
   final bool isSelected;
@@ -471,7 +438,7 @@ class _MaskedPrivateTaskTile extends StatelessWidget {
 
   const _MaskedPrivateTaskTile({
     required this.title,
-    required this.category,
+    required this.categories,
     required this.dueDate,
     required this.priority,
     required this.isSelected,
@@ -513,30 +480,11 @@ class _MaskedPrivateTaskTile extends StatelessWidget {
     final themeService = Provider.of<ThemeService>(context, listen: false);
     final priorityColor = _getPriorityColor(priority);
 
-    return Container(
+    return GlassContainer(
       margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-      decoration: BoxDecoration(
-        color: isSelected ? theme.colorScheme.primaryContainer : theme.cardTheme.color,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: isSelected
-              ? theme.colorScheme.primary
-              : (theme.brightness == Brightness.light
-                  ? Colors.grey.withValues(alpha: 0.1)
-                  : Colors.white.withValues(alpha: 0.05)),
-          width: isSelected ? 2 : 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: isSelected
-                ? theme.colorScheme.primary.withValues(alpha: 0.05)
-                : Colors.black.withValues(alpha: 0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      clipBehavior: Clip.antiAlias,
+      isSelected: isSelected,
+      selectedBorderColor: theme.colorScheme.primary,
+      color: isSelected ? theme.colorScheme.primary : null,
       child: InkWell(
         onTap: () => _handleTap(context),
         onLongPress: onLongPress,
@@ -568,38 +516,36 @@ class _MaskedPrivateTaskTile extends StatelessWidget {
                     const SizedBox(height: 10),
                     Row(
                       children: [
-                        if (category != null) ...[
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Color(category!.colorValue).withValues(alpha: 0.10),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  IconUtils.getIconData(category!.iconCode),
-                                  size: 12,
-                                  color: Color(category!.colorValue),
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  category!.name,
-                                  style: GoogleFonts.outfit(
-                                    color: Color(category!.colorValue),
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
+                        ...categories.map((c) => Container(
+                          margin: const EdgeInsets.only(right: 8),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
                           ),
-                          const SizedBox(width: 8),
-                        ],
+                          decoration: BoxDecoration(
+                            color: Color(c.colorValue).withValues(alpha: 0.10),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                IconUtils.getIconData(c.iconCode),
+                                size: 12,
+                                color: Color(c.colorValue),
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                c.name,
+                                style: GoogleFonts.outfit(
+                                  color: Color(c.colorValue),
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        )),
                         if (dueDate != null)
                           Container(
                             padding: const EdgeInsets.symmetric(

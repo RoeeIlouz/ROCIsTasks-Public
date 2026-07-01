@@ -33,8 +33,9 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   late TextEditingController _titleController;
   late TextEditingController _descriptionController;
   DateTime? _selectedDate;
+  bool _dateCleared = false;
   TaskPriority _priority = TaskPriority.medium;
-  String? _category;
+  List<String> _selectedCategoryIds = [];
   ui.TextDirection _titleDirection = ui.TextDirection.ltr;
   ui.TextDirection _descriptionDirection = ui.TextDirection.ltr;
   List<SubTask> _subTasks = [];
@@ -42,6 +43,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   NlpResult? _nlpSuggestion;
   bool _requireSubTasksBeforeReminders = false;
   bool _syncWithGoogleCalendar = false;
+  bool _skipReminders = false;
   List<String> _attachmentPaths = [];
 
   @override
@@ -53,7 +55,10 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     );
     _selectedDate = widget.task?.dueDate;
     _priority = widget.task?.priority ?? TaskPriority.medium;
-    _category = widget.task?.categoryId;
+    _selectedCategoryIds = widget.task?.categoryIds.toList() ?? [];
+    if (_selectedCategoryIds.isEmpty && widget.task?.categoryId != null) {
+      _selectedCategoryIds.add(widget.task!.categoryId!);
+    }
     _titleDirection = _getTextDirection(_titleController.text);
     _descriptionDirection = _getTextDirection(_descriptionController.text);
     _subTasks =
@@ -64,6 +69,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     _requireSubTasksBeforeReminders =
         widget.task?.requireSubTasksBeforeReminders ?? false;
     _syncWithGoogleCalendar = widget.task?.syncWithGoogleCalendar ?? false;
+    _skipReminders = widget.task?.skipReminders ?? false;
     _attachmentPaths = List<String>.from(widget.task?.attachmentPaths ?? const []);
   }
 
@@ -167,12 +173,15 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
             title: sanitizedTitle,
             description: sanitizedDescription,
             dueDate: _selectedDate,
+            clearDueDate: _dateCleared,
             priority: _priority,
-            categoryId: _category,
+            categoryId: _selectedCategoryIds.isNotEmpty ? _selectedCategoryIds.first : null,
+            categoryIds: _selectedCategoryIds,
             subTasks: _subTasks,
             requireSubTasksBeforeReminders: _requireSubTasksBeforeReminders,
             syncWithGoogleCalendar: _syncWithGoogleCalendar,
             attachmentPaths: _attachmentPaths,
+            skipReminders: _skipReminders,
           );
         } else {
           Provider.of<TaskProvider>(context, listen: false).addTask(
@@ -180,11 +189,13 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
             sanitizedDescription,
             _selectedDate,
             _priority,
-            _category,
+            _selectedCategoryIds.isNotEmpty ? _selectedCategoryIds.first : null,
+            categoryIds: _selectedCategoryIds,
             subTasks: _subTasks,
             requireSubTasksBeforeReminders: _requireSubTasksBeforeReminders,
             syncWithGoogleCalendar: _syncWithGoogleCalendar,
             attachmentPaths: _attachmentPaths,
+            skipReminders: _skipReminders,
           );
         }
         HapticFeedback.mediumImpact();
@@ -404,16 +415,11 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                 child: InkWell(
                   onTap: () => _selectDate(context),
                   borderRadius: BorderRadius.circular(16),
-                  child: Container(
+                  child: GlassContainer(
+                    borderRadius: BorderRadius.circular(16),
                     padding: const EdgeInsets.symmetric(
                       horizontal: 16,
                       vertical: 14,
-                    ),
-                    decoration: BoxDecoration(
-                      color: theme.brightness == Brightness.light
-                          ? Colors.grey.withValues(alpha: 0.05)
-                          : Colors.white.withValues(alpha: 0.05),
-                      borderRadius: BorderRadius.circular(16),
                     ),
                     child: Row(
                       children: [
@@ -446,6 +452,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                               onTap: () {
                                 setState(() {
                                   _selectedDate = null;
+                                  _dateCleared = true;
                                 });
                               },
                               child: Icon(
@@ -505,6 +512,27 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                 },
               ),
               const SizedBox(height: 24),
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                secondary: Icon(
+                  _skipReminders
+                      ? Icons.notifications_off_rounded
+                      : Icons.notifications_rounded,
+                ),
+                title: Text(
+                  l10n.doNotRemind,
+                  style: GoogleFonts.outfit(fontWeight: FontWeight.w600),
+                ),
+                subtitle: Text(
+                  l10n.doNotRemindSubtitle,
+                  style: GoogleFonts.outfit(fontSize: 13),
+                ),
+                value: _skipReminders,
+                onChanged: (value) {
+                  setState(() => _skipReminders = value);
+                },
+              ),
+              const SizedBox(height: 24),
               Text(
                 l10n.category,
                 style: GoogleFonts.outfit(
@@ -517,52 +545,45 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
               Consumer<TaskProvider>(
                 builder: (context, provider, child) {
                   final categories = provider.categories;
-                  return DropdownButtonFormField<String>(
-                    initialValue: categories.any((c) => c.id == _category)
-                        ? _category
-                        : null,
-                    style: GoogleFonts.outfit(
-                      color: theme.colorScheme.onSurface,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    decoration: SharedInputDecorations.getFieldDecoration(
-                      label: '',
-                      prefixIcon: Icons.category_outlined,
-                      theme: theme,
-                    ),
-                    items: [
-                      DropdownMenuItem<String>(
-                        value: null,
-                        child: Text(
-                          l10n.noCategory,
-                          style: GoogleFonts.outfit(),
-                        ),
-                      ),
-                      ...categories.map((category) {
-                        return DropdownMenuItem(
-                          value: category.id,
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 12,
-                                height: 12,
-                                decoration: BoxDecoration(
-                                  color: Color(category.colorValue),
-                                  shape: BoxShape.circle,
-                                ),
+                  if (categories.isEmpty) {
+                    return Text(
+                      l10n.noCategory,
+                      style: GoogleFonts.outfit(color: theme.colorScheme.onSurfaceVariant),
+                    );
+                  }
+                  return Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: categories.map((category) {
+                      final isSelected = _selectedCategoryIds.contains(category.id);
+                      return FilterChip(
+                        selected: isSelected,
+                        label: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              width: 12,
+                              height: 12,
+                              decoration: BoxDecoration(
+                                color: Color(category.colorValue),
+                                shape: BoxShape.circle,
                               ),
-                              const SizedBox(width: 12),
-                              Text(category.name, style: GoogleFonts.outfit()),
-                            ],
-                          ),
-                        );
-                      }),
-                    ],
-                    onChanged: (value) {
-                      setState(() {
-                        _category = value;
-                      });
-                    },
+                            ),
+                            const SizedBox(width: 8),
+                            Text(category.name, style: GoogleFonts.outfit()),
+                          ],
+                        ),
+                        onSelected: (selected) {
+                          setState(() {
+                            if (selected) {
+                              _selectedCategoryIds.add(category.id);
+                            } else {
+                              _selectedCategoryIds.remove(category.id);
+                            }
+                          });
+                        },
+                      );
+                    }).toList(),
                   );
                 },
               ),

@@ -1,4 +1,4 @@
-﻿{
+{
   "@@locale": "ar",
   "appTitle": "مهام ROCI",
   "settings": "الإعدادات",
@@ -341,5 +341,16 @@
   "biometricAuthReason": "الرجاء تأكيد الهوية للوصول للمهام الخاصة",
   "usePinInstead": "استخدام رمز PIN بدلاً من ذلك",
   "securitySettings": "إعدادات الأمان",
-  "securitySettingsSubtitle": "إدارة الوصول عبر رمز PIN والبصمة البيومترية"
+  "securitySettingsSubtitle": "إدارة الوصول عبر رمز PIN والبصمة البيومترية",
+  "enableSecurity": "تفعيل الأمان",
+  "enableSecurityDescription": "لقد أنشأت مهمة خاصة. قم بإعداد رمز PIN أو البيومتريا لحماية محتواك الخاص.",
+  "notNow": "ليس الآن",
+  "setUp": "إعداد",
+  "doNotRemind": "لا تذكرني",
+  "doNotRemindSubtitle": "تعطيل جميع الإشعارات لهذه المهمة",
+  "glassmorphismEffects": "تأثيرات الزجاج البلوري",
+  "glassmorphismEffectsSubtitle": "تطبيق تأثير الزجاج البلوري على البطاقات",
+  "noEventsForThisDay": "لا توجد فعاليات لهذا اليوم",
+  "searchSymbols": "رموز البحث",
+  "searchSymbolsDesc": "استخدم الرموز لتصفية المهام: @فئة (مثلاً @عمل)، #عنوان (مثلاً #اجتماع)، !أولوية (مثلاً !عالية)، %تاريخ (مثلاً %2025-06-15)، &مهمة فرعية (مثلاً &إصلاح خطأ)، *حالة (*منجز أو *معلق)، ? (مهام اليوم). يمكن دمج عدة رموز."
 }

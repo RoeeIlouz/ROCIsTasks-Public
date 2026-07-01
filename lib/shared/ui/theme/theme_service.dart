@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class ThemeService extends ChangeNotifier {
   ThemeMode _themeMode = ThemeMode.system;
 
   bool _useMaterialTheme = true;
   bool _useAmoledTheme = false;
+  bool _useGlassmorphism = false;
   bool _use24HourFormat = false;
   bool _autoRemoveNlpDates = true;
+  bool _taskCompletionFeedback = true;
   Locale? _locale;
   bool _useCustomSeedColor = false;
   int? _customSeedColorValue;
@@ -15,8 +18,10 @@ class ThemeService extends ChangeNotifier {
   ThemeMode get themeMode => _themeMode;
   bool get useMaterialTheme => _useMaterialTheme;
   bool get useAmoledTheme => _useAmoledTheme;
+  bool get useGlassmorphism => !kIsWeb && _useGlassmorphism;
   bool get use24HourFormat => _use24HourFormat;
   bool get autoRemoveNlpDates => _autoRemoveNlpDates;
+  bool get taskCompletionFeedback => _taskCompletionFeedback;
   Locale? get locale => _locale;
   bool get useCustomSeedColor => _useCustomSeedColor;
   int? get customSeedColorValue => _customSeedColorValue;
@@ -30,12 +35,16 @@ class ThemeService extends ChangeNotifier {
     }
     // Load Material Theme
     _useMaterialTheme = prefs.getBool('use_material_theme') ?? true;
+    // Load Glassmorphism Theme
+    _useGlassmorphism = prefs.getBool('use_glassmorphism') ?? false;
     // Load AMOLED Theme
     _useAmoledTheme = prefs.getBool('use_amoled_theme') ?? false;
     // Load 24h format
     _use24HourFormat = prefs.getBool('use_24h_format') ?? false;
     // Load NLP settings
     _autoRemoveNlpDates = prefs.getBool('auto_remove_nlp_dates') ?? true;
+    // Load task completion feedback
+    _taskCompletionFeedback = prefs.getBool('task_completion_feedback') ?? true;
     // Load Locale
     final languageCode = prefs.getString('language_code');
     if (languageCode != null) {
@@ -88,6 +97,13 @@ class ThemeService extends ChangeNotifier {
     await prefs.setBool('use_material_theme', _useMaterialTheme);
   }
 
+  Future<void> toggleGlassmorphism(bool value) async {
+    _useGlassmorphism = value;
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('use_glassmorphism', _useGlassmorphism);
+  }
+
   Future<void> toggleAmoledTheme(bool value) async {
     _useAmoledTheme = value;
     notifyListeners();
@@ -107,6 +123,13 @@ class ThemeService extends ChangeNotifier {
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('auto_remove_nlp_dates', _autoRemoveNlpDates);
+  }
+
+  Future<void> toggleTaskCompletionFeedback(bool value) async {
+    _taskCompletionFeedback = value;
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('task_completion_feedback', _taskCompletionFeedback);
   }
 
   Future<void> setLocale(Locale? locale) async {

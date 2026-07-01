@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:rocis_tasks/core/services/calendar_color_service.dart';
 import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
+import 'package:rocis_tasks/shared/ui/widgets/glass_container.dart';
 
 class CalendarColoringSheet extends StatelessWidget {
   const CalendarColoringSheet({super.key});
@@ -12,12 +13,10 @@ class CalendarColoringSheet extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final taskProvider = Provider.of<TaskProvider>(context, listen: false);
 
-    return Container(
+    return GlassContainer(
+      opacity: 0.9,
+      borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       padding: const EdgeInsets.only(top: 16, bottom: 24),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-      ),
       child: Consumer<CalendarColorService>(
         builder: (context, colorService, _) => Column(
           mainAxisSize: MainAxisSize.min,

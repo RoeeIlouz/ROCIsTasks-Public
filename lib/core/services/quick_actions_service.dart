@@ -1,5 +1,6 @@
 import 'package:quick_actions/quick_actions.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
 import 'package:rocis_tasks/features/tasks/presentation/screens/add_task_screen.dart';
@@ -12,6 +13,7 @@ class QuickActionsService {
   final QuickActions _quickActions = const QuickActions();
 
   void initialize(BuildContext context) {
+    if (kIsWeb) return;
     _quickActions.initialize((String shortcutType) {
       _handleShortcut(context, shortcutType);
     });

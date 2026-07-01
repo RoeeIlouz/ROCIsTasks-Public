@@ -996,4 +996,41 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get securitySettingsSubtitle =>
       'PIN- und biometrischen Zugriff verwalten';
+
+  @override
+  String get enableSecurity => 'Sicherheit aktivieren';
+
+  @override
+  String get enableSecurityDescription =>
+      'Sie haben gerade eine private Aufgabe erstellt. Richten Sie eine PIN oder Biometrie ein, um Ihre privaten Daten zu schützen.';
+
+  @override
+  String get notNow => 'Nicht jetzt';
+
+  @override
+  String get setUp => 'Einrichten';
+
+  @override
+  String get doNotRemind => 'Nicht erinnern';
+
+  @override
+  String get doNotRemindSubtitle =>
+      'Alle Benachrichtigungen für diese Aufgabe unterdrücken';
+
+  @override
+  String get glassmorphismEffects => 'Glassmorphismus-Effekte';
+
+  @override
+  String get glassmorphismEffectsSubtitle =>
+      'Milchglaseffekt auf Karten anwenden';
+
+  @override
+  String get noEventsForThisDay => 'Keine Ereignisse für diesen Tag';
+
+  @override
+  String get searchSymbols => 'Suchsymbole';
+
+  @override
+  String get searchSymbolsDesc =>
+      'Verwenden Sie Symbole zum Filtern von Aufgaben: @Kategorie (z.B. @Arbeit), #Titel (z.B. #Besprechung), !Priorität (z.B. !hoch), %Datum (z.B. %2025-06-15), &Unteraufgabe (z.B. &Bugfix), !Status (*erledigt oder *ausstehend), ? (Aufgaben heute). Kombinieren Sie mehrere Symbole.';
 }

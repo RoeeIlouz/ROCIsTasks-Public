@@ -36,14 +36,17 @@ void main() {
 
     when(() => mockThemeService.use24HourFormat).thenReturn(true);
     when(() => mockThemeService.isDarkMode).thenReturn(false);
+    when(() => mockThemeService.useGlassmorphism).thenReturn(true);
+    when(() => mockThemeService.taskCompletionFeedback).thenReturn(false);
     when(() => mockSubscriptionService.isPremium).thenReturn(true);
     when(() => mockPrivateModeService.shouldHidePrivateContent)
         .thenReturn(false);
+    when(() => mockPrivateModeService.hasPin).thenReturn(false);
   });
 
   Widget createWidgetUnderTest(
     Task task, {
-    Category? category,
+    List<Category> categories = const [],
     VoidCallback? onToggle,
     VoidCallback? onDelete,
     VoidCallback? onTap,
@@ -73,7 +76,7 @@ void main() {
         home: Scaffold(
           body: TaskTile(
             task: task,
-            category: category,
+            categories: categories,
             onToggle: onToggle ?? () {},
             onDelete: onDelete ?? () {},
             onTap: onTap ?? () {},
@@ -153,7 +156,7 @@ void main() {
         iconCode: 0xe06f,
       );
       await tester.pumpWidget(
-        createWidgetUnderTest(task, category: category),
+        createWidgetUnderTest(task, categories: [category]),
       );
       expect(find.text('With Category'), findsOneWidget);
     });
@@ -269,6 +272,7 @@ void main() {
       when(() => mockSubscriptionService.isPremium).thenReturn(true);
       when(() => mockPrivateModeService.shouldHidePrivateContent)
           .thenReturn(true);
+      when(() => mockPrivateModeService.hasPin).thenReturn(true);
 
       final task = Task(id: '1', title: 'Secret Task');
       final category = Category(
@@ -279,7 +283,7 @@ void main() {
         isPrivate: true,
       );
       await tester.pumpWidget(
-        createWidgetUnderTest(task, category: category),
+        createWidgetUnderTest(task, categories: [category]),
       );
       // Should show the private task label instead of actual title
       expect(find.byIcon(Icons.lock_rounded), findsOneWidget);

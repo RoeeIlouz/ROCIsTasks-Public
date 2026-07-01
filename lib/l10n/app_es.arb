@@ -1,4 +1,4 @@
-﻿{
+{
   "appTitle": "Tareas de ROCI",
   "settings": "Configuración",
   "account": "Cuenta",
@@ -343,5 +343,16 @@
   "biometricAuthReason": "Autentíquese para acceder a tareas privadas",
   "usePinInstead": "Usar PIN en su lugar",
   "securitySettings": "Ajustes de Seguridad",
-  "securitySettingsSubtitle": "Administra el acceso con PIN y biometría"
+  "securitySettingsSubtitle": "Administra el acceso con PIN y biometría",
+  "enableSecurity": "Activar seguridad",
+  "enableSecurityDescription": "Acabas de crear una tarea privada. Configura un PIN o biometría para mantener tu contenido privado seguro.",
+  "notNow": "Ahora no",
+  "setUp": "Configurar",
+  "doNotRemind": "No recordar",
+  "doNotRemindSubtitle": "Suprimir todas las notificaciones de esta tarea",
+  "glassmorphismEffects": "Efectos de Glassmorphism",
+  "glassmorphismEffectsSubtitle": "Aplicar efecto de cristal esmerilado a las tarjetas",
+  "noEventsForThisDay": "No hay eventos para este día",
+  "searchSymbols": "Símbolos de búsqueda",
+  "searchSymbolsDesc": "Usa símbolos para filtrar tareas: @categoría (ej. @trabajo), #título (ej. #reunión), !prioridad (ej. !alta), %fecha (ej. %2025-06-15), &subtarea (ej. &corregir error), *estado (*hecho o *pendiente), ? (tareas de hoy). Combina varios símbolos."
 }

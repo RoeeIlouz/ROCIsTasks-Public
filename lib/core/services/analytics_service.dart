@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:rocis_tasks/core/config/app_config.dart';
 import 'package:rocis_tasks/core/services/logger_service.dart';
@@ -115,7 +116,12 @@ class AnalyticsService {
     String? osVersion;
 
     try {
-      if (Platform.isAndroid) {
+      if (kIsWeb) {
+        final webInfo = await deviceInfo.webBrowserInfo;
+        platform = 'web';
+        model = webInfo.browserName.name;
+        osVersion = webInfo.platform ?? 'unknown';
+      } else if (Platform.isAndroid) {
         final androidInfo = await deviceInfo.androidInfo;
         platform = 'android';
         model = androidInfo.model;

@@ -341,5 +341,16 @@
   "biometricAuthReason": "Authentifizieren, um auf private Aufgaben zuzugreifen",
   "usePinInstead": "Stattdessen PIN verwenden",
   "securitySettings": "Sicherheitseinstellungen",
-  "securitySettingsSubtitle": "PIN- und biometrischen Zugriff verwalten"
+  "securitySettingsSubtitle": "PIN- und biometrischen Zugriff verwalten",
+  "enableSecurity": "Sicherheit aktivieren",
+  "enableSecurityDescription": "Sie haben gerade eine private Aufgabe erstellt. Richten Sie eine PIN oder Biometrie ein, um Ihre privaten Daten zu schützen.",
+  "notNow": "Nicht jetzt",
+  "setUp": "Einrichten",
+  "doNotRemind": "Nicht erinnern",
+  "doNotRemindSubtitle": "Alle Benachrichtigungen für diese Aufgabe unterdrücken",
+  "glassmorphismEffects": "Glassmorphismus-Effekte",
+  "glassmorphismEffectsSubtitle": "Milchglaseffekt auf Karten anwenden",
+  "noEventsForThisDay": "Keine Ereignisse für diesen Tag",
+  "searchSymbols": "Suchsymbole",
+  "searchSymbolsDesc": "Verwenden Sie Symbole zum Filtern von Aufgaben: @Kategorie (z.B. @Arbeit), #Titel (z.B. #Besprechung), !Priorität (z.B. !hoch), %Datum (z.B. %2025-06-15), &Unteraufgabe (z.B. &Bugfix), !Status (*erledigt oder *ausstehend), ? (Aufgaben heute). Kombinieren Sie mehrere Symbole."
 }

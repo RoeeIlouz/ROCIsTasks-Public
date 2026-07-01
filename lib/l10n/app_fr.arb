@@ -341,5 +341,16 @@
   "biometricAuthReason": "S'authentifier pour accéder aux tâches privées",
   "usePinInstead": "Utiliser le code PIN à la place",
   "securitySettings": "Paramètres de sécurité",
-  "securitySettingsSubtitle": "Gérer l'accès par code PIN et biométrie"
+  "securitySettingsSubtitle": "Gérer l'accès par code PIN et biométrie",
+  "enableSecurity": "Activer la sécurité",
+  "enableSecurityDescription": "Vous venez de créer une tâche privée. Configurez un code PIN ou la biométrie pour protéger votre contenu privé.",
+  "notNow": "Pas maintenant",
+  "setUp": "Configurer",
+  "doNotRemind": "Ne pas rappeler",
+  "doNotRemindSubtitle": "Supprimer toutes les notifications pour cette tâche",
+  "glassmorphismEffects": "Effets de Glassmorphism",
+  "glassmorphismEffectsSubtitle": "Appliquer un effet verre dépoli aux cartes",
+  "noEventsForThisDay": "Aucun événement pour ce jour",
+  "searchSymbols": "Symboles de recherche",
+  "searchSymbolsDesc": "Utilisez des symboles pour filtrer les tâches : @catégorie (ex. @travail), #titre (ex. #réunion), !priorité (ex. !haute), %date (ex. %2025-06-15), &sous-tâche (ex. &correction bug), *statut (*fait ou *en cours), ? (tâches d'aujourd'hui). Combiner plusieurs symboles."
 }

@@ -7,6 +7,9 @@ import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:rocis_tasks/core/services/validation_service.dart';
 import 'package:rocis_tasks/core/utils/icon_utils.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:rocis_tasks/shared/ui/widgets/glass_container.dart';
+import 'package:rocis_tasks/shared/ui/theme/theme_service.dart';
+import 'package:rocis_tasks/shared/ui/widgets/easter_egg_spinner.dart';
 
 class CategoriesScreen extends StatelessWidget {
   const CategoriesScreen({super.key});
@@ -74,24 +77,9 @@ class CategoriesScreen extends StatelessWidget {
             itemCount: categories.length,
             itemBuilder: (context, index) {
               final category = categories[index];
-              return Container(
+              return GlassContainer(
                 margin: const EdgeInsets.only(bottom: 12),
-                decoration: BoxDecoration(
-                  color: theme.cardTheme.color,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: theme.brightness == Brightness.light
-                        ? Colors.grey.withValues(alpha: 0.1)
-                        : Colors.white.withValues(alpha: 0.05),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.02),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
+                borderRadius: BorderRadius.circular(20),
                 child: Semantics(
                   label: 'Category: ${category.name}',
                   hint: 'Double tap to edit category',
@@ -161,41 +149,75 @@ class CategoriesScreen extends StatelessWidget {
       floatingActionButton: Consumer<TaskProvider>(
         builder: (context, provider, child) {
           final isAtLimit = !provider.canAddCategory;
-          return FloatingActionButton.extended(
-            onPressed: () => _showCategorySheet(context),
-            icon: isAtLimit
-                ? const Icon(Icons.lock_rounded, size: 18)
-                : const Icon(Icons.add_rounded),
-            label: Row(
-              children: [
-                Text(
-                  l10n.addCategory,
-                  style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
-                ),
-                if (isAtLimit)
-                  Container(
-                    margin: const EdgeInsets.only(left: 8),
+          final theme = Theme.of(context);
+          final themeService = Provider.of<ThemeService>(context);
+          final subscriptionService = Provider.of<SubscriptionService>(context);
+          final useGlass = themeService.useGlassmorphism && subscriptionService.isPremium;
+
+          return EasterEggSpinner(
+            child: GlassContainer(
+              borderRadius: BorderRadius.circular(16),
+              elevation: 4.0,
+              color: useGlass 
+                  ? theme.colorScheme.primary.withValues(alpha: 0.15) 
+                  : theme.colorScheme.primary,
+              opacity: 0.15,
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () => _showCategorySheet(context),
+                  borderRadius: BorderRadius.circular(16),
+                  child: Padding(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 6,
-                      vertical: 2,
+                      horizontal: 16,
+                      vertical: 12,
                     ),
-                    decoration: BoxDecoration(
-                      color: Colors.amber.withValues(alpha: 0.3),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: const Text(
-                      'PRO',
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          isAtLimit ? Icons.lock_rounded : Icons.add_rounded,
+                          size: isAtLimit ? 18 : 24,
+                          color: useGlass 
+                              ? theme.colorScheme.primary 
+                              : theme.colorScheme.onPrimary,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          l10n.addCategory,
+                          style: GoogleFonts.outfit(
+                            fontWeight: FontWeight.bold,
+                            color: useGlass 
+                                ? theme.colorScheme.primary 
+                                : theme.colorScheme.onPrimary,
+                          ),
+                        ),
+                        if (isAtLimit) ...[
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.amber.withValues(alpha: 0.3),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: const Text(
+                              'PRO',
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
                     ),
                   ),
-              ],
-            ),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
+                ),
+              ),
             ),
           );
         },
@@ -284,18 +306,9 @@ class _CategorySheetState extends State<_CategorySheet> {
       listen: true,
     );
 
-    return Container(
-      decoration: BoxDecoration(
-        color: theme.scaffoldBackgroundColor,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 20,
-            offset: const Offset(0, -5),
-          ),
-        ],
-      ),
+    return GlassContainer(
+      opacity: 0.9,
+      borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom + 24,
         top: 12,

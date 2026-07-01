@@ -995,4 +995,41 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get securitySettingsSubtitle =>
       'Gérer l\'accès par code PIN et biométrie';
+
+  @override
+  String get enableSecurity => 'Activer la sécurité';
+
+  @override
+  String get enableSecurityDescription =>
+      'Vous venez de créer une tâche privée. Configurez un code PIN ou la biométrie pour protéger votre contenu privé.';
+
+  @override
+  String get notNow => 'Pas maintenant';
+
+  @override
+  String get setUp => 'Configurer';
+
+  @override
+  String get doNotRemind => 'Ne pas rappeler';
+
+  @override
+  String get doNotRemindSubtitle =>
+      'Supprimer toutes les notifications pour cette tâche';
+
+  @override
+  String get glassmorphismEffects => 'Effets de Glassmorphism';
+
+  @override
+  String get glassmorphismEffectsSubtitle =>
+      'Appliquer un effet verre dépoli aux cartes';
+
+  @override
+  String get noEventsForThisDay => 'Aucun événement pour ce jour';
+
+  @override
+  String get searchSymbols => 'Symboles de recherche';
+
+  @override
+  String get searchSymbolsDesc =>
+      'Utilisez des symboles pour filtrer les tâches : @catégorie (ex. @travail), #titre (ex. #réunion), !priorité (ex. !haute), %date (ex. %2025-06-15), &sous-tâche (ex. &correction bug), *statut (*fait ou *en cours), ? (tâches d\'aujourd\'hui). Combiner plusieurs symboles.';
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
@@ -8,6 +9,8 @@ import 'package:rocis_tasks/features/tasks/presentation/screens/task_detail_scre
 import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:rocis_tasks/features/categories/domain/models/category.dart';
+import 'package:rocis_tasks/shared/ui/ui_kit.dart';
 
 class TaskListView extends StatefulWidget {
   const TaskListView({super.key});
@@ -43,24 +46,8 @@ class _TaskListViewState extends State<TaskListView> {
         if (tasks.isEmpty) {
           final theme = Theme.of(context);
           return Center(
-            child: Container(
+            child: GlassContainer(
               padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: theme.cardTheme.color,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: theme.brightness == Brightness.light
-                      ? Colors.grey.withValues(alpha: 0.1)
-                      : Colors.white.withValues(alpha: 0.05),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -99,6 +86,62 @@ class _TaskListViewState extends State<TaskListView> {
           );
         }
 
+        if (kIsWeb) {
+          return ListView.builder(
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.fromLTRB(8, 8, 8, 100),
+            itemCount: tasks.length,
+            itemBuilder: (context, index) {
+              final task = tasks[index];
+              return Consumer<TaskProvider>(
+                builder: (context, provider, _) {
+                  final categoryIds = task.categoryIds.isNotEmpty 
+                      ? task.categoryIds 
+                      : (task.categoryId != null ? [task.categoryId!] : []);
+                  final categories = categoryIds
+                      .map((id) => provider.getCategoryById(id))
+                      .where((c) => c != null)
+                      .cast<Category>()
+                      .toList();
+                  final isSelectionMode = provider.isSelectionMode;
+                  final isSelected = provider.selectedTaskIds.contains(task.id);
+
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: TaskTile(
+                      task: task,
+                      categories: categories,
+                      isSelected: isSelected,
+                      isSelectionMode: isSelectionMode,
+                      onToggle: () => provider.toggleTaskCompletion(task),
+                      onDelete: () => provider.deleteTask(task.id),
+                      onLongPress: () {
+                        HapticFeedback.mediumImpact();
+                        provider.toggleTaskSelection(task.id);
+                      },
+                      onTap: () {
+                        if (isSelectionMode) {
+                          provider.toggleTaskSelection(task.id);
+                        } else {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => TaskDetailScreen(
+                                task: task,
+                                category: categories.isNotEmpty ? categories.first : null,
+                              ),
+                            ),
+                          );
+                        }
+                      },
+                    ),
+                  );
+                },
+              );
+            },
+          );
+        }
+
         return AnimationLimiter(
           child: ListView.builder(
             physics: const BouncingScrollPhysics(),
@@ -108,7 +151,14 @@ class _TaskListViewState extends State<TaskListView> {
               final task = tasks[index];
               return Consumer<TaskProvider>(
                 builder: (context, provider, _) {
-                  final category = provider.getCategoryById(task.categoryId);
+                  final categoryIds = task.categoryIds.isNotEmpty 
+                      ? task.categoryIds 
+                      : (task.categoryId != null ? [task.categoryId!] : []);
+                  final categories = categoryIds
+                      .map((id) => provider.getCategoryById(id))
+                      .where((c) => c != null)
+                      .cast<Category>()
+                      .toList();
                   final isSelectionMode = provider.isSelectionMode;
                   final isSelected = provider.selectedTaskIds.contains(task.id);
 
@@ -122,7 +172,7 @@ class _TaskListViewState extends State<TaskListView> {
                           padding: const EdgeInsets.only(bottom: 8),
                           child: TaskTile(
                             task: task,
-                            category: category,
+                            categories: categories,
                             isSelected: isSelected,
                             isSelectionMode: isSelectionMode,
                             onToggle: () => provider.toggleTaskCompletion(task),
@@ -140,7 +190,7 @@ class _TaskListViewState extends State<TaskListView> {
                                   MaterialPageRoute(
                                     builder: (context) => TaskDetailScreen(
                                       task: task,
-                                      category: category,
+                                      category: categories.isNotEmpty ? categories.first : null,
                                     ),
                                   ),
                                 );

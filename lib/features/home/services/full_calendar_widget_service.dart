@@ -308,7 +308,9 @@ class FullCalendarWidgetService {
             int? colorVal;
             try {
               final cat = categories.firstWhere(
-                (c) => c.id == t.categoryId,
+                (c) => t.categoryIds.isNotEmpty 
+                       ? t.categoryIds.contains(c.id) 
+                       : c.id == t.categoryId,
               );
               colorVal = cat.colorValue;
             } catch (_) {}

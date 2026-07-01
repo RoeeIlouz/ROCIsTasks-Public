@@ -185,7 +185,8 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
         val action = intent.action
         
         if (action == ACTION_FILTER_TASKS || action == ACTION_FILTER_GOOGLE || 
-            action == ACTION_PREV_MONTH || action == ACTION_NEXT_MONTH) {
+            action == ACTION_PREV_MONTH || action == ACTION_NEXT_MONTH || 
+            action == ACTION_TODAY) {
             
             val widgetData = es.antonborri.home_widget.HomeWidgetPlugin.getData(context)
             val editor = widgetData.edit()
@@ -200,6 +201,9 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
                     editor.putBoolean(PREF_SHOW_GOOGLE, !current)
                 }
                 ACTION_PREV_MONTH -> {
+                    val currentOffset = widgetData.getInt(PREF_OFFSET, 0)
+                    editor.putInt(PREF_OFFSET, currentOffset - 1)
+                    
                     // Trigger Dart background update
                     val backgroundIntent = es.antonborri.home_widget.HomeWidgetBackgroundIntent.getBroadcast(
                         context, Uri.parse("rocistasks://full_calendar_prev")
@@ -209,6 +213,9 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
                     } catch (e: Exception) {}
                 }
                 ACTION_NEXT_MONTH -> {
+                    val currentOffset = widgetData.getInt(PREF_OFFSET, 0)
+                    editor.putInt(PREF_OFFSET, currentOffset + 1)
+                    
                     // Trigger Dart background update
                     val backgroundIntent = es.antonborri.home_widget.HomeWidgetBackgroundIntent.getBroadcast(
                         context, Uri.parse("rocistasks://full_calendar_next")

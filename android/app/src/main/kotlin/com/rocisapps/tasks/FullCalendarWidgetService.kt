@@ -110,68 +110,84 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
                          today.get(java.util.Calendar.DAY_OF_MONTH))
                      
                      val isToday = dateStr == currentTodayStr
- 
+
+                     var dayOfWeek = 0
+                     try {
+                         val dateObj = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).parse(dateStr)
+                         if (dateObj != null) {
+                             val cal = java.util.Calendar.getInstance()
+                             cal.time = dateObj
+                             dayOfWeek = cal.get(java.util.Calendar.DAY_OF_WEEK)
+                         }
+                     } catch (e: Exception) {}
+
                      cellViews.setTextViewText(R.id.widget_full_calendar_day_text, dayNum.toString())
-                     cellViews.setViewVisibility(R.id.widget_full_calendar_today_indicator, if (isToday) android.view.View.VISIBLE else android.view.View.GONE)
+                     
+                     if (isToday) {
+                         cellViews.setInt(R.id.widget_full_calendar_day_text, "setBackgroundResource", R.drawable.widget_today_background)
+                     } else {
+                         cellViews.setInt(R.id.widget_full_calendar_day_text, "setBackgroundResource", 0) // Transparent
+                     }
                      
                      val textColor = if (isToday) {
                          android.graphics.Color.WHITE
                      } else if (isCurrentMonth) {
-                         context.getColor(R.color.widget_title_text)
+                         when (dayOfWeek) {
+                             java.util.Calendar.SUNDAY -> android.graphics.Color.parseColor("#FF5252")
+                             java.util.Calendar.SATURDAY -> android.graphics.Color.parseColor("#448AFF")
+                             else -> context.getColor(R.color.widget_title_text)
+                         }
                      } else {
                          context.getColor(R.color.widget_secondary_text)
                      }
                      cellViews.setTextColor(R.id.widget_full_calendar_day_text, textColor)
 
-                    // Summaries (event/task titles)
+                    // Summaries (event/task indicators)
                     val summaries = day.optJSONArray("summaries") ?: JSONArray()
+                    val count = summaries.length()
                     
                     // Reset visibility
+                    cellViews.setViewVisibility(R.id.widget_full_calendar_day_title, android.view.View.GONE)
+                    cellViews.setViewVisibility(R.id.widget_full_calendar_indicators_container, android.view.View.GONE)
                     cellViews.setViewVisibility(R.id.widget_full_calendar_summary_1, android.view.View.GONE)
                     cellViews.setViewVisibility(R.id.widget_full_calendar_summary_2, android.view.View.GONE)
                     cellViews.setViewVisibility(R.id.widget_full_calendar_summary_3, android.view.View.GONE)
                     
-                    // Populate up to 3 summaries
-                    for (j in 0 until minOf(3, summaries.length())) {
-                        val summary = summaries.getJSONObject(j)
+                    if (count == 1) {
+                        val summary = summaries.getJSONObject(0)
                         val title = summary.optString("text", "")
-                        val time = summary.optString("time", "")
-                        val priority = summary.optString("priority", "")
                         val colorHex = summary.optString("color", "")
 
-                        // Enhance title with details (time and priority) - Title First
-                        var displayTitle = title
-                        if (time.isNotEmpty()) {
-                            displayTitle = "$displayTitle $time"
-                        }
-                        if (priority.isNotEmpty()) {
-                            val prioritySymbol = when (priority.lowercase()) {
-                                "high" -> "!!!"
-                                "medium" -> "!!"
-                                "low" -> "!"
-                                else -> ""
-                            }
-                            displayTitle = "$displayTitle $prioritySymbol"
-                        }
+                        cellViews.setViewVisibility(R.id.widget_full_calendar_day_title, android.view.View.VISIBLE)
+                        cellViews.setTextViewText(R.id.widget_full_calendar_day_title, title)
 
-                        val viewId = when(j) {
-                            0 -> R.id.widget_full_calendar_summary_1
-                            1 -> R.id.widget_full_calendar_summary_2
-                            else -> R.id.widget_full_calendar_summary_3
-                        }
-                        
-                        cellViews.setViewVisibility(viewId, android.view.View.VISIBLE)
-                        cellViews.setTextViewText(viewId, displayTitle)
-                        cellViews.setTextColor(viewId, android.graphics.Color.parseColor("#CCFFFFFF"))
-                        cellViews.setTextViewTextSize(viewId, android.util.TypedValue.COMPLEX_UNIT_SP, 9f)
-                        
                         if (colorHex.isNotEmpty()) {
                             try {
                                 val color = android.graphics.Color.parseColor(colorHex)
-                                // Apply some alpha to the background color (60% = 0x99)
-                                val alphaColor = (color and 0x00FFFFFF) or (0x99 shl 24)
-                                cellViews.setInt(viewId, "setBackgroundColor", alphaColor)
+                                cellViews.setTextColor(R.id.widget_full_calendar_day_title, color)
                             } catch (e: Exception) {}
+                        }
+                    } else if (count > 1) {
+                        cellViews.setViewVisibility(R.id.widget_full_calendar_indicators_container, android.view.View.VISIBLE)
+                        for (j in 0 until minOf(3, count)) {
+                            val summary = summaries.getJSONObject(j)
+                            val colorHex = summary.optString("color", "")
+
+                            val viewId = when(j) {
+                                0 -> R.id.widget_full_calendar_summary_1
+                                1 -> R.id.widget_full_calendar_summary_2
+                                else -> R.id.widget_full_calendar_summary_3
+                            }
+                            
+                            cellViews.setViewVisibility(viewId, android.view.View.VISIBLE)
+                            
+                            if (colorHex.isNotEmpty()) {
+                                try {
+                                    val color = android.graphics.Color.parseColor(colorHex)
+                                    val alphaColor = (color and 0x00FFFFFF) or (0xFF shl 24)
+                                    cellViews.setInt(viewId, "setColorFilter", alphaColor)
+                                } catch (e: Exception) {}
+                            }
                         }
                     }
 
