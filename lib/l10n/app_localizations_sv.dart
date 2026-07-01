@@ -984,4 +984,40 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get securitySettingsSubtitle => 'Hantera PIN och biometrisk åtkomst';
+
+  @override
+  String get enableSecurity => 'Aktivera säkerhet';
+
+  @override
+  String get enableSecurityDescription =>
+      'Du skapade precis en privat uppgift. Ställ in en PIN-kod eller biometri för att skydda ditt privata innehåll.';
+
+  @override
+  String get notNow => 'Inte nu';
+
+  @override
+  String get setUp => 'Konfigurera';
+
+  @override
+  String get doNotRemind => 'Påminn inte';
+
+  @override
+  String get doNotRemindSubtitle =>
+      'Undertryck alla aviseringar för denna uppgift';
+
+  @override
+  String get glassmorphismEffects => 'Glassmorphism-effekter';
+
+  @override
+  String get glassmorphismEffectsSubtitle => 'Använd frostat glas på kort';
+
+  @override
+  String get noEventsForThisDay => 'Inga händelser för denna dag';
+
+  @override
+  String get searchSymbols => 'Sök symboler';
+
+  @override
+  String get searchSymbolsDesc =>
+      'Använd symboler för att filtrera uppgifter: @kategori (t.ex. @arbete), #titel (t.ex. #möte), !prioritet (t.ex. !hög), %datum (t.ex. %2025-06-15), &deluppgift (t.ex. &bugfix), *status (*klar eller *pågående), ? (uppgifter idag). Kombinera flera symboler.';
 }

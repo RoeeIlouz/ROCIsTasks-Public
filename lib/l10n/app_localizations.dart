@@ -1943,6 +1943,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Manage PIN and Biometric access'**
   String get securitySettingsSubtitle;
+
+  /// No description provided for @enableSecurity.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable Security'**
+  String get enableSecurity;
+
+  /// No description provided for @enableSecurityDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'You just created a private task. Set up a PIN or biometrics to keep your private content secure.'**
+  String get enableSecurityDescription;
+
+  /// No description provided for @notNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Not now'**
+  String get notNow;
+
+  /// No description provided for @setUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Set up'**
+  String get setUp;
+
+  /// No description provided for @doNotRemind.
+  ///
+  /// In en, this message translates to:
+  /// **'Do not remind'**
+  String get doNotRemind;
+
+  /// No description provided for @doNotRemindSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Suppress all notifications for this task'**
+  String get doNotRemindSubtitle;
+
+  /// No description provided for @glassmorphismEffects.
+  ///
+  /// In en, this message translates to:
+  /// **'Glassmorphism Effects'**
+  String get glassmorphismEffects;
+
+  /// No description provided for @glassmorphismEffectsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply frosted glass to cards'**
+  String get glassmorphismEffectsSubtitle;
+
+  /// No description provided for @noEventsForThisDay.
+  ///
+  /// In en, this message translates to:
+  /// **'No events for this day'**
+  String get noEventsForThisDay;
+
+  /// No description provided for @searchSymbols.
+  ///
+  /// In en, this message translates to:
+  /// **'Search Symbols'**
+  String get searchSymbols;
+
+  /// No description provided for @searchSymbolsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Use symbols to filter tasks: @category (e.g. @work), #title (e.g. #meeting), !priority (e.g. !high), %date (e.g. %2025-06-15), &subtask (e.g. &fix bug), *status (*done or *pending), ? (tasks due today). Combine multiple symbols.'**
+  String get searchSymbolsDesc;
 }
 
 class _AppLocalizationsDelegate

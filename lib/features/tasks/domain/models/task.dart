@@ -39,6 +39,9 @@ class Task extends HiveObject {
   @HiveField(6)
   String? categoryId;
 
+  @HiveField(19)
+  List<String> categoryIds;
+
   @HiveField(7)
   bool? isDeleted;
 
@@ -72,6 +75,9 @@ class Task extends HiveObject {
   @HiveField(17)
   List<String> attachmentPaths;
 
+  @HiveField(18)
+  bool skipReminders;
+
   Task({
     String? id,
     required this.title,
@@ -80,6 +86,7 @@ class Task extends HiveObject {
     this.dueDate,
     this.priority = TaskPriority.medium,
     this.categoryId,
+    List<String>? categoryIds,
     this.isDeleted = false,
     this.isPinned = false,
     this.subTasks,
@@ -91,9 +98,11 @@ class Task extends HiveObject {
     this.calendarEventId,
     this.calendarId,
     List<String>? attachmentPaths,
+    this.skipReminders = false,
   }) : id = id ?? const Uuid().v4(),
        createdAt = createdAt ?? DateTime.now(),
-       attachmentPaths = attachmentPaths ?? <String>[];
+       attachmentPaths = attachmentPaths ?? <String>[],
+       categoryIds = categoryIds ?? <String>[];
 
   Task copyWith({
     String? title,
@@ -102,6 +111,7 @@ class Task extends HiveObject {
     DateTime? dueDate,
     TaskPriority? priority,
     String? categoryId,
+    List<String>? categoryIds,
     bool? isDeleted,
     bool? isPinned,
     List<SubTask>? subTasks,
@@ -113,6 +123,7 @@ class Task extends HiveObject {
     String? calendarEventId,
     String? calendarId,
     List<String>? attachmentPaths,
+    bool? skipReminders,
   }) {
     return Task(
       id: id,
@@ -122,6 +133,7 @@ class Task extends HiveObject {
       dueDate: dueDate ?? this.dueDate,
       priority: priority ?? this.priority,
       categoryId: categoryId ?? this.categoryId,
+      categoryIds: categoryIds ?? this.categoryIds,
       isDeleted: isDeleted ?? this.isDeleted,
       isPinned: isPinned ?? this.isPinned,
       subTasks: subTasks ?? this.subTasks,
@@ -135,6 +147,7 @@ class Task extends HiveObject {
       calendarEventId: calendarEventId ?? this.calendarEventId,
       calendarId: calendarId ?? this.calendarId,
       attachmentPaths: attachmentPaths ?? this.attachmentPaths,
+      skipReminders: skipReminders ?? this.skipReminders,
     );
   }
 
@@ -147,6 +160,7 @@ class Task extends HiveObject {
       'dueDate': dueDate?.toIso8601String(),
       'priority': priority.index,
       'categoryId': categoryId,
+      'categoryIds': categoryIds,
       'isDeleted': isDeleted,
       'isPinned': isPinned,
       'subTasks': subTasks?.map((st) => st.toMap()).toList(),
@@ -158,6 +172,7 @@ class Task extends HiveObject {
       'calendarEventId': calendarEventId,
       'calendarId': calendarId,
       'attachmentPaths': attachmentPaths,
+      'skipReminders': skipReminders,
     };
   }
 
@@ -170,6 +185,7 @@ class Task extends HiveObject {
       'dueDate': dueDate,
       'priority': priority.index,
       'categoryId': categoryId,
+      'categoryIds': categoryIds,
       'isDeleted': isDeleted ?? false,
       'isPinned': isPinned ?? false,
       'subTasks': subTasks?.map((st) => st.toMap()).toList(),
@@ -178,6 +194,7 @@ class Task extends HiveObject {
       'createdAt': createdAt,
       'requireSubTasksBeforeReminders': requireSubTasksBeforeReminders,
       'syncWithGoogleCalendar': syncWithGoogleCalendar,
+      'skipReminders': skipReminders,
     };
   }
 
@@ -198,6 +215,8 @@ class Task extends HiveObject {
       dueDate: _parseDate(map['dueDate']),
       priority: TaskPriority.values[map['priority'] ?? 1],
       categoryId: map['categoryId'],
+      categoryIds: (map['categoryIds'] as List?)?.whereType<String>().toList() ?? 
+          (map['categoryId'] != null ? [map['categoryId'] as String] : []),
       isDeleted: map['isDeleted'] ?? false,
       isPinned: map['isPinned'] ?? false,
       subTasks: (map['subTasks'] as List?)
@@ -213,6 +232,7 @@ class Task extends HiveObject {
       calendarId: map['calendarId'],
       attachmentPaths:
           (map['attachmentPaths'] as List?)?.whereType<String>().toList(),
+      skipReminders: map['skipReminders'] ?? false,
     );
   }
 }

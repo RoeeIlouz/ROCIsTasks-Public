@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:rocis_tasks/features/home/presentation/screens/web_home_screen.dart';
 import 'package:rocis_tasks/features/calendar/presentation/screens/calendar_screen.dart';
-import 'package:rocis_tasks/features/calendar/presentation/widgets/calendar_filter_sheet.dart';
-import 'package:rocis_tasks/features/calendar/presentation/widgets/calendar_coloring_sheet.dart';
 import 'package:rocis_tasks/features/categories/presentation/screens/categories_screen.dart';
 import 'package:rocis_tasks/features/tasks/presentation/screens/add_task_screen.dart';
 import 'package:rocis_tasks/features/tasks/presentation/screens/task_list_screen.dart';
 import 'package:rocis_tasks/features/tasks/presentation/widgets/task_sort_filter_sheet.dart';
 import 'package:rocis_tasks/features/home/presentation/screens/settings_screen.dart';
 import 'package:rocis_tasks/features/home/presentation/screens/app_guide_screen.dart';
+import 'package:rocis_tasks/features/auth/presentation/screens/security_settings_screen.dart';
 import 'package:home_widget/home_widget.dart' as hw;
 import 'package:provider/provider.dart';
 import 'package:rocis_tasks/features/calendar/presentation/providers/calendar_provider.dart';
@@ -19,6 +19,10 @@ import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.
 import 'package:rocis_tasks/core/services/connectivity_service.dart';
 import 'package:rocis_tasks/core/utils/icon_utils.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:rocis_tasks/shared/ui/widgets/glass_container.dart';
+import 'package:rocis_tasks/shared/ui/theme/theme_service.dart';
+import 'package:rocis_tasks/shared/ui/widgets/easter_egg_spinner.dart';
+import 'package:rocis_tasks/core/services/subscription_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -174,9 +178,30 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint('HomeScreen: build called');
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        debugPrint(
+          'HomeScreen LayoutBuilder: maxWidth = ${constraints.maxWidth}',
+        );
+        if (constraints.maxWidth >= 950) {
+          debugPrint('HomeScreen: rendering WebHomeScreen');
+          return const WebHomeScreen();
+        }
+        debugPrint('HomeScreen: rendering MobileHomeScreen');
+        return _buildMobileHomeScreen(context);
+      },
+    );
+  }
+
+  Widget _buildMobileHomeScreen(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
+    final themeService = Provider.of<ThemeService>(context);
     final taskProvider = Provider.of<TaskProvider>(context);
+    final subscriptionService = Provider.of<SubscriptionService>(context);
+    final useGlass =
+        themeService.useGlassmorphism && subscriptionService.isPremium;
 
     if (taskProvider.taskToEdit != null) {
       final task = taskProvider.taskToEdit!;
@@ -189,9 +214,18 @@ class _HomeScreenState extends State<HomeScreen> {
       });
     }
 
+    // Show security prompt when private task/category is created without security
+    if (taskProvider.showSecurityPrompt) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        taskProvider.clearSecurityPrompt();
+        _showSecurityPromptDialog(context, l10n);
+      });
+    }
+
     final isSelectionMode = taskProvider.isSelectionMode && _currentIndex == 0;
 
     return Scaffold(
+      extendBody: true,
       appBar: isSelectionMode
           ? AppBar(
               backgroundColor: theme.colorScheme.primaryContainer,
@@ -222,115 +256,98 @@ class _HomeScreenState extends State<HomeScreen> {
                 IconButton(
                   icon: const Icon(Icons.delete_outline),
                   tooltip: l10n.delete,
-                  onPressed: () => _showBulkDeleteConfirmation(context, taskProvider, l10n),
+                  onPressed: () =>
+                      _showBulkDeleteConfirmation(context, taskProvider, l10n),
                 ),
                 const SizedBox(width: 8),
               ],
             )
           : AppBar(
-        title: _isSearching && _currentIndex == 0
-            ? TextField(
-                controller: _searchController,
-                autofocus: true,
-                style: GoogleFonts.outfit(fontSize: 16),
-                decoration: InputDecoration(
-                  hintText: l10n.searchTasksHint,
-                  border: InputBorder.none,
-                  hintStyle: GoogleFonts.outfit(
-                    color: theme.disabledColor.withValues(alpha: 0.5),
+              title: _isSearching && _currentIndex == 0
+                  ? TextField(
+                      controller: _searchController,
+                      autofocus: true,
+                      style: GoogleFonts.outfit(fontSize: 16),
+                      decoration: InputDecoration(
+                        hintText: l10n.searchTasksHint,
+                        border: InputBorder.none,
+                        hintStyle: GoogleFonts.outfit(
+                          color: theme.disabledColor.withValues(alpha: 0.5),
+                        ),
+                      ),
+                      onChanged: (value) {
+                        Provider.of<TaskProvider>(
+                          context,
+                          listen: false,
+                        ).setSearchQuery(value);
+                      },
+                    )
+                  : Text(
+                      _currentIndex == 0
+                          ? l10n.myTasks
+                          : _currentIndex == 1
+                          ? l10n.calendar
+                          : l10n.settings,
+                      style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
+                    ),
+              actions: [
+                if (_currentIndex == 0) ...[
+                  IconButton(
+                    icon: Icon(_isSearching ? Icons.close : Icons.search),
+                    onPressed: () {
+                      setState(() {
+                        if (_isSearching) {
+                          _searchController.clear();
+                          Provider.of<TaskProvider>(
+                            context,
+                            listen: false,
+                          ).setSearchQuery('');
+                        }
+                        _isSearching = !_isSearching;
+                      });
+                    },
                   ),
-                ),
-                onChanged: (value) {
-                  Provider.of<TaskProvider>(context, listen: false).setSearchQuery(value);
-                },
-              )
-            : Text(
-                _currentIndex == 0
-                    ? l10n.myTasks
-                    : _currentIndex == 1
-                    ? l10n.calendar
-                    : l10n.settings,
-                style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
-              ),
-        actions: [
-          if (_currentIndex == 0) ...[
-            IconButton(
-              icon: Icon(_isSearching ? Icons.close : Icons.search),
-              onPressed: () {
-                setState(() {
-                  if (_isSearching) {
-                    _searchController.clear();
-                    Provider.of<TaskProvider>(context, listen: false).setSearchQuery('');
-                  }
-                  _isSearching = !_isSearching;
-                });
-              },
-            ),
-            IconButton(
-              icon: const Icon(Icons.dashboard_customize_outlined),
-              tooltip: l10n.categories,
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const CategoriesScreen(),
+                  IconButton(
+                    icon: const Icon(Icons.dashboard_customize_outlined),
+                    tooltip: l10n.categories,
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const CategoriesScreen(),
+                        ),
+                      );
+                    },
                   ),
-                );
-              },
+                  IconButton(
+                    icon: const Icon(Icons.filter_alt_outlined),
+                    tooltip: l10n.sortAndFilter,
+                    onPressed: () {
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.transparent,
+                        builder: (context) => const TaskSortFilterSheet(),
+                      );
+                    },
+                  ),
+                  if (taskProvider.showMyTasksGuideShortcut)
+                    IconButton(
+                      icon: const Icon(Icons.help_outline_rounded),
+                      tooltip: l10n.appGuide,
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const AppGuideScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                ],
+                const SizedBox(width: 8),
+              ],
             ),
-            IconButton(
-              icon: const Icon(Icons.filter_alt_outlined),
-              tooltip: l10n.sortAndFilter,
-              onPressed: () {
-                showModalBottomSheet(
-                  context: context,
-                  isScrollControlled: true,
-                  backgroundColor: Colors.transparent,
-                  builder: (context) => const TaskSortFilterSheet(),
-                );
-              },
-            ),
-            if (taskProvider.showMyTasksGuideShortcut)
-              IconButton(
-                icon: const Icon(Icons.help_outline_rounded),
-                tooltip: l10n.appGuide,
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const AppGuideScreen()),
-                  );
-                },
-              ),
-          ],
-          if (_currentIndex == 1) ...[
-            IconButton(
-              icon: const Icon(Icons.palette_outlined),
-              tooltip: l10n.calendarColors,
-              onPressed: () {
-                showModalBottomSheet(
-                  context: context,
-                  isScrollControlled: true,
-                  backgroundColor: Colors.transparent,
-                  builder: (context) => const CalendarColoringSheet(),
-                );
-              },
-            ),
-            IconButton(
-              icon: const Icon(Icons.filter_alt_outlined),
-              tooltip: l10n.calendarFiltersTitle,
-              onPressed: () {
-                showModalBottomSheet(
-                  context: context,
-                  isScrollControlled: true,
-                  backgroundColor: Colors.transparent,
-                  builder: (context) => const CalendarFilterSheet(),
-                );
-              },
-            ),
-          ],
-          const SizedBox(width: 8),
-        ],
-      ),
       body: Column(
         children: [
           Consumer<ConnectivityService>(
@@ -376,58 +393,189 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       floatingActionButton: _currentIndex == 0 || _currentIndex == 1
-          ? FloatingActionButton.extended(
-              onPressed: _navigateToAddTask,
-              label: Text(
-                l10n.newTask,
-                style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
+          ? EasterEggSpinner(
+              child: GlassContainer(
+                borderRadius: BorderRadius.circular(16),
+                elevation: 4.0,
+                color: useGlass
+                    ? theme.colorScheme.primary.withValues(alpha: 0.15)
+                    : theme.colorScheme.primary,
+                opacity: 0.15,
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: _navigateToAddTask,
+                    borderRadius: BorderRadius.circular(16),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.add_rounded,
+                            color: useGlass
+                                ? theme.colorScheme.primary
+                                : theme.colorScheme.onPrimary,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            l10n.newTask,
+                            style: GoogleFonts.outfit(
+                              fontWeight: FontWeight.bold,
+                              color: useGlass
+                                  ? theme.colorScheme.primary
+                                  : theme.colorScheme.onPrimary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
               ),
-              icon: const Icon(Icons.add_rounded),
             )
           : null,
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.1),
-              blurRadius: 20,
-              offset: const Offset(0, -4),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.only(left: 16, right: 16, bottom: 12),
+        child: GlassContainer(
+          borderRadius: BorderRadius.circular(24),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _buildNavItem(
+                  0,
+                  Icons.task_alt_outlined,
+                  Icons.task_alt,
+                  l10n.tasks,
+                  theme,
+                ),
+                _buildNavItem(
+                  1,
+                  Icons.calendar_month_outlined,
+                  Icons.calendar_month,
+                  l10n.calendar,
+                  theme,
+                ),
+                _buildNavItem(
+                  2,
+                  Icons.settings_outlined,
+                  Icons.settings,
+                  l10n.settings,
+                  theme,
+                ),
+              ],
             ),
-          ],
-        ),
-        child: NavigationBar(
-          selectedIndex: _currentIndex,
-          onDestinationSelected: _onItemTapped,
-          height: 65,
-          labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-          destinations: [
-            NavigationDestination(
-              icon: const Icon(Icons.task_alt_outlined),
-              selectedIcon: const Icon(Icons.task_alt),
-              label: l10n.tasks,
-            ),
-            NavigationDestination(
-              icon: const Icon(Icons.calendar_month_outlined),
-              selectedIcon: const Icon(Icons.calendar_month),
-              label: l10n.calendar,
-            ),
-            NavigationDestination(
-              icon: const Icon(Icons.settings_outlined),
-              selectedIcon: const Icon(Icons.settings),
-              label: l10n.settings,
-            ),
-          ],
+          ),
         ),
       ),
     );
   }
 
-  void _showBulkDeleteConfirmation(BuildContext context, TaskProvider provider, AppLocalizations l10n) {
+  Widget _buildNavItem(
+    int index,
+    IconData icon,
+    IconData selectedIcon,
+    String label,
+    ThemeData theme,
+  ) {
+    final isSelected = _currentIndex == index;
+
+    return Expanded(
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => _onItemTapped(index),
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? theme.colorScheme.primary.withValues(alpha: 0.15)
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Icon(
+                    isSelected ? selectedIcon : icon,
+                    color: isSelected
+                        ? theme.colorScheme.primary
+                        : theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                    size: 24,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  label,
+                  style: GoogleFonts.outfit(
+                    fontSize: 11,
+                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                    color: isSelected
+                        ? theme.colorScheme.primary
+                        : theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showSecurityPromptDialog(BuildContext context, AppLocalizations l10n) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        icon: const Icon(Icons.lock_outline, size: 48),
+        title: Text(l10n.enableSecurity),
+        content: Text(l10n.enableSecurityDescription),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.notNow),
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const SecuritySettingsScreen(),
+                ),
+              );
+            },
+            child: Text(l10n.setUp),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showBulkDeleteConfirmation(
+    BuildContext context,
+    TaskProvider provider,
+    AppLocalizations l10n,
+  ) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(l10n.deleteTaskTitle),
-        content: Text('${l10n.deleteTaskConfirmation} (${provider.selectedCount} ${l10n.tasks})'),
+        content: Text(
+          '${l10n.deleteTaskConfirmation} (${provider.selectedCount} ${l10n.tasks})',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -438,7 +586,9 @@ class _HomeScreenState extends State<HomeScreen> {
               provider.deleteSelectedTasks();
               Navigator.pop(context);
             },
-            style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.error),
+            style: TextButton.styleFrom(
+              foregroundColor: Theme.of(context).colorScheme.error,
+            ),
             child: Text(l10n.delete),
           ),
         ],

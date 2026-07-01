@@ -965,4 +965,40 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get securitySettingsSubtitle => 'נהל גישה עם PIN וביומטריה';
+
+  @override
+  String get enableSecurity => 'הפעל אבטחה';
+
+  @override
+  String get enableSecurityDescription =>
+      'יצרת משימה פרטית. הגדר קוד PIN או ביומטריה כדי להגן על התוכן הפרטי שלך.';
+
+  @override
+  String get notNow => 'לא עכשיו';
+
+  @override
+  String get setUp => 'הגדר';
+
+  @override
+  String get doNotRemind => 'לא להזכיר';
+
+  @override
+  String get doNotRemindSubtitle => 'השבת את כל ההתראות עבור משימה זו';
+
+  @override
+  String get glassmorphismEffects => 'אפקטי זכוכית';
+
+  @override
+  String get glassmorphismEffectsSubtitle =>
+      'החל עיצוב זכוכית חלבית על כרטיסים';
+
+  @override
+  String get noEventsForThisDay => 'אין אירועים ליום זה';
+
+  @override
+  String get searchSymbols => 'סימני חיפוש';
+
+  @override
+  String get searchSymbolsDesc =>
+      'השתמש בסימנים לסינון משימות: @קטגוריה (למשל @עבודה), #כותרת (למשל #פגישה), !עדיפות (למשל !גבוהה), %תאריך (למשל %2025-06-15), &תת-משימה (למשל &תיקון באג), *סטטוס (*בוצע או *ממתין), ? (משימות להיום). ניתן לשלב סימנים מרובים.';
 }

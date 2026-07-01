@@ -994,4 +994,41 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get securitySettingsSubtitle =>
       'Administra el acceso con PIN y biometría';
+
+  @override
+  String get enableSecurity => 'Activar seguridad';
+
+  @override
+  String get enableSecurityDescription =>
+      'Acabas de crear una tarea privada. Configura un PIN o biometría para mantener tu contenido privado seguro.';
+
+  @override
+  String get notNow => 'Ahora no';
+
+  @override
+  String get setUp => 'Configurar';
+
+  @override
+  String get doNotRemind => 'No recordar';
+
+  @override
+  String get doNotRemindSubtitle =>
+      'Suprimir todas las notificaciones de esta tarea';
+
+  @override
+  String get glassmorphismEffects => 'Efectos de Glassmorphism';
+
+  @override
+  String get glassmorphismEffectsSubtitle =>
+      'Aplicar efecto de cristal esmerilado a las tarjetas';
+
+  @override
+  String get noEventsForThisDay => 'No hay eventos para este día';
+
+  @override
+  String get searchSymbols => 'Símbolos de búsqueda';
+
+  @override
+  String get searchSymbolsDesc =>
+      'Usa símbolos para filtrar tareas: @categoría (ej. @trabajo), #título (ej. #reunión), !prioridad (ej. !alta), %fecha (ej. %2025-06-15), &subtarea (ej. &corregir error), *estado (*hecho o *pendiente), ? (tareas de hoy). Combina varios símbolos.';
 }

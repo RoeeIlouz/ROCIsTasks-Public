@@ -1,6 +1,18 @@
 import 'package:device_calendar/device_calendar.dart';
 import 'package:rocis_tasks/core/services/logger_service.dart';
 import 'package:timezone/timezone.dart' as tz;
+import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+class GoogleTokenExpiredException implements Exception {
+  final String message;
+  GoogleTokenExpiredException([this.message = 'Google Calendar access token expired or invalid.']);
+  
+  @override
+  String toString() => message;
+}
 
 class CalendarService {
   final DeviceCalendarPlugin _deviceCalendarPlugin = DeviceCalendarPlugin();
@@ -11,6 +23,7 @@ class CalendarService {
   }
 
   Future<bool> requestPermissions() async {
+    if (kIsWeb) return true;
     try {
       var permissionsGranted = await _deviceCalendarPlugin.hasPermissions();
       if (permissionsGranted.isSuccess && permissionsGranted.data!) {
@@ -30,6 +43,72 @@ class CalendarService {
   }
 
   Future<List<Calendar>> getAvailableCalendars() async {
+    if (kIsWeb) {
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        final token = prefs.getString('google_access_token');
+        final expiresAtStr = prefs.getString('google_access_token_expires_at');
+        
+        if (token == null || expiresAtStr == null) {
+          throw GoogleTokenExpiredException();
+        }
+        
+        final expiresAt = DateTime.parse(expiresAtStr);
+        if (DateTime.now().isAfter(expiresAt)) {
+          throw GoogleTokenExpiredException();
+        }
+        
+        final response = await http.get(
+          Uri.parse('https://www.googleapis.com/calendar/v3/users/me/calendarList'),
+          headers: {'Authorization': 'Bearer $token'},
+        );
+        
+        if (response.statusCode == 401) {
+          throw GoogleTokenExpiredException();
+        }
+        
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body);
+          final items = data['items'] as List<dynamic>? ?? [];
+          
+          final List<Calendar> calendars = [];
+          for (final item in items) {
+            final id = item['id'] as String?;
+            if (id == null) continue;
+            final name = item['summary'] as String? ?? 'Unnamed Calendar';
+            final accessRole = item['accessRole'] as String?;
+            final isReadOnly = accessRole == 'reader' || accessRole == 'freeBusyReader';
+            
+            final bgHex = item['backgroundColor'] as String? ?? '#6366F1';
+            int colorVal = 0xFF6366F1;
+            try {
+              final hex = bgHex.replaceAll('#', '');
+              colorVal = int.parse('FF$hex', radix: 16);
+            } catch (_) {}
+            
+            calendars.add(Calendar(
+              id: id,
+              name: name,
+              isReadOnly: isReadOnly,
+              isDefault: item['primary'] == true,
+              color: colorVal,
+            ));
+          }
+          return calendars;
+        } else {
+          AppLogger.error(
+            'Google Calendar list API failed on Web. Status: ${response.statusCode}, Body: ${response.body}',
+            tag: 'Calendar',
+          );
+        }
+      } on GoogleTokenExpiredException {
+        rethrow;
+      } catch (e, s) {
+        AppLogger.error('Error retrieving calendars on Web', error: e, stack: s);
+      }
+      return [];
+    }
+
     final hasPermission = await requestPermissions();
     if (!hasPermission) return [];
 
@@ -49,7 +128,7 @@ class CalendarService {
     final Map<String, String> colorMap = {};
     for (final calendar in calendars) {
       if (calendar.id != null && calendar.color != null) {
-        colorMap[calendar.id!] = '#${calendar.color!.toRadixString(16).padLeft(8, '0')}';
+        colorMap[calendar.id!] = '#${calendar.color!.toUnsigned(32).toRadixString(16).padLeft(8, '0')}';
       }
     }
     return colorMap;
@@ -60,6 +139,117 @@ class CalendarService {
     DateTime? endDate,
     List<String>? calendarIds,
   }) async {
+    if (kIsWeb) {
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        final token = prefs.getString('google_access_token');
+        final expiresAtStr = prefs.getString('google_access_token_expires_at');
+        
+        if (token == null || expiresAtStr == null) {
+          throw GoogleTokenExpiredException();
+        }
+        
+        final expiresAt = DateTime.parse(expiresAtStr);
+        if (DateTime.now().isAfter(expiresAt)) {
+          throw GoogleTokenExpiredException();
+        }
+        
+        final now = DateTime.now();
+        final start = startDate ?? now.subtract(const Duration(days: 365));
+        final end = endDate ?? now.add(const Duration(days: 365));
+        final List<Event> allEvents = [];
+        
+        final cals = await getAvailableCalendars();
+        final availableIds = cals.map((c) => c.id).whereType<String>().toSet();
+        
+        List<String> targetCalendarIds = calendarIds ?? [];
+        if (targetCalendarIds.isEmpty) {
+          targetCalendarIds = availableIds.toList();
+        } else {
+          targetCalendarIds = targetCalendarIds.where((id) => availableIds.contains(id)).toList();
+        }
+        
+        for (final calendarId in targetCalendarIds) {
+          try {
+            final encodedId = Uri.encodeComponent(calendarId);
+            final timeMin = start.toUtc().toIso8601String();
+            final timeMax = end.toUtc().toIso8601String();
+            
+            final url = 'https://www.googleapis.com/calendar/v3/calendars/$encodedId/events'
+                '?timeMin=$timeMin&timeMax=$timeMax&singleEvents=true';
+                
+            final response = await http.get(
+              Uri.parse(url),
+              headers: {'Authorization': 'Bearer $token'},
+            );
+            
+            if (response.statusCode == 401) {
+              throw GoogleTokenExpiredException();
+            }
+            
+            if (response.statusCode == 200) {
+              final data = json.decode(response.body);
+              final items = data['items'] as List<dynamic>? ?? [];
+              
+              for (final item in items) {
+                final id = item['id'] as String?;
+                final title = item['summary'] as String? ?? 'No Title';
+                final desc = item['description'] as String?;
+                
+                final startData = item['start'] as Map<String, dynamic>?;
+                final endData = item['end'] as Map<String, dynamic>?;
+                
+                if (startData == null) continue;
+                
+                DateTime? startTime;
+                DateTime? endTime;
+                bool allDay = false;
+                
+                if (startData.containsKey('dateTime')) {
+                  startTime = DateTime.parse(startData['dateTime'] as String);
+                } else if (startData.containsKey('date')) {
+                  startTime = DateTime.parse(startData['date'] as String);
+                  allDay = true;
+                }
+                
+                if (endData != null) {
+                  if (endData.containsKey('dateTime')) {
+                    endTime = DateTime.parse(endData['dateTime'] as String);
+                  } else if (endData.containsKey('date')) {
+                    endTime = DateTime.parse(endData['date'] as String);
+                  }
+                }
+                
+                if (startTime == null) continue;
+                endTime ??= startTime.add(const Duration(hours: 1));
+                
+                allEvents.add(Event(
+                  calendarId,
+                  eventId: id,
+                  title: title,
+                  description: desc,
+                  start: tz.TZDateTime.from(startTime, tz.local),
+                  end: tz.TZDateTime.from(endTime, tz.local),
+                  allDay: allDay,
+                ));
+              }
+            }
+          } catch (e) {
+            if (e is GoogleTokenExpiredException) {
+              rethrow;
+            }
+            AppLogger.error('Error fetching events for calendar $calendarId on Web', error: e);
+          }
+        }
+        return allEvents;
+      } on GoogleTokenExpiredException {
+        rethrow;
+      } catch (e, s) {
+        AppLogger.error('Error fetching Google Calendar events on Web', error: e, stack: s);
+      }
+      return [];
+    }
+
     final hasPermission = await requestPermissions();
     if (!hasPermission) {
       AppLogger.warning('Calendar permissions not granted');
@@ -137,6 +327,68 @@ class CalendarService {
     required DateTime end,
     String? eventId,
   }) async {
+    if (kIsWeb) {
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        final token = prefs.getString('google_access_token');
+        final expiresAtStr = prefs.getString('google_access_token_expires_at');
+        
+        if (token == null || expiresAtStr == null) {
+          throw GoogleTokenExpiredException();
+        }
+        
+        final expiresAt = DateTime.parse(expiresAtStr);
+        if (DateTime.now().isAfter(expiresAt)) {
+          throw GoogleTokenExpiredException();
+        }
+        
+        final body = {
+          'summary': title,
+          'description': description ?? '',
+          'start': {
+            'dateTime': start.toUtc().toIso8601String(),
+          },
+          'end': {
+            'dateTime': end.toUtc().toIso8601String(),
+          },
+        };
+        
+        final headers = {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        };
+        
+        http.Response response;
+        if (eventId != null) {
+          response = await http.put(
+            Uri.parse('https://www.googleapis.com/calendar/v3/calendars/$calendarId/events/$eventId'),
+            headers: headers,
+            body: json.encode(body),
+          );
+        } else {
+          response = await http.post(
+            Uri.parse('https://www.googleapis.com/calendar/v3/calendars/$calendarId/events'),
+            headers: headers,
+            body: json.encode(body),
+          );
+        }
+        
+        if (response.statusCode == 401) {
+          throw GoogleTokenExpiredException();
+        }
+        
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          final data = json.decode(response.body);
+          return data['id'] as String?;
+        }
+      } on GoogleTokenExpiredException {
+        rethrow;
+      } catch (e, s) {
+        AppLogger.error('Error creating/updating calendar event on Web', error: e, stack: s);
+      }
+      return null;
+    }
+
     final hasPermission = await requestPermissions();
     if (!hasPermission) {
       AppLogger.warning('Calendar permissions not granted');
@@ -171,6 +423,41 @@ class CalendarService {
     required String calendarId,
     required String eventId,
   }) async {
+    if (kIsWeb) {
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        final token = prefs.getString('google_access_token');
+        final expiresAtStr = prefs.getString('google_access_token_expires_at');
+        
+        if (token == null || expiresAtStr == null) {
+          throw GoogleTokenExpiredException();
+        }
+        
+        final expiresAt = DateTime.parse(expiresAtStr);
+        if (DateTime.now().isAfter(expiresAt)) {
+          throw GoogleTokenExpiredException();
+        }
+        
+        final response = await http.delete(
+          Uri.parse('https://www.googleapis.com/calendar/v3/calendars/$calendarId/events/$eventId'),
+          headers: {'Authorization': 'Bearer $token'},
+        );
+        
+        if (response.statusCode == 401) {
+          throw GoogleTokenExpiredException();
+        }
+        
+        if (response.statusCode == 200 || response.statusCode == 204) {
+          return true;
+        }
+      } on GoogleTokenExpiredException {
+        rethrow;
+      } catch (e, s) {
+        AppLogger.error('Error deleting calendar event on Web', error: e, stack: s);
+      }
+      return false;
+    }
+
     final hasPermission = await requestPermissions();
     if (!hasPermission) {
       AppLogger.warning('Calendar permissions not granted');

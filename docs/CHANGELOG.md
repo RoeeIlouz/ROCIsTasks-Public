@@ -5,6 +5,124 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.19+48] - 2026-06-27
+
+### Added
+- Paywall protection and PRO locks for the Glassmorphism visual theme.
+- Settings screen lock icon indicators for premium theme options.
+
+### Changed
+- Standardized the FAB design across Home and Categories screens (with solid primary coloring fallback for free users).
+
+## [0.1.18+47] - 2026-06-26
+
+### Fixed
+- Positioned date numbers above events/tasks in calendar screen and Android home widget.
+- Brought event indicators/titles closer to the date headers.
+- Centered the "No events for this day" empty state in the calendar screen to fix vertical stretching.
+
+## [0.1.17+46] - 2026-06-26
+
+### Added
+- Widget selection menu preview layout for the full calendar widget.
+- Bouncy Easter Egg spin animations on double-tap/long-press on FABs and settings logo.
+- Soft elevation shadows for cards, FABs, and navbar when glassmorphism is disabled.
+
+### Fixed
+- Widget single event/task title display, layout alignment, and color rendering.
+- Better calendar screen selection readability using border outlines.
+
+## [0.1.16+45] - 2026-06-26
+
+### Added
+- Symmetrical, custom-built bottom navigation bar vertical spacing.
+- Dynamic FAB styling (glassy translucent/solid primary based on glassmorphism toggle).
+- 10-18% color tinting in glass containers & borders.
+- Show single task/event title directly on calendar screen cell.
+
+### Fixed
+- Android widget month & today buttons navigation offset updates natively (avoids freeze).
+- Timeout for timezone queries in background isolates.
+
+## [0.1.15+44] - 2026-06-25
+
+### Added
+
+- **Task completion haptic feedback:** Ticking a task off now triggers a satisfying medium haptic impact. Un-completing a task triggers a lighter haptic so the two actions feel distinct.
+- **Settings toggle for completion feedback:** A new "Task Completion Feedback" toggle in the Productivity section of Settings lets users enable or disable the haptic pulse at any time. The preference is persisted across sessions.
+
+## [0.1.14+43] - 2026-06-25
+
+### Changed
+
+- Completed the glassmorphism visual redesign across the remaining screens and sheets:
+  - Upgraded the category screen list items and the category sheet to use the unified premium `GlassContainer`.
+  - Converted the date/time picker button inside the new task screen to `GlassContainer` styling.
+  - Redesigned the app guide sections to group items within premium glassy containers separated by thin dividers.
+  - Restructured the task details view into structured glassy cards for properties, description, subtasks checklist, and attachments.
+  - Redesigned the sorting and filtering sheets (Task Filters, Calendar Filters, Calendar Colors) to use high-opacity glass containers with custom rounded corners.
+  - Re-styled trash screen items into glassy list elements.
+  - Grouped premium feature showcase list items on the ROCIs Tasks Pro screen into a single glassy container card with separators.
+
+## [0.1.13+42] - 2026-06-25
+
+### Added
+
+- Added a floating glassy bottom navigation bar with content extending underneath.
+- Redesigned the "New Task" Floating Action Button to match the glassy visual style.
+- Added custom glassy empty states for the Task List and Calendar Event List.
+- Upgraded Google Calendar Event Tiles to use the unified premium GlassContainer style.
+
+### Fixed
+
+- Resolved all active static analysis warnings: replaced deprecated `withOpacity` with `withValues`, added missing curly braces in control structures, and replaced production `print` statements with `debugPrint`.
+
+## [0.1.11+39] - 2026-06-25
+
+### Changed
+
+- UI Redesign: Implemented Glassmorphism style across the app.
+- Added `GlassContainer` widget for frosted glass effect.
+- Redesigned `TaskTile` to use `GlassContainer` and circular checkboxes.
+- Redesigned `CalendarScreen` (Samsung Calendar style) to display events as horizontal bars inside day cells with custom styling for weekends and the current day.
+- Added a subtle gradient background to the main `Scaffold` body to enhance the glassmorphism blur effect.
+
+## [1.1.10+34] - 2026-06-13
+
+### Added
+
+- **Birthday Promo**: Free Pro access for all users from June 16 to July 16, 2026. After the promo ends, users who didn't pay return to the basic version. Premium screen shows "Birthday Promo - Free until July 16" during the promo period.
+
+### Fixed
+
+- **Widget Preview Layout**: Added `android:previewLayout` to Overdue Tasks, Quick Add, and Mini Calendar widget info XMLs to fix "couldn't add widget" error on some launchers.
+- **Mini Calendar Widget**: Removed invalid `findViewById` call from `MiniCalendarWidgetProvider.kt` that caused build failures.
+
+## [1.1.8+32] - 2026-06-13
+
+### Added
+
+- **Overdue Tasks Widget**: New Android home screen widget showing overdue incomplete tasks with priority colors, severity indicators, category badges, and due time labels. Includes add task button and empty state.
+- **Quick Add Widget**: New minimal Android home screen widget with a + button for rapid task creation without opening the app. Tapping anywhere opens the add task screen.
+- **Mini Calendar Widget**: New compact single-month calendar grid variant showing day numbers with event/task indicator dots and month navigation (prev/next/today). Simpler and smaller than the FullCalendar widget.
+- **Localization regenerated** from ARB files with all new strings.
+
+## [1.1.7+31] - 2026-06-13
+
+### Added
+
+- **Search Symbols**: Added @ for category, # for title, ! for priority, % for due date, & for subtask, \* for status, and ? for today filtering in search. Symbols are combinable (e.g. `@work !high`). Updated search hint text in all 7 locales.
+- **Do Not Remind Option**: Added `skipReminders` field to Task model. Tasks with this option enabled will not schedule any notifications. Available to all users.
+- **Private Task Security Prompt**: When creating a private task or category without security enabled, a dismissible dialog prompts the user to set up PIN/biometrics.
+- **Attachments in Task Details**: Task detail screen now shows attached files with file-type icons and open functionality via `url_launcher`.
+- **Search Symbols in App Guide**: Added a "Search Symbols" section to the app guide documenting all 7 search symbols.
+- **New Widget Suggestions**: Documented Quick Add, Overdue Tasks, Weekly Summary, and Habit Tracker widget ideas.
+
+### Fixed
+
+- **Due Date Rescheduling**: Fixed `updateTask()` treating `dueDate: null` as "don't change" instead of "clear the date". Added `clearDueDate` parameter. Removed unconditional `recurrenceRule = null` wipe.
+- **Task Counter Notification**: Added immediate task counter notification on task creation, bypassing the widget update debounce.
+
 ## [1.1.6+30] - 2026-06-12
 
 ### Changed

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
+import 'package:rocis_tasks/shared/ui/widgets/glass_container.dart';
 
 class AppGuideScreen extends StatelessWidget {
   const AppGuideScreen({super.key});
@@ -104,6 +105,18 @@ class AppGuideScreen extends StatelessWidget {
               ),
             ],
           ),
+          const SizedBox(height: 24),
+          _buildGuideSection(
+            context,
+            l10n.searchSymbols,
+            [
+              _GuideItem(
+                icon: Icons.search,
+                title: l10n.searchSymbolsDesc,
+                description: '',
+              ),
+            ],
+          ),
           const SizedBox(height: 32),
           Center(
             child: Text(
@@ -126,7 +139,7 @@ class AppGuideScreen extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
           child: Text(
             title,
             style: theme.textTheme.headlineSmall?.copyWith(
@@ -135,43 +148,64 @@ class AppGuideScreen extends StatelessWidget {
             ),
           ),
         ),
-        ...items.map((item) => Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(item.icon, color: theme.colorScheme.primary),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      item.title,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+        GlassContainer(
+          borderRadius: BorderRadius.circular(20),
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: List.generate(items.length, (index) {
+              final item = items[index];
+              return Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(item.icon, color: theme.colorScheme.primary),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                item.title,
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              if (item.description.isNotEmpty) ...[
+                                const SizedBox(height: 4),
+                                Text(
+                                  item.description,
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.8),
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      item.description,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.8),
-                      ),
+                  ),
+                  if (index < items.length - 1)
+                    Divider(
+                      height: 1,
+                      thickness: 1,
+                      color: theme.dividerColor.withValues(alpha: 0.08),
                     ),
-                  ],
-                ),
-              ),
-            ],
+                ],
+              );
+            }),
           ),
-        )),
+        ),
       ],
     );
   }

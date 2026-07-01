@@ -1,4 +1,5 @@
 import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
@@ -52,6 +53,11 @@ class NotificationService {
 
   Future<void> init() async {
     if (_isInitialized) return;
+    if (kIsWeb) {
+      _isInitialized = true;
+      AppLogger.info('NotificationService initialization skipped on web', tag: 'Notifications');
+      return;
+    }
     tz.initializeTimeZones();
     final timezoneInfo = await FlutterTimezone.getLocalTimezone();
     final timeZoneName = timezoneInfo.identifier;
@@ -112,6 +118,7 @@ class NotificationService {
     String? openTaskLabel,
     List<AndroidNotificationAction>? androidActions,
   }) async {
+    if (kIsWeb) return;
     if (scheduledDate.isBefore(DateTime.now())) return;
 
     AppLogger.info(
@@ -179,10 +186,12 @@ class NotificationService {
 
 
   Future<void> cancelNotification(int id) async {
+    if (kIsWeb) return;
     await flutterLocalNotificationsPlugin.cancel(id: id);
   }
 
   Future<void> requestPermissions() async {
+    if (kIsWeb) return;
     final androidPlugin = flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin
@@ -207,6 +216,7 @@ class NotificationService {
     String? tasksRemainingLabel,
     String? tasksSummaryLabel,
   }) async {
+    if (kIsWeb) return;
     try {
       await _platform.invokeMethod('updateTaskCountIcon', {
         'count': count,
@@ -261,6 +271,7 @@ class NotificationService {
     required String body,
     int id = 777,
   }) async {
+    if (kIsWeb) return;
     const androidDetails = AndroidNotificationDetails(
       'rocis_tasks_info',
       'Task Information',
@@ -278,6 +289,7 @@ class NotificationService {
   }
 
   Future<void> cancelAllNotifications() async {
+    if (kIsWeb) return;
     await flutterLocalNotificationsPlugin.cancelAll();
   }
 

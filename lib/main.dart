@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:dynamic_color/dynamic_color.dart';
@@ -35,9 +36,12 @@ Future<void> main() async {
   await AppInitializer.initialize();
 
   // Register callback for home widget interactivity
-  HomeWidget.registerInteractivityCallback(
-    BackgroundHandler.handleInteractivity,
-  );
+  if (!kIsWeb) {
+    HomeWidget.registerInteractivityCallback(
+      BackgroundHandler.handleInteractivity,
+    );
+  }
+  debugPrint('main(): calling runApp(AppRoot)');
   runApp(const AppRoot());
 }
 
@@ -80,10 +84,12 @@ class _AppRootState extends State<AppRoot> {
   @override
   void initState() {
     super.initState();
+    debugPrint('AppRoot: initState called');
     _initFuture = _initServices();
   }
 
   Future<void> _initServices() async {
+    debugPrint('AppRoot: _initServices started');
     _onboardingService = OnboardingService();
     _appRouter = AppRouter(_authService, _onboardingService);
 
@@ -168,7 +174,9 @@ class _AppRootState extends State<AppRoot> {
       await _subscriptionService.syncWithAuthUserId(
         _authService.currentUser?.uid,
       );
+      debugPrint('AppRoot: _initServices finished successfully');
     } catch (e, stackTrace) {
+      debugPrint('AppRoot: _initServices critical failure: $e');
       AppLogger.critical(
         'Critical app initialization failure',
         error: e,
@@ -196,6 +204,7 @@ class _AppRootState extends State<AppRoot> {
       future: _initFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
+          debugPrint('AppRoot: FutureBuilder waiting...');
           return MaterialApp(
             debugShowCheckedModeBanner: false,
             localizationsDelegates: const [
@@ -244,6 +253,7 @@ class _AppRootState extends State<AppRoot> {
         }
 
         if (snapshot.hasError) {
+          debugPrint('AppRoot: FutureBuilder error: ${snapshot.error}');
           return MaterialApp(
             debugShowCheckedModeBanner: false,
             localizationsDelegates: const [
@@ -330,6 +340,7 @@ class _AppRootState extends State<AppRoot> {
           );
         }
 
+        debugPrint('AppRoot: FutureBuilder complete, building MultiProvider');
         return MultiProvider(
           providers: [
             ChangeNotifierProvider.value(value: _themeService),
@@ -379,12 +390,14 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint('MyApp: build called');
     final themeService = Provider.of<ThemeService>(context);
     final subscriptionService = Provider.of<SubscriptionService>(context);
     final appRouter = Provider.of<AppRouter>(context);
 
     return DynamicColorBuilder(
       builder: (lightDynamic, darkDynamic) {
+        debugPrint('DynamicColorBuilder: builder called');
         final bool canUseCustomSeed =
             subscriptionService.isPremium &&
             themeService.useCustomSeedColor &&

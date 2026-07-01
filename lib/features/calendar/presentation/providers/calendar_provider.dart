@@ -16,12 +16,14 @@ class CalendarProvider extends ChangeNotifier {
   String? _userId;
   List<Calendar> _availableCalendars = [];
   Set<String> _selectedCalendarIds = {};
+  bool _isGoogleCalendarTokenExpired = false;
 
   CalendarProvider(
     this._calendarService,
     this._widgetService,
   );
 
+  bool get isGoogleCalendarTokenExpired => _isGoogleCalendarTokenExpired;
   List<Event> get events => _events;
   bool get showTasks => _showTasks;
   bool get showGoogleCalendar => _showGoogleCalendar;
@@ -139,18 +141,25 @@ class CalendarProvider extends ChangeNotifier {
 
   Future<void> loadEvents() async {
     _isLoading = true;
+    _isGoogleCalendarTokenExpired = false;
     notifyListeners();
 
     try {
       // Fetch available calendars first to populate the list
       _availableCalendars = await _calendarService.getAvailableCalendars();
 
-      // If no calendars are selected yet, default to all of them
-      if (_selectedCalendarIds.isEmpty && _availableCalendars.isNotEmpty) {
-        _selectedCalendarIds = _availableCalendars
-            .where((c) => c.id != null)
-            .map((c) => c.id!)
-            .toSet();
+      if (_availableCalendars.isNotEmpty) {
+        final availableIds = _availableCalendars.map((c) => c.id).whereType<String>().toSet();
+        final validSelectedIds = _selectedCalendarIds.intersection(availableIds);
+        if (validSelectedIds.isEmpty) {
+          // If no selected calendars are valid in the current platform's available calendars,
+          // default to selecting all available calendars.
+          _selectedCalendarIds = availableIds;
+        } else {
+          _selectedCalendarIds = validSelectedIds;
+        }
+      } else {
+        _selectedCalendarIds = {};
       }
 
       // Load device calendar events
@@ -159,14 +168,26 @@ class CalendarProvider extends ChangeNotifier {
       );
 
       _processEventsToMap();
-    } catch (e, s) {
-      AppLogger.error(
-        'Error loading events in calendar provider',
-        error: e,
-        stack: s,
-      );
+    } on GoogleTokenExpiredException {
+      _isGoogleCalendarTokenExpired = true;
       _events = [];
       _eventsMap = {};
+      AppLogger.warning('Google Calendar token expired on Web.');
+    } catch (e, s) {
+      // Also catch String exception representation if needed
+      if (e.toString().contains('GoogleTokenExpiredException')) {
+        _isGoogleCalendarTokenExpired = true;
+        _events = [];
+        _eventsMap = {};
+      } else {
+        AppLogger.error(
+          'Error loading events in calendar provider',
+          error: e,
+          stack: s,
+        );
+        _events = [];
+        _eventsMap = {};
+      }
     } finally {
       _isLoading = false;
       notifyListeners();

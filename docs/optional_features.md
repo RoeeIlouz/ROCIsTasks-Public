@@ -45,3 +45,19 @@ Deeper insights into work patterns:
 - **Activity Heatmap**: A year-view completion heatmap (GitHub style).
 - **Time Allocation**: Analysis of how much time is spent on different categories.
 - **Predictive Deadlines**: AI-powered suggestions for task deadlines based on historical behavior.
+
+## 6. New Features
+
+- [x] **The default visibility of private tasks is locked**: If a private task is created immediately lock it, and if the user doesnt have the security setting turned on then when he creted the private task/private category then they will see a pop up prompting them to enable the security settings (setting up a pin or biometrics).
+- [x] **Fix the issue where notifications are sent for tasks that are created with the "Do not remind" option**: These notifications should not be sent.
+- [x] **When a task is created immediately call the task counter notification so it will be updated**.
+- [x] **Add search symbols**: add the functionality of adding a "@" for searching a category, a "#" for searching a task, a "!" for searching a priority, a "%" for searching a due date, a "&" for searching a sub-task, a "\*" for searching a completion status and a "?" for searching a task that is due today. add this feature to the app guide.
+- [x] **App Guide Update**: Update the app guide to include the new features. also show the app guide in the onboarding page when new users get in to the app.
+- **New Widgets**: Suggest new widgets that we can add to the app to improve the user experience.
+  - [x] **Quick Add Widget**: A small widget with just a text field and + button for rapid task creation without opening the app.
+  - [x] **Overdue Tasks Widget**: A compact widget showing only overdue tasks with priority colors and due times.
+  - [x] **Mini Calendar Widget**: A compact single-month grid variant with event/task indicator dots and month navigation.
+  - **Weekly Summary Widget**: Shows completion stats for the current week (completed vs pending, streak info).
+  - **Habit Tracker Widget**: Daily streak tracking widget with checkmarks for completed habits.
+- [x] **Fix the issue where the due date is not updated when the task is rescheduled**.
+- [x] **Fix the issue where attached files arent shown in the task details**.

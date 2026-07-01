@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -42,8 +43,10 @@ class AppInitializer {
 
       // Start custom cold start trace for performance monitoring
       Trace? coldStartTrace;
-      if (AppConfig.enablePerformanceMonitoring) {
-        coldStartTrace = FirebasePerformance.instance.newTrace('app_cold_start');
+      if (!isBackground && AppConfig.enablePerformanceMonitoring) {
+        coldStartTrace = FirebasePerformance.instance.newTrace(
+          'app_cold_start',
+        );
         await coldStartTrace.start();
       }
 
@@ -53,10 +56,12 @@ class AppInitializer {
             _initHive().then(
               (_) => _initEncryption(),
             ), // Encryption needs Hive for key gen fallback
-            _initTimezone(),
-            _initSecondaryFirebase(),
-            _initPerformance(),
-            _initRemoteConfig(),
+            _initTimezone(isBackground: isBackground),
+            if (!isBackground) ...[
+              _initSecondaryFirebase(),
+              _initPerformance(),
+              _initRemoteConfig(),
+            ]
           ])
           .then((_) {
             // Services that depend on Firebase but can run after it's ready
@@ -172,6 +177,10 @@ class AppInitializer {
 
   /// Initialize secondary Firebase app for accessing ROCIs-Schedule Firestore
   static Future<void> _initSecondaryFirebase() async {
+    if (kIsWeb) {
+      AppLogger.info('ROCIs-Schedule integration skipped on web');
+      return;
+    }
     try {
       // Check if secondary app already exists
       try {
@@ -214,11 +223,19 @@ class AppInitializer {
     }
   }
 
-  static Future<void> _initTimezone() async {
+  static Future<void> _initTimezone({bool isBackground = false}) async {
     try {
       tz.initializeTimeZones();
-      final timezoneInfo = await FlutterTimezone.getLocalTimezone();
-      final timeZoneName = timezoneInfo.identifier;
+      String timeZoneName = 'UTC';
+      if (!isBackground) {
+        try {
+          final timezoneInfo = await FlutterTimezone.getLocalTimezone()
+              .timeout(const Duration(seconds: 2));
+          timeZoneName = timezoneInfo.identifier;
+        } catch (e) {
+          AppLogger.warning('Failed to get local timezone via platform channel: $e');
+        }
+      }
       t.setLocalLocation(t.getLocation(timeZoneName));
       AppLogger.info('Timezone initialized: $timeZoneName');
     } catch (e) {
@@ -227,6 +244,7 @@ class AppInitializer {
   }
 
   static Future<void> _initPerformance() async {
+    if (kIsWeb) return; // Disable Firebase Performance entirely on Web to prevent adblocker-induced crashes
     if (!AppConfig.enablePerformanceMonitoring) return;
     try {
       FirebasePerformance.instance.setPerformanceCollectionEnabled(true);

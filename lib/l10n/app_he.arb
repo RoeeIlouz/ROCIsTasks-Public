@@ -1,4 +1,4 @@
-﻿{
+{
   "appTitle": "המשימות של ROCI",
   "settings": "הגדרות",
   "account": "חשבון",
@@ -343,5 +343,16 @@
   "biometricAuthReason": "הזדהה כדי לגשת למשימות פרטיות",
   "usePinInstead": "השתמש ב-PIN במקום",
   "securitySettings": "הגדרות אבטחה",
-  "securitySettingsSubtitle": "נהל גישה עם PIN וביומטריה"
+  "securitySettingsSubtitle": "נהל גישה עם PIN וביומטריה",
+  "enableSecurity": "הפעל אבטחה",
+  "enableSecurityDescription": "יצרת משימה פרטית. הגדר קוד PIN או ביומטריה כדי להגן על התוכן הפרטי שלך.",
+  "notNow": "לא עכשיו",
+  "setUp": "הגדר",
+  "doNotRemind": "לא להזכיר",
+  "doNotRemindSubtitle": "השבת את כל ההתראות עבור משימה זו",
+  "glassmorphismEffects": "אפקטי זכוכית",
+  "glassmorphismEffectsSubtitle": "החל עיצוב זכוכית חלבית על כרטיסים",
+  "noEventsForThisDay": "אין אירועים ליום זה",
+  "searchSymbols": "סימני חיפוש",
+  "searchSymbolsDesc": "השתמש בסימנים לסינון משימות: @קטגוריה (למשל @עבודה), #כותרת (למשל #פגישה), !עדיפות (למשל !גבוהה), %תאריך (למשל %2025-06-15), &תת-משימה (למשל &תיקון באג), *סטטוס (*בוצע או *ממתין), ? (משימות להיום). ניתן לשלב סימנים מרובים."
 }
