@@ -1001,4 +1001,46 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get searchSymbolsDesc =>
       'השתמש בסימנים לסינון משימות: @קטגוריה (למשל @עבודה), #כותרת (למשל #פגישה), !עדיפות (למשל !גבוהה), %תאריך (למשל %2025-06-15), &תת-משימה (למשל &תיקון באג), *סטטוס (*בוצע או *ממתין), ? (משימות להיום). ניתן לשלב סימנים מרובים.';
+
+  @override
+  String get widgetSettings => 'התאמת ווידג\'ט';
+
+  @override
+  String get widgetSettingsSubtitle => 'הגדר צבעים, ערכת נושא ואפשרויות';
+
+  @override
+  String get widgetTheme => 'ערכת נושא של הווידג\'ט';
+
+  @override
+  String get widgetThemeSystem => 'ברירת מחדל של המערכת';
+
+  @override
+  String get widgetThemeLight => 'בהיר';
+
+  @override
+  String get widgetThemeDark => 'כהה';
+
+  @override
+  String get widgetThemeGlassmorphic => 'אפקט זכוכית';
+
+  @override
+  String get showWeekNumbers => 'הצג מספרי שבועות';
+
+  @override
+  String get weekendHighlights => 'הדגש סופי שבוע';
+
+  @override
+  String get startOfWeek => 'תחילת השבוע';
+
+  @override
+  String get sunday => 'יום ראשון';
+
+  @override
+  String get monday => 'יום שני';
+
+  @override
+  String get saturday => 'יום שבת';
+
+  @override
+  String get widgetAccentColor => 'צבע הדגשה של הווידג\'ט';
 }

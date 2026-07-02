@@ -723,6 +723,21 @@ class TaskProvider extends ChangeNotifier {
     }
   }
 
+  bool _looksLikeGoogleCalendar(dynamic calendar) {
+    try {
+      final accountType = (calendar.accountType as String?)?.toLowerCase();
+      final accountName = (calendar.accountName as String?)?.toLowerCase();
+      final name = (calendar.name as String?)?.toLowerCase();
+
+      return (accountType?.contains('google') ?? false) ||
+          (accountType?.contains('com.google') ?? false) ||
+          (accountName?.contains('gmail') ?? false) ||
+          (name?.contains('google') ?? false);
+    } catch (_) {
+      return false;
+    }
+  }
+
   Future<void> _processGoogleCalendarUpstreamRocisTasksHook() async {
     if (!_subscriptionService.isPremium) return;
 
@@ -1972,47 +1987,7 @@ class TaskProvider extends ChangeNotifier {
     }
   }
 
-  bool _looksLikeGoogleCalendar(dynamic calendar) {
-    try {
-      final accountType = (calendar.accountType as String?)?.toLowerCase();
-      final accountName = (calendar.accountName as String?)?.toLowerCase();
-      final name = (calendar.name as String?)?.toLowerCase();
 
-      return (accountType?.contains('google') ?? false) ||
-          (accountType?.contains('com.google') ?? false) ||
-          (accountName?.contains('gmail') ?? false) ||
-          (name?.contains('google') ?? false);
-    } catch (_) {
-      return false;
-    }
-  }
-
-  String? _selectWritableCalendarId(
-    List<dynamic> calendars, {
-    String? preferredCalendarId,
-  }) {
-    if (calendars.isEmpty) return null;
-
-    dynamic preferred;
-    if (preferredCalendarId != null) {
-      try {
-        preferred = calendars.firstWhere(
-          (c) => c.id == preferredCalendarId && c.isReadOnly != true,
-        );
-      } catch (_) {}
-    }
-    if (preferred?.id != null) return preferred.id as String?;
-
-    final writable = calendars.where((c) => c.isReadOnly != true).toList();
-    if (writable.isEmpty) return null;
-
-    try {
-      final googleCalendar = writable.firstWhere(_looksLikeGoogleCalendar);
-      return googleCalendar.id as String?;
-    } catch (_) {}
-
-    return writable.first.id as String?;
-  }
 
   Future<void> _removeGoogleTask(Task task) async {
     final taskId = task.googleTaskId;

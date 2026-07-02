@@ -21,6 +21,7 @@ import 'package:rocis_tasks/features/home/presentation/screens/app_guide_screen.
 import 'package:rocis_tasks/shared/ui/widgets/easter_egg_spinner.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:rocis_tasks/features/auth/presentation/screens/security_settings_screen.dart';
+import 'package:rocis_tasks/features/home/presentation/screens/widget_customization_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -514,6 +515,21 @@ class SettingsScreen extends StatelessWidget {
               );
             },
           ),
+          if (!kIsWeb)
+            ListTile(
+              leading: _buildLeadingIcon(context, Icons.widgets_rounded, Colors.orange),
+              title: Text(l10n.widgetSettings),
+              subtitle: Text(l10n.widgetSettingsSubtitle),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const WidgetCustomizationScreen(),
+                  ),
+                );
+              },
+            ),
         ]),
         _buildSectionHeader(context, l10n.productivity),
         _buildSectionCard(context, [

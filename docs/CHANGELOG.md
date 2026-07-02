@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.20+49] - 2026-07-02
+
+### Added
+- Dynamic customization options for the full calendar widget (Themes, Week Numbers, Weekend Highlights) and a live mock preview.
+
+### Changed
+- Migrated task synchronization from Google Calendar to Google Tasks under a custom "ROCIs Tasks" list.
+- Cleaned up static analysis warnings and resolved calendar import compilation errors.
+
 ## [0.1.19+48] - 2026-06-27
 
 ### Added

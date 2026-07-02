@@ -43,7 +43,81 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
             try {
                 val views = RemoteViews(context.packageName, R.layout.widget_full_calendar_layout)
 
-                // 1. Title Update
+                // Read theme and customization preferences
+                val theme = widgetData.getString("full_calendar_theme", "system") ?: "system"
+                val showWeekNumbers = widgetData.getBoolean("full_calendar_show_week_numbers", true)
+                val weekendHighlight = widgetData.getBoolean("full_calendar_weekend_highlight", true)
+
+                // 1. Apply Widget Theme Background
+                val rootBgRes = when (theme) {
+                    "light" -> R.drawable.widget_background_light
+                    "dark" -> R.drawable.widget_background_dark
+                    "glassmorphic" -> R.drawable.widget_background_glass
+                    else -> R.drawable.widget_background
+                }
+                views.setInt(R.id.widget_full_calendar_root, "setBackgroundResource", rootBgRes)
+
+                // 2. Set Text Colors depending on Theme
+                val textColor = when (theme) {
+                    "light" -> android.graphics.Color.parseColor("#1C1C1E")
+                    "dark", "glassmorphic" -> android.graphics.Color.parseColor("#FFFFFF")
+                    else -> context.getColor(R.color.widget_title_text)
+                }
+                views.setTextColor(R.id.widget_full_calendar_title, textColor)
+                views.setTextColor(R.id.widget_full_calendar_prev, textColor)
+                views.setTextColor(R.id.widget_full_calendar_next, textColor)
+
+                // Weekday headers text colors
+                val weekdayColor = when (theme) {
+                    "light" -> android.graphics.Color.parseColor("#2C2C2E")
+                    "dark", "glassmorphic" -> android.graphics.Color.parseColor("#E5E5EA")
+                    else -> context.getColor(R.color.widget_body_text)
+                }
+                val weekdaySecondaryColor = when (theme) {
+                    "light" -> android.graphics.Color.parseColor("#8E8E93")
+                    "dark", "glassmorphic" -> android.graphics.Color.parseColor("#AEAEB2")
+                    else -> context.getColor(R.color.widget_secondary_text)
+                }
+
+                views.setTextColor(R.id.widget_weekday_num_header, weekdaySecondaryColor)
+
+                // Dynamic Weekday headers text and colors based on startOfWeek
+                val startOfWeek = widgetData.getInt("full_calendar_start_of_week", 7) // 7 = Sunday, 1 = Monday, 6 = Saturday
+                val daysOfWeekLetters = listOf("M", "T", "W", "T", "F", "S", "S") // 1-indexed days of week: 1=Mon, ..., 7=Sun
+                val weekdayViewIds = listOf(
+                    R.id.widget_weekday_sun_header,
+                    R.id.widget_weekday_mon_header,
+                    R.id.widget_weekday_tue_header,
+                    R.id.widget_weekday_wed_header,
+                    R.id.widget_weekday_thu_header,
+                    R.id.widget_weekday_fri_header,
+                    R.id.widget_weekday_sat_header
+                )
+
+                for (col in 0..6) {
+                    val dayOfWeek = (startOfWeek + col - 1) % 7 + 1
+                    val letter = daysOfWeekLetters[dayOfWeek - 1]
+                    val viewId = weekdayViewIds[col]
+                    views.setTextViewText(viewId, letter)
+
+                    val color = if (weekendHighlight) {
+                        if (dayOfWeek == 7) {
+                            android.graphics.Color.parseColor("#FF5252") // Red for Sunday
+                        } else if (dayOfWeek == 6) {
+                            android.graphics.Color.parseColor("#448AFF") // Blue for Saturday
+                        } else {
+                            weekdayColor
+                        }
+                    } else {
+                        weekdayColor
+                    }
+                    views.setTextColor(viewId, color)
+                }
+
+                // Show / Hide Week Numbers column header
+                views.setViewVisibility(R.id.widget_weekday_num_header, if (showWeekNumbers) android.view.View.VISIBLE else android.view.View.GONE)
+
+                // 3. Title Update
                 val monthName = widgetData.getString("full_calendar_month_name", "Calendar")
                 views.setTextViewText(R.id.widget_full_calendar_title, monthName)
 

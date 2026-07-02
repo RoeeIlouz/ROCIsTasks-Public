@@ -19,6 +19,10 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
     private var days = ArrayList<JSONObject>()
     private var showTasks = true
     private var showGoogle = true
+    private var selectedDateStr = ""
+    private var widgetTheme = "system"
+    private var showWeekNumbers = true
+    private var weekendHighlight = true
 
     override fun onCreate() {
         onDataSetChanged()
@@ -32,6 +36,17 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
             // Read filter settings
             showTasks = widgetData.getBoolean(FullCalendarWidgetProvider.PREF_SHOW_TASKS, true)
             showGoogle = widgetData.getBoolean(FullCalendarWidgetProvider.PREF_SHOW_GOOGLE, true)
+            selectedDateStr = widgetData.getString("full_calendar_selected_date", "") ?: ""
+            if (selectedDateStr.isEmpty()) {
+                val today = java.util.Calendar.getInstance()
+                selectedDateStr = String.format("%04d-%02d-%02d", 
+                    today.get(java.util.Calendar.YEAR),
+                    today.get(java.util.Calendar.MONTH) + 1,
+                    today.get(java.util.Calendar.DAY_OF_MONTH))
+            }
+            widgetTheme = widgetData.getString("full_calendar_theme", "system") ?: "system"
+            showWeekNumbers = widgetData.getBoolean("full_calendar_show_week_numbers", true)
+            weekendHighlight = widgetData.getBoolean("full_calendar_weekend_highlight", true)
             
             val gridDataJson = widgetData.getString("full_calendar_grid_data", "[]")
             val gridData = JSONArray(gridDataJson)
@@ -96,6 +111,17 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
                     cellViews = RemoteViews(context.packageName, R.layout.widget_full_calendar_week_num_item)
                     val weekNum = day.optInt("weekNumber", 0)
                     cellViews.setTextViewText(R.id.widget_full_calendar_day_text, weekNum.toString())
+                    
+                    // Show/hide week number root
+                    cellViews.setViewVisibility(R.id.widget_full_calendar_week_num_root, if (showWeekNumbers) android.view.View.VISIBLE else android.view.View.GONE)
+                    
+                    // Set week number text color depending on theme
+                    val weekColor = when (widgetTheme) {
+                        "light" -> android.graphics.Color.parseColor("#8E8E93")
+                        "dark", "glassmorphic" -> android.graphics.Color.parseColor("#AEAEB2")
+                        else -> context.getColor(R.color.widget_secondary_text)
+                    }
+                    cellViews.setTextColor(R.id.widget_full_calendar_day_text, weekColor)
                  } else {
                      cellViews = RemoteViews(context.packageName, R.layout.widget_full_calendar_day_item)
                      val dayNum = day.optInt("day", 1)
@@ -109,38 +135,79 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
                          today.get(java.util.Calendar.MONTH) + 1,
                          today.get(java.util.Calendar.DAY_OF_MONTH))
                      
-                     val isToday = dateStr == currentTodayStr
+                      val isToday = dateStr == currentTodayStr
+                      val isSelected = dateStr.isNotEmpty() && dateStr == selectedDateStr
 
-                     var dayOfWeek = 0
-                     try {
-                         val dateObj = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).parse(dateStr)
-                         if (dateObj != null) {
-                             val cal = java.util.Calendar.getInstance()
-                             cal.time = dateObj
-                             dayOfWeek = cal.get(java.util.Calendar.DAY_OF_WEEK)
-                         }
-                     } catch (e: Exception) {}
+                      var dayOfWeek = 0
+                      try {
+                          val dateObj = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).parse(dateStr)
+                          if (dateObj != null) {
+                              val cal = java.util.Calendar.getInstance()
+                              cal.time = dateObj
+                              dayOfWeek = cal.get(java.util.Calendar.DAY_OF_WEEK)
+                          }
+                      } catch (e: Exception) {}
 
-                     cellViews.setTextViewText(R.id.widget_full_calendar_day_text, dayNum.toString())
-                     
-                     if (isToday) {
-                         cellViews.setInt(R.id.widget_full_calendar_day_text, "setBackgroundResource", R.drawable.widget_today_background)
-                     } else {
-                         cellViews.setInt(R.id.widget_full_calendar_day_text, "setBackgroundResource", 0) // Transparent
-                     }
-                     
-                     val textColor = if (isToday) {
-                         android.graphics.Color.WHITE
-                     } else if (isCurrentMonth) {
-                         when (dayOfWeek) {
-                             java.util.Calendar.SUNDAY -> android.graphics.Color.parseColor("#FF5252")
-                             java.util.Calendar.SATURDAY -> android.graphics.Color.parseColor("#448AFF")
-                             else -> context.getColor(R.color.widget_title_text)
-                         }
-                     } else {
-                         context.getColor(R.color.widget_secondary_text)
-                     }
-                     cellViews.setTextColor(R.id.widget_full_calendar_day_text, textColor)
+                      cellViews.setTextViewText(R.id.widget_full_calendar_day_text, dayNum.toString())
+                      
+                      val highlightColorStr = widgetData.getString("full_calendar_highlight_color", "#6C63FF") ?: "#6C63FF"
+                      var highlightColor = android.graphics.Color.parseColor("#6C63FF")
+                      try {
+                          highlightColor = android.graphics.Color.parseColor(highlightColorStr)
+                      } catch (_: Exception) {}
+
+                      // Reset text background circle
+                      cellViews.setInt(R.id.widget_full_calendar_day_text, "setBackgroundResource", 0)
+
+                      // Set cell-wide highlights
+                      if (isToday) {
+                          val fillAlphaColor = (highlightColor & 0x00FFFFFF) or (0x1A shl 24)
+                          cellViews.setViewVisibility(R.id.widget_full_calendar_day_fill, android.view.View.VISIBLE)
+                          cellViews.setInt(R.id.widget_full_calendar_day_fill, "setColorFilter", fillAlphaColor)
+                      } else {
+                          cellViews.setViewVisibility(R.id.widget_full_calendar_day_fill, android.view.View.GONE)
+                      }
+
+                      if (isSelected) {
+                          val strokeColor = (highlightColor & 0x00FFFFFF) or (0xFF.toInt() shl 24)
+                          cellViews.setViewVisibility(R.id.widget_full_calendar_day_stroke, android.view.View.VISIBLE)
+                          cellViews.setInt(R.id.widget_full_calendar_day_stroke, "setColorFilter", strokeColor)
+                      } else {
+                          cellViews.setViewVisibility(R.id.widget_full_calendar_day_stroke, android.view.View.GONE)
+                      }
+                      
+                      val textColor = if (isToday || isSelected) {
+                          highlightColor
+                      } else if (isCurrentMonth) {
+                          when (dayOfWeek) {
+                              java.util.Calendar.SUNDAY -> if (weekendHighlight) android.graphics.Color.parseColor("#FF5252") else {
+                                  when (widgetTheme) {
+                                      "light" -> android.graphics.Color.parseColor("#1C1C1E")
+                                      "dark", "glassmorphic" -> android.graphics.Color.parseColor("#FFFFFF")
+                                      else -> context.getColor(R.color.widget_title_text)
+                                  }
+                              }
+                              java.util.Calendar.SATURDAY -> if (weekendHighlight) android.graphics.Color.parseColor("#448AFF") else {
+                                  when (widgetTheme) {
+                                      "light" -> android.graphics.Color.parseColor("#1C1C1E")
+                                      "dark", "glassmorphic" -> android.graphics.Color.parseColor("#FFFFFF")
+                                      else -> context.getColor(R.color.widget_title_text)
+                                  }
+                              }
+                              else -> when (widgetTheme) {
+                                  "light" -> android.graphics.Color.parseColor("#1C1C1E")
+                                  "dark", "glassmorphic" -> android.graphics.Color.parseColor("#FFFFFF")
+                                  else -> context.getColor(R.color.widget_title_text)
+                              }
+                          }
+                      } else {
+                          when (widgetTheme) {
+                              "light" -> android.graphics.Color.parseColor("#8E8E93")
+                              "dark", "glassmorphic" -> android.graphics.Color.parseColor("#AEAEB2")
+                              else -> context.getColor(R.color.widget_secondary_text)
+                          }
+                      }
+                      cellViews.setTextColor(R.id.widget_full_calendar_day_text, textColor)
 
                     // Summaries (event/task indicators)
                     val summaries = day.optJSONArray("summaries") ?: JSONArray()
@@ -161,12 +228,19 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
                         cellViews.setViewVisibility(R.id.widget_full_calendar_day_title, android.view.View.VISIBLE)
                         cellViews.setTextViewText(R.id.widget_full_calendar_day_title, title)
 
-                        if (colorHex.isNotEmpty()) {
-                            try {
-                                val color = android.graphics.Color.parseColor(colorHex)
-                                cellViews.setTextColor(R.id.widget_full_calendar_day_title, color)
-                            } catch (e: Exception) {}
-                        }
+                         if (colorHex.isNotEmpty()) {
+                             try {
+                                 val color = android.graphics.Color.parseColor(colorHex)
+                                 cellViews.setTextColor(R.id.widget_full_calendar_day_title, color)
+                             } catch (e: Exception) {}
+                         } else {
+                             val defaultTitleColor = when (widgetTheme) {
+                                 "light" -> android.graphics.Color.parseColor("#2C2C2E")
+                                 "dark", "glassmorphic" -> android.graphics.Color.parseColor("#E5E5EA")
+                                 else -> context.getColor(R.color.widget_title_text)
+                             }
+                             cellViews.setTextColor(R.id.widget_full_calendar_day_title, defaultTitleColor)
+                         }
                     } else if (count > 1) {
                         cellViews.setViewVisibility(R.id.widget_full_calendar_indicators_container, android.view.View.VISIBLE)
                         for (j in 0 until minOf(3, count)) {

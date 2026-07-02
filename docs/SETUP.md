@@ -1,73 +1,82 @@
 # Setup & Development Guide
 
-Follow these steps to set up the **Roci's Tasks** development environment on your machine.
+Follow these steps to set up the **ROCIs Tasks** development environment and configure the backend dependencies on your machine.
 
-## Prerequisites
+---
 
-- **Flutter SDK**: [Install Flutter](https://flutter.dev/docs/get-started/install) (Ensure version complies with `pubspec.yaml` environment sdk: `^3.10.0`).
-- **Dart SDK**: Included with Flutter.
-- **Editor**: VS Code (recommended) or Android Studio.
-- **Firebase Account**: Required for backend services.
+## 📋 Prerequisites
 
-## 🛠️ Installation
+- **Flutter SDK**: [Install Flutter](https://flutter.dev/docs/get-started/install) (Ensure version complies with `pubspec.yaml` environment SDK: `^3.10.0`).
+- **Dart SDK**: Included with the Flutter installation.
+- **Editor**: VS Code (recommended with Flutter/Dart extensions) or Android Studio.
+- **Firebase Account**: Required for Authentication, Firestore database, Analytics, and Performance monitoring.
+- **RevenueCat Account**: Required for managing Pro subscriptions.
 
-1.  **Clone the Repository**:
+---
 
-    ```bash
-    git clone <repository-url>
-    cd rocis_tasks
-    ```
+## 🛠️ Installation & Code Generation
 
-2.  **Install Dependencies**:
+1. **Clone the Repository**:
+   ```bash
+   git clone <repository-url>
+   cd rocis_tasks
+   ```
 
-    ```bash
-    flutter pub get
-    ```
+2. **Retrieve Package Dependencies**:
+   ```bash
+   flutter pub get
+   ```
 
-3.  **Code Generation**:
-    This project uses `hive_generator` for database adapters. If you encounter errors about missing adapters (like `TaskAdapter`), run:
-    ```bash
-    dart run build_runner build --delete-conflicting-outputs
-    ```
+3. **Hive Database Code Generation**:
+   This project uses `hive_generator` to compile data storage adapters. Run the build runner command:
+   ```bash
+   dart run build_runner build --delete-conflicting-outputs
+   ```
+
+---
+
+## 🔑 Environment & API Key Configuration
+
+The project relies on external credentials for payment processing and database connections. These are kept out of version control for security.
+
+1. **Copy Settings Templates**:
+   ```bash
+   cp .env.example .env
+   cp lib/firebase_options.dart.example lib/firebase_options.dart
+   cp lib/firebase_schedule_options.dart.example lib/firebase_schedule_options.dart
+   ```
+
+2. **Configure Environment Variables (`.env`)**:
+   Open the `.env` file and populate your RevenueCat credentials:
+   ```properties
+   REVENUECAT_API_KEY_ANDROID=goog_your_android_api_key
+   REVENUECAT_API_KEY_IOS=appl_your_ios_api_key
+   ```
+
+---
 
 ## 🔥 Firebase Configuration
 
-The app relies on Firebase Auth and Firestore. Since security-sensitive configuration files are excluded from version control, you must set them up manually before building the project.
+The app integrates with Firebase using two separate connection profiles:
+- **Default Connection**: Main database for user auth, tasks, categories, and analytics.
+- **Secondary Connection**: Integrates with the `ROCIs-Schedule` system to pull academic schedules.
 
-1.  **Initialize Configuration Templates**:
-    Copy the provided templates to their active locations:
-    ```bash
-    cp .env.example .env
-    cp lib/firebase_options.dart.example lib/firebase_options.dart
-    cp lib/firebase_schedule_options.dart.example lib/firebase_schedule_options.dart
-    ```
+### Step 1: Default Firebase Setup
+Configure the platforms and download the platform-specific files (`google-services.json` / `GoogleService-Info.plist`) by executing:
+```bash
+flutterfire configure
+```
+Follow the interactive prompt to associate the platforms with your Firebase project. This will regenerate the file `lib/firebase_options.dart`.
 
-2.  **Install Firebase CLI**:
-    ```bash
-    npm install -g firebase-tools
-    firebase login
-    ```
+### Step 2: Secondary Firebase Setup
+Edit the file `lib/firebase_schedule_options.dart` and populate the `FirebaseOptions` structures with the credentials corresponding to your secondary `rocis-schedule` Firestore project.
 
-3.  **Configure Project**:
-    You can run the FlutterFire CLI to automatically register your platforms and generate the native configuration files (`google-services.json` for Android, `GoogleService-Info.plist` for iOS) along with `lib/firebase_options.dart`:
-    ```bash
-    flutterfire configure
-    ```
-    - Select your Firebase project.
-    - Select the platforms you want to support.
+### Step 3: Enable Services in Firebase Console
+1. **Authentication**: Enable **Google Sign-In** and **Email/Password** authentication.
+2. **Firestore Database**: Initialize Firestore and apply the security rules defined in `firestore.rules`.
+3. **Storage**: Enable Firebase Storage for task attachment uploads.
 
-    *Note: If you are not using the CLI, you must download the `google-services.json` / `GoogleService-Info.plist` files manually from your Firebase Console and place them in `android/app/` and `ios/Runner/` respectively, and populate the templates created in Step 1.*
-
-4.  **Enable Services in Firebase Console**:
-    - **Authentication**: Enable **Google Sign-In**.
-    - **Firestore Database**: Create a database and set appropriate security rules.
-
-## 🔑 Calendar API Setup
-
-For Google Calendar synchronization to work on Android (via `device_calendar`):
-
-1.  Ideally, this uses the on-device calendar store. Ensure your Android Emulator or Real Device is signed in with a Google Account that has a calendar.
-2.  Permissions are handled by the `permission_handler` package.
+---
 
 ## 🏃‍♂️ Running the App
 
@@ -75,16 +84,28 @@ For Google Calendar synchronization to work on Android (via `device_calendar`):
   ```bash
   flutter run
   ```
-- **Profile/Release**:
+- **Profile / Release Mode**:
   ```bash
   flutter run --release
   ```
-  _(Note: Release builds invoke code shrinking (R8). If implementing complex reflection, check `android/app/proguard-rules.pro`)_.
+  *(Note: Release compilation runs tree-shaking and obfuscation (R8). If you modify model serialization, verify `android/app/proguard-rules.pro` to prevent runtime crashes).*
 
-## 🧪 Testing
+---
 
-Run unit and widget tests:
+## 🧪 Testing & Code Quality Audits
 
+Run the unit and widget test suite:
 ```bash
 flutter test
+```
+
+### Validation Checklists (Antigravity Kit)
+The repository is bundled with automated checklist scripts to enforce code styling, dependency checkups, and security guidelines:
+
+```bash
+# Run incremental validation checks (Security Scan, Lint Check, Schema, Tests, UX, SEO)
+python .agent/scripts/checklist.py .
+
+# Run comprehensive release validation checks (Checklist + Lighthouse, E2E Playwright, Mobile Audit)
+python .agent/scripts/verify_all.py . --url <local-server-url>
 ```

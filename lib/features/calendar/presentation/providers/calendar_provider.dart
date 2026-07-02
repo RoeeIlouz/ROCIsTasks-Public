@@ -41,6 +41,15 @@ class CalendarProvider extends ChangeNotifier {
   void setSelectedDate(DateTime date) {
     _selectedDate = date;
     notifyListeners();
+    _updateWidgetSelectedDate(date);
+  }
+
+  Future<void> _updateWidgetSelectedDate(DateTime date) async {
+    try {
+      await _widgetService.updateSelectedDate(date, _userId);
+    } catch (e) {
+      // Gracefully ignore widget update errors
+    }
   }
 
   Future<void> loadFilters() async {
