@@ -21,7 +21,16 @@ class SubscriptionService extends ChangeNotifier {
   String? _configurationError;
   String? _syncedAuthUserId;
 
-  bool get isPremium => _isPremium;
+  bool get isPremium {
+    // Birthday promotion: Free Pro for all users from June 16 to July 16
+    final now = DateTime.now();
+    final promoStart = DateTime(now.year, 6, 16);
+    final promoEnd = DateTime(now.year, 7, 16);
+    if (!now.isBefore(promoStart) && now.isBefore(promoEnd)) {
+      return true;
+    }
+    return _isPremium;
+  }
   bool get isInitialized => _isInitialized;
   String? get configurationError => _configurationError;
 
@@ -142,7 +151,7 @@ class SubscriptionService extends ChangeNotifier {
     }
   }
 
-  void _updateCustomerStatus(CustomerInfo customerInfo) async {
+  Future<void> _updateCustomerStatus(CustomerInfo customerInfo) async {
     // Check for "premium" entitlement.
     // Make sure to match this entitlement identifier in RevenueCat dashboard.
     const entitlementId = AppConfig.entitlementId;

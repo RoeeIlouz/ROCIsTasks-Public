@@ -21,7 +21,7 @@ class CategoryAdapter extends TypeAdapter<Category> {
       name: fields[1] as String,
       colorValue: fields[2] as int,
       iconCode: fields[3] as int,
-      isPrivate: fields[4] as bool? ?? false,
+      isPrivate: fields[4] as bool,
     );
   }
 

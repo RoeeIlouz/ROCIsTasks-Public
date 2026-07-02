@@ -145,15 +145,15 @@ class AppLocalizationsEs extends AppLocalizations {
   String get noDateSelected => 'Sin fecha seleccionada';
 
   @override
-  String get syncWithGoogleCalendar => 'Sincronizar con Google Calendar';
+  String get syncWithGoogleTasks => 'Sincronizar con Google Tasks';
 
   @override
-  String get syncWithGoogleCalendarSubtitle =>
-      'Crea un evento del calendario para esta tarea';
+  String get syncWithGoogleTasksSubtitle =>
+      'Crea y sincroniza una tarea en Google Tasks';
 
   @override
-  String get syncWithGoogleCalendarRequiresDueDate =>
-      'Establece una fecha de vencimiento para sincronizar esta tarea con tu calendario.';
+  String get googleSignInRequiredForSync =>
+      'Se requiere iniciar sesión con Google para sincronizar tareas.';
 
   @override
   String get calendarPermissionNotGranted =>
@@ -994,4 +994,84 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get securitySettingsSubtitle =>
       'Administra el acceso con PIN y biometría';
+
+  @override
+  String get enableSecurity => 'Activar seguridad';
+
+  @override
+  String get enableSecurityDescription =>
+      'Acabas de crear una tarea privada. Configura un PIN o biometría para mantener tu contenido privado seguro.';
+
+  @override
+  String get notNow => 'Ahora no';
+
+  @override
+  String get setUp => 'Configurar';
+
+  @override
+  String get doNotRemind => 'No recordar';
+
+  @override
+  String get doNotRemindSubtitle =>
+      'Suprimir todas las notificaciones de esta tarea';
+
+  @override
+  String get glassmorphismEffects => 'Efectos de Glassmorphism';
+
+  @override
+  String get glassmorphismEffectsSubtitle =>
+      'Aplicar efecto de cristal esmerilado a las tarjetas';
+
+  @override
+  String get noEventsForThisDay => 'No hay eventos para este día';
+
+  @override
+  String get searchSymbols => 'Símbolos de búsqueda';
+
+  @override
+  String get searchSymbolsDesc =>
+      'Usa símbolos para filtrar tareas: @categoría (ej. @trabajo), #título (ej. #reunión), !prioridad (ej. !alta), %fecha (ej. %2025-06-15), &subtarea (ej. &corregir error), *estado (*hecho o *pendiente), ? (tareas de hoy). Combina varios símbolos.';
+
+  @override
+  String get widgetSettings => 'Personalización del Widget';
+
+  @override
+  String get widgetSettingsSubtitle =>
+      'Configura colores, tema y características';
+
+  @override
+  String get widgetTheme => 'Tema del Widget';
+
+  @override
+  String get widgetThemeSystem => 'Predeterminado del sistema';
+
+  @override
+  String get widgetThemeLight => 'Claro sólido';
+
+  @override
+  String get widgetThemeDark => 'Oscuro sólido';
+
+  @override
+  String get widgetThemeGlassmorphic => 'Glassmorphism';
+
+  @override
+  String get showWeekNumbers => 'Mostrar números de semana';
+
+  @override
+  String get weekendHighlights => 'Destacar fines de semana';
+
+  @override
+  String get startOfWeek => 'Inicio de la semana';
+
+  @override
+  String get sunday => 'Domingo';
+
+  @override
+  String get monday => 'Lunes';
+
+  @override
+  String get saturday => 'Sábado';
+
+  @override
+  String get widgetAccentColor => 'Color de acento del widget';
 }

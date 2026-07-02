@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rocis_tasks/features/calendar/presentation/providers/calendar_provider.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
+import 'package:rocis_tasks/shared/ui/widgets/glass_container.dart';
 
 class CalendarFilterSheet extends StatelessWidget {
   const CalendarFilterSheet({super.key});
@@ -17,14 +18,12 @@ class CalendarFilterSheet extends StatelessWidget {
           maxChildSize: 0.7,
           expand: false,
           builder: (context, scrollController) {
-            return Container(
-              padding: const EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(20),
-                ),
+            return GlassContainer(
+              opacity: 0.9,
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(20),
               ),
+              padding: const EdgeInsets.all(16.0),
               child: ListView(
                 controller: scrollController,
                 children: [
@@ -45,17 +44,8 @@ class CalendarFilterSheet extends StatelessWidget {
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 24),
-                  Card(
-                    elevation: 0,
-                    color: Theme.of(context).cardColor,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      side: BorderSide(
-                        color: Theme.of(
-                          context,
-                        ).dividerColor.withValues(alpha: 0.1),
-                      ),
-                    ),
+                  GlassContainer(
+                    borderRadius: BorderRadius.circular(12),
                     child: Column(
                       children: [
                         SwitchListTile(

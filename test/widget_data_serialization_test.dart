@@ -226,14 +226,14 @@ class WidgetDataSerializer {
     final calendarItems = <Map<String, dynamic>>[];
 
     // Add events
-    for (var event in events) {
+    for (final event in events) {
       if (event.start != null) {
         calendarItems.add(serializeEventForWidget(event));
       }
     }
 
     // Add tasks with due dates
-    for (var task in tasks) {
+    for (final task in tasks) {
       if (task.dueDate != null &&
           !task.isCompleted &&
           !(task.isDeleted ?? false)) {
@@ -316,7 +316,7 @@ class WidgetDataSerializer {
     final scheduleItems = <Map<String, dynamic>>[];
 
     // Add tasks with due dates
-    for (var task in tasks) {
+    for (final task in tasks) {
       if (task.dueDate != null &&
           !task.isCompleted &&
           !(task.isDeleted ?? false)) {
@@ -341,7 +341,7 @@ class WidgetDataSerializer {
     }
 
     // Add events
-    for (var event in events) {
+    for (final event in events) {
       if (event.start != null) {
         // Ensure event has a non-empty ID
         final eventId = event.eventId?.isNotEmpty == true
@@ -2026,11 +2026,11 @@ void main() {
           if (i < 20) {
             // Test additional error scenarios for first 20 iterations
             final errorScenarios = [
-              () => _testColorParsingFallback(),
-              () => _testDateParsingFallback(),
-              () => _testMissingFieldHandling(),
-              () => _testNullValueHandling(),
-              () => _testLargeDataHandling(),
+              _testColorParsingFallback,
+              _testDateParsingFallback,
+              _testMissingFieldHandling,
+              _testNullValueHandling,
+              _testLargeDataHandling,
             ];
 
             final scenarioIndex = i % errorScenarios.length;

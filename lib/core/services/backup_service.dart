@@ -41,14 +41,14 @@ class BackupService {
 
       // Import Categories first to ensure foreign keys (categoryId) are valid
       if (categoriesData != null) {
-        for (var catMap in categoriesData) {
+        for (final catMap in categoriesData) {
           final cat = Category.fromMap(catMap as Map<String, dynamic>);
           await _localSource.addCategory(cat);
         }
       }
 
       if (tasksData != null) {
-        for (var taskMap in tasksData) {
+        for (final taskMap in tasksData) {
           final task = Task.fromMap(taskMap as Map<String, dynamic>);
           await _localSource.addTask(task);
         }

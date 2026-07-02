@@ -8,7 +8,7 @@ import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/sub_task.dart';
 import 'package:rocis_tasks/core/services/subscription_service.dart';
 import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
-import 'package:rocis_tasks/core/services/calendar_service.dart';
+import 'package:rocis_tasks/core/services/auth_service.dart';
 import 'package:rocis_tasks/core/services/validation_service.dart';
 import 'package:rocis_tasks/core/services/error_service.dart';
 import 'package:rocis_tasks/core/validation/validators.dart';
@@ -33,15 +33,17 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   late TextEditingController _titleController;
   late TextEditingController _descriptionController;
   DateTime? _selectedDate;
+  bool _dateCleared = false;
   TaskPriority _priority = TaskPriority.medium;
-  String? _category;
+  List<String> _selectedCategoryIds = [];
   ui.TextDirection _titleDirection = ui.TextDirection.ltr;
   ui.TextDirection _descriptionDirection = ui.TextDirection.ltr;
   List<SubTask> _subTasks = [];
   List<TextEditingController> _subTaskControllers = [];
   NlpResult? _nlpSuggestion;
   bool _requireSubTasksBeforeReminders = false;
-  bool _syncWithGoogleCalendar = false;
+  bool _syncWithGoogleTasks = false;
+  bool _skipReminders = false;
   List<String> _attachmentPaths = [];
 
   @override
@@ -53,7 +55,10 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     );
     _selectedDate = widget.task?.dueDate;
     _priority = widget.task?.priority ?? TaskPriority.medium;
-    _category = widget.task?.categoryId;
+    _selectedCategoryIds = widget.task?.categoryIds.toList() ?? [];
+    if (_selectedCategoryIds.isEmpty && widget.task?.categoryId != null) {
+      _selectedCategoryIds.add(widget.task!.categoryId!);
+    }
     _titleDirection = _getTextDirection(_titleController.text);
     _descriptionDirection = _getTextDirection(_descriptionController.text);
     _subTasks =
@@ -63,7 +68,8 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
         .toList();
     _requireSubTasksBeforeReminders =
         widget.task?.requireSubTasksBeforeReminders ?? false;
-    _syncWithGoogleCalendar = widget.task?.syncWithGoogleCalendar ?? false;
+    _syncWithGoogleTasks = widget.task?.syncWithGoogleTasks ?? false;
+    _skipReminders = widget.task?.skipReminders ?? false;
     _attachmentPaths = List<String>.from(widget.task?.attachmentPaths ?? const []);
   }
 
@@ -71,7 +77,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   void dispose() {
     _titleController.dispose();
     _descriptionController.dispose();
-    for (var controller in _subTaskControllers) {
+    for (final controller in _subTaskControllers) {
       controller.dispose();
     }
     super.dispose();
@@ -136,8 +142,6 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   void _saveTask() {
     if (_formKey.currentState!.validate()) {
       try {
-        final l10n = AppLocalizations.of(context)!;
-
         // Validate due date
         final dateError = ValidationService.validateDueDate(_selectedDate);
         if (dateError != null) {
@@ -145,13 +149,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
           return;
         }
 
-        if (_syncWithGoogleCalendar && _selectedDate == null) {
-          ErrorService.handleUserError(
-            context,
-            l10n.syncWithGoogleCalendarRequiresDueDate,
-          );
-          return;
-        }
+        // Google Tasks does not require a due date to sync.
 
         // Sanitize inputs
         final sanitizedTitle = ValidationService.sanitizeText(
@@ -167,12 +165,15 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
             title: sanitizedTitle,
             description: sanitizedDescription,
             dueDate: _selectedDate,
+            clearDueDate: _dateCleared,
             priority: _priority,
-            categoryId: _category,
+            categoryId: _selectedCategoryIds.isNotEmpty ? _selectedCategoryIds.first : null,
+            categoryIds: _selectedCategoryIds,
             subTasks: _subTasks,
             requireSubTasksBeforeReminders: _requireSubTasksBeforeReminders,
-            syncWithGoogleCalendar: _syncWithGoogleCalendar,
+            syncWithGoogleTasks: _syncWithGoogleTasks,
             attachmentPaths: _attachmentPaths,
+            skipReminders: _skipReminders,
           );
         } else {
           Provider.of<TaskProvider>(context, listen: false).addTask(
@@ -180,11 +181,13 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
             sanitizedDescription,
             _selectedDate,
             _priority,
-            _category,
+            _selectedCategoryIds.isNotEmpty ? _selectedCategoryIds.first : null,
+            categoryIds: _selectedCategoryIds,
             subTasks: _subTasks,
             requireSubTasksBeforeReminders: _requireSubTasksBeforeReminders,
-            syncWithGoogleCalendar: _syncWithGoogleCalendar,
+            syncWithGoogleTasks: _syncWithGoogleTasks,
             attachmentPaths: _attachmentPaths,
+            skipReminders: _skipReminders,
           );
         }
         HapticFeedback.mediumImpact();
@@ -404,16 +407,11 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                 child: InkWell(
                   onTap: () => _selectDate(context),
                   borderRadius: BorderRadius.circular(16),
-                  child: Container(
+                  child: GlassContainer(
+                    borderRadius: BorderRadius.circular(16),
                     padding: const EdgeInsets.symmetric(
                       horizontal: 16,
                       vertical: 14,
-                    ),
-                    decoration: BoxDecoration(
-                      color: theme.brightness == Brightness.light
-                          ? Colors.grey.withValues(alpha: 0.05)
-                          : Colors.white.withValues(alpha: 0.05),
-                      borderRadius: BorderRadius.circular(16),
                     ),
                     child: Row(
                       children: [
@@ -446,6 +444,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                               onTap: () {
                                 setState(() {
                                   _selectedDate = null;
+                                  _dateCleared = true;
                                 });
                               },
                               child: Icon(
@@ -464,44 +463,80 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
                 secondary: Icon(
-                  _syncWithGoogleCalendar
-                      ? Icons.event_available_rounded
-                      : Icons.event_busy_rounded,
+                  _syncWithGoogleTasks
+                      ? Icons.playlist_add_check_rounded
+                      : Icons.playlist_add_rounded,
                 ),
                 title: Text(
-                  l10n.syncWithGoogleCalendar,
+                  l10n.syncWithGoogleTasks,
                   style: GoogleFonts.outfit(fontWeight: FontWeight.w600),
                 ),
                 subtitle: Text(
-                  l10n.syncWithGoogleCalendarSubtitle,
+                  l10n.syncWithGoogleTasksSubtitle,
                   style: GoogleFonts.outfit(fontSize: 13),
                 ),
-                value: _syncWithGoogleCalendar,
+                value: _syncWithGoogleTasks,
                 onChanged: (value) async {
                   if (!value) {
-                    setState(() => _syncWithGoogleCalendar = false);
+                    setState(() => _syncWithGoogleTasks = false);
                     return;
                   }
 
                   final messenger = ScaffoldMessenger.of(context);
-                  final permissionNotGrantedText =
-                      l10n.calendarPermissionNotGranted;
-                  final calendarService = Provider.of<CalendarService>(
+                  final authService = Provider.of<AuthService>(
                     context,
                     listen: false,
                   );
-                  final granted = await calendarService.requestPermissions();
+                  
+                  final token = await authService.getGoogleAccessToken();
                   if (!context.mounted) return;
 
-                  if (!granted) {
-                    messenger.showSnackBar(
-                      SnackBar(content: Text(permissionNotGrantedText)),
-                    );
-                    setState(() => _syncWithGoogleCalendar = false);
-                    return;
+                  if (token == null) {
+                    if (Theme.of(context).platform == TargetPlatform.iOS ||
+                        Theme.of(context).platform == TargetPlatform.android) {
+                      // Mobile
+                      messenger.showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            l10n.googleSignInRequiredForSync,
+                          ),
+                        ),
+                      );
+                      setState(() => _syncWithGoogleTasks = false);
+                      return;
+                    } else {
+                      // Web / Other
+                      final success = await authService.linkGoogleTasksOnWeb();
+                      if (!context.mounted) return;
+                      if (!success) {
+                        setState(() => _syncWithGoogleTasks = false);
+                        return;
+                      }
+                    }
                   }
 
-                  setState(() => _syncWithGoogleCalendar = true);
+                  setState(() => _syncWithGoogleTasks = true);
+                },
+              ),
+              const SizedBox(height: 24),
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                secondary: Icon(
+                  _skipReminders
+                      ? Icons.notifications_off_rounded
+                      : Icons.notifications_rounded,
+                ),
+                title: Text(
+                  l10n.doNotRemind,
+                  style: GoogleFonts.outfit(fontWeight: FontWeight.w600),
+                ),
+                subtitle: Text(
+                  l10n.doNotRemindSubtitle,
+                  style: GoogleFonts.outfit(fontSize: 13),
+                ),
+                value: _skipReminders,
+                onChanged: (value) {
+                  setState(() => _skipReminders = value);
                 },
               ),
               const SizedBox(height: 24),
@@ -517,52 +552,45 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
               Consumer<TaskProvider>(
                 builder: (context, provider, child) {
                   final categories = provider.categories;
-                  return DropdownButtonFormField<String>(
-                    initialValue: categories.any((c) => c.id == _category)
-                        ? _category
-                        : null,
-                    style: GoogleFonts.outfit(
-                      color: theme.colorScheme.onSurface,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    decoration: SharedInputDecorations.getFieldDecoration(
-                      label: '',
-                      prefixIcon: Icons.category_outlined,
-                      theme: theme,
-                    ),
-                    items: [
-                      DropdownMenuItem<String>(
-                        value: null,
-                        child: Text(
-                          l10n.noCategory,
-                          style: GoogleFonts.outfit(),
-                        ),
-                      ),
-                      ...categories.map((category) {
-                        return DropdownMenuItem(
-                          value: category.id,
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 12,
-                                height: 12,
-                                decoration: BoxDecoration(
-                                  color: Color(category.colorValue),
-                                  shape: BoxShape.circle,
-                                ),
+                  if (categories.isEmpty) {
+                    return Text(
+                      l10n.noCategory,
+                      style: GoogleFonts.outfit(color: theme.colorScheme.onSurfaceVariant),
+                    );
+                  }
+                  return Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: categories.map((category) {
+                      final isSelected = _selectedCategoryIds.contains(category.id);
+                      return FilterChip(
+                        selected: isSelected,
+                        label: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              width: 12,
+                              height: 12,
+                              decoration: BoxDecoration(
+                                color: Color(category.colorValue),
+                                shape: BoxShape.circle,
                               ),
-                              const SizedBox(width: 12),
-                              Text(category.name, style: GoogleFonts.outfit()),
-                            ],
-                          ),
-                        );
-                      }),
-                    ],
-                    onChanged: (value) {
-                      setState(() {
-                        _category = value;
-                      });
-                    },
+                            ),
+                            const SizedBox(width: 8),
+                            Text(category.name, style: GoogleFonts.outfit()),
+                          ],
+                        ),
+                        onSelected: (selected) {
+                          setState(() {
+                            if (selected) {
+                              _selectedCategoryIds.add(category.id);
+                            } else {
+                              _selectedCategoryIds.remove(category.id);
+                            }
+                          });
+                        },
+                      );
+                    }).toList(),
                   );
                 },
               ),
@@ -671,7 +699,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
-                  "PRO",
+                  'PRO',
                   style: GoogleFonts.outfit(
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
@@ -746,7 +774,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
-                  "PRO",
+                  'PRO',
                   style: GoogleFonts.outfit(
                     fontSize: 10,
                     fontWeight: FontWeight.bold,

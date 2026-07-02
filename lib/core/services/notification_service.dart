@@ -1,4 +1,5 @@
 import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
@@ -52,8 +53,14 @@ class NotificationService {
 
   Future<void> init() async {
     if (_isInitialized) return;
+    if (kIsWeb) {
+      _isInitialized = true;
+      AppLogger.info('NotificationService initialization skipped on web', tag: 'Notifications');
+      return;
+    }
     tz.initializeTimeZones();
-    final String timeZoneName = await FlutterTimezone.getLocalTimezone();
+    final timezoneInfo = await FlutterTimezone.getLocalTimezone();
+    final timeZoneName = timezoneInfo.identifier;
     tz.setLocalLocation(tz.getLocation(timeZoneName));
     AppLogger.info(
       'NotificationService initialized with timezone: $timeZoneName',
@@ -93,10 +100,8 @@ class NotificationService {
         );
 
     await flutterLocalNotificationsPlugin.initialize(
-      initializationSettings,
-      onDidReceiveNotificationResponse: (NotificationResponse response) {
-        _responseController.add(response);
-      },
+      settings: initializationSettings,
+      onDidReceiveNotificationResponse: _responseController.add,
       onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
     );
     _isInitialized = true;
@@ -113,6 +118,7 @@ class NotificationService {
     String? openTaskLabel,
     List<AndroidNotificationAction>? androidActions,
   }) async {
+    if (kIsWeb) return;
     if (scheduledDate.isBefore(DateTime.now())) return;
 
     AppLogger.info(
@@ -122,11 +128,11 @@ class NotificationService {
 
     await flutterLocalNotificationsPlugin
         .zonedSchedule(
-          id,
-          title,
-          body,
-          tz.TZDateTime.from(scheduledDate, tz.local),
-          NotificationDetails(
+          id: id,
+          title: title,
+          body: body,
+          scheduledDate: tz.TZDateTime.from(scheduledDate, tz.local),
+          notificationDetails: NotificationDetails(
             android: AndroidNotificationDetails(
               'rocis_tasks_channel',
               'Rocis Tasks Reminders',
@@ -180,10 +186,12 @@ class NotificationService {
 
 
   Future<void> cancelNotification(int id) async {
-    await flutterLocalNotificationsPlugin.cancel(id);
+    if (kIsWeb) return;
+    await flutterLocalNotificationsPlugin.cancel(id: id);
   }
 
   Future<void> requestPermissions() async {
+    if (kIsWeb) return;
     final androidPlugin = flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin
@@ -208,6 +216,7 @@ class NotificationService {
     String? tasksRemainingLabel,
     String? tasksSummaryLabel,
   }) async {
+    if (kIsWeb) return;
     try {
       await _platform.invokeMethod('updateTaskCountIcon', {
         'count': count,
@@ -249,10 +258,10 @@ class NotificationService {
       final details = NotificationDetails(android: androidDetails);
 
       await flutterLocalNotificationsPlugin.show(
-        888,
-        'Tasks Remaining',
-        body,
-        details,
+        id: 888,
+        title: 'Tasks Remaining',
+        body: body,
+        notificationDetails: details,
       );
     }
   }
@@ -262,6 +271,7 @@ class NotificationService {
     required String body,
     int id = 777,
   }) async {
+    if (kIsWeb) return;
     const androidDetails = AndroidNotificationDetails(
       'rocis_tasks_info',
       'Task Information',
@@ -270,11 +280,22 @@ class NotificationService {
       priority: Priority.defaultPriority,
     );
     const details = NotificationDetails(android: androidDetails);
-    await flutterLocalNotificationsPlugin.show(id, title, body, details);
+    await flutterLocalNotificationsPlugin.show(
+      id: id,
+      title: title,
+      body: body,
+      notificationDetails: details,
+    );
   }
 
   Future<void> cancelAllNotifications() async {
+    if (kIsWeb) return;
     await flutterLocalNotificationsPlugin.cancelAll();
+  }
+
+  void dispose() {
+    _actionController.close();
+    _responseController.close();
   }
 
   /// separate ID for task count so it is doesn't get cancelled by cancelAll if we were to exclude it (but we won't for now)

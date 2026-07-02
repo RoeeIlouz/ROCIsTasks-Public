@@ -18,7 +18,8 @@ migrate_working_dir/
 .claude/
 .dbg/
 .kilocode/
-
+.mimocode/
+.agents/
 # IntelliJ related
 *.iml
 *.ipr
@@ -67,7 +68,7 @@ android/app/google-services.json
 firebase_options.dart.backup
 **/firebase_options_backup.dart
 .firebaserc
-
+.firebase/
 # Sensitive Configuration
 secrets/
 config/secrets/

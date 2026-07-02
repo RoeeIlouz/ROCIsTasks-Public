@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
+import 'package:rocis_tasks/shared/ui/widgets/glass_container.dart';
 
 class TaskSortFilterSheet extends StatelessWidget {
   const TaskSortFilterSheet({super.key});
@@ -19,14 +20,12 @@ class TaskSortFilterSheet extends StatelessWidget {
           maxChildSize: 0.9,
           expand: false,
           builder: (context, scrollController) {
-            return Container(
-              padding: const EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(20),
-                ),
+            return GlassContainer(
+              opacity: 0.9,
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(20),
               ),
+              padding: const EdgeInsets.all(16.0),
               child: ListView(
                 controller: scrollController,
                 children: [
@@ -56,17 +55,8 @@ class TaskSortFilterSheet extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  Card(
-                    elevation: 0,
-                    color: Theme.of(context).cardColor,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      side: BorderSide(
-                        color: Theme.of(
-                          context,
-                        ).dividerColor.withValues(alpha: 0.1),
-                      ),
-                    ),
+                  GlassContainer(
+                    borderRadius: BorderRadius.circular(12),
                     child: RadioGroup<TaskSortOption>(
                       groupValue: provider.currentSortOption,
                       onChanged: (value) {

@@ -5,7 +5,7 @@ import 'package:rocis_tasks/core/services/error_service.dart';
 void main() {
   group('ErrorService', () {
     test('should initialize without errors', () {
-      expect(() => ErrorService.initialize(), returnsNormally);
+      expect(ErrorService.initialize, returnsNormally);
     });
 
     testWidgets('should handle user error with snackbar', (

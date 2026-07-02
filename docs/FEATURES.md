@@ -1,72 +1,97 @@
 # Features Deep Dive
 
-This document outlines the core capabilities of Roci's Tasks and how they are implemented.
+This document outlines the core capabilities of **ROCIs Tasks** and details their design, interaction, and technical implementation.
 
-## 🔐 Authentication
+---
 
-_Implementation: `features/auth`_
+## 🔐 Multi-Tiered Authentication
 
-- **Google Sign-In**: Users can sign in using their Google account. This is the primary method of authentication.
-- **Session Management**: handled by `AuthService`. It persists the user session so users remain logged in across app restarts.
-- **Protection**: The root widget (`MyApp`) uses a `StreamBuilder` on auth state to redirect unauthenticated users to the Login screen.
+_Implementation: `lib/features/auth` and `lib/core/services/auth_service.dart`_
 
-## ✅ Task Management
+- **Primary Google Sign-In**: One-click authentication with Google.
+- **Secondary Email & Password**: Secure email registration, sign-in, and password reset capability using Firebase Authentication.
+- **Session Persistence**: Managed via `AuthService` using a reactive FirebaseAuth listener. It synchronizes automatically with `SubscriptionService` when user state changes.
+- **Entry Guards**: The root router (`AppRouter`) uses route guards to intercept unauthenticated users and redirect them to the Auth flow.
 
-_Implementation: `features/tasks`_
+---
 
-Central to the application, the task system supports a robust workflow:
+## ✅ Task & Category Management
 
-- **CRUD Operations**:
-  - **Create**: Add tasks with Title, Description, Due Date/Time, and Priority.
-  - **Update**: Modify any task detail.
-  - **Delete**: Soft-delete tasks. They are moved to a "Bin" or marked as deleted rather than legally removed immediately (allowing for restore).
-- **Organization**:
-  - **Priority**: High, Medium, Low specific visual indicators.
-  - **Date-based**: Tasks are sorted and grouped by their due dates.
-- **Synchronization**:
-  - Tasks are saved locally to **Hive** for instant access.
-  - Changes are synced to **Firebase Firestore** real-time.
+_Implementation: `lib/features/tasks` and `lib/features/categories`_
+
+- **Core CRUD Operations**:
+  - **Create / Update**: Add tasks with Title, Description, Due Date/Time, Priority class, Category, Subtasks checklist, and Attachments.
+  - **Bin & Soft Delete**: Tasks are soft-deleted and placed in the "Bin" screen, where they can be restored or permanently cleared.
+- **Task Organization**:
+  - **Priority Indicators**: Red (High), Orange (Medium), and Green (Low) visual tags.
+  - **Sorting & Filtering**: Filter list sheets by category, completion status, calendar origin, and sort chronologically.
+- **Subtask Checklists**: Nest dynamic checklist items within any task. Progress is calculated as a completion ratio.
+- **File Attachments**: Upload and link images or document files directly to tasks, stored securely in Firebase Storage.
+- **Recurrence Logic**: Setup recurring schedules (daily, weekly, monthly) using rule definitions parsed via the `rrule` package.
+
+---
 
 ## 📅 Calendar Integration
 
-_Implementation: `features/calendar`_
+_Implementation: `lib/features/calendar` and `lib/core/services/calendar_service.dart`_
 
-The calendar view is not just a date picker but a full agenda interface:
+- **Unified Agenda View**: Built using `table_calendar`. Renders due tasks and Google Calendar events concurrently.
+- **Device Calendar Sync**: Reads from device-native calendar accounts using the `device_calendar` plugin.
+- **Day Markers**: Calendar cells display colored dots or markers indicating the combination of tasks and external events scheduled for that day.
 
-- **UI**: Built using `table_calendar`. It displays indicators (dots/markers) for days with generic events or tasks.
-- **Google Calendar Sync**:
-  - Uses `device_calendar` plugin to request permission and read events from the user's on-device calendars (which sync with Google/iCal).
-  - Events from external calendars are displayed alongside app-specific tasks in the daily view.
-- **Unified View**: Tapping a day shows a combined list of that day's Tasks (due that day) and Calendar Events.
+---
 
-## 📱 Home Screen Widgets
+## 📱 Interactive Home Screen Widgets
 
-_Implementation: Android Native (XML) & `home_widget` package_
+_Implementation: Android Native (`android/app/src/main/...`) & `home_widget` package_
 
-Roci's Tasks offers interactive widgets for the Android home screen:
+ROCIs Tasks offers dynamic, interactive widgets for the Android home screen:
+- **Task List Widget**: Interactive scrollable list of pending tasks. Users can check off tasks directly from the home screen.
+- **Calendar Agenda Widget**: Shows a monthly calendar grid and schedule list.
+- **Interactivity Engine**:
+  - Tapping a task triggers a background broadcast intent (e.g. `complete?id=123`). The Dart `BackgroundHandler` isolate intercepts the intent, completes the task in Hive/Firestore, and refreshes the widget data snapshot.
+  - **Native Navigation**: Calendar navigation offsets (Prev/Next/Today) are intercepted and adjusted natively in Kotlin on the Android side before calling Dart. This eliminates UI redraw delay and prevents state double-incrementing.
 
-- **Task List Widget**: Shows pending tasks. Users can scroll through the list and check off tasks directly from the home screen.
-- **Mechanism**:
-  - The Flutter app generates a data snapshot (JSON) and saves it to shared storage.
-  - The Android widget reads this data to render the list.
-  - Interactions (clicks) send a URI (e.g., `app://complete?id=123`) which the background Flutter isolate intercepts to update the database.
+---
 
-## 🎨 Theming & UI
+## 🎨 Premium UI & Theming System
 
-_Implementation: `core/theme`_
+_Implementation: `lib/core/theme` and `lib/shared/ui/ui_kit.dart`_
 
-- **Material You**: The app creates a custom `ColorScheme` derived from the user's OS wallaper (using `dynamic_color`).
-- **Dark Mode**: Fully supported with a dedicated dark color scheme.
-- **Customization**: Custom widget shapes and typography integration (Google Fonts) ensure a modern look.
+- **Premium Glassmorphism**: Frosted glass panels and dividers built using `GlassContainer`. Backdrop blur interpolation blends 12% tint in light mode and 18% tint in dark mode of the category or primary accent color.
+- **Material You Dynamic Colors**: Extracts the Android wallpaper color palette using `dynamic_color` to generate a harmonious theme.
+- **System Default Support**: Theme modes (ThemeMode.system, ThemeMode.light, ThemeMode.dark) transition automatically based on OS preferences.
+- **Completion Haptics**:satisfying physical vibration responses on interactions (medium pulse for completing, light pulse for uncompleting), configurable in Settings.
+- **Bouncy Animations**: Elastic bouncy spin animations triggered by double-tapping or long-pressing FABs and icons.
+
+---
 
 ## 📊 Productivity Analytics & Insights
 
-_Implementation: `features/analytics`_
+_Implementation: `lib/features/analytics`_
 
-Helping users understand their work patterns and improve efficiency:
+- **Completion Trends**: Staggered line charts (via `fl_chart`) plotting completed task counts over the last 7 days.
+- **Category Balancing**: Pie charts illustrating effort distribution across different categories.
+- **Historical Analysis**: Tracks completion timestamps (`completedAt`) for precise productivity measurements.
 
-- **Insights Dashboard**: A dedicated tab for visualizing productivity metrics.
-- **Completion Trends**: Line charts showing task completion volume over the last 7 days, helping identify peak productivity periods.
-- **Category Distribution**: Pie charts visualizing the balance of effort across different categories (e.g., Work, Personal, Education).
-- **Stat Summaries**: Instant visibility into total completed and pending tasks.
-- **Historical Tracking**: Automatically records completion timestamps (`completedAt`) for all tasks to enable precise trend analysis.
+---
+
+## 🚀 Interactive Onboarding Carousel
+
+_Implementation: `lib/features/onboarding` and `lib/core/config/router.dart`_
+
+- **Slide Walkthrough**: Sliding tutorial pages (`PageView`) introducing Smart Add NLP parsing, Calendar Sync, and Analytics Dashboards.
+- **Navigation Guard**: Restricts entry to main app dashboard for first-time users until onboarding is completed, storing status inside Hive.
+
+---
+
+## 💰 Subscription Gating (PRO)
+
+_Implementation: `lib/features/premium` and `lib/core/services/subscription_service.dart`_
+
+- **RevenueCat Paywalls**: Integrates App Store and Play Store purchase flows via `purchases_flutter` and `purchases_ui_flutter`.
+- **Gated Features**:
+  - Gated widgets (limit 1 for free tier).
+  - Gated categories (limit 5 for free tier).
+  - Subtask checklists and attachments (Pro only).
+- **Birthday Promo Waiver**: Unlocks full Pro entitlement for all users during the promo month of June 16 - July 16 automatically.

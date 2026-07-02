@@ -62,7 +62,7 @@ class RetryService {
     return retry(
       operation,
       maxAttempts: maxAttempts,
-      shouldRetry: (error) => _isRetryableNetworkError(error),
+      shouldRetry: _isRetryableNetworkError,
     );
   }
 
@@ -74,7 +74,7 @@ class RetryService {
     return retry(
       operation,
       maxAttempts: maxAttempts,
-      shouldRetry: (error) => _isRetryableFirestoreError(error),
+      shouldRetry: _isRetryableFirestoreError,
     );
   }
 

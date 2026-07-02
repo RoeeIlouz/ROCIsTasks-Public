@@ -1,67 +1,110 @@
 # Architecture & Technical Overview
 
-Roci's Tasks follows a **Feature-First Clean Architecture** approach. This ensures separation of concerns, scalability, and maintainability.
+ROCIs Tasks is built using a **Feature-First Clean Architecture** approach. This guarantees clean separation of concerns, decouples business logic from external frameworks, and ensures high developer velocity, testability, and stability.
 
-## 📂 Project Structure
+---
 
-The code is organized primarily by **features** within the `lib/features` directory. Each feature contains its own layers (`data`, `domain`, `presentation`). Shared resources are located in `lib/core`.
+## 📂 Directory Structure
 
-```
+The codebase is organized by cohesive features under `lib/features` and shared capabilities under `lib/core`.
+
+```plaintext
 lib/
-├── core/                   # Shared resources
-│   ├── services/           # Global services (Auth, Calendar, etc.)
-│   └── theme/              # App theming and styling logic
-├── features/               # Feature modules
-│   ├── analytics/          # Productivity charts and insights
-│   ├── auth/               # Authentication (Login, User Session)
-│   ├── calendar/           # Calendar view and logic
-│   ├── home/               # Home screen container
-│   └── tasks/              # Task management (Create, Read, Update, Delete)
-│       ├── data/           # Repositories, Models (DTOs), Data Sources
-│       ├── domain/         # Entities, Use Cases, Repository Interfaces
-│       └── presentation/   # Widgets, Screens, Providers (State)
-├── main.dart               # App entry point, DI setup
-└── firebase_options.dart   # Firebase configuration
+├── core/
+│   ├── config/             # System configuration (AppConfig, Router, Firebase Options)
+│   ├── models/             # Core shared domain models
+│   ├── services/           # Global services (Auth, Calendar, Storage, Notifications)
+│   └── theme/              # Typography (Outfit), dark/AMOLED themes, and Glassmorphism specifications
+├── features/
+│   ├── analytics/          # Productivity trend lines and category distribution charts
+│   ├── auth/               # Google & secondary Email/Password login flows
+│   ├── calendar/           # Samsung-style table agenda & device calendar mapping
+│   ├── categories/         # Category CRUD & limit gating (5 free max)
+│   ├── home/               # Navigation container, bottom bar, and bouncy eggs
+│   ├── onboarding/         # swipeable PageView onboarding carousel & guards
+│   ├── premium/            # RevenueCat paywalls and PRO lock indicators
+│   └── tasks/              # Task CRUD, nested subtask checklists, and attachments
+│       ├── data/           # Repositories, models (DTOs), and Hive/Firestore data sources
+│       ├── domain/         # Entities, use cases, and repository interfaces
+│       └── presentation/   # UI widgets, screens, and Provider state wrappers
+├── l10n/                   # System localization translation templates (EN, HE, ES)
+└── main.dart               # App initialization entry point
 ```
+
+---
 
 ## 🏗️ Architectural Layers
 
-For complex features like `tasks`, we use a layered approach:
+For core feature modules like `tasks`, development is strictly separated into three layers:
 
-1.  **Domain Layer** (`domain/`):
+```
+┌────────────────────────────────────────────────────────┐
+│                   Presentation Layer                   │
+│         (UI Widgets, Screens, State Providers)          │
+└──────────────────────────┬─────────────────────────────┘
+                           ▼
+┌────────────────────────────────────────────────────────┐
+│                      Domain Layer                      │
+│        (Pure Dart Entities, Repository Interfaces)     │
+└──────────────────────────┬─────────────────────────────┘
+                           ▼
+┌────────────────────────────────────────────────────────┐
+│                       Data Layer                       │
+│    (Repository Implementations, DB Sources, API/DTOs)  │
+└────────────────────────────────────────────────────────┘
+```
 
-    - Contains business logic and entities (e.g., `Task` model).
-    - Defines Repository interfaces (contracts) for data operations.
-    - Pure Dart code, independent of Flutter or external libraries where possible.
+1. **Domain Layer** (`domain/`):
+   - Contains raw business entities (e.g., `Task` model) and rules.
+   - Defines interfaces (contracts) for repositories.
+   - Contains zero dependencies on Flutter, local storage libraries, or network clients.
 
-2.  **Data Layer** (`data/`):
+2. **Data Layer** (`data/`):
+   - Implements Domain repository interfaces.
+   - Manages retrieval, mutation, and syncing between local database sources (**Hive**) and cloud databases (**Firebase Firestore**).
+   - Converts between Data transfer objects (DTOs) and Domain entities.
 
-    - Implements the Domain interfaces.
-    - Handles data retrieval from sources (Firebase Firestore, Hive).
-    - Converts between Data Models (JSON/Hive) and Domain Entities.
+3. **Presentation Layer** (`presentation/`):
+   - **Widgets/Screens**: Reusable visual components styled with the custom glassmorphism design system.
+   - **State Providers**: Implementations of `ChangeNotifier` that coordinate business use cases and state, notifying the UI to rebuild on changes.
 
-3.  **Presentation Layer** (`presentation/`):
-    - **Screens/Widgets**: The UI components.
-    - **Providers**: State management using `ChangeNotifier`. They interact with Domain/Data layers to fetch data and notify the UI.
+---
 
-## 🧩 State Management
+## 🧩 State Management & DI
 
-The app uses the **Provider** package for state management and Dependency Injection.
+- **Dependency Injection**: Services and repositories are initialized at startup in `main.dart` and injected throughout the widget tree using a root-level `MultiProvider`.
+- **Reactive UI**: Components consume providers using `context.watch<T>()` or `Selector<T, V>` to isolate rebuild triggers and maximize scrolling frame rates.
 
-- **Service & Repository Injection**: created at the root in `main.dart` and provided via `MultiProvider`.
-- **UI State**: Features expose specific providers (e.g., `TaskProvider`, `CalendarProvider`) which extend `ChangeNotifier`.
-- **Reactive**: UI widgets listen to these providers using `Consumer` or `context.watch<T>()` to rebuild on state changes.
+---
 
-## 💾 Data Strategy
+## 💾 Local-First Synchronization Strategy
 
-The app employs a **Local-First / Sync** strategy (or Hybrid):
+The application leverages a hybrid **Offline-First Caching** model:
+- **Write Path**: Task creation, updates, and completions are committed instantly to the local **Hive** box, ensuring zero UI latency. The update is then asynchronously synchronized to **Firebase Firestore**.
+- **Read Path**: The app loads initially from Hive cache, showing task lists instantly. It then listens to Firestore streams to pull down external changes and resolve conflicts.
+- **Offline Resilience**: When internet access is lost, transactions are held locally. Upon reconnection, the sync manager pushes local changes back to the cloud.
 
-- **Firebase Firestore**: Acts as the single source of truth for cloud storage and multi-device sync.
-- **Hive**: Used for local persistence and caching. This allows the app to work offline and load data instantly on startup. The background widget service also relies on Hive to read task data without launching the full Flutter engine UI.
+---
 
-## 🤖 Background Services & Widgets
+## 📱 Interactive Widget & Background Engine
 
-- **HomeWidget**: The app integrates with Android home screen widgets.
-- **WorkManager / Background Isolate**:
-  - `interactiveCallback` in `main.dart` handles actions triggered from the widget (e.g., completing a task).
-  - Since background isolates don't share memory with the main app, `Hive` is re-initialized in the background to access and update task data.
+The Android home screen widget integration utilizes a hybrid Kotlin-Dart bridge to guarantee zero lag:
+
+1. **Native Kotlin Interactivity** (`FullCalendarWidgetProvider`):
+   - Actions like calendar month navigation (`Prev`/`Next`/`Today`) are handled natively on the Android side in Kotlin. 
+   - Kotlin modifies and saves the navigation offset state in the shared widget SharedPreferences *before* invoking the Dart isolate. This prevents double-incrementing state and rendering delay.
+
+2. **Background Dart Isolate** (`BackgroundHandler`):
+   - Interactivity callbacks spawn a background Dart isolate.
+   - The isolate initializes a lightweight database instance (Hive) to read task data, processes changes (e.g. marking a task complete), updates Firestore, and triggers a widget redrawing command.
+   - **Isolate Protection**: To prevent background execution freezes, platform channel queries (such as timezone queries via `FlutterTimezone`) are strictly throttled with a 2-second timeout.
+
+---
+
+## 💰 Monetization & RevenueCat Configuration
+
+ROCIs Tasks employs a hybrid freemium model managed securely through **RevenueCat** (`purchases_flutter`):
+- **Free Limits**: Free users are limited to 5 categories, 1 basic widget type, no subtask lists, and no task attachments.
+- **Entitlements**: Entitlements are validated reactively via `SubscriptionService`.
+- **Lock System**: The app uses visual `PRO` badges and locks in settings and creation sheets. Attempting to access premium features triggers the sliding RevenueCat paywall interface dynamically.
+- **Birthday Promo Override**: The system contains a built-in time-based promo override (June 16 to July 16) that unlocks full Pro features automatically without querying subscription stores during the promotional month.

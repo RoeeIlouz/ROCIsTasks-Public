@@ -40,6 +40,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint('OnboardingScreen: build called');
     final l10n = AppLocalizations.of(context)!;
     final pages = _buildPages(l10n);
 

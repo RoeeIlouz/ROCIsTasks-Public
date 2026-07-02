@@ -144,15 +144,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get noDateSelected => 'لم يتم اختيار تاريخ';
 
   @override
-  String get syncWithGoogleCalendar => 'المزامنة مع تقويم Google';
+  String get syncWithGoogleTasks => 'المزامنة مع Google Tasks';
 
   @override
-  String get syncWithGoogleCalendarSubtitle =>
-      'ينشئ حدثًا في التقويم لهذه المهمة';
+  String get syncWithGoogleTasksSubtitle =>
+      'ينشئ ويقوم بمزامنة مهمة في Google Tasks';
 
   @override
-  String get syncWithGoogleCalendarRequiresDueDate =>
-      'عيّن تاريخ استحقاق لمزامنة هذه المهمة مع التقويم.';
+  String get googleSignInRequiredForSync =>
+      'تسجيل الدخول باستخدام Google مطلوب لمزامنة المهام.';
 
   @override
   String get calendarPermissionNotGranted => 'لم يتم منح إذن التقويم';
@@ -966,4 +966,82 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get securitySettingsSubtitle =>
       'إدارة الوصول عبر رمز PIN والبصمة البيومترية';
+
+  @override
+  String get enableSecurity => 'تفعيل الأمان';
+
+  @override
+  String get enableSecurityDescription =>
+      'لقد أنشأت مهمة خاصة. قم بإعداد رمز PIN أو البيومتريا لحماية محتواك الخاص.';
+
+  @override
+  String get notNow => 'ليس الآن';
+
+  @override
+  String get setUp => 'إعداد';
+
+  @override
+  String get doNotRemind => 'لا تذكرني';
+
+  @override
+  String get doNotRemindSubtitle => 'تعطيل جميع الإشعارات لهذه المهمة';
+
+  @override
+  String get glassmorphismEffects => 'تأثيرات الزجاج البلوري';
+
+  @override
+  String get glassmorphismEffectsSubtitle =>
+      'تطبيق تأثير الزجاج البلوري على البطاقات';
+
+  @override
+  String get noEventsForThisDay => 'لا توجد فعاليات لهذا اليوم';
+
+  @override
+  String get searchSymbols => 'رموز البحث';
+
+  @override
+  String get searchSymbolsDesc =>
+      'استخدم الرموز لتصفية المهام: @فئة (مثلاً @عمل)، #عنوان (مثلاً #اجتماع)، !أولوية (مثلاً !عالية)، %تاريخ (مثلاً %2025-06-15)، &مهمة فرعية (مثلاً &إصلاح خطأ)، *حالة (*منجز أو *معلق)، ? (مهام اليوم). يمكن دمج عدة رموز.';
+
+  @override
+  String get widgetSettings => 'Widget Customization';
+
+  @override
+  String get widgetSettingsSubtitle => 'Configure colors, theme, and features';
+
+  @override
+  String get widgetTheme => 'Widget Theme';
+
+  @override
+  String get widgetThemeSystem => 'System Default';
+
+  @override
+  String get widgetThemeLight => 'Solid Light';
+
+  @override
+  String get widgetThemeDark => 'Solid Dark';
+
+  @override
+  String get widgetThemeGlassmorphic => 'Glassmorphism';
+
+  @override
+  String get showWeekNumbers => 'Show Week Numbers';
+
+  @override
+  String get weekendHighlights => 'Highlight Weekends';
+
+  @override
+  String get startOfWeek => 'Start of Week';
+
+  @override
+  String get sunday => 'Sunday';
+
+  @override
+  String get monday => 'Monday';
+
+  @override
+  String get saturday => 'Saturday';
+
+  @override
+  String get widgetAccentColor => 'Widget Accent Color';
 }

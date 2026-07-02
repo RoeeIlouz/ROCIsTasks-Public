@@ -144,7 +144,7 @@ class _TaskUnlockDialogState extends State<TaskUnlockDialog> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  "Authenticating...",
+                  'Authenticating...',
                   style: theme.textTheme.bodySmall,
                 ),
               ] else if (_showPinInput) ...[
@@ -160,7 +160,7 @@ class _TaskUnlockDialogState extends State<TaskUnlockDialog> {
                     fontWeight: FontWeight.bold,
                   ),
                   decoration: InputDecoration(
-                    hintText: "••••",
+                    hintText: '••••',
                     hintStyle: TextStyle(
                       color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
                     ),
