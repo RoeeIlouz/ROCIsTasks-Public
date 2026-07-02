@@ -12,6 +12,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:rocis_tasks/shared/ui/ui_kit.dart';
 import 'package:rocis_tasks/core/services/auth_service.dart';
 import 'package:rocis_tasks/core/services/calendar_service.dart';
+import 'package:rocis_tasks/core/services/google_tasks_service.dart';
 import 'package:rocis_tasks/core/services/connectivity_service.dart';
 import 'package:rocis_tasks/core/config/app_config.dart';
 import 'package:rocis_tasks/core/services/pagination_service.dart';
@@ -52,6 +53,7 @@ class TaskProvider extends ChangeNotifier {
   final AnalyticsService _analyticsService;
   final AuthService _authService;
   final CalendarService _calendarService;
+  final GoogleTasksService _googleTasksService;
   final ThemeService _themeService;
   final ErrorHandlingService _errorHandlingService;
   final SubscriptionService _subscriptionService;
@@ -85,6 +87,7 @@ class TaskProvider extends ChangeNotifier {
   TaskProvider(
     this._authService,
     this._calendarService,
+    this._googleTasksService,
     this._themeService,
     this._errorHandlingService,
     this._subscriptionService, {
@@ -774,7 +777,7 @@ class TaskProvider extends ChangeNotifier {
           description: taskDescription,
           dueDate: start,
           priority: TaskPriority.medium,
-          syncWithGoogleCalendar: false,
+          syncWithGoogleTasks: false,
         );
         await _source.addTask(task);
         _firestoreService.addTask(task).catchError((e, s) {
@@ -1488,7 +1491,7 @@ class TaskProvider extends ChangeNotifier {
     List<String>? categoryIds,
     List<SubTask>? subTasks,
     bool requireSubTasksBeforeReminders = false,
-    bool syncWithGoogleCalendar = false,
+    bool syncWithGoogleTasks = false,
     List<String>? attachmentPaths,
     bool skipReminders = false,
   }) async {
@@ -1501,7 +1504,7 @@ class TaskProvider extends ChangeNotifier {
       categoryIds: categoryIds,
       subTasks: subTasks,
       requireSubTasksBeforeReminders: requireSubTasksBeforeReminders,
-      syncWithGoogleCalendar: syncWithGoogleCalendar,
+      syncWithGoogleTasks: syncWithGoogleTasks,
       attachmentPaths: attachmentPaths,
       skipReminders: skipReminders,
     );
@@ -1524,7 +1527,7 @@ class TaskProvider extends ChangeNotifier {
       }
     }
 
-    await _syncTaskCalendarState(task);
+    await _syncTaskGoogleTasksState(task);
 
     _refreshPagination();
     notifyListeners();
@@ -1567,11 +1570,7 @@ class TaskProvider extends ChangeNotifier {
       });
     });
 
-    if (task.isCompleted) {
-      await _removeTaskCalendarEvent(task);
-    } else {
-      await _syncTaskCalendarState(task);
-    }
+    await _syncTaskGoogleTasksState(task);
 
     if (task.isCompleted) {
       await _cancelTaskNotifications(task);
@@ -1606,7 +1605,7 @@ class TaskProvider extends ChangeNotifier {
     List<String>? categoryIds,
     List<SubTask>? subTasks,
     bool? requireSubTasksBeforeReminders,
-    bool? syncWithGoogleCalendar,
+    bool? syncWithGoogleTasks,
     List<String>? attachmentPaths,
     bool? skipReminders,
   }) async {
@@ -1624,8 +1623,8 @@ class TaskProvider extends ChangeNotifier {
     if (requireSubTasksBeforeReminders != null) {
       task.requireSubTasksBeforeReminders = requireSubTasksBeforeReminders;
     }
-    if (syncWithGoogleCalendar != null) {
-      task.syncWithGoogleCalendar = syncWithGoogleCalendar;
+    if (syncWithGoogleTasks != null) {
+      task.syncWithGoogleTasks = syncWithGoogleTasks;
     }
     if (attachmentPaths != null) {
       task.attachmentPaths = attachmentPaths;
@@ -1654,7 +1653,7 @@ class TaskProvider extends ChangeNotifier {
       }
     }
 
-    await _syncTaskCalendarState(task);
+    await _syncTaskGoogleTasksState(task);
 
     _refreshPagination();
     notifyListeners();
@@ -1733,7 +1732,7 @@ class TaskProvider extends ChangeNotifier {
         _errorHandlingService.logError(e, s, reason: 'Background cloud updateTask failed');
       });
       await _cancelTaskNotifications(task);
-      await _removeTaskCalendarEvent(task);
+      await _removeGoogleTask(task);
     } catch (e, s) {
       _errorHandlingService.logError(e, s, reason: 'Deleting task');
     }
@@ -1747,6 +1746,7 @@ class TaskProvider extends ChangeNotifier {
   Future<void> restoreTask(Task task) async {
     task.isDeleted = false;
     await _source.addTask(task);
+    await _syncTaskGoogleTasksState(task);
     _firestoreService.updateTask(task).catchError((e, s) {
       _errorHandlingService.logError(e, s, reason: 'Background cloud updateTask failed');
     });
@@ -1771,7 +1771,7 @@ class TaskProvider extends ChangeNotifier {
   Future<void> deleteTaskPermanently(String id) async {
     final task = getTaskById(id);
     if (task != null) {
-      await _removeTaskCalendarEvent(task);
+      await _removeGoogleTask(task);
     }
     await _source.deleteTask(id);
     _firestoreService.deleteTask(id).catchError((e, s) {
@@ -2014,65 +2014,79 @@ class TaskProvider extends ChangeNotifier {
     return writable.first.id as String?;
   }
 
-  Future<void> _removeTaskCalendarEvent(Task task) async {
-    final calendarId = task.calendarId;
-    final eventId = task.calendarEventId;
-    if (calendarId == null || eventId == null) return;
+  Future<void> _removeGoogleTask(Task task) async {
+    final taskId = task.googleTaskId;
+    if (taskId == null) return;
 
-    await _calendarService.deleteEvent(calendarId: calendarId, eventId: eventId);
+    try {
+      await _googleTasksService.deleteTask(taskId: taskId);
+    } catch (e, s) {
+      _errorHandlingService.logError(
+        e,
+        s,
+        reason: 'Failed to delete Google task',
+      );
+    }
 
-    task.calendarEventId = null;
-    task.calendarId = null;
+    task.googleTaskId = null;
+    task.googleTaskListId = null;
     await _source.addTask(task);
   }
 
-  Future<void> _syncTaskCalendarState(Task task) async {
-    if (task.isCompleted || (task.isDeleted ?? false)) {
-      await _removeTaskCalendarEvent(task);
+  Future<void> _syncTaskGoogleTasksState(Task task) async {
+    if (task.isDeleted ?? false) {
+      await _removeGoogleTask(task);
       return;
     }
 
-    if (!task.syncWithGoogleCalendar) {
-      await _removeTaskCalendarEvent(task);
-      return;
-    }
-
-    if (task.dueDate == null) {
-      await _removeTaskCalendarEvent(task);
+    if (!task.syncWithGoogleTasks) {
+      await _removeGoogleTask(task);
       return;
     }
 
     try {
-      final calendars = await _calendarService.getAvailableCalendars();
-      final calendarId = _selectWritableCalendarId(
-        calendars,
-        preferredCalendarId: task.calendarId,
-      );
-      if (calendarId == null) return;
+      String? categoryName;
+      if (task.categoryIds.isNotEmpty) {
+        categoryName = getCategoryById(task.categoryIds.first)?.name;
+      } else if (task.categoryId != null) {
+        categoryName = getCategoryById(task.categoryId)?.name;
+      }
 
-      final start = task.dueDate!;
-      final end = start.add(const Duration(hours: 1));
+      if (task.googleTaskId == null) {
+        final taskId = await _googleTasksService.createTask(
+          title: task.title,
+          description: task.description.isEmpty ? null : task.description,
+          dueDate: task.dueDate,
+          categoryName: categoryName,
+        );
 
-      final eventId = await _calendarService.createOrUpdateTaskEvent(
-        calendarId: calendarId,
-        eventId: task.calendarEventId,
-        title: task.title,
-        description: task.description.isEmpty ? null : task.description,
-        start: start,
-        end: end,
-      );
-      if (eventId == null) return;
+        if (taskId != null) {
+          task.googleTaskId = taskId;
+          task.googleTaskListId = 'ROCIs Tasks';
+          await _source.addTask(task);
+        }
+      } else {
+        final success = await _googleTasksService.updateTask(
+          taskId: task.googleTaskId!,
+          title: task.title,
+          description: task.description.isEmpty ? null : task.description,
+          dueDate: task.dueDate,
+          isCompleted: task.isCompleted,
+          categoryName: categoryName,
+        );
 
-      if (task.calendarEventId != eventId || task.calendarId != calendarId) {
-        task.calendarEventId = eventId;
-        task.calendarId = calendarId;
-        await _source.addTask(task);
+        if (!success) {
+          task.googleTaskId = null;
+          task.googleTaskListId = null;
+          await _source.addTask(task);
+          await _syncTaskGoogleTasksState(task);
+        }
       }
     } catch (e, s) {
       _errorHandlingService.logError(
         e,
         s,
-        reason: 'Sync task to calendar failed',
+        reason: 'Sync task to Google Tasks failed',
       );
     }
   }

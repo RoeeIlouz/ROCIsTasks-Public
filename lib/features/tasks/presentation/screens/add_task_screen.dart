@@ -8,7 +8,7 @@ import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/sub_task.dart';
 import 'package:rocis_tasks/core/services/subscription_service.dart';
 import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
-import 'package:rocis_tasks/core/services/calendar_service.dart';
+import 'package:rocis_tasks/core/services/auth_service.dart';
 import 'package:rocis_tasks/core/services/validation_service.dart';
 import 'package:rocis_tasks/core/services/error_service.dart';
 import 'package:rocis_tasks/core/validation/validators.dart';
@@ -42,7 +42,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   List<TextEditingController> _subTaskControllers = [];
   NlpResult? _nlpSuggestion;
   bool _requireSubTasksBeforeReminders = false;
-  bool _syncWithGoogleCalendar = false;
+  bool _syncWithGoogleTasks = false;
   bool _skipReminders = false;
   List<String> _attachmentPaths = [];
 
@@ -68,7 +68,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
         .toList();
     _requireSubTasksBeforeReminders =
         widget.task?.requireSubTasksBeforeReminders ?? false;
-    _syncWithGoogleCalendar = widget.task?.syncWithGoogleCalendar ?? false;
+    _syncWithGoogleTasks = widget.task?.syncWithGoogleTasks ?? false;
     _skipReminders = widget.task?.skipReminders ?? false;
     _attachmentPaths = List<String>.from(widget.task?.attachmentPaths ?? const []);
   }
@@ -151,13 +151,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
           return;
         }
 
-        if (_syncWithGoogleCalendar && _selectedDate == null) {
-          ErrorService.handleUserError(
-            context,
-            l10n.syncWithGoogleCalendarRequiresDueDate,
-          );
-          return;
-        }
+        // Google Tasks does not require a due date to sync.
 
         // Sanitize inputs
         final sanitizedTitle = ValidationService.sanitizeText(
@@ -179,7 +173,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
             categoryIds: _selectedCategoryIds,
             subTasks: _subTasks,
             requireSubTasksBeforeReminders: _requireSubTasksBeforeReminders,
-            syncWithGoogleCalendar: _syncWithGoogleCalendar,
+            syncWithGoogleTasks: _syncWithGoogleTasks,
             attachmentPaths: _attachmentPaths,
             skipReminders: _skipReminders,
           );
@@ -193,7 +187,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
             categoryIds: _selectedCategoryIds,
             subTasks: _subTasks,
             requireSubTasksBeforeReminders: _requireSubTasksBeforeReminders,
-            syncWithGoogleCalendar: _syncWithGoogleCalendar,
+            syncWithGoogleTasks: _syncWithGoogleTasks,
             attachmentPaths: _attachmentPaths,
             skipReminders: _skipReminders,
           );
@@ -471,44 +465,59 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
                 secondary: Icon(
-                  _syncWithGoogleCalendar
-                      ? Icons.event_available_rounded
-                      : Icons.event_busy_rounded,
+                  _syncWithGoogleTasks
+                      ? Icons.playlist_add_check_rounded
+                      : Icons.playlist_add_rounded,
                 ),
                 title: Text(
-                  l10n.syncWithGoogleCalendar,
+                  l10n.syncWithGoogleTasks ?? 'Sync with Google Tasks',
                   style: GoogleFonts.outfit(fontWeight: FontWeight.w600),
                 ),
                 subtitle: Text(
-                  l10n.syncWithGoogleCalendarSubtitle,
+                  l10n.syncWithGoogleTasksSubtitle ?? 'Creates and syncs a task in Google Tasks',
                   style: GoogleFonts.outfit(fontSize: 13),
                 ),
-                value: _syncWithGoogleCalendar,
+                value: _syncWithGoogleTasks,
                 onChanged: (value) async {
                   if (!value) {
-                    setState(() => _syncWithGoogleCalendar = false);
+                    setState(() => _syncWithGoogleTasks = false);
                     return;
                   }
 
                   final messenger = ScaffoldMessenger.of(context);
-                  final permissionNotGrantedText =
-                      l10n.calendarPermissionNotGranted;
-                  final calendarService = Provider.of<CalendarService>(
+                  final authService = Provider.of<AuthService>(
                     context,
                     listen: false,
                   );
-                  final granted = await calendarService.requestPermissions();
+                  
+                  final token = await authService.getGoogleAccessToken();
                   if (!context.mounted) return;
 
-                  if (!granted) {
-                    messenger.showSnackBar(
-                      SnackBar(content: Text(permissionNotGrantedText)),
-                    );
-                    setState(() => _syncWithGoogleCalendar = false);
-                    return;
+                  if (token == null) {
+                    if (Theme.of(context).platform == TargetPlatform.iOS ||
+                        Theme.of(context).platform == TargetPlatform.android) {
+                      // Mobile
+                      messenger.showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            l10n.googleSignInRequiredForSync ?? 'Google Sign-In is required to sync tasks.',
+                          ),
+                        ),
+                      );
+                      setState(() => _syncWithGoogleTasks = false);
+                      return;
+                    } else {
+                      // Web / Other
+                      final success = await authService.linkGoogleTasksOnWeb();
+                      if (!context.mounted) return;
+                      if (!success) {
+                        setState(() => _syncWithGoogleTasks = false);
+                        return;
+                      }
+                    }
                   }
 
-                  setState(() => _syncWithGoogleCalendar = true);
+                  setState(() => _syncWithGoogleTasks = true);
                 },
               ),
               const SizedBox(height: 24),

@@ -62,9 +62,9 @@ class AppGuideScreen extends StatelessWidget {
                 description: l10n.privateModeSubtitle,
               ),
               _GuideItem(
-                icon: Icons.event_available_rounded,
-                title: l10n.syncWithGoogleCalendar,
-                description: l10n.syncWithGoogleCalendarSubtitle,
+                icon: Icons.playlist_add_check_rounded,
+                title: l10n.syncWithGoogleTasks,
+                description: l10n.syncWithGoogleTasksSubtitle,
               ),
               _GuideItem(
                 icon: Icons.notifications_active,

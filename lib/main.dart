@@ -11,6 +11,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:rocis_tasks/shared/ui/ui_kit.dart';
 import 'package:rocis_tasks/core/services/auth_service.dart';
 import 'package:rocis_tasks/core/services/calendar_service.dart';
+import 'package:rocis_tasks/core/services/google_tasks_service.dart';
 import 'package:rocis_tasks/core/services/app_initializer.dart';
 import 'package:rocis_tasks/core/services/background_handler.dart';
 import 'package:rocis_tasks/core/services/connectivity_service.dart';
@@ -67,9 +68,11 @@ class _AppRootState extends State<AppRoot> {
     _calendarService,
     _taskSource,
   );
+  late final _googleTasksService = GoogleTasksService(_authService);
   late final _taskProvider = TaskProvider(
     _authService,
     _calendarService,
+    _googleTasksService,
     _themeService,
     _errorHandlingService,
     _subscriptionService,
@@ -349,6 +352,7 @@ class _AppRootState extends State<AppRoot> {
             ChangeNotifierProvider.value(value: _taskProvider),
             ChangeNotifierProvider.value(value: _privateModeService),
             Provider.value(value: _calendarService),
+            Provider.value(value: _googleTasksService),
             Provider.value(value: _scheduleService),
             Provider.value(value: _fullCalendarWidgetService),
             ChangeNotifierProvider(

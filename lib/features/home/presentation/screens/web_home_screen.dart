@@ -35,7 +35,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
   TaskPriority _priority = TaskPriority.medium;
   List<String> _categoryIds = [];
   List<SubTask> _subTasks = [];
-  bool _syncWithGoogleCalendar = false;
+  bool _syncWithGoogleTasks = false;
   bool _skipReminders = false;
 
   final TextEditingController _searchController = TextEditingController();
@@ -80,7 +80,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
           _categoryIds.add(task.categoryId!);
         }
         _subTasks = task.subTasks?.map((st) => st.copyWith()).toList() ?? [];
-        _syncWithGoogleCalendar = task.syncWithGoogleCalendar;
+        _syncWithGoogleTasks = task.syncWithGoogleTasks;
         _skipReminders = task.skipReminders;
       }
     });
@@ -96,7 +96,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
       _priority = TaskPriority.medium;
       _categoryIds = [];
       _subTasks = [];
-      _syncWithGoogleCalendar = false;
+      _syncWithGoogleTasks = false;
       _skipReminders = false;
     });
   }
@@ -119,7 +119,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
           categoryId: catId,
           categoryIds: _categoryIds,
           subTasks: _subTasks,
-          syncWithGoogleCalendar: _syncWithGoogleCalendar,
+          syncWithGoogleTasks: _syncWithGoogleTasks,
           skipReminders: _skipReminders,
         );
         ScaffoldMessenger.of(context).showSnackBar(
@@ -136,7 +136,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
           catId,
           categoryIds: _categoryIds,
           subTasks: _subTasks,
-          syncWithGoogleCalendar: _syncWithGoogleCalendar,
+          syncWithGoogleTasks: _syncWithGoogleTasks,
           skipReminders: _skipReminders,
         );
         ScaffoldMessenger.of(context).showSnackBar(
@@ -314,7 +314,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                   const SizedBox(height: 8),
                   ElevatedButton(
                     onPressed: () async {
-                      final success = await authService.linkGoogleCalendarOnWeb();
+                      final success = await authService.linkGoogleTasksOnWeb();
                       if (success) {
                         calendarProvider.loadEvents();
                       }
@@ -990,14 +990,14 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                     ),
                     const SizedBox(height: 20),
 
-                    // Google Calendar Sync Switch
+                    // Google Tasks Sync Switch
                     SwitchListTile(
                       contentPadding: EdgeInsets.zero,
-                      title: Text(l10n.syncWithGoogleCalendar, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
-                      subtitle: const Text('Add task as calendar event', style: TextStyle(fontSize: 11)),
-                      value: _syncWithGoogleCalendar,
+                      title: Text(l10n.syncWithGoogleTasks, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                      subtitle: Text(l10n.syncWithGoogleTasksSubtitle, style: const TextStyle(fontSize: 11)),
+                      value: _syncWithGoogleTasks,
                       onChanged: (value) {
-                        setState(() { _syncWithGoogleCalendar = value; });
+                        setState(() { _syncWithGoogleTasks = value; });
                       },
                     ),
                     

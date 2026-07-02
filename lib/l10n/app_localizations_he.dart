@@ -144,14 +144,14 @@ class AppLocalizationsHe extends AppLocalizations {
   String get noDateSelected => 'לא נבחר תאריך';
 
   @override
-  String get syncWithGoogleCalendar => 'סנכרון עם יומן Google';
+  String get syncWithGoogleTasks => 'סנכרון עם Google Tasks';
 
   @override
-  String get syncWithGoogleCalendarSubtitle => 'יוצר אירוע יומן עבור משימה זו';
+  String get syncWithGoogleTasksSubtitle => 'יוצר ומסנכרן משימה ב-Google Tasks';
 
   @override
-  String get syncWithGoogleCalendarRequiresDueDate =>
-      'קבע תאריך יעד כדי לסנכרן את המשימה ליומן.';
+  String get googleSignInRequiredForSync =>
+      'נדרשת התחברות ל-Google כדי לסנכרן משימות.';
 
   @override
   String get calendarPermissionNotGranted => 'הרשאת יומן לא אושרה';

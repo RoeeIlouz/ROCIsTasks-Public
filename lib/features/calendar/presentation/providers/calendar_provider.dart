@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:device_calendar/device_calendar.dart';
+import 'package:rocis_tasks/core/services/auth_service.dart';
 import 'package:rocis_tasks/core/services/calendar_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rocis_tasks/features/home/services/full_calendar_widget_service.dart';
@@ -18,10 +19,7 @@ class CalendarProvider extends ChangeNotifier {
   Set<String> _selectedCalendarIds = {};
   bool _isGoogleCalendarTokenExpired = false;
 
-  CalendarProvider(
-    this._calendarService,
-    this._widgetService,
-  );
+  CalendarProvider(this._calendarService, this._widgetService);
 
   bool get isGoogleCalendarTokenExpired => _isGoogleCalendarTokenExpired;
   List<Event> get events => _events;
@@ -149,8 +147,13 @@ class CalendarProvider extends ChangeNotifier {
       _availableCalendars = await _calendarService.getAvailableCalendars();
 
       if (_availableCalendars.isNotEmpty) {
-        final availableIds = _availableCalendars.map((c) => c.id).whereType<String>().toSet();
-        final validSelectedIds = _selectedCalendarIds.intersection(availableIds);
+        final availableIds = _availableCalendars
+            .map((c) => c.id)
+            .whereType<String>()
+            .toSet();
+        final validSelectedIds = _selectedCalendarIds.intersection(
+          availableIds,
+        );
         if (validSelectedIds.isEmpty) {
           // If no selected calendars are valid in the current platform's available calendars,
           // default to selecting all available calendars.
@@ -234,7 +237,11 @@ class CalendarProvider extends ChangeNotifier {
         }
         _eventsMap[currentDay]!.add(event);
 
-        currentDay = DateTime(currentDay.year, currentDay.month, currentDay.day + 1);
+        currentDay = DateTime(
+          currentDay.year,
+          currentDay.month,
+          currentDay.day + 1,
+        );
       }
     }
   }
