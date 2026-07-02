@@ -16,6 +16,8 @@ class AppConfig {
   static const String termsOfServiceUrl =
       'https://rocisapps.ilouz.xyz/terms.html';
   static const String websiteUrl = 'https://rocisapps.ilouz.xyz';
+  static const String githubUrl =
+      'https://github.com/RoeeIlouz/ROCIsTasks-public';
 
   // Feature flags
   static const bool enableAnalytics = isProduction;

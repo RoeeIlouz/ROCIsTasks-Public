@@ -1049,6 +1049,23 @@ class SettingsScreen extends StatelessWidget {
                               ),
                               ListTile(
                                 contentPadding: EdgeInsets.zero,
+                                leading: const Icon(Icons.code_rounded),
+                                title: Text(l10n.viewGitHub),
+                                subtitle: Text(l10n.viewGitHubSubtitle),
+                                onTap: () async {
+                                  final Uri url = Uri.parse(
+                                    AppConfig.githubUrl,
+                                  );
+                                  if (await canLaunchUrl(url)) {
+                                    await launchUrl(
+                                      url,
+                                      mode: LaunchMode.externalApplication,
+                                    );
+                                  }
+                                },
+                              ),
+                              ListTile(
+                                contentPadding: EdgeInsets.zero,
                                 leading: const Icon(Icons.mail_outline),
                                 title: Text(l10n.contactSupport),
                                 subtitle: const Text(AppConfig.supportEmail),

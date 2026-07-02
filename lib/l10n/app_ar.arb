@@ -138,6 +138,8 @@
   "aboutAppSubtitle": "إصدار التطبيق والدعم والمعلومات",
   "aboutAppDescription": "تم تصميم مهام ROCI لمساعدتك على التنظيم وزيادة الإنتاجية. بُني باستخدام Flutter ويوفر تجربة سلسة لإدارة مهامك اليومية وفئاتك وجدولك.",
   "visitWebsite": "زيارة موقعنا",
+  "viewGitHub": "مشروع GitHub",
+  "viewGitHubSubtitle": "عرض الكود البرمجي على GitHub",
   "contactSupport": "اتصل بالدعم",
   "rocisTasksPro": "مهام ROCIs برو",
   "youAreProUser": "أنت مستخدم Pro!",
