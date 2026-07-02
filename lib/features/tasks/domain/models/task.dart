@@ -194,6 +194,8 @@ class Task extends HiveObject {
       'createdAt': createdAt,
       'requireSubTasksBeforeReminders': requireSubTasksBeforeReminders,
       'syncWithGoogleTasks': syncWithGoogleTasks,
+      'googleTaskId': googleTaskId,
+      'googleTaskListId': googleTaskListId,
       'skipReminders': skipReminders,
     };
   }

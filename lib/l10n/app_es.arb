@@ -354,5 +354,19 @@
   "glassmorphismEffectsSubtitle": "Aplicar efecto de cristal esmerilado a las tarjetas",
   "noEventsForThisDay": "No hay eventos para este día",
   "searchSymbols": "Símbolos de búsqueda",
-  "searchSymbolsDesc": "Usa símbolos para filtrar tareas: @categoría (ej. @trabajo), #título (ej. #reunión), !prioridad (ej. !alta), %fecha (ej. %2025-06-15), &subtarea (ej. &corregir error), *estado (*hecho o *pendiente), ? (tareas de hoy). Combina varios símbolos."
+  "searchSymbolsDesc": "Usa símbolos para filtrar tareas: @categoría (ej. @trabajo), #título (ej. #reunión), !prioridad (ej. !alta), %fecha (ej. %2025-06-15), &subtarea (ej. &corregir error), *estado (*hecho o *pendiente), ? (tareas de hoy). Combina varios símbolos.",
+  "widgetSettings": "Personalización del Widget",
+  "widgetSettingsSubtitle": "Configura colores, tema y características",
+  "widgetTheme": "Tema del Widget",
+  "widgetThemeSystem": "Predeterminado del sistema",
+  "widgetThemeLight": "Claro sólido",
+  "widgetThemeDark": "Oscuro sólido",
+  "widgetThemeGlassmorphic": "Glassmorphism",
+  "showWeekNumbers": "Mostrar números de semana",
+  "weekendHighlights": "Destacar fines de semana",
+  "startOfWeek": "Inicio de la semana",
+  "sunday": "Domingo",
+  "monday": "Lunes",
+  "saturday": "Sábado",
+  "widgetAccentColor": "Color de acento del widget"
 }

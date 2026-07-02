@@ -355,5 +355,19 @@
   "glassmorphismEffectsSubtitle": "Apply frosted glass to cards",
   "noEventsForThisDay": "No events for this day",
   "searchSymbols": "Search Symbols",
-  "searchSymbolsDesc": "Use symbols to filter tasks: @category (e.g. @work), #title (e.g. #meeting), !priority (e.g. !high), %date (e.g. %2025-06-15), &subtask (e.g. &fix bug), *status (*done or *pending), ? (tasks due today). Combine multiple symbols."
+  "searchSymbolsDesc": "Use symbols to filter tasks: @category (e.g. @work), #title (e.g. #meeting), !priority (e.g. !high), %date (e.g. %2025-06-15), &subtask (e.g. &fix bug), *status (*done or *pending), ? (tasks due today). Combine multiple symbols.",
+  "widgetSettings": "Widget Customization",
+  "widgetSettingsSubtitle": "Configure colors, theme, and features",
+  "widgetTheme": "Widget Theme",
+  "widgetThemeSystem": "System Default",
+  "widgetThemeLight": "Solid Light",
+  "widgetThemeDark": "Solid Dark",
+  "widgetThemeGlassmorphic": "Glassmorphism",
+  "showWeekNumbers": "Show Week Numbers",
+  "weekendHighlights": "Highlight Weekends",
+  "startOfWeek": "Start of Week",
+  "sunday": "Sunday",
+  "monday": "Monday",
+  "saturday": "Saturday",
+  "widgetAccentColor": "Widget Accent Color"
 }

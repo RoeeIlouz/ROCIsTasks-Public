@@ -193,9 +193,10 @@ class FullCalendarWidgetService {
       final targetMonth = DateTime(now.year, now.month + offset, 1);
       final monthName = DateFormat('MMMM yyyy').format(targetMonth);
 
-      // Calculate calendar grid (6 weeks)
+      // Calculate calendar grid (6 weeks) based on startOfWeek preference (7=Sunday, 1=Monday, 6=Saturday)
+      final startOfWeek = prefs.getInt('full_calendar_start_of_week') ?? 7;
       final firstDayOfMonth = targetMonth;
-      final difference = firstDayOfMonth.weekday % 7;
+      final difference = (firstDayOfMonth.weekday - startOfWeek) % 7;
       final startDate = firstDayOfMonth.subtract(Duration(days: difference));
       final endDate = startDate.add(const Duration(days: 41));
 
@@ -422,6 +423,17 @@ class FullCalendarWidgetService {
     }
   }
 
+  /// Update the selected date on the widget and trigger refresh
+  Future<void> updateSelectedDate(DateTime date, String? userId) async {
+    try {
+      final dateStr = DateFormat('yyyy-MM-dd').format(date);
+      await HomeWidget.saveWidgetData<String>('full_calendar_selected_date', dateStr);
+      await updateFullCalendarWidget(userId: userId);
+    } catch (e, stack) {
+      AppLogger.error('Failed to update selected date on widget', error: e, stack: stack);
+    }
+  }
+
   /// Generates a grid with just dates (no events) to prevent blank widget
   Future<void> _generateFallbackGrid(int? monthOffset, String? userId) async {
     try {
@@ -433,8 +445,11 @@ class FullCalendarWidgetService {
       final targetMonth = DateTime(now.year, now.month + offset, 1);
       final monthName = DateFormat('MMMM yyyy').format(targetMonth);
 
+      final prefs = await SharedPreferences.getInstance();
+      // Calculate calendar grid (6 weeks) based on startOfWeek preference (7=Sunday, 1=Monday, 6=Saturday)
+      final startOfWeek = prefs.getInt('full_calendar_start_of_week') ?? 7;
       final firstDayOfMonth = targetMonth;
-      final difference = firstDayOfMonth.weekday % 7;
+      final difference = (firstDayOfMonth.weekday - startOfWeek) % 7;
       final startDate = firstDayOfMonth.subtract(Duration(days: difference));
 
       final gridData = <Map<String, dynamic>>[];

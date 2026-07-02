@@ -1032,4 +1032,46 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get searchSymbolsDesc =>
       'Utilisez des symboles pour filtrer les tâches : @catégorie (ex. @travail), #titre (ex. #réunion), !priorité (ex. !haute), %date (ex. %2025-06-15), &sous-tâche (ex. &correction bug), *statut (*fait ou *en cours), ? (tâches d\'aujourd\'hui). Combiner plusieurs symboles.';
+
+  @override
+  String get widgetSettings => 'Widget Customization';
+
+  @override
+  String get widgetSettingsSubtitle => 'Configure colors, theme, and features';
+
+  @override
+  String get widgetTheme => 'Widget Theme';
+
+  @override
+  String get widgetThemeSystem => 'System Default';
+
+  @override
+  String get widgetThemeLight => 'Solid Light';
+
+  @override
+  String get widgetThemeDark => 'Solid Dark';
+
+  @override
+  String get widgetThemeGlassmorphic => 'Glassmorphism';
+
+  @override
+  String get showWeekNumbers => 'Show Week Numbers';
+
+  @override
+  String get weekendHighlights => 'Highlight Weekends';
+
+  @override
+  String get startOfWeek => 'Start of Week';
+
+  @override
+  String get sunday => 'Sunday';
+
+  @override
+  String get monday => 'Monday';
+
+  @override
+  String get saturday => 'Saturday';
+
+  @override
+  String get widgetAccentColor => 'Widget Accent Color';
 }

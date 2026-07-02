@@ -142,8 +142,6 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   void _saveTask() {
     if (_formKey.currentState!.validate()) {
       try {
-        final l10n = AppLocalizations.of(context)!;
-
         // Validate due date
         final dateError = ValidationService.validateDueDate(_selectedDate);
         if (dateError != null) {
@@ -470,11 +468,11 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                       : Icons.playlist_add_rounded,
                 ),
                 title: Text(
-                  l10n.syncWithGoogleTasks ?? 'Sync with Google Tasks',
+                  l10n.syncWithGoogleTasks,
                   style: GoogleFonts.outfit(fontWeight: FontWeight.w600),
                 ),
                 subtitle: Text(
-                  l10n.syncWithGoogleTasksSubtitle ?? 'Creates and syncs a task in Google Tasks',
+                  l10n.syncWithGoogleTasksSubtitle,
                   style: GoogleFonts.outfit(fontSize: 13),
                 ),
                 value: _syncWithGoogleTasks,
@@ -500,7 +498,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                       messenger.showSnackBar(
                         SnackBar(
                           content: Text(
-                            l10n.googleSignInRequiredForSync ?? 'Google Sign-In is required to sync tasks.',
+                            l10n.googleSignInRequiredForSync,
                           ),
                         ),
                       );

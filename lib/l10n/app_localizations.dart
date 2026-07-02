@@ -2009,6 +2009,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Use symbols to filter tasks: @category (e.g. @work), #title (e.g. #meeting), !priority (e.g. !high), %date (e.g. %2025-06-15), &subtask (e.g. &fix bug), *status (*done or *pending), ? (tasks due today). Combine multiple symbols.'**
   String get searchSymbolsDesc;
+
+  /// No description provided for @widgetSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Widget Customization'**
+  String get widgetSettings;
+
+  /// No description provided for @widgetSettingsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Configure colors, theme, and features'**
+  String get widgetSettingsSubtitle;
+
+  /// No description provided for @widgetTheme.
+  ///
+  /// In en, this message translates to:
+  /// **'Widget Theme'**
+  String get widgetTheme;
+
+  /// No description provided for @widgetThemeSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'System Default'**
+  String get widgetThemeSystem;
+
+  /// No description provided for @widgetThemeLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Solid Light'**
+  String get widgetThemeLight;
+
+  /// No description provided for @widgetThemeDark.
+  ///
+  /// In en, this message translates to:
+  /// **'Solid Dark'**
+  String get widgetThemeDark;
+
+  /// No description provided for @widgetThemeGlassmorphic.
+  ///
+  /// In en, this message translates to:
+  /// **'Glassmorphism'**
+  String get widgetThemeGlassmorphic;
+
+  /// No description provided for @showWeekNumbers.
+  ///
+  /// In en, this message translates to:
+  /// **'Show Week Numbers'**
+  String get showWeekNumbers;
+
+  /// No description provided for @weekendHighlights.
+  ///
+  /// In en, this message translates to:
+  /// **'Highlight Weekends'**
+  String get weekendHighlights;
+
+  /// No description provided for @startOfWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'Start of Week'**
+  String get startOfWeek;
+
+  /// No description provided for @sunday.
+  ///
+  /// In en, this message translates to:
+  /// **'Sunday'**
+  String get sunday;
+
+  /// No description provided for @monday.
+  ///
+  /// In en, this message translates to:
+  /// **'Monday'**
+  String get monday;
+
+  /// No description provided for @saturday.
+  ///
+  /// In en, this message translates to:
+  /// **'Saturday'**
+  String get saturday;
+
+  /// No description provided for @widgetAccentColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Widget Accent Color'**
+  String get widgetAccentColor;
 }
 
 class _AppLocalizationsDelegate
