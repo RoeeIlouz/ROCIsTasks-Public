@@ -378,23 +378,23 @@ abstract class AppLocalizations {
   /// **'No Date Selected'**
   String get noDateSelected;
 
-  /// No description provided for @syncWithGoogleCalendar.
+  /// No description provided for @syncWithGoogleTasks.
   ///
   /// In en, this message translates to:
-  /// **'Sync with Google Calendar'**
-  String get syncWithGoogleCalendar;
+  /// **'Sync with Google Tasks'**
+  String get syncWithGoogleTasks;
 
-  /// No description provided for @syncWithGoogleCalendarSubtitle.
+  /// No description provided for @syncWithGoogleTasksSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Creates a calendar event for this task'**
-  String get syncWithGoogleCalendarSubtitle;
+  /// **'Creates and syncs a task in Google Tasks'**
+  String get syncWithGoogleTasksSubtitle;
 
-  /// No description provided for @syncWithGoogleCalendarRequiresDueDate.
+  /// No description provided for @googleSignInRequiredForSync.
   ///
   /// In en, this message translates to:
-  /// **'Set a due date to sync this task to your calendar.'**
-  String get syncWithGoogleCalendarRequiresDueDate;
+  /// **'Google Sign-In is required to sync tasks.'**
+  String get googleSignInRequiredForSync;
 
   /// No description provided for @calendarPermissionNotGranted.
   ///

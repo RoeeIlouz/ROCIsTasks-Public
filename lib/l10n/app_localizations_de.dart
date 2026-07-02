@@ -144,15 +144,15 @@ class AppLocalizationsDe extends AppLocalizations {
   String get noDateSelected => 'Kein Datum ausgewählt';
 
   @override
-  String get syncWithGoogleCalendar => 'Mit Google Kalender synchronisieren';
+  String get syncWithGoogleTasks => 'Mit Google Tasks synchronisieren';
 
   @override
-  String get syncWithGoogleCalendarSubtitle =>
-      'Erstellt einen Kalendereintrag für diese Aufgabe';
+  String get syncWithGoogleTasksSubtitle =>
+      'Erstellt und synchronisiert eine Aufgabe in Google Tasks';
 
   @override
-  String get syncWithGoogleCalendarRequiresDueDate =>
-      'Legen Sie ein Fälligkeitsdatum fest, um diese Aufgabe mit Ihrem Kalender zu synchronisieren.';
+  String get googleSignInRequiredForSync =>
+      'Google-Anmeldung ist erforderlich, um Aufgaben zu synchronisieren.';
 
   @override
   String get calendarPermissionNotGranted =>

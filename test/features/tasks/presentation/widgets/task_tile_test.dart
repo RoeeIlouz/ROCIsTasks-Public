@@ -255,12 +255,12 @@ void main() {
     });
   });
 
-  group('TaskTile - Google Calendar', () {
-    testWidgets('shows Google Calendar badge when synced', (tester) async {
+  group('TaskTile - Google Tasks', () {
+    testWidgets('shows Google Tasks badge when synced', (tester) async {
       final task = Task(
         id: '1',
         title: 'Google Synced',
-        syncWithGoogleCalendar: true,
+        syncWithGoogleTasks: true,
       );
       await tester.pumpWidget(createWidgetUnderTest(task));
       expect(find.text('Google Synced'), findsOneWidget);

@@ -144,15 +144,15 @@ class AppLocalizationsSv extends AppLocalizations {
   String get noDateSelected => 'Inget datum valt';
 
   @override
-  String get syncWithGoogleCalendar => 'Synka med Google Kalender';
+  String get syncWithGoogleTasks => 'Synka med Google Tasks';
 
   @override
-  String get syncWithGoogleCalendarSubtitle =>
-      'Skapar en kalenderhändelse för denna uppgift';
+  String get syncWithGoogleTasksSubtitle =>
+      'Skapar och synkar en uppgift i Google Tasks';
 
   @override
-  String get syncWithGoogleCalendarRequiresDueDate =>
-      'Ange ett förfallodatum för att synka uppgiften till din kalender.';
+  String get googleSignInRequiredForSync =>
+      'Google-inloggning krävs för att synka uppgifter.';
 
   @override
   String get calendarPermissionNotGranted => 'Kalenderbehörighet inte beviljad';

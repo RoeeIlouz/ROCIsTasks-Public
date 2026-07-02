@@ -5,14 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
-class GoogleTokenExpiredException implements Exception {
-  final String message;
-  GoogleTokenExpiredException([this.message = 'Google Calendar access token expired or invalid.']);
-  
-  @override
-  String toString() => message;
-}
+import 'package:rocis_tasks/core/services/auth_service.dart';
 
 class CalendarService {
   final DeviceCalendarPlugin _deviceCalendarPlugin = DeviceCalendarPlugin();
@@ -166,7 +159,7 @@ class CalendarService {
         if (targetCalendarIds.isEmpty) {
           targetCalendarIds = availableIds.toList();
         } else {
-          targetCalendarIds = targetCalendarIds.where((id) => availableIds.contains(id)).toList();
+          targetCalendarIds = targetCalendarIds.where(availableIds.contains).toList();
         }
         
         for (final calendarId in targetCalendarIds) {

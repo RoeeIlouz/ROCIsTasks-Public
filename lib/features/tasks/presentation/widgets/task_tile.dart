@@ -215,9 +215,9 @@ class TaskTile extends StatelessWidget {
                                       ),
                                 ),
                               ),
-                              if (task.syncWithGoogleCalendar) ...[
+                              if (task.syncWithGoogleTasks) ...[
                                 const SizedBox(width: 6),
-                                const _GCalendarBadge(),
+                                const _GTasksBadge(),
                               ],
                             ],
                           ),
@@ -607,16 +607,16 @@ class _MaskedPrivateTaskTile extends StatelessWidget {
   }
 }
 
-// ─── Google Calendar Sync Badge ──────────────────────────────────────────────
+// ─── Google Tasks Sync Badge ──────────────────────────────────────────────────
 
-class _GCalendarBadge extends StatelessWidget {
-  const _GCalendarBadge();
+class _GTasksBadge extends StatelessWidget {
+  const _GTasksBadge();
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Tooltip(
-      message: 'Synced with Google Calendar',
+      message: 'Synced with Google Tasks',
       child: Container(
         width: 20,
         height: 20,

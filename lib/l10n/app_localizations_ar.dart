@@ -144,15 +144,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get noDateSelected => 'لم يتم اختيار تاريخ';
 
   @override
-  String get syncWithGoogleCalendar => 'المزامنة مع تقويم Google';
+  String get syncWithGoogleTasks => 'المزامنة مع Google Tasks';
 
   @override
-  String get syncWithGoogleCalendarSubtitle =>
-      'ينشئ حدثًا في التقويم لهذه المهمة';
+  String get syncWithGoogleTasksSubtitle =>
+      'ينشئ ويقوم بمزامنة مهمة في Google Tasks';
 
   @override
-  String get syncWithGoogleCalendarRequiresDueDate =>
-      'عيّن تاريخ استحقاق لمزامنة هذه المهمة مع التقويم.';
+  String get googleSignInRequiredForSync =>
+      'تسجيل الدخول باستخدام Google مطلوب لمزامنة المهام.';
 
   @override
   String get calendarPermissionNotGranted => 'لم يتم منح إذن التقويم';

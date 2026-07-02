@@ -9,6 +9,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rocis_tasks/core/services/encryption_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+class GoogleTokenExpiredException implements Exception {
+  final String message;
+  GoogleTokenExpiredException([this.message = 'Google Calendar access token expired or invalid.']);
+  
+  @override
+  String toString() => message;
+}
+
 class AuthService extends ChangeNotifier {
   final ErrorHandlingService _errorHandlingService;
   FirebaseAuth get _auth => FirebaseAuth.instance;
@@ -82,7 +90,7 @@ class AuthService extends ChangeNotifier {
         final GoogleAuthProvider googleProvider = GoogleAuthProvider();
         googleProvider.addScope('email');
         googleProvider.addScope('profile');
-        googleProvider.addScope('https://www.googleapis.com/auth/calendar');
+        googleProvider.addScope('https://www.googleapis.com/auth/tasks');
         
         final UserCredential userCredential = await _auth.signInWithPopup(googleProvider);
         
@@ -127,7 +135,11 @@ class AuthService extends ChangeNotifier {
 
       // Obtain access token via authorization client
       final clientAuth = await googleUser.authorizationClient
-          .authorizationForScopes(['email', 'profile']);
+          .authorizationForScopes([
+        'email',
+        'profile',
+        'https://www.googleapis.com/auth/tasks',
+      ]);
 
       final AuthCredential credential = GoogleAuthProvider.credential(
         accessToken: clientAuth?.accessToken,
@@ -382,8 +394,8 @@ class AuthService extends ChangeNotifier {
     }
   }
 
-  /// Opens a Google popup to refresh calendar scopes and retrieve a new Access Token on Web.
-  Future<bool> linkGoogleCalendarOnWeb() async {
+  /// Opens a Google popup to refresh tasks scopes and retrieve a new Access Token on Web.
+  Future<bool> linkGoogleTasksOnWeb() async {
     if (!kIsWeb) return false;
     try {
       final user = currentUser;
@@ -392,9 +404,9 @@ class AuthService extends ChangeNotifier {
       final GoogleAuthProvider googleProvider = GoogleAuthProvider();
       googleProvider.addScope('email');
       googleProvider.addScope('profile');
-      googleProvider.addScope('https://www.googleapis.com/auth/calendar');
+      googleProvider.addScope('https://www.googleapis.com/auth/tasks');
 
-      AppLogger.info('Opening Google popup to refresh Calendar access token...', tag: 'Auth');
+      AppLogger.info('Opening Google popup to refresh Tasks access token...', tag: 'Auth');
       final UserCredential userCredential = await user.reauthenticateWithPopup(googleProvider);
       
       final OAuthCredential? oAuthCred = userCredential.credential as OAuthCredential?;
@@ -405,12 +417,12 @@ class AuthService extends ChangeNotifier {
         await prefs.setString('google_access_token', accessToken);
         final expiresAt = DateTime.now().add(const Duration(minutes: 55));
         await prefs.setString('google_access_token_expires_at', expiresAt.toIso8601String());
-        AppLogger.info('Web Google Calendar access token refreshed successfully.', tag: 'Auth');
+        AppLogger.info('Web Google Tasks access token refreshed successfully.', tag: 'Auth');
         notifyListeners();
         return true;
       }
     } catch (e, s) {
-      AppLogger.error('Error refreshing Google Calendar access token on Web', error: e, stack: s, tag: 'Auth');
+      AppLogger.error('Error refreshing Google Tasks access token on Web', error: e, stack: s, tag: 'Auth');
     }
     return false;
   }
@@ -586,5 +598,39 @@ class AuthService extends ChangeNotifier {
     }
 
     return false;
+  }
+
+  /// Get active Google Access Token for calling API.
+  Future<String?> getGoogleAccessToken() async {
+    if (kIsWeb) {
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        final token = prefs.getString('google_access_token');
+        final expiresAtStr = prefs.getString('google_access_token_expires_at');
+        if (token == null || expiresAtStr == null) return null;
+        final expiresAt = DateTime.parse(expiresAtStr);
+        if (DateTime.now().isAfter(expiresAt)) return null;
+        return token;
+      } catch (e) {
+        AppLogger.error('Error reading access token from prefs', error: e, tag: 'Auth');
+      }
+      return null;
+    } else {
+      try {
+        final googleUser = await _googleSignIn.attemptLightweightAuthentication();
+        if (googleUser != null) {
+          final clientAuth = await googleUser.authorizationClient
+              .authorizationForScopes([
+            'email',
+            'profile',
+            'https://www.googleapis.com/auth/tasks',
+          ]);
+          return clientAuth?.accessToken;
+        }
+      } catch (e) {
+        AppLogger.warning('Failed to retrieve Google access token silently on mobile', error: e, tag: 'Auth');
+      }
+      return null;
+    }
   }
 }
