@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:rocis_tasks/core/services/security_service.dart';
 import 'package:rocis_tasks/core/services/subscription_service.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class SecuritySettingsScreen extends StatefulWidget {
   const SecuritySettingsScreen({super.key});
@@ -125,76 +126,78 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
               ),
             ),
 
-            const SizedBox(height: 24),
-            _buildSectionHeader(context, l10n.biometricUnlock),
+            if (!kIsWeb) ...[
+              const SizedBox(height: 24),
+              _buildSectionHeader(context, l10n.biometricUnlock),
 
-            // Biometric Toggle (Premium Gated)
-            Card(
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-                side: BorderSide(
-                  color: theme.dividerColor.withValues(alpha: 0.1),
-                ),
-              ),
-              child: Opacity(
-                opacity: (isPremium && _deviceSupportsBiometrics) ? 1.0 : 0.5,
-                child: SwitchListTile(
-                  secondary: Icon(
-                    Icons.fingerprint_rounded,
-                    color:
-                        (isPremium &&
-                            _deviceSupportsBiometrics &&
-                            privateModeService.isBiometricEnabled)
-                        ? theme.colorScheme.primary
-                        : theme.disabledColor,
+              // Biometric Toggle (Premium Gated)
+              Card(
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  side: BorderSide(
+                    color: theme.dividerColor.withValues(alpha: 0.1),
                   ),
-                  title: Row(
-                    children: [
-                      Text(
-                        l10n.biometricUnlock,
-                        style: GoogleFonts.outfit(fontWeight: FontWeight.w500),
-                      ),
-                      if (!isPremium) ...[
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 6,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.amber.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(
-                            'PRO',
-                            style: GoogleFonts.outfit(
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.amber[800],
+                ),
+                child: Opacity(
+                  opacity: (isPremium && _deviceSupportsBiometrics) ? 1.0 : 0.5,
+                  child: SwitchListTile(
+                    secondary: Icon(
+                      Icons.fingerprint_rounded,
+                      color:
+                          (isPremium &&
+                              _deviceSupportsBiometrics &&
+                              privateModeService.isBiometricEnabled)
+                          ? theme.colorScheme.primary
+                          : theme.disabledColor,
+                    ),
+                    title: Row(
+                      children: [
+                        Text(
+                          l10n.biometricUnlock,
+                          style: GoogleFonts.outfit(fontWeight: FontWeight.w500),
+                        ),
+                        if (!isPremium) ...[
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.amber.withValues(alpha: 0.2),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              'PRO',
+                              style: GoogleFonts.outfit(
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.amber[800],
+                              ),
                             ),
                           ),
-                        ),
+                        ],
                       ],
-                    ],
+                    ),
+                    subtitle: Text(
+                      _checkingHardware
+                          ? 'Checking device capabilities...'
+                          : !_deviceSupportsBiometrics
+                          ? l10n.biometricNotAvailable
+                          : l10n.biometricUnlockSubtitle,
+                    ),
+                    value:
+                        isPremium &&
+                        _deviceSupportsBiometrics &&
+                        privateModeService.isBiometricEnabled,
+                    onChanged: (isPremium && _deviceSupportsBiometrics)
+                        ? privateModeService.setBiometricEnabled
+                        : null, // Grayed out/disabled
                   ),
-                  subtitle: Text(
-                    _checkingHardware
-                        ? 'Checking device capabilities...'
-                        : !_deviceSupportsBiometrics
-                        ? l10n.biometricNotAvailable
-                        : l10n.biometricUnlockSubtitle,
-                  ),
-                  value:
-                      isPremium &&
-                      _deviceSupportsBiometrics &&
-                      privateModeService.isBiometricEnabled,
-                  onChanged: (isPremium && _deviceSupportsBiometrics)
-                      ? privateModeService.setBiometricEnabled
-                      : null, // Grayed out/disabled
                 ),
               ),
-            ),
+            ],
           ],
         ],
       ),

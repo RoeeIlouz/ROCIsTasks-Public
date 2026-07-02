@@ -144,15 +144,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noDateSelected => 'No Date Selected';
 
   @override
-  String get syncWithGoogleCalendar => 'Sync with Google Calendar';
+  String get syncWithGoogleTasks => 'Sync with Google Tasks';
 
   @override
-  String get syncWithGoogleCalendarSubtitle =>
-      'Creates a calendar event for this task';
+  String get syncWithGoogleTasksSubtitle =>
+      'Creates and syncs a task in Google Tasks';
 
   @override
-  String get syncWithGoogleCalendarRequiresDueDate =>
-      'Set a due date to sync this task to your calendar.';
+  String get googleSignInRequiredForSync =>
+      'Google Sign-In is required to sync tasks.';
 
   @override
   String get calendarPermissionNotGranted => 'Calendar permission not granted';
@@ -975,4 +975,81 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get securitySettingsSubtitle => 'Manage PIN and Biometric access';
+
+  @override
+  String get enableSecurity => 'Enable Security';
+
+  @override
+  String get enableSecurityDescription =>
+      'You just created a private task. Set up a PIN or biometrics to keep your private content secure.';
+
+  @override
+  String get notNow => 'Not now';
+
+  @override
+  String get setUp => 'Set up';
+
+  @override
+  String get doNotRemind => 'Do not remind';
+
+  @override
+  String get doNotRemindSubtitle => 'Suppress all notifications for this task';
+
+  @override
+  String get glassmorphismEffects => 'Glassmorphism Effects';
+
+  @override
+  String get glassmorphismEffectsSubtitle => 'Apply frosted glass to cards';
+
+  @override
+  String get noEventsForThisDay => 'No events for this day';
+
+  @override
+  String get searchSymbols => 'Search Symbols';
+
+  @override
+  String get searchSymbolsDesc =>
+      'Use symbols to filter tasks: @category (e.g. @work), #title (e.g. #meeting), !priority (e.g. !high), %date (e.g. %2025-06-15), &subtask (e.g. &fix bug), *status (*done or *pending), ? (tasks due today). Combine multiple symbols.';
+
+  @override
+  String get widgetSettings => 'Widget Customization';
+
+  @override
+  String get widgetSettingsSubtitle => 'Configure colors, theme, and features';
+
+  @override
+  String get widgetTheme => 'Widget Theme';
+
+  @override
+  String get widgetThemeSystem => 'System Default';
+
+  @override
+  String get widgetThemeLight => 'Solid Light';
+
+  @override
+  String get widgetThemeDark => 'Solid Dark';
+
+  @override
+  String get widgetThemeGlassmorphic => 'Glassmorphism';
+
+  @override
+  String get showWeekNumbers => 'Show Week Numbers';
+
+  @override
+  String get weekendHighlights => 'Highlight Weekends';
+
+  @override
+  String get startOfWeek => 'Start of Week';
+
+  @override
+  String get sunday => 'Sunday';
+
+  @override
+  String get monday => 'Monday';
+
+  @override
+  String get saturday => 'Saturday';
+
+  @override
+  String get widgetAccentColor => 'Widget Accent Color';
 }

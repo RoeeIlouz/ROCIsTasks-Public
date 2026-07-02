@@ -378,23 +378,23 @@ abstract class AppLocalizations {
   /// **'No Date Selected'**
   String get noDateSelected;
 
-  /// No description provided for @syncWithGoogleCalendar.
+  /// No description provided for @syncWithGoogleTasks.
   ///
   /// In en, this message translates to:
-  /// **'Sync with Google Calendar'**
-  String get syncWithGoogleCalendar;
+  /// **'Sync with Google Tasks'**
+  String get syncWithGoogleTasks;
 
-  /// No description provided for @syncWithGoogleCalendarSubtitle.
+  /// No description provided for @syncWithGoogleTasksSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Creates a calendar event for this task'**
-  String get syncWithGoogleCalendarSubtitle;
+  /// **'Creates and syncs a task in Google Tasks'**
+  String get syncWithGoogleTasksSubtitle;
 
-  /// No description provided for @syncWithGoogleCalendarRequiresDueDate.
+  /// No description provided for @googleSignInRequiredForSync.
   ///
   /// In en, this message translates to:
-  /// **'Set a due date to sync this task to your calendar.'**
-  String get syncWithGoogleCalendarRequiresDueDate;
+  /// **'Google Sign-In is required to sync tasks.'**
+  String get googleSignInRequiredForSync;
 
   /// No description provided for @calendarPermissionNotGranted.
   ///
@@ -1943,6 +1943,156 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Manage PIN and Biometric access'**
   String get securitySettingsSubtitle;
+
+  /// No description provided for @enableSecurity.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable Security'**
+  String get enableSecurity;
+
+  /// No description provided for @enableSecurityDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'You just created a private task. Set up a PIN or biometrics to keep your private content secure.'**
+  String get enableSecurityDescription;
+
+  /// No description provided for @notNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Not now'**
+  String get notNow;
+
+  /// No description provided for @setUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Set up'**
+  String get setUp;
+
+  /// No description provided for @doNotRemind.
+  ///
+  /// In en, this message translates to:
+  /// **'Do not remind'**
+  String get doNotRemind;
+
+  /// No description provided for @doNotRemindSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Suppress all notifications for this task'**
+  String get doNotRemindSubtitle;
+
+  /// No description provided for @glassmorphismEffects.
+  ///
+  /// In en, this message translates to:
+  /// **'Glassmorphism Effects'**
+  String get glassmorphismEffects;
+
+  /// No description provided for @glassmorphismEffectsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply frosted glass to cards'**
+  String get glassmorphismEffectsSubtitle;
+
+  /// No description provided for @noEventsForThisDay.
+  ///
+  /// In en, this message translates to:
+  /// **'No events for this day'**
+  String get noEventsForThisDay;
+
+  /// No description provided for @searchSymbols.
+  ///
+  /// In en, this message translates to:
+  /// **'Search Symbols'**
+  String get searchSymbols;
+
+  /// No description provided for @searchSymbolsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Use symbols to filter tasks: @category (e.g. @work), #title (e.g. #meeting), !priority (e.g. !high), %date (e.g. %2025-06-15), &subtask (e.g. &fix bug), *status (*done or *pending), ? (tasks due today). Combine multiple symbols.'**
+  String get searchSymbolsDesc;
+
+  /// No description provided for @widgetSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Widget Customization'**
+  String get widgetSettings;
+
+  /// No description provided for @widgetSettingsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Configure colors, theme, and features'**
+  String get widgetSettingsSubtitle;
+
+  /// No description provided for @widgetTheme.
+  ///
+  /// In en, this message translates to:
+  /// **'Widget Theme'**
+  String get widgetTheme;
+
+  /// No description provided for @widgetThemeSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'System Default'**
+  String get widgetThemeSystem;
+
+  /// No description provided for @widgetThemeLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Solid Light'**
+  String get widgetThemeLight;
+
+  /// No description provided for @widgetThemeDark.
+  ///
+  /// In en, this message translates to:
+  /// **'Solid Dark'**
+  String get widgetThemeDark;
+
+  /// No description provided for @widgetThemeGlassmorphic.
+  ///
+  /// In en, this message translates to:
+  /// **'Glassmorphism'**
+  String get widgetThemeGlassmorphic;
+
+  /// No description provided for @showWeekNumbers.
+  ///
+  /// In en, this message translates to:
+  /// **'Show Week Numbers'**
+  String get showWeekNumbers;
+
+  /// No description provided for @weekendHighlights.
+  ///
+  /// In en, this message translates to:
+  /// **'Highlight Weekends'**
+  String get weekendHighlights;
+
+  /// No description provided for @startOfWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'Start of Week'**
+  String get startOfWeek;
+
+  /// No description provided for @sunday.
+  ///
+  /// In en, this message translates to:
+  /// **'Sunday'**
+  String get sunday;
+
+  /// No description provided for @monday.
+  ///
+  /// In en, this message translates to:
+  /// **'Monday'**
+  String get monday;
+
+  /// No description provided for @saturday.
+  ///
+  /// In en, this message translates to:
+  /// **'Saturday'**
+  String get saturday;
+
+  /// No description provided for @widgetAccentColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Widget Accent Color'**
+  String get widgetAccentColor;
 }
 
 class _AppLocalizationsDelegate

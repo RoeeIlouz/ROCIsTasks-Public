@@ -5,6 +5,7 @@ import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:rocis_tasks/features/premium/presentation/screens/paywall_screen.dart';
+import 'package:rocis_tasks/shared/ui/widgets/glass_container.dart';
 
 class PremiumScreen extends StatefulWidget {
   const PremiumScreen({super.key});
@@ -45,29 +46,41 @@ class _PremiumScreenState extends State<PremiumScreen> {
                     children: [
                       _buildHero(context, l10n),
                       const SizedBox(height: 32),
-                      _buildFeature(
-                        context,
-                        Icons.dashboard_customize_rounded,
-                        l10n.unlimitedCategories,
-                        l10n.unlimitedCategoriesDesc,
-                      ),
-                      _buildFeature(
-                        context,
-                        Icons.widgets_rounded,
-                        l10n.premiumWidgets,
-                        l10n.premiumWidgetsDesc,
-                      ),
-                      _buildFeature(
-                        context,
-                        Icons.checklist_rounded,
-                        l10n.subtasksAndChecklists,
-                        l10n.subtasksAndChecklistsDesc,
-                      ),
-                      _buildFeature(
-                        context,
-                        Icons.lock_rounded,
-                        l10n.privateMode,
-                        l10n.privateModeSubtitle,
+                      GlassContainer(
+                        borderRadius: BorderRadius.circular(24),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        child: Column(
+                          children: [
+                            _buildFeature(
+                              context,
+                              Icons.dashboard_customize_rounded,
+                              l10n.unlimitedCategories,
+                              l10n.unlimitedCategoriesDesc,
+                              isLast: false,
+                            ),
+                            _buildFeature(
+                              context,
+                              Icons.widgets_rounded,
+                              l10n.premiumWidgets,
+                              l10n.premiumWidgetsDesc,
+                              isLast: false,
+                            ),
+                            _buildFeature(
+                              context,
+                              Icons.checklist_rounded,
+                              l10n.subtasksAndChecklists,
+                              l10n.subtasksAndChecklistsDesc,
+                              isLast: false,
+                            ),
+                            _buildFeature(
+                              context,
+                              Icons.lock_rounded,
+                              l10n.privateMode,
+                              l10n.privateModeSubtitle,
+                              isLast: true,
+                            ),
+                          ],
+                        ),
                       ),
                       const SizedBox(height: 48),
                       if (subscriptionService.isPremium)
@@ -133,49 +146,60 @@ class _PremiumScreenState extends State<PremiumScreen> {
     BuildContext context,
     IconData icon,
     String title,
-    String description,
-  ) {
+    String description, {
+    required bool isLast,
+  }) {
     final theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 24.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.primary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(icon, color: theme.colorScheme.primary, size: 24),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: GoogleFonts.outfit(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  description,
-                  style: GoogleFonts.outfit(
-                    fontSize: 14,
-                    color: theme.textTheme.bodyMedium?.color?.withValues(
-                      alpha: 0.7,
+                child: Icon(icon, color: theme.colorScheme.primary, size: 24),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: GoogleFonts.outfit(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 4),
+                    Text(
+                      description,
+                      style: GoogleFonts.outfit(
+                        fontSize: 14,
+                        color: theme.textTheme.bodyMedium?.color?.withValues(
+                          alpha: 0.7,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+        if (!isLast)
+          Divider(
+            height: 1,
+            thickness: 1,
+            color: theme.dividerColor.withValues(alpha: 0.08),
+          ),
+      ],
     );
   }
 
@@ -205,6 +229,10 @@ class _PremiumScreenState extends State<PremiumScreen> {
   }
 
   Widget _buildActiveStatus(BuildContext context, AppLocalizations l10n) {
+    final now = DateTime.now();
+    final isPromo = !now.isBefore(DateTime(now.year, 6, 16)) &&
+        now.isBefore(DateTime(now.year, 7, 16));
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -212,19 +240,33 @@ class _PremiumScreenState extends State<PremiumScreen> {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.green.withValues(alpha: 0.3)),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: Column(
         children: [
-          const Icon(Icons.check_circle_rounded, color: Colors.green),
-          const SizedBox(width: 12),
-          Text(
-            l10n.proSubscriptionActive,
-            style: GoogleFonts.outfit(
-              color: Colors.green,
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.check_circle_rounded, color: Colors.green),
+              const SizedBox(width: 12),
+              Text(
+                l10n.proSubscriptionActive,
+                style: GoogleFonts.outfit(
+                  color: Colors.green,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+            ],
           ),
+          if (isPromo) ...[
+            const SizedBox(height: 8),
+            Text(
+              'Birthday Promo - Free until July 16',
+              style: GoogleFonts.outfit(
+                color: Colors.green.withValues(alpha: 0.7),
+                fontSize: 13,
+              ),
+            ),
+          ],
         ],
       ),
     );

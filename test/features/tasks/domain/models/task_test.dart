@@ -172,8 +172,8 @@ void main() {
         expect(restored.categoryId, isNull);
         expect(restored.completedAt, isNull);
         expect(restored.recurrenceRule, isNull);
-        expect(restored.calendarEventId, isNull);
-        expect(restored.calendarId, isNull);
+        expect(restored.googleTaskId, isNull);
+        expect(restored.googleTaskListId, isNull);
       });
     });
 

@@ -144,14 +144,14 @@ class AppLocalizationsHe extends AppLocalizations {
   String get noDateSelected => 'לא נבחר תאריך';
 
   @override
-  String get syncWithGoogleCalendar => 'סנכרון עם יומן Google';
+  String get syncWithGoogleTasks => 'סנכרון עם Google Tasks';
 
   @override
-  String get syncWithGoogleCalendarSubtitle => 'יוצר אירוע יומן עבור משימה זו';
+  String get syncWithGoogleTasksSubtitle => 'יוצר ומסנכרן משימה ב-Google Tasks';
 
   @override
-  String get syncWithGoogleCalendarRequiresDueDate =>
-      'קבע תאריך יעד כדי לסנכרן את המשימה ליומן.';
+  String get googleSignInRequiredForSync =>
+      'נדרשת התחברות ל-Google כדי לסנכרן משימות.';
 
   @override
   String get calendarPermissionNotGranted => 'הרשאת יומן לא אושרה';
@@ -965,4 +965,82 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get securitySettingsSubtitle => 'נהל גישה עם PIN וביומטריה';
+
+  @override
+  String get enableSecurity => 'הפעל אבטחה';
+
+  @override
+  String get enableSecurityDescription =>
+      'יצרת משימה פרטית. הגדר קוד PIN או ביומטריה כדי להגן על התוכן הפרטי שלך.';
+
+  @override
+  String get notNow => 'לא עכשיו';
+
+  @override
+  String get setUp => 'הגדר';
+
+  @override
+  String get doNotRemind => 'לא להזכיר';
+
+  @override
+  String get doNotRemindSubtitle => 'השבת את כל ההתראות עבור משימה זו';
+
+  @override
+  String get glassmorphismEffects => 'אפקטי זכוכית';
+
+  @override
+  String get glassmorphismEffectsSubtitle =>
+      'החל עיצוב זכוכית חלבית על כרטיסים';
+
+  @override
+  String get noEventsForThisDay => 'אין אירועים ליום זה';
+
+  @override
+  String get searchSymbols => 'סימני חיפוש';
+
+  @override
+  String get searchSymbolsDesc =>
+      'השתמש בסימנים לסינון משימות: @קטגוריה (למשל @עבודה), #כותרת (למשל #פגישה), !עדיפות (למשל !גבוהה), %תאריך (למשל %2025-06-15), &תת-משימה (למשל &תיקון באג), *סטטוס (*בוצע או *ממתין), ? (משימות להיום). ניתן לשלב סימנים מרובים.';
+
+  @override
+  String get widgetSettings => 'התאמת ווידג\'ט';
+
+  @override
+  String get widgetSettingsSubtitle => 'הגדר צבעים, ערכת נושא ואפשרויות';
+
+  @override
+  String get widgetTheme => 'ערכת נושא של הווידג\'ט';
+
+  @override
+  String get widgetThemeSystem => 'ברירת מחדל של המערכת';
+
+  @override
+  String get widgetThemeLight => 'בהיר';
+
+  @override
+  String get widgetThemeDark => 'כהה';
+
+  @override
+  String get widgetThemeGlassmorphic => 'אפקט זכוכית';
+
+  @override
+  String get showWeekNumbers => 'הצג מספרי שבועות';
+
+  @override
+  String get weekendHighlights => 'הדגש סופי שבוע';
+
+  @override
+  String get startOfWeek => 'תחילת השבוע';
+
+  @override
+  String get sunday => 'יום ראשון';
+
+  @override
+  String get monday => 'יום שני';
+
+  @override
+  String get saturday => 'יום שבת';
+
+  @override
+  String get widgetAccentColor => 'צבע הדגשה של הווידג\'ט';
 }

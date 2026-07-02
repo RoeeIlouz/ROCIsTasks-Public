@@ -39,6 +39,9 @@ class Task extends HiveObject {
   @HiveField(6)
   String? categoryId;
 
+  @HiveField(19)
+  List<String> categoryIds;
+
   @HiveField(7)
   bool? isDeleted;
 
@@ -61,16 +64,19 @@ class Task extends HiveObject {
   bool requireSubTasksBeforeReminders;
 
   @HiveField(14)
-  bool syncWithGoogleCalendar;
+  bool syncWithGoogleTasks;
 
   @HiveField(15)
-  String? calendarEventId;
+  String? googleTaskId;
 
   @HiveField(16)
-  String? calendarId;
+  String? googleTaskListId;
 
   @HiveField(17)
   List<String> attachmentPaths;
+
+  @HiveField(18)
+  bool skipReminders;
 
   Task({
     String? id,
@@ -80,6 +86,7 @@ class Task extends HiveObject {
     this.dueDate,
     this.priority = TaskPriority.medium,
     this.categoryId,
+    List<String>? categoryIds,
     this.isDeleted = false,
     this.isPinned = false,
     this.subTasks,
@@ -87,13 +94,15 @@ class Task extends HiveObject {
     this.completedAt,
     DateTime? createdAt,
     this.requireSubTasksBeforeReminders = false,
-    this.syncWithGoogleCalendar = false,
-    this.calendarEventId,
-    this.calendarId,
+    this.syncWithGoogleTasks = false,
+    this.googleTaskId,
+    this.googleTaskListId,
     List<String>? attachmentPaths,
+    this.skipReminders = false,
   }) : id = id ?? const Uuid().v4(),
        createdAt = createdAt ?? DateTime.now(),
-       attachmentPaths = attachmentPaths ?? <String>[];
+       attachmentPaths = attachmentPaths ?? <String>[],
+       categoryIds = categoryIds ?? <String>[];
 
   Task copyWith({
     String? title,
@@ -102,6 +111,7 @@ class Task extends HiveObject {
     DateTime? dueDate,
     TaskPriority? priority,
     String? categoryId,
+    List<String>? categoryIds,
     bool? isDeleted,
     bool? isPinned,
     List<SubTask>? subTasks,
@@ -109,10 +119,11 @@ class Task extends HiveObject {
     DateTime? completedAt,
     DateTime? createdAt,
     bool? requireSubTasksBeforeReminders,
-    bool? syncWithGoogleCalendar,
-    String? calendarEventId,
-    String? calendarId,
+    bool? syncWithGoogleTasks,
+    String? googleTaskId,
+    String? googleTaskListId,
     List<String>? attachmentPaths,
+    bool? skipReminders,
   }) {
     return Task(
       id: id,
@@ -122,6 +133,7 @@ class Task extends HiveObject {
       dueDate: dueDate ?? this.dueDate,
       priority: priority ?? this.priority,
       categoryId: categoryId ?? this.categoryId,
+      categoryIds: categoryIds ?? this.categoryIds,
       isDeleted: isDeleted ?? this.isDeleted,
       isPinned: isPinned ?? this.isPinned,
       subTasks: subTasks ?? this.subTasks,
@@ -130,11 +142,12 @@ class Task extends HiveObject {
       createdAt: createdAt ?? this.createdAt,
       requireSubTasksBeforeReminders:
           requireSubTasksBeforeReminders ?? this.requireSubTasksBeforeReminders,
-      syncWithGoogleCalendar:
-          syncWithGoogleCalendar ?? this.syncWithGoogleCalendar,
-      calendarEventId: calendarEventId ?? this.calendarEventId,
-      calendarId: calendarId ?? this.calendarId,
+      syncWithGoogleTasks:
+          syncWithGoogleTasks ?? this.syncWithGoogleTasks,
+      googleTaskId: googleTaskId ?? this.googleTaskId,
+      googleTaskListId: googleTaskListId ?? this.googleTaskListId,
       attachmentPaths: attachmentPaths ?? this.attachmentPaths,
+      skipReminders: skipReminders ?? this.skipReminders,
     );
   }
 
@@ -147,6 +160,7 @@ class Task extends HiveObject {
       'dueDate': dueDate?.toIso8601String(),
       'priority': priority.index,
       'categoryId': categoryId,
+      'categoryIds': categoryIds,
       'isDeleted': isDeleted,
       'isPinned': isPinned,
       'subTasks': subTasks?.map((st) => st.toMap()).toList(),
@@ -154,10 +168,11 @@ class Task extends HiveObject {
       'completedAt': completedAt?.toIso8601String(),
       'createdAt': createdAt.toIso8601String(),
       'requireSubTasksBeforeReminders': requireSubTasksBeforeReminders,
-      'syncWithGoogleCalendar': syncWithGoogleCalendar,
-      'calendarEventId': calendarEventId,
-      'calendarId': calendarId,
+      'syncWithGoogleTasks': syncWithGoogleTasks,
+      'googleTaskId': googleTaskId,
+      'googleTaskListId': googleTaskListId,
       'attachmentPaths': attachmentPaths,
+      'skipReminders': skipReminders,
     };
   }
 
@@ -170,6 +185,7 @@ class Task extends HiveObject {
       'dueDate': dueDate,
       'priority': priority.index,
       'categoryId': categoryId,
+      'categoryIds': categoryIds,
       'isDeleted': isDeleted ?? false,
       'isPinned': isPinned ?? false,
       'subTasks': subTasks?.map((st) => st.toMap()).toList(),
@@ -177,7 +193,10 @@ class Task extends HiveObject {
       'completedAt': completedAt,
       'createdAt': createdAt,
       'requireSubTasksBeforeReminders': requireSubTasksBeforeReminders,
-      'syncWithGoogleCalendar': syncWithGoogleCalendar,
+      'syncWithGoogleTasks': syncWithGoogleTasks,
+      'googleTaskId': googleTaskId,
+      'googleTaskListId': googleTaskListId,
+      'skipReminders': skipReminders,
     };
   }
 
@@ -198,6 +217,8 @@ class Task extends HiveObject {
       dueDate: _parseDate(map['dueDate']),
       priority: TaskPriority.values[map['priority'] ?? 1],
       categoryId: map['categoryId'],
+      categoryIds: (map['categoryIds'] as List?)?.whereType<String>().toList() ?? 
+          (map['categoryId'] != null ? [map['categoryId'] as String] : []),
       isDeleted: map['isDeleted'] ?? false,
       isPinned: map['isPinned'] ?? false,
       subTasks: (map['subTasks'] as List?)
@@ -208,11 +229,12 @@ class Task extends HiveObject {
       createdAt: _parseDate(map['createdAt']),
       requireSubTasksBeforeReminders:
           map['requireSubTasksBeforeReminders'] ?? false,
-      syncWithGoogleCalendar: map['syncWithGoogleCalendar'] ?? false,
-      calendarEventId: map['calendarEventId'],
-      calendarId: map['calendarId'],
+      syncWithGoogleTasks: map['syncWithGoogleTasks'] ?? map['syncWithGoogleCalendar'] ?? false,
+      googleTaskId: map['googleTaskId'] ?? map['calendarEventId'],
+      googleTaskListId: map['googleTaskListId'] ?? map['calendarId'],
       attachmentPaths:
           (map['attachmentPaths'] as List?)?.whereType<String>().toList(),
+      skipReminders: map['skipReminders'] ?? false,
     );
   }
 }

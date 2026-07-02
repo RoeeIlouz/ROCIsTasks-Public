@@ -144,15 +144,15 @@ class AppLocalizationsDe extends AppLocalizations {
   String get noDateSelected => 'Kein Datum ausgewählt';
 
   @override
-  String get syncWithGoogleCalendar => 'Mit Google Kalender synchronisieren';
+  String get syncWithGoogleTasks => 'Mit Google Tasks synchronisieren';
 
   @override
-  String get syncWithGoogleCalendarSubtitle =>
-      'Erstellt einen Kalendereintrag für diese Aufgabe';
+  String get syncWithGoogleTasksSubtitle =>
+      'Erstellt und synchronisiert eine Aufgabe in Google Tasks';
 
   @override
-  String get syncWithGoogleCalendarRequiresDueDate =>
-      'Legen Sie ein Fälligkeitsdatum fest, um diese Aufgabe mit Ihrem Kalender zu synchronisieren.';
+  String get googleSignInRequiredForSync =>
+      'Google-Anmeldung ist erforderlich, um Aufgaben zu synchronisieren.';
 
   @override
   String get calendarPermissionNotGranted =>
@@ -996,4 +996,83 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get securitySettingsSubtitle =>
       'PIN- und biometrischen Zugriff verwalten';
+
+  @override
+  String get enableSecurity => 'Sicherheit aktivieren';
+
+  @override
+  String get enableSecurityDescription =>
+      'Sie haben gerade eine private Aufgabe erstellt. Richten Sie eine PIN oder Biometrie ein, um Ihre privaten Daten zu schützen.';
+
+  @override
+  String get notNow => 'Nicht jetzt';
+
+  @override
+  String get setUp => 'Einrichten';
+
+  @override
+  String get doNotRemind => 'Nicht erinnern';
+
+  @override
+  String get doNotRemindSubtitle =>
+      'Alle Benachrichtigungen für diese Aufgabe unterdrücken';
+
+  @override
+  String get glassmorphismEffects => 'Glassmorphismus-Effekte';
+
+  @override
+  String get glassmorphismEffectsSubtitle =>
+      'Milchglaseffekt auf Karten anwenden';
+
+  @override
+  String get noEventsForThisDay => 'Keine Ereignisse für diesen Tag';
+
+  @override
+  String get searchSymbols => 'Suchsymbole';
+
+  @override
+  String get searchSymbolsDesc =>
+      'Verwenden Sie Symbole zum Filtern von Aufgaben: @Kategorie (z.B. @Arbeit), #Titel (z.B. #Besprechung), !Priorität (z.B. !hoch), %Datum (z.B. %2025-06-15), &Unteraufgabe (z.B. &Bugfix), !Status (*erledigt oder *ausstehend), ? (Aufgaben heute). Kombinieren Sie mehrere Symbole.';
+
+  @override
+  String get widgetSettings => 'Widget Customization';
+
+  @override
+  String get widgetSettingsSubtitle => 'Configure colors, theme, and features';
+
+  @override
+  String get widgetTheme => 'Widget Theme';
+
+  @override
+  String get widgetThemeSystem => 'System Default';
+
+  @override
+  String get widgetThemeLight => 'Solid Light';
+
+  @override
+  String get widgetThemeDark => 'Solid Dark';
+
+  @override
+  String get widgetThemeGlassmorphic => 'Glassmorphism';
+
+  @override
+  String get showWeekNumbers => 'Show Week Numbers';
+
+  @override
+  String get weekendHighlights => 'Highlight Weekends';
+
+  @override
+  String get startOfWeek => 'Start of Week';
+
+  @override
+  String get sunday => 'Sunday';
+
+  @override
+  String get monday => 'Monday';
+
+  @override
+  String get saturday => 'Saturday';
+
+  @override
+  String get widgetAccentColor => 'Widget Accent Color';
 }

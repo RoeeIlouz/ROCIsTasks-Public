@@ -42,9 +42,10 @@ class BackgroundHandler {
         host == 'prev_month' ||
         host == 'next_month') {
       final isNext = host == 'full_calendar_next' || host == 'next_month';
-      await _handleFullCalendarNavigation(isNext: isNext);
+      final isAndroidWidget = host.startsWith('full_calendar_');
+      await _handleFullCalendarNavigation(isNext: isAndroidWidget ? null : isNext);
     } else if (host == 'full_calendar_today') {
-      await _handleFullCalendarNavigation(targetOffset: 0);
+      await _handleFullCalendarNavigation();
     } else if (host == 'full_calendar_filter_tasks') {
       await _handleFullCalendarFilterToggle('tasks');
     } else if (host == 'full_calendar_filter_google') {

@@ -144,15 +144,15 @@ class AppLocalizationsSv extends AppLocalizations {
   String get noDateSelected => 'Inget datum valt';
 
   @override
-  String get syncWithGoogleCalendar => 'Synka med Google Kalender';
+  String get syncWithGoogleTasks => 'Synka med Google Tasks';
 
   @override
-  String get syncWithGoogleCalendarSubtitle =>
-      'Skapar en kalenderhändelse för denna uppgift';
+  String get syncWithGoogleTasksSubtitle =>
+      'Skapar och synkar en uppgift i Google Tasks';
 
   @override
-  String get syncWithGoogleCalendarRequiresDueDate =>
-      'Ange ett förfallodatum för att synka uppgiften till din kalender.';
+  String get googleSignInRequiredForSync =>
+      'Google-inloggning krävs för att synka uppgifter.';
 
   @override
   String get calendarPermissionNotGranted => 'Kalenderbehörighet inte beviljad';
@@ -984,4 +984,82 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get securitySettingsSubtitle => 'Hantera PIN och biometrisk åtkomst';
+
+  @override
+  String get enableSecurity => 'Aktivera säkerhet';
+
+  @override
+  String get enableSecurityDescription =>
+      'Du skapade precis en privat uppgift. Ställ in en PIN-kod eller biometri för att skydda ditt privata innehåll.';
+
+  @override
+  String get notNow => 'Inte nu';
+
+  @override
+  String get setUp => 'Konfigurera';
+
+  @override
+  String get doNotRemind => 'Påminn inte';
+
+  @override
+  String get doNotRemindSubtitle =>
+      'Undertryck alla aviseringar för denna uppgift';
+
+  @override
+  String get glassmorphismEffects => 'Glassmorphism-effekter';
+
+  @override
+  String get glassmorphismEffectsSubtitle => 'Använd frostat glas på kort';
+
+  @override
+  String get noEventsForThisDay => 'Inga händelser för denna dag';
+
+  @override
+  String get searchSymbols => 'Sök symboler';
+
+  @override
+  String get searchSymbolsDesc =>
+      'Använd symboler för att filtrera uppgifter: @kategori (t.ex. @arbete), #titel (t.ex. #möte), !prioritet (t.ex. !hög), %datum (t.ex. %2025-06-15), &deluppgift (t.ex. &bugfix), *status (*klar eller *pågående), ? (uppgifter idag). Kombinera flera symboler.';
+
+  @override
+  String get widgetSettings => 'Widget Customization';
+
+  @override
+  String get widgetSettingsSubtitle => 'Configure colors, theme, and features';
+
+  @override
+  String get widgetTheme => 'Widget Theme';
+
+  @override
+  String get widgetThemeSystem => 'System Default';
+
+  @override
+  String get widgetThemeLight => 'Solid Light';
+
+  @override
+  String get widgetThemeDark => 'Solid Dark';
+
+  @override
+  String get widgetThemeGlassmorphic => 'Glassmorphism';
+
+  @override
+  String get showWeekNumbers => 'Show Week Numbers';
+
+  @override
+  String get weekendHighlights => 'Highlight Weekends';
+
+  @override
+  String get startOfWeek => 'Start of Week';
+
+  @override
+  String get sunday => 'Sunday';
+
+  @override
+  String get monday => 'Monday';
+
+  @override
+  String get saturday => 'Saturday';
+
+  @override
+  String get widgetAccentColor => 'Widget Accent Color';
 }

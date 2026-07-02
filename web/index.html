@@ -36,17 +36,70 @@
 
   <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="rocis_tasks">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ROCI's Tasks">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>
 
+  <!-- Google Sign-In SDK configuration for Web -->
+  <meta name="google-signin-client_id" content="867477199658-df3ptf7v5fi66ijc5jeunfmrpf5eghou.apps.googleusercontent.com">
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+
   <title>ROCI's Tasks</title>
   <link rel="manifest" href="manifest.json">
+  <style>
+    body {
+      background-color: #0F172A;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+    .loading-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      width: 100vw;
+      font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      color: #F8FAFC;
+    }
+    .spinner {
+      border: 4px solid rgba(248, 250, 252, 0.1);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border-left-color: #ffffff;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .title {
+      margin-top: 24px;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+    }
+    .tagline {
+      margin-top: 8px;
+      font-size: 16px;
+      color: rgba(248, 250, 252, 0.7);
+      letter-spacing: 1.2px;
+    }
+  </style>
 </head>
 <body>
+  <div id="loading">
+    <div class="loading-container">
+      <div class="spinner"></div>
+      <div class="title">ROCI's Tasks</div>
+      <div class="tagline">Smart productivity, localized & premium</div>
+    </div>
+  </div>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>

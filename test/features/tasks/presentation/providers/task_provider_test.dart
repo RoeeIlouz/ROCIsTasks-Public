@@ -8,6 +8,7 @@ import 'package:rocis_tasks/core/services/firestore_service.dart';
 import 'package:rocis_tasks/core/services/connectivity_service.dart';
 import 'package:rocis_tasks/core/services/auth_service.dart';
 import 'package:rocis_tasks/core/services/calendar_service.dart';
+import 'package:rocis_tasks/core/services/google_tasks_service.dart';
 import 'package:rocis_tasks/shared/ui/ui_kit.dart';
 import 'package:rocis_tasks/core/services/error_handling_service.dart';
 import 'package:rocis_tasks/core/services/subscription_service.dart';
@@ -27,6 +28,8 @@ class MockConnectivityService extends Mock implements ConnectivityService {}
 class MockAuthService extends Mock implements AuthService {}
 
 class MockCalendarService extends Mock implements CalendarService {}
+
+class MockGoogleTasksService extends Mock implements GoogleTasksService {}
 
 class MockThemeService extends Mock implements ThemeService {}
 
@@ -52,6 +55,7 @@ void main() {
   late MockConnectivityService mockConnectivityService;
   late MockAuthService mockAuthService;
   late MockCalendarService mockCalendarService;
+  late MockGoogleTasksService mockGoogleTasksService;
   late MockThemeService mockThemeService;
   late MockErrorHandlingService mockErrorHandlingService;
   late MockSubscriptionService mockSubscriptionService;
@@ -72,6 +76,7 @@ void main() {
     mockConnectivityService = MockConnectivityService();
     mockAuthService = MockAuthService();
     mockCalendarService = MockCalendarService();
+    mockGoogleTasksService = MockGoogleTasksService();
     mockThemeService = MockThemeService();
     mockErrorHandlingService = MockErrorHandlingService();
     mockSubscriptionService = MockSubscriptionService();
@@ -126,6 +131,7 @@ void main() {
     taskProvider = TaskProvider(
       mockAuthService,
       mockCalendarService,
+      mockGoogleTasksService,
       mockThemeService,
       mockErrorHandlingService,
       mockSubscriptionService,

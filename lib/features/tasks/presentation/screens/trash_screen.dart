@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
 import 'package:intl/intl.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
+import 'package:rocis_tasks/shared/ui/widgets/glass_container.dart';
 
 class TrashScreen extends StatelessWidget {
   const TrashScreen({super.key});
@@ -73,11 +74,13 @@ class TrashScreen extends StatelessWidget {
           }
 
           return ListView.builder(
-            padding: const EdgeInsets.symmetric(vertical: 8),
+            padding: const EdgeInsets.all(16),
             itemCount: deletedTasks.length,
             itemBuilder: (context, index) {
               final task = deletedTasks[index];
-              return Card(
+              return GlassContainer(
+                margin: const EdgeInsets.only(bottom: 12),
+                borderRadius: BorderRadius.circular(16),
                 child: ListTile(
                   title: Text(
                     task.title,

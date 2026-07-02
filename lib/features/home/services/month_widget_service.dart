@@ -128,7 +128,9 @@ class MonthWidgetService {
             int? colorVal;
             try {
               final cat = _taskSource.getCategories().firstWhere(
-                (c) => c.id == t.categoryId,
+                (c) => t.categoryIds.isNotEmpty 
+                       ? t.categoryIds.contains(c.id) 
+                       : c.id == t.categoryId,
               );
               colorVal = cat.colorValue;
             } catch (e) {

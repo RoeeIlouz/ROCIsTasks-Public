@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:device_calendar/device_calendar.dart';
+import 'package:rocis_tasks/core/services/auth_service.dart';
 import 'package:rocis_tasks/core/services/calendar_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rocis_tasks/features/home/services/full_calendar_widget_service.dart';
@@ -16,12 +17,11 @@ class CalendarProvider extends ChangeNotifier {
   String? _userId;
   List<Calendar> _availableCalendars = [];
   Set<String> _selectedCalendarIds = {};
+  bool _isGoogleCalendarTokenExpired = false;
 
-  CalendarProvider(
-    this._calendarService,
-    this._widgetService,
-  );
+  CalendarProvider(this._calendarService, this._widgetService);
 
+  bool get isGoogleCalendarTokenExpired => _isGoogleCalendarTokenExpired;
   List<Event> get events => _events;
   bool get showTasks => _showTasks;
   bool get showGoogleCalendar => _showGoogleCalendar;
@@ -41,6 +41,15 @@ class CalendarProvider extends ChangeNotifier {
   void setSelectedDate(DateTime date) {
     _selectedDate = date;
     notifyListeners();
+    _updateWidgetSelectedDate(date);
+  }
+
+  Future<void> _updateWidgetSelectedDate(DateTime date) async {
+    try {
+      await _widgetService.updateSelectedDate(date, _userId);
+    } catch (e) {
+      // Gracefully ignore widget update errors
+    }
   }
 
   Future<void> loadFilters() async {
@@ -139,18 +148,30 @@ class CalendarProvider extends ChangeNotifier {
 
   Future<void> loadEvents() async {
     _isLoading = true;
+    _isGoogleCalendarTokenExpired = false;
     notifyListeners();
 
     try {
       // Fetch available calendars first to populate the list
       _availableCalendars = await _calendarService.getAvailableCalendars();
 
-      // If no calendars are selected yet, default to all of them
-      if (_selectedCalendarIds.isEmpty && _availableCalendars.isNotEmpty) {
-        _selectedCalendarIds = _availableCalendars
-            .where((c) => c.id != null)
-            .map((c) => c.id!)
+      if (_availableCalendars.isNotEmpty) {
+        final availableIds = _availableCalendars
+            .map((c) => c.id)
+            .whereType<String>()
             .toSet();
+        final validSelectedIds = _selectedCalendarIds.intersection(
+          availableIds,
+        );
+        if (validSelectedIds.isEmpty) {
+          // If no selected calendars are valid in the current platform's available calendars,
+          // default to selecting all available calendars.
+          _selectedCalendarIds = availableIds;
+        } else {
+          _selectedCalendarIds = validSelectedIds;
+        }
+      } else {
+        _selectedCalendarIds = {};
       }
 
       // Load device calendar events
@@ -159,14 +180,26 @@ class CalendarProvider extends ChangeNotifier {
       );
 
       _processEventsToMap();
-    } catch (e, s) {
-      AppLogger.error(
-        'Error loading events in calendar provider',
-        error: e,
-        stack: s,
-      );
+    } on GoogleTokenExpiredException {
+      _isGoogleCalendarTokenExpired = true;
       _events = [];
       _eventsMap = {};
+      AppLogger.warning('Google Calendar token expired on Web.');
+    } catch (e, s) {
+      // Also catch String exception representation if needed
+      if (e.toString().contains('GoogleTokenExpiredException')) {
+        _isGoogleCalendarTokenExpired = true;
+        _events = [];
+        _eventsMap = {};
+      } else {
+        AppLogger.error(
+          'Error loading events in calendar provider',
+          error: e,
+          stack: s,
+        );
+        _events = [];
+        _eventsMap = {};
+      }
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -213,7 +246,11 @@ class CalendarProvider extends ChangeNotifier {
         }
         _eventsMap[currentDay]!.add(event);
 
-        currentDay = DateTime(currentDay.year, currentDay.month, currentDay.day + 1);
+        currentDay = DateTime(
+          currentDay.year,
+          currentDay.month,
+          currentDay.day + 1,
+        );
       }
     }
   }

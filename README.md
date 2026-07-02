@@ -1,115 +1,165 @@
-# ROCIs Tasks
+# 📋 ROCIs Tasks
 
-**ROCIs Tasks** is a modern, feature-rich task management application built with Flutter. It combines robust task tracking with seamless calendar integration, real-time synchronization, and native Android home screen widgets to help you stay organized.
+**ROCIs Tasks** is a premium, feature-rich task management application built with Flutter. Combining robust task tracking with seamless Google Calendar integration, real-time local-cloud synchronization, and native Android home screen widgets, the app offers an ultra-modern workspace to keep users organized and productive.
+
+---
 
 ## ✨ Key Features
 
-- **🔐 Authentication**
-  - Secure Google Sign-In integration.
-  - Persistent session management.
+### 🔐 Multi-Tiered Authentication
 
-- **✅ Task Management**
-  - **CRUD Operations**: Create, read, update, and delete tasks easily.
-  - **Organization**: Prioritize tasks (High, Medium, Low) and organize them by due dates.
-  - **Synchronization**: Real-time sync between local storage (Hive) and the cloud (Firebase Firestore). Offline-first support ensures data availability anytime.
+- **Primary Auth**: Seamless, secure Google Sign-In.
+- **Secondary Credentials**: Custom Email & Password Sign-up, Sign-in, and Password Reset flows.
+- **Session Persistence**: Managed securely with `AuthService` to persist sessions across launches.
 
-- **📅 Calendar Integration**
-  - **Unified View**: See your tasks alongside your Google Calendar events in a single interface.
-  - **Device Sync**: Seamlessly reads events from your device's native calendar.
+### ✅ Task & Category Management
 
-- **📱 Android Home Screen Widgets**
-  - **Interactive Widgets**: View and complete tasks directly from your home screen without opening the app.
-  - **Background Updates**: Instant state synchronization between the widget and the main application.
+- **Full CRUD Support**: Create, read, update, and soft-delete tasks.
+- **Priority Classes**: Dynamic visual signaling for High, Medium, and Low priorities.
+- **Subtasks & Checklists**: Nest checklists within tasks for granular breakdown.
+- **Task Attachments**: Upload and associate files/images with tasks (Firebase Storage).
+- **Recurrence**: Standard rule-based recurring tasks (via `rrule`).
+- **Local Cache & Sync**: Instant access via **Hive** with background sync to **Firebase Firestore** (offline-first support).
+- **Soft-Deletion Bin**: Restore deleted tasks easily.
 
-- **🎨 Modern UI/UX**
-  - **Material You**: Dynamic color themes derived from your device's wallpaper (Android).
-  - **Dark Mode**: Fully supported, eye-friendly dark theme.
-  - **Localization**: Support for English, Hebrew, and Spanish.
+### 📅 Unified Calendar View
 
-## 🏗️ Architecture
+- **Integrated Agenda**: Built using `table_calendar` to display events and tasks side-by-side.
+- **On-Device Sync**: Integrates with local device calendars using `device_calendar` to render external calendar events.
+- **Activity Badges**: Color-coded markers for days containing tasks or external events.
 
-ROCIs Tasks follows a **Feature-First Clean Architecture** to ensure scalability and maintainability.
+### 📊 Productivity Analytics & Insights
 
-- **State Management**: Uses `Provider` for dependency injection and state management.
-- **Data Layer**: A hybrid approach using **Hive** for local persistence/caching and **Firebase Firestore** as the remote source of truth.
-- **Feature Modules**: Code is organized by features (Auth, Tasks, Calendar, Home) with clear separation of concerns (Domain, Data, Presentation layers).
+- **Completion Trends**: Visualized last 7 days metrics (via `fl_chart`).
+- **Category Balancing**: Pie charts illustrating effort distribution across different work spheres.
 
-For a deep dive into the system design, check out [ARCHITECTURE.md](docs/ARCHITECTURE.md).
+### 📱 Android Home Screen Widgets
+
+- **Interactive Action**: View, filter, and mark tasks complete directly from the home screen.
+- **Native State Offset**: Calendar navigation offsets (Prev/Next/Today) are calculated and persisted natively on the Android side (Kotlin) before notifying the Dart background handler, eliminating synchronization lag and double-incrementing states.
+
+### 🎨 Premium Glassmorphism UI/UX
+
+- **Visual Design**: Elegant frosted glass cards and dialogs using `GlassContainer` with custom category borders and opacity blends.
+- **Dynamic Theming**: Android Material You wallpaper-derived themes (via `dynamic_color`).
+- **System Default Mode**: Automatic transitions between Dark and Light mode.
+- **Satisfying Haptics**: Satisfying medium/light haptic pulses on completing/uncompleting tasks.
+- **Bouncy Easter Eggs**: Fun interaction animations on FAB double-taps/long-presses.
+
+### 💰 Subscription Gating (PRO)
+
+- **RevenueCat Integration**: App Store / Play Store subscription flows with `purchases_flutter` and `purchases_ui_flutter`.
+- **PRO Lockouts**: Visual premium badges and paywalls for recurring tasks, attachments, unlimited categories, and widgets.
+
+---
+
+## 🏗️ Clean Architecture
+
+The app is built following a **Feature-First Clean Architecture** system to maintain a decoupled codebase:
+
+```mermaid
+graph TD
+    UI[Presentation Layer: Screens & Widgets] --> Provider[State Management: Providers]
+    Provider --> UseCase[Domain Layer: Models & Repository Interfaces]
+    UseCase --> Data[Data Layer: Repositories & Data Sources]
+    Data --> Hive[(Hive Local Cache)]
+    Data --> Firestore[(Firestore Remote DB)]
+```
+
+### File Hierarchy
+
+```plaintext
+lib/
+├── core/
+│   ├── config/        # Environment configurations (AppConfig, Router)
+│   ├── models/        # Shared system models
+│   ├── services/      # Global infrastructure (Auth, Sync, Timezone, Security, RevenueCat)
+│   └── theme/         # UI tokens and dynamic theme providers
+├── features/
+│   ├── auth/          # Authentication screens and providers
+│   ├── calendar/      # Calendar rendering and device-calendar sync
+│   ├── categories/    # Category CRUD and gating limits
+│   ├── home/          # Shell and bottom navigation layouts
+│   ├── onboarding/    # Multi-pane sliding tutorial carousel
+│   ├── premium/       # Paywall views and PRO locks
+│   └── tasks/         # Tasks CRUD, details, checklists, attachments
+├── l10n/              # ARB file translation templates (EN, HE, ES)
+└── main.dart          # Application initialization root
+```
+
+---
 
 ## 🚀 Getting Started
 
 ### Prerequisites
 
-- [Flutter SDK](https://flutter.dev/docs/get-started/install) (^3.10.0)
-- A Firebase project with Authentication (Google) and Firestore enabled.
+- **Flutter SDK** (`^3.10.0`)
+- **Android SDK** (API Level 21+) / **iOS SDK** (iOS 13.0+)
+- **Firebase Project** containing Auth, Firestore, Analytics, and Crashlytics.
 
-### Installation
+### Setup & Installation
 
-1.  **Clone the repository**:
+1. **Clone the repository**:
 
-    ```bash
-    git clone https://github.com/yourusername/rocis-tasks.git
-    cd rocis_tasks
-    ```
+   ```bash
+   git clone https://github.com/yourusername/rocis-tasks.git
+   cd rocis-tasks
+   ```
 
-2.  **Install dependencies**:
+2. **Retrieve Dependencies**:
 
-    ```bash
-    flutter pub get
-    ```
+   ```bash
+   flutter pub get
+   ```
 
-3.  **Generate code adapters** (required for Hive database):
-    ```bash
-    dart run build_runner build --delete-conflicting-outputs
-    ```
+3. **Initialize Configuration Templates**:
 
-### Configuration
+   ```bash
+   cp .env.example .env
+   cp lib/firebase_options.dart.example lib/firebase_options.dart
+   cp lib/firebase_schedule_options.dart.example lib/firebase_schedule_options.dart
+   ```
 
-1.  **Environment Setup**:
-    Copy the example environment file and fill in your details:
+   _Note: Populate `.env` with your RevenueCat and App Config environment variables._
 
-    ```bash
-    cp .env.example .env
-    ```
+4. **Generate Hive Code Adapters**:
 
-2.  **Firebase Setup**:
-    Use the FlutterFire CLI to configure your app:
-    ```bash
-    flutterfire configure
-    ```
-    This will generate the necessary `firebase_options.dart` and platform-specific configuration files.
+   ```bash
+   dart run build_runner build --delete-conflicting-outputs
+   ```
 
-For detailed setup instructions, please refer to [SETUP.md](docs/SETUP.md).
+5. **Register Firebase (via FlutterFire CLI)**:
+   ```bash
+   flutterfire configure
+   ```
 
-## 📦 Deployment
+---
 
-This project includes a comprehensive guide for deploying to Android, iOS, and Web.
-See [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) for instructions on signing, building release binaries, and configuring Firebase for production.
+## 🧪 Testing & Validation
 
-## 🧪 Testing
-
-To run the test suite:
+Run unit and widget tests:
 
 ```bash
 flutter test
 ```
 
-## 📂 Project Structure
+### Master Validation Scripts (Antigravity Kit)
 
-```
-lib/
-├── core/                   # Shared resources (Theme, Config, Services)
-├── features/               # Feature modules
-│   ├── auth/               # Authentication logic & UI
-│   ├── calendar/           # Calendar integration
-│   ├── home/               # Home screen container
-│   └── tasks/              # Task management (Clean Arch layers)
-├── l10n/                   # Localization files
-└── main.dart               # App entry point
+The repository contains built-in automated scripts to ensure compliance with quality, security, and styling guidelines:
+
+```bash
+# Run incremental validation (Security, Lint, Schema, Tests, UX, SEO)
+python .agent/scripts/checklist.py .
+
+# Run comprehensive release checks (Checklist + Lighthouse, E2E, Mobile Audit)
+python .agent/scripts/verify_all.py . --url <local-dev-server-url>
 ```
 
-## 📄 License & Versioning
+---
 
-- **License**: This project is licensed under the [MIT License](LICENSE).
-- **History**: See [CHANGELOG.md](CHANGELOG.md) for version history and updates.
-- **Privacy**: See [PRIVACY_POLICY.md](PRIVACY_POLICY.md) for our data handling practices.
+## 📄 License & Documentation
+
+- **License**: Licensed under the [MIT License](LICENSE).
+- **Setup Details**: Refer to [docs/SETUP.md](docs/SETUP.md) for full backend configuration details.
+- **Architectural Guidelines**: Refer to [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and [.agent/rules/AGENTS.md](.agent/rules/AGENTS.md).
+- **Latest Changes**: Review [docs/CHANGELOG.md](docs/CHANGELOG.md) for release records.

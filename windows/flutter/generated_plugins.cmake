@@ -8,6 +8,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   dynamic_color
   firebase_auth
   firebase_core
+  firebase_remote_config
   flutter_secure_storage_windows
   flutter_timezone
   local_auth_windows
