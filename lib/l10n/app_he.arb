@@ -137,6 +137,8 @@
   "aboutAppSubtitle": "גרסת אפליקציה, תמיכה ומידע",
   "aboutAppDescription": "ROCIs Tasks נועד לעזור לך להישאר מאורגן ופרודוקטיבי. בנוי עם Flutter, הוא מספק חוויה חלקה לניהול המשימות, הקטגוריות והלוח הזמנים היומי שלך.",
   "visitWebsite": "בקר באתר שלנו",
+  "viewGitHub": "פרויקט GitHub",
+  "viewGitHubSubtitle": "צפה בקוד המקור ב-GitHub",
   "contactSupport": "צור קשר עם התמיכה",
   "rocisTasksPro": "ROCIs Tasks Pro",
   "youAreProUser": "אתה משתמש Pro!",

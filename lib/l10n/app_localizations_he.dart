@@ -388,6 +388,12 @@ class AppLocalizationsHe extends AppLocalizations {
   String get visitWebsite => 'בקר באתר שלנו';
 
   @override
+  String get viewGitHub => 'פרויקט GitHub';
+
+  @override
+  String get viewGitHubSubtitle => 'צפה בקוד המקור ב-GitHub';
+
+  @override
   String get contactSupport => 'צור קשר עם התמיכה';
 
   @override

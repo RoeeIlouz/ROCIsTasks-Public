@@ -389,6 +389,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get visitWebsite => 'زيارة موقعنا';
 
   @override
+  String get viewGitHub => 'مشروع GitHub';
+
+  @override
+  String get viewGitHubSubtitle => 'عرض الكود البرمجي على GitHub';
+
+  @override
   String get contactSupport => 'اتصل بالدعم';
 
   @override

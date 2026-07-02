@@ -394,6 +394,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get visitWebsite => 'Visiter notre site Web';
 
   @override
+  String get viewGitHub => 'Projet GitHub';
+
+  @override
+  String get viewGitHubSubtitle => 'Voir le code source sur GitHub';
+
+  @override
   String get contactSupport => 'Contacter le support';
 
   @override

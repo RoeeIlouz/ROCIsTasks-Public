@@ -393,6 +393,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String get visitWebsite => 'Besuchen Sie unsere Website';
 
   @override
+  String get viewGitHub => 'GitHub-Projekt';
+
+  @override
+  String get viewGitHubSubtitle => 'Quellcode auf GitHub anzeigen';
+
+  @override
   String get contactSupport => 'Support kontaktieren';
 
   @override
