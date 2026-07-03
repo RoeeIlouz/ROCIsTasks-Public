@@ -2,6 +2,13 @@
 
 **ROCIs Tasks** is a premium, feature-rich task management application built with Flutter. Combining robust task tracking with seamless Google Calendar integration, real-time local-cloud synchronization, and native Android home screen widgets, the app offers an ultra-modern workspace to keep users organized and productive.
 
+<div align="center">
+
+[![Web App](https://img.shields.io/badge/Web_Version-rocis--todo.web.app-blue?style=for-the-badge&logo=googlechrome&logoColor=white)](https://rocis-todo.web.app)
+[![Android App](https://img.shields.io/badge/Android_Version-Google_Play-green?style=for-the-badge&logo=android&logoColor=white)](https://play.google.com/store/apps/details?id=com.rocisapps.tasks)
+
+</div>
+
 ---
 
 ## ✨ Key Features

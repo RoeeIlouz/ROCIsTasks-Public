@@ -391,6 +391,12 @@ class AppLocalizationsSv extends AppLocalizations {
   String get visitWebsite => 'Besök vår webbplats';
 
   @override
+  String get viewGitHub => 'GitHub-projekt';
+
+  @override
+  String get viewGitHubSubtitle => 'Visa källkoden på GitHub';
+
+  @override
   String get contactSupport => 'Kontakta support';
 
   @override

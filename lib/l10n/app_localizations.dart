@@ -846,6 +846,18 @@ abstract class AppLocalizations {
   /// **'Visit our Website'**
   String get visitWebsite;
 
+  /// No description provided for @viewGitHub.
+  ///
+  /// In en, this message translates to:
+  /// **'GitHub Project'**
+  String get viewGitHub;
+
+  /// No description provided for @viewGitHubSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'View the source code on GitHub'**
+  String get viewGitHubSubtitle;
+
   /// No description provided for @contactSupport.
   ///
   /// In en, this message translates to:

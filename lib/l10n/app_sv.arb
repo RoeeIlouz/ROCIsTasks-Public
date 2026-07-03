@@ -138,6 +138,8 @@
   "aboutAppSubtitle": "Appversion, support och info",
   "aboutAppDescription": "ROCI's Tasks är utformad för att hjälpa dig att hålla dig organiserad och produktiv. Byggd med Flutter ger den en sömlös upplevelse för att hantera dina dagliga uppgifter, kategorier och schema.",
   "visitWebsite": "Besök vår webbplats",
+  "viewGitHub": "GitHub-projekt",
+  "viewGitHubSubtitle": "Visa källkoden på GitHub",
   "contactSupport": "Kontakta support",
   "rocisTasksPro": "ROCIs Tasks Pro",
   "youAreProUser": "Du är en Pro-användare!",

@@ -9,13 +9,15 @@ class AppConfig {
 
   // App information
   static const String appName = 'ROCI\'s Tasks';
-  static const String appVersion = '0.1.20';
+  static const String appVersion = '0.2.1';
   static const String supportEmail = 'support@ilouz.xyz';
   static const String privacyPolicyUrl =
       'https://rocisapps.ilouz.xyz/privacy.html';
   static const String termsOfServiceUrl =
       'https://rocisapps.ilouz.xyz/terms.html';
   static const String websiteUrl = 'https://rocisapps.ilouz.xyz';
+  static const String githubUrl =
+      'https://github.com/RoeeIlouz/ROCIsTasks-public';
 
   // Feature flags
   static const bool enableAnalytics = isProduction;
