@@ -1028,44 +1028,45 @@ class AppLocalizationsSv extends AppLocalizations {
       'Använd symboler för att filtrera uppgifter: @kategori (t.ex. @arbete), #titel (t.ex. #möte), !prioritet (t.ex. !hög), %datum (t.ex. %2025-06-15), &deluppgift (t.ex. &bugfix), *status (*klar eller *pågående), ? (uppgifter idag). Kombinera flera symboler.';
 
   @override
-  String get widgetSettings => 'Widget Customization';
+  String get widgetSettings => 'Widget-anpassning';
 
   @override
-  String get widgetSettingsSubtitle => 'Configure colors, theme, and features';
+  String get widgetSettingsSubtitle =>
+      'Konfigurera färger, tema och funktioner';
 
   @override
-  String get widgetTheme => 'Widget Theme';
+  String get widgetTheme => 'Widget-tema';
 
   @override
-  String get widgetThemeSystem => 'System Default';
+  String get widgetThemeSystem => 'Systemstandard';
 
   @override
-  String get widgetThemeLight => 'Solid Light';
+  String get widgetThemeLight => 'Solid ljus';
 
   @override
-  String get widgetThemeDark => 'Solid Dark';
+  String get widgetThemeDark => 'Solid mörk';
 
   @override
-  String get widgetThemeGlassmorphic => 'Glassmorphism';
+  String get widgetThemeGlassmorphic => 'Glasmorfism';
 
   @override
-  String get showWeekNumbers => 'Show Week Numbers';
+  String get showWeekNumbers => 'Visa veckonummer';
 
   @override
-  String get weekendHighlights => 'Highlight Weekends';
+  String get weekendHighlights => 'Markera helger';
 
   @override
-  String get startOfWeek => 'Start of Week';
+  String get startOfWeek => 'Start på veckan';
 
   @override
-  String get sunday => 'Sunday';
+  String get sunday => 'Söndag';
 
   @override
-  String get monday => 'Monday';
+  String get monday => 'Måndag';
 
   @override
-  String get saturday => 'Saturday';
+  String get saturday => 'Lördag';
 
   @override
-  String get widgetAccentColor => 'Widget Accent Color';
+  String get widgetAccentColor => 'Widget-accentfärg';
 }

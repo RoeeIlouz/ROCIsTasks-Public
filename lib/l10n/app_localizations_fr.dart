@@ -1040,44 +1040,45 @@ class AppLocalizationsFr extends AppLocalizations {
       'Utilisez des symboles pour filtrer les tâches : @catégorie (ex. @travail), #titre (ex. #réunion), !priorité (ex. !haute), %date (ex. %2025-06-15), &sous-tâche (ex. &correction bug), *statut (*fait ou *en cours), ? (tâches d\'aujourd\'hui). Combiner plusieurs symboles.';
 
   @override
-  String get widgetSettings => 'Widget Customization';
+  String get widgetSettings => 'Personnalisation du widget';
 
   @override
-  String get widgetSettingsSubtitle => 'Configure colors, theme, and features';
+  String get widgetSettingsSubtitle =>
+      'Configurer les couleurs, le thème et les fonctionnalités';
 
   @override
-  String get widgetTheme => 'Widget Theme';
+  String get widgetTheme => 'Thème du widget';
 
   @override
-  String get widgetThemeSystem => 'System Default';
+  String get widgetThemeSystem => 'Par défaut du système';
 
   @override
-  String get widgetThemeLight => 'Solid Light';
+  String get widgetThemeLight => 'Clair uni';
 
   @override
-  String get widgetThemeDark => 'Solid Dark';
+  String get widgetThemeDark => 'Sombre uni';
 
   @override
-  String get widgetThemeGlassmorphic => 'Glassmorphism';
+  String get widgetThemeGlassmorphic => 'Effet verre dépoli';
 
   @override
-  String get showWeekNumbers => 'Show Week Numbers';
+  String get showWeekNumbers => 'Afficher les numéros de semaine';
 
   @override
-  String get weekendHighlights => 'Highlight Weekends';
+  String get weekendHighlights => 'Mettre en évidence les week-ends';
 
   @override
-  String get startOfWeek => 'Start of Week';
+  String get startOfWeek => 'Début de la semaine';
 
   @override
-  String get sunday => 'Sunday';
+  String get sunday => 'Dimanche';
 
   @override
-  String get monday => 'Monday';
+  String get monday => 'Lundi';
 
   @override
-  String get saturday => 'Saturday';
+  String get saturday => 'Samedi';
 
   @override
-  String get widgetAccentColor => 'Widget Accent Color';
+  String get widgetAccentColor => 'Couleur d\'accentuation du widget';
 }

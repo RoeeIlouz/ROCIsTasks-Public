@@ -1,5 +1,5 @@
 {
-"@@locale": "fr",
+  "@@locale": "fr",
   "appTitle": "ROCI's Tasks",
   "settings": "Paramètres",
   "account": "Compte",
@@ -33,9 +33,9 @@
   "english": "Anglais",
   "spanish": "Espagnol",
   "arabic": "Arabe",
-  "swedish": "Su\u00e9dois",
+  "swedish": "Suédois",
   "german": "Allemand",
-  "french": "Fran\u00e7ais",
+  "french": "Français",
   "tasks": "Tâches",
   "editTask": "Modifier la tâche",
   "newTask": "Nouvelle tâche",
@@ -76,7 +76,9 @@
   "restoredTask": "Tâche \"{title}\" restaurée",
   "@restoredTask": {
     "placeholders": {
-      "title": { "type": "String" }
+      "title": {
+        "type": "String"
+      }
     }
   },
   "deletePermanently": "Supprimer définitivement ?",
@@ -109,7 +111,9 @@
   "exportFailed": "Échec de l'exportation : {error}",
   "@exportFailed": {
     "placeholders": {
-      "error": { "type": "String" }
+      "error": {
+        "type": "String"
+      }
     }
   },
   "importData": "Importer les données (JSON)",
@@ -121,7 +125,9 @@
   "importFailed": "Importation terminée !",
   "@importFailed": {
     "placeholders": {
-      "error": { "type": "String" }
+      "error": {
+        "type": "String"
+      }
     }
   },
   "privacyAndGdpr": "Confidentialité & RGPD",
@@ -199,7 +205,9 @@
   "taskReminderTitle": "Rappel de tâche : {title}",
   "@taskReminderTitle": {
     "placeholders": {
-      "title": { "type": "String" }
+      "title": {
+        "type": "String"
+      }
     }
   },
   "taskDueNowBody": "Vous avez une tâche à faire maintenant !",
@@ -213,8 +221,12 @@
   "nextOccurrenceSet": "Prochaine échéance de \"{title}\" fixée au {date}",
   "@nextOccurrenceSet": {
     "placeholders": {
-      "title": { "type": "String" },
-      "date": { "type": "String" }
+      "title": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
     }
   },
   "initializationFailedError": "Échec de l'initialisation des données. Veuillez redémarrer.",
@@ -237,14 +249,18 @@
   "notificationUncompletedTasks": "{count} tâches non terminées",
   "@notificationUncompletedTasks": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "notificationTasksRemaining": "Tâches restantes",
   "notificationTasksSummary": "{count} tâches",
   "@notificationTasksSummary": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "skip": "Passer",
@@ -354,5 +370,19 @@
   "glassmorphismEffectsSubtitle": "Appliquer un effet verre dépoli aux cartes",
   "noEventsForThisDay": "Aucun événement pour ce jour",
   "searchSymbols": "Symboles de recherche",
-  "searchSymbolsDesc": "Utilisez des symboles pour filtrer les tâches : @catégorie (ex. @travail), #titre (ex. #réunion), !priorité (ex. !haute), %date (ex. %2025-06-15), &sous-tâche (ex. &correction bug), *statut (*fait ou *en cours), ? (tâches d'aujourd'hui). Combiner plusieurs symboles."
+  "searchSymbolsDesc": "Utilisez des symboles pour filtrer les tâches : @catégorie (ex. @travail), #titre (ex. #réunion), !priorité (ex. !haute), %date (ex. %2025-06-15), &sous-tâche (ex. &correction bug), *statut (*fait ou *en cours), ? (tâches d'aujourd'hui). Combiner plusieurs symboles.",
+  "monday": "Lundi",
+  "saturday": "Samedi",
+  "showWeekNumbers": "Afficher les numéros de semaine",
+  "startOfWeek": "Début de la semaine",
+  "sunday": "Dimanche",
+  "weekendHighlights": "Mettre en évidence les week-ends",
+  "widgetAccentColor": "Couleur d'accentuation du widget",
+  "widgetSettings": "Personnalisation du widget",
+  "widgetSettingsSubtitle": "Configurer les couleurs, le thème et les fonctionnalités",
+  "widgetTheme": "Thème du widget",
+  "widgetThemeDark": "Sombre uni",
+  "widgetThemeGlassmorphic": "Effet verre dépoli",
+  "widgetThemeLight": "Clair uni",
+  "widgetThemeSystem": "Par défaut du système"
 }

@@ -76,7 +76,9 @@
   "restoredTask": "تمت استعادة {title}",
   "@restoredTask": {
     "placeholders": {
-      "title": { "type": "String" }
+      "title": {
+        "type": "String"
+      }
     }
   },
   "deletePermanently": "حذف نهائيًا؟",
@@ -109,7 +111,9 @@
   "exportFailed": "فشل التصدير: {error}",
   "@exportFailed": {
     "placeholders": {
-      "error": { "type": "String" }
+      "error": {
+        "type": "String"
+      }
     }
   },
   "importData": "استيراد البيانات (JSON)",
@@ -121,7 +125,9 @@
   "importFailed": "فشل الاستيراد: {error}",
   "@importFailed": {
     "placeholders": {
-      "error": { "type": "String" }
+      "error": {
+        "type": "String"
+      }
     }
   },
   "privacyAndGdpr": "الخصوصية وGDPR",
@@ -199,7 +205,9 @@
   "taskReminderTitle": "تذكير بالمهمة: {title}",
   "@taskReminderTitle": {
     "placeholders": {
-      "title": { "type": "String" }
+      "title": {
+        "type": "String"
+      }
     }
   },
   "taskDueNowBody": "لديك مهمة مستحقة الآن!",
@@ -213,8 +221,12 @@
   "nextOccurrenceSet": "تم تحديد المرة التالية لـ \"{title}\" في {date}",
   "@nextOccurrenceSet": {
     "placeholders": {
-      "title": { "type": "String" },
-      "date": { "type": "String" }
+      "title": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
     }
   },
   "initializationFailedError": "فشل تهيئة بيانات التطبيق. يرجى إعادة التشغيل.",
@@ -237,14 +249,18 @@
   "notificationUncompletedTasks": "{count} مهام غير مكتملة",
   "@notificationUncompletedTasks": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "notificationTasksRemaining": "المهام المتبقية",
   "notificationTasksSummary": "{count} مهام",
   "@notificationTasksSummary": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "skip": "تخطي",
@@ -354,5 +370,19 @@
   "glassmorphismEffectsSubtitle": "تطبيق تأثير الزجاج البلوري على البطاقات",
   "noEventsForThisDay": "لا توجد فعاليات لهذا اليوم",
   "searchSymbols": "رموز البحث",
-  "searchSymbolsDesc": "استخدم الرموز لتصفية المهام: @فئة (مثلاً @عمل)، #عنوان (مثلاً #اجتماع)، !أولوية (مثلاً !عالية)، %تاريخ (مثلاً %2025-06-15)، &مهمة فرعية (مثلاً &إصلاح خطأ)، *حالة (*منجز أو *معلق)، ? (مهام اليوم). يمكن دمج عدة رموز."
+  "searchSymbolsDesc": "استخدم الرموز لتصفية المهام: @فئة (مثلاً @عمل)، #عنوان (مثلاً #اجتماع)، !أولوية (مثلاً !عالية)، %تاريخ (مثلاً %2025-06-15)، &مهمة فرعية (مثلاً &إصلاح خطأ)، *حالة (*منجز أو *معلق)، ? (مهام اليوم). يمكن دمج عدة رموز.",
+  "monday": "الإثنين",
+  "saturday": "السبت",
+  "showWeekNumbers": "عرض أرقام الأسابيع",
+  "startOfWeek": "بداية الأسبوع",
+  "sunday": "الأحد",
+  "weekendHighlights": "تمييز عطلة نهاية الأسبوع",
+  "widgetAccentColor": "لون تمييز الأداة",
+  "widgetSettings": "تخصيص الأداة",
+  "widgetSettingsSubtitle": "تكوين الألوان، المظهر، والميزات",
+  "widgetTheme": "مظهر الأداة",
+  "widgetThemeDark": "داكن مصمت",
+  "widgetThemeGlassmorphic": "تأثير زجاجي",
+  "widgetThemeLight": "فاتح مصمت",
+  "widgetThemeSystem": "الافتراضي للنظام"
 }

@@ -1,5 +1,5 @@
 {
-"@@locale": "sv",
+  "@@locale": "sv",
   "appTitle": "ROCI's Tasks",
   "settings": "Inställningar",
   "account": "Konto",
@@ -76,7 +76,9 @@
   "restoredTask": "Återställde {title}",
   "@restoredTask": {
     "placeholders": {
-      "title": { "type": "String" }
+      "title": {
+        "type": "String"
+      }
     }
   },
   "deletePermanently": "Ta bort permanent?",
@@ -109,7 +111,9 @@
   "exportFailed": "Exporten misslyckades: {error}",
   "@exportFailed": {
     "placeholders": {
-      "error": { "type": "String" }
+      "error": {
+        "type": "String"
+      }
     }
   },
   "importData": "Importera data (JSON)",
@@ -121,7 +125,9 @@
   "importFailed": "Importen misslyckades: {error}",
   "@importFailed": {
     "placeholders": {
-      "error": { "type": "String" }
+      "error": {
+        "type": "String"
+      }
     }
   },
   "privacyAndGdpr": "Integritet & GDPR",
@@ -199,7 +205,9 @@
   "taskReminderTitle": "Påminnelse: {title}",
   "@taskReminderTitle": {
     "placeholders": {
-      "title": { "type": "String" }
+      "title": {
+        "type": "String"
+      }
     }
   },
   "taskDueNowBody": "Du har en uppgift som förfaller nu!",
@@ -213,8 +221,12 @@
   "nextOccurrenceSet": "Nästa förekomst av \"{title}\" satt till {date}",
   "@nextOccurrenceSet": {
     "placeholders": {
-      "title": { "type": "String" },
-      "date": { "type": "String" }
+      "title": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
     }
   },
   "initializationFailedError": "Misslyckades med att initiera appdata. Starta om appen.",
@@ -237,14 +249,18 @@
   "notificationUncompletedTasks": "{count} oavslutade uppgifter",
   "@notificationUncompletedTasks": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "notificationTasksRemaining": "Uppgifter kvar",
   "notificationTasksSummary": "{count} uppgifter",
   "@notificationTasksSummary": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "skip": "Hoppa över",
@@ -354,5 +370,19 @@
   "glassmorphismEffectsSubtitle": "Använd frostat glas på kort",
   "noEventsForThisDay": "Inga händelser för denna dag",
   "searchSymbols": "Sök symboler",
-  "searchSymbolsDesc": "Använd symboler för att filtrera uppgifter: @kategori (t.ex. @arbete), #titel (t.ex. #möte), !prioritet (t.ex. !hög), %datum (t.ex. %2025-06-15), &deluppgift (t.ex. &bugfix), *status (*klar eller *pågående), ? (uppgifter idag). Kombinera flera symboler."
+  "searchSymbolsDesc": "Använd symboler för att filtrera uppgifter: @kategori (t.ex. @arbete), #titel (t.ex. #möte), !prioritet (t.ex. !hög), %datum (t.ex. %2025-06-15), &deluppgift (t.ex. &bugfix), *status (*klar eller *pågående), ? (uppgifter idag). Kombinera flera symboler.",
+  "monday": "Måndag",
+  "saturday": "Lördag",
+  "showWeekNumbers": "Visa veckonummer",
+  "startOfWeek": "Start på veckan",
+  "sunday": "Söndag",
+  "weekendHighlights": "Markera helger",
+  "widgetAccentColor": "Widget-accentfärg",
+  "widgetSettings": "Widget-anpassning",
+  "widgetSettingsSubtitle": "Konfigurera färger, tema och funktioner",
+  "widgetTheme": "Widget-tema",
+  "widgetThemeDark": "Solid mörk",
+  "widgetThemeGlassmorphic": "Glasmorfism",
+  "widgetThemeLight": "Solid ljus",
+  "widgetThemeSystem": "Systemstandard"
 }

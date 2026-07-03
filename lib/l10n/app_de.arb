@@ -1,5 +1,5 @@
 {
-"@@locale": "de",
+  "@@locale": "de",
   "appTitle": "ROCI's Tasks",
   "settings": "Einstellungen",
   "account": "Konto",
@@ -35,7 +35,7 @@
   "arabic": "Arabisch",
   "swedish": "Schwedisch",
   "german": "Deutsch",
-  "french": "Franz\u00f6sisch",
+  "french": "Französisch",
   "tasks": "Aufgaben",
   "editTask": "Aufgabe bearbeiten",
   "newTask": "Neue Aufgabe",
@@ -76,7 +76,9 @@
   "restoredTask": "\"{title}\" wiederhergestellt",
   "@restoredTask": {
     "placeholders": {
-      "title": { "type": "String" }
+      "title": {
+        "type": "String"
+      }
     }
   },
   "deletePermanently": "Dauerhaft löschen?",
@@ -109,7 +111,9 @@
   "exportFailed": "Export fehlgeschlagen: {error}",
   "@exportFailed": {
     "placeholders": {
-      "error": { "type": "String" }
+      "error": {
+        "type": "String"
+      }
     }
   },
   "importData": "Daten importieren (JSON)",
@@ -121,7 +125,9 @@
   "importFailed": "Import fehlgeschlagen: {error}",
   "@importFailed": {
     "placeholders": {
-      "error": { "type": "String" }
+      "error": {
+        "type": "String"
+      }
     }
   },
   "privacyAndGdpr": "Datenschutz & DSGVO",
@@ -199,7 +205,9 @@
   "taskReminderTitle": "Erinnerung: {title}",
   "@taskReminderTitle": {
     "placeholders": {
-      "title": { "type": "String" }
+      "title": {
+        "type": "String"
+      }
     }
   },
   "taskDueNowBody": "Eine Aufgabe ist jetzt fällig!",
@@ -213,8 +221,12 @@
   "nextOccurrenceSet": "Nächster Termin für \"{title}\" am {date} festgelegt",
   "@nextOccurrenceSet": {
     "placeholders": {
-      "title": { "type": "String" },
-      "date": { "type": "String" }
+      "title": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
     }
   },
   "initializationFailedError": "Fehler beim Initialisieren der App-Daten. Bitte neu starten.",
@@ -237,14 +249,18 @@
   "notificationUncompletedTasks": "{count} unvollständige Aufgaben",
   "@notificationUncompletedTasks": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "notificationTasksRemaining": "Verbleibende Aufgaben",
   "notificationTasksSummary": "{count} Aufgaben",
   "@notificationTasksSummary": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "skip": "Überspringen",
@@ -354,5 +370,19 @@
   "glassmorphismEffectsSubtitle": "Milchglaseffekt auf Karten anwenden",
   "noEventsForThisDay": "Keine Ereignisse für diesen Tag",
   "searchSymbols": "Suchsymbole",
-  "searchSymbolsDesc": "Verwenden Sie Symbole zum Filtern von Aufgaben: @Kategorie (z.B. @Arbeit), #Titel (z.B. #Besprechung), !Priorität (z.B. !hoch), %Datum (z.B. %2025-06-15), &Unteraufgabe (z.B. &Bugfix), !Status (*erledigt oder *ausstehend), ? (Aufgaben heute). Kombinieren Sie mehrere Symbole."
+  "searchSymbolsDesc": "Verwenden Sie Symbole zum Filtern von Aufgaben: @Kategorie (z.B. @Arbeit), #Titel (z.B. #Besprechung), !Priorität (z.B. !hoch), %Datum (z.B. %2025-06-15), &Unteraufgabe (z.B. &Bugfix), !Status (*erledigt oder *ausstehend), ? (Aufgaben heute). Kombinieren Sie mehrere Symbole.",
+  "monday": "Montag",
+  "saturday": "Samstag",
+  "showWeekNumbers": "Wochennummern anzeigen",
+  "startOfWeek": "Wochenbeginn",
+  "sunday": "Sonntag",
+  "weekendHighlights": "Wochenenden hervorheben",
+  "widgetAccentColor": "Widget-Akzentfarbe",
+  "widgetSettings": "Widget-Anpassung",
+  "widgetSettingsSubtitle": "Farben, Design und Funktionen konfigurieren",
+  "widgetTheme": "Widget-Design",
+  "widgetThemeDark": "Einfarbig Dunkel",
+  "widgetThemeGlassmorphic": "Glassmorphismus",
+  "widgetThemeLight": "Einfarbig Hell",
+  "widgetThemeSystem": "Systemstandard"
 }

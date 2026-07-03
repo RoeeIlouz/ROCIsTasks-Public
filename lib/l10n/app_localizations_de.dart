@@ -1041,44 +1041,45 @@ class AppLocalizationsDe extends AppLocalizations {
       'Verwenden Sie Symbole zum Filtern von Aufgaben: @Kategorie (z.B. @Arbeit), #Titel (z.B. #Besprechung), !Priorität (z.B. !hoch), %Datum (z.B. %2025-06-15), &Unteraufgabe (z.B. &Bugfix), !Status (*erledigt oder *ausstehend), ? (Aufgaben heute). Kombinieren Sie mehrere Symbole.';
 
   @override
-  String get widgetSettings => 'Widget Customization';
+  String get widgetSettings => 'Widget-Anpassung';
 
   @override
-  String get widgetSettingsSubtitle => 'Configure colors, theme, and features';
+  String get widgetSettingsSubtitle =>
+      'Farben, Design und Funktionen konfigurieren';
 
   @override
-  String get widgetTheme => 'Widget Theme';
+  String get widgetTheme => 'Widget-Design';
 
   @override
-  String get widgetThemeSystem => 'System Default';
+  String get widgetThemeSystem => 'Systemstandard';
 
   @override
-  String get widgetThemeLight => 'Solid Light';
+  String get widgetThemeLight => 'Einfarbig Hell';
 
   @override
-  String get widgetThemeDark => 'Solid Dark';
+  String get widgetThemeDark => 'Einfarbig Dunkel';
 
   @override
-  String get widgetThemeGlassmorphic => 'Glassmorphism';
+  String get widgetThemeGlassmorphic => 'Glassmorphismus';
 
   @override
-  String get showWeekNumbers => 'Show Week Numbers';
+  String get showWeekNumbers => 'Wochennummern anzeigen';
 
   @override
-  String get weekendHighlights => 'Highlight Weekends';
+  String get weekendHighlights => 'Wochenenden hervorheben';
 
   @override
-  String get startOfWeek => 'Start of Week';
+  String get startOfWeek => 'Wochenbeginn';
 
   @override
-  String get sunday => 'Sunday';
+  String get sunday => 'Sonntag';
 
   @override
-  String get monday => 'Monday';
+  String get monday => 'Montag';
 
   @override
-  String get saturday => 'Saturday';
+  String get saturday => 'Samstag';
 
   @override
-  String get widgetAccentColor => 'Widget Accent Color';
+  String get widgetAccentColor => 'Widget-Akzentfarbe';
 }

@@ -1010,44 +1010,44 @@ class AppLocalizationsAr extends AppLocalizations {
       'استخدم الرموز لتصفية المهام: @فئة (مثلاً @عمل)، #عنوان (مثلاً #اجتماع)، !أولوية (مثلاً !عالية)، %تاريخ (مثلاً %2025-06-15)، &مهمة فرعية (مثلاً &إصلاح خطأ)، *حالة (*منجز أو *معلق)، ? (مهام اليوم). يمكن دمج عدة رموز.';
 
   @override
-  String get widgetSettings => 'Widget Customization';
+  String get widgetSettings => 'تخصيص الأداة';
 
   @override
-  String get widgetSettingsSubtitle => 'Configure colors, theme, and features';
+  String get widgetSettingsSubtitle => 'تكوين الألوان، المظهر، والميزات';
 
   @override
-  String get widgetTheme => 'Widget Theme';
+  String get widgetTheme => 'مظهر الأداة';
 
   @override
-  String get widgetThemeSystem => 'System Default';
+  String get widgetThemeSystem => 'الافتراضي للنظام';
 
   @override
-  String get widgetThemeLight => 'Solid Light';
+  String get widgetThemeLight => 'فاتح مصمت';
 
   @override
-  String get widgetThemeDark => 'Solid Dark';
+  String get widgetThemeDark => 'داكن مصمت';
 
   @override
-  String get widgetThemeGlassmorphic => 'Glassmorphism';
+  String get widgetThemeGlassmorphic => 'تأثير زجاجي';
 
   @override
-  String get showWeekNumbers => 'Show Week Numbers';
+  String get showWeekNumbers => 'عرض أرقام الأسابيع';
 
   @override
-  String get weekendHighlights => 'Highlight Weekends';
+  String get weekendHighlights => 'تمييز عطلة نهاية الأسبوع';
 
   @override
-  String get startOfWeek => 'Start of Week';
+  String get startOfWeek => 'بداية الأسبوع';
 
   @override
-  String get sunday => 'Sunday';
+  String get sunday => 'الأحد';
 
   @override
-  String get monday => 'Monday';
+  String get monday => 'الإثنين';
 
   @override
-  String get saturday => 'Saturday';
+  String get saturday => 'السبت';
 
   @override
-  String get widgetAccentColor => 'Widget Accent Color';
+  String get widgetAccentColor => 'لون تمييز الأداة';
 }
