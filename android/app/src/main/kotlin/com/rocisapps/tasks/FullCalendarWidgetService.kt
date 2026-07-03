@@ -23,6 +23,7 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
     private var widgetTheme = "system"
     private var showWeekNumbers = true
     private var weekendHighlight = true
+    private var highlightColorStr = "#6C63FF"
 
     override fun onCreate() {
         onDataSetChanged()
@@ -47,6 +48,7 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
             widgetTheme = widgetData.getString("full_calendar_theme", "system") ?: "system"
             showWeekNumbers = widgetData.getBoolean("full_calendar_show_week_numbers", true)
             weekendHighlight = widgetData.getBoolean("full_calendar_weekend_highlight", true)
+            highlightColorStr = widgetData.getString("full_calendar_highlight_color", "#6C63FF") ?: "#6C63FF"
             
             val gridDataJson = widgetData.getString("full_calendar_grid_data", "[]")
             val gridData = JSONArray(gridDataJson)
@@ -150,10 +152,10 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
 
                       cellViews.setTextViewText(R.id.widget_full_calendar_day_text, dayNum.toString())
                       
-                      val highlightColorStr = widgetData.getString("full_calendar_highlight_color", "#6C63FF") ?: "#6C63FF"
+                      val colorStr = highlightColorStr
                       var highlightColor = android.graphics.Color.parseColor("#6C63FF")
                       try {
-                          highlightColor = android.graphics.Color.parseColor(highlightColorStr)
+                          highlightColor = android.graphics.Color.parseColor(colorStr)
                       } catch (_: Exception) {}
 
                       // Reset text background circle
@@ -161,7 +163,7 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
 
                       // Set cell-wide highlights
                       if (isToday) {
-                          val fillAlphaColor = (highlightColor & 0x00FFFFFF) or (0x1A shl 24)
+                          val fillAlphaColor = (highlightColor and 0x00FFFFFF) or (0x1A shl 24)
                           cellViews.setViewVisibility(R.id.widget_full_calendar_day_fill, android.view.View.VISIBLE)
                           cellViews.setInt(R.id.widget_full_calendar_day_fill, "setColorFilter", fillAlphaColor)
                       } else {
@@ -169,7 +171,7 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
                       }
 
                       if (isSelected) {
-                          val strokeColor = (highlightColor & 0x00FFFFFF) or (0xFF.toInt() shl 24)
+                          val strokeColor = (highlightColor and 0x00FFFFFF) or (0xFF.toInt() shl 24)
                           cellViews.setViewVisibility(R.id.widget_full_calendar_day_stroke, android.view.View.VISIBLE)
                           cellViews.setInt(R.id.widget_full_calendar_day_stroke, "setColorFilter", strokeColor)
                       } else {
