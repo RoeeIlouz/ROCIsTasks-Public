@@ -8,30 +8,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.2.1+50] - 2026-07-03
 
 ### Changed
-- Excluded Firebase configuration files from version control to prevent credential leaks.
-- Synchronized versioning variables across Android and Web configurations.
+
+- Full web version release.
+- New UI options to customize the app and home screen widget.
 
 ## [0.1.20+49] - 2026-07-02
 
 ### Added
+
 - Dynamic customization options for the full calendar widget (Themes, Week Numbers, Weekend Highlights) and a live mock preview.
 
 ### Changed
+
 - Migrated task synchronization from Google Calendar to Google Tasks under a custom "ROCIs Tasks" list.
 - Cleaned up static analysis warnings and resolved calendar import compilation errors.
 
 ## [0.1.19+48] - 2026-06-27
 
 ### Added
+
 - Paywall protection and PRO locks for the Glassmorphism visual theme.
 - Settings screen lock icon indicators for premium theme options.
 
 ### Changed
+
 - Standardized the FAB design across Home and Categories screens (with solid primary coloring fallback for free users).
 
 ## [0.1.18+47] - 2026-06-26
 
 ### Fixed
+
 - Positioned date numbers above events/tasks in calendar screen and Android home widget.
 - Brought event indicators/titles closer to the date headers.
 - Centered the "No events for this day" empty state in the calendar screen to fix vertical stretching.
@@ -39,23 +45,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.17+46] - 2026-06-26
 
 ### Added
+
 - Widget selection menu preview layout for the full calendar widget.
 - Bouncy Easter Egg spin animations on double-tap/long-press on FABs and settings logo.
 - Soft elevation shadows for cards, FABs, and navbar when glassmorphism is disabled.
 
 ### Fixed
+
 - Widget single event/task title display, layout alignment, and color rendering.
 - Better calendar screen selection readability using border outlines.
 
 ## [0.1.16+45] - 2026-06-26
 
 ### Added
+
 - Symmetrical, custom-built bottom navigation bar vertical spacing.
 - Dynamic FAB styling (glassy translucent/solid primary based on glassmorphism toggle).
 - 10-18% color tinting in glass containers & borders.
 - Show single task/event title directly on calendar screen cell.
 
 ### Fixed
+
 - Android widget month & today buttons navigation offset updates natively (avoids freeze).
 - Timeout for timezone queries in background isolates.
 
