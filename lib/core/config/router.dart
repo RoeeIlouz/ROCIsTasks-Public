@@ -8,12 +8,15 @@ import 'package:rocis_tasks/features/onboarding/presentation/screens/onboarding_
 import 'package:rocis_tasks/shared/ui/widgets/global_error_boundary.dart';
 
 class AppRouter {
+  static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
   final AuthService authService;
   final OnboardingService onboardingService;
 
   AppRouter(this.authService, this.onboardingService);
 
   late final GoRouter router = GoRouter(
+    navigatorKey: navigatorKey,
     refreshListenable: Listenable.merge([authService, onboardingService]),
     initialLocation: '/',
     debugLogDiagnostics: kDebugMode,

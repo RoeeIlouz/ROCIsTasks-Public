@@ -117,6 +117,9 @@ class AppLocalizationsSv extends AppLocalizations {
   String get french => 'Franska';
 
   @override
+  String get hindi => 'Hindi';
+
+  @override
   String get tasks => 'Uppgifter';
 
   @override
@@ -1069,4 +1072,73 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get widgetAccentColor => 'Widget-accentfärg';
+
+  @override
+  String get googleTasksDisconnected => 'Google Tasks bortkopplad';
+
+  @override
+  String get googleTasksDisconnectedSubtitle =>
+      'Tryck för att ansluta igen och återuppta synkroniseringen';
+
+  @override
+  String get reconnect => 'Återanslut';
+
+  @override
+  String get webPaywallTitle => 'Lås upp ROCIs Tasks Pro på webben';
+
+  @override
+  String get webPaywallSubtitle =>
+      'Uppgradera till premium för att få tillgång till alla avancerade funktioner på valfri plattform.';
+
+  @override
+  String get webSimulatedUpgradeBtn => 'Uppgradera till Pro';
+
+  @override
+  String get webPaywallNotice =>
+      'Betalningar behandlas säkert av Lemon Squeezy. Ditt abonnemang kommer att aktiveras automatiskt.';
+
+  @override
+  String get monthlyPlanTitle => 'Månadsplan';
+
+  @override
+  String get monthlyPlanPrice => '4,99 \$ / månad';
+
+  @override
+  String get yearlyPlanTitle => 'Årsplan';
+
+  @override
+  String get yearlyPlanPrice => '39,99 \$ / år';
+
+  @override
+  String get yearlyPlanSaving => 'Spara 33%';
+
+  @override
+  String get groceryListMode => 'Uppgiftslista';
+
+  @override
+  String get groceryListModeSubtitle =>
+      'Formatera uppgiften som en interaktiv uppgiftslista';
+
+  @override
+  String itemsInCart(Object completed, Object total) {
+    return '$completed/$total klara';
+  }
+
+  @override
+  String get toBuy => 'Att göra';
+
+  @override
+  String get inCart => 'Klara';
+
+  @override
+  String get resetCart => 'Återställ lista';
+
+  @override
+  String get clearCartItems => 'Töm listan';
+
+  @override
+  String get addItemHint => 'Lägg till objekt...';
+
+  @override
+  String get quantityHint => 'Antal';
 }

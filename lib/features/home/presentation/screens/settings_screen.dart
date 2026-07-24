@@ -46,6 +46,7 @@ class SettingsScreen extends StatelessWidget {
 
     String _currentLanguageLabel() {
       final code = themeService.locale?.languageCode;
+      if (code == 'hi') return '🇮🇳 ${l10n.hindi}';
       if (code == 'he') return '🇮🇱 ${l10n.hebrew}';
       if (code == 'es') return '🇪🇸 ${l10n.spanish}';
       if (code == 'ar') return '🇸🇦 ${l10n.arabic}';
@@ -391,6 +392,7 @@ class SettingsScreen extends StatelessWidget {
                 builder: (context) {
                   final currentLocaleCode = themeService.locale?.languageCode;
                   final isEnSelected = currentLocaleCode == 'en' || themeService.locale == null;
+                  final isHiSelected = currentLocaleCode == 'hi';
                   final isHeSelected = currentLocaleCode == 'he';
                   final isEsSelected = currentLocaleCode == 'es';
                   final isArSelected = currentLocaleCode == 'ar';
@@ -438,6 +440,17 @@ class SettingsScreen extends StatelessWidget {
                             onTap: () {
                               themeService.setLocale(const Locale('en'));
                               analyticsService.logLanguageChanged(locale: 'en');
+                              Navigator.pop(context);
+                            },
+                          ),
+                          const SizedBox(height: 8),
+                          buildLanguageTile(
+                            flag: '🇮🇳',
+                            name: l10n.hindi,
+                            isSelected: isHiSelected,
+                            onTap: () {
+                              themeService.setLocale(const Locale('hi'));
+                              analyticsService.logLanguageChanged(locale: 'hi');
                               Navigator.pop(context);
                             },
                           ),

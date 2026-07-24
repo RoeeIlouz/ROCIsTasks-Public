@@ -229,10 +229,6 @@ class _PremiumScreenState extends State<PremiumScreen> {
   }
 
   Widget _buildActiveStatus(BuildContext context, AppLocalizations l10n) {
-    final now = DateTime.now();
-    final isPromo = !now.isBefore(DateTime(now.year, 6, 16)) &&
-        now.isBefore(DateTime(now.year, 7, 16));
-
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -257,16 +253,6 @@ class _PremiumScreenState extends State<PremiumScreen> {
               ),
             ],
           ),
-          if (isPromo) ...[
-            const SizedBox(height: 8),
-            Text(
-              'Birthday Promo - Free until July 16',
-              style: GoogleFonts.outfit(
-                color: Colors.green.withValues(alpha: 0.7),
-                fontSize: 13,
-              ),
-            ),
-          ],
         ],
       ),
     );

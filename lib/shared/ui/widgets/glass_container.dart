@@ -43,9 +43,10 @@ class GlassContainer extends StatelessWidget {
     
     // Default glass color adapts to theme if not provided, with a beautiful primary/category tint
     final tintColor = color ?? theme.colorScheme.primary;
-    final glassColor = isDark 
-        ? Color.lerp(const Color(0xFF151824), tintColor, 0.18)!
-        : Color.lerp(Colors.white, tintColor, 0.12)!;
+    final baseColor = isDark
+        ? (themeService.useMaterialTheme ? theme.colorScheme.surface : const Color(0xFF151824))
+        : (themeService.useMaterialTheme ? theme.colorScheme.surface : Colors.white);
+    final glassColor = Color.lerp(baseColor, tintColor, isDark ? 0.18 : 0.12)!;
     
     final radius = borderRadius ?? BorderRadius.circular(24.0);
     

@@ -1,17 +1,17 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
-import 'app_localizations_ar.dart';
-import 'app_localizations_de.dart';
-import 'app_localizations_en.dart';
-import 'app_localizations_es.dart';
-import 'app_localizations_fr.dart';
-import 'app_localizations_he.dart';
-import 'app_localizations_sv.dart';
+import 'app_localizations_ar.dart' deferred as app_localizations_ar;
+import 'app_localizations_de.dart' deferred as app_localizations_de;
+import 'app_localizations_en.dart' deferred as app_localizations_en;
+import 'app_localizations_es.dart' deferred as app_localizations_es;
+import 'app_localizations_fr.dart' deferred as app_localizations_fr;
+import 'app_localizations_he.dart' deferred as app_localizations_he;
+import 'app_localizations_hi.dart' deferred as app_localizations_hi;
+import 'app_localizations_sv.dart' deferred as app_localizations_sv;
 
 // ignore_for_file: type=lint
 
@@ -105,6 +105,7 @@ abstract class AppLocalizations {
     Locale('es'),
     Locale('fr'),
     Locale('he'),
+    Locale('hi'),
     Locale('sv'),
   ];
 
@@ -323,6 +324,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'French'**
   String get french;
+
+  /// No description provided for @hindi.
+  ///
+  /// In en, this message translates to:
+  /// **'Hindi'**
+  String get hindi;
 
   /// No description provided for @tasks.
   ///
@@ -2105,6 +2112,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Widget Accent Color'**
   String get widgetAccentColor;
+
+  /// No description provided for @googleTasksDisconnected.
+  ///
+  /// In en, this message translates to:
+  /// **'Google Tasks Disconnected'**
+  String get googleTasksDisconnected;
+
+  /// No description provided for @googleTasksDisconnectedSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to reconnect and resume sync'**
+  String get googleTasksDisconnectedSubtitle;
+
+  /// No description provided for @reconnect.
+  ///
+  /// In en, this message translates to:
+  /// **'Reconnect'**
+  String get reconnect;
+
+  /// No description provided for @webPaywallTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock ROCIs Tasks Pro on Web'**
+  String get webPaywallTitle;
+
+  /// No description provided for @webPaywallSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade to premium to access all advanced features on any platform.'**
+  String get webPaywallSubtitle;
+
+  /// No description provided for @webSimulatedUpgradeBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade to Pro'**
+  String get webSimulatedUpgradeBtn;
+
+  /// No description provided for @webPaywallNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Payments are securely processed by Lemon Squeezy. Your subscription will be activated automatically.'**
+  String get webPaywallNotice;
+
+  /// No description provided for @monthlyPlanTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly Plan'**
+  String get monthlyPlanTitle;
+
+  /// No description provided for @monthlyPlanPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'\$4.99 / month'**
+  String get monthlyPlanPrice;
+
+  /// No description provided for @yearlyPlanTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Yearly Plan'**
+  String get yearlyPlanTitle;
+
+  /// No description provided for @yearlyPlanPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'\$39.99 / year'**
+  String get yearlyPlanPrice;
+
+  /// No description provided for @yearlyPlanSaving.
+  ///
+  /// In en, this message translates to:
+  /// **'Save 33%'**
+  String get yearlyPlanSaving;
+
+  /// No description provided for @groceryListMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Task List'**
+  String get groceryListMode;
+
+  /// No description provided for @groceryListModeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Format task as an interactive task list'**
+  String get groceryListModeSubtitle;
+
+  /// No description provided for @itemsInCart.
+  ///
+  /// In en, this message translates to:
+  /// **'{completed}/{total} completed'**
+  String itemsInCart(Object completed, Object total);
+
+  /// No description provided for @toBuy.
+  ///
+  /// In en, this message translates to:
+  /// **'To Do'**
+  String get toBuy;
+
+  /// No description provided for @inCart.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get inCart;
+
+  /// No description provided for @resetCart.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset List'**
+  String get resetCart;
+
+  /// No description provided for @clearCartItems.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear List Items'**
+  String get clearCartItems;
+
+  /// No description provided for @addItemHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Add item...'**
+  String get addItemHint;
+
+  /// No description provided for @quantityHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Qty'**
+  String get quantityHint;
 }
 
 class _AppLocalizationsDelegate
@@ -2113,7 +2246,7 @@ class _AppLocalizationsDelegate
 
   @override
   Future<AppLocalizations> load(Locale locale) {
-    return SynchronousFuture<AppLocalizations>(lookupAppLocalizations(locale));
+    return lookupAppLocalizations(locale);
   }
 
   @override
@@ -2124,6 +2257,7 @@ class _AppLocalizationsDelegate
     'es',
     'fr',
     'he',
+    'hi',
     'sv',
   ].contains(locale.languageCode);
 
@@ -2131,23 +2265,41 @@ class _AppLocalizationsDelegate
   bool shouldReload(_AppLocalizationsDelegate old) => false;
 }
 
-AppLocalizations lookupAppLocalizations(Locale locale) {
+Future<AppLocalizations> lookupAppLocalizations(Locale locale) {
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
     case 'ar':
-      return AppLocalizationsAr();
+      return app_localizations_ar.loadLibrary().then(
+        (dynamic _) => app_localizations_ar.AppLocalizationsAr(),
+      );
     case 'de':
-      return AppLocalizationsDe();
+      return app_localizations_de.loadLibrary().then(
+        (dynamic _) => app_localizations_de.AppLocalizationsDe(),
+      );
     case 'en':
-      return AppLocalizationsEn();
+      return app_localizations_en.loadLibrary().then(
+        (dynamic _) => app_localizations_en.AppLocalizationsEn(),
+      );
     case 'es':
-      return AppLocalizationsEs();
+      return app_localizations_es.loadLibrary().then(
+        (dynamic _) => app_localizations_es.AppLocalizationsEs(),
+      );
     case 'fr':
-      return AppLocalizationsFr();
+      return app_localizations_fr.loadLibrary().then(
+        (dynamic _) => app_localizations_fr.AppLocalizationsFr(),
+      );
     case 'he':
-      return AppLocalizationsHe();
+      return app_localizations_he.loadLibrary().then(
+        (dynamic _) => app_localizations_he.AppLocalizationsHe(),
+      );
+    case 'hi':
+      return app_localizations_hi.loadLibrary().then(
+        (dynamic _) => app_localizations_hi.AppLocalizationsHi(),
+      );
     case 'sv':
-      return AppLocalizationsSv();
+      return app_localizations_sv.loadLibrary().then(
+        (dynamic _) => app_localizations_sv.AppLocalizationsSv(),
+      );
   }
 
   throw FlutterError(

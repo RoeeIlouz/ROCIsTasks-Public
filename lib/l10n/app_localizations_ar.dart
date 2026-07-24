@@ -117,6 +117,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get french => 'الفرنسية';
 
   @override
+  String get hindi => 'الهندية';
+
+  @override
   String get tasks => 'المهام';
 
   @override
@@ -1050,4 +1053,72 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get widgetAccentColor => 'لون تمييز الأداة';
+
+  @override
+  String get googleTasksDisconnected => 'تم قطع اتصال Google Tasks';
+
+  @override
+  String get googleTasksDisconnectedSubtitle =>
+      'انقر لإعادة الاتصال واستئناف المزامنة';
+
+  @override
+  String get reconnect => 'إعادة الاتصال';
+
+  @override
+  String get webPaywallTitle => 'افتح ROCIs Tasks Pro على الويب';
+
+  @override
+  String get webPaywallSubtitle =>
+      'قم بالترقية إلى بريميوم للوصول إلى جميع الميزات المتقدمة على أي منصة.';
+
+  @override
+  String get webSimulatedUpgradeBtn => 'الترقية إلى برو';
+
+  @override
+  String get webPaywallNotice =>
+      'يتم معالجة المدفوعات بشكل آمن بواسطة Lemon Squeezy. سيتم تفعيل اشتراكك تلقائيًا.';
+
+  @override
+  String get monthlyPlanTitle => 'الخطة الشهرية';
+
+  @override
+  String get monthlyPlanPrice => '4.99 \$ / شهر';
+
+  @override
+  String get yearlyPlanTitle => 'الخطة السنوية';
+
+  @override
+  String get yearlyPlanPrice => '39.99 \$ / سنة';
+
+  @override
+  String get yearlyPlanSaving => 'وفر 33%';
+
+  @override
+  String get groceryListMode => 'قائمة المهام';
+
+  @override
+  String get groceryListModeSubtitle => 'تنسيق المهمة كقائمة مهام تفاعلية';
+
+  @override
+  String itemsInCart(Object completed, Object total) {
+    return '$completed/$total مكتمل';
+  }
+
+  @override
+  String get toBuy => 'قيد الانتظار';
+
+  @override
+  String get inCart => 'مكتمل';
+
+  @override
+  String get resetCart => 'إعادة ضبط القائمة';
+
+  @override
+  String get clearCartItems => 'مسح عناصر القائمة';
+
+  @override
+  String get addItemHint => 'إضافة عنصر...';
+
+  @override
+  String get quantityHint => 'الكمية';
 }

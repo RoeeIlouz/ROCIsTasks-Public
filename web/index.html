@@ -47,6 +47,18 @@
   <meta name="google-signin-client_id" content="867477199658-df3ptf7v5fi66ijc5jeunfmrpf5eghou.apps.googleusercontent.com">
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 
+  <!-- Lemon Squeezy Web Overlay SDK -->
+  <script src="https://assets.lemonsqueezy.com/lemon.js" defer></script>
+  <script>
+    window.openLemonSqueezyOverlay = function(url) {
+      if (typeof LemonSqueezy !== 'undefined') {
+        LemonSqueezy.Url.Open(url);
+      } else {
+        window.open(url, '_blank');
+      }
+    }
+  </script>
+
   <title>ROCI's Tasks</title>
   <link rel="manifest" href="manifest.json">
   <style>

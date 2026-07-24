@@ -24,7 +24,7 @@ class GoogleTasksService {
     try {
       // 1. List all lists
       final listResponse = await http.get(
-        Uri.parse('https://tasks.googleapis.com/v1/users/@me/lists'),
+        Uri.parse('https://tasks.googleapis.com/tasks/v1/users/@me/lists'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -48,7 +48,7 @@ class GoogleTasksService {
 
       // 2. Not found, create it
       final createResponse = await http.post(
-        Uri.parse('https://tasks.googleapis.com/v1/users/@me/lists'),
+        Uri.parse('https://tasks.googleapis.com/tasks/v1/users/@me/lists'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -93,13 +93,11 @@ class GoogleTasksService {
       };
 
       if (dueDate != null) {
-        // Tasks API expects RFC 3339 formatted date-time, e.g. "2026-07-02T00:00:00.000Z"
-        final midnightUtc = DateTime.utc(dueDate.year, dueDate.month, dueDate.day);
-        body['due'] = midnightUtc.toIso8601String();
+        body['due'] = dueDate.toUtc().toIso8601String();
       }
 
       final response = await http.post(
-        Uri.parse('https://tasks.googleapis.com/v1/lists/$listId/tasks'),
+        Uri.parse('https://tasks.googleapis.com/tasks/v1/lists/$listId/tasks'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -156,14 +154,13 @@ class GoogleTasksService {
       }
 
       if (dueDate != null) {
-        final midnightUtc = DateTime.utc(dueDate.year, dueDate.month, dueDate.day);
-        body['due'] = midnightUtc.toIso8601String();
+        body['due'] = dueDate.toUtc().toIso8601String();
       } else {
         body['due'] = null;
       }
 
       final response = await http.put(
-        Uri.parse('https://tasks.googleapis.com/v1/lists/$listId/tasks/$taskId'),
+        Uri.parse('https://tasks.googleapis.com/tasks/v1/lists/$listId/tasks/$taskId'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -202,7 +199,7 @@ class GoogleTasksService {
       final listId = await _getOrCreateTaskList(token);
 
       final response = await http.delete(
-        Uri.parse('https://tasks.googleapis.com/v1/lists/$listId/tasks/$taskId'),
+        Uri.parse('https://tasks.googleapis.com/tasks/v1/lists/$listId/tasks/$taskId'),
         headers: {
           'Authorization': 'Bearer $token',
         },
@@ -222,6 +219,54 @@ class GoogleTasksService {
       if (e is GoogleTokenExpiredException) rethrow;
       AppLogger.error('Error deleting Google task', error: e);
       return false;
+    }
+  }
+
+  Future<List<Map<String, dynamic>>?> getTasks() async {
+    try {
+      final token = await _getAccessToken();
+      final listId = await _getOrCreateTaskList(token);
+
+      final List<Map<String, dynamic>> allTasks = [];
+      String? nextPageToken;
+
+      do {
+        var uri = Uri.parse('https://tasks.googleapis.com/tasks/v1/lists/$listId/tasks?showCompleted=true&showHidden=true&maxResults=100');
+        if (nextPageToken != null) {
+          uri = uri.replace(queryParameters: {
+            ...uri.queryParameters,
+            'pageToken': nextPageToken,
+          });
+        }
+
+        final response = await http.get(
+          uri,
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'application/json',
+          },
+        );
+
+        if (response.statusCode == 401) {
+          throw GoogleTokenExpiredException();
+        }
+
+        if (response.statusCode != 200) {
+          AppLogger.error('Failed to fetch Google tasks page. Status: ${response.statusCode}, Body: ${response.body}');
+          return null;
+        }
+
+        final data = json.decode(response.body);
+        final items = data['items'] as List<dynamic>? ?? [];
+        allTasks.addAll(items.map((item) => Map<String, dynamic>.from(item as Map)));
+        nextPageToken = data['nextPageToken'] as String?;
+      } while (nextPageToken != null);
+
+      return allTasks;
+    } catch (e) {
+      if (e is GoogleTokenExpiredException) rethrow;
+      AppLogger.error('Error fetching Google tasks', error: e);
+      return null;
     }
   }
 }

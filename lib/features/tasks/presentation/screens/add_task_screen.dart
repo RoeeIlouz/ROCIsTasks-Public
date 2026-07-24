@@ -18,6 +18,7 @@ import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:rocis_tasks/shared/ui/ui_kit.dart';
 
 import 'package:google_fonts/google_fonts.dart';
+import 'package:rocis_tasks/core/utils/attachment_utils.dart';
 
 class AddTaskScreen extends StatefulWidget {
   final Task? task;
@@ -44,6 +45,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   bool _requireSubTasksBeforeReminders = false;
   bool _syncWithGoogleTasks = false;
   bool _skipReminders = false;
+  bool _isGroceryList = false;
   List<String> _attachmentPaths = [];
 
   @override
@@ -70,6 +72,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
         widget.task?.requireSubTasksBeforeReminders ?? false;
     _syncWithGoogleTasks = widget.task?.syncWithGoogleTasks ?? false;
     _skipReminders = widget.task?.skipReminders ?? false;
+    _isGroceryList = widget.task?.isGroceryList ?? false;
     _attachmentPaths = List<String>.from(widget.task?.attachmentPaths ?? const []);
   }
 
@@ -174,6 +177,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
             syncWithGoogleTasks: _syncWithGoogleTasks,
             attachmentPaths: _attachmentPaths,
             skipReminders: _skipReminders,
+            isGroceryList: _isGroceryList,
           );
         } else {
           Provider.of<TaskProvider>(context, listen: false).addTask(
@@ -188,6 +192,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
             syncWithGoogleTasks: _syncWithGoogleTasks,
             attachmentPaths: _attachmentPaths,
             skipReminders: _skipReminders,
+            isGroceryList: _isGroceryList,
           );
         }
         HapticFeedback.mediumImpact();
@@ -201,11 +206,6 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
         );
       }
     }
-  }
-
-  String _attachmentLabel(String path) {
-    final parts = path.split(RegExp(r'[\\/]+'));
-    return parts.isNotEmpty ? parts.last : path;
   }
 
   Future<void> _pickAttachments() async {
@@ -482,7 +482,6 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                     return;
                   }
 
-                  final messenger = ScaffoldMessenger.of(context);
                   final authService = Provider.of<AuthService>(
                     context,
                     listen: false,
@@ -492,26 +491,11 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   if (!context.mounted) return;
 
                   if (token == null) {
-                    if (Theme.of(context).platform == TargetPlatform.iOS ||
-                        Theme.of(context).platform == TargetPlatform.android) {
-                      // Mobile
-                      messenger.showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            l10n.googleSignInRequiredForSync,
-                          ),
-                        ),
-                      );
+                    final success = await authService.linkGoogleTasks();
+                    if (!context.mounted) return;
+                    if (!success) {
                       setState(() => _syncWithGoogleTasks = false);
                       return;
-                    } else {
-                      // Web / Other
-                      final success = await authService.linkGoogleTasksOnWeb();
-                      if (!context.mounted) return;
-                      if (!success) {
-                        setState(() => _syncWithGoogleTasks = false);
-                        return;
-                      }
                     }
                   }
 
@@ -537,6 +521,26 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                 value: _skipReminders,
                 onChanged: (value) {
                   setState(() => _skipReminders = value);
+                },
+              ),
+              const SizedBox(height: 12),
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                secondary: Icon(
+                  Icons.checklist_rounded,
+                  color: _isGroceryList ? theme.colorScheme.primary : null,
+                ),
+                title: Text(
+                  l10n.groceryListMode,
+                  style: GoogleFonts.outfit(fontWeight: FontWeight.w600),
+                ),
+                subtitle: Text(
+                  l10n.groceryListModeSubtitle,
+                  style: GoogleFonts.outfit(fontSize: 13),
+                ),
+                value: _isGroceryList,
+                onChanged: (value) {
+                  setState(() => _isGroceryList = value);
                 },
               ),
               const SizedBox(height: 24),
@@ -732,10 +736,12 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
             children: List.generate(_attachmentPaths.length, (index) {
               final path = _attachmentPaths[index];
               return InputChip(
+                avatar: Icon(AttachmentUtils.getFileIcon(path), size: 18),
                 label: Text(
-                  _attachmentLabel(path),
+                  AttachmentUtils.getFilename(path),
                   style: GoogleFonts.outfit(fontSize: 12),
                 ),
+                onPressed: () => AttachmentUtils.openAttachment(context, path),
                 onDeleted: () => _removeAttachmentAt(index),
               );
             }),

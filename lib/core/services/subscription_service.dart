@@ -8,9 +8,14 @@ import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:purchases_ui_flutter/purchases_ui_flutter.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart' show showModalBottomSheet;
 import 'package:rocis_tasks/core/config/app_config.dart';
+import 'package:rocis_tasks/core/config/router.dart';
 import 'package:rocis_tasks/core/services/error_handling_service.dart';
 import 'package:rocis_tasks/core/services/logger_service.dart' hide LogLevel;
+import 'package:rocis_tasks/features/premium/presentation/screens/paywall_screen.dart';
 
 class SubscriptionService extends ChangeNotifier {
   final ErrorHandlingService _errorHandlingService;
@@ -20,17 +25,13 @@ class SubscriptionService extends ChangeNotifier {
   bool _isConfigured = false;
   String? _configurationError;
   String? _syncedAuthUserId;
+  StreamSubscription<DocumentSnapshot>? _webSubscriptionListener;
 
-  bool get isPremium {
-    // Birthday promotion: Free Pro for all users from June 16 to July 16
-    final now = DateTime.now();
-    final promoStart = DateTime(now.year, 6, 16);
-    final promoEnd = DateTime(now.year, 7, 16);
-    if (!now.isBefore(promoStart) && now.isBefore(promoEnd)) {
-      return true;
-    }
-    return _isPremium;
-  }
+  // Track sources separately for cross-platform synchronization
+  bool _firestorePremium = false;
+  bool _revenueCatPremium = false;
+
+  bool get isPremium => _isPremium;
   bool get isInitialized => _isInitialized;
   String? get configurationError => _configurationError;
 
@@ -39,8 +40,9 @@ class SubscriptionService extends ChangeNotifier {
   Future<void> init() async {
     try {
       if (kIsWeb) {
-        // RevenueCat doesn't support web yet in the same way, or maybe we don't need it for web
-        // For now, just marking initialized.
+        final prefs = await SharedPreferences.getInstance();
+        _firestorePremium = prefs.getBool('web_is_premium') ?? false;
+        _isPremium = _firestorePremium;
         _isInitialized = true;
         notifyListeners();
         return;
@@ -106,35 +108,71 @@ class SubscriptionService extends ChangeNotifier {
   }
 
   Future<void> syncWithAuthUserId(String? authUserId) async {
-    if (kIsWeb) return;
-    if (!_isConfigured) return;
-
     final normalized = authUserId?.trim();
     if (_syncedAuthUserId == normalized) return;
     _syncedAuthUserId = normalized;
 
-    try {
-      if (normalized == null || normalized.isEmpty) {
-        final customerInfo = await Purchases.logOut();
-        _updateCustomerStatus(customerInfo);
-        return;
-      }
+    await _webSubscriptionListener?.cancel();
+    _firestorePremium = false;
 
-      final result = await Purchases.logIn(normalized);
-      _updateCustomerStatus(result.customerInfo);
-    } catch (e, s) {
-      _errorHandlingService.logError(
-        e,
-        s,
-        reason: 'Syncing subscription user id',
-      );
-      await _checkSubscriptionStatus();
+    if (normalized == null || normalized.isEmpty) {
+      _isPremium = false;
+      _revenueCatPremium = false;
+      if (kIsWeb) {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.remove('web_is_premium');
+      }
+      if (!kIsWeb && _isConfigured) {
+        try {
+          final customerInfo = await Purchases.logOut();
+          _updateCustomerStatus(customerInfo);
+        } catch (e) {
+          // Ignore logout errors
+        }
+      }
+      _updatePremiumState();
+      return;
+    }
+
+    // Start listening to Firestore (cross-platform)
+    _webSubscriptionListener = FirebaseFirestore.instance
+        .collection('users')
+        .doc(normalized)
+        .snapshots()
+        .listen((snapshot) async {
+      final data = snapshot.data();
+      final cloudPremium = data?['is_premium'] == true;
+      if (_firestorePremium != cloudPremium) {
+        _firestorePremium = cloudPremium;
+        if (kIsWeb) {
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setBool('web_is_premium', cloudPremium);
+        }
+        _updatePremiumState();
+      }
+    });
+
+    if (!kIsWeb && _isConfigured) {
+      try {
+        final result = await Purchases.logIn(normalized);
+        _updateCustomerStatus(result.customerInfo);
+      } catch (e, s) {
+        _errorHandlingService.logError(
+          e,
+          s,
+          reason: 'Syncing subscription user id',
+        );
+        await _checkSubscriptionStatus();
+      }
     }
   }
 
   @override
   void dispose() {
-    Purchases.removeCustomerInfoUpdateListener(_updateCustomerStatus);
+    _webSubscriptionListener?.cancel();
+    if (!kIsWeb) {
+      Purchases.removeCustomerInfoUpdateListener(_updateCustomerStatus);
+    }
     super.dispose();
   }
 
@@ -151,20 +189,71 @@ class SubscriptionService extends ChangeNotifier {
     }
   }
 
+  void _updatePremiumState() {
+    final newPremium = _revenueCatPremium || _firestorePremium;
+    if (_isPremium != newPremium) {
+      _isPremium = newPremium;
+      notifyListeners();
+
+      // Sync to HomeWidget
+      try {
+        HomeWidget.saveWidgetData<bool>('is_premium', _isPremium);
+        HomeWidget.updateWidget(
+          name: 'MonthWidgetProvider',
+          iOSName: 'MonthWidget',
+        );
+        HomeWidget.updateWidget(
+          name: 'TaskWidgetProvider',
+          iOSName: 'TaskWidget',
+        );
+        HomeWidget.updateWidget(
+          name: 'FullCalendarWidgetProvider',
+          iOSName: 'FullCalendarWidget',
+        );
+      } catch (e) {
+        // Ignore widget update errors
+      }
+    }
+  }
+
+  Future<void> _backSyncToFirestore(String userId) async {
+    try {
+      if (!_firestorePremium) {
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userId)
+            .set({
+          'is_premium': true,
+          'subscription_status': 'active',
+          'last_synced_from_mobile': FieldValue.serverTimestamp(),
+        }, SetOptions(merge: true));
+        _firestorePremium = true;
+        _updatePremiumState();
+      }
+    } catch (e) {
+      AppLogger.warning(
+        'Failed to back-sync mobile premium status to Firestore: $e',
+        tag: 'Subscription',
+      );
+    }
+  }
+
   Future<void> _updateCustomerStatus(CustomerInfo customerInfo) async {
     // Check for "premium" entitlement.
     // Make sure to match this entitlement identifier in RevenueCat dashboard.
     const entitlementId = AppConfig.entitlementId;
 
     final wasPremium = _isPremium;
-    _isPremium =
+    _revenueCatPremium =
         customerInfo.entitlements.all[entitlementId]?.isActive ?? false;
+
+    _updatePremiumState();
 
     // Always log entitlement data for debugging
     final activeEntitlements = customerInfo.entitlements.active.keys.join(', ');
     final allEntitlements = customerInfo.entitlements.all.keys.join(', ');
     AppLogger.info(
-      'Customer status update: isPremium=$_isPremium, activeEntitlements=[$activeEntitlements], allEntitlements=[$allEntitlements]',
+      'Customer status update: isPremium=$_isPremium (RevenueCat=$_revenueCatPremium, Firestore=$_firestorePremium), activeEntitlements=[$activeEntitlements], allEntitlements=[$allEntitlements]',
       tag: 'Subscription',
     );
 
@@ -184,26 +273,10 @@ class SubscriptionService extends ChangeNotifier {
           tag: 'Subscription',
         );
       }
-      notifyListeners();
+    }
 
-      // Sync to HomeWidget
-      try {
-        await HomeWidget.saveWidgetData<bool>('is_premium', _isPremium);
-        await HomeWidget.updateWidget(
-          name: 'MonthWidgetProvider',
-          iOSName: 'MonthWidget',
-        );
-        await HomeWidget.updateWidget(
-          name: 'TaskWidgetProvider',
-          iOSName: 'TaskWidget',
-        );
-        await HomeWidget.updateWidget(
-          name: 'FullCalendarWidgetProvider',
-          iOSName: 'FullCalendarWidget',
-        );
-      } catch (e) {
-        // Ignore widget update errors
-      }
+    if (_revenueCatPremium && _syncedAuthUserId != null) {
+      _backSyncToFirestore(_syncedAuthUserId!);
     }
   }
 
@@ -227,7 +300,20 @@ class SubscriptionService extends ChangeNotifier {
   /// Shows the paywall using RevenueCat's UI library.
   /// returns true if a purchase was made (and thus premium is likely active)
   Future<bool> showPaywall() async {
-    if (kIsWeb) return false;
+    if (kIsWeb) {
+      if (_isPremium) return true;
+      final context = AppRouter.navigatorKey.currentContext;
+      if (context != null) {
+        final result = await showModalBottomSheet<bool>(
+          context: context,
+          isScrollControlled: true,
+          useSafeArea: true,
+          builder: (context) => const PaywallScreen(),
+        );
+        return result ?? false;
+      }
+      return false;
+    }
     if (!_isConfigured) return false;
     try {
       // Only show if not already premium
@@ -265,6 +351,15 @@ class SubscriptionService extends ChangeNotifier {
       _errorHandlingService.logError(e, s, reason: 'Showing paywall');
       return false;
     }
+  }
+
+  /// Toggles premium status specifically for the web platform.
+  Future<void> toggleWebPremium(bool value) async {
+    if (!kIsWeb) return;
+    _firestorePremium = value;
+    _updatePremiumState();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('web_is_premium', value);
   }
 
   /// Fetches the current offerings from RevenueCat.

@@ -9,6 +9,7 @@ import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/sub_task.dart';
 import 'package:rocis_tasks/features/categories/domain/models/category.dart';
 import 'package:rocis_tasks/features/tasks/presentation/widgets/task_tile.dart';
+import 'package:rocis_tasks/features/tasks/presentation/widgets/task_skeleton.dart';
 import 'package:rocis_tasks/features/calendar/presentation/screens/calendar_screen.dart';
 import 'package:rocis_tasks/features/home/presentation/screens/settings_screen.dart';
 import 'package:rocis_tasks/features/categories/presentation/screens/categories_screen.dart';
@@ -47,15 +48,6 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
     super.initState();
     _titleController = TextEditingController();
     _descController = TextEditingController();
-    
-    // Request calendar reload on startup
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final calendarProvider = Provider.of<CalendarProvider>(context, listen: false);
-      final authService = Provider.of<AuthService>(context, listen: false);
-      calendarProvider.setUserId(authService.currentUser?.uid);
-      calendarProvider.loadFilters();
-      calendarProvider.loadEvents();
-    });
   }
 
   @override
@@ -259,7 +251,10 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
             icon: Icons.task_alt_rounded,
             label: l10n.tasks,
             isActive: _activeTab == 'tasks',
-            onTap: () => setState(() { _activeTab = 'tasks'; _selectTask(null); }),
+            onTap: () {
+              setState(() { _activeTab = 'tasks'; _selectTask(null); });
+              Provider.of<TaskProvider>(context, listen: false).syncGoogleTasksToLocal();
+            },
           ),
           _buildSidebarTab(
             icon: Icons.calendar_month_rounded,
@@ -314,7 +309,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                   const SizedBox(height: 8),
                   ElevatedButton(
                     onPressed: () async {
-                      final success = await authService.linkGoogleTasksOnWeb();
+                      final success = await authService.linkGoogleTasks();
                       if (success) {
                         calendarProvider.loadEvents();
                       }
@@ -327,6 +322,53 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                       elevation: 0,
                     ),
                     child: const Text('Reconnect', style: TextStyle(fontSize: 11)),
+                  ),
+                ],
+              ),
+            ),
+
+          // Google Tasks Connection Status banner
+          if (authService.isGoogleTasksTokenExpired)
+            Container(
+              margin: const EdgeInsets.only(bottom: 16),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.errorContainer.withValues(alpha: 0.4),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: theme.colorScheme.error.withValues(alpha: 0.3)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.warning_amber_rounded, color: theme.colorScheme.error, size: 18),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          l10n.googleTasksDisconnected,
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: theme.colorScheme.onErrorContainer,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  ElevatedButton(
+                    onPressed: () async {
+                      await authService.linkGoogleTasks();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      visualDensity: VisualDensity.compact,
+                      backgroundColor: theme.colorScheme.error,
+                      foregroundColor: theme.colorScheme.onError,
+                      elevation: 0,
+                    ),
+                    child: Text(l10n.reconnect, style: const TextStyle(fontSize: 11)),
                   ),
                 ],
               ),
@@ -773,17 +815,19 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
         ),
         const SizedBox(height: 12),
         Expanded(
-          child: tasks.isEmpty
-              ? Container(
-                  decoration: BoxDecoration(
-                    color: theme.brightness == Brightness.dark ? Colors.white.withValues(alpha: 0.01) : Colors.grey[100],
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Center(
-                    child: Text('No tasks in this section', style: TextStyle(color: theme.disabledColor, fontSize: 13)),
-                  ),
-                )
-              : ListView.builder(
+          child: provider.isLoading
+              ? const TaskListSkeleton()
+              : tasks.isEmpty
+                  ? Container(
+                      decoration: BoxDecoration(
+                        color: theme.brightness == Brightness.dark ? Colors.white.withValues(alpha: 0.01) : Colors.grey[100],
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Center(
+                        child: Text('No tasks in this section', style: TextStyle(color: theme.disabledColor, fontSize: 13)),
+                      ),
+                    )
+                  : ListView.builder(
                   itemCount: tasks.length,
                   itemBuilder: (context, index) {
                     final task = tasks[index];

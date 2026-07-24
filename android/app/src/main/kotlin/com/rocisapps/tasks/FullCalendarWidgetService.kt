@@ -150,33 +150,46 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
                           }
                       } catch (e: Exception) {}
 
-                      cellViews.setTextViewText(R.id.widget_full_calendar_day_text, dayNum.toString())
-                      
-                      val colorStr = highlightColorStr
-                      var highlightColor = android.graphics.Color.parseColor("#6C63FF")
-                      try {
-                          highlightColor = android.graphics.Color.parseColor(colorStr)
-                      } catch (_: Exception) {}
+                       val dayText = dayNum.toString()
+                       val finalSpannable = android.text.SpannableString(dayText)
+                       if (isToday || isSelected) {
+                           finalSpannable.setSpan(
+                               android.text.style.StyleSpan(android.graphics.Typeface.BOLD),
+                               0,
+                               dayText.length,
+                               android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                           )
+                       }
+                       cellViews.setTextViewText(R.id.widget_full_calendar_day_text, finalSpannable)
+                       
+                       val colorStr = highlightColorStr
+                       var highlightColor = android.graphics.Color.parseColor("#6C63FF")
+                       try {
+                           highlightColor = android.graphics.Color.parseColor(colorStr)
+                       } catch (_: Exception) {}
 
-                      // Reset text background circle
-                      cellViews.setInt(R.id.widget_full_calendar_day_text, "setBackgroundResource", 0)
+                       // Reset text background circle
+                       cellViews.setInt(R.id.widget_full_calendar_day_text, "setBackgroundResource", 0)
 
-                      // Set cell-wide highlights
-                      if (isToday) {
-                          val fillAlphaColor = (highlightColor and 0x00FFFFFF) or (0x1A shl 24)
-                          cellViews.setViewVisibility(R.id.widget_full_calendar_day_fill, android.view.View.VISIBLE)
-                          cellViews.setInt(R.id.widget_full_calendar_day_fill, "setColorFilter", fillAlphaColor)
-                      } else {
-                          cellViews.setViewVisibility(R.id.widget_full_calendar_day_fill, android.view.View.GONE)
-                      }
+                        // 1. Current Day (isToday): Small semi-transparent circle around the day number
+                        if (isToday) {
+                            val circleColor = (highlightColor and 0x00FFFFFF) or (0xFF.toInt() shl 24)
+                            cellViews.setViewVisibility(R.id.widget_full_calendar_today_circle, android.view.View.VISIBLE)
+                            cellViews.setInt(R.id.widget_full_calendar_today_circle, "setColorFilter", circleColor)
+                            cellViews.setInt(R.id.widget_full_calendar_today_circle, "setImageAlpha", 0x33) // 20% opacity for today circle
+                        } else {
+                            cellViews.setViewVisibility(R.id.widget_full_calendar_today_circle, android.view.View.GONE)
+                        }
 
-                      if (isSelected) {
-                          val strokeColor = (highlightColor and 0x00FFFFFF) or (0xFF.toInt() shl 24)
-                          cellViews.setViewVisibility(R.id.widget_full_calendar_day_stroke, android.view.View.VISIBLE)
-                          cellViews.setInt(R.id.widget_full_calendar_day_stroke, "setColorFilter", strokeColor)
-                      } else {
-                          cellViews.setViewVisibility(R.id.widget_full_calendar_day_stroke, android.view.View.GONE)
-                      }
+                        // 2. Selected Day (isSelected): Semi-transparent background fill over the entire cell
+                        if (isSelected) {
+                            val fillColor = (highlightColor and 0x00FFFFFF) or (0xFF.toInt() shl 24)
+                            cellViews.setViewVisibility(R.id.widget_full_calendar_day_fill, android.view.View.VISIBLE)
+                            cellViews.setInt(R.id.widget_full_calendar_day_fill, "setColorFilter", fillColor)
+                            cellViews.setInt(R.id.widget_full_calendar_day_fill, "setImageAlpha", 0x1A) // 10% opacity for cell background
+                        } else {
+                            cellViews.setViewVisibility(R.id.widget_full_calendar_day_fill, android.view.View.GONE)
+                        }
                       
                       val textColor = if (isToday || isSelected) {
                           highlightColor

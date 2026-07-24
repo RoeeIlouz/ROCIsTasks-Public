@@ -21,7 +21,19 @@ class AuthService extends ChangeNotifier {
   final ErrorHandlingService _errorHandlingService;
   FirebaseAuth get _auth => FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
+  bool _googleSignInInitialized = false;
+  GoogleSignInAccount? _googleUser;
   final Completer<void> _initCompleter = Completer<void>();
+  bool _isGoogleTasksTokenExpired = false;
+
+  bool get isGoogleTasksTokenExpired => _isGoogleTasksTokenExpired;
+
+  void setGoogleTasksTokenExpired(bool expired) {
+    if (_isGoogleTasksTokenExpired != expired) {
+      _isGoogleTasksTokenExpired = expired;
+      notifyListeners();
+    }
+  }
 
   /// Future that completes when the first auth state has been determined
   Future<void> get initialized => _initCompleter.future;
@@ -52,6 +64,9 @@ class AuthService extends ChangeNotifier {
       if (user != null) {
         unawaited(_syncEncryptionKey(user.uid));
         unawaited(ensureSecondaryAuth());
+        if (!kIsWeb) {
+          unawaited(_restoreGoogleSignInSession(user));
+        }
       }
 
       // Complete init on the FIRST auth state event.
@@ -125,24 +140,25 @@ class AuthService extends ChangeNotifier {
         return userCredential;
       }
 
-      await _googleSignIn.initialize();
+      await _ensureGoogleSignInInitialized();
 
-      final GoogleSignInAccount? googleUser =
-          await _googleSignIn.attemptLightweightAuthentication();
-      if (googleUser == null) return null; // User canceled
+      final GoogleSignInAccount googleUser = await _googleSignIn.authenticate(
+        scopeHint: _googleTasksScopes,
+      );
+      _googleUser = googleUser;
 
       final GoogleSignInAuthentication googleAuth = googleUser.authentication;
 
       // Obtain access token via authorization client
       final clientAuth = await googleUser.authorizationClient
-          .authorizationForScopes([
-        'email',
-        'profile',
-        'https://www.googleapis.com/auth/tasks',
-      ]);
+          .authorizationForScopes(_googleTasksScopes)
+          ?? await googleUser.authorizationClient.authorizeScopes(_googleTasksScopes);
+
+      // Cache the access token for later use by GoogleTasksService
+      await _cacheGoogleAccessToken(clientAuth.accessToken);
 
       final AuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: clientAuth?.accessToken,
+        accessToken: clientAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
@@ -367,8 +383,8 @@ class AuthService extends ChangeNotifier {
     // If user is signed in to primary but not secondary, try to sign in
     if (_auth.currentUser != null) {
       try {
-        // Try to get fresh Google credentials
-        final googleUser = await _googleSignIn.attemptLightweightAuthentication();
+        // Try to get fresh Google credentials using in-memory user first
+        final googleUser = _googleUser ?? await _googleSignIn.attemptLightweightAuthentication();
         if (googleUser != null) {
           final googleAuth = googleUser.authentication;
           final clientAuth = await googleUser.authorizationClient
@@ -394,38 +410,75 @@ class AuthService extends ChangeNotifier {
     }
   }
 
-  /// Opens a Google popup to refresh tasks scopes and retrieve a new Access Token on Web.
-  Future<bool> linkGoogleTasksOnWeb() async {
-    if (!kIsWeb) return false;
-    try {
-      final user = currentUser;
-      if (user == null) return false;
+  /// Opens Google sign-in/authorization to request Tasks scope and retrieve a new Access Token.
+  /// Works on both Mobile and Web.
+  Future<bool> linkGoogleTasks() async {
+    if (kIsWeb) {
+      try {
+        final user = currentUser;
+        if (user == null) return false;
 
-      final GoogleAuthProvider googleProvider = GoogleAuthProvider();
-      googleProvider.addScope('email');
-      googleProvider.addScope('profile');
-      googleProvider.addScope('https://www.googleapis.com/auth/tasks');
+        final GoogleAuthProvider googleProvider = GoogleAuthProvider();
+        for (final scope in _googleTasksScopes) {
+          googleProvider.addScope(scope);
+        }
 
-      AppLogger.info('Opening Google popup to refresh Tasks access token...', tag: 'Auth');
-      final UserCredential userCredential = await user.reauthenticateWithPopup(googleProvider);
-      
-      final OAuthCredential? oAuthCred = userCredential.credential as OAuthCredential?;
-      final String? accessToken = oAuthCred?.accessToken;
+        AppLogger.info('Opening Google popup to refresh Tasks access token...', tag: 'Auth');
+        final UserCredential userCredential = await user.reauthenticateWithPopup(googleProvider);
+        
+        final OAuthCredential? oAuthCred = userCredential.credential as OAuthCredential?;
+        final String? accessToken = oAuthCred?.accessToken;
 
-      if (accessToken != null) {
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('google_access_token', accessToken);
-        final expiresAt = DateTime.now().add(const Duration(minutes: 55));
-        await prefs.setString('google_access_token_expires_at', expiresAt.toIso8601String());
-        AppLogger.info('Web Google Tasks access token refreshed successfully.', tag: 'Auth');
+        if (accessToken != null) {
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString('google_access_token', accessToken);
+          final expiresAt = DateTime.now().add(const Duration(minutes: 55));
+          await prefs.setString('google_access_token_expires_at', expiresAt.toIso8601String());
+          AppLogger.info('Web Google Tasks access token refreshed successfully.', tag: 'Auth');
+          setGoogleTasksTokenExpired(false);
+          notifyListeners();
+          return true;
+        }
+      } catch (e, s) {
+        AppLogger.error('Error refreshing Google Tasks access token on Web', error: e, stack: s, tag: 'Auth');
+      }
+      return false;
+    } else {
+      try {
+        await _ensureGoogleSignInInitialized();
+
+        GoogleSignInAccount? googleUser = _googleUser ??
+            await _googleSignIn.attemptLightweightAuthentication();
+        googleUser ??= await _googleSignIn.authenticate(
+          scopeHint: _googleTasksScopes,
+        );
+        _googleUser = googleUser;
+        
+        // Request authorization for Tasks scopes
+        final clientAuth = await googleUser.authorizationClient
+            .authorizationForScopes(_googleTasksScopes)
+            ?? await googleUser.authorizationClient.authorizeScopes(_googleTasksScopes);
+
+        // Cache the token so getGoogleAccessToken() can retrieve it without prompts
+        await _cacheGoogleAccessToken(clientAuth.accessToken);
+
+        AppLogger.info(
+          'Mobile Google Tasks & Calendar authorized. Token cached.',
+          tag: 'Auth',
+        );
+        setGoogleTasksTokenExpired(false);
         notifyListeners();
         return true;
+      } catch (e, s) {
+        AppLogger.error('Error authorizing Google Tasks access token on Mobile', error: e, stack: s, tag: 'Auth');
       }
-    } catch (e, s) {
-      AppLogger.error('Error refreshing Google Tasks access token on Web', error: e, stack: s, tag: 'Auth');
+      return false;
     }
-    return false;
   }
+
+  /// Opens a Google popup to refresh tasks scopes and retrieve a new Access Token on Web.
+  @Deprecated('Use linkGoogleTasks() instead')
+  Future<bool> linkGoogleTasksOnWeb() => linkGoogleTasks();
 
   Future<void> signOut() async {
     try {
@@ -435,17 +488,19 @@ class AuthService extends ChangeNotifier {
 
       if (!kIsWeb) {
         await _googleSignIn.signOut();
-      } else {
-        // Clear stored Google Calendar access token on Web
-        try {
-          final prefs = await SharedPreferences.getInstance();
-          await prefs.remove('google_access_token');
-          await prefs.remove('google_access_token_expires_at');
-          AppLogger.info('Cleared Web Google Calendar tokens from SharedPreferences.', tag: 'Auth');
-        } catch (e) {
-          AppLogger.error('Failed to clear Web Google access token on sign out', error: e, tag: 'Auth');
-        }
+        _googleUser = null;
       }
+      
+      // Clear stored Google access token on all platforms
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.remove('google_access_token');
+        await prefs.remove('google_access_token_expires_at');
+        AppLogger.info('Cleared Google access token from SharedPreferences.', tag: 'Auth');
+      } catch (e) {
+        AppLogger.error('Failed to clear Google access token on sign out', error: e, tag: 'Auth');
+      }
+      
       await _auth.signOut();
       notifyListeners();
     } catch (e, s) {
@@ -600,37 +655,144 @@ class AuthService extends ChangeNotifier {
     return false;
   }
 
-  /// Get active Google Access Token for calling API.
-  Future<String?> getGoogleAccessToken() async {
-    if (kIsWeb) {
-      try {
-        final prefs = await SharedPreferences.getInstance();
-        final token = prefs.getString('google_access_token');
-        final expiresAtStr = prefs.getString('google_access_token_expires_at');
-        if (token == null || expiresAtStr == null) return null;
-        final expiresAt = DateTime.parse(expiresAtStr);
-        if (DateTime.now().isAfter(expiresAt)) return null;
-        return token;
-      } catch (e) {
-        AppLogger.error('Error reading access token from prefs', error: e, tag: 'Auth');
-      }
-      return null;
-    } else {
-      try {
-        final googleUser = await _googleSignIn.attemptLightweightAuthentication();
-        if (googleUser != null) {
-          final clientAuth = await googleUser.authorizationClient
-              .authorizationForScopes([
-            'email',
-            'profile',
-            'https://www.googleapis.com/auth/tasks',
-          ]);
-          return clientAuth?.accessToken;
+  /// Scopes needed for Google Tasks integration on Mobile (no calendar needed).
+  static const List<String> _googleTasksScopesMobile = [
+    'email',
+    'profile',
+    'https://www.googleapis.com/auth/tasks',
+  ];
+
+  /// Scopes needed for Google Tasks and Calendar integration on Web.
+  static const List<String> _googleTasksScopesWeb = [
+    'email',
+    'profile',
+    'https://www.googleapis.com/auth/tasks',
+    'https://www.googleapis.com/auth/calendar',
+  ];
+
+  List<String> get _googleTasksScopes => kIsWeb ? _googleTasksScopesWeb : _googleTasksScopesMobile;
+
+  /// Restores Google Sign-In session silently on startup if applicable.
+  Future<void> _restoreGoogleSignInSession(User user) async {
+    final isGoogleUser = user.providerData.any((p) => p.providerId == 'google.com');
+    final prefs = await SharedPreferences.getInstance();
+    final hasGoogleTasks = prefs.containsKey('google_access_token');
+
+    // Only restore if user logged in with Google or previously linked tasks
+    if (!isGoogleUser && !hasGoogleTasks) return;
+    if (_googleUser != null) return;
+
+    try {
+      await _ensureGoogleSignInInitialized();
+      
+      // Start listening to authentication stream events
+      _googleSignIn.authenticationEvents.listen((event) {
+        if (event is GoogleSignInAuthenticationEventSignIn) {
+          _googleUser = event.user;
+          unawaited(_cacheTokenFromUser(event.user));
+        } else if (event is GoogleSignInAuthenticationEventSignOut) {
+          _googleUser = null;
         }
-      } catch (e) {
-        AppLogger.warning('Failed to retrieve Google access token silently on mobile', error: e, tag: 'Auth');
+      });
+
+      final googleUser = await _googleSignIn.attemptLightweightAuthentication();
+      if (googleUser != null) {
+        _googleUser = googleUser;
+        await _cacheTokenFromUser(googleUser);
       }
-      return null;
+    } catch (e, s) {
+      AppLogger.warning('Failed to restore Google Sign-In session silently', error: e, stack: s, tag: 'Auth');
     }
+  }
+
+  /// Silent token fetch and caching helper.
+  Future<void> _cacheTokenFromUser(GoogleSignInAccount googleUser) async {
+    try {
+      final clientAuth = await googleUser.authorizationClient
+          .authorizationForScopes(_googleTasksScopes);
+      if (clientAuth != null) {
+        await _cacheGoogleAccessToken(clientAuth.accessToken);
+      }
+    } catch (e, s) {
+      AppLogger.warning('Failed to silently cache token from user', error: e, stack: s, tag: 'Auth');
+    }
+  }
+
+  /// Ensures GoogleSignIn.initialize() has been called exactly once.
+  Future<void> _ensureGoogleSignInInitialized() async {
+    if (!_googleSignInInitialized) {
+      await _googleSignIn.initialize();
+      _googleSignInInitialized = true;
+    }
+  }
+
+  /// Caches a Google access token in SharedPreferences with a 55-minute expiry.
+  Future<void> _cacheGoogleAccessToken(String accessToken) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('google_access_token', accessToken);
+      final expiresAt = DateTime.now().add(const Duration(minutes: 55));
+      await prefs.setString('google_access_token_expires_at', expiresAt.toIso8601String());
+      AppLogger.info('Google access token cached (expires in 55 min).', tag: 'Auth');
+    } catch (e) {
+      AppLogger.error('Failed to cache Google access token', error: e, tag: 'Auth');
+    }
+  }
+
+  Future<String?> getGoogleAccessToken() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('google_access_token');
+      final expiresAtStr = prefs.getString('google_access_token_expires_at');
+      if (token != null && expiresAtStr != null) {
+        final expiresAt = DateTime.parse(expiresAtStr);
+        if (DateTime.now().isBefore(expiresAt)) {
+          setGoogleTasksTokenExpired(false);
+          return token;
+        }
+        AppLogger.info('Cached Google access token expired, attempting silent refresh...', tag: 'Auth');
+      }
+    } catch (e) {
+      AppLogger.error('Error reading cached access token', error: e, tag: 'Auth');
+    }
+
+    try {
+      await _ensureGoogleSignInInitialized();
+
+      GoogleSignInAccount? googleUser = _googleUser;
+      if (googleUser == null && !kIsWeb) {
+        final prefs = await SharedPreferences.getInstance();
+        final hasGoogleTasks = prefs.containsKey('google_access_token');
+        if (hasGoogleTasks) {
+          googleUser = await _googleSignIn.attemptLightweightAuthentication();
+          _googleUser = googleUser;
+        }
+      }
+
+      if (googleUser != null) {
+        final authClient = googleUser.authorizationClient;
+        // Try to get authorization SILENTLY ONLY (never call interactive authorizeScopes in background getter)
+        final clientAuth = await authClient.authorizationForScopes(_googleTasksScopes);
+        if (clientAuth != null) {
+          await _cacheGoogleAccessToken(clientAuth.accessToken);
+          setGoogleTasksTokenExpired(false);
+          return clientAuth.accessToken;
+        }
+      }
+      AppLogger.warning('Google access token not available silently', tag: 'Auth');
+      
+      final prefs = await SharedPreferences.getInstance();
+      if (prefs.containsKey('google_access_token')) {
+        setGoogleTasksTokenExpired(true);
+      }
+    } catch (e) {
+      AppLogger.warning('Failed to silently refresh Google access token', error: e, tag: 'Auth');
+      final prefs = await SharedPreferences.getInstance();
+      if (prefs.containsKey('google_access_token')) {
+        setGoogleTasksTokenExpired(true);
+      }
+    }
+
+    return null;
   }
 }

@@ -689,6 +689,7 @@ class TaskProvider extends ChangeNotifier {
       );
 
       // Cloud sync started successfully
+      unawaited(syncGoogleTasksToLocal());
     } catch (e, s) {
       _errorHandlingService.logError(e, s, reason: 'Starting cloud sync');
     }
@@ -703,6 +704,9 @@ class TaskProvider extends ChangeNotifier {
     try {
       // 1. Refresh data from cloud
       await syncWithCloud();
+
+      // Sync Google Tasks to Local database
+      await syncGoogleTasksToLocal();
 
       await _processGoogleCalendarUpstreamRocisTasksHook();
 
@@ -1509,6 +1513,7 @@ class TaskProvider extends ChangeNotifier {
     bool syncWithGoogleTasks = false,
     List<String>? attachmentPaths,
     bool skipReminders = false,
+    bool isGroceryList = false,
   }) async {
     final task = Task(
       title: title,
@@ -1522,6 +1527,7 @@ class TaskProvider extends ChangeNotifier {
       syncWithGoogleTasks: syncWithGoogleTasks,
       attachmentPaths: attachmentPaths,
       skipReminders: skipReminders,
+      isGroceryList: isGroceryList,
     );
     await _source.addTask(task);
     // Sync to cloud - Firestore handles offline state and buffering
@@ -1623,6 +1629,7 @@ class TaskProvider extends ChangeNotifier {
     bool? syncWithGoogleTasks,
     List<String>? attachmentPaths,
     bool? skipReminders,
+    bool? isGroceryList,
   }) async {
     if (title != null) task.title = title;
     if (description != null) task.description = description;
@@ -1646,6 +1653,20 @@ class TaskProvider extends ChangeNotifier {
     }
     if (skipReminders != null) {
       task.skipReminders = skipReminders;
+    }
+    if (isGroceryList != null) {
+      task.isGroceryList = isGroceryList;
+    }
+
+    if (task.isGroceryList && task.subTasks != null && task.subTasks!.isNotEmpty) {
+      final allCompleted = task.subTasks!.every((st) => st.isCompleted);
+      if (allCompleted && !task.isCompleted) {
+        task.isCompleted = true;
+        task.completedAt = DateTime.now();
+      } else if (!allCompleted && task.isCompleted) {
+        task.isCompleted = false;
+        task.completedAt = null;
+      }
     }
 
     await _source.addTask(task);
@@ -1691,12 +1712,30 @@ class TaskProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> toggleSubTask(Task task, String subTaskId) async {
-    if (task.subTasks == null) return;
+  Future<void> toggleSubTask(Task task, dynamic identifier) async {
+    if (task.subTasks == null || task.subTasks!.isEmpty) return;
 
-    final index = task.subTasks!.indexWhere((st) => st.id == subTaskId);
+    int index = -1;
+    if (identifier is int && identifier >= 0 && identifier < task.subTasks!.length) {
+      index = identifier;
+    } else if (identifier is String) {
+      index = task.subTasks!.indexWhere((st) => st.id == identifier);
+    }
+
     if (index != -1) {
       task.subTasks![index].isCompleted = !task.subTasks![index].isCompleted;
+
+      if (task.isGroceryList && task.subTasks != null && task.subTasks!.isNotEmpty) {
+        final allCompleted = task.subTasks!.every((st) => st.isCompleted);
+        if (allCompleted && !task.isCompleted) {
+          task.isCompleted = true;
+          task.completedAt = DateTime.now();
+        } else if (!allCompleted && task.isCompleted) {
+          task.isCompleted = false;
+          task.completedAt = null;
+        }
+      }
+
       await _source.addTask(task);
       try {
         if (!task.isCompleted &&
@@ -1996,6 +2035,9 @@ class TaskProvider extends ChangeNotifier {
     try {
       await _googleTasksService.deleteTask(taskId: taskId);
     } catch (e, s) {
+      if (e is GoogleTokenExpiredException) {
+        _authService.setGoogleTasksTokenExpired(true);
+      }
       _errorHandlingService.logError(
         e,
         s,
@@ -2058,6 +2100,9 @@ class TaskProvider extends ChangeNotifier {
         }
       }
     } catch (e, s) {
+      if (e is GoogleTokenExpiredException) {
+        _authService.setGoogleTasksTokenExpired(true);
+      }
       _errorHandlingService.logError(
         e,
         s,
@@ -2072,5 +2117,143 @@ class TaskProvider extends ChangeNotifier {
     } catch (e) {
       return null;
     }
+  }
+
+  Future<void> syncGoogleTasksToLocal() async {
+    final accessToken = await _authService.getGoogleAccessToken();
+    if (accessToken == null || _authService.isGoogleTasksTokenExpired) return;
+
+    try {
+      final googleTasks = await _googleTasksService.getTasks();
+      if (googleTasks == null) return;
+
+      final allLocalTasks = _source.getTasks();
+      final googleTaskIds = googleTasks
+          .map((t) => t['id'] as String?)
+          .where((id) => id != null)
+          .cast<String>()
+          .toSet();
+
+      bool needsUpdate = false;
+
+      for (final gTask in googleTasks) {
+        final gTaskId = gTask['id'] as String?;
+        if (gTaskId == null) continue;
+
+        final localTask = allLocalTasks.firstWhere(
+          (t) => t.googleTaskId == gTaskId && !(t.isDeleted ?? false),
+          orElse: () => Task(
+            id: '',
+            title: '',
+            createdAt: DateTime.now(),
+          ),
+        );
+
+        if (localTask.id.isNotEmpty) {
+          final isCompletedInGoogle = gTask['status'] == 'completed';
+          final dueStr = gTask['due'] as String?;
+          if (dueStr != null) {
+            final parsedDue = DateTime.tryParse(dueStr)?.toLocal();
+            if (parsedDue != null && localTask.dueDate != parsedDue) {
+              localTask.dueDate = parsedDue;
+              await _source.addTask(localTask);
+              await _firestoreService.updateTask(localTask);
+              needsUpdate = true;
+            }
+          }
+
+          if (isCompletedInGoogle && !localTask.isCompleted) {
+            localTask.isCompleted = true;
+            localTask.completedAt = DateTime.now();
+
+            _pendingLocalWrites[localTask.id] = true;
+            await _source.addTask(localTask);
+            await _firestoreService.updateTask(localTask);
+            await _cancelTaskNotifications(localTask);
+            
+            Future.delayed(const Duration(seconds: 3), () {
+              _pendingLocalWrites.remove(localTask.id);
+            });
+
+            needsUpdate = true;
+          } else if (!isCompletedInGoogle && localTask.isCompleted) {
+            localTask.isCompleted = false;
+            localTask.completedAt = null;
+
+            _pendingLocalWrites[localTask.id] = false;
+            await _source.addTask(localTask);
+            await _firestoreService.updateTask(localTask);
+            if (localTask.dueDate != null && localTask.dueDate!.isAfter(DateTime.now())) {
+              await _scheduleTaskNotifications(localTask);
+            }
+
+            Future.delayed(const Duration(seconds: 3), () {
+              _pendingLocalWrites.remove(localTask.id);
+            });
+
+            needsUpdate = true;
+          }
+        }
+      }
+
+      final activeLocalTasksWithGoogleId = allLocalTasks
+          .where((t) => t.googleTaskId != null && !(t.isDeleted ?? false))
+          .toList();
+
+      for (final localTask in activeLocalTasksWithGoogleId) {
+        if (!googleTaskIds.contains(localTask.googleTaskId)) {
+          localTask.isDeleted = true;
+          await _source.addTask(localTask);
+          await _firestoreService.updateTask(localTask);
+          await _cancelTaskNotifications(localTask);
+          needsUpdate = true;
+        }
+      }
+
+      if (needsUpdate) {
+        _refreshPagination();
+        notifyListeners();
+        updateHomeWidgetWithNotification();
+      }
+    } catch (e, s) {
+      if (e is GoogleTokenExpiredException) {
+        _authService.setGoogleTasksTokenExpired(true);
+      }
+      _errorHandlingService.logError(
+        e,
+        s,
+        reason: 'Sync Google Tasks back to local failed',
+      );
+    }
+  }
+
+
+
+  /// Add a grocery item / subtask directly to a task
+  Future<void> addGroceryItem(Task task, String itemTitle, {String? quantity}) async {
+    if (itemTitle.trim().isEmpty) return;
+    final subTasks = List<SubTask>.from(task.subTasks ?? []);
+    subTasks.add(SubTask(title: itemTitle.trim(), quantity: quantity?.trim()));
+    await updateTask(task, subTasks: subTasks);
+  }
+
+  /// Reset all items in a grocery list (uncheck all items for reuse)
+  Future<void> resetGroceryList(Task task) async {
+    final subTasks = task.subTasks;
+    if (subTasks == null || subTasks.isEmpty) return;
+
+    for (final st in subTasks) {
+      st.isCompleted = false;
+    }
+    await updateTask(task, subTasks: subTasks);
+  }
+
+  /// Remove completed items from a grocery list
+  Future<void> clearCompletedSubTasks(Task task) async {
+    final subTasks = task.subTasks;
+    if (subTasks == null || subTasks.isEmpty) return;
+
+    final remaining = subTasks.where((st) => !st.isCompleted).toList();
+    await updateTask(task, subTasks: remaining);
   }
 }

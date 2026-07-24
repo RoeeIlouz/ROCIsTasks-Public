@@ -5,6 +5,7 @@ import 'package:table_calendar/table_calendar.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
 import 'package:rocis_tasks/features/tasks/presentation/widgets/task_tile.dart';
+import 'package:rocis_tasks/features/tasks/presentation/widgets/task_skeleton.dart';
 import 'package:rocis_tasks/features/calendar/presentation/providers/calendar_provider.dart';
 import 'package:rocis_tasks/core/services/auth_service.dart';
 import 'package:rocis_tasks/core/services/calendar_color_service.dart';
@@ -408,11 +409,16 @@ class _CalendarScreenState extends State<CalendarScreen> {
         ),
         const SizedBox(height: 8.0),
         Expanded(
-          child: selectedItems.isEmpty
-              ? Align(
-                  alignment: Alignment.topCenter,
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 16.0),
+          child: calendarProvider.isLoading
+              ? const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  child: TaskListSkeleton(),
+                )
+              : selectedItems.isEmpty
+                  ? Align(
+                      alignment: Alignment.topCenter,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 16.0),
                     child: GlassContainer(
                       margin: const EdgeInsets.symmetric(horizontal: 16),
                       padding: const EdgeInsets.symmetric(

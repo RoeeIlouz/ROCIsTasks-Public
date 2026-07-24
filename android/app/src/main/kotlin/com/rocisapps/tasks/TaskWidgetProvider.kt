@@ -94,7 +94,7 @@ class TaskWidgetProvider : HomeWidgetProvider() {
         }
         val sortPendingIntent = android.app.PendingIntent.getBroadcast(
             context, appWidgetId, sortIntent, 
-            android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_MUTABLE
+            android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE
         )
         views.setOnClickPendingIntent(R.id.widget_btn_sort, sortPendingIntent)
 
@@ -104,7 +104,7 @@ class TaskWidgetProvider : HomeWidgetProvider() {
         }
         val filterPendingIntent = android.app.PendingIntent.getBroadcast(
             context, appWidgetId + 10000, filterIntent, // Offset to avoid collision
-            android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_MUTABLE
+            android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE
         )
         views.setOnClickPendingIntent(R.id.widget_btn_filter, filterPendingIntent)
     }

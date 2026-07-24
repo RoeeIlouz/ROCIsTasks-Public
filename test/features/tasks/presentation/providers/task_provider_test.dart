@@ -110,6 +110,7 @@ void main() {
       () => mockAuthService.authStateChanges,
     ).thenAnswer((_) => Stream.value(null));
     when(() => mockAuthService.currentUser).thenReturn(null);
+    when(() => mockAuthService.getGoogleAccessToken()).thenAnswer((_) async => null);
     when(
       () => mockErrorHandlingService.logError(
         any(),

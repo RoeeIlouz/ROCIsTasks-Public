@@ -117,6 +117,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get french => 'Francés';
 
   @override
+  String get hindi => 'Hindi';
+
+  @override
   String get tasks => 'Tareas';
 
   @override
@@ -1080,4 +1083,73 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get widgetAccentColor => 'Color de acento del widget';
+
+  @override
+  String get googleTasksDisconnected => 'Google Tasks Desconectado';
+
+  @override
+  String get googleTasksDisconnectedSubtitle =>
+      'Toca para reconectar y reanudar la sincronización';
+
+  @override
+  String get reconnect => 'Reconectar';
+
+  @override
+  String get webPaywallTitle => 'Desbloquea ROCIs Tasks Pro en la Web';
+
+  @override
+  String get webPaywallSubtitle =>
+      'Actualiza a premium para acceder a todas las funciones avanzadas en cualquier plataforma.';
+
+  @override
+  String get webSimulatedUpgradeBtn => 'Actualizar a Pro';
+
+  @override
+  String get webPaywallNotice =>
+      'Los pagos se procesan de forma segura por Lemon Squeezy. Tu suscripción se activará automáticamente.';
+
+  @override
+  String get monthlyPlanTitle => 'Plan Mensual';
+
+  @override
+  String get monthlyPlanPrice => '\$4.99 / mes';
+
+  @override
+  String get yearlyPlanTitle => 'Plan Anual';
+
+  @override
+  String get yearlyPlanPrice => '\$39.99 / año';
+
+  @override
+  String get yearlyPlanSaving => 'Ahorra 33%';
+
+  @override
+  String get groceryListMode => 'Lista de tareas';
+
+  @override
+  String get groceryListModeSubtitle =>
+      'Formatear tarea como una lista de tareas interactiva';
+
+  @override
+  String itemsInCart(Object completed, Object total) {
+    return '$completed/$total completadas';
+  }
+
+  @override
+  String get toBuy => 'Pendientes';
+
+  @override
+  String get inCart => 'Completadas';
+
+  @override
+  String get resetCart => 'Reiniciar lista';
+
+  @override
+  String get clearCartItems => 'Limpiar elementos';
+
+  @override
+  String get addItemHint => 'Añadir elemento...';
+
+  @override
+  String get quantityHint => 'Cant.';
 }

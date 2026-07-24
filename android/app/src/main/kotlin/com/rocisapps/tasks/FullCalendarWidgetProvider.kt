@@ -128,7 +128,7 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
                 }
                 val prevPendingIntent = android.app.PendingIntent.getBroadcast(
                     context, REQUEST_CODE_PREV_MONTH, prevIntent,
-                    android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_MUTABLE
+                    android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE
                 )
                 views.setOnClickPendingIntent(R.id.widget_full_calendar_prev, prevPendingIntent)
                 
@@ -138,7 +138,7 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
                 }
                 val nextPendingIntent = android.app.PendingIntent.getBroadcast(
                     context, REQUEST_CODE_NEXT_MONTH, nextIntent,
-                    android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_MUTABLE
+                    android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE
                 )
                 views.setOnClickPendingIntent(R.id.widget_full_calendar_next, nextPendingIntent)
                 
@@ -148,7 +148,7 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
                 }
                 val todayPendingIntent = android.app.PendingIntent.getBroadcast(
                     context, REQUEST_CODE_TODAY, todayIntent,
-                    android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_MUTABLE
+                    android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE
                 )
                 views.setOnClickPendingIntent(R.id.widget_full_calendar_today, todayPendingIntent)
 
@@ -238,7 +238,7 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
         }
         val filterTasksPendingIntent = android.app.PendingIntent.getBroadcast(
             context, REQUEST_CODE_FILTER_TASKS, filterTasksIntent,
-            android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_MUTABLE
+            android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE
         )
         views.setOnClickPendingIntent(R.id.widget_filter_tasks, filterTasksPendingIntent)
 
@@ -249,7 +249,7 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
         }
         val filterGooglePendingIntent = android.app.PendingIntent.getBroadcast(
             context, REQUEST_CODE_FILTER_GOOGLE, filterGoogleIntent,
-            android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_MUTABLE
+            android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE
         )
         views.setOnClickPendingIntent(R.id.widget_filter_google, filterGooglePendingIntent)
     }

@@ -37,13 +37,14 @@ class TaskAdapter extends TypeAdapter<Task> {
       googleTaskListId: fields[16] as String?,
       attachmentPaths: (fields[17] as List?)?.cast<String>(),
       skipReminders: fields[18] as bool,
+      isGroceryList: fields[20] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, Task obj) {
     writer
-      ..writeByte(20)
+      ..writeByte(21)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -83,7 +84,9 @@ class TaskAdapter extends TypeAdapter<Task> {
       ..writeByte(17)
       ..write(obj.attachmentPaths)
       ..writeByte(18)
-      ..write(obj.skipReminders);
+      ..write(obj.skipReminders)
+      ..writeByte(20)
+      ..write(obj.isGroceryList);
   }
 
   @override

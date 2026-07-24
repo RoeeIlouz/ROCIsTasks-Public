@@ -14,7 +14,7 @@ import 'package:rocis_tasks/core/utils/icon_utils.dart';
 import 'package:rocis_tasks/core/services/security_service.dart';
 import 'package:rocis_tasks/features/tasks/presentation/widgets/task_unlock_dialog.dart';
 import 'package:rocis_tasks/core/services/subscription_service.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:rocis_tasks/core/utils/attachment_utils.dart';
 
 class TaskDetailScreen extends StatefulWidget {
   final Task task;
@@ -33,9 +33,13 @@ class TaskDetailScreen extends StatefulWidget {
 class _TaskDetailScreenState extends State<TaskDetailScreen> {
   bool _authorized = false;
   bool _promptScheduled = false;
+  final TextEditingController _newGroceryItemController = TextEditingController();
+  final TextEditingController _newGroceryQtyController = TextEditingController();
 
   @override
   void dispose() {
+    _newGroceryItemController.dispose();
+    _newGroceryQtyController.dispose();
     PrivateModeService? privateModeService;
     try {
       privateModeService = Provider.of<PrivateModeService>(context, listen: false);
@@ -188,32 +192,46 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    InkWell(
-                      onTap: () {
-                        final themeService = Provider.of<ThemeService>(context, listen: false);
-                        if (themeService.taskCompletionFeedback) {
-                          if (!updatedTask.isCompleted) {
-                            HapticFeedback.mediumImpact();
-                          } else {
-                            HapticFeedback.lightImpact();
+                    if (!updatedTask.isGroceryList)
+                      InkWell(
+                        onTap: () {
+                          final themeService = Provider.of<ThemeService>(context, listen: false);
+                          if (themeService.taskCompletionFeedback) {
+                            if (!updatedTask.isCompleted) {
+                              HapticFeedback.mediumImpact();
+                            } else {
+                              HapticFeedback.lightImpact();
+                            }
                           }
-                        }
-                        provider.toggleTaskCompletion(updatedTask);
-                      },
-                      borderRadius: BorderRadius.circular(12),
-                      child: Padding(
+                          provider.toggleTaskCompletion(updatedTask);
+                        },
+                        borderRadius: BorderRadius.circular(12),
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 12, top: 4),
+                          child: Icon(
+                            updatedTask.isCompleted
+                                ? Icons.check_circle_rounded
+                                : Icons.radio_button_unchecked_rounded,
+                            size: 28,
+                            color: updatedTask.isCompleted
+                                ? theme.colorScheme.primary
+                                : theme.disabledColor,
+                          ),
+                        ),
+                      )
+                    else
+                      Padding(
                         padding: const EdgeInsets.only(right: 12, top: 4),
                         child: Icon(
                           updatedTask.isCompleted
                               ? Icons.check_circle_rounded
-                              : Icons.radio_button_unchecked_rounded,
+                              : Icons.checklist_rounded,
                           size: 28,
                           color: updatedTask.isCompleted
                               ? theme.colorScheme.primary
-                              : theme.disabledColor,
+                              : theme.colorScheme.primary.withValues(alpha: 0.7),
                         ),
                       ),
-                    ),
                     Expanded(
                       child: Text(
                         updatedTask.title,
@@ -314,7 +332,9 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                   const SizedBox(height: 24),
                 ],
 
-                if (updatedTask.subTasks != null && updatedTask.subTasks!.isNotEmpty) ...[
+                if (updatedTask.isGroceryList)
+                  _buildGroceryListSection(context, updatedTask, provider, l10n, theme)
+                else if (updatedTask.subTasks != null && updatedTask.subTasks!.isNotEmpty) ...[
                   Text(
                     l10n.subtasks,
                     style: theme.textTheme.titleMedium?.copyWith(
@@ -383,8 +403,8 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                         spacing: 8,
                         runSpacing: 8,
                         children: updatedTask.attachmentPaths.map((path) {
-                          final filename = path.split('/').last;
-                          final icon = _getFileIcon(filename);
+                          final filename = AttachmentUtils.getFilename(path);
+                          final icon = AttachmentUtils.getFileIcon(path);
                           return InputChip(
                             avatar: Icon(icon, size: 18),
                             label: Text(
@@ -392,7 +412,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                               overflow: TextOverflow.ellipsis,
                               style: theme.textTheme.bodySmall,
                             ),
-                            onPressed: () => _openAttachment(path),
+                            onPressed: () => AttachmentUtils.openAttachment(context, path),
                           );
                         }).toList(),
                       ),
@@ -407,50 +427,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
     );
   }
 
-  IconData _getFileIcon(String filename) {
-    final ext = filename.split('.').last.toLowerCase();
-    switch (ext) {
-      case 'jpg':
-      case 'jpeg':
-      case 'png':
-      case 'gif':
-      case 'webp':
-        return Icons.image_rounded;
-      case 'pdf':
-        return Icons.picture_as_pdf_rounded;
-      case 'doc':
-      case 'docx':
-        return Icons.description_rounded;
-      case 'xls':
-      case 'xlsx':
-        return Icons.table_chart_rounded;
-      case 'mp3':
-      case 'wav':
-      case 'm4a':
-        return Icons.audiotrack_rounded;
-      case 'mp4':
-      case 'mov':
-      case 'avi':
-        return Icons.videocam_rounded;
-      default:
-        return Icons.attach_file_rounded;
-    }
-  }
 
-  Future<void> _openAttachment(String path) async {
-    try {
-      final uri = Uri.file(path);
-      if (await canLaunchUrl(uri)) {
-        await launchUrl(uri, mode: LaunchMode.externalApplication);
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Could not open file: ${path.split('/').last}')),
-        );
-      }
-    }
-  }
 
   Color _getDueDateColor(DateTime date, ThemeData theme) {
     if (date.isBefore(DateTime.now())) {
@@ -511,5 +488,229 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
       provider.deleteTask(widget.task.id);
       Navigator.pop(context);
     }
+  }
+
+  Widget _buildGroceryListSection(
+    BuildContext context,
+    Task task,
+    TaskProvider provider,
+    AppLocalizations l10n,
+    ThemeData theme,
+  ) {
+    final subtasks = task.subTasks ?? [];
+    final toBuyItems = subtasks.where((st) => !st.isCompleted).toList();
+    final inCartItems = subtasks.where((st) => st.isCompleted).toList();
+    final total = subtasks.length;
+    final completed = inCartItems.length;
+    final progress = total > 0 ? completed / total : 0.0;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(Icons.shopping_cart_rounded, color: theme.colorScheme.primary, size: 22),
+            const SizedBox(width: 8),
+            Text(
+              l10n.groceryListMode,
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: theme.colorScheme.primary,
+              ),
+            ),
+            const Spacer(),
+            if (subtasks.isNotEmpty)
+              TextButton.icon(
+                onPressed: () {
+                  HapticFeedback.lightImpact();
+                  provider.resetGroceryList(task);
+                },
+                icon: const Icon(Icons.refresh_rounded, size: 16),
+                label: Text(l10n.resetCart, style: GoogleFonts.outfit(fontSize: 12)),
+              ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        // Progress bar card
+        GlassContainer(
+          borderRadius: BorderRadius.circular(16),
+          padding: const EdgeInsets.all(14),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    l10n.itemsInCart(completed, total),
+                    style: GoogleFonts.outfit(fontWeight: FontWeight.w600, fontSize: 13),
+                  ),
+                  Text(
+                    '${(progress * 100).toInt()}%',
+                    style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 13, color: theme.colorScheme.primary),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: LinearProgressIndicator(
+                  value: progress,
+                  minHeight: 6,
+                  backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.15),
+                  valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        // Quick add item card
+        GlassContainer(
+          borderRadius: BorderRadius.circular(16),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          child: Row(
+            children: [
+              Expanded(
+                flex: 3,
+                child: TextField(
+                  controller: _newGroceryItemController,
+                  decoration: InputDecoration(
+                    hintText: l10n.addItemHint,
+                    border: InputBorder.none,
+                    isDense: true,
+                  ),
+                  style: GoogleFonts.outfit(fontSize: 14),
+                  onSubmitted: (val) {
+                    if (val.trim().isNotEmpty) {
+                      provider.addGroceryItem(task, val, quantity: _newGroceryQtyController.text);
+                      _newGroceryItemController.clear();
+                      _newGroceryQtyController.clear();
+                    }
+                  },
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                flex: 1,
+                child: TextField(
+                  controller: _newGroceryQtyController,
+                  decoration: InputDecoration(
+                    hintText: l10n.quantityHint,
+                    border: InputBorder.none,
+                    isDense: true,
+                  ),
+                  style: GoogleFonts.outfit(fontSize: 13),
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.add_circle_rounded),
+                color: theme.colorScheme.primary,
+                onPressed: () {
+                  final title = _newGroceryItemController.text;
+                  if (title.trim().isNotEmpty) {
+                    provider.addGroceryItem(task, title, quantity: _newGroceryQtyController.text);
+                    _newGroceryItemController.clear();
+                    _newGroceryQtyController.clear();
+                  }
+                },
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        // To Buy Section
+        if (toBuyItems.isNotEmpty) ...[
+          Text(
+            '${l10n.toBuy} (${toBuyItems.length})',
+            style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 13, color: theme.colorScheme.onSurfaceVariant),
+          ),
+          const SizedBox(height: 8),
+          GlassContainer(
+            borderRadius: BorderRadius.circular(16),
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            child: Column(
+              children: List.generate(toBuyItems.length, (index) {
+                final item = toBuyItems[index];
+                return CheckboxListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+                  controlAffinity: ListTileControlAffinity.leading,
+                  title: Text(item.title, style: GoogleFonts.outfit(fontWeight: FontWeight.w500)),
+                  secondary: item.quantity != null && item.quantity!.isNotEmpty
+                      ? Chip(
+                          label: Text(item.quantity!, style: GoogleFonts.outfit(fontSize: 11)),
+                          visualDensity: VisualDensity.compact,
+                          padding: EdgeInsets.zero,
+                          backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
+                          side: BorderSide.none,
+                        )
+                      : null,
+                  value: item.isCompleted,
+                  onChanged: (val) {
+                    HapticFeedback.lightImpact();
+                    provider.toggleSubTask(task, item.id);
+                  },
+                );
+              }),
+            ),
+          ),
+          const SizedBox(height: 16),
+        ],
+        // In Cart Section
+        if (inCartItems.isNotEmpty) ...[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '${l10n.inCart} (${inCartItems.length})',
+                style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 13, color: theme.colorScheme.onSurfaceVariant),
+              ),
+              TextButton(
+                onPressed: () {
+                  HapticFeedback.lightImpact();
+                  provider.clearCompletedSubTasks(task);
+                },
+                child: Text(l10n.clearCartItems, style: GoogleFonts.outfit(fontSize: 12, color: theme.colorScheme.error)),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          GlassContainer(
+            borderRadius: BorderRadius.circular(16),
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            child: Column(
+              children: List.generate(inCartItems.length, (index) {
+                final item = inCartItems[index];
+                return CheckboxListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+                  controlAffinity: ListTileControlAffinity.leading,
+                  title: Text(
+                    item.title,
+                    style: GoogleFonts.outfit(
+                      decoration: TextDecoration.lineThrough,
+                      color: theme.disabledColor,
+                    ),
+                  ),
+                  secondary: item.quantity != null && item.quantity!.isNotEmpty
+                      ? Chip(
+                          label: Text(item.quantity!, style: GoogleFonts.outfit(fontSize: 11, color: theme.disabledColor)),
+                          visualDensity: VisualDensity.compact,
+                          padding: EdgeInsets.zero,
+                          side: BorderSide.none,
+                        )
+                      : null,
+                  value: item.isCompleted,
+                  onChanged: (val) {
+                    HapticFeedback.lightImpact();
+                    provider.toggleSubTask(task, item.id);
+                  },
+                );
+              }),
+            ),
+          ),
+          const SizedBox(height: 16),
+        ],
+      ],
+    );
   }
 }

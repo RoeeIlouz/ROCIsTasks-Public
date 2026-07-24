@@ -1,5 +1,4 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -14,6 +13,9 @@ import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/features/tasks/services/task_widget_service.dart';
 import 'package:rocis_tasks/core/services/logger_service.dart';
 import 'package:rocis_tasks/l10n/l10n_helper.dart';
+import 'package:rocis_tasks/core/services/auth_service.dart';
+import 'package:rocis_tasks/core/services/google_tasks_service.dart';
+import 'package:rocis_tasks/core/services/error_handling_service.dart';
 import 'dart:ui';
 
 @pragma('vm:entry-point')
@@ -43,7 +45,9 @@ class BackgroundHandler {
         host == 'next_month') {
       final isNext = host == 'full_calendar_next' || host == 'next_month';
       final isAndroidWidget = host.startsWith('full_calendar_');
-      await _handleFullCalendarNavigation(isNext: isAndroidWidget ? null : isNext);
+      await _handleFullCalendarNavigation(
+        isNext: isAndroidWidget ? null : isNext,
+      );
     } else if (host == 'full_calendar_today') {
       await _handleFullCalendarNavigation();
     } else if (host == 'full_calendar_filter_tasks') {
@@ -169,6 +173,9 @@ class BackgroundHandler {
     try {
       await AppInitializer.initialize(isBackground: true);
 
+      final taskSource = LocalTaskSource();
+      await taskSource.init();
+
       final box = await Hive.openBox<Task>(LocalTaskSource.boxName);
       final task = box.values.firstWhere((t) => t.id == taskId);
       task.isCompleted = true;
@@ -179,6 +186,53 @@ class BackgroundHandler {
         final firestoreService = FirestoreService();
         firestoreService.setUserId(currentUser.uid);
         await firestoreService.updateTask(task);
+      }
+
+      if (task.googleTaskId != null) {
+        try {
+          final authService = AuthService(ErrorHandlingService());
+          final googleTasksService = GoogleTasksService(authService);
+
+          final categories = taskSource.getCategories();
+          String? categoryName;
+          final categoryIds = task.categoryIds.isNotEmpty
+              ? task.categoryIds
+              : (task.categoryId != null ? [task.categoryId!] : []);
+          if (categoryIds.isNotEmpty) {
+            try {
+              final cat = categories.firstWhere(
+                (c) => c.id == categoryIds.first,
+              );
+              categoryName = cat.name;
+            } catch (_) {}
+          }
+
+          final success = await googleTasksService.updateTask(
+            taskId: task.googleTaskId!,
+            title: task.title,
+            description: task.description,
+            dueDate: task.dueDate,
+            isCompleted: task.isCompleted,
+            categoryName: categoryName,
+          );
+          if (success) {
+            AppLogger.info(
+              'Successfully updated Google Task in background',
+              tag: 'Background',
+            );
+          } else {
+            AppLogger.warning(
+              'Failed to update Google Task in background',
+              tag: 'Background',
+            );
+          }
+        } catch (e, s) {
+          AppLogger.warning(
+            'Error updating Google Task in background: $e',
+            stack: s,
+            tag: 'Background',
+          );
+        }
       }
 
       final pendingTasks = box.values
@@ -195,13 +249,9 @@ class BackgroundHandler {
       if (themeModeIndex == 2) {
         isDarkText = false;
       } else if (themeModeIndex == 0) {
-        final brightness =
-            WidgetsBinding.instance.platformDispatcher.platformBrightness;
+        final brightness = PlatformDispatcher.instance.platformBrightness;
         isDarkText = brightness != Brightness.dark;
       }
-
-      final taskSource = LocalTaskSource();
-      await taskSource.init();
 
       final categories = taskSource.getCategories();
       Category? getCategoryById(String? id) {
@@ -223,6 +273,7 @@ class BackgroundHandler {
       final currentLocale = languageCode != null
           ? Locale(languageCode)
           : PlatformDispatcher.instance.locale;
+      await ensureLocaleLoaded(currentLocale);
       final l10n = getSafeAppLocalizations(currentLocale);
       String priorityLabel(TaskPriority p) {
         switch (p) {

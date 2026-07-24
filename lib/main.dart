@@ -359,7 +359,7 @@ class _AppRootState extends State<AppRoot> {
               create: (_) => CalendarProvider(
                 _calendarService,
                 _fullCalendarWidgetService,
-              )..loadEvents(),
+              ),
             ),
             ChangeNotifierProvider.value(value: _onboardingService),
             Provider.value(value: _appRouter!),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:rocis_tasks/l10n/l10n_helper.dart';
 
 class ThemeService extends ChangeNotifier {
   ThemeMode _themeMode = ThemeMode.system;
@@ -57,6 +58,9 @@ class ThemeService extends ChangeNotifier {
       } else {
         _locale = const Locale('en');
       }
+    }
+    if (_locale != null) {
+      await ensureLocaleLoaded(_locale!);
     }
     _useCustomSeedColor = prefs.getBool('use_custom_seed_color') ?? false;
     _customSeedColorValue = prefs.getInt('custom_seed_color_value');
@@ -134,6 +138,9 @@ class ThemeService extends ChangeNotifier {
 
   Future<void> setLocale(Locale? locale) async {
     _locale = locale;
+    if (locale != null) {
+      await ensureLocaleLoaded(locale);
+    }
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
     if (locale != null) {

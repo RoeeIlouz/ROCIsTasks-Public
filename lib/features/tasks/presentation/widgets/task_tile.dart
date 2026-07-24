@@ -119,29 +119,56 @@ class TaskTile extends StatelessWidget {
             ? (categories.isNotEmpty ? Color(categories.first.colorValue) : theme.colorScheme.primary)
             : null,
         child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 10,
+          padding: const EdgeInsets.only(
+            left: 6,
+            right: 16,
+            top: 10,
+            bottom: 10,
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 2),
-                child: GestureDetector(
-                  onTap: isSelectionMode
-                      ? () => onLongPress?.call()
-                      : () {
-                          if (themeService.taskCompletionFeedback) {
-                            // Stronger impact when completing, lighter when un-completing
-                            if (!task.isCompleted) {
-                              HapticFeedback.mediumImpact();
-                            } else {
-                              HapticFeedback.lightImpact();
-                            }
+              if (!isSelectionMode && task.isGroceryList)
+                Padding(
+                  padding: const EdgeInsets.only(
+                    left: 10,
+                    right: 10,
+                    top: 2,
+                    bottom: 18,
+                  ),
+                  child: Icon(
+                    task.isCompleted ? Icons.check_circle_rounded : Icons.checklist_rounded,
+                    color: task.isCompleted
+                        ? theme.colorScheme.primary
+                        : (categories.isNotEmpty
+                            ? Color(categories.first.colorValue)
+                            : theme.colorScheme.primary).withValues(alpha: 0.7),
+                    size: 26,
+                  ),
+                )
+              else
+                GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: isSelectionMode
+                    ? () => onLongPress?.call()
+                    : () {
+                        if (themeService.taskCompletionFeedback) {
+                          // Stronger impact when completing, lighter when un-completing
+                          if (!task.isCompleted) {
+                            HapticFeedback.mediumImpact();
+                          } else {
+                            HapticFeedback.lightImpact();
                           }
-                          onToggle();
-                        },
+                        }
+                        onToggle();
+                      },
+                child: Padding(
+                  padding: const EdgeInsets.only(
+                    left: 10,
+                    right: 10,
+                    top: 2,
+                    bottom: 18,
+                  ),
                   child: Semantics(
                     label: isSelectionMode
                         ? (isSelected ? 'Selected' : 'Not selected')
@@ -181,7 +208,7 @@ class TaskTile extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 6),
               Expanded(
                 child: InkWell(
                   onTap: isSelectionMode ? onLongPress : onTap,
@@ -251,6 +278,13 @@ class TaskTile extends StatelessWidget {
                                 label: c.name,
                                 color: Color(c.colorValue),
                               )),
+                              if (task.isGroceryList)
+                                _buildChip(
+                                  context,
+                                  icon: Icons.checklist_rounded,
+                                  label: '${task.subTasks?.where((st) => st.isCompleted).length ?? 0}/${task.subTasks?.length ?? 0}',
+                                  color: theme.colorScheme.primary,
+                                ),
                               if (task.dueDate != null)
                                 _buildChip(
                                   context,

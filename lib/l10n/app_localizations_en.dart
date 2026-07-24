@@ -117,6 +117,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get french => 'French';
 
   @override
+  String get hindi => 'Hindi';
+
+  @override
   String get tasks => 'Tasks';
 
   @override
@@ -1058,4 +1061,73 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get widgetAccentColor => 'Widget Accent Color';
+
+  @override
+  String get googleTasksDisconnected => 'Google Tasks Disconnected';
+
+  @override
+  String get googleTasksDisconnectedSubtitle =>
+      'Tap to reconnect and resume sync';
+
+  @override
+  String get reconnect => 'Reconnect';
+
+  @override
+  String get webPaywallTitle => 'Unlock ROCIs Tasks Pro on Web';
+
+  @override
+  String get webPaywallSubtitle =>
+      'Upgrade to premium to access all advanced features on any platform.';
+
+  @override
+  String get webSimulatedUpgradeBtn => 'Upgrade to Pro';
+
+  @override
+  String get webPaywallNotice =>
+      'Payments are securely processed by Lemon Squeezy. Your subscription will be activated automatically.';
+
+  @override
+  String get monthlyPlanTitle => 'Monthly Plan';
+
+  @override
+  String get monthlyPlanPrice => '\$4.99 / month';
+
+  @override
+  String get yearlyPlanTitle => 'Yearly Plan';
+
+  @override
+  String get yearlyPlanPrice => '\$39.99 / year';
+
+  @override
+  String get yearlyPlanSaving => 'Save 33%';
+
+  @override
+  String get groceryListMode => 'Task List';
+
+  @override
+  String get groceryListModeSubtitle =>
+      'Format task as an interactive task list';
+
+  @override
+  String itemsInCart(Object completed, Object total) {
+    return '$completed/$total completed';
+  }
+
+  @override
+  String get toBuy => 'To Do';
+
+  @override
+  String get inCart => 'Completed';
+
+  @override
+  String get resetCart => 'Reset List';
+
+  @override
+  String get clearCartItems => 'Clear List Items';
+
+  @override
+  String get addItemHint => 'Add item...';
+
+  @override
+  String get quantityHint => 'Qty';
 }

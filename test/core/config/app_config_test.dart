@@ -9,7 +9,7 @@ void main() {
 
     test('should have valid version string', () {
       expect(AppConfig.appVersion, isNotEmpty);
-      expect(AppConfig.appVersion, matches(RegExp(r'^\d+\.\d+\.\d+$')));
+      expect(AppConfig.appVersion, matches(RegExp(r'^\d+\.\d+\.\d+(\+\d+)?$')));
     });
 
     test('should have valid URLs', () {

@@ -78,6 +78,9 @@ class Task extends HiveObject {
   @HiveField(18)
   bool skipReminders;
 
+  @HiveField(20)
+  bool isGroceryList;
+
   Task({
     String? id,
     required this.title,
@@ -99,6 +102,7 @@ class Task extends HiveObject {
     this.googleTaskListId,
     List<String>? attachmentPaths,
     this.skipReminders = false,
+    this.isGroceryList = false,
   }) : id = id ?? const Uuid().v4(),
        createdAt = createdAt ?? DateTime.now(),
        attachmentPaths = attachmentPaths ?? <String>[],
@@ -124,6 +128,7 @@ class Task extends HiveObject {
     String? googleTaskListId,
     List<String>? attachmentPaths,
     bool? skipReminders,
+    bool? isGroceryList,
   }) {
     return Task(
       id: id,
@@ -148,6 +153,7 @@ class Task extends HiveObject {
       googleTaskListId: googleTaskListId ?? this.googleTaskListId,
       attachmentPaths: attachmentPaths ?? this.attachmentPaths,
       skipReminders: skipReminders ?? this.skipReminders,
+      isGroceryList: isGroceryList ?? this.isGroceryList,
     );
   }
 
@@ -173,6 +179,7 @@ class Task extends HiveObject {
       'googleTaskListId': googleTaskListId,
       'attachmentPaths': attachmentPaths,
       'skipReminders': skipReminders,
+      'isGroceryList': isGroceryList,
     };
   }
 
@@ -197,6 +204,7 @@ class Task extends HiveObject {
       'googleTaskId': googleTaskId,
       'googleTaskListId': googleTaskListId,
       'skipReminders': skipReminders,
+      'isGroceryList': isGroceryList,
     };
   }
 
@@ -235,6 +243,7 @@ class Task extends HiveObject {
       attachmentPaths:
           (map['attachmentPaths'] as List?)?.whereType<String>().toList(),
       skipReminders: map['skipReminders'] ?? false,
+      isGroceryList: map['isGroceryList'] ?? false,
     );
   }
 }

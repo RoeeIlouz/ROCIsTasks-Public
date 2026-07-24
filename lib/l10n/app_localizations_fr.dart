@@ -117,6 +117,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get french => 'Français';
 
   @override
+  String get hindi => 'Hindi';
+
+  @override
   String get tasks => 'Tâches';
 
   @override
@@ -1081,4 +1084,73 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get widgetAccentColor => 'Couleur d\'accentuation du widget';
+
+  @override
+  String get googleTasksDisconnected => 'Google Tasks Déconnecté';
+
+  @override
+  String get googleTasksDisconnectedSubtitle =>
+      'Appuyez pour vous reconnecter et reprendre la synchronisation';
+
+  @override
+  String get reconnect => 'Se reconnecter';
+
+  @override
+  String get webPaywallTitle => 'Débloquez ROCIs Tasks Pro sur le Web';
+
+  @override
+  String get webPaywallSubtitle =>
+      'Passez à la version premium pour accéder à toutes les fonctionnalités avancées sur n\'importe quelle plateforme.';
+
+  @override
+  String get webSimulatedUpgradeBtn => 'Mettre à niveau vers Pro';
+
+  @override
+  String get webPaywallNotice =>
+      'Les paiements sont traités en toute sécurité par Lemon Squeezy. Votre abonnement sera activé automatiquement.';
+
+  @override
+  String get monthlyPlanTitle => 'Forfait Mensuel';
+
+  @override
+  String get monthlyPlanPrice => '4,99 \$ / mois';
+
+  @override
+  String get yearlyPlanTitle => 'Forfait Annuel';
+
+  @override
+  String get yearlyPlanPrice => '39,99 \$ / an';
+
+  @override
+  String get yearlyPlanSaving => 'Économisez 33%';
+
+  @override
+  String get groceryListMode => 'Liste de tâches';
+
+  @override
+  String get groceryListModeSubtitle =>
+      'Formater la tâche sous forme de liste de tâches interactive';
+
+  @override
+  String itemsInCart(Object completed, Object total) {
+    return '$completed/$total terminées';
+  }
+
+  @override
+  String get toBuy => 'À faire';
+
+  @override
+  String get inCart => 'Terminées';
+
+  @override
+  String get resetCart => 'Réinitialiser la liste';
+
+  @override
+  String get clearCartItems => 'Vider la liste';
+
+  @override
+  String get addItemHint => 'Ajouter un élément...';
+
+  @override
+  String get quantityHint => 'Qté';
 }

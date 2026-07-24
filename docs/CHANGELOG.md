@@ -5,12 +5,87 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.2.1+50] - 2026-07-03
+## [0.2.4+67] - 2026-07-24
+
+### Added
+- Task List mode with items checklist, auto-completion, progress tracking, and one-tap reset.
+- In-app interactive preview dialog for task attachments.
+
+### Fixed
+- Fixed Google Sign-In triple prompt bug by making background token getters strictly silent.
+- Preserved task due time (hours/minutes) in Google Tasks sync.
+
+### Added
+- Hindi (`hi`) language support with full ARB translations and settings modal picker.
+- NotebookLM knowledge grounding documentation package in `docs/notebooklm/`.
+
+## [0.2.3+65] - 2026-07-18
+
+### Added
+- Lemon Squeezy JS checkout overlay modal inside web app.
+- Cross-platform two-way subscription status sync between Web (Firestore) and Mobile (RevenueCat).
+
+### Changed
+- Migrated webhook signature verification to Pipedream for Firebase Spark free plan compliance.
+
+### Optimized
+- Checkbox hit target to 48dp on task tiles.
+- Dynamic wallpaper color blending on glass containers.
+- Entry transition speed for task lists.
+
+## [0.2.2+64] - 2026-07-18
+
+### Fixed
+- Web paywall crash with a live Lemon Squeezy integration, Firestore real-time sync, and a secure webhook Cloud Function.
+- Release builds (Gradle R8, Kotlin 2.1.10 sync, and namespace injections).
+- Pulsing loaders to prevent screen flashing.
+
+### Added
+- Background Google Tasks synchronization.
+
+### Optimized
+- Deferred localizations and lazy calendar views to speed up cold starts.
+
+## [0.2.2+63] - 2026-07-17
+
+### Added
+
+- Google Tasks two-way sync: completions, uncompletions, and deletions propagate back to ROCIs Tasks.
+- Platform-agnostic silent access token refresh for Google Tasks on Web and Mobile.
+- Glassmorphic reconnect banner states when Google Tasks token is disconnected.
+
+## [0.2.2+60] - 2026-07-16
+
+### Fixed
+
+- Fixed regression with multiple interactive Google Sign-In prompts on mobile by caching Google Access Token securely in SharedPreferences.
+
+## [0.2.2+58] - 2026-07-16
+
+### Added
+
+- Google Calendar API scope to Web authentication and linking flows.
+
+### Fixed
+
+- Google Tasks sync permissions by correctly prompting for scopes once during initial Google Sign-In on mobile.
+- Google Tasks sync API URLs updated to correct `/tasks/v1/` prefix.
+
+### Removed
+
+- Birthday promotion free PRO trial benefits to prevent feature abuse.
+
+## [0.2.1+54] - 2026-07-04
+
+### Added
+
+- Full web version release.
+- Custom theme, week number, and weekend options for the calendar widget.
 
 ### Changed
 
-- Full web version release.
-- New UI options to customize the app and home screen widget.
+- Replaced widget selected day border with a bold brand-colored text style to avoid solid color block rendering bugs.
+- Retained today's soft 10% opacity tint highlight.
 
 ## [0.1.20+49] - 2026-07-02
 

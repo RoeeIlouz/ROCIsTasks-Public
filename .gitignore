@@ -54,7 +54,12 @@ app.*.map.json
 /android/app/release
 /lib/firebase_options.dart
 /lib/firebase_schedule_options.dart
-
+/docs/SUMMARY.md
+graphify-out/
+.serena/
+functions/
+assets/screenshots/*
+docs/notebooklm/
 # Environment and Security Files
 .env
 .env.local

@@ -14,19 +14,32 @@ class SubTask extends HiveObject {
   @HiveField(2)
   bool isCompleted;
 
-  SubTask({String? id, required this.title, this.isCompleted = false})
-    : id = id ?? const Uuid().v4();
+  @HiveField(3)
+  String? quantity;
 
-  SubTask copyWith({String? title, bool? isCompleted}) {
+  SubTask({
+    String? id,
+    required this.title,
+    this.isCompleted = false,
+    this.quantity,
+  }) : id = id ?? const Uuid().v4();
+
+  SubTask copyWith({String? title, bool? isCompleted, String? quantity}) {
     return SubTask(
       id: id,
       title: title ?? this.title,
       isCompleted: isCompleted ?? this.isCompleted,
+      quantity: quantity ?? this.quantity,
     );
   }
 
   Map<String, dynamic> toMap() {
-    return {'id': id, 'title': title, 'isCompleted': isCompleted};
+    return {
+      'id': id,
+      'title': title,
+      'isCompleted': isCompleted,
+      'quantity': quantity,
+    };
   }
 
   factory SubTask.fromMap(Map<String, dynamic> map) {
@@ -34,6 +47,7 @@ class SubTask extends HiveObject {
       id: map['id'],
       title: map['title'] ?? '',
       isCompleted: map['isCompleted'] ?? false,
+      quantity: map['quantity'] as String?,
     );
   }
 }
