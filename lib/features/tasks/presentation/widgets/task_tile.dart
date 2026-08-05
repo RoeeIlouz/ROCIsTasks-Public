@@ -339,32 +339,52 @@ class TaskTile extends StatelessWidget {
                             listen: false,
                           ).toggleTaskPin(task);
                         },
-                        constraints: const BoxConstraints(),
-                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+                        padding: const EdgeInsets.all(8),
                       ),
                     )
                   else
                     const SizedBox(height: 40),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 8),
                   Semantics(
                     label: '${l10n.priority}: ${task.priority.name}',
                     child: Container(
-                      width: 10,
-                      height: 10,
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                       decoration: BoxDecoration(
-                        color: _getPriorityColor(
-                          context,
-                          task.priority,
+                        color: _getPriorityColor(context, task.priority).withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(
+                          color: _getPriorityColor(context, task.priority).withValues(alpha: 0.3),
+                          width: 1,
                         ),
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: _getPriorityColor(
-                              context,
-                              task.priority,
-                            ).withValues(alpha: 0.4),
-                            blurRadius: 6,
-                            spreadRadius: 1,
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            width: 6,
+                            height: 6,
+                            decoration: BoxDecoration(
+                              color: _getPriorityColor(context, task.priority),
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: _getPriorityColor(context, task.priority).withValues(alpha: 0.6),
+                                  blurRadius: 4,
+                                  spreadRadius: 1,
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            task.priority.name.toUpperCase(),
+                            style: GoogleFonts.outfit(
+                              fontSize: 9,
+                              fontWeight: FontWeight.bold,
+                              color: _getPriorityColor(context, task.priority),
+                              letterSpacing: 0.5,
+                            ),
                           ),
                         ],
                       ),

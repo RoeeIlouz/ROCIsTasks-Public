@@ -101,6 +101,13 @@ Input fields are rounded, bordered only on focus, and rely on subtle container f
 - **Thickness**: Segment stroke width is exactly **12%** of the chart's total bounding size.
 - **Empty State**: Rendered as a light grey (`#EEEEEE`) inactive stroke.
 
+### 5. Task Attachments Section (`TaskAttachmentsSection`)
+- **Attachment Chips**: Wrapped inside a `GlassContainer` with `BorderRadius.circular(12.0)`.
+- **Thumbnail Previews**: Image files (`.png`, `.jpg`, `.jpeg`, `.webp`, `.gif`, `.bmp`) feature a 32x32 rounded thumbnail (`BorderRadius.circular(6.0)`).
+- **File Extension Badges**: Non-image attachments display a file type icon (`AttachmentUtils.getFileIcon`) styled with `theme.colorScheme.primary`.
+- **Interactive Preview Handler**: Tapping an attachment chip triggers press feedback and invokes `AttachmentUtils.openAttachment` (opening pinch-to-zoom modal for images or external OS handler for documents).
+- **Ergonomic Remove Target**: Delete/close icons (`Icons.close`) have an expanded touch hit box meeting the **48×48 dp** touch accessibility standard (`constraints: BoxConstraints(minWidth: 32, minHeight: 32)` or wrapped in `InkWell`/`GestureDetector` padding).
+
 ---
 
 ## 🎬 Animations & Micro-interactions
@@ -110,4 +117,30 @@ Input fields are rounded, bordered only on focus, and rely on subtle container f
   - Fade-in animation starting from opacity `0.0`.
   - Staggered delay per list index.
   *Note: For performance optimization, staggered list animations are disabled on the Web version, rendering list items directly.*
-- **Tactile Feedback**: Medium impact haptic feedback (`HapticFeedback.mediumImpact()`) on long-press selection triggers.
+- **Tactile Feedback**: Medium impact haptic feedback (`HapticFeedback.mediumImpact()`) on long-press selection, task checkmarks, and destructive actions.
+- **Smooth State Transitions**: Interactive state changes (hover, focus, selection) must use smooth `150ms` to `300ms` transitions without causing layout shifts.
+
+---
+
+## 🎯 Touch Target Ergonomics
+- **Minimum Interactive Target**: All buttons, checkboxes, icons, and chip removal controls must adhere to the **48×48 dp** touch target standard.
+- **Hit Target Padding**: Visual icon sizes may remain compact (e.g. `16px` to `24px`), but must be wrapped in padding or constraint boxes to ensure full touch usability on touchscreen devices.
+
+---
+
+## ⏳ Skeletons & Empty States
+- **Loading Skeletons**: Use pulsing shimmer skeletons (`TaskListSkeleton`, `TaskTileSkeleton`) instead of full-screen block spinners to minimize perceived latency.
+- **Contextual Empty States**: Empty screens display friendly vector graphics or themed Material Icons alongside localized encouraging prompts (e.g. *"No tasks for today! Tap + to create one"*). Emojis are strictly forbidden as UI placeholders.
+
+---
+
+## 📋 Pre-Delivery UI/UX Quality Checklist
+
+Before finalizing any UI component edit, verify compliance with the following requirements:
+- [ ] **No Emoji Icons**: Emojis are never used as standalone UI icons or buttons (use `Material Icons` or `Heroicons/Lucide` SVGs).
+- [ ] **Ergonomic Touch Targets**: Every clickable element has a minimum **48×48 dp** hit target.
+- [ ] **Stable Hover/Focus States**: Hover and active state effects use smooth transitions (`150ms-300ms`) and do not alter layout dimensions or cause jitter.
+- [ ] **Color Contrast Compliance**: Body text meets a minimum `4.5:1` contrast ratio in both Light and Dark modes.
+- [ ] **Glassmorphism Theme Blending**: Glass cards use `10-18%` primary/category tint blending and respect AMOLED true-black rules.
+- [ ] **Localization (i18n)**: No hardcoded user-facing text strings in UI widget files.
+

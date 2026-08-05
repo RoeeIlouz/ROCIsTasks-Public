@@ -95,6 +95,7 @@ class _AppRootState extends State<AppRoot> {
     debugPrint('AppRoot: _initServices started');
     _onboardingService = OnboardingService();
     _appRouter = AppRouter(_authService, _onboardingService);
+    _calendarService.setAuthService(_authService);
 
     try {
       await Future.wait([

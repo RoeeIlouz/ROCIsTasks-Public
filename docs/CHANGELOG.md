@@ -5,75 +5,96 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.5+73] - 2026-08-05
+
+### Fixed
+- Fixed Google sign-in persistence so users no longer get prompted to re-authenticate when reopening the app.
+- Improved background token refresh and calendar sync reliability across Web and Android.
+
+## [0.2.5+72] - 2026-08-01
+
+### Added
+- Interactive priority selector grid with haptic feedback on the Add Task screen.
+- Glowing gradient priority pills on task cards for quick visual urgency recognition.
+- Interactive full-screen image lightbox previews and uppercase file type badges on attachments.
+- Enlarged 48dp touch targets on pin and removal controls.
+
+## [0.2.5+71] - 2026-08-01
+
+### Added
+- Interactive task attachment previews (tap to view full-screen images or open documents).
+- Visual file type badges on attachments for quick file identification.
+
+### Improved
+- Ergonomic 48dp touch targets on attachment controls for easier tapping.
+- Visual theme polish and dynamic glassmorphism performance.
+
+## [0.2.4+70] - 2026-08-01
+
+### Improved
+- Upgraded offline storage engine for faster task loading and enhanced stability.
+- Optimized background notification scheduling and Google account sync performance.
+
+## [0.2.4+69] - 2026-08-01
+
+### Changed
+- Maintenance update and version sync.
+
+## [0.2.4+68] - 2026-07-30
+
+### Fixed
+- Seamless background Google account re-authentication without popups.
+- Resolved an issue where task lists could occasionally freeze after checking off items.
+
 ## [0.2.4+67] - 2026-07-24
 
 ### Added
-- Task List mode with items checklist, auto-completion, progress tracking, and one-tap reset.
-- In-app interactive preview dialog for task attachments.
+- Interactive Task List mode with item checklists, auto-completion, progress tracking, and one-tap reset.
+- Full Hindi (🇮🇳 हिंदी) language localization.
+- Full-screen pinch-to-zoom image viewer for task attachments.
 
 ### Fixed
-- Fixed Google Sign-In triple prompt bug by making background token getters strictly silent.
-- Preserved task due time (hours/minutes) in Google Tasks sync.
-
-### Added
-- Hindi (`hi`) language support with full ARB translations and settings modal picker.
-- NotebookLM knowledge grounding documentation package in `docs/notebooklm/`.
+- Eliminated redundant Google Sign-In prompts on startup.
+- Preserved task due time (hours/minutes) during Google Tasks synchronization.
 
 ## [0.2.3+65] - 2026-07-18
 
 ### Added
-- Lemon Squeezy JS checkout overlay modal inside web app.
-- Cross-platform two-way subscription status sync between Web (Firestore) and Mobile (RevenueCat).
+- Lemon Squeezy web checkout overlay modal for seamless web subscriptions.
+- Cross-platform subscription sync between Web and Mobile apps.
 
-### Changed
-- Migrated webhook signature verification to Pipedream for Firebase Spark free plan compliance.
-
-### Optimized
-- Checkbox hit target to 48dp on task tiles.
-- Dynamic wallpaper color blending on glass containers.
-- Entry transition speed for task lists.
+### Improved
+- Touch target hit area expanded to 48dp on task tiles.
+- Wallpaper-aware dynamic color blending on glass containers.
+- Faster list transition animations.
 
 ## [0.2.2+64] - 2026-07-18
 
 ### Fixed
-- Web paywall crash with a live Lemon Squeezy integration, Firestore real-time sync, and a secure webhook Cloud Function.
-- Release builds (Gradle R8, Kotlin 2.1.10 sync, and namespace injections).
-- Pulsing loaders to prevent screen flashing.
+- Web paywall stability and billing checkout sync.
+- Pulsing loading skeletons to eliminate screen flickering.
 
 ### Added
 - Background Google Tasks synchronization.
 
-### Optimized
-- Deferred localizations and lazy calendar views to speed up cold starts.
-
 ## [0.2.2+63] - 2026-07-17
 
 ### Added
-
-- Google Tasks two-way sync: completions, uncompletions, and deletions propagate back to ROCIs Tasks.
-- Platform-agnostic silent access token refresh for Google Tasks on Web and Mobile.
-- Glassmorphic reconnect banner states when Google Tasks token is disconnected.
+- Two-way Google Tasks sync: completions and deletions propagate automatically.
+- Reconnect notification banners when Google access token expires.
 
 ## [0.2.2+60] - 2026-07-16
 
 ### Fixed
-
-- Fixed regression with multiple interactive Google Sign-In prompts on mobile by caching Google Access Token securely in SharedPreferences.
+- Resolved redundant Google Sign-In prompts on mobile by securely caching access tokens.
 
 ## [0.2.2+58] - 2026-07-16
 
 ### Added
-
-- Google Calendar API scope to Web authentication and linking flows.
+- Google Calendar integration support for Web authentication and linking flows.
 
 ### Fixed
-
-- Google Tasks sync permissions by correctly prompting for scopes once during initial Google Sign-In on mobile.
-- Google Tasks sync API URLs updated to correct `/tasks/v1/` prefix.
-
-### Removed
-
-- Birthday promotion free PRO trial benefits to prevent feature abuse.
+- Google Tasks scope permissions during mobile sign-in.
 
 ## [0.2.1+54] - 2026-07-04
 

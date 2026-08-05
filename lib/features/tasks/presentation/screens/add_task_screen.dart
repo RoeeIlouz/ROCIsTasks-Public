@@ -16,9 +16,9 @@ import 'package:rocis_tasks/features/tasks/services/nlp_service.dart';
 
 import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:rocis_tasks/shared/ui/ui_kit.dart';
+import 'package:rocis_tasks/features/tasks/presentation/widgets/task_attachments_section.dart';
 
 import 'package:google_fonts/google_fonts.dart';
-import 'package:rocis_tasks/core/utils/attachment_utils.dart';
 
 class AddTaskScreen extends StatefulWidget {
   final Task? task;
@@ -389,7 +389,11 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                 },
               ),
               const SizedBox(height: 24),
-              _buildAttachmentsSection(context, l10n),
+              TaskAttachmentsSection(
+                attachmentPaths: _attachmentPaths,
+                onAddAttachment: _pickAttachments,
+                onRemoveAttachment: _removeAttachmentAt,
+              ),
               const SizedBox(height: 24),
               Text(
                 l10n.dueDateAndTime,
@@ -608,33 +612,79 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                 ),
               ),
               const SizedBox(height: 12),
-              DropdownButtonFormField<TaskPriority>(
-                initialValue: _priority,
-                style: GoogleFonts.outfit(
-                  color: theme.colorScheme.onSurface,
-                  fontWeight: FontWeight.w500,
-                ),
-                decoration: SharedInputDecorations.getFieldDecoration(
-                  label: '',
-                  prefixIcon: Icons.flag_outlined,
-                  theme: theme,
-                ),
-                items: TaskPriority.values.map((priority) {
-                  return DropdownMenuItem(
-                    value: priority,
-                    child: Text(
-                      _getPriorityLabel(priority, l10n),
-                      style: GoogleFonts.outfit(),
+              Row(
+                children: TaskPriority.values.map((priority) {
+                  final isSelected = _priority == priority;
+                  final Color color = priority == TaskPriority.high
+                      ? Colors.redAccent
+                      : (priority == TaskPriority.medium
+                          ? Colors.orangeAccent
+                          : Colors.greenAccent);
+
+                  return Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      child: InkWell(
+                        onTap: () {
+                          HapticFeedback.lightImpact();
+                          setState(() => _priority = priority);
+                        },
+                        borderRadius: BorderRadius.circular(12),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? color.withValues(alpha: 0.18)
+                                : theme.colorScheme.surfaceContainerLow,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: isSelected
+                                  ? color
+                                  : theme.dividerColor.withValues(alpha: 0.2),
+                              width: isSelected ? 2 : 1,
+                            ),
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                width: 8,
+                                height: 8,
+                                decoration: BoxDecoration(
+                                  color: color,
+                                  shape: BoxShape.circle,
+                                  boxShadow: isSelected
+                                      ? [
+                                          BoxShadow(
+                                            color: color.withValues(alpha: 0.6),
+                                            blurRadius: 6,
+                                            spreadRadius: 1,
+                                          ),
+                                        ]
+                                      : null,
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                _getPriorityLabel(priority, l10n),
+                                style: GoogleFonts.outfit(
+                                  fontSize: 12,
+                                  fontWeight: isSelected
+                                      ? FontWeight.bold
+                                      : FontWeight.w500,
+                                  color: isSelected
+                                      ? color
+                                      : theme.colorScheme.onSurface,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                     ),
                   );
                 }).toList(),
-                onChanged: (value) {
-                  if (value != null) {
-                    setState(() {
-                      _priority = value;
-                    });
-                  }
-                },
               ),
               const SizedBox(height: 24),
               _buildSubTasksSection(context, l10n),
@@ -671,82 +721,6 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildAttachmentsSection(BuildContext context, AppLocalizations l10n) {
-    final theme = Theme.of(context);
-    final subscriptionService = Provider.of<SubscriptionService>(
-      context,
-      listen: true,
-    );
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Text(
-              l10n.attachments,
-              style: GoogleFonts.outfit(
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
-                color: theme.colorScheme.primary,
-              ),
-            ),
-            if (!subscriptionService.isPremium)
-              Container(
-                margin: const EdgeInsets.only(left: 8),
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
-                  color: Colors.amber.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Text(
-                  'PRO',
-                  style: GoogleFonts.outfit(
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.amber[800],
-                  ),
-                ),
-              ),
-            const Spacer(),
-            IconButton(
-              icon: const Icon(Icons.attach_file_rounded, size: 20),
-              onPressed: _pickAttachments,
-            ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        if (!subscriptionService.isPremium)
-          Text(
-            l10n.attachmentsPremiumOnly,
-            style: theme.textTheme.bodySmall,
-          )
-        else if (_attachmentPaths.isEmpty)
-          Text(
-            l10n.noAttachmentsAdded,
-            style: theme.textTheme.bodySmall,
-          )
-        else
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: List.generate(_attachmentPaths.length, (index) {
-              final path = _attachmentPaths[index];
-              return InputChip(
-                avatar: Icon(AttachmentUtils.getFileIcon(path), size: 18),
-                label: Text(
-                  AttachmentUtils.getFilename(path),
-                  style: GoogleFonts.outfit(fontSize: 12),
-                ),
-                onPressed: () => AttachmentUtils.openAttachment(context, path),
-                onDeleted: () => _removeAttachmentAt(index),
-              );
-            }),
-          ),
-      ],
     );
   }
 

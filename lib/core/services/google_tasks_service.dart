@@ -9,9 +9,15 @@ class GoogleTasksService {
 
   GoogleTasksService(this._authService);
 
-  // Throws exception if token expired or unavailable
+  /// Gets an access token, retrying once after a brief delay if the token
+  /// is null (startup race with Google user restoration).
   Future<String> _getAccessToken() async {
-    final token = await _authService.getGoogleAccessToken();
+    var token = await _authService.getGoogleAccessToken();
+    if (token != null) return token;
+
+    // Brief wait for startup restoration, then one retry
+    await Future<void>.delayed(const Duration(milliseconds: 800));
+    token = await _authService.getGoogleAccessToken();
     if (token == null) {
       throw GoogleTokenExpiredException('Google Tasks access token expired or invalid.');
     }
@@ -32,7 +38,7 @@ class GoogleTasksService {
       );
 
       if (listResponse.statusCode == 401) {
-        throw GoogleTokenExpiredException();
+        throw GoogleTokenExpiredException('Google token rejected by server.', true);
       }
 
       if (listResponse.statusCode == 200) {
@@ -57,7 +63,7 @@ class GoogleTasksService {
       );
 
       if (createResponse.statusCode == 401) {
-        throw GoogleTokenExpiredException();
+        throw GoogleTokenExpiredException('Google token rejected by server.', true);
       }
 
       if (createResponse.statusCode == 200 || createResponse.statusCode == 201) {
@@ -106,7 +112,7 @@ class GoogleTasksService {
       );
 
       if (response.statusCode == 401) {
-        throw GoogleTokenExpiredException();
+        throw GoogleTokenExpiredException('Google token rejected by server.', true);
       }
 
       if (response.statusCode == 200 || response.statusCode == 201) {
@@ -169,7 +175,7 @@ class GoogleTasksService {
       );
 
       if (response.statusCode == 401) {
-        throw GoogleTokenExpiredException();
+        throw GoogleTokenExpiredException('Google token rejected by server.', true);
       }
 
       if (response.statusCode == 200 || response.statusCode == 204) {
@@ -206,7 +212,7 @@ class GoogleTasksService {
       );
 
       if (response.statusCode == 401) {
-        throw GoogleTokenExpiredException();
+        throw GoogleTokenExpiredException('Google token rejected by server.', true);
       }
 
       if (response.statusCode == 200 || response.statusCode == 204 || response.statusCode == 404) {
@@ -248,7 +254,7 @@ class GoogleTasksService {
         );
 
         if (response.statusCode == 401) {
-          throw GoogleTokenExpiredException();
+          throw GoogleTokenExpiredException('Google token rejected by server.', true);
         }
 
         if (response.statusCode != 200) {

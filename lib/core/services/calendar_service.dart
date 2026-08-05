@@ -9,10 +9,46 @@ import 'package:rocis_tasks/core/services/auth_service.dart';
 
 class CalendarService {
   final DeviceCalendarPlugin _deviceCalendarPlugin = DeviceCalendarPlugin();
+  AuthService? _authService;
+
+  void setAuthService(AuthService authService) {
+    _authService = authService;
+  }
 
   Future<void> init() async {
     // Permissions will be requested when needed (e.g. entering calendar view)
     // or when loading events, to avoid blocking app startup.
+  }
+
+  /// Safely converts a [DateTime] to [tz.TZDateTime] without crashing if
+  /// timezones are uninitialized on Web.
+  tz.TZDateTime _toTZDateTime(DateTime dt) {
+    try {
+      return tz.TZDateTime.from(dt, tz.local);
+    } catch (_) {
+      try {
+        return tz.TZDateTime.from(dt.toUtc(), tz.getLocation('UTC'));
+      } catch (_) {
+        return tz.TZDateTime(tz.UTC, dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second);
+      }
+    }
+  }
+
+  /// Centralized Web token resolution that goes through the silent refresh
+  /// pipeline instead of reading raw SharedPreferences + throwing on expiry.
+  Future<String> _getWebAccessToken() async {
+    // Prefer AuthService's managed token pipeline (with silent refresh)
+    if (_authService != null) {
+      final token = await _authService!.getGoogleAccessToken();
+      if (token != null) return token;
+      throw GoogleTokenExpiredException();
+    }
+
+    // Fallback: direct SharedPreferences read (background handler, etc.)
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('google_access_token');
+    if (token == null) throw GoogleTokenExpiredException();
+    return token;
   }
 
   Future<bool> requestPermissions() async {
@@ -38,26 +74,15 @@ class CalendarService {
   Future<List<Calendar>> getAvailableCalendars() async {
     if (kIsWeb) {
       try {
-        final prefs = await SharedPreferences.getInstance();
-        final token = prefs.getString('google_access_token');
-        final expiresAtStr = prefs.getString('google_access_token_expires_at');
-        
-        if (token == null || expiresAtStr == null) {
-          throw GoogleTokenExpiredException();
-        }
-        
-        final expiresAt = DateTime.parse(expiresAtStr);
-        if (DateTime.now().isAfter(expiresAt)) {
-          throw GoogleTokenExpiredException();
-        }
+        final token = await _getWebAccessToken();
         
         final response = await http.get(
           Uri.parse('https://www.googleapis.com/calendar/v3/users/me/calendarList'),
           headers: {'Authorization': 'Bearer $token'},
         );
         
-        if (response.statusCode == 401) {
-          throw GoogleTokenExpiredException();
+        if (response.statusCode == 401 || response.statusCode == 403) {
+          throw GoogleTokenExpiredException('Google Calendar token rejected by server.', true);
         }
         
         if (response.statusCode == 200) {
@@ -134,18 +159,7 @@ class CalendarService {
   }) async {
     if (kIsWeb) {
       try {
-        final prefs = await SharedPreferences.getInstance();
-        final token = prefs.getString('google_access_token');
-        final expiresAtStr = prefs.getString('google_access_token_expires_at');
-        
-        if (token == null || expiresAtStr == null) {
-          throw GoogleTokenExpiredException();
-        }
-        
-        final expiresAt = DateTime.parse(expiresAtStr);
-        if (DateTime.now().isAfter(expiresAt)) {
-          throw GoogleTokenExpiredException();
-        }
+        final token = await _getWebAccessToken();
         
         final now = DateTime.now();
         final start = startDate ?? now.subtract(const Duration(days: 365));
@@ -176,8 +190,8 @@ class CalendarService {
               headers: {'Authorization': 'Bearer $token'},
             );
             
-            if (response.statusCode == 401) {
-              throw GoogleTokenExpiredException();
+            if (response.statusCode == 401 || response.statusCode == 403) {
+              throw GoogleTokenExpiredException('Google Calendar token rejected by server.', true);
             }
             
             if (response.statusCode == 200) {
@@ -221,8 +235,8 @@ class CalendarService {
                   eventId: id,
                   title: title,
                   description: desc,
-                  start: tz.TZDateTime.from(startTime, tz.local),
-                  end: tz.TZDateTime.from(endTime, tz.local),
+                  start: _toTZDateTime(startTime),
+                  end: _toTZDateTime(endTime),
                   allDay: allDay,
                 ));
               }
@@ -322,18 +336,7 @@ class CalendarService {
   }) async {
     if (kIsWeb) {
       try {
-        final prefs = await SharedPreferences.getInstance();
-        final token = prefs.getString('google_access_token');
-        final expiresAtStr = prefs.getString('google_access_token_expires_at');
-        
-        if (token == null || expiresAtStr == null) {
-          throw GoogleTokenExpiredException();
-        }
-        
-        final expiresAt = DateTime.parse(expiresAtStr);
-        if (DateTime.now().isAfter(expiresAt)) {
-          throw GoogleTokenExpiredException();
-        }
+        final token = await _getWebAccessToken();
         
         final body = {
           'summary': title,
@@ -366,8 +369,8 @@ class CalendarService {
           );
         }
         
-        if (response.statusCode == 401) {
-          throw GoogleTokenExpiredException();
+        if (response.statusCode == 401 || response.statusCode == 403) {
+          throw GoogleTokenExpiredException('Google Calendar token rejected by server.', true);
         }
         
         if (response.statusCode == 200 || response.statusCode == 201) {
@@ -418,26 +421,15 @@ class CalendarService {
   }) async {
     if (kIsWeb) {
       try {
-        final prefs = await SharedPreferences.getInstance();
-        final token = prefs.getString('google_access_token');
-        final expiresAtStr = prefs.getString('google_access_token_expires_at');
-        
-        if (token == null || expiresAtStr == null) {
-          throw GoogleTokenExpiredException();
-        }
-        
-        final expiresAt = DateTime.parse(expiresAtStr);
-        if (DateTime.now().isAfter(expiresAt)) {
-          throw GoogleTokenExpiredException();
-        }
+        final token = await _getWebAccessToken();
         
         final response = await http.delete(
           Uri.parse('https://www.googleapis.com/calendar/v3/calendars/$calendarId/events/$eventId'),
           headers: {'Authorization': 'Bearer $token'},
         );
         
-        if (response.statusCode == 401) {
-          throw GoogleTokenExpiredException();
+        if (response.statusCode == 401 || response.statusCode == 403) {
+          throw GoogleTokenExpiredException('Google Calendar token rejected by server.', true);
         }
         
         if (response.statusCode == 200 || response.statusCode == 204) {

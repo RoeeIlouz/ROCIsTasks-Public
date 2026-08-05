@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:device_calendar/device_calendar.dart';
 import 'package:rocis_tasks/core/services/auth_service.dart';
@@ -180,14 +181,15 @@ class CalendarProvider extends ChangeNotifier {
       );
 
       _processEventsToMap();
-    } on GoogleTokenExpiredException {
-      _isGoogleCalendarTokenExpired = true;
+    } on GoogleTokenExpiredException catch (e) {
+      if (e.isServerRejection || kIsWeb) {
+        _isGoogleCalendarTokenExpired = true;
+      }
       _events = [];
       _eventsMap = {};
-      AppLogger.warning('Google Calendar token expired on Web.');
+      AppLogger.warning('Google Calendar token expired on Web (serverRejection: ${e.isServerRejection}).');
     } catch (e, s) {
-      // Also catch String exception representation if needed
-      if (e.toString().contains('GoogleTokenExpiredException')) {
+      if (e is GoogleTokenExpiredException && (e.isServerRejection || kIsWeb)) {
         _isGoogleCalendarTokenExpired = true;
         _events = [];
         _eventsMap = {};

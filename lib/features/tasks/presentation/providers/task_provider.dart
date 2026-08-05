@@ -1,46 +1,45 @@
-import 'package:flutter/foundation.dart' hide Category;
-import 'package:rocis_tasks/l10n/app_localizations.dart';
-import 'package:rocis_tasks/l10n/l10n_helper.dart';
 import 'dart:async';
-import 'package:intl/intl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:rocis_tasks/core/services/notification_service.dart';
-import 'package:rocis_tasks/features/tasks/data/datasources/local_task_source.dart';
-import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
-import 'package:rocis_tasks/core/services/firestore_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:rocis_tasks/shared/ui/ui_kit.dart';
+import 'package:flutter/foundation.dart' hide Category;
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'package:rocis_tasks/core/config/app_config.dart';
+import 'package:rocis_tasks/core/services/analytics_service.dart';
 import 'package:rocis_tasks/core/services/auth_service.dart';
 import 'package:rocis_tasks/core/services/calendar_service.dart';
-import 'package:rocis_tasks/core/services/google_tasks_service.dart';
 import 'package:rocis_tasks/core/services/connectivity_service.dart';
-import 'package:rocis_tasks/core/config/app_config.dart';
-import 'package:rocis_tasks/core/services/pagination_service.dart';
-import 'package:rocis_tasks/core/services/subscription_service.dart';
-
-import 'package:rocis_tasks/features/tasks/domain/models/sub_task.dart';
-import 'package:rocis_tasks/features/categories/domain/models/category.dart';
-import 'package:rocis_tasks/features/home/services/month_widget_service.dart';
-import 'package:rocis_tasks/features/home/services/full_calendar_widget_service.dart';
-import 'package:rocis_tasks/features/tasks/services/task_widget_service.dart';
-import 'package:rocis_tasks/core/services/widget_data_service.dart';
-
 import 'package:rocis_tasks/core/services/error_handling_service.dart';
-import 'package:rocis_tasks/core/services/analytics_service.dart';
-import 'package:rocis_tasks/core/services/validation_service.dart';
+import 'package:rocis_tasks/core/services/firestore_service.dart';
+import 'package:rocis_tasks/core/services/google_tasks_service.dart';
 import 'package:rocis_tasks/core/services/logger_service.dart';
+import 'package:rocis_tasks/core/services/notification_service.dart';
+import 'package:rocis_tasks/core/services/pagination_service.dart';
 import 'package:rocis_tasks/core/services/security_service.dart';
+import 'package:rocis_tasks/core/services/subscription_service.dart';
+import 'package:rocis_tasks/core/services/validation_service.dart';
+import 'package:rocis_tasks/core/services/widget_data_service.dart';
+import 'package:rocis_tasks/features/categories/domain/models/category.dart';
+import 'package:rocis_tasks/features/home/services/full_calendar_widget_service.dart';
+import 'package:rocis_tasks/features/home/services/month_widget_service.dart';
+import 'package:rocis_tasks/features/tasks/data/datasources/local_task_source.dart';
+import 'package:rocis_tasks/features/tasks/domain/models/sub_task.dart';
+import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
+import 'package:rocis_tasks/features/tasks/presentation/providers/helpers/task_filter_service.dart';
+import 'package:rocis_tasks/features/tasks/presentation/providers/helpers/task_notification_manager.dart';
+import 'package:rocis_tasks/features/tasks/presentation/providers/helpers/task_sync_manager.dart';
+import 'package:rocis_tasks/features/tasks/services/task_widget_service.dart';
+import 'package:rocis_tasks/l10n/app_localizations.dart';
+import 'package:rocis_tasks/l10n/l10n_helper.dart';
+import 'package:rocis_tasks/shared/ui/ui_kit.dart';
 
-enum TaskSortOption { dueDate, priority, title, dateCreated }
-
-enum DateTimeFilterOption { all, today, thisWeek, overdue, noDate }
+export 'package:rocis_tasks/features/tasks/presentation/providers/helpers/task_filter_service.dart'
+    show TaskSortOption, DateTimeFilterOption;
 
 /// Main provider for task management and synchronization.
 ///
 /// This class handles local persistence via Hive, cloud synchronization via Firestore,
 /// and coordination between various services (notifications, widgets, etc.).
 class TaskProvider extends ChangeNotifier {
-  static const int _maxNagNotifications = 5;
   AppLocalizations get _l10n {
     final currentLocale = _themeService.locale ?? PlatformDispatcher.instance.locale;
     return getSafeAppLocalizations(currentLocale);
@@ -58,23 +57,31 @@ class TaskProvider extends ChangeNotifier {
   final ErrorHandlingService _errorHandlingService;
   final SubscriptionService _subscriptionService;
   final PrivateModeService _privateModeService;
+
   late final MonthWidgetService _monthWidgetService;
   late final FullCalendarWidgetService _fullCalendarWidgetService;
   late final WidgetDataService _widgetDataService;
   late final PaginationService<Task> _taskPagination;
+
+  late final TaskFilterService _filterService;
+  late final TaskNotificationManager _notificationManager;
+  late final TaskSyncManager _syncManager;
+
   bool _isLoading = true;
-  StreamSubscription? _tasksSubscription;
-  StreamSubscription? _categoriesSubscription;
   StreamSubscription? _authSubscription;
   StreamSubscription? _connectivitySubscription;
   StreamSubscription? _notificationSubscription;
   String? _lastUserId;
-  String? _completedPrefetchUserId;
-  bool _completedPrefetchInFlight = false;
 
-  // Guard against Firestore stream reverting local toggles.
-  // Maps task ID → the isCompleted state we just wrote locally.
-  final Map<String, bool> _pendingLocalWrites = {};
+  // Reminders & Quiet Hours settings
+  bool _advancedRemindersEnabled = false;
+  bool _nagRemindersEnabled = false;
+  int _nagIntervalMinutes = 15;
+  int _nagCount = 3;
+  bool _quietHoursEnabled = false;
+  int _quietStartMinutes = 22 * 60;
+  int _quietEndMinutes = 7 * 60;
+  bool _showMyTasksGuideShortcut = true;
 
   // Bulk Selection State
   bool _isSelectionMode = false;
@@ -97,18 +104,31 @@ class TaskProvider extends ChangeNotifier {
     FirestoreService? firestoreService,
     ConnectivityService? connectivityService,
     AnalyticsService? analyticsService,
-  }) : _privateModeService = privateModeService ?? PrivateModeService(),
-       _source = source ?? LocalTaskSource(),
-       _notificationService = notificationService ?? NotificationService(),
-       _firestoreService = firestoreService ?? FirestoreService(),
-       _connectivityService = connectivityService ?? ConnectivityService(),
-       _analyticsService = analyticsService ?? AnalyticsService();
+  })  : _privateModeService = privateModeService ?? PrivateModeService(),
+        _source = source ?? LocalTaskSource(),
+        _notificationService = notificationService ?? NotificationService(),
+        _firestoreService = firestoreService ?? FirestoreService(),
+        _connectivityService = connectivityService ?? ConnectivityService(),
+        _analyticsService = analyticsService ?? AnalyticsService() {
+    _filterService = TaskFilterService();
+    _notificationManager = TaskNotificationManager(
+      notificationService: _notificationService,
+    );
+    _syncManager = TaskSyncManager(
+      authService: _authService,
+      firestoreService: _firestoreService,
+      googleTasksService: _googleTasksService,
+      calendarService: _calendarService,
+      source: _source,
+      errorHandlingService: _errorHandlingService,
+    );
+  }
+
   Timer? _widgetDebounce;
   bool _widgetUpdateInProgress = false;
   bool _pendingWidgetUpdate = false;
   bool get isLoading => _isLoading;
 
-  // Security prompt for private task/category creation
   bool _showSecurityPrompt = false;
   bool get showSecurityPrompt => _showSecurityPrompt;
   void clearSecurityPrompt() {
@@ -138,22 +158,21 @@ class TaskProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Initialize the provider and its dependencies.
-  ///
-  /// Sets up listeners for authentication changes, connectivity, and Firestore streams.
   Future<void> init() async {
     final prefs = await SharedPreferences.getInstance();
     final sortIndex = prefs.getInt('sort_option');
     if (sortIndex != null && sortIndex < TaskSortOption.values.length) {
-      _currentSortOption = TaskSortOption.values[sortIndex];
+      _filterService.currentSortOption = TaskSortOption.values[sortIndex];
     }
     final dateFilterIndex = prefs.getInt('date_filter');
     if (dateFilterIndex != null &&
         dateFilterIndex < DateTimeFilterOption.values.length) {
-      _currentDateFilter = DateTimeFilterOption.values[dateFilterIndex];
+      _filterService.currentDateFilter =
+          DateTimeFilterOption.values[dateFilterIndex];
     }
-    _selectedCategoryIds = prefs.getStringList('category_filters') ?? [];
-    _showCompleted = prefs.getBool('show_completed') ?? true;
+    _filterService.selectedCategoryIds =
+        prefs.getStringList('category_filters') ?? [];
+    _filterService.showCompleted = prefs.getBool('show_completed') ?? true;
     _advancedRemindersEnabled =
         prefs.getBool('advanced_reminders_enabled') ?? false;
     _nagRemindersEnabled = prefs.getBool('nag_reminders_enabled') ?? false;
@@ -164,7 +183,7 @@ class TaskProvider extends ChangeNotifier {
     _quietEndMinutes = prefs.getInt('quiet_end_minutes') ?? (7 * 60);
     _showMyTasksGuideShortcut =
         prefs.getBool('show_my_tasks_guide_shortcut') ?? true;
-    _searchQuery = '';
+    _filterService.searchQuery = '';
 
     _monthWidgetService = MonthWidgetService(_calendarService, _source);
     _fullCalendarWidgetService = FullCalendarWidgetService(
@@ -173,13 +192,10 @@ class TaskProvider extends ChangeNotifier {
     );
     _widgetDataService = WidgetDataService(_calendarService);
 
-    // Initialize schedule service for ROCIs-Schedule integration
     await _widgetDataService.initScheduleService();
     await _fullCalendarWidgetService.initScheduleService();
 
-    // Initialize pagination service
     _taskPagination = PaginationService<Task>(_getFilteredAndSortedTasks);
-    // Don't initialize yet - wait for source init
 
     try {
       await _source.init();
@@ -195,15 +211,11 @@ class TaskProvider extends ChangeNotifier {
     _refreshPagination();
 
     await _notificationService.cancelAllNotifications();
-
-    // Initialize RevenueCat SDK
     await _subscriptionService.init();
 
-    // Listen to subscription changes
     _subscriptionService.addListener(notifyListeners);
     _privateModeService.addListener(_onPrivateModeChanged);
 
-    // Defer notification rescheduling to not block startup
     Future.delayed(const Duration(seconds: 2), () async {
       final allTasks = _source.getTasks();
       for (final task in allTasks) {
@@ -219,19 +231,14 @@ class TaskProvider extends ChangeNotifier {
       }
     });
 
-    // Initialize connectivity service
     await _connectivityService.init();
 
-    // Listen to connectivity changes to sync when coming back online
-    _connectivitySubscription =
-        _connectivityService.addListener(() {
-              if (_connectivityService.isOnline &&
-                  _authService.currentUser != null) {
-                // Network restored - attempting sync
-                syncWithCloud();
-              }
-            })
-            as StreamSubscription?;
+    _connectivitySubscription = _connectivityService.addListener(() {
+      if (_connectivityService.isOnline &&
+          _authService.currentUser != null) {
+        syncWithCloud();
+      }
+    }) as StreamSubscription?;
 
     _lastUserId = _authService.currentUser?.uid;
     _authSubscription = _authService.authStateChanges.listen((
@@ -240,20 +247,15 @@ class TaskProvider extends ChangeNotifier {
       if (user != null) {
         _lastUserId = user.uid;
         _firestoreService.setUserId(user.uid);
-        
-        // Refresh pagination to show Hive data for the user
         _refreshPagination();
-        
-        // Always attempt sync - Firestore handles offline state
         uploadLocalDataToCloud();
         syncWithCloud();
         unawaited(_prefetchCompletedTasksIfNeeded());
       } else {
-        // Only clear if we were previously logged in (_lastUserId was set)
         if (_lastUserId != null) {
           AppLogger.info('User signed out, clearing local data...', tag: 'Tasks');
           _firestoreService.setUserId(null);
-          await _cancelSubscriptions();
+          await _syncManager.cancelSubscriptions();
           await _source.clearAll();
           updateHomeWidget();
           _lastUserId = null;
@@ -265,7 +267,6 @@ class TaskProvider extends ChangeNotifier {
     _isLoading = false;
     notifyListeners();
 
-    // Defer home widget update - show notification on app first open
     Future.delayed(
       const Duration(seconds: 1),
       () async => await updateHomeWidgetWithNotification(),
@@ -275,7 +276,6 @@ class TaskProvider extends ChangeNotifier {
       _firestoreService.setUserId(_authService.currentUser!.uid);
       _refreshPagination();
       
-      // Attempt sync in background - Firestore handles offline state
       uploadLocalDataToCloud()
           .then((_) => syncWithCloud())
           .then((_) => updateHomeWidget())
@@ -318,7 +318,7 @@ class TaskProvider extends ChangeNotifier {
     try {
       final task = _source.getTasks().firstWhere((t) => t.id == taskId);
       if (task.dueDate != null) {
-        final newDate = _getSnoozedDate(task.dueDate!, actionId);
+        final newDate = _notificationManager.getSnoozedDate(task.dueDate!, actionId);
         await updateTask(task, dueDate: newDate);
       }
     } catch (e, s) {
@@ -341,179 +341,29 @@ class TaskProvider extends ChangeNotifier {
     }
   }
 
-  DateTime _getSnoozedDate(DateTime base, String? actionId) {
-    if (actionId == 'snooze_10') {
-      return base.add(const Duration(minutes: 10));
-    }
-    if (actionId == 'snooze_60') {
-      return base.add(const Duration(hours: 1));
-    }
-    if (actionId == 'snooze_tomorrow_morning') {
-      final now = DateTime.now();
-      final tomorrow = DateTime(now.year, now.month, now.day).add(
-        const Duration(days: 1),
-      );
-      return DateTime(tomorrow.year, tomorrow.month, tomorrow.day, 9);
-    }
-    return base.add(const Duration(minutes: 15));
-  }
-
-  DateTime _applyQuietHours(DateTime date) {
-    if (!quietHoursEnabled) return date;
-    final start = _quietStartMinutes;
-    final end = _quietEndMinutes;
-    if (start == end) return date;
-
-    final minutes = date.hour * 60 + date.minute;
-    final spansMidnight = start > end;
-    final inQuiet = spansMidnight
-        ? (minutes >= start || minutes < end)
-        : (minutes >= start && minutes < end);
-
-    if (!inQuiet) return date;
-
-    final endHour = end ~/ 60;
-    final endMinute = end % 60;
-    final endDate = (spansMidnight && minutes >= start)
-        ? date.add(const Duration(days: 1))
-        : date;
-    return DateTime(endDate.year, endDate.month, endDate.day, endHour, endMinute);
-  }
-
-  List<int> _getNotificationIdsForTask(Task task) {
-    final baseId = NotificationService.getNotificationId(task.id);
-    final ids = <int>[baseId];
-    for (var i = 1; i <= _maxNagNotifications; i++) {
-      ids.add(NotificationService.getNotificationId('${task.id}_nag_$i'));
-    }
-    return ids;
-  }
-
   Future<void> _cancelTaskNotifications(Task task) async {
-    final ids = _getNotificationIdsForTask(task);
-    for (final id in ids) {
-      await _notificationService.cancelNotification(id);
-    }
+    await _notificationManager.cancelTaskNotifications(task);
   }
 
   Future<void> _cancelTaskNotificationsById(String taskId) async {
-    final ids = <int>[NotificationService.getNotificationId(taskId)];
-    for (var i = 1; i <= _maxNagNotifications; i++) {
-      ids.add(NotificationService.getNotificationId('${taskId}_nag_$i'));
-    }
-    for (final id in ids) {
-      await _notificationService.cancelNotification(id);
-    }
+    await _notificationManager.cancelTaskNotificationsById(taskId);
   }
 
   Future<void> _scheduleTaskNotifications(Task task) async {
-    if (task.isCompleted || (task.isDeleted ?? false)) return;
-    if (task.skipReminders) return;
-    if (task.dueDate == null) return;
-    if (!task.dueDate!.isAfter(DateTime.now())) return;
-
-    await _cancelTaskNotifications(task);
-
-    if (_subscriptionService.isPremium &&
-        task.requireSubTasksBeforeReminders &&
-        (task.subTasks?.isNotEmpty ?? false) &&
-        (task.subTasks?.any((st) => !st.isCompleted) ?? false)) {
-      return;
-    }
-
-    final isPrivate = _isPrivateTask(task);
-    final shouldHide =
-        _shouldMaskPrivateContent() && isPrivate;
-
-    final title = shouldHide
-        ? _l10n.taskReminderTitle(_l10n.privateLabel)
-        : _l10n.taskReminderTitle(task.title);
-    final body = shouldHide
-        ? _l10n.taskDueNowBody
-        : (task.description.isNotEmpty ? task.description : _l10n.taskDueNowBody);
-
-    final actions = <AndroidNotificationAction>[
-      if (advancedRemindersEnabled) ...[
-        AndroidNotificationAction(
-          'snooze_10',
-          _l10n.snooze10m,
-          showsUserInterface: true,
-        ),
-        AndroidNotificationAction(
-          'snooze',
-          _l10n.notificationSnooze,
-          showsUserInterface: true,
-        ),
-        AndroidNotificationAction(
-          'snooze_60',
-          _l10n.snooze1h,
-          showsUserInterface: true,
-        ),
-        AndroidNotificationAction(
-          'snooze_tomorrow_morning',
-          _l10n.tomorrowAtNine,
-          showsUserInterface: true,
-        ),
-      ] else ...[
-        AndroidNotificationAction(
-          'snooze',
-          _l10n.notificationSnooze,
-          showsUserInterface: true,
-        ),
-      ],
-      AndroidNotificationAction(
-        'complete',
-        _l10n.notificationMarkCompleted,
-        showsUserInterface: true,
-      ),
-      AndroidNotificationAction(
-        'open_task',
-        _l10n.notificationOpenTask,
-        showsUserInterface: true,
-      ),
-    ];
-
-    final baseScheduledDate = _applyQuietHours(task.dueDate!);
-    if (!baseScheduledDate.isAfter(DateTime.now())) return;
-
-    await _notificationService.scheduleNotification(
-      id: NotificationService.getNotificationId(task.id),
-      title: title,
-      body: body,
-      scheduledDate: baseScheduledDate,
-      taskId: task.id,
-      androidActions: actions,
+    await _notificationManager.scheduleTaskNotifications(
+      task,
+      l10n: _l10n,
+      isPremium: _subscriptionService.isPremium,
+      advancedRemindersEnabled: advancedRemindersEnabled,
+      nagRemindersEnabled: nagRemindersEnabled,
+      nagCount: _nagCount,
+      nagIntervalMinutes: _nagIntervalMinutes,
+      quietHoursEnabled: quietHoursEnabled,
+      quietStartMinutes: _quietStartMinutes,
+      quietEndMinutes: _quietEndMinutes,
+      isPrivate: _isPrivateTask(task),
+      shouldHidePrivate: _shouldMaskPrivateContent(),
     );
-
-    if (nagRemindersEnabled) {
-      final effectiveCount = _nagCount.clamp(0, _maxNagNotifications);
-      final effectiveInterval = _nagIntervalMinutes.clamp(1, 24 * 60);
-      final scheduledTimes = <int>{baseScheduledDate.millisecondsSinceEpoch};
-
-      for (var i = 1; i <= effectiveCount; i++) {
-        final rawDate = baseScheduledDate.add(
-          Duration(minutes: effectiveInterval * i),
-        );
-        final scheduledDate = _applyQuietHours(rawDate);
-        if (!scheduledDate.isAfter(DateTime.now())) continue;
-        if (!scheduledTimes.add(scheduledDate.millisecondsSinceEpoch)) continue;
-        await _notificationService.scheduleNotification(
-          id: NotificationService.getNotificationId('${task.id}_nag_$i'),
-          title: title,
-          body: body,
-          scheduledDate: scheduledDate,
-          taskId: task.id,
-          androidActions: actions,
-        );
-      }
-    }
-  }
-
-  Future<void> _cancelSubscriptions() async {
-    await _tasksSubscription?.cancel();
-    await _categoriesSubscription?.cancel();
-    _tasksSubscription = null;
-    _categoriesSubscription = null;
   }
 
   void _onPrivateModeChanged() {
@@ -529,193 +379,53 @@ class TaskProvider extends ChangeNotifier {
     _notificationSubscription?.cancel();
     _widgetDebounce?.cancel();
     _privateModeService.removeListener(_onPrivateModeChanged);
-    _cancelSubscriptions();
+    _syncManager.cancelSubscriptions();
     super.dispose();
   }
 
   Future<void> uploadLocalDataToCloud() async {
-    if (_authService.currentUser == null) return;
-
-    try {
-      final tasks = _source.getTasks();
-      final categories = _source.getCategories();
-      for (final category in categories) {
-        await _firestoreService.addCategory(category);
-      }
-      for (final task in tasks) {
-        await _firestoreService.addTask(task);
-      }
-      // Successfully uploaded local data to cloud
-    } catch (e, s) {
-      _errorHandlingService.logError(
-        e,
-        s,
-        reason: 'Uploading local data to cloud',
-      );
-    }
+    await _syncManager.uploadLocalDataToCloud();
   }
 
   Future<void> _prefetchCompletedTasksIfNeeded() async {
-    if (!_showCompleted) return;
-    final user = _authService.currentUser;
-    if (user == null) return;
-    if (_completedPrefetchInFlight) return;
-
-    final hasAnyCompletedLocally = _source
-        .getTasks()
-        .any((t) => t.isCompleted && !(t.isDeleted ?? false));
-    if (_completedPrefetchUserId == user.uid && hasAnyCompletedLocally) {
-      return;
-    }
-
-    _completedPrefetchInFlight = true;
-    try {
-      final completed = await _firestoreService.getNextCompletedTasksBatch();
-      if (completed.isEmpty) {
-        _completedPrefetchUserId = user.uid;
-        return;
-      }
-
-      for (final task in completed) {
-        await _source.addTask(task);
-      }
-      _completedPrefetchUserId = user.uid;
-      _refreshPagination();
-      notifyListeners();
-    } catch (e, s) {
-      _errorHandlingService.logError(e, s, reason: 'Prefetch completed tasks');
-    } finally {
-      _completedPrefetchInFlight = false;
-    }
+    await _syncManager.prefetchCompletedTasksIfNeeded(
+      showCompleted: _filterService.showCompleted,
+      onDataChanged: () {
+        _refreshPagination();
+        notifyListeners();
+      },
+    );
   }
 
   Future<void> syncWithCloud() async {
-    if (_authService.currentUser == null) return;
-
-    // Remove isOnline check to allow Firestore cache to provide data
-
-    await _cancelSubscriptions();
-    try {
-      _tasksSubscription = _firestoreService.getActiveTasksStream().listen(
-        (events) async {
-          bool needsUpdate = false;
-          for (final event in events) {
-            final cloudTask = event.task;
-            
-            // If we just toggled this task locally, don't let a stale
-            // Firestore snapshot revert our write.
-            final pendingState = _pendingLocalWrites[cloudTask.id];
-            if (pendingState != null) {
-              // For removed events the snapshot may still show the old state;
-              // for added/modified events the snapshot may lag behind.
-              if (event.type == SyncEventType.removed && pendingState) {
-                // We just completed this task — the removed event is expected.
-                // Update Hive to reflect completion.
-                final (latestTask, isMissing) =
-                    await _firestoreService.fetchTaskById(cloudTask.id);
-                if (latestTask != null && latestTask.isCompleted) {
-                  await _source.addTask(latestTask);
-                  await _cancelTaskNotificationsById(latestTask.id);
-                  needsUpdate = true;
-                }
-                continue;
-              }
-              if (event.type != SyncEventType.removed && !pendingState) {
-                // We just uncompleted this task — ignore the stale cloud event.
-                continue;
-              }
-            }
-            
-            if (event.type == SyncEventType.removed) {
-              // If it's removed from active, it might be completed or deleted.
-              // DocumentChange.removed gives the *previous* state (still active),
-              // so we must fetch the latest document to avoid reverting completion/deletion.
-              final (latestTask, isMissing) =
-                  await _firestoreService.fetchTaskById(cloudTask.id);
-              if (latestTask != null) {
-                await _source.addTask(latestTask);
-                if (latestTask.isCompleted || (latestTask.isDeleted ?? false)) {
-                  await _cancelTaskNotificationsById(latestTask.id);
-                }
-              } else if (isMissing) {
-                await _source.deleteTask(cloudTask.id);
-                await _cancelTaskNotificationsById(cloudTask.id);
-              } else {
-                continue;
-              }
-            } else {
-              // Added or modified
-              await _source.addTask(cloudTask);
-
-              if (cloudTask.isCompleted || (cloudTask.isDeleted ?? false)) {
-                await _cancelTaskNotificationsById(cloudTask.id);
-              } else {
-                await _scheduleTaskNotifications(cloudTask);
-              }
-            }
-            needsUpdate = true;
-          }
-          
-          if (needsUpdate) {
-            _refreshPagination();
-            notifyListeners();
-            updateHomeWidget();
-          }
-        },
-        onError: (error, stackTrace) {
-          _errorHandlingService.logError(
-            error,
-            stackTrace,
-            reason: 'Tasks stream error',
-          );
-        },
-      );
-
-      _categoriesSubscription = _firestoreService.getCategoriesStream().listen(
-        (cloudCategories) async {
-          for (final cloudCategory in cloudCategories) {
-            await _source.addCategory(cloudCategory);
-          }
-          _refreshPagination();
-          notifyListeners();
-        },
-        onError: (error, stackTrace) {
-          _errorHandlingService.logError(
-            error,
-            stackTrace,
-            reason: 'Categories stream error',
-          );
-        },
-      );
-
-      // Cloud sync started successfully
-      unawaited(syncGoogleTasksToLocal());
-    } catch (e, s) {
-      _errorHandlingService.logError(e, s, reason: 'Starting cloud sync');
-    }
+    await _syncManager.startCloudSync(
+      getTaskById: getTaskById,
+      scheduleTaskNotifications: _scheduleTaskNotifications,
+      cancelNotificationsById: _cancelTaskNotificationsById,
+      onDataChanged: () {
+        _refreshPagination();
+        notifyListeners();
+        updateHomeWidget();
+      },
+    );
   }
 
-  /// Performs a comprehensive sync:
-  /// 1. Forces cloud sync for tasks and categories
-  /// 2. Updates all home widgets with current data
-  /// 3. Updates the global task count notification
-  /// 4. Reschedules all task reminders to ensure they are up-to-date
   Future<void> performFullSync() async {
     try {
-      // 1. Refresh data from cloud
       await syncWithCloud();
-
-      // Sync Google Tasks to Local database
       await syncGoogleTasksToLocal();
-
-      await _processGoogleCalendarUpstreamRocisTasksHook();
-
-      // 2. Force widget updates and global notification refresh
+      await _syncManager.processGoogleCalendarUpstreamRocisTasksHook(
+        isPremium: _subscriptionService.isPremium,
+        scheduleTaskNotifications: _scheduleTaskNotifications,
+        onDataChanged: () {
+          _refreshPagination();
+          notifyListeners();
+          updateHomeWidget();
+        },
+      );
       await updateHomeWidgetWithNotification();
 
-      // 3. Reschedule all task notifications
       final allTasks = _source.getTasks();
-      // First cancel existing to avoid duplicates or orphans
       await _notificationService.cancelAllNotifications();
 
       for (final task in allTasks) {
@@ -727,153 +437,10 @@ class TaskProvider extends ChangeNotifier {
     }
   }
 
-  bool _looksLikeGoogleCalendar(dynamic calendar) {
-    try {
-      final accountType = (calendar.accountType as String?)?.toLowerCase();
-      final accountName = (calendar.accountName as String?)?.toLowerCase();
-      final name = (calendar.name as String?)?.toLowerCase();
-
-      return (accountType?.contains('google') ?? false) ||
-          (accountType?.contains('com.google') ?? false) ||
-          (accountName?.contains('gmail') ?? false) ||
-          (name?.contains('google') ?? false);
-    } catch (_) {
-      return false;
-    }
-  }
-
-  Future<void> _processGoogleCalendarUpstreamRocisTasksHook() async {
-    if (!_subscriptionService.isPremium) return;
-
-    try {
-      final calendars = await _calendarService.getAvailableCalendars();
-      final googleWritableCalendarIds = calendars
-          .where((c) => c.id != null && c.isReadOnly != true)
-          .where(_looksLikeGoogleCalendar)
-          .map((c) => c.id!)
-          .toList();
-      if (googleWritableCalendarIds.isEmpty) return;
-
-      final now = DateTime.now();
-      final events = await _calendarService.getEvents(
-        startDate: now.subtract(const Duration(days: 30)),
-        endDate: now.add(const Duration(days: 365)),
-        calendarIds: googleWritableCalendarIds,
-      );
-      if (events.isEmpty) return;
-
-      var createdAny = false;
-      for (final event in events) {
-        final title = event.title;
-        if (title == null || title.isEmpty) continue;
-
-        final hasMarker =
-            title.contains('[ROCIsTasks]') || title.contains('[RT]');
-        if (!hasMarker) continue;
-
-        final calendarId = event.calendarId;
-        final eventId = event.eventId;
-        final start = event.start;
-        if (calendarId == null || eventId == null || start == null) continue;
-
-        final end = event.end ?? start.add(const Duration(hours: 1));
-        final taskTitle = _stripRocisTasksMarkers(title);
-        final taskDescription = _buildImportedTaskDescription(
-          eventDescription: event.description,
-          start: start,
-          end: end,
-          isAllDay: event.allDay == true,
-        );
-
-        final deleted = await _calendarService.deleteEvent(
-          calendarId: calendarId,
-          eventId: eventId,
-        );
-        if (!deleted) continue;
-
-        final task = Task(
-          title: taskTitle,
-          description: taskDescription,
-          dueDate: start,
-          priority: TaskPriority.medium,
-          syncWithGoogleTasks: false,
-        );
-        await _source.addTask(task);
-        _firestoreService.addTask(task).catchError((e, s) {
-          _errorHandlingService.logError(
-            e,
-            s,
-            reason: 'Background cloud addTask failed (calendar import)',
-          );
-        });
-        if (task.dueDate != null && task.dueDate!.isAfter(DateTime.now())) {
-          try {
-            await _scheduleTaskNotifications(task);
-          } catch (e, s) {
-            _errorHandlingService.logError(
-              e,
-              s,
-              reason: 'Scheduling notification for imported task',
-            );
-          }
-        }
-
-        createdAny = true;
-      }
-
-      if (createdAny) {
-        _refreshPagination();
-        notifyListeners();
-        updateHomeWidget();
-      }
-    } catch (e, s) {
-      _errorHandlingService.logError(
-        e,
-        s,
-        reason: 'Processing upstream Google Calendar import hook',
-      );
-    }
-  }
-
-  String _stripRocisTasksMarkers(String title) {
-    final stripped = title
-        .replaceAll('[ROCIsTasks]', '')
-        .replaceAll('[RT]', '')
-        .trim();
-    return stripped.isEmpty ? 'Task' : stripped;
-  }
-
-  String _buildImportedTaskDescription({
-    required String? eventDescription,
-    required DateTime start,
-    required DateTime end,
-    required bool isAllDay,
-  }) {
-    final base = (eventDescription ?? '').trim();
-    final range = isAllDay
-        ? '${DateFormat.yMMMd().format(start)} → ${DateFormat.yMMMd().format(end)}'
-        : '${DateFormat.yMMMd().add_Hm().format(start)} → ${DateFormat.yMMMd().add_Hm().format(end)}';
-    if (base.isEmpty) return range;
-    return '$base\n\n$range';
-  }
-
-  TaskSortOption _currentSortOption = TaskSortOption.dueDate;
-  DateTimeFilterOption _currentDateFilter = DateTimeFilterOption.all;
-  List<String> _selectedCategoryIds = [];
-  bool _showCompleted = true;
-  bool _advancedRemindersEnabled = false;
-  bool _nagRemindersEnabled = false;
-  int _nagIntervalMinutes = 15;
-  int _nagCount = 3;
-  bool _quietHoursEnabled = false;
-  int _quietStartMinutes = 22 * 60;
-  int _quietEndMinutes = 7 * 60;
-  bool _showMyTasksGuideShortcut = true;
-
-  TaskSortOption get currentSortOption => _currentSortOption;
-  DateTimeFilterOption get currentDateFilter => _currentDateFilter;
-  List<String> get selectedCategoryIds => _selectedCategoryIds;
-  bool get showCompleted => _showCompleted;
+  TaskSortOption get currentSortOption => _filterService.currentSortOption;
+  DateTimeFilterOption get currentDateFilter => _filterService.currentDateFilter;
+  List<String> get selectedCategoryIds => _filterService.selectedCategoryIds;
+  bool get showCompleted => _filterService.showCompleted;
   bool get advancedRemindersEnabled =>
       _subscriptionService.isPremium && _advancedRemindersEnabled;
   bool get nagRemindersEnabled => _subscriptionService.isPremium && _nagRemindersEnabled;
@@ -948,7 +515,7 @@ class TaskProvider extends ChangeNotifier {
   }
 
   void setSortOption(TaskSortOption option) {
-    _currentSortOption = option;
+    _filterService.currentSortOption = option;
     _refreshPagination();
     notifyListeners();
     SharedPreferences.getInstance()
@@ -961,7 +528,7 @@ class TaskProvider extends ChangeNotifier {
   }
 
   void setDateFilter(DateTimeFilterOption option) {
-    _currentDateFilter = option;
+    _filterService.currentDateFilter = option;
     _refreshPagination();
     notifyListeners();
     SharedPreferences.getInstance()
@@ -974,18 +541,14 @@ class TaskProvider extends ChangeNotifier {
   }
 
   void toggleCategoryFilter(String categoryId) {
-    if (_selectedCategoryIds.contains(categoryId)) {
-      _selectedCategoryIds.remove(categoryId);
-    } else {
-      _selectedCategoryIds.add(categoryId);
-    }
+    _filterService.toggleCategoryFilter(categoryId);
     _refreshPagination();
     notifyListeners();
     _saveCategoryFilters();
   }
 
   void clearCategoryFilters() {
-    _selectedCategoryIds = [];
+    _filterService.clearCategoryFilters();
     _refreshPagination();
     notifyListeners();
     _saveCategoryFilters();
@@ -994,7 +557,7 @@ class TaskProvider extends ChangeNotifier {
   void _saveCategoryFilters() {
     SharedPreferences.getInstance()
         .then((prefs) {
-          prefs.setStringList('category_filters', _selectedCategoryIds);
+          prefs.setStringList('category_filters', _filterService.selectedCategoryIds);
         })
         .catchError((e, s) {
           _errorHandlingService.logError(
@@ -1005,17 +568,16 @@ class TaskProvider extends ChangeNotifier {
         });
   }
 
-  String _searchQuery = '';
-  String get searchQuery => _searchQuery;
+  String get searchQuery => _filterService.searchQuery;
 
   void setSearchQuery(String query) {
-    _searchQuery = query.toLowerCase();
+    _filterService.setSearchQuery(query);
     _refreshPagination();
     notifyListeners();
   }
 
   void toggleShowCompleted(bool value) {
-    _showCompleted = value;
+    _filterService.showCompleted = value;
     _refreshPagination();
     notifyListeners();
     if (value) {
@@ -1039,7 +601,6 @@ class TaskProvider extends ChangeNotifier {
     return _taskPagination.items;
   }
 
-  /// Get all tasks for analytics (unfiltered, unpaginated)
   List<Task> get allTasks {
     if (_isLoading) return [];
     var tasks = _source.getTasks().where((t) => !(t.isDeleted ?? false)).toList();
@@ -1049,241 +610,13 @@ class TaskProvider extends ChangeNotifier {
     return tasks;
   }
 
-  /// Get all tasks without pagination (for internal use)
   List<Task> _getFilteredAndSortedTasks() {
-    var tasks = _source
-        .getTasks()
-        .where((t) => !(t.isDeleted ?? false))
-        .toList();
-
-    final maskPrivate = _shouldMaskPrivateContent();
-
-    if (_searchQuery.isNotEmpty) {
-      // Parse search symbols: @category #title !priority %date &subtask *status ?today
-      final lowerQuery = _searchQuery.toLowerCase();
-
-      // Extract symbol filters
-      String? categoryFilter;
-      String? titleFilter;
-      String? priorityFilter;
-      String? dateFilter;
-      String? subtaskFilter;
-      String? statusFilter;
-      bool todayFilter = false;
-      String freeText = lowerQuery;
-
-      // Parse @category
-      final categoryMatch = RegExp(r'@(\S+)').firstMatch(freeText);
-      if (categoryMatch != null) {
-        categoryFilter = categoryMatch.group(1);
-        freeText = freeText.replaceFirst(RegExp(r'@\S+'), '').trim();
-      }
-
-      // Parse #title
-      final titleMatch = RegExp(r'#(\S+)').firstMatch(freeText);
-      if (titleMatch != null) {
-        titleFilter = titleMatch.group(1);
-        freeText = freeText.replaceFirst(RegExp(r'#\S+'), '').trim();
-      }
-
-      // Parse !priority
-      final priorityMatch = RegExp(r'!(\S+)').firstMatch(freeText);
-      if (priorityMatch != null) {
-        priorityFilter = priorityMatch.group(1);
-        freeText = freeText.replaceFirst(RegExp(r'!\S+'), '').trim();
-      }
-
-      // Parse %date
-      final dateMatch = RegExp(r'%(\S+)').firstMatch(freeText);
-      if (dateMatch != null) {
-        dateFilter = dateMatch.group(1);
-        freeText = freeText.replaceFirst(RegExp(r'%\S+'), '').trim();
-      }
-
-      // Parse &subtask
-      final subtaskMatch = RegExp(r'&(\S+)').firstMatch(freeText);
-      if (subtaskMatch != null) {
-        subtaskFilter = subtaskMatch.group(1);
-        freeText = freeText.replaceFirst(RegExp(r'&\S+'), '').trim();
-      }
-
-      // Parse *status
-      final statusMatch = RegExp(r'\*(\S+)').firstMatch(freeText);
-      if (statusMatch != null) {
-        statusFilter = statusMatch.group(1);
-        freeText = freeText.replaceFirst(RegExp(r'\*\S+'), '').trim();
-      }
-
-      // Parse ?
-      if (freeText.contains('?')) {
-        todayFilter = true;
-        freeText = freeText.replaceFirst('?', '').trim();
-      }
-
-      tasks = tasks.where((t) {
-        // Free text search on title/description
-        if (freeText.isNotEmpty) {
-          final titleMatch = t.title.toLowerCase().contains(freeText);
-          if (!titleMatch) {
-            if (maskPrivate && _isPrivateTask(t)) return false;
-            if (!t.description.toLowerCase().contains(freeText)) return false;
-          }
-        }
-
-        // @category filter
-        if (categoryFilter != null) {
-          bool matched = false;
-          if (t.categoryId != null) {
-            final cat = getCategoryById(t.categoryId);
-            if (cat != null && cat.name.toLowerCase().contains(categoryFilter)) {
-              matched = true;
-            }
-          }
-          if (!matched && t.categoryIds.isNotEmpty) {
-            for (final id in t.categoryIds) {
-              final cat = getCategoryById(id);
-              if (cat != null && cat.name.toLowerCase().contains(categoryFilter)) {
-                matched = true;
-                break;
-              }
-            }
-          }
-          if (!matched) return false;
-        }
-
-        // #title filter
-        if (titleFilter != null) {
-          if (!t.title.toLowerCase().contains(titleFilter)) return false;
-        }
-
-        // !priority filter
-        if (priorityFilter != null) {
-          final priorityName = t.priority.name.toLowerCase();
-          if (!priorityName.contains(priorityFilter)) return false;
-        }
-
-        // %date filter (matches date string like 2025-06-15 or partial)
-        if (dateFilter != null && t.dueDate != null) {
-          final dateStr = DateFormat('yyyy-MM-dd').format(t.dueDate!);
-          if (!dateStr.contains(dateFilter)) return false;
-        } else if (dateFilter != null && t.dueDate == null) {
-          return false;
-        }
-
-        // &subtask filter
-        if (subtaskFilter != null && subtaskFilter.isNotEmpty) {
-          final filter = subtaskFilter;
-          final hasMatchingSubtask = t.subTasks?.any(
-            (st) => st.title.toLowerCase().contains(filter),
-          ) ?? false;
-          if (!hasMatchingSubtask) return false;
-        }
-
-        // *status filter
-        if (statusFilter != null) {
-          if (statusFilter == 'done' || statusFilter == 'completed') {
-            if (!t.isCompleted) return false;
-          } else if (statusFilter == 'pending' || statusFilter == 'active') {
-            if (t.isCompleted) return false;
-          }
-        }
-
-        // ? filter — tasks due today
-        if (todayFilter) {
-          if (t.dueDate == null) return false;
-          final now = DateTime.now();
-          final today = DateTime(now.year, now.month, now.day);
-          if (t.dueDate!.year != today.year ||
-              t.dueDate!.month != today.month ||
-              t.dueDate!.day != today.day) {
-            return false;
-          }
-        }
-
-        return true;
-      }).toList();
-    }
-
-    if (_selectedCategoryIds.isNotEmpty) {
-      tasks = tasks
-          .where((t) => _selectedCategoryIds.contains(t.categoryId) || t.categoryIds.any((id) => _selectedCategoryIds.contains(id)))
-          .toList();
-    }
-
-    if (!_showCompleted) {
-      tasks = tasks.where((t) {
-        if (maskPrivate && _isPrivateTask(t)) return true;
-        return !t.isCompleted;
-      }).toList();
-    }
-
-    // Apply Date Filter
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final weekEnd = today.add(const Duration(days: 7));
-
-    switch (_currentDateFilter) {
-      case DateTimeFilterOption.today:
-        tasks = tasks.where((t) {
-          if (maskPrivate && _isPrivateTask(t)) return true;
-          if (t.dueDate == null) return false;
-          final d = t.dueDate!;
-          return d.year == today.year && d.month == today.month && d.day == today.day;
-        }).toList();
-        break;
-      case DateTimeFilterOption.thisWeek:
-        tasks = tasks.where((t) {
-          if (maskPrivate && _isPrivateTask(t)) return true;
-          if (t.dueDate == null) return false;
-          return t.dueDate!.isAfter(today.subtract(const Duration(seconds: 1))) && 
-                 t.dueDate!.isBefore(weekEnd);
-        }).toList();
-        break;
-      case DateTimeFilterOption.overdue:
-        tasks = tasks.where((t) {
-          if (maskPrivate && _isPrivateTask(t)) return true;
-          if (t.dueDate == null || t.isCompleted) return false;
-          return t.dueDate!.isBefore(now);
-        }).toList();
-        break;
-      case DateTimeFilterOption.noDate:
-        tasks = tasks.where((t) {
-          if (maskPrivate && _isPrivateTask(t)) return true;
-          return t.dueDate == null;
-        }).toList();
-        break;
-      case DateTimeFilterOption.all:
-        break;
-    }
-
-    tasks.sort((a, b) {
-      final aPrivate = maskPrivate && _isPrivateTask(a);
-      final bPrivate = maskPrivate && _isPrivateTask(b);
-      if (aPrivate != bPrivate) return aPrivate ? 1 : -1;
-      if (aPrivate && bPrivate) {
-        return a.title.toLowerCase().compareTo(b.title.toLowerCase());
-      }
-      if ((a.isPinned ?? false) != (b.isPinned ?? false)) {
-        return (a.isPinned ?? false) ? -1 : 1;
-      }
-      if (a.isCompleted != b.isCompleted) {
-        return a.isCompleted ? 1 : -1;
-      }
-      switch (_currentSortOption) {
-        case TaskSortOption.dueDate:
-          if (a.dueDate == null && b.dueDate == null) return 0;
-          if (a.dueDate == null) return 1;
-          if (b.dueDate == null) return -1;
-          return a.dueDate!.compareTo(b.dueDate!);
-        case TaskSortOption.priority:
-          return b.priority.index.compareTo(a.priority.index);
-        case TaskSortOption.title:
-          return a.title.toLowerCase().compareTo(b.title.toLowerCase());
-        case TaskSortOption.dateCreated:
-          return a.createdAt.compareTo(b.createdAt);
-      }
-    });
-    return tasks;
+    return _filterService.filterAndSortTasks(
+      allTasks: _source.getTasks(),
+      getCategoryById: getCategoryById,
+      isPrivateTask: _isPrivateTask,
+      shouldMaskPrivateContent: _shouldMaskPrivateContent(),
+    );
   }
 
   List<Task> get deletedTasks {
@@ -1296,20 +629,17 @@ class TaskProvider extends ChangeNotifier {
     return _source.getCategories();
   }
 
-  // Pagination methods
   bool get hasMoreTasks => _taskPagination.hasMoreItems;
   bool get isLoadingMoreTasks => _taskPagination.isLoading;
   int get currentTaskPage => _taskPagination.currentPage;
   int get totalTaskPages => _taskPagination.totalPages;
   int get totalTaskCount => _taskPagination.totalItems;
 
-  /// Load more tasks (for infinite scroll)
   Future<void> loadMoreTasks() async {
     await _taskPagination.loadNextPage();
     
-    // If we've exhausted local tasks and are showing completed tasks, fetch more from Firestore
     if (!_taskPagination.hasMoreItems && 
-        _showCompleted && 
+        _filterService.showCompleted && 
         _authService.currentUser != null) {
       
       final moreTasks = await _firestoreService.getNextCompletedTasksBatch();
@@ -1324,12 +654,10 @@ class TaskProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Check if should load more tasks based on scroll position
   bool shouldLoadMoreTasks(int index) {
     return _taskPagination.shouldLoadMore(index);
   }
 
-  /// Refresh pagination when data changes
   void _refreshPagination() {
     _taskPagination.refresh();
   }
@@ -1374,45 +702,27 @@ class TaskProvider extends ChangeNotifier {
     return parts.join(' • ');
   }
 
-  /// Update home widgets without showing the task count notification
-  /// Use this for general widget updates (color changes, pin/unpin, etc.)
-  /// Immediately update task counter notification, bypassing widget debounce.
-  /// Called after task creation to ensure the notification is shown right away.
   Future<void> _updateTaskCounterNotification() async {
-    try {
-      final allTasks = _source.getTasks();
-      final uncompletedTasks = allTasks
-          .where((t) => !t.isCompleted && !(t.isDeleted ?? false))
-          .toList();
+    final allTasks = _source.getTasks();
+    final uncompletedTasks = allTasks
+        .where((t) => !t.isCompleted && !(t.isDeleted ?? false))
+        .toList();
 
-      final titles = uncompletedTasks.map((t) => t.title).toList();
-
-      await _notificationService.showTaskCountNotification(
-        uncompletedTasks.length,
-        titles,
-        isDarkText: !_themeService.isDarkMode,
-        uncompletedTasksLabel: _l10n.notificationUncompletedTasks(
-          uncompletedTasks.length,
-        ),
-        tasksRemainingLabel: _l10n.notificationTasksRemaining,
-        tasksSummaryLabel: _l10n.notificationTasksSummary(uncompletedTasks.length),
-      );
-    } catch (e) {
-      // Not critical — widget update will handle it as fallback
-    }
+    await _notificationManager.updateTaskCounterNotification(
+      uncompletedTasks: uncompletedTasks,
+      isDarkMode: _themeService.isDarkMode,
+      l10n: _l10n,
+    );
   }
 
   Future<void> updateHomeWidget() async {
     await _updateWidgets(showNotification: false);
   }
 
-  /// Update home widgets AND show the task count notification
-  /// Use this only when tasks are added, completed, or deleted
   Future<void> updateHomeWidgetWithNotification() async {
     await _updateWidgets(showNotification: true);
   }
 
-  /// Internal method to update widgets with optional notification
   Future<void> _updateWidgets({required bool showNotification}) async {
     if (kIsWeb) return;
     if (_widgetUpdateInProgress) {
@@ -1439,33 +749,23 @@ class TaskProvider extends ChangeNotifier {
             isDarkText: !_themeService.isDarkMode,
           );
 
-          // Only show notification when explicitly requested
-          // (task added, completed, deleted, or app first opened)
           if (showNotification) {
             final uncompletedTasks = tasksForTaskWidgetAndCounter
                 .where((t) => !t.isCompleted && !(t.isDeleted ?? false))
                 .toList();
 
-            await _notificationService.showTaskCountNotification(
-              uncompletedTasks.length,
-              uncompletedTasks.map(_formatTaskTitleForCounter).toList(),
+            await _notificationManager.updateTaskCounterNotification(
+              uncompletedTasks: uncompletedTasks,
+              isDarkMode: _themeService.isDarkMode,
+              l10n: _l10n,
               largeIconPath: chartPath,
-              isDarkText: !_themeService.isDarkMode,
-              uncompletedTasksLabel: _l10n.notificationUncompletedTasks(
-                uncompletedTasks.length,
-              ),
-              tasksRemainingLabel: _l10n.notificationTasksRemaining,
-              tasksSummaryLabel: _l10n.notificationTasksSummary(
-                uncompletedTasks.length,
-              ),
+              formattedTitles: uncompletedTasks.map(_formatTaskTitleForCounter).toList(),
             );
           }
 
-          // Get current user ID and email for ROCIs-Schedule integration
           final userId = _authService.currentUser?.uid;
           final userEmail = _authService.currentUser?.email;
 
-          // Set user email for cross-app schedule data lookup
           _widgetDataService.setUserEmail(userEmail);
           _fullCalendarWidgetService.setUserEmail(userEmail);
 
@@ -1500,7 +800,6 @@ class TaskProvider extends ChangeNotifier {
     );
   }
 
-  /// Add a new task to local storage and sync with cloud.
   Future<void> addTask(
     String title,
     String description,
@@ -1530,7 +829,7 @@ class TaskProvider extends ChangeNotifier {
       isGroceryList: isGroceryList,
     );
     await _source.addTask(task);
-    // Sync to cloud - Firestore handles offline state and buffering
+
     _firestoreService.addTask(task).catchError((e, s) {
       _errorHandlingService.logError(e, s, reason: 'Background cloud addTask failed');
     });
@@ -1544,7 +843,6 @@ class TaskProvider extends ChangeNotifier {
           s,
           reason: 'Scheduling notification for new task',
         );
-        // Not critical enough to show error, but good to know
       }
     }
 
@@ -1552,18 +850,14 @@ class TaskProvider extends ChangeNotifier {
 
     _refreshPagination();
     notifyListeners();
-    updateHomeWidgetWithNotification(); // Show notification when task is added
-
-    // Immediately update task counter notification (bypass widget debounce)
+    updateHomeWidgetWithNotification();
     _updateTaskCounterNotification();
 
-    // Log analytics
     await _analyticsService.logTaskCreated(
       categoryId: categoryIds?.isNotEmpty == true ? categoryIds!.join(',') : (category ?? 'none'),
       hasDueDate: dueDate != null,
     );
 
-    // Check if private task was created without security enabled
     if (category != null) {
       final cat = getCategoryById(category);
       if (cat?.isPrivate == true && !_privateModeService.shouldHidePrivateContent) {
@@ -1577,18 +871,14 @@ class TaskProvider extends ChangeNotifier {
     task.isCompleted = !task.isCompleted;
     task.completedAt = task.isCompleted ? DateTime.now() : null;
 
-    // Record the intended state so the Firestore stream doesn't revert it
-    _pendingLocalWrites[task.id] = task.isCompleted;
+    _syncManager.recordPendingWrite(task.id, task.isCompleted);
 
     notifyListeners();
     await _source.addTask(task);
     _firestoreService.updateTask(task).catchError((e, s) {
       _errorHandlingService.logError(e, s, reason: 'Background cloud updateTask failed');
     }).whenComplete(() {
-      // Allow stream to handle this task again after Firestore write settles
-      Future.delayed(const Duration(seconds: 3), () {
-        _pendingLocalWrites.remove(task.id);
-      });
+      _syncManager.schedulePendingWriteCleanup(task.id, delay: const Duration(seconds: 15));
     });
 
     await _syncTaskGoogleTasksState(task);
@@ -1608,7 +898,8 @@ class TaskProvider extends ChangeNotifier {
     }
     _refreshPagination();
     notifyListeners();
-    updateHomeWidgetWithNotification(); // Show notification when task is completed/uncompleted
+    unawaited(_updateTaskCounterNotification());
+    updateHomeWidgetWithNotification();
 
     if (task.isCompleted) {
       await _analyticsService.logTaskCompleted();
@@ -1663,15 +954,20 @@ class TaskProvider extends ChangeNotifier {
       if (allCompleted && !task.isCompleted) {
         task.isCompleted = true;
         task.completedAt = DateTime.now();
+        _syncManager.recordPendingWrite(task.id, true);
       } else if (!allCompleted && task.isCompleted) {
         task.isCompleted = false;
         task.completedAt = null;
+        _syncManager.recordPendingWrite(task.id, false);
       }
     }
 
     await _source.addTask(task);
+    final taskId = task.id;
     _firestoreService.updateTask(task).catchError((e, s) {
       _errorHandlingService.logError(e, s, reason: 'Background cloud updateTask failed');
+    }).whenComplete(() {
+      _syncManager.schedulePendingWriteCleanup(taskId, delay: const Duration(seconds: 15));
     });
 
     await _cancelTaskNotifications(task);
@@ -1693,7 +989,8 @@ class TaskProvider extends ChangeNotifier {
 
     _refreshPagination();
     notifyListeners();
-    updateHomeWidget();
+    unawaited(_updateTaskCounterNotification());
+    updateHomeWidgetWithNotification();
   }
 
   Future<void> _clearDeprecatedRecurringTaskData() async {
@@ -1730,9 +1027,11 @@ class TaskProvider extends ChangeNotifier {
         if (allCompleted && !task.isCompleted) {
           task.isCompleted = true;
           task.completedAt = DateTime.now();
+          _syncManager.recordPendingWrite(task.id, true);
         } else if (!allCompleted && task.isCompleted) {
           task.isCompleted = false;
           task.completedAt = null;
+          _syncManager.recordPendingWrite(task.id, false);
         }
       }
 
@@ -1756,12 +1055,15 @@ class TaskProvider extends ChangeNotifier {
       _refreshPagination();
       notifyListeners();
 
-      // Sync to cloud in background - no isOnline check needed as Firestore handles buffering
+      final taskId = task.id;
       _firestoreService.addTask(task).catchError((e, s) {
         _errorHandlingService.logError(e, s, reason: 'Cloud addTask failed');
+      }).whenComplete(() {
+        _syncManager.schedulePendingWriteCleanup(taskId, delay: const Duration(seconds: 15));
       });
-      
-      updateHomeWidget();
+
+      unawaited(_updateTaskCounterNotification());
+      updateHomeWidgetWithNotification();
     }
   }
 
@@ -1792,7 +1094,8 @@ class TaskProvider extends ChangeNotifier {
     }
     _refreshPagination();
     notifyListeners();
-    updateHomeWidgetWithNotification(); // Show notification when task is deleted
+    unawaited(_updateTaskCounterNotification());
+    updateHomeWidgetWithNotification();
 
     await _analyticsService.logTaskDeleted();
   }
@@ -1819,7 +1122,8 @@ class TaskProvider extends ChangeNotifier {
     }
     _refreshPagination();
     notifyListeners();
-    updateHomeWidgetWithNotification(); // Show notification when task is restored
+    unawaited(_updateTaskCounterNotification());
+    updateHomeWidgetWithNotification();
   }
 
   Future<void> deleteTaskPermanently(String id) async {
@@ -1834,7 +1138,7 @@ class TaskProvider extends ChangeNotifier {
     await _cancelTaskNotificationsById(id);
     _refreshPagination();
     notifyListeners();
-    updateHomeWidgetWithNotification(); // Show notification when task is permanently deleted
+    updateHomeWidgetWithNotification();
 
     await _analyticsService.logTaskDeleted();
   }
@@ -1857,8 +1161,6 @@ class TaskProvider extends ChangeNotifier {
     if (_subscriptionService.isPremium) return true;
     return categories.length < AppConfig.freeCategoryLimit;
   }
-
-  // --- Bulk Action Methods ---
 
   void toggleSelectionMode() {
     _isSelectionMode = !_isSelectionMode;
@@ -1899,8 +1201,7 @@ class TaskProvider extends ChangeNotifier {
   Future<void> toggleSelectedTasksPin() async {
     final idsToToggle = List<String>.from(_selectedTaskIds);
     final tasksToToggle = _source.getTasks().where((t) => idsToToggle.contains(t.id)).toList();
-    
-    // Determine the target state (pin if most are unpinned, or vice versa)
+
     final pinnedCount = tasksToToggle.where((t) => t.isPinned ?? false).length;
     final targetPin = pinnedCount < (tasksToToggle.length / 2);
 
@@ -1953,7 +1254,6 @@ class TaskProvider extends ChangeNotifier {
 
     await _analyticsService.logCategoryCreated(name: name);
 
-    // Check if private category was created without security enabled
     if (isPrivate && !_privateModeService.shouldHidePrivateContent) {
       _showSecurityPrompt = true;
       notifyListeners();
@@ -2026,89 +1326,12 @@ class TaskProvider extends ChangeNotifier {
     }
   }
 
-
-
   Future<void> _removeGoogleTask(Task task) async {
-    final taskId = task.googleTaskId;
-    if (taskId == null) return;
-
-    try {
-      await _googleTasksService.deleteTask(taskId: taskId);
-    } catch (e, s) {
-      if (e is GoogleTokenExpiredException) {
-        _authService.setGoogleTasksTokenExpired(true);
-      }
-      _errorHandlingService.logError(
-        e,
-        s,
-        reason: 'Failed to delete Google task',
-      );
-    }
-
-    task.googleTaskId = null;
-    task.googleTaskListId = null;
-    await _source.addTask(task);
+    await _syncManager.removeGoogleTask(task);
   }
 
   Future<void> _syncTaskGoogleTasksState(Task task) async {
-    if (task.isDeleted ?? false) {
-      await _removeGoogleTask(task);
-      return;
-    }
-
-    if (!task.syncWithGoogleTasks) {
-      await _removeGoogleTask(task);
-      return;
-    }
-
-    try {
-      String? categoryName;
-      if (task.categoryIds.isNotEmpty) {
-        categoryName = getCategoryById(task.categoryIds.first)?.name;
-      } else if (task.categoryId != null) {
-        categoryName = getCategoryById(task.categoryId)?.name;
-      }
-
-      if (task.googleTaskId == null) {
-        final taskId = await _googleTasksService.createTask(
-          title: task.title,
-          description: task.description.isEmpty ? null : task.description,
-          dueDate: task.dueDate,
-          categoryName: categoryName,
-        );
-
-        if (taskId != null) {
-          task.googleTaskId = taskId;
-          task.googleTaskListId = 'ROCIs Tasks';
-          await _source.addTask(task);
-        }
-      } else {
-        final success = await _googleTasksService.updateTask(
-          taskId: task.googleTaskId!,
-          title: task.title,
-          description: task.description.isEmpty ? null : task.description,
-          dueDate: task.dueDate,
-          isCompleted: task.isCompleted,
-          categoryName: categoryName,
-        );
-
-        if (!success) {
-          task.googleTaskId = null;
-          task.googleTaskListId = null;
-          await _source.addTask(task);
-          await _syncTaskGoogleTasksState(task);
-        }
-      }
-    } catch (e, s) {
-      if (e is GoogleTokenExpiredException) {
-        _authService.setGoogleTasksTokenExpired(true);
-      }
-      _errorHandlingService.logError(
-        e,
-        s,
-        reason: 'Sync task to Google Tasks failed',
-      );
-    }
+    await _syncManager.syncTaskGoogleTasksState(task, getCategoryById: getCategoryById);
   }
 
   Task? getTaskById(String id) {
@@ -2120,116 +1343,17 @@ class TaskProvider extends ChangeNotifier {
   }
 
   Future<void> syncGoogleTasksToLocal() async {
-    final accessToken = await _authService.getGoogleAccessToken();
-    if (accessToken == null || _authService.isGoogleTasksTokenExpired) return;
-
-    try {
-      final googleTasks = await _googleTasksService.getTasks();
-      if (googleTasks == null) return;
-
-      final allLocalTasks = _source.getTasks();
-      final googleTaskIds = googleTasks
-          .map((t) => t['id'] as String?)
-          .where((id) => id != null)
-          .cast<String>()
-          .toSet();
-
-      bool needsUpdate = false;
-
-      for (final gTask in googleTasks) {
-        final gTaskId = gTask['id'] as String?;
-        if (gTaskId == null) continue;
-
-        final localTask = allLocalTasks.firstWhere(
-          (t) => t.googleTaskId == gTaskId && !(t.isDeleted ?? false),
-          orElse: () => Task(
-            id: '',
-            title: '',
-            createdAt: DateTime.now(),
-          ),
-        );
-
-        if (localTask.id.isNotEmpty) {
-          final isCompletedInGoogle = gTask['status'] == 'completed';
-          final dueStr = gTask['due'] as String?;
-          if (dueStr != null) {
-            final parsedDue = DateTime.tryParse(dueStr)?.toLocal();
-            if (parsedDue != null && localTask.dueDate != parsedDue) {
-              localTask.dueDate = parsedDue;
-              await _source.addTask(localTask);
-              await _firestoreService.updateTask(localTask);
-              needsUpdate = true;
-            }
-          }
-
-          if (isCompletedInGoogle && !localTask.isCompleted) {
-            localTask.isCompleted = true;
-            localTask.completedAt = DateTime.now();
-
-            _pendingLocalWrites[localTask.id] = true;
-            await _source.addTask(localTask);
-            await _firestoreService.updateTask(localTask);
-            await _cancelTaskNotifications(localTask);
-            
-            Future.delayed(const Duration(seconds: 3), () {
-              _pendingLocalWrites.remove(localTask.id);
-            });
-
-            needsUpdate = true;
-          } else if (!isCompletedInGoogle && localTask.isCompleted) {
-            localTask.isCompleted = false;
-            localTask.completedAt = null;
-
-            _pendingLocalWrites[localTask.id] = false;
-            await _source.addTask(localTask);
-            await _firestoreService.updateTask(localTask);
-            if (localTask.dueDate != null && localTask.dueDate!.isAfter(DateTime.now())) {
-              await _scheduleTaskNotifications(localTask);
-            }
-
-            Future.delayed(const Duration(seconds: 3), () {
-              _pendingLocalWrites.remove(localTask.id);
-            });
-
-            needsUpdate = true;
-          }
-        }
-      }
-
-      final activeLocalTasksWithGoogleId = allLocalTasks
-          .where((t) => t.googleTaskId != null && !(t.isDeleted ?? false))
-          .toList();
-
-      for (final localTask in activeLocalTasksWithGoogleId) {
-        if (!googleTaskIds.contains(localTask.googleTaskId)) {
-          localTask.isDeleted = true;
-          await _source.addTask(localTask);
-          await _firestoreService.updateTask(localTask);
-          await _cancelTaskNotifications(localTask);
-          needsUpdate = true;
-        }
-      }
-
-      if (needsUpdate) {
+    await _syncManager.syncGoogleTasksToLocal(
+      cancelTaskNotifications: _cancelTaskNotificationsById,
+      scheduleTaskNotifications: _scheduleTaskNotifications,
+      onDataChanged: () {
         _refreshPagination();
         notifyListeners();
         updateHomeWidgetWithNotification();
-      }
-    } catch (e, s) {
-      if (e is GoogleTokenExpiredException) {
-        _authService.setGoogleTasksTokenExpired(true);
-      }
-      _errorHandlingService.logError(
-        e,
-        s,
-        reason: 'Sync Google Tasks back to local failed',
-      );
-    }
+      },
+    );
   }
 
-
-
-  /// Add a grocery item / subtask directly to a task
   Future<void> addGroceryItem(Task task, String itemTitle, {String? quantity}) async {
     if (itemTitle.trim().isEmpty) return;
     final subTasks = List<SubTask>.from(task.subTasks ?? []);
@@ -2237,7 +1361,6 @@ class TaskProvider extends ChangeNotifier {
     await updateTask(task, subTasks: subTasks);
   }
 
-  /// Reset all items in a grocery list (uncheck all items for reuse)
   Future<void> resetGroceryList(Task task) async {
     final subTasks = task.subTasks;
     if (subTasks == null || subTasks.isEmpty) return;
@@ -2248,7 +1371,6 @@ class TaskProvider extends ChangeNotifier {
     await updateTask(task, subTasks: subTasks);
   }
 
-  /// Remove completed items from a grocery list
   Future<void> clearCompletedSubTasks(Task task) async {
     final subTasks = task.subTasks;
     if (subTasks == null || subTasks.isEmpty) return;
