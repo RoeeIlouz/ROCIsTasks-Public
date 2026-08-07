@@ -106,12 +106,21 @@ class GoogleOAuthManager {
           freshToken = await _performSilentTokenRefresh();
         }
 
+        final bool isTokenUnexpired = token != null &&
+            expiresAtStr != null &&
+            DateTime.tryParse(expiresAtStr) != null &&
+            DateTime.now().isBefore(DateTime.parse(expiresAtStr));
+
         _tokenRefreshCompleter!.complete(freshToken);
-        return freshToken ?? token;
+        return freshToken ?? (isTokenUnexpired ? token : null);
       } catch (e, s) {
         _tokenRefreshCompleter!.completeError(e, s);
         _errorHandlingService.logError(e, s, reason: 'getGoogleAccessToken refresh');
-        return token;
+        final bool isTokenUnexpired = token != null &&
+            expiresAtStr != null &&
+            DateTime.tryParse(expiresAtStr) != null &&
+            DateTime.now().isBefore(DateTime.parse(expiresAtStr));
+        return isTokenUnexpired ? token : null;
       } finally {
         _tokenRefreshCompleter = null;
       }

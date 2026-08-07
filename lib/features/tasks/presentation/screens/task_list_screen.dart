@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:rocis_tasks/core/services/auth_service.dart';
 import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
+import 'package:rocis_tasks/features/calendar/presentation/providers/calendar_provider.dart';
 import 'package:rocis_tasks/features/tasks/presentation/widgets/task_tile.dart';
 import 'package:rocis_tasks/features/tasks/presentation/widgets/task_skeleton.dart';
 import 'package:rocis_tasks/features/tasks/presentation/screens/add_task_screen.dart';
@@ -282,7 +283,14 @@ class _TaskListViewState extends State<TaskListView> {
             const SizedBox(width: 8),
             TextButton(
               onPressed: () async {
-                await authService.linkGoogleTasks();
+                final success = await authService.linkGoogleTasks();
+                if (success && context.mounted) {
+                  final calendarProvider = Provider.of<CalendarProvider>(context, listen: false);
+                  calendarProvider.resetTokenExpiredState();
+                  calendarProvider.loadEvents();
+                  final taskProvider = Provider.of<TaskProvider>(context, listen: false);
+                  taskProvider.syncGoogleTasksToLocal();
+                }
               },
               style: TextButton.styleFrom(
                 foregroundColor: theme.colorScheme.error,

@@ -99,6 +99,7 @@ class AuthService extends ChangeNotifier {
         for (final scope in GoogleOAuthManager.googleTasksScopes) {
           googleProvider.addScope(scope);
         }
+        googleProvider.setCustomParameters({'prompt': 'consent'});
 
         final UserCredential userCredential =
             await _auth.signInWithPopup(googleProvider);
@@ -394,6 +395,7 @@ class AuthService extends ChangeNotifier {
         for (final scope in GoogleOAuthManager.googleTasksScopes) {
           googleProvider.addScope(scope);
         }
+        googleProvider.setCustomParameters({'prompt': 'consent'});
 
         AppLogger.info('Opening Google popup to refresh Tasks & Calendar access token...', tag: 'Auth');
         UserCredential userCredential;

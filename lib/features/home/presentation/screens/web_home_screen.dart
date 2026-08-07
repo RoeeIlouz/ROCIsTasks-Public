@@ -218,6 +218,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
   ) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final taskProvider = Provider.of<TaskProvider>(context, listen: false);
 
     return Container(
       width: 260,
@@ -311,7 +312,9 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                     onPressed: () async {
                       final success = await authService.linkGoogleTasks();
                       if (success) {
+                        calendarProvider.resetTokenExpiredState();
                         calendarProvider.loadEvents();
+                        taskProvider.syncGoogleTasksToLocal();
                       }
                     },
                     style: ElevatedButton.styleFrom(
@@ -359,7 +362,12 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                   const SizedBox(height: 8),
                   ElevatedButton(
                     onPressed: () async {
-                      await authService.linkGoogleTasks();
+                      final success = await authService.linkGoogleTasks();
+                      if (success) {
+                        calendarProvider.resetTokenExpiredState();
+                        calendarProvider.loadEvents();
+                        taskProvider.syncGoogleTasksToLocal();
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 4),

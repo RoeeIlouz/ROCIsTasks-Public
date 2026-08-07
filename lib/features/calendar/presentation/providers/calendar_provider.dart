@@ -23,6 +23,13 @@ class CalendarProvider extends ChangeNotifier {
   CalendarProvider(this._calendarService, this._widgetService);
 
   bool get isGoogleCalendarTokenExpired => _isGoogleCalendarTokenExpired;
+
+  void resetTokenExpiredState() {
+    if (_isGoogleCalendarTokenExpired) {
+      _isGoogleCalendarTokenExpired = false;
+      notifyListeners();
+    }
+  }
   List<Event> get events => _events;
   bool get showTasks => _showTasks;
   bool get showGoogleCalendar => _showGoogleCalendar;
