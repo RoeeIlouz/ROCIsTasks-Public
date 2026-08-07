@@ -38,10 +38,14 @@ migrate_working_dir/
 .flutter-plugins-dependencies
 .pub-cache/
 .pub/
-/build/
+build/
+**/build/
+android/app/build/
+android/build/
 /coverage/
 .agent/
 .kilocode/
+repomix-output.xml
 # Symbolication related
 app.*.symbols
 
