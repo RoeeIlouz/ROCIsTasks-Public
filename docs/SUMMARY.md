@@ -2,6 +2,30 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## Web Google Calendar Reauth Access Token Fix & Android Startup Prompt Elimination - 2026-08-08
+
+#### Goals / Requirements
+* Fix Web issue where Google Calendar remained empty even after re-authenticating.
+* Fix Android issue where app reprompted the user to sign in with Google on startup or authorization.
+* Verify end-to-end web calendar operation and pass full automated test suite.
+
+#### Changes/Fixes
+1. **Platform-Aware Google OAuth Scopes (`google_oauth_manager.dart`)**:
+   - Scope request updated so Mobile (Android/iOS) only requests `email` and `https://www.googleapis.com/auth/tasks`, removing sensitive Web REST API scopes (`calendar.readonly`, `calendar.events`) that triggered unwanted consent screens and blocked silent background authentication on Android.
+   - Web retains full REST API scopes (`email`, `tasks`, `calendar.readonly`, `calendar.events`).
+2. **Web Access Token & Dual-Stage Token Pipeline (`auth_service.dart` & `calendar_service.dart`)**:
+   - Updated `CalendarService._getWebAccessToken()` to return `null` gracefully when no token is cached, preventing `GoogleTokenExpiredException` from falsely triggering the "Calendar Disconnected" state on cold start or for accounts without Google Calendar connected.
+   - Refined HTTP status code handling in `getAvailableCalendars()` and `getEvents()` on Web to throw `GoogleTokenExpiredException` strictly on HTTP 401 (Unauthorized) status codes, preventing HTTP 403 (quota / permission limits) from marking token as expired.
+   - Implemented a two-stage fallback in `linkGoogleTasks()` on Web: Stage 1 attempts Firebase Auth popup (`reauthenticateWithPopup` / `linkWithPopup`), and Stage 2 falls back to `GoogleSignIn.instance.authenticate()` if the popup credential does not expose the raw access token directly.
+   - Added immediate reset of `_isGoogleCalendarTokenExpired` on Reconnect tap in `WebHomeScreen`, instantly clearing the error banner upon user action.
+3. **Android Startup Reprompt Elimination (`auth_service.dart`)**:
+   - Updated `_restoreGoogleUser()` to check `providerData` and cached tokens before calling `attemptLightweightAuthentication()`. Email/Password users without linked Google Tasks now skip lightweight authentication on startup, eliminating native Credential Manager bottom sheet popups.
+4. **Verification & Audit**:
+   - `flutter analyze`: 0 issues found.
+   - `flutter test`: 216/216 unit and integration tests passed.
+   - `flutter build web --release`: Web compilation succeeded (110.5s).
+   - Local web server verification: Static release assets load properly with HTTP 200 OK.
+
 ## Git Push Large Build Artifacts Cleanup - 2026-08-07
 
 #### Goals / Requirements

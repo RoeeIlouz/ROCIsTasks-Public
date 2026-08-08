@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:rocis_tasks/core/services/auth/google_oauth_manager.dart';
 import 'package:rocis_tasks/core/services/encryption_service.dart';
@@ -62,6 +63,20 @@ class AuthService extends ChangeNotifier {
   Future<void> _restoreGoogleUser() async {
     if (_oauthManager.googleUser != null) return;
     try {
+      final user = currentUser;
+      if (user == null) return;
+
+      final isGoogleUser =
+          user.providerData.any((p) => p.providerId == 'google.com');
+      final prefs = await SharedPreferences.getInstance();
+      final hasCachedToken = prefs.containsKey('google_access_token');
+
+      // Only attempt startup lightweight authentication if user signed in via Google
+      // or has linked Google Tasks, avoiding unwanted prompts for Email/Password users.
+      if (!isGoogleUser && !hasCachedToken) {
+        return;
+      }
+
       await _oauthManager.ensureGoogleSignInInitialized();
       final restored =
           await _oauthManager.googleSignIn.attemptLightweightAuthentication();
@@ -97,9 +112,11 @@ class AuthService extends ChangeNotifier {
       if (kIsWeb) {
         final GoogleAuthProvider googleProvider = GoogleAuthProvider();
         for (final scope in GoogleOAuthManager.googleTasksScopes) {
-          googleProvider.addScope(scope);
+          if (scope != 'email' && scope != 'profile') {
+            googleProvider.addScope(scope);
+          }
         }
-        googleProvider.setCustomParameters({'prompt': 'consent'});
+        googleProvider.setCustomParameters({'prompt': 'select_account'});
 
         final UserCredential userCredential =
             await _auth.signInWithPopup(googleProvider);
@@ -108,7 +125,7 @@ class AuthService extends ChangeNotifier {
             userCredential.credential as OAuthCredential?;
         final String? accessToken = oAuthCred?.accessToken;
 
-        if (accessToken != null) {
+        if (accessToken != null && accessToken.isNotEmpty) {
           await _oauthManager.cacheGoogleAccessToken(accessToken);
         }
 
@@ -389,32 +406,36 @@ class AuthService extends ChangeNotifier {
     if (kIsWeb) {
       try {
         final user = currentUser;
-        if (user == null) return false;
-
         final GoogleAuthProvider googleProvider = GoogleAuthProvider();
         for (final scope in GoogleOAuthManager.googleTasksScopes) {
-          googleProvider.addScope(scope);
-        }
-        googleProvider.setCustomParameters({'prompt': 'consent'});
-
-        AppLogger.info('Opening Google popup to refresh Tasks & Calendar access token...', tag: 'Auth');
-        UserCredential userCredential;
-        try {
-          userCredential = await user.reauthenticateWithPopup(googleProvider);
-        } catch (_) {
-          try {
-            userCredential = await user.linkWithPopup(googleProvider);
-          } catch (_) {
-            userCredential = await _auth.signInWithPopup(googleProvider);
+          if (scope != 'email' && scope != 'profile') {
+            googleProvider.addScope(scope);
           }
+        }
+        googleProvider.setCustomParameters({'prompt': 'select_account'});
+
+        AppLogger.info('Opening Google popup to refresh access token on Web...', tag: 'Auth');
+        UserCredential userCredential;
+        if (user != null) {
+          try {
+            userCredential = await user.reauthenticateWithPopup(googleProvider);
+          } catch (_) {
+            try {
+              userCredential = await user.linkWithPopup(googleProvider);
+            } catch (_) {
+              userCredential = await _auth.signInWithPopup(googleProvider);
+            }
+          }
+        } else {
+          userCredential = await _auth.signInWithPopup(googleProvider);
         }
 
         final OAuthCredential? oAuthCred =
             userCredential.credential as OAuthCredential?;
-        final String? accessToken = oAuthCred?.accessToken;
+        final String? popupToken = oAuthCred?.accessToken;
 
-        if (accessToken != null) {
-          await _oauthManager.cacheGoogleAccessToken(accessToken);
+        if (popupToken != null && popupToken.isNotEmpty) {
+          await _oauthManager.cacheGoogleAccessToken(popupToken);
           setGoogleTasksTokenExpired(false);
           notifyListeners();
           return true;

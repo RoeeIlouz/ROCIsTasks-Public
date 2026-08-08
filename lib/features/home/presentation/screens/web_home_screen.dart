@@ -310,9 +310,9 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                   const SizedBox(height: 8),
                   ElevatedButton(
                     onPressed: () async {
+                      calendarProvider.resetTokenExpiredState();
                       final success = await authService.linkGoogleTasks();
                       if (success) {
-                        calendarProvider.resetTokenExpiredState();
                         calendarProvider.loadEvents();
                         taskProvider.syncGoogleTasksToLocal();
                       }

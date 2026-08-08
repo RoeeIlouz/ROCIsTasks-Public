@@ -4,6 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rocis_tasks/core/services/error_handling_service.dart';
 import 'package:rocis_tasks/core/services/logger_service.dart';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
+
 class GoogleTokenExpiredException implements Exception {
   final String message;
 
@@ -22,12 +24,17 @@ class GoogleTokenExpiredException implements Exception {
 }
 
 class GoogleOAuthManager {
-  static const List<String> googleTasksScopes = [
-    'email',
-    'https://www.googleapis.com/auth/tasks',
-    'https://www.googleapis.com/auth/calendar.readonly',
-    'https://www.googleapis.com/auth/calendar.events',
-  ];
+  static List<String> get googleTasksScopes => kIsWeb
+      ? const [
+          'email',
+          'https://www.googleapis.com/auth/tasks',
+          'https://www.googleapis.com/auth/calendar.readonly',
+          'https://www.googleapis.com/auth/calendar.events',
+        ]
+      : const [
+          'email',
+          'https://www.googleapis.com/auth/tasks',
+        ];
 
   final ErrorHandlingService _errorHandlingService;
   final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
@@ -131,6 +138,11 @@ class GoogleOAuthManager {
   }
 
   Future<String?> _performSilentTokenRefresh() async {
+    if (kIsWeb) {
+      // On Web, silent refresh via GoogleSignIn GIS SDK isn't available without explicit popup.
+      // Return null so the app gracefully uses cached token or requests user popup re-authentication.
+      return null;
+    }
     try {
       await ensureGoogleSignInInitialized();
 
