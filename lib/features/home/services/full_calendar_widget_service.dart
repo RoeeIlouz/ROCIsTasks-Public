@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:home_widget/home_widget.dart';
@@ -72,22 +73,10 @@ class FullCalendarWidgetService {
 
   /// Get current filter settings
   Future<FullCalendarFilters> getFilters() async {
-    final showTasks =
-        await HomeWidget.getWidgetData<bool>('full_calendar_show_tasks') ??
-        true;
-    final showGoogle =
-        await HomeWidget.getWidgetData<bool>('full_calendar_show_google') ??
-        true;
-
-    final selectedIdsJson = await HomeWidget.getWidgetData<String>(
-      'full_calendar_selected_ids',
-    );
-    List<String> selectedCalendarIds = [];
-    if (selectedIdsJson != null) {
-      try {
-        selectedCalendarIds = List<String>.from(jsonDecode(selectedIdsJson));
-      } catch (_) {}
-    }
+    final prefs = await SharedPreferences.getInstance();
+    final showTasks = prefs.getBool('full_calendar_show_tasks') ?? true;
+    final showGoogle = prefs.getBool('full_calendar_show_google') ?? true;
+    final selectedCalendarIds = prefs.getStringList('full_calendar_selected_ids') ?? [];
 
     return FullCalendarFilters(
       showTasks: showTasks,
@@ -99,7 +88,20 @@ class FullCalendarWidgetService {
 
   /// Save filter settings
   Future<void> saveFilters(FullCalendarFilters filters) async {
-    // Save to widget data for native and Dart access
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('full_calendar_show_tasks', filters.showTasks);
+    await prefs.setBool(
+      'full_calendar_show_google',
+      filters.showGoogleCalendar,
+    );
+    await prefs.setBool('full_calendar_show_rocis', false);
+    await prefs.setStringList(
+      'full_calendar_selected_ids',
+      filters.selectedCalendarIds,
+    );
+
+    if (kIsWeb) return;
+
     await HomeWidget.saveWidgetData<bool>(
       'full_calendar_show_tasks',
       filters.showTasks,
@@ -116,26 +118,11 @@ class FullCalendarWidgetService {
       'full_calendar_selected_ids',
       jsonEncode(filters.selectedCalendarIds),
     );
-
-    // Also save to SharedPreferences as backup
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('full_calendar_show_tasks', filters.showTasks);
-    await prefs.setBool(
-      'full_calendar_show_google',
-      filters.showGoogleCalendar,
-    );
-    await prefs.setBool('full_calendar_show_rocis', false);
-    await prefs.setStringList(
-      'full_calendar_selected_ids',
-      filters.selectedCalendarIds,
-    );
   }
 
   /// Toggle a specific filter
   Future<FullCalendarFilters> toggleFilter(String filterName) async {
-    // Toggle filter called
     final current = await getFilters();
-    // Current filters retrieved
     FullCalendarFilters updated;
 
     switch (filterName) {
@@ -148,13 +135,10 @@ class FullCalendarWidgetService {
         );
         break;
       default:
-        // Unknown filter name
         updated = current;
     }
 
-    // Updated filters applied
     await saveFilters(updated);
-    // Filters saved
     return updated;
   }
 
@@ -162,6 +146,7 @@ class FullCalendarWidgetService {
     int? monthOffset,
     String? userId,
   }) async {
+    if (kIsWeb) return;
     try {
       final prefs = await SharedPreferences.getInstance();
       final int offset =

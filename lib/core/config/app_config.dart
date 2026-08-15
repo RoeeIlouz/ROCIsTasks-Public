@@ -9,13 +9,12 @@ class AppConfig {
 
   // App information
   static const String appName = 'ROCI\'s Tasks';
-  static const String appVersion = '0.2.5';
-  static const String supportEmail = 'support@ilouz.xyz';
-  static const String privacyPolicyUrl =
-      'https://rocisapps.ilouz.xyz/privacy.html';
-  static const String termsOfServiceUrl =
-      'https://rocisapps.ilouz.xyz/terms.html';
-  static const String websiteUrl = 'https://rocisapps.ilouz.xyz';
+  static const String appVersion = '0.2.6';
+  static const String supportEmail = 'support@rocisapps.com';
+  static const String privacyPolicyUrl = 'https://rocisapps.com/privacy.html';
+  static const String termsOfServiceUrl = 'https://rocisapps.com/terms.html';
+  static const String websiteUrl = 'https://rocisapps.com';
+  static const String webAppUrl = 'https://tasks.rocisapps.com';
   static const String githubUrl =
       'https://github.com/RoeeIlouz/ROCIsTasks-public';
 

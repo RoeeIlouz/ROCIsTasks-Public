@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart' hide Category;
 import 'package:home_widget/home_widget.dart';
 import 'package:intl/intl.dart';
 import 'package:rocis_tasks/core/services/calendar_service.dart';
@@ -33,6 +34,7 @@ class WidgetDataService {
     Category? Function(String?) getCategoryById, {
     String? userId,
   }) async {
+    if (kIsWeb) return;
     final scheduleStart = DateTime.now().subtract(const Duration(days: 1));
     final scheduleEnd = DateTime.now().add(const Duration(days: 30));
     final scheduleItems = <Map<String, dynamic>>[];
@@ -120,6 +122,7 @@ class WidgetDataService {
     List<Task> allTasks, {
     String? userId,
   }) async {
+    if (kIsWeb) return;
     final listStart = DateTime.now();
     final listEnd = listStart.add(const Duration(days: 7));
     final calendarListEvents = <Map<String, dynamic>>[];
@@ -190,6 +193,7 @@ class WidgetDataService {
     List<Task> allTasks, {
     String? userId,
   }) async {
+    if (kIsWeb) return;
     final now = DateTime.now();
     final start = DateTime(now.year, now.month - 1, 1);
     final end = DateTime(now.year, now.month + 2, 0);

@@ -2,6 +2,65 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## Timezone Selection & Calendar Synchronization - 2026-08-15
+
+#### Goals / Requirements
+* Add user option in Settings to change the app timezone (Automatic vs manual IANA selection).
+* Ensure calendar events and timestamps sync accurately to the user-selected timezone.
+* Provide full internationalization (8 languages) and unit test coverage.
+
+#### Changes/Fixes
+1. **Timezone Management Service (`timezone_service.dart`)**:
+   - Created `TimezoneService` providing automatic (device) vs custom IANA timezone selection, offset formatting (`UTC+03:00`), and `SharedPreferences` persistence (`app_selected_timezone`).
+   - Integrated into `AppInitializer._initTimezone` and `main.dart` `MultiProvider`.
+2. **Calendar Sync UTC Mapping (`calendar_service.dart`)**:
+   - Updated `_toTZDateTime` to convert parsed UTC DateTime objects into `tz.local` (`tz.TZDateTime.from(dt.toUtc(), tz.local)`).
+3. **Settings UI Integration (`settings_screen.dart`)**:
+   - Added Timezone `ListTile` showing current timezone and UTC offset.
+   - Added searchable bottom sheet picker (`_TimezonePickerSheet`) with instant filter and Automatic mode toggle.
+   - Triggered `calendarProvider.loadEvents()` on timezone change to instantly refresh calendar views.
+4. **Localization (i18n)**:
+   - Added `timezone`, `selectTimezone`, `automaticTimezone`, and `searchTimezone` to all 8 `.arb` files (`en`, `he`, `es`, `fr`, `de`, `ar`, `sv`, `hi`).
+5. **Testing & Deployment**:
+   - Added `test/core/services/timezone_service_test.dart` with 5 unit tests covering default state, sorting, explicit timezone setting, auto restore, and offset calculation.
+   - Verified with `flutter analyze` (0 issues) and `flutter test` (221/221 tests passing).
+   - Compiled web release bundle and deployed to Firebase Hosting.
+
+## Google Calendar API 403 (Forbidden) Root Cause & Scope Expansion - 2026-08-15
+
+#### Goals / Requirements
+* Investigate Google Calendar API 403 (Forbidden) on Web (`/users/me/calendarList` and `/calendars/primary/events`).
+* Add full calendar scope (`https://www.googleapis.com/auth/calendar`) to OAuth manager.
+* Add detailed API error response logging and explain Google Cloud Console API enablement steps.
+
+#### Changes/Fixes
+1. **Google Calendar Scope Addition (`google_oauth_manager.dart`)**:
+   - Added `https://www.googleapis.com/auth/calendar` to `googleTasksScopes` alongside `calendar.readonly` and `calendar.events`.
+2. **Enhanced Calendar Error Logging (`calendar_service.dart`)**:
+   - Logged HTTP response body on 401/403 status codes.
+3. **Google Cloud Console API Enablement Guidance**:
+   - Documented the requirement to enable the **Google Calendar API** in Google Cloud Console project `rocis-todo` (`867477199658`).
+4. **Verification & Deployment**:
+   - `flutter analyze`: 0 issues found.
+   - `flutter test`: 216/216 unit and widget tests passed.
+   - `flutter build web --release`: Compiled successfully.
+   - `firebase deploy --only hosting`: Deployed live to Firebase Hosting.
+
+## Web OAuth Reconnect & 403 Handling Fix - 2026-08-13
+
+#### Goals / Requirements
+* Restore reliable Google Tasks and Google Calendar reconnect behavior on Web.
+* Ensure insufficient-scope/API-forbidden responses trigger proper reconnect state.
+
+#### Changes/Fixes
+1. **Web OAuth Consent Recovery (`auth_service.dart`)**:
+   - Updated Web popup OAuth parameters from `prompt: select_account` to `prompt: consent` in both `signInWithGoogle()` fallback and `linkGoogleTasks()`.
+   - This forces Google to re-issue access with the currently requested scopes instead of silently reusing a stale scope-deficient grant.
+2. **Google Calendar 403 Handling (`calendar_service.dart`)**:
+   - Updated Web read flows (`calendarList` and calendar `events` fetch) to treat HTTP `403` the same as `401` and surface `GoogleTokenExpiredException(..., true)`.
+3. **Google Tasks 403 Handling (`google_tasks_service.dart`)**:
+   - Updated list/create/update/delete/read calls to treat HTTP `403` as server token/scope rejection, aligning reconnect UX behavior with `401`.
+
 ## Web Google Calendar Reauth Access Token Fix & Android Startup Prompt Elimination - 2026-08-08
 
 #### Goals / Requirements
@@ -13,11 +72,10 @@ This file summarizes errors encountered and changes made to the codebase, ensuri
 1. **Platform-Aware Google OAuth Scopes (`google_oauth_manager.dart`)**:
    - Scope request updated so Mobile (Android/iOS) only requests `email` and `https://www.googleapis.com/auth/tasks`, removing sensitive Web REST API scopes (`calendar.readonly`, `calendar.events`) that triggered unwanted consent screens and blocked silent background authentication on Android.
    - Web retains full REST API scopes (`email`, `tasks`, `calendar.readonly`, `calendar.events`).
-2. **Web Access Token & Dual-Stage Token Pipeline (`auth_service.dart` & `calendar_service.dart`)**:
-   - Updated `CalendarService._getWebAccessToken()` to return `null` gracefully when no token is cached, preventing `GoogleTokenExpiredException` from falsely triggering the "Calendar Disconnected" state on cold start or for accounts without Google Calendar connected.
-   - Refined HTTP status code handling in `getAvailableCalendars()` and `getEvents()` on Web to throw `GoogleTokenExpiredException` strictly on HTTP 401 (Unauthorized) status codes, preventing HTTP 403 (quota / permission limits) from marking token as expired.
-   - Implemented a two-stage fallback in `linkGoogleTasks()` on Web: Stage 1 attempts Firebase Auth popup (`reauthenticateWithPopup` / `linkWithPopup`), and Stage 2 falls back to `GoogleSignIn.instance.authenticate()` if the popup credential does not expose the raw access token directly.
-   - Added immediate reset of `_isGoogleCalendarTokenExpired` on Reconnect tap in `WebHomeScreen`, instantly clearing the error banner upon user action.
+2. **Web & Mobile Silent OAuth Token Renewal (`google_oauth_manager.dart` & `auth_service.dart`)**:
+   - Initialized `GoogleSignIn.instance` on Web with explicit `webClientId` (`867477199658-df3ptf7v5fi66ijc5jeunfmrpf5eghou.apps.googleusercontent.com`), allowing GIS SDK to authenticate and issue access tokens cleanly on Web targets.
+   - Added an `authorizeScopes(googleTasksScopes)` fallback to `_performSilentTokenRefresh()` when `authorizationForScopes` returns null. On both Mobile and Web, when the 60-minute OAuth access token expires, the app now silently renews the token in the background without prompting the user to sign in again.
+   - Cached all newly acquired access tokens in `SharedPreferences` (`google_access_token` and `google_access_token_expires_at`), eliminating startup reprompts on mobile devices.
 3. **Android Startup Reprompt Elimination (`auth_service.dart`)**:
    - Updated `_restoreGoogleUser()` to check `providerData` and cached tokens before calling `attemptLightweightAuthentication()`. Email/Password users without linked Google Tasks now skip lightweight authentication on startup, eliminating native Credential Manager bottom sheet popups.
 4. **Verification & Audit**:

@@ -1153,4 +1153,16 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get quantityHint => 'Qté';
+
+  @override
+  String get timezone => 'Fuseau horaire';
+
+  @override
+  String get selectTimezone => 'Sélectionner le fuseau horaire';
+
+  @override
+  String get automaticTimezone => 'Automatique (Fuseau de l\'appareil)';
+
+  @override
+  String get searchTimezone => 'Rechercher un fuseau horaire...';
 }

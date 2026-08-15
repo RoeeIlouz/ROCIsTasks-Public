@@ -393,5 +393,9 @@
   "resetCart": "Reset List",
   "clearCartItems": "Clear List Items",
   "addItemHint": "Add item...",
-  "quantityHint": "Qty"
+  "quantityHint": "Qty",
+  "timezone": "Timezone",
+  "selectTimezone": "Select Timezone",
+  "automaticTimezone": "Automatic (Device Timezone)",
+  "searchTimezone": "Search timezone..."
 }

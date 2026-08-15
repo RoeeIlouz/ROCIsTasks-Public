@@ -390,5 +390,9 @@
   "resetCart": "सूची रीसेट करें",
   "clearCartItems": "सूची आइटम साफ़ करें",
   "addItemHint": "आइटम जोड़ें...",
-  "quantityHint": "मात्रा"
+  "quantityHint": "मात्रा",
+  "timezone": "समय क्षेत्र",
+  "selectTimezone": "समय क्षेत्र चुनें",
+  "automaticTimezone": "स्वचालित (उपकरण समय क्षेत्र)",
+  "searchTimezone": "समय क्षेत्र खोजें..."
 }

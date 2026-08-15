@@ -37,12 +37,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
     // Reload events when entering the screen to ensure we have the latest data
     // and to retry if permissions were previously denied
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       // Set user ID and email for schedule data fetching (must be done after build to avoid setState during build)
       final authService = Provider.of<AuthService>(context, listen: false);
       provider.setUserId(authService.currentUser?.uid);
-      provider.loadFilters();
-      provider.loadEvents();
+      await provider.loadFilters();
+      await provider.loadEvents();
     });
   }
 
@@ -138,6 +138,43 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
     return Column(
       children: [
+        if (calendarProvider.isGoogleCalendarTokenExpired)
+          Container(
+            width: double.infinity,
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.amber.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.amber.shade700),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.warning_amber_rounded, color: Colors.amber),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    l10n.googleTasksDisconnected,
+                    style: const TextStyle(fontSize: 13),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    final authService = Provider.of<AuthService>(
+                      context,
+                      listen: false,
+                    );
+                    final success = await authService.linkGoogleTasks();
+                    if (success) {
+                      calendarProvider.resetTokenExpiredState();
+                      await calendarProvider.loadEvents();
+                    }
+                  },
+                  child: Text(l10n.reconnect),
+                ),
+              ],
+            ),
+          ),
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: GlassContainer(

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 
 import 'package:home_widget/home_widget.dart';
 import 'package:intl/intl.dart';
@@ -14,6 +15,7 @@ class MonthWidgetService {
   MonthWidgetService(this._calendarService, this._taskSource);
 
   Future<void> updateMonthWidget({int? monthOffset}) async {
+    if (kIsWeb) return;
     try {
       final prefs = await SharedPreferences.getInstance();
       final int offset =

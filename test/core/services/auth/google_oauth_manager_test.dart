@@ -28,10 +28,18 @@ void main() {
       expect(callbackFired, isTrue);
     });
 
-    test('googleTasksScopes includes tasks scope on all platforms', () {
+    test('googleTasksScopes includes tasks and calendar scopes on all platforms', () {
       expect(
         GoogleOAuthManager.googleTasksScopes,
         contains('https://www.googleapis.com/auth/tasks'),
+      );
+      expect(
+        GoogleOAuthManager.googleTasksScopes,
+        contains('https://www.googleapis.com/auth/calendar.readonly'),
+      );
+      expect(
+        GoogleOAuthManager.googleTasksScopes,
+        contains('https://www.googleapis.com/auth/calendar.events'),
       );
     });
   });

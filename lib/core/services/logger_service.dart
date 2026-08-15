@@ -72,8 +72,9 @@ class AppLogger {
       }
     }
 
-    // 2. Monitoring (Crashlytics)
+    // 2. Monitoring (Crashlytics - Native mobile only)
     if (AppConfig.enableCrashReporting &&
+        !kIsWeb &&
         level.index >= LogLevel.warning.index &&
         Firebase.apps.isNotEmpty) {
       final crashlytics = FirebaseCrashlytics.instance;

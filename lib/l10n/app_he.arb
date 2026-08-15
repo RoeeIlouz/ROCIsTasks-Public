@@ -392,5 +392,9 @@
   "resetCart": "איפוס רשימה",
   "clearCartItems": "ניקוי פריטים ברשימה",
   "addItemHint": "הוספת פריט...",
-  "quantityHint": "כמות"
+  "quantityHint": "כמות",
+  "timezone": "אזור זמן",
+  "selectTimezone": "בחירת אזור זמן",
+  "automaticTimezone": "אוטומטי (אזור זמן המכשיר)",
+  "searchTimezone": "חיפוש אזור זמן..."
 }

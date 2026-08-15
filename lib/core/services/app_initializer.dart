@@ -18,8 +18,9 @@ import 'package:firebase_performance/firebase_performance.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 
 import 'package:rocis_tasks/core/services/encryption_service.dart';
-import 'package:timezone/data/latest_all.dart' as tz;
-import 'package:timezone/timezone.dart' as t;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:timezone/data/latest_all.dart' as tz_data;
+import 'package:timezone/timezone.dart' as tz;
 import 'package:flutter_timezone/flutter_timezone.dart';
 
 class AppInitializer {
@@ -41,9 +42,9 @@ class AppInitializer {
       // try to access Firebase before it is ready.
       await _initFirebase();
 
-      // Start custom cold start trace for performance monitoring
+      // Start custom cold start trace for performance monitoring (disabled on Web for adblockers)
       Trace? coldStartTrace;
-      if (!isBackground && AppConfig.enablePerformanceMonitoring) {
+      if (!isBackground && !kIsWeb && AppConfig.enablePerformanceMonitoring) {
         coldStartTrace = FirebasePerformance.instance.newTrace(
           'app_cold_start',
         );
@@ -66,7 +67,9 @@ class AppInitializer {
           .then((_) {
             // Services that depend on Firebase but can run after it's ready
             ErrorService.initialize();
-            AnalyticsService();
+            if (!kIsWeb) {
+              AnalyticsService();
+            }
           })
           .timeout(
             Duration(seconds: AppConfig.syncTimeoutSeconds),
@@ -225,18 +228,27 @@ class AppInitializer {
 
   static Future<void> _initTimezone({bool isBackground = false}) async {
     try {
-      tz.initializeTimeZones();
+      tz_data.initializeTimeZones();
       String timeZoneName = 'UTC';
-      if (!isBackground) {
-        try {
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        final saved = prefs.getString('app_selected_timezone');
+        if (saved != null &&
+            saved.isNotEmpty &&
+            saved != 'auto' &&
+            tz.timeZoneDatabase.locations.containsKey(saved)) {
+          timeZoneName = saved;
+        } else if (!isBackground) {
           final timezoneInfo = await FlutterTimezone.getLocalTimezone()
               .timeout(const Duration(seconds: 2));
-          timeZoneName = timezoneInfo.identifier;
-        } catch (e) {
-          AppLogger.warning('Failed to get local timezone via platform channel: $e');
+          if (tz.timeZoneDatabase.locations.containsKey(timezoneInfo.identifier)) {
+            timeZoneName = timezoneInfo.identifier;
+          }
         }
+      } catch (e) {
+        AppLogger.warning('Failed to get local timezone: $e');
       }
-      t.setLocalLocation(t.getLocation(timeZoneName));
+      tz.setLocalLocation(tz.getLocation(timeZoneName));
       AppLogger.info('Timezone initialized: $timeZoneName');
     } catch (e) {
       AppLogger.error('Timezone initialization failed', error: e);

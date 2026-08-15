@@ -406,5 +406,9 @@
   "resetCart": "Liste zurücksetzen",
   "clearCartItems": "Einträge löschen",
   "addItemHint": "Eintrag hinzufügen...",
-  "quantityHint": "Menge"
+  "quantityHint": "Menge",
+  "timezone": "Zeitzone",
+  "selectTimezone": "Zeitzone auswählen",
+  "automaticTimezone": "Automatisch (Gerätezeitzone)",
+  "searchTimezone": "Zeitzone suchen..."
 }

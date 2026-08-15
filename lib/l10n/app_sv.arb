@@ -407,5 +407,9 @@
   "resetCart": "Återställ lista",
   "clearCartItems": "Töm listan",
   "addItemHint": "Lägg till objekt...",
-  "quantityHint": "Antal"
+  "quantityHint": "Antal",
+  "timezone": "Tidszon",
+  "selectTimezone": "Välj tidszon",
+  "automaticTimezone": "Automatisk (Enhetens tidszon)",
+  "searchTimezone": "Sök tidszon..."
 }

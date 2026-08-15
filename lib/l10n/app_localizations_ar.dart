@@ -1121,4 +1121,16 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get quantityHint => 'الكمية';
+
+  @override
+  String get timezone => 'المنطقة الزمنية';
+
+  @override
+  String get selectTimezone => 'تحديد المنطقة الزمنية';
+
+  @override
+  String get automaticTimezone => 'تلقائي (منطقة الجهاز الزمنية)';
+
+  @override
+  String get searchTimezone => 'البحث عن منطقة زمنية...';
 }

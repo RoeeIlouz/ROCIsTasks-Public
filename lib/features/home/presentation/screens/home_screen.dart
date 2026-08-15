@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:rocis_tasks/features/home/presentation/screens/web_home_screen.dart';
 import 'package:rocis_tasks/features/calendar/presentation/screens/calendar_screen.dart';
@@ -52,12 +53,14 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _pageController = PageController(initialPage: _currentIndex);
 
-    // Handle Click Intents from Home Widgets (HomeWidget plugin)
-    hw.HomeWidget.initiallyLaunchedFromHomeWidget().then(_handleWidgetLaunch);
-    hw.HomeWidget.widgetClicked.listen(_handleWidgetLaunch);
+    if (!kIsWeb) {
+      // Handle Click Intents from Home Widgets (HomeWidget plugin)
+      hw.HomeWidget.initiallyLaunchedFromHomeWidget().then(_handleWidgetLaunch);
+      hw.HomeWidget.widgetClicked.listen(_handleWidgetLaunch);
 
-    // Handle widget deep links via method channel (for fill-in intents)
-    _widgetChannel.setMethodCallHandler(_handleWidgetMethodCall);
+      // Handle widget deep links via method channel (for fill-in intents)
+      _widgetChannel.setMethodCallHandler(_handleWidgetMethodCall);
+    }
 
     // Handle Notification Actions
     _notificationActionSubscription = NotificationService().onAction.listen((

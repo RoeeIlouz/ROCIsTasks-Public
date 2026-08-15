@@ -10,14 +10,15 @@ class AnalyticsService {
   factory AnalyticsService() => _instance;
   AnalyticsService._internal();
 
-  final FirebaseAnalytics _analytics = FirebaseAnalytics.instance;
+  final FirebaseAnalytics? _analytics =
+      kIsWeb ? null : FirebaseAnalytics.instance;
 
   /// Log a standard event
   Future<void> logEvent({
     required String name,
     Map<String, Object>? parameters,
   }) async {
-    if (!AppConfig.enableAnalytics) return;
+    if (!AppConfig.enableAnalytics || kIsWeb || _analytics == null) return;
 
     try {
       await _analytics.logEvent(name: name, parameters: parameters);
@@ -36,7 +37,7 @@ class AnalyticsService {
     required String screenName,
     String? screenClass,
   }) async {
-    if (!AppConfig.enableAnalytics) return;
+    if (!AppConfig.enableAnalytics || kIsWeb || _analytics == null) return;
 
     try {
       await _analytics.logScreenView(

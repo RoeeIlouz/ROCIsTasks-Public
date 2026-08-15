@@ -21,6 +21,7 @@ import 'package:rocis_tasks/features/home/presentation/screens/app_guide_screen.
 import 'package:rocis_tasks/shared/ui/widgets/easter_egg_spinner.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:rocis_tasks/features/auth/presentation/screens/security_settings_screen.dart';
+import 'package:rocis_tasks/core/services/timezone_service.dart';
 import 'package:rocis_tasks/features/home/presentation/screens/widget_customization_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -30,6 +31,7 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final themeService = Provider.of<ThemeService>(context);
+    final timezoneService = Provider.of<TimezoneService>(context);
     final authService = Provider.of<AuthService>(context, listen: false);
     final taskProvider = Provider.of<TaskProvider>(context, listen: true);
     final calendarProvider = Provider.of<CalendarProvider>(
@@ -82,7 +84,11 @@ class SettingsScreen extends StatelessWidget {
               subtitle: Text(user.email ?? ''),
             ),
           ListTile(
-            leading: _buildLeadingIcon(context, Icons.stars_rounded, Colors.amber),
+            leading: _buildLeadingIcon(
+              context,
+              Icons.stars_rounded,
+              Colors.amber,
+            ),
             title: Text(l10n.rocisTasksPro),
             subtitle: Text(
               subscriptionService.isPremium
@@ -99,7 +105,11 @@ class SettingsScreen extends StatelessWidget {
           ),
           if (subscriptionService.isPremium)
             ListTile(
-              leading: _buildLeadingIcon(context, Icons.settings_suggest_rounded, Colors.blue),
+              leading: _buildLeadingIcon(
+                context,
+                Icons.settings_suggest_rounded,
+                Colors.blue,
+              ),
               title: Text(l10n.manageSubscription),
               subtitle: Text(l10n.manageSubscriptionSubtitle),
               onTap: () async {
@@ -128,7 +138,11 @@ class SettingsScreen extends StatelessWidget {
         _buildSectionHeader(context, l10n.appearance),
         _buildSectionCard(context, [
           ListTile(
-            leading: _buildLeadingIcon(context, Icons.brightness_medium, Colors.purple),
+            leading: _buildLeadingIcon(
+              context,
+              Icons.brightness_medium,
+              Colors.purple,
+            ),
             title: Text(l10n.theme),
             subtitle: Text(
               themeService.themeMode == ThemeMode.system
@@ -151,23 +165,30 @@ class SettingsScreen extends StatelessWidget {
                       children: [
                         Text(
                           l10n.theme,
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 16),
                         ListTile(
                           selected: themeMode == ThemeMode.system,
-                          selectedTileColor: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3),
+                          selectedTileColor: Theme.of(
+                            context,
+                          ).colorScheme.primaryContainer.withValues(alpha: 0.3),
                           selectedColor: Theme.of(context).colorScheme.primary,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          leading: _buildLeadingIcon(context, Icons.brightness_auto, Colors.grey),
+                          leading: _buildLeadingIcon(
+                            context,
+                            Icons.brightness_auto,
+                            Colors.grey,
+                          ),
                           title: Text(l10n.systemDefault),
                           onTap: () {
                             themeService.setThemeMode(ThemeMode.system);
-                            analyticsService.logThemeChanged(themeMode: 'system');
+                            analyticsService.logThemeChanged(
+                              themeMode: 'system',
+                            );
                             Navigator.pop(context);
                           },
                           trailing: themeMode == ThemeMode.system
@@ -177,16 +198,24 @@ class SettingsScreen extends StatelessWidget {
                         const SizedBox(height: 8),
                         ListTile(
                           selected: themeMode == ThemeMode.light,
-                          selectedTileColor: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3),
+                          selectedTileColor: Theme.of(
+                            context,
+                          ).colorScheme.primaryContainer.withValues(alpha: 0.3),
                           selectedColor: Theme.of(context).colorScheme.primary,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          leading: _buildLeadingIcon(context, Icons.light_mode, Colors.amber),
+                          leading: _buildLeadingIcon(
+                            context,
+                            Icons.light_mode,
+                            Colors.amber,
+                          ),
                           title: Text(l10n.lightMode),
                           onTap: () {
                             themeService.setThemeMode(ThemeMode.light);
-                            analyticsService.logThemeChanged(themeMode: 'light');
+                            analyticsService.logThemeChanged(
+                              themeMode: 'light',
+                            );
                             Navigator.pop(context);
                           },
                           trailing: themeMode == ThemeMode.light
@@ -196,12 +225,18 @@ class SettingsScreen extends StatelessWidget {
                         const SizedBox(height: 8),
                         ListTile(
                           selected: themeMode == ThemeMode.dark,
-                          selectedTileColor: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3),
+                          selectedTileColor: Theme.of(
+                            context,
+                          ).colorScheme.primaryContainer.withValues(alpha: 0.3),
                           selectedColor: Theme.of(context).colorScheme.primary,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          leading: _buildLeadingIcon(context, Icons.dark_mode, Colors.indigo),
+                          leading: _buildLeadingIcon(
+                            context,
+                            Icons.dark_mode,
+                            Colors.indigo,
+                          ),
                           title: Text(l10n.darkMode),
                           onTap: () {
                             themeService.setThemeMode(ThemeMode.dark);
@@ -248,7 +283,9 @@ class SettingsScreen extends StatelessWidget {
                 ],
               ),
               subtitle: Text(l10n.glassmorphismEffectsSubtitle),
-              value: themeService.useGlassmorphism && subscriptionService.isPremium,
+              value:
+                  themeService.useGlassmorphism &&
+                  subscriptionService.isPremium,
               onChanged: (value) {
                 if (value && !subscriptionService.isPremium) {
                   subscriptionService.showPaywall();
@@ -261,7 +298,11 @@ class SettingsScreen extends StatelessWidget {
               },
             ),
           ListTile(
-            leading: _buildLeadingIcon(context, Icons.color_lens_outlined, Colors.orange),
+            leading: _buildLeadingIcon(
+              context,
+              Icons.color_lens_outlined,
+              Colors.orange,
+            ),
             title: Text(l10n.accentColor),
             subtitle: Text(l10n.accentColorSubtitle),
             trailing: Container(
@@ -361,7 +402,11 @@ class SettingsScreen extends StatelessWidget {
             },
           ),
           SwitchListTile(
-            secondary: _buildLeadingIcon(context, Icons.brightness_2, Colors.indigo),
+            secondary: _buildLeadingIcon(
+              context,
+              Icons.brightness_2,
+              Colors.indigo,
+            ),
             title: Text(l10n.amoledDarkMode),
             subtitle: Text(l10n.pureBlackBackground),
             value: themeService.useAmoledTheme,
@@ -375,7 +420,11 @@ class SettingsScreen extends StatelessWidget {
                 : null,
           ),
           SwitchListTile(
-            secondary: _buildLeadingIcon(context, Icons.access_time, Colors.blueGrey),
+            secondary: _buildLeadingIcon(
+              context,
+              Icons.access_time,
+              Colors.blueGrey,
+            ),
             title: Text(l10n.timeFormat24h),
             value: themeService.use24HourFormat,
             onChanged: themeService.toggle24HourFormat,
@@ -391,7 +440,8 @@ class SettingsScreen extends StatelessWidget {
                 context: context,
                 builder: (context) {
                   final currentLocaleCode = themeService.locale?.languageCode;
-                  final isEnSelected = currentLocaleCode == 'en' || themeService.locale == null;
+                  final isEnSelected =
+                      currentLocaleCode == 'en' || themeService.locale == null;
                   final isHiSelected = currentLocaleCode == 'hi';
                   final isHeSelected = currentLocaleCode == 'he';
                   final isEsSelected = currentLocaleCode == 'es';
@@ -399,7 +449,7 @@ class SettingsScreen extends StatelessWidget {
                   final isSvSelected = currentLocaleCode == 'sv';
                   final isDeSelected = currentLocaleCode == 'de';
                   final isFrSelected = currentLocaleCode == 'fr';
-                  
+
                   Widget buildLanguageTile({
                     required String flag,
                     required String name,
@@ -408,7 +458,9 @@ class SettingsScreen extends StatelessWidget {
                   }) {
                     return ListTile(
                       selected: isSelected,
-                      selectedTileColor: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3),
+                      selectedTileColor: Theme.of(
+                        context,
+                      ).colorScheme.primaryContainer.withValues(alpha: 0.3),
                       selectedColor: Theme.of(context).colorScheme.primary,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -428,9 +480,8 @@ class SettingsScreen extends StatelessWidget {
                         children: [
                           Text(
                             l10n.language,
-                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: Theme.of(context).textTheme.titleMedium
+                                ?.copyWith(fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 16),
                           buildLanguageTile(
@@ -528,9 +579,44 @@ class SettingsScreen extends StatelessWidget {
               );
             },
           ),
+          ListTile(
+            leading: _buildLeadingIcon(
+              context,
+              Icons.schedule_rounded,
+              Colors.teal,
+            ),
+            title: Text(l10n.timezone),
+            subtitle: Text(
+              timezoneService.isAuto
+                  ? '${l10n.automaticTimezone} (${timezoneService.currentTimezone} ${timezoneService.formatTimezoneOffset(timezoneService.currentTimezone)})'
+                  : '${timezoneService.currentTimezone} (${timezoneService.formatTimezoneOffset(timezoneService.currentTimezone)})',
+            ),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              showModalBottomSheet(
+                useSafeArea: true,
+                isScrollControlled: true,
+                context: context,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                ),
+                builder: (context) {
+                  return _TimezonePickerSheet(
+                    timezoneService: timezoneService,
+                    calendarProvider: calendarProvider,
+                    l10n: l10n,
+                  );
+                },
+              );
+            },
+          ),
           if (!kIsWeb)
             ListTile(
-              leading: _buildLeadingIcon(context, Icons.widgets_rounded, Colors.orange),
+              leading: _buildLeadingIcon(
+                context,
+                Icons.widgets_rounded,
+                Colors.orange,
+              ),
               title: Text(l10n.widgetSettings),
               subtitle: Text(l10n.widgetSettingsSubtitle),
               trailing: const Icon(Icons.chevron_right),
@@ -547,7 +633,11 @@ class SettingsScreen extends StatelessWidget {
         _buildSectionHeader(context, l10n.productivity),
         _buildSectionCard(context, [
           SwitchListTile(
-            secondary: _buildLeadingIcon(context, Icons.auto_awesome, Colors.amber),
+            secondary: _buildLeadingIcon(
+              context,
+              Icons.auto_awesome,
+              Colors.amber,
+            ),
             title: Text(l10n.smartAdd),
             subtitle: Text(l10n.autoRemoveNlpDatesSubtitle),
             value: themeService.autoRemoveNlpDates,
@@ -555,14 +645,22 @@ class SettingsScreen extends StatelessWidget {
           ),
           if (!kIsWeb)
             SwitchListTile(
-              secondary: _buildLeadingIcon(context, Icons.vibration_rounded, Colors.deepOrange),
+              secondary: _buildLeadingIcon(
+                context,
+                Icons.vibration_rounded,
+                Colors.deepOrange,
+              ),
               title: const Text('Task Completion Feedback'),
               subtitle: const Text('Haptic pulse when ticking off a task'),
               value: themeService.taskCompletionFeedback,
               onChanged: themeService.toggleTaskCompletionFeedback,
             ),
           SwitchListTile(
-            secondary: _buildLeadingIcon(context, Icons.help_outline_rounded, Colors.green),
+            secondary: _buildLeadingIcon(
+              context,
+              Icons.help_outline_rounded,
+              Colors.green,
+            ),
             title: Text(l10n.showMyTasksGuideShortcut),
             subtitle: Text(l10n.showMyTasksGuideShortcutSubtitle),
             value: taskProvider.showMyTasksGuideShortcut,
@@ -573,7 +671,11 @@ class SettingsScreen extends StatelessWidget {
           if (subscriptionService.isPremium) ...[
             if (!kIsWeb) ...[
               SwitchListTile(
-                secondary: _buildLeadingIcon(context, Icons.notifications_active_outlined, Colors.purple),
+                secondary: _buildLeadingIcon(
+                  context,
+                  Icons.notifications_active_outlined,
+                  Colors.purple,
+                ),
                 title: Text(l10n.advancedReminders),
                 subtitle: Text(l10n.advancedRemindersSubtitle),
                 value: taskProvider.advancedRemindersEnabled,
@@ -582,7 +684,11 @@ class SettingsScreen extends StatelessWidget {
                 },
               ),
               SwitchListTile(
-                secondary: _buildLeadingIcon(context, Icons.notification_important_outlined, Colors.red),
+                secondary: _buildLeadingIcon(
+                  context,
+                  Icons.notification_important_outlined,
+                  Colors.red,
+                ),
                 title: Text(l10n.nagReminders),
                 subtitle: Text(l10n.nagRemindersSubtitle),
                 value: taskProvider.nagRemindersEnabled,
@@ -592,9 +698,15 @@ class SettingsScreen extends StatelessWidget {
               ),
               if (taskProvider.nagRemindersEnabled) ...[
                 ListTile(
-                  leading: _buildLeadingIcon(context, Icons.schedule_outlined, Colors.orange),
+                  leading: _buildLeadingIcon(
+                    context,
+                    Icons.schedule_outlined,
+                    Colors.orange,
+                  ),
                   title: Text(l10n.nagInterval),
-                  subtitle: Text(_formatMinutes(taskProvider.nagIntervalMinutes)),
+                  subtitle: Text(
+                    _formatMinutes(taskProvider.nagIntervalMinutes),
+                  ),
                   onTap: () async {
                     final selected = await showDialog<int>(
                       context: context,
@@ -621,7 +733,11 @@ class SettingsScreen extends StatelessWidget {
                   },
                 ),
                 ListTile(
-                  leading: _buildLeadingIcon(context, Icons.format_list_numbered_rounded, Colors.blue),
+                  leading: _buildLeadingIcon(
+                    context,
+                    Icons.format_list_numbered_rounded,
+                    Colors.blue,
+                  ),
                   title: Text(l10n.nagCount),
                   subtitle: Text('${taskProvider.nagCount}'),
                   onTap: () async {
@@ -644,7 +760,11 @@ class SettingsScreen extends StatelessWidget {
                 ),
               ],
               SwitchListTile(
-                secondary: _buildLeadingIcon(context, Icons.bedtime_outlined, Colors.indigo),
+                secondary: _buildLeadingIcon(
+                  context,
+                  Icons.bedtime_outlined,
+                  Colors.indigo,
+                ),
                 title: Text(l10n.quietHours),
                 subtitle: Text(l10n.quietHoursSubtitle),
                 value: taskProvider.quietHoursEnabled,
@@ -654,7 +774,11 @@ class SettingsScreen extends StatelessWidget {
               ),
               if (taskProvider.quietHoursEnabled) ...[
                 ListTile(
-                  leading: _buildLeadingIcon(context, Icons.nights_stay_outlined, Colors.blue),
+                  leading: _buildLeadingIcon(
+                    context,
+                    Icons.nights_stay_outlined,
+                    Colors.blue,
+                  ),
                   title: Text(l10n.quietHoursStart),
                   subtitle: Text(
                     MaterialLocalizations.of(context).formatTimeOfDay(
@@ -679,7 +803,11 @@ class SettingsScreen extends StatelessWidget {
                   },
                 ),
                 ListTile(
-                  leading: _buildLeadingIcon(context, Icons.wb_sunny_outlined, Colors.amber),
+                  leading: _buildLeadingIcon(
+                    context,
+                    Icons.wb_sunny_outlined,
+                    Colors.amber,
+                  ),
                   title: Text(l10n.quietHoursEnd),
                   subtitle: Text(
                     MaterialLocalizations.of(context).formatTimeOfDay(
@@ -706,7 +834,11 @@ class SettingsScreen extends StatelessWidget {
               ],
             ],
             ListTile(
-              leading: _buildLeadingIcon(context, Icons.security_rounded, Colors.teal),
+              leading: _buildLeadingIcon(
+                context,
+                Icons.security_rounded,
+                Colors.teal,
+              ),
               title: Text(l10n.securitySettings),
               subtitle: Text(l10n.securitySettingsSubtitle),
               trailing: const Icon(Icons.chevron_right_rounded),
@@ -722,7 +854,11 @@ class SettingsScreen extends StatelessWidget {
           ],
           if (!kIsWeb)
             ListTile(
-              leading: _buildLeadingIcon(context, Icons.notifications_active_outlined, Colors.blue),
+              leading: _buildLeadingIcon(
+                context,
+                Icons.notifications_active_outlined,
+                Colors.blue,
+              ),
               title: Text(l10n.showTaskCounterNotification),
               subtitle: Text(l10n.showTaskCounterNotificationSubtitle),
               onTap: () async {
@@ -757,7 +893,11 @@ class SettingsScreen extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: _buildLeadingIcon(context, Icons.dashboard_customize_outlined, Colors.orange),
+            leading: _buildLeadingIcon(
+              context,
+              Icons.dashboard_customize_outlined,
+              Colors.orange,
+            ),
             title: Text(l10n.categories),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
@@ -770,7 +910,11 @@ class SettingsScreen extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: _buildLeadingIcon(context, Icons.delete_outline, Colors.red),
+            leading: _buildLeadingIcon(
+              context,
+              Icons.delete_outline,
+              Colors.red,
+            ),
             title: Text(l10n.trash),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
@@ -866,7 +1010,11 @@ class SettingsScreen extends StatelessWidget {
         _buildSectionHeader(context, l10n.privacyAndGdpr),
         _buildSectionCard(context, [
           ListTile(
-            leading: _buildLeadingIcon(context, Icons.privacy_tip_outlined, Colors.blue),
+            leading: _buildLeadingIcon(
+              context,
+              Icons.privacy_tip_outlined,
+              Colors.blue,
+            ),
             title: Text(l10n.privacyPolicy),
             subtitle: Text(l10n.privacyPolicySubtitle),
             trailing: const Icon(Icons.open_in_new, size: 16),
@@ -878,7 +1026,11 @@ class SettingsScreen extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: _buildLeadingIcon(context, Icons.person_remove_outlined, Colors.red),
+            leading: _buildLeadingIcon(
+              context,
+              Icons.person_remove_outlined,
+              Colors.red,
+            ),
             title: Text(
               l10n.deleteAccountTitle,
               style: TextStyle(color: Colors.red[700]),
@@ -971,7 +1123,11 @@ class SettingsScreen extends StatelessWidget {
         _buildSectionHeader(context, l10n.about),
         _buildSectionCard(context, [
           ListTile(
-            leading: _buildLeadingIcon(context, Icons.help_outline_rounded, Colors.green),
+            leading: _buildLeadingIcon(
+              context,
+              Icons.help_outline_rounded,
+              Colors.green,
+            ),
             title: Text(l10n.appGuide),
             subtitle: Text(l10n.appGuideSubtitle),
             trailing: const Icon(Icons.chevron_right),
@@ -983,7 +1139,11 @@ class SettingsScreen extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: _buildLeadingIcon(context, Icons.info_outline, Colors.blueGrey),
+            leading: _buildLeadingIcon(
+              context,
+              Icons.info_outline,
+              Colors.blueGrey,
+            ),
             title: Text(l10n.aboutApp),
             subtitle: Text(l10n.aboutAppSubtitle),
             onTap: () {
@@ -1047,7 +1207,7 @@ class SettingsScreen extends StatelessWidget {
                                 contentPadding: EdgeInsets.zero,
                                 leading: const Icon(Icons.language),
                                 title: Text(l10n.visitWebsite),
-                                subtitle: const Text('rocisapps.ilouz.xyz'),
+                                subtitle: const Text('rocisapps.com'),
                                 onTap: () async {
                                   final Uri url = Uri.parse(
                                     AppConfig.websiteUrl,
@@ -1177,11 +1337,7 @@ class SettingsScreen extends StatelessWidget {
         color: color.withValues(alpha: isDark ? 0.2 : 0.1),
         borderRadius: BorderRadius.circular(10),
       ),
-      child: Icon(
-        icon,
-        color: color,
-        size: 20,
-      ),
+      child: Icon(icon, color: color, size: 20),
     );
   }
 
@@ -1211,6 +1367,192 @@ class SettingsScreen extends StatelessWidget {
           child: Column(children: dividedChildren),
         ),
       ),
+    );
+  }
+}
+
+class _TimezonePickerSheet extends StatefulWidget {
+  final TimezoneService timezoneService;
+  final CalendarProvider calendarProvider;
+  final AppLocalizations l10n;
+
+  const _TimezonePickerSheet({
+    required this.timezoneService,
+    required this.calendarProvider,
+    required this.l10n,
+  });
+
+  @override
+  State<_TimezonePickerSheet> createState() => _TimezonePickerSheetState();
+}
+
+class _TimezonePickerSheetState extends State<_TimezonePickerSheet> {
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final allTimezones = TimezoneService.availableTimezones;
+    final filtered = _searchQuery.isEmpty
+        ? allTimezones
+        : allTimezones
+              .where(
+                (tz) =>
+                    tz.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+                    widget.timezoneService
+                        .formatTimezoneOffset(tz)
+                        .toLowerCase()
+                        .contains(_searchQuery.toLowerCase()),
+              )
+              .toList();
+
+    return DraggableScrollableSheet(
+      initialChildSize: 0.85,
+      minChildSize: 0.5,
+      maxChildSize: 0.95,
+      expand: false,
+      builder: (context, scrollController) {
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+          child: Column(
+            children: [
+              Container(
+                width: 36,
+                height: 4,
+                margin: const EdgeInsets.only(bottom: 12),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              Text(
+                widget.l10n.selectTimezone,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: _searchController,
+                onChanged: (val) => setState(() => _searchQuery = val.trim()),
+                decoration: InputDecoration(
+                  hintText: widget.l10n.searchTimezone,
+                  prefixIcon: const Icon(Icons.search),
+                  suffixIcon: _searchQuery.isNotEmpty
+                      ? IconButton(
+                          icon: const Icon(Icons.clear),
+                          onPressed: () {
+                            _searchController.clear();
+                            setState(() => _searchQuery = '');
+                          },
+                        )
+                      : null,
+                  filled: true,
+                  fillColor: theme.colorScheme.surfaceContainerHighest
+                      .withValues(alpha: 0.4),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Expanded(
+                child: ListView.builder(
+                  controller: scrollController,
+                  itemCount: filtered.length + (_searchQuery.isEmpty ? 1 : 0),
+                  itemBuilder: (context, index) {
+                    if (_searchQuery.isEmpty && index == 0) {
+                      final isAuto = widget.timezoneService.isAuto;
+                      return ListTile(
+                        selected: isAuto,
+                        selectedTileColor: theme.colorScheme.primaryContainer
+                            .withValues(alpha: 0.3),
+                        selectedColor: theme.colorScheme.primary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        leading: const Icon(Icons.auto_mode_rounded),
+                        title: Text(widget.l10n.automaticTimezone),
+                        subtitle: Text(
+                          '${widget.timezoneService.currentTimezone} (${widget.timezoneService.formatTimezoneOffset(widget.timezoneService.currentTimezone)})',
+                        ),
+                        trailing: isAuto ? const Icon(Icons.check) : null,
+                        onTap: () async {
+                          await widget.timezoneService.setTimezone(null);
+                          await widget.calendarProvider.loadEvents();
+                          if (context.mounted) Navigator.pop(context);
+                        },
+                      );
+                    }
+
+                    final tzIndex = _searchQuery.isEmpty ? index - 1 : index;
+                    final tzName = filtered[tzIndex];
+                    final isSelected =
+                        !widget.timezoneService.isAuto &&
+                        widget.timezoneService.currentTimezone == tzName;
+                    final offset = widget.timezoneService.formatTimezoneOffset(
+                      tzName,
+                    );
+
+                    return ListTile(
+                      selected: isSelected,
+                      selectedTileColor: theme.colorScheme.primaryContainer
+                          .withValues(alpha: 0.3),
+                      selectedColor: theme.colorScheme.primary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      title: Text(tzName),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 3,
+                            ),
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.surfaceContainerHighest,
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              offset,
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          if (isSelected) ...[
+                            const SizedBox(width: 8),
+                            const Icon(Icons.check),
+                          ],
+                        ],
+                      ),
+                      onTap: () async {
+                        await widget.timezoneService.setTimezone(tzName);
+                        await widget.calendarProvider.loadEvents();
+                        if (context.mounted) Navigator.pop(context);
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

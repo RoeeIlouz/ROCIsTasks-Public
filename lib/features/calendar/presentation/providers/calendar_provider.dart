@@ -222,8 +222,8 @@ class CalendarProvider extends ChangeNotifier {
     for (final event in _events) {
       if (event.start == null) continue;
 
-      final start = event.start!;
-      final end = event.end ?? start.add(const Duration(hours: 1));
+      final start = event.start!.toLocal();
+      final end = (event.end ?? start.add(const Duration(hours: 1))).toLocal();
 
       // Normalize to dates (midnight)
       DateTime currentDay = DateTime(start.year, start.month, start.day);

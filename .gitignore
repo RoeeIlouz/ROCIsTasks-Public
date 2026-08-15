@@ -19,6 +19,7 @@ migrate_working_dir/
 .dbg/
 .kilocode/
 .mimocode/
+.github/
 .agents/
 # IntelliJ related
 *.iml

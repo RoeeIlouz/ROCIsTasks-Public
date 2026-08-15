@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart' hide Category;
 import 'package:flutter/material.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
@@ -31,7 +32,6 @@ class TaskWidgetService {
       };
     } catch (e) {
       // Silent error handling - return fallback data
-      // Return fallback data structure
       return {
         'id': task.id,
         'title': 'Error loading task',
@@ -52,7 +52,6 @@ class TaskWidgetService {
         return !task.isCompleted && !(task.isDeleted ?? false);
       }).toList();
     } catch (e) {
-      // Silent error handling - return empty list
       return [];
     }
   }
@@ -77,10 +76,9 @@ class TaskWidgetService {
     Category? Function(String?) getCategoryById, {
     bool isDarkText = false,
   }) async {
+    if (kIsWeb) return null;
     String? chartPath;
     try {
-      // Starting widget update
-
       // Calculate priority stats for pending tasks
       int high = 0;
       int medium = 0;
@@ -136,7 +134,6 @@ class TaskWidgetService {
 
       // Filter to get only pending tasks
       final pendingTasks = filterPendingTasks(allTasks);
-      // Found pending tasks
 
       // Sort by due date
       sortTasksByDueDate(pendingTasks);
@@ -149,22 +146,18 @@ class TaskWidgetService {
           final serializedTask = _serializeTaskForWidget(task, category);
           tasksJson.add(serializedTask);
         } catch (e) {
-          // Error processing task - continue with others
-          // Continue with other tasks instead of failing completely
+          // Error processing task
         }
       }
 
       // Save widget data with error handling
       try {
         final jsonString = jsonEncode(tasksJson);
-        // Saving tasks to widget
         await HomeWidget.saveWidgetData<String>(
           'pending_tasks_list',
           jsonString,
         );
       } catch (e) {
-        // Error serializing tasks - using fallback
-        // Provide fallback empty data to prevent widget crashes
         await HomeWidget.saveWidgetData<String>('pending_tasks_list', '[]');
       }
 
@@ -174,11 +167,8 @@ class TaskWidgetService {
         iOSName: 'TaskWidget',
       );
 
-      // Widget update completed
       return chartPath;
     } catch (e) {
-      // Critical error during widget update
-      // Ensure widget has some data even if update fails
       try {
         await HomeWidget.saveWidgetData<String>('pending_tasks_list', '[]');
         await HomeWidget.updateWidget(
@@ -186,7 +176,7 @@ class TaskWidgetService {
           iOSName: 'TaskWidget',
         );
       } catch (fallbackError) {
-        // Fallback update also failed
+        // Fallback update failed
       }
       return null;
     }
@@ -197,8 +187,7 @@ class TaskWidgetService {
     try {
       return '#${colorValue.toRadixString(16).padLeft(8, '0')}';
     } catch (e) {
-      // Error formatting color
-      return ''; // Return empty string as fallback
+      return '';
     }
   }
 
@@ -209,8 +198,7 @@ class TaskWidgetService {
           '${date.month.toString().padLeft(2, '0')}-'
           '${date.day.toString().padLeft(2, '0')}';
     } catch (e) {
-      // Error formatting date
-      return ''; // Return empty string as fallback
+      return '';
     }
   }
 }

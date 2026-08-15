@@ -406,5 +406,9 @@
   "resetCart": "Réinitialiser la liste",
   "clearCartItems": "Vider la liste",
   "addItemHint": "Ajouter un élément...",
-  "quantityHint": "Qté"
+  "quantityHint": "Qté",
+  "timezone": "Fuseau horaire",
+  "selectTimezone": "Sélectionner le fuseau horaire",
+  "automaticTimezone": "Automatique (Fuseau de l'appareil)",
+  "searchTimezone": "Rechercher un fuseau horaire..."
 }

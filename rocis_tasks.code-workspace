@@ -5,6 +5,7 @@
 		}
 	],
 	"settings": {
-		"kiroAgent.configureMCP": "Disabled"
+		"kiroAgent.configureMCP": "Disabled",
+		"agentSystem.advanced.logCommands": true
 	}
 }

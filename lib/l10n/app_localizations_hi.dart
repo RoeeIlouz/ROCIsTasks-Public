@@ -1138,4 +1138,16 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get quantityHint => 'मात्रा';
+
+  @override
+  String get timezone => 'समय क्षेत्र';
+
+  @override
+  String get selectTimezone => 'समय क्षेत्र चुनें';
+
+  @override
+  String get automaticTimezone => 'स्वचालित (उपकरण समय क्षेत्र)';
+
+  @override
+  String get searchTimezone => 'समय क्षेत्र खोजें...';
 }

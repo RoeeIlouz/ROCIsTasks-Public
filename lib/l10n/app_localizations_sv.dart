@@ -1141,4 +1141,16 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get quantityHint => 'Antal';
+
+  @override
+  String get timezone => 'Tidszon';
+
+  @override
+  String get selectTimezone => 'Välj tidszon';
+
+  @override
+  String get automaticTimezone => 'Automatisk (Enhetens tidszon)';
+
+  @override
+  String get searchTimezone => 'Sök tidszon...';
 }

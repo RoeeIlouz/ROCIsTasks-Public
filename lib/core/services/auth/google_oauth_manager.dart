@@ -24,17 +24,13 @@ class GoogleTokenExpiredException implements Exception {
 }
 
 class GoogleOAuthManager {
-  static List<String> get googleTasksScopes => kIsWeb
-      ? const [
-          'email',
-          'https://www.googleapis.com/auth/tasks',
-          'https://www.googleapis.com/auth/calendar.readonly',
-          'https://www.googleapis.com/auth/calendar.events',
-        ]
-      : const [
-          'email',
-          'https://www.googleapis.com/auth/tasks',
-        ];
+  static List<String> get googleTasksScopes => const [
+        'email',
+        'https://www.googleapis.com/auth/tasks',
+        'https://www.googleapis.com/auth/calendar',
+        'https://www.googleapis.com/auth/calendar.readonly',
+        'https://www.googleapis.com/auth/calendar.events',
+      ];
 
   final ErrorHandlingService _errorHandlingService;
   final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
@@ -56,10 +52,17 @@ class GoogleOAuthManager {
     }
   }
 
+  static const String webClientId =
+      '867477199658-df3ptf7v5fi66ijc5jeunfmrpf5eghou.apps.googleusercontent.com';
+
   Future<void> ensureGoogleSignInInitialized() async {
     if (!_googleSignInInitialized) {
       try {
-        await _googleSignIn.initialize();
+        if (kIsWeb) {
+          await _googleSignIn.initialize(clientId: webClientId);
+        } else {
+          await _googleSignIn.initialize();
+        }
         _googleSignInInitialized = true;
       } catch (e) {
         AppLogger.error('Failed to initialize GoogleSignIn', error: e, tag: 'Auth');
@@ -138,31 +141,20 @@ class GoogleOAuthManager {
   }
 
   Future<String?> _performSilentTokenRefresh() async {
-    if (kIsWeb) {
-      // On Web, silent refresh via GoogleSignIn GIS SDK isn't available without explicit popup.
-      // Return null so the app gracefully uses cached token or requests user popup re-authentication.
-      return null;
-    }
     try {
-      await ensureGoogleSignInInitialized();
-
-      if (_googleUser == null) {
-        final restoredUser = await _googleSignIn.attemptLightweightAuthentication();
-        _googleUser ??= restoredUser;
-      }
-
       if (_googleUser == null) {
         AppLogger.info('Silent refresh: no Google user available.', tag: 'Auth');
         return null;
       }
 
-      final clientAuth = await _googleUser!.authorizationClient.authorizationForScopes(googleTasksScopes);
+      var clientAuth = await _googleUser!.authorizationClient.authorizationForScopes(googleTasksScopes);
+      clientAuth ??= await _googleUser!.authorizationClient.authorizeScopes(googleTasksScopes);
 
-      if (clientAuth != null && clientAuth.accessToken.isNotEmpty) {
+      if (clientAuth.accessToken.isNotEmpty) {
         await cacheGoogleAccessToken(clientAuth.accessToken);
         return clientAuth.accessToken;
       }
-      AppLogger.info('Silent refresh: authorizationForScopes returned null.', tag: 'Auth');
+      AppLogger.info('Silent refresh: authorizationClient returned null.', tag: 'Auth');
       return null;
     } catch (e) {
       AppLogger.warning('Silent Google token refresh failed: $e', tag: 'Auth');

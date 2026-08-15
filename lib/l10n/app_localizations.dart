@@ -2238,6 +2238,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Qty'**
   String get quantityHint;
+
+  /// No description provided for @timezone.
+  ///
+  /// In en, this message translates to:
+  /// **'Timezone'**
+  String get timezone;
+
+  /// No description provided for @selectTimezone.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Timezone'**
+  String get selectTimezone;
+
+  /// No description provided for @automaticTimezone.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatic (Device Timezone)'**
+  String get automaticTimezone;
+
+  /// No description provided for @searchTimezone.
+  ///
+  /// In en, this message translates to:
+  /// **'Search timezone...'**
+  String get searchTimezone;
 }
 
 class _AppLocalizationsDelegate

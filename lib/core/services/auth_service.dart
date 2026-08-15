@@ -66,10 +66,16 @@ class AuthService extends ChangeNotifier {
       final user = currentUser;
       if (user == null) return;
 
-      final isGoogleUser =
-          user.providerData.any((p) => p.providerId == 'google.com');
+      final isGoogleUser = user.providerData.any(
+        (p) => p.providerId == 'google.com',
+      );
       final prefs = await SharedPreferences.getInstance();
       final hasCachedToken = prefs.containsKey('google_access_token');
+      final token = prefs.getString('google_access_token');
+      final expiresAtStr = prefs.getString('google_access_token_expires_at');
+      final isTokenValid = token != null &&
+          expiresAtStr != null &&
+          DateTime.tryParse(expiresAtStr)?.isAfter(DateTime.now()) == true;
 
       // Only attempt startup lightweight authentication if user signed in via Google
       // or has linked Google Tasks, avoiding unwanted prompts for Email/Password users.
@@ -77,9 +83,19 @@ class AuthService extends ChangeNotifier {
         return;
       }
 
+      // Skip automatic lightweight authentication on startup if cached token exists
+      // or on Web to prevent native Credential Manager bottom sheet popups on app launch.
+      if (isTokenValid || hasCachedToken || kIsWeb) {
+        AppLogger.info(
+          'Google access token cached or Web. Skipping startup lightweight authentication.',
+          tag: 'Auth',
+        );
+        return;
+      }
+
       await _oauthManager.ensureGoogleSignInInitialized();
-      final restored =
-          await _oauthManager.googleSignIn.attemptLightweightAuthentication();
+      final restored = await _oauthManager.googleSignIn
+          .attemptLightweightAuthentication();
       if (restored != null) {
         _oauthManager.setGoogleUser(restored);
         AppLogger.info('Google user restored on startup.', tag: 'Auth');
@@ -90,6 +106,38 @@ class AuthService extends ChangeNotifier {
         tag: 'Auth',
       );
     }
+  }
+
+  Future<String?> _resolveWebGoogleAccessToken({String? popupToken}) async {
+    if (!kIsWeb) return popupToken;
+    if (popupToken != null && popupToken.isNotEmpty) return popupToken;
+
+    try {
+      await _oauthManager.ensureGoogleSignInInitialized();
+      final restored = await _oauthManager.googleSignIn
+          .attemptLightweightAuthentication();
+      if (restored != null) {
+        _oauthManager.setGoogleUser(restored);
+        final clientAuth =
+            await restored.authorizationClient.authorizationForScopes(
+              GoogleOAuthManager.googleTasksScopes,
+            ) ??
+            await restored.authorizationClient.authorizeScopes(
+              GoogleOAuthManager.googleTasksScopes,
+            );
+
+        if (clientAuth.accessToken.isNotEmpty) {
+          return clientAuth.accessToken;
+        }
+      }
+    } catch (e) {
+      AppLogger.warning(
+        'Could not resolve web token via GoogleSignIn after popup: $e',
+        tag: 'Auth',
+      );
+    }
+
+    return _oauthManager.getGoogleAccessToken();
   }
 
   @override
@@ -108,68 +156,83 @@ class AuthService extends ChangeNotifier {
   bool get isAuthenticatedInSchedule => _scheduleAuth?.currentUser != null;
 
   Future<UserCredential?> signInWithGoogle() async {
-    try {
-      if (kIsWeb) {
+    if (kIsWeb) {
+      try {
         final GoogleAuthProvider googleProvider = GoogleAuthProvider();
         for (final scope in GoogleOAuthManager.googleTasksScopes) {
           if (scope != 'email' && scope != 'profile') {
             googleProvider.addScope(scope);
           }
         }
-        googleProvider.setCustomParameters({'prompt': 'select_account'});
+        // Force consent so Google issues access tokens with all required scopes.
+        googleProvider.setCustomParameters({'prompt': 'consent'});
 
-        final UserCredential userCredential =
-            await _auth.signInWithPopup(googleProvider);
-
+        final UserCredential userCredential = await _auth.signInWithPopup(
+          googleProvider,
+        );
         final OAuthCredential? oAuthCred =
             userCredential.credential as OAuthCredential?;
-        final String? accessToken = oAuthCred?.accessToken;
+        final resolvedToken = await _resolveWebGoogleAccessToken(
+          popupToken: oAuthCred?.accessToken,
+        );
 
-        if (accessToken != null && accessToken.isNotEmpty) {
-          await _oauthManager.cacheGoogleAccessToken(accessToken);
+        if (resolvedToken != null && resolvedToken.isNotEmpty) {
+          await _oauthManager.cacheGoogleAccessToken(resolvedToken);
+          setGoogleTasksTokenExpired(false);
         }
 
         if (userCredential.user != null) {
-          AppLogger.info(
-            'Web Google Sign in successful. Starting critical key sync...',
-            tag: 'Auth',
-          );
           await _syncEncryptionKey(userCredential.user!.uid);
-          AppLogger.info('Key sync complete.', tag: 'Auth');
         }
 
         notifyListeners();
         return userCredential;
+      } catch (webErr, webStack) {
+        _errorHandlingService.logError(
+          webErr,
+          webStack,
+          reason: 'Sign in with Google Web Popup',
+        );
+        return null;
       }
+    }
 
+    try {
       await _oauthManager.ensureGoogleSignInInitialized();
 
-      final GoogleSignInAccount googleUser =
-          await _oauthManager.googleSignIn.authenticate(
-        scopeHint: GoogleOAuthManager.googleTasksScopes,
-      );
-      _oauthManager.setGoogleUser(googleUser);
+      GoogleSignInAccount? googleUser = _oauthManager.googleUser;
+      if (googleUser == null) {
+        googleUser = await _oauthManager.googleSignIn.authenticate(
+          scopeHint: GoogleOAuthManager.googleTasksScopes,
+        );
+        _oauthManager.setGoogleUser(googleUser);
+      }
 
       final GoogleSignInAuthentication googleAuth = googleUser.authentication;
 
-      final clientAuth = await googleUser.authorizationClient
-              .authorizationForScopes(GoogleOAuthManager.googleTasksScopes) ??
-          await googleUser.authorizationClient
-              .authorizeScopes(GoogleOAuthManager.googleTasksScopes);
+      var clientAuth = await googleUser.authorizationClient
+          .authorizationForScopes(GoogleOAuthManager.googleTasksScopes);
+      clientAuth ??= await googleUser.authorizationClient.authorizeScopes(
+        GoogleOAuthManager.googleTasksScopes,
+      );
 
-      await _oauthManager.cacheGoogleAccessToken(clientAuth.accessToken);
+      final String accessToken = clientAuth.accessToken;
+      if (accessToken.isNotEmpty) {
+        await _oauthManager.cacheGoogleAccessToken(accessToken);
+      }
 
       final AuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: clientAuth.accessToken,
+        accessToken: accessToken.isNotEmpty ? accessToken : null,
         idToken: googleAuth.idToken,
       );
 
-      final UserCredential userCredential =
-          await _auth.signInWithCredential(credential);
+      final UserCredential userCredential = await _auth.signInWithCredential(
+        credential,
+      );
 
       if (userCredential.user != null) {
         AppLogger.info(
-          'Sign in successful. Starting critical key sync...',
+          'Sign in with Google successful. Starting critical key sync...',
           tag: 'Auth',
         );
         await _syncEncryptionKey(userCredential.user!.uid);
@@ -191,11 +254,8 @@ class AuthService extends ChangeNotifier {
     String password,
   ) async {
     try {
-      final UserCredential userCredential =
-          await _auth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      final UserCredential userCredential = await _auth
+          .signInWithEmailAndPassword(email: email, password: password);
 
       if (userCredential.user != null) {
         AppLogger.info(
@@ -221,11 +281,8 @@ class AuthService extends ChangeNotifier {
     String password,
   ) async {
     try {
-      final UserCredential userCredential =
-          await _auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      final UserCredential userCredential = await _auth
+          .createUserWithEmailAndPassword(email: email, password: password);
 
       if (userCredential.user != null) {
         AppLogger.info(
@@ -412,9 +469,13 @@ class AuthService extends ChangeNotifier {
             googleProvider.addScope(scope);
           }
         }
-        googleProvider.setCustomParameters({'prompt': 'select_account'});
+        // Force consent so reconnect flow can recover missing calendar/task scopes.
+        googleProvider.setCustomParameters({'prompt': 'consent'});
 
-        AppLogger.info('Opening Google popup to refresh access token on Web...', tag: 'Auth');
+        AppLogger.info(
+          'Opening Google popup to refresh access token on Web...',
+          tag: 'Auth',
+        );
         UserCredential userCredential;
         if (user != null) {
           try {
@@ -432,10 +493,12 @@ class AuthService extends ChangeNotifier {
 
         final OAuthCredential? oAuthCred =
             userCredential.credential as OAuthCredential?;
-        final String? popupToken = oAuthCred?.accessToken;
+        final resolvedToken = await _resolveWebGoogleAccessToken(
+          popupToken: oAuthCred?.accessToken,
+        );
 
-        if (popupToken != null && popupToken.isNotEmpty) {
-          await _oauthManager.cacheGoogleAccessToken(popupToken);
+        if (resolvedToken != null && resolvedToken.isNotEmpty) {
+          await _oauthManager.cacheGoogleAccessToken(resolvedToken);
           setGoogleTasksTokenExpired(false);
           notifyListeners();
           return true;
@@ -453,17 +516,21 @@ class AuthService extends ChangeNotifier {
       try {
         await _oauthManager.ensureGoogleSignInInitialized();
 
-        GoogleSignInAccount? googleUser = _oauthManager.googleUser ??
+        GoogleSignInAccount? googleUser =
+            _oauthManager.googleUser ??
             await _oauthManager.googleSignIn.attemptLightweightAuthentication();
         googleUser ??= await _oauthManager.googleSignIn.authenticate(
           scopeHint: GoogleOAuthManager.googleTasksScopes,
         );
         _oauthManager.setGoogleUser(googleUser);
 
-        final clientAuth = await googleUser.authorizationClient
-                .authorizationForScopes(GoogleOAuthManager.googleTasksScopes) ??
-            await googleUser.authorizationClient
-                .authorizeScopes(GoogleOAuthManager.googleTasksScopes);
+        final clientAuth =
+            await googleUser.authorizationClient.authorizationForScopes(
+              GoogleOAuthManager.googleTasksScopes,
+            ) ??
+            await googleUser.authorizationClient.authorizeScopes(
+              GoogleOAuthManager.googleTasksScopes,
+            );
 
         await _oauthManager.cacheGoogleAccessToken(clientAuth.accessToken);
 
@@ -590,8 +657,8 @@ class AuthService extends ChangeNotifier {
           return true;
         }
 
-        final GoogleSignInAccount? googleUser =
-            await _oauthManager.googleSignIn.attemptLightweightAuthentication();
+        final GoogleSignInAccount? googleUser = await _oauthManager.googleSignIn
+            .attemptLightweightAuthentication();
         if (googleUser == null) return false;
         final GoogleSignInAuthentication googleAuth = googleUser.authentication;
         final clientAuth = await googleUser.authorizationClient
@@ -616,7 +683,9 @@ class AuthService extends ChangeNotifier {
       final email = user.email;
       final normalizedPassword = password?.trim();
       if (email == null || email.isEmpty) return false;
-      if (normalizedPassword == null || normalizedPassword.isEmpty) return false;
+      if (normalizedPassword == null || normalizedPassword.isEmpty) {
+        return false;
+      }
       try {
         final credential = EmailAuthProvider.credential(
           email: email,

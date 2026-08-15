@@ -406,5 +406,9 @@
   "resetCart": "إعادة ضبط القائمة",
   "clearCartItems": "مسح عناصر القائمة",
   "addItemHint": "إضافة عنصر...",
-  "quantityHint": "الكمية"
+  "quantityHint": "الكمية",
+  "timezone": "المنطقة الزمنية",
+  "selectTimezone": "تحديد المنطقة الزمنية",
+  "automaticTimezone": "تلقائي (منطقة الجهاز الزمنية)",
+  "searchTimezone": "البحث عن منطقة زمنية..."
 }

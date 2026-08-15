@@ -1121,4 +1121,16 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get quantityHint => 'כמות';
+
+  @override
+  String get timezone => 'אזור זמן';
+
+  @override
+  String get selectTimezone => 'בחירת אזור זמן';
+
+  @override
+  String get automaticTimezone => 'אוטומטי (אזור זמן המכשיר)';
+
+  @override
+  String get searchTimezone => 'חיפוש אזור זמן...';
 }

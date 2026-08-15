@@ -1154,4 +1154,16 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get quantityHint => 'Menge';
+
+  @override
+  String get timezone => 'Zeitzone';
+
+  @override
+  String get selectTimezone => 'Zeitzone auswählen';
+
+  @override
+  String get automaticTimezone => 'Automatisch (Gerätezeitzone)';
+
+  @override
+  String get searchTimezone => 'Zeitzone suchen...';
 }
