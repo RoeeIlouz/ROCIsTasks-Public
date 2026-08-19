@@ -49,7 +49,8 @@ jobs:
 
       - name: Run tests
         run: flutter test
-
+      - name: TruffleHog OSS
+        uses: trufflesecurity/trufflehog@v3.97.0
       - name: Build App Bundle (Release)
         shell: bash
         run: |
