@@ -19,7 +19,7 @@ migrate_working_dir/
 .dbg/
 .kilocode/
 .mimocode/
-.github/
+.github/copilot-instructions.md
 .agents/
 # IntelliJ related
 *.iml
