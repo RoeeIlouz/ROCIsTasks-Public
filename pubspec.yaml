@@ -1,0 +1,115 @@
+name: rocis_tasks
+description: "ROCI's Tasks — A premium task management app with Google Tasks sync, calendar integration, and glassmorphism UI."
+publish_to: "none"
+
+version: 0.2.8+77
+
+environment:
+  sdk: ^3.10.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # UI & Design
+  cupertino_icons: ^1.0.8
+  google_fonts: ^8.2.1
+  dynamic_color: ^1.8.1
+  auto_size_text: ^3.0.0
+  flutter_staggered_animations: ^1.1.1
+  fl_chart: ^1.2.0
+  cached_network_image: ^3.4.1
+  flutter_svg: ^2.0.10+1
+
+  # Navigation & Routing
+  go_router: ^17.0.1
+
+  # State Management
+  provider: ^6.1.5+1
+
+  # Local Storage
+  hive_ce: ^2.7.0
+  hive_ce_flutter: ^2.3.0
+  shared_preferences: ^2.5.4
+  flutter_secure_storage: ^10.0.0
+
+  # Firebase
+  firebase_core: ^4.10.0
+  cloud_firestore: ^6.5.0
+  firebase_auth: ^6.5.2
+  firebase_crashlytics: ^5.2.3
+  firebase_analytics: ^12.4.2
+  firebase_performance: ^0.11.4+2
+  firebase_remote_config: ^6.5.2
+
+  # Google Services
+  google_sign_in: ^7.2.0
+
+  # Calendar & Scheduling
+  table_calendar: ^3.2.0
+  device_calendar: ^4.3.2
+  timezone: ^0.11.0
+  flutter_timezone: ^5.1.0
+  rrule: ^0.2.18
+
+  # Notifications
+  flutter_local_notifications: ^22.0.0
+
+  # Networking & Connectivity
+  http: ^1.2.1
+  connectivity_plus: ^7.1.1
+
+  # Security & Encryption
+  encrypt: ^5.0.3
+  local_auth: ^3.0.1
+
+  # Monetization
+  purchases_flutter: ^10.2.3
+  purchases_ui_flutter: ^10.2.3
+
+  # Utilities
+  intl: ^0.20.2
+  uuid: ^4.5.2
+  url_launcher: ^6.3.2
+  permission_handler: ^12.0.1
+  device_info_plus: ^12.4.0
+  file_picker: ^8.3.7
+  flutter_dotenv: ^6.0.1
+  flutter_gen: ^5.9.0
+
+  # Platform Features
+  home_widget: ^0.8.1
+  quick_actions: ^1.0.9
+
+dependency_overrides:
+  timezone: ^0.11.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_launcher_icons: ^0.14.4
+  flutter_lints: ^6.0.0
+  build_runner: ^2.4.13
+  hive_ce_generator: ^1.4.0
+  mocktail: ^1.0.4
+
+flutter:
+  uses-material-design: true
+  generate: true
+
+  assets:
+    - assets/images/logo.png
+    - assets/icons/
+    - shorebird.yaml
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  web:
+    generate: true
+    image_path: "assets/images/logo.png"
+    background_color: "#0F172A"
+    theme_color: "#6366F1"
+  image_path: "assets/images/logo.png"

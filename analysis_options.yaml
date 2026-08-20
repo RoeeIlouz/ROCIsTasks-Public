@@ -1,0 +1,31 @@
+analyzer:
+  errors:
+    no_leading_underscores_for_local_identifiers: ignore
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    avoid_print: true
+    avoid_unnecessary_containers: true
+    sized_box_for_whitespace: true
+    prefer_is_empty: true
+    prefer_is_not_empty: true
+    avoid_empty_else: true
+    avoid_init_to_null: true
+    avoid_returning_null_for_void: true
+    avoid_void_async: true
+    cancel_subscriptions: true
+    close_sinks: true
+    no_duplicate_case_values: true
+    null_closures: true
+    prefer_final_in_for_each: true
+    prefer_single_quotes: true
+    sort_child_properties_last: true
+    use_key_in_widget_constructors: true
+    unnecessary_string_interpolations: true
+    unnecessary_lambdas: true
+    unnecessary_this: true
+    unnecessary_new: true
+    unnecessary_overrides: true
+    unnecessary_parenthesis: true
+    unnecessary_string_escapes: true

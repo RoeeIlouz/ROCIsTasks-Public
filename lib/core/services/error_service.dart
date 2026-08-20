@@ -1,0 +1,143 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:rocis_tasks/core/config/app_config.dart';
+import 'package:rocis_tasks/core/services/logger_service.dart';
+import 'package:rocis_tasks/shared/ui/widgets/snackbars.dart';
+
+/// Global error handling service
+class ErrorService {
+  static final ErrorService _instance = ErrorService._internal();
+  factory ErrorService() => _instance;
+  ErrorService._internal();
+
+  static FirebaseCrashlytics? _crashlytics;
+  static FirebaseAnalytics? _analytics;
+
+  /// Initialize global error handling
+  static void initialize() {
+    // Initialize Firebase services if available (native only)
+    try {
+      if (AppConfig.enableCrashReporting && !kIsWeb) {
+        _crashlytics = FirebaseCrashlytics.instance;
+        _analytics = FirebaseAnalytics.instance;
+      }
+    } catch (e) {
+      AppLogger.warning(
+        'Firebase services not available during ErrorService init',
+        error: e,
+      );
+    }
+
+    // Catch Flutter framework errors
+    FlutterError.onError = (FlutterErrorDetails details) {
+      FlutterError.presentError(details);
+      _logError(
+        'Flutter Error',
+        details.exception,
+        details.stack,
+        details.context?.toString(),
+      );
+    };
+
+    // Catch async errors
+    PlatformDispatcher.instance.onError = (error, stack) {
+      _logError('Platform Error', error, stack);
+      return true;
+    };
+  }
+
+  /// Log error with context
+  static void _logError(
+    String type,
+    Object error,
+    StackTrace? stack, [
+    String? context,
+  ]) {
+    final reason = context != null ? '[$type] $context' : type;
+    AppLogger.error(reason, error: error, stack: stack);
+
+    // Send to crash reporting service in production
+    if (AppConfig.enableCrashReporting && _crashlytics != null) {
+      try {
+        _crashlytics!.recordError(
+          error,
+          stack,
+          fatal: false,
+          information: context != null ? <Object>[context] : <Object>[],
+        );
+      } catch (e) {
+        AppLogger.warning('Failed to record error to Crashlytics', error: e);
+      }
+    }
+
+    // Log to analytics for error tracking
+    if (AppConfig.enableAnalytics && _analytics != null) {
+      try {
+        _analytics!.logEvent(
+          name: 'app_error',
+          parameters: {
+            'error_type': type,
+            'error_message': error.toString().substring(0, 100),
+            'has_stack_trace': stack != null ? 1 : 0,
+            'context': context?.substring(0, 100) ?? 'none',
+            'is_production': AppConfig.isProduction ? 1 : 0,
+          },
+        );
+      } catch (e) {
+        AppLogger.warning('Failed to log error to Analytics', error: e);
+      }
+    }
+  }
+
+  /// Handle and report user-facing errors
+  static void handleUserError(
+    BuildContext context,
+    String message, {
+    Object? error,
+    StackTrace? stack,
+    VoidCallback? onRetry,
+  }) {
+    _logError('User Error', error ?? message, stack);
+
+    // Show user-friendly error message
+    if (context.mounted) {
+      showErrorSnackBar(context, message);
+    }
+  }
+
+  /// Handle network errors specifically
+  static void handleNetworkError(
+    BuildContext context, {
+    VoidCallback? onRetry,
+  }) {
+    handleUserError(
+      context,
+      'Network error. Please check your connection and try again.',
+      onRetry: onRetry,
+    );
+  }
+
+  /// Handle sync errors
+  static void handleSyncError(BuildContext context, {VoidCallback? onRetry}) {
+    handleUserError(
+      context,
+      'Sync failed. Your data is saved locally and will sync when connection is restored.',
+      onRetry: onRetry,
+    );
+  }
+
+  /// Handle authentication errors
+  static void handleAuthError(BuildContext context) {
+    handleUserError(context, 'Authentication failed. Please sign in again.');
+  }
+
+  /// Handle storage errors
+  static void handleStorageError(BuildContext context) {
+    handleUserError(
+      context,
+      'Storage error. Please check available space and try again.',
+    );
+  }
+}

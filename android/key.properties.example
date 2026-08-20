@@ -1,0 +1,8 @@
+# Android Signing Configuration Template
+# Copy this file to key.properties and fill in your actual values
+# DO NOT COMMIT key.properties TO VERSION CONTROL
+
+storePassword=your-store-password
+keyPassword=your-key-password
+keyAlias=your-key-alias
+storeFile=../path/to/your/keystore.jks

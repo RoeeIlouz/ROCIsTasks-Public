@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!--
+    If you are serving your web app in a path other than the root, change the
+    href value below to reflect the base path you are serving from.
+
+    The path provided below has to start and end with a slash "/" in order for
+    it to work correctly.
+
+    For more details:
+    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
+
+    This is a placeholder for base href that will be replaced by the value of
+    the `--base-href` argument provided to `flutter build`.
+  -->
+  <base href="$FLUTTER_BASE_HREF">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="ROCI's Tasks - A powerful, minimalist productivity app with smart NLP input, bulk actions, and deep insights.">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://rocis-tasks.app/">
+  <meta property="og:title" content="ROCI's Tasks">
+  <meta property="og:description" content="ROCI's Tasks - A powerful, minimalist productivity app with smart NLP input, bulk actions, and deep insights.">
+  <meta property="og:image" content="https://rocis-tasks.app/og-image.png">
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://rocis-tasks.app/">
+  <meta property="twitter:title" content="ROCI's Tasks">
+  <meta property="twitter:description" content="ROCI's Tasks - A powerful, minimalist productivity app with smart NLP input, bulk actions, and deep insights.">
+  <meta property="twitter:image" content="https://rocis-tasks.app/og-image.png">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ROCI's Tasks">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png"/>
+
+  <!-- Google Sign-In SDK configuration for Web -->
+  <meta name="google-signin-client_id" content="867477199658-df3ptf7v5fi66ijc5jeunfmrpf5eghou.apps.googleusercontent.com">
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+  <!-- Lemon Squeezy Web Overlay SDK -->
+  <script src="https://assets.lemonsqueezy.com/lemon.js" defer></script>
+  <script>
+    window.openLemonSqueezyOverlay = function(url) {
+      if (typeof LemonSqueezy !== 'undefined') {
+        LemonSqueezy.Url.Open(url);
+      } else {
+        window.open(url, '_blank');
+      }
+    }
+  </script>
+
+  <title>ROCI's Tasks</title>
+  <link rel="manifest" href="manifest.json">
+  <style>
+    body {
+      background-color: #0F172A;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+    .loading-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      width: 100vw;
+      font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      color: #F8FAFC;
+    }
+    .spinner {
+      border: 4px solid rgba(248, 250, 252, 0.1);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border-left-color: #ffffff;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .title {
+      margin-top: 24px;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+    }
+    .tagline {
+      margin-top: 8px;
+      font-size: 16px;
+      color: rgba(248, 250, 252, 0.7);
+      letter-spacing: 1.2px;
+    }
+  </style>
+</head>
+<body>
+  <div id="loading">
+    <div class="loading-container">
+      <div class="spinner"></div>
+      <div class="title">ROCI's Tasks</div>
+      <div class="tagline">Smart productivity, localized & premium</div>
+    </div>
+  </div>
+  <script src="flutter_bootstrap.js" async></script>
+</body>
+</html>

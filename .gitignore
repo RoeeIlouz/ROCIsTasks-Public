@@ -1,0 +1,93 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+.kilo/
+.claude/
+.kilocode/
+.antigravitycli/
+.claude/
+.dbg/
+.kilocode/
+.mimocode/
+.github/copilot-instructions.md
+.agents/
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# The .vscode folder contains launch configuration and tasks you configure in
+# VS Code which you may wish to be included in version control, so this line
+# is commented out by default.
+#.vscode/
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+build/
+**/build/
+android/app/build/
+android/build/
+/coverage/
+.agent/
+.kilocode/
+repomix-output.xml
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Android Studio will place build artifacts here
+/android/app/debug
+/android/app/profile
+/android/app/release
+/lib/firebase_options.dart
+/lib/firebase_schedule_options.dart
+/docs/SUMMARY.md
+graphify-out/
+.serena/
+functions/
+assets/screenshots/*
+docs/notebooklm/
+# Environment and Security Files
+.env
+.env.local
+.env.production
+.env.staging
+android/key.properties
+android/app/upload-keystore.jks
+android/app/release-keystore.jks
+ios/Runner/GoogleService-Info.plist
+android/app/google-services.json
+
+# Firebase and API Keys
+firebase_options.dart.backup
+**/firebase_options_backup.dart
+.firebaserc
+.firebase/
+# Sensitive Configuration
+secrets/
+config/secrets/
+*.pem
+*.p12
+*.mobileprovision
+
+
+# Improvement Plan
+IMPROVEMENT_PLAN.md

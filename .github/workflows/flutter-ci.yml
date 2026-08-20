@@ -1,0 +1,72 @@
+name: ROCIs Tasks CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      REVENUECAT_API_KEY_ANDROID: ${{ secrets.REVENUECAT_API_KEY_ANDROID }}
+
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Set up Java
+        uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@f2c4f6686ca8e8d6e6d0f28410eeef506ed66aff # v2.18.0
+        with:
+          flutter-version: '3.44.2'
+          channel: 'stable'
+          cache: true
+
+      - name: Cache Gradle
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # v4.2.2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/gradle-wrapper.properties', '**/*.gradle*', '**/gradle.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Setup configuration templates
+        run: |
+          cp .env.example .env
+          cp lib/firebase_options.dart.example lib/firebase_options.dart
+          cp lib/firebase_schedule_options.dart.example lib/firebase_schedule_options.dart
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Run code generation
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Analyze project
+        run: flutter analyze
+
+      - name: Run tests
+        run: flutter test
+
+      - name: Build App Bundle (Release)
+        shell: bash
+        run: |
+          set -euo pipefail
+          ( while true; do echo "Build still running..."; sleep 240; done ) &
+          KEEPALIVE_PID=$!
+          trap 'kill $KEEPALIVE_PID' EXIT
+          flutter build appbundle --release --dart-define=REVENUECAT_API_KEY_ANDROID="$REVENUECAT_API_KEY_ANDROID"
+
+      - name: Upload Android artifact (AAB)
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
+        with:
+          name: app-release-aab
+          path: build/app/outputs/bundle/release/app-release.aab
