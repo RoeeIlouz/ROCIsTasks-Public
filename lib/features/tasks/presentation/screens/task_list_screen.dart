@@ -14,7 +14,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:rocis_tasks/features/categories/domain/models/category.dart';
 import 'package:rocis_tasks/shared/ui/ui_kit.dart';
-import 'package:rocis_tasks/features/auth/presentation/screens/login_screen.dart';
 
 class TaskListView extends StatefulWidget {
   const TaskListView({super.key});
@@ -29,25 +28,25 @@ class _TaskListViewState extends State<TaskListView> {
     final l10n = AppLocalizations.of(context)!;
     final authService = Provider.of<AuthService>(context);
     final isGoogleTasksExpired = authService.isGoogleTasksTokenExpired;
-    final isGuest = authService.isGuestMode;
 
-    return Consumer<TaskProvider>(
-      builder: (context, provider, child) {
-        final tasks = provider.tasks;
-        final isLoading = provider.isLoading;
-
+    return Selector<TaskProvider, ({List tasks, bool isLoading})>(
+      selector: (_, provider) => (tasks: provider.tasks, isLoading: provider.isLoading),
+      builder: (context, data, _) {
+        final tasks = data.tasks;
+        final isLoading = data.isLoading;
         // Check for error and show snackbar
-        if (provider.errorMessage != null) {
+        final taskProvider = Provider.of<TaskProvider>(context, listen: false);
+        if (taskProvider.errorMessage != null) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (mounted && provider.errorMessage != null) {
+            if (mounted && taskProvider.errorMessage != null) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text(provider.errorMessage!),
+                  content: Text(taskProvider.errorMessage!),
                   backgroundColor: Theme.of(context).colorScheme.error,
                   behavior: SnackBarBehavior.floating,
                 ),
               );
-              provider.clearError();
+              taskProvider.clearError();
             }
           });
         }
@@ -109,46 +108,50 @@ class _TaskListViewState extends State<TaskListView> {
               itemCount: tasks.length,
               itemBuilder: (context, index) {
                 final task = tasks[index];
-                final categoryIds = task.categoryIds.isNotEmpty 
-                    ? task.categoryIds 
-                    : (task.categoryId != null ? [task.categoryId!] : []);
-                final categories = categoryIds
-                    .map((id) => provider.getCategoryById(id))
-                    .where((c) => c != null)
-                    .cast<Category>()
-                    .toList();
-                final isSelectionMode = provider.isSelectionMode;
-                final isSelected = provider.selectedTaskIds.contains(task.id);
+                return Consumer<TaskProvider>(
+                  builder: (context, provider, _) {
+                    final categoryIds = task.categoryIds.isNotEmpty 
+                        ? task.categoryIds 
+                        : (task.categoryId != null ? [task.categoryId!] : []);
+                    final categories = categoryIds
+                        .map((id) => provider.getCategoryById(id))
+                        .where((c) => c != null)
+                        .cast<Category>()
+                        .toList();
+                    final isSelectionMode = provider.isSelectionMode;
+                    final isSelected = provider.selectedTaskIds.contains(task.id);
 
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: TaskTile(
-                    task: task,
-                    categories: categories,
-                    isSelected: isSelected,
-                    isSelectionMode: isSelectionMode,
-                    onToggle: () => provider.toggleTaskCompletion(task),
-                    onDelete: () => provider.deleteTask(task.id),
-                    onLongPress: () {
-                      HapticFeedback.mediumImpact();
-                      provider.toggleTaskSelection(task.id);
-                    },
-                    onTap: () {
-                      if (isSelectionMode) {
-                        provider.toggleTaskSelection(task.id);
-                      } else {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => TaskDetailScreen(
-                              task: task,
-                              category: categories.isNotEmpty ? categories.first : null,
-                            ),
-                          ),
-                        );
-                      }
-                    },
-                  ),
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: TaskTile(
+                        task: task,
+                        categories: categories,
+                        isSelected: isSelected,
+                        isSelectionMode: isSelectionMode,
+                        onToggle: () => provider.toggleTaskCompletion(task),
+                        onDelete: () => provider.deleteTask(task.id),
+                        onLongPress: () {
+                          HapticFeedback.mediumImpact();
+                          provider.toggleTaskSelection(task.id);
+                        },
+                        onTap: () {
+                          if (isSelectionMode) {
+                            provider.toggleTaskSelection(task.id);
+                          } else {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => TaskDetailScreen(
+                                  task: task,
+                                  category: categories.isNotEmpty ? categories.first : null,
+                                ),
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                    );
+                  },
                 );
               },
             ),
@@ -162,55 +165,59 @@ class _TaskListViewState extends State<TaskListView> {
                 itemCount: tasks.length,
                 itemBuilder: (context, index) {
                   final task = tasks[index];
-                  final categoryIds = task.categoryIds.isNotEmpty 
-                      ? task.categoryIds 
-                      : (task.categoryId != null ? [task.categoryId!] : []);
-                  final categories = categoryIds
-                      .map((id) => provider.getCategoryById(id))
-                      .where((c) => c != null)
-                      .cast<Category>()
-                      .toList();
-                  final isSelectionMode = provider.isSelectionMode;
-                  final isSelected = provider.selectedTaskIds.contains(task.id);
+                  return Consumer<TaskProvider>(
+                    builder: (context, provider, _) {
+                      final categoryIds = task.categoryIds.isNotEmpty 
+                          ? task.categoryIds 
+                          : (task.categoryId != null ? [task.categoryId!] : []);
+                      final categories = categoryIds
+                          .map((id) => provider.getCategoryById(id))
+                          .where((c) => c != null)
+                          .cast<Category>()
+                          .toList();
+                      final isSelectionMode = provider.isSelectionMode;
+                      final isSelected = provider.selectedTaskIds.contains(task.id);
 
-                  return AnimationConfiguration.staggeredList(
-                    position: index,
-                    duration: const Duration(milliseconds: 250),
-                    child: SlideAnimation(
-                      verticalOffset: 30.0,
-                      child: FadeInAnimation(
-                        child: Padding(
-                          padding: const EdgeInsets.only(bottom: 8),
-                          child: TaskTile(
-                            task: task,
-                            categories: categories,
-                            isSelected: isSelected,
-                            isSelectionMode: isSelectionMode,
-                            onToggle: () => provider.toggleTaskCompletion(task),
-                            onDelete: () => provider.deleteTask(task.id),
-                            onLongPress: () {
-                              HapticFeedback.mediumImpact();
-                              provider.toggleTaskSelection(task.id);
-                            },
-                            onTap: () {
-                              if (isSelectionMode) {
-                                provider.toggleTaskSelection(task.id);
-                              } else {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => TaskDetailScreen(
-                                      task: task,
-                                      category: categories.isNotEmpty ? categories.first : null,
-                                    ),
-                                  ),
-                                );
-                              }
-                            },
+                      return AnimationConfiguration.staggeredList(
+                        position: index,
+                        duration: const Duration(milliseconds: 250),
+                        child: SlideAnimation(
+                          verticalOffset: 30.0,
+                          child: FadeInAnimation(
+                            child: Padding(
+                              padding: const EdgeInsets.only(bottom: 8),
+                              child: TaskTile(
+                                task: task,
+                                categories: categories,
+                                isSelected: isSelected,
+                                isSelectionMode: isSelectionMode,
+                                onToggle: () => provider.toggleTaskCompletion(task),
+                                onDelete: () => provider.deleteTask(task.id),
+                                onLongPress: () {
+                                  HapticFeedback.mediumImpact();
+                                  provider.toggleTaskSelection(task.id);
+                                },
+                                onTap: () {
+                                  if (isSelectionMode) {
+                                    provider.toggleTaskSelection(task.id);
+                                  } else {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => TaskDetailScreen(
+                                          task: task,
+                                          category: categories.isNotEmpty ? categories.first : null,
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                },
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-                    ),
+                      );
+                    },
                   );
                 },
               ),
@@ -222,82 +229,10 @@ class _TaskListViewState extends State<TaskListView> {
           children: [
             if (isGoogleTasksExpired)
               _buildGoogleTasksWarning(context, l10n, authService),
-            if (isGuest)
-              _buildGuestModeBanner(context, l10n),
             mainContent,
           ],
         );
       },
-    );
-  }
-
-  Widget _buildGuestModeBanner(
-    BuildContext context,
-    AppLocalizations l10n,
-  ) {
-    final theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-      child: GlassContainer(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: theme.colorScheme.primary.withValues(alpha: 0.3),
-        ),
-        child: Row(
-          children: [
-            Icon(
-              Icons.cloud_off_rounded,
-              color: theme.colorScheme.primary,
-              size: 24,
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    l10n.guestModeBannerTitle,
-                    style: GoogleFonts.outfit(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 13,
-                      color: theme.colorScheme.onSurface,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    l10n.guestModeBannerSubtitle,
-                    style: GoogleFonts.outfit(
-                      fontSize: 11,
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 8),
-            FilledButton.tonal(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const LoginScreen(),
-                  ),
-                );
-              },
-              style: FilledButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                visualDensity: VisualDensity.compact,
-              ),
-              child: Text(
-                l10n.signInNow,
-                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 

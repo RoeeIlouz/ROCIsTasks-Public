@@ -8,7 +8,7 @@ part of 'sub_task.dart';
 
 class SubTaskAdapter extends TypeAdapter<SubTask> {
   @override
-  final int typeId = 3;
+  final typeId = 3;
 
   @override
   SubTask read(BinaryReader reader) {
@@ -19,7 +19,7 @@ class SubTaskAdapter extends TypeAdapter<SubTask> {
     return SubTask(
       id: fields[0] as String?,
       title: fields[1] as String,
-      isCompleted: fields[2] as bool,
+      isCompleted: fields[2] == null ? false : fields[2] as bool,
       quantity: fields[3] as String?,
     );
   }

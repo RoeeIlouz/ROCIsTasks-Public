@@ -8,6 +8,7 @@ import 'package:rocis_tasks/firebase_options.dart' as default_options;
 import 'package:rocis_tasks/firebase_schedule_options.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/sub_task.dart';
+import 'package:rocis_tasks/features/tasks/domain/models/custom_field.dart';
 import 'package:rocis_tasks/features/categories/domain/models/category.dart';
 import 'package:rocis_tasks/core/services/notification_service.dart';
 import 'package:rocis_tasks/core/services/error_service.dart';
@@ -135,6 +136,12 @@ class AppInitializer {
     if (!Hive.isAdapterRegistered(1)) Hive.registerAdapter(TaskAdapter());
     if (!Hive.isAdapterRegistered(2)) Hive.registerAdapter(CategoryAdapter());
     if (!Hive.isAdapterRegistered(3)) Hive.registerAdapter(SubTaskAdapter());
+    if (!Hive.isAdapterRegistered(4)) {
+      Hive.registerAdapter(CustomFieldTypeAdapter());
+    }
+    if (!Hive.isAdapterRegistered(5)) {
+      Hive.registerAdapter(TaskCustomFieldAdapter());
+    }
   }
 
   static Future<void> _initFirebase() async {

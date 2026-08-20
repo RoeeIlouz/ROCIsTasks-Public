@@ -448,7 +448,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get recurringTasksDesc =>
-      'लचीले दोहराव नियमों के साथ अपनी दिनचर्या को स्वचालित करें।';
+      'दैनिक, साप्ताहिक, मासिक या कस्टम शेड्यूल के साथ कार्यों को स्वचालित करें।';
 
   @override
   String get viewPricingPlans => 'मूल्य निर्धारण योजनाएं देखें';
@@ -530,25 +530,25 @@ class AppLocalizationsHi extends AppLocalizations {
   String get signInFailed => 'साइन इन विफल रहा';
 
   @override
-  String get onboardingWelcomeTitle => 'Google Tasks और कैलेंडर सिंक';
+  String get onboardingWelcomeTitle => 'ROCI\'s Tasks में आपका स्वागत है';
 
   @override
   String get onboardingWelcomeDesc =>
-      'Google Tasks के साथ सहज 2-वे सिंक और एक ही स्थान पर समय प्रबंधन।';
+      'दक्षता और शैली के साथ अपने जीवन को व्यवस्थित करें।';
 
   @override
-  String get onboardingSyncTitle => 'ग्लासमॉर्फ़िज्म डिज़ाइन';
+  String get onboardingSyncTitle => 'सिंक और ऑफ़लाइन';
 
   @override
   String get onboardingSyncDesc =>
-      'डायनामिक वॉलपेपर रंगों, चमकदार प्राथमिकताओं और सहज एनिमेशन के साथ आधुनिक डिज़ाइन।';
+      'आपके कार्य हर जगह आपके साथ हैं। इंटरनेट कनेक्शन के बिना भी उन्हें एक्सेस करें।';
 
   @override
-  String get onboardingGesturesTitle => 'इंटरएक्टिव विजेट्स और आदतें';
+  String get onboardingGesturesTitle => 'स्मार्ट जेस्चर';
 
   @override
   String get onboardingGesturesDesc =>
-      'अपनी होम स्क्रीन से सीधे कार्यों को पूरा करें और दैनिक आदतें बनाएं।';
+      'हटाने के लिए बाएं स्वाइप करें, पूरा करने के लिए दाएं स्वाइप करें। अधिक विकल्पों के लिए दबाकर रखें।';
 
   @override
   String get getStarted => 'प्रारंभ करें';
@@ -1152,37 +1152,114 @@ class AppLocalizationsHi extends AppLocalizations {
   String get searchTimezone => 'समय क्षेत्र खोजें...';
 
   @override
-  String get continueAsGuest => 'अतिथि के रूप में जारी रखें';
+  String get repeatWeekdays => 'कार्यदिवस (सोम–शुक्र)';
 
   @override
-  String get continueAsGuestSubtitle =>
-      'बिना खाते के स्थानीय रूप से उपयोग करें';
+  String get repeatYearly => 'वार्षिक';
 
   @override
-  String get guestModeBannerTitle => 'ऑफ़लाइन अतिथि मोड';
+  String get repeatCustom => 'कस्टम...';
 
   @override
-  String get guestModeBannerSubtitle =>
-      'Google Tasks के साथ सिंक करने और क्लाउड पर बैकअप लेने के लिए साइन इन करें।';
+  String get repeatsEvery => 'हर दोहराता है';
 
   @override
-  String get signInNow => 'साइन इन करें';
+  String get customRecurrence => 'कस्टम पुनरावृत्ति';
+
+  @override
+  String get daySingular => 'दिन';
+
+  @override
+  String get daysPlural => 'दिन';
+
+  @override
+  String get weekSingular => 'सप्ताह';
+
+  @override
+  String get weeksPlural => 'सप्ताह';
+
+  @override
+  String get monthSingular => 'महीना';
+
+  @override
+  String get monthsPlural => 'महीने';
+
+  @override
+  String get yearSingular => 'वर्ष';
+
+  @override
+  String get yearsPlural => 'वर्ष';
+
+  @override
+  String get selectRecurrence => 'पुनरावृत्ति चुनें';
+
+  @override
+  String get guestMode => 'अतिथि मोड';
+
+  @override
+  String get guestModeSubtitle =>
+      'सभी डेटा इस डिवाइस पर स्थानीय रूप से संग्रहीत है। बैकअप और क्लाउड के साथ सिंक करने के लिए साइन इन करें।';
 
   @override
   String get guestAccount => 'अतिथि खाता';
 
   @override
-  String get linkAccount => 'खाता लिंक / साइन इन करें';
+  String get signInOrRegister => 'साइन इन / रजिस्टर करें';
 
   @override
-  String get lifetimePlanTitle => 'लाइफटाइम प्लान';
+  String get continueAsGuest => 'अतिथि के रूप में जारी रखें';
 
   @override
-  String get lifetimePlanPrice => '\$49.99 एकमुश्त';
+  String get skipForNow => 'अभी के लिए छोड़ें';
 
   @override
-  String get lifetimePlanBadge => 'सर्वश्रेष्ठ मूल्य';
+  String get cloudSync => 'क्लाउड बैकअप और सिंक';
 
   @override
-  String get lifetimePlanSaving => 'एक बार भुगतान करें';
+  String get cloudSyncActive => 'सक्रिय और समन्वयित';
+
+  @override
+  String get customFields => 'कस्टम पंक्तियाँ';
+
+  @override
+  String get customFieldsSubtitle => 'संपर्क, स्थान, लिंक या नोट्स संलग्न करें';
+
+  @override
+  String get addCustomField => 'पंक्ति जोड़ें';
+
+  @override
+  String get contact => 'संपर्क';
+
+  @override
+  String get location => 'स्थान';
+
+  @override
+  String get link => 'लिंक';
+
+  @override
+  String get note => 'नोट';
+
+  @override
+  String get fieldLabel => 'लेबल';
+
+  @override
+  String get fieldValue => 'मान';
+
+  @override
+  String get enterContactInfo => 'फ़ोन नंबर या ईमेल';
+
+  @override
+  String get enterLocation => 'पता या स्थान';
+
+  @override
+  String get enterUrl => 'वेबसाइट या यूआरएल';
+
+  @override
+  String get enterNote => 'कस्टम विवरण';
+
+  @override
+  String get copiedToClipboard => 'क्लिपबोर्ड पर कॉपी किया गया';
+
+  @override
+  String get noCustomFieldsAdded => 'कोई कस्टम पंक्ति नहीं जोड़ी गई';
 }

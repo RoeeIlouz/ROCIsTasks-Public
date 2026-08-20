@@ -23,7 +23,9 @@ import 'package:rocis_tasks/features/home/services/full_calendar_widget_service.
 import 'package:rocis_tasks/features/home/services/month_widget_service.dart';
 import 'package:rocis_tasks/features/tasks/data/datasources/local_task_source.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/sub_task.dart';
+import 'package:rocis_tasks/features/tasks/domain/models/custom_field.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
+import 'package:rocis_tasks/features/tasks/domain/services/task_recurrence_service.dart';
 import 'package:rocis_tasks/features/tasks/presentation/providers/helpers/task_filter_service.dart';
 import 'package:rocis_tasks/features/tasks/presentation/providers/helpers/task_notification_manager.dart';
 import 'package:rocis_tasks/features/tasks/presentation/providers/helpers/task_sync_manager.dart';
@@ -200,7 +202,6 @@ class TaskProvider extends ChangeNotifier {
     try {
       await _source.init();
       _taskPagination.initialize();
-      await _clearDeprecatedRecurringTaskData();
       await _notificationService.init();
       await _notificationService.requestPermissions();
     } catch (e, s) {
@@ -813,6 +814,8 @@ class TaskProvider extends ChangeNotifier {
     List<String>? attachmentPaths,
     bool skipReminders = false,
     bool isGroceryList = false,
+    String? recurrenceRule,
+    List<TaskCustomField>? customFields,
   }) async {
     final task = Task(
       title: title,
@@ -827,6 +830,8 @@ class TaskProvider extends ChangeNotifier {
       attachmentPaths: attachmentPaths,
       skipReminders: skipReminders,
       isGroceryList: isGroceryList,
+      recurrenceRule: recurrenceRule,
+      customFields: customFields,
     );
     await _source.addTask(task);
 
@@ -885,6 +890,46 @@ class TaskProvider extends ChangeNotifier {
 
     if (task.isCompleted) {
       await _cancelTaskNotifications(task);
+
+      // If this is a recurring task and user is Pro, spawn the next recurring instance
+      if (task.recurrenceRule != null &&
+          task.recurrenceRule!.trim().isNotEmpty &&
+          _subscriptionService.isPremium) {
+        final baseDate = task.dueDate ?? task.createdAt;
+        final nextDueDate = TaskRecurrenceService.getNextDueDate(
+          baseDate,
+          task.recurrenceRule!,
+        );
+
+        if (nextDueDate != null) {
+          final nextTask = TaskRecurrenceService.createNextRecurringTask(
+            task,
+            nextDueDate,
+          );
+          await _source.addTask(nextTask);
+          _firestoreService.addTask(nextTask).catchError((e, s) {
+            _errorHandlingService.logError(
+              e,
+              s,
+              reason: 'Background cloud addTask for recurring next instance failed',
+            );
+          });
+
+          if (nextTask.dueDate != null && nextTask.dueDate!.isAfter(DateTime.now())) {
+            try {
+              await _scheduleTaskNotifications(nextTask);
+            } catch (e, s) {
+              _errorHandlingService.logError(
+                e,
+                s,
+                reason: 'Scheduling notification for next recurring task',
+              );
+            }
+          }
+
+          await _syncTaskGoogleTasksState(nextTask);
+        }
+      }
     } else if (task.dueDate != null && task.dueDate!.isAfter(DateTime.now())) {
       try {
         await _scheduleTaskNotifications(task);
@@ -921,6 +966,9 @@ class TaskProvider extends ChangeNotifier {
     List<String>? attachmentPaths,
     bool? skipReminders,
     bool? isGroceryList,
+    String? recurrenceRule,
+    bool clearRecurrenceRule = false,
+    List<TaskCustomField>? customFields,
   }) async {
     if (title != null) task.title = title;
     if (description != null) task.description = description;
@@ -947,6 +995,14 @@ class TaskProvider extends ChangeNotifier {
     }
     if (isGroceryList != null) {
       task.isGroceryList = isGroceryList;
+    }
+    if (customFields != null) {
+      task.customFields = customFields;
+    }
+    if (clearRecurrenceRule) {
+      task.recurrenceRule = null;
+    } else if (recurrenceRule != null) {
+      task.recurrenceRule = recurrenceRule;
     }
 
     if (task.isGroceryList && task.subTasks != null && task.subTasks!.isNotEmpty) {
@@ -991,22 +1047,6 @@ class TaskProvider extends ChangeNotifier {
     notifyListeners();
     unawaited(_updateTaskCounterNotification());
     updateHomeWidgetWithNotification();
-  }
-
-  Future<void> _clearDeprecatedRecurringTaskData() async {
-    final tasks = _source.getTasks();
-    var changed = false;
-    for (final task in tasks) {
-      if (task.recurrenceRule != null) {
-        task.recurrenceRule = null;
-        await _source.addTask(task);
-        changed = true;
-      }
-    }
-    if (changed) {
-      _refreshPagination();
-      notifyListeners();
-    }
   }
 
   Future<void> toggleSubTask(Task task, dynamic identifier) async {

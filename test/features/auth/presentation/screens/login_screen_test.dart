@@ -117,21 +117,13 @@ void main() {
       expect(find.byType(TextButton), findsWidgets);
     });
 
-    testWidgets('renders Continue as Guest button and calls continueAsGuest on tap', (tester) async {
-      when(() => mockAuthService.continueAsGuest()).thenAnswer((_) async {});
-
+    testWidgets('renders continue as guest and skip buttons', (tester) async {
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pumpAndSettle();
 
-      final guestButton = find.widgetWithText(TextButton, 'Continue as Guest');
-      expect(guestButton, findsOneWidget);
-
-      await tester.ensureVisible(guestButton);
-      await tester.pumpAndSettle();
-      await tester.tap(guestButton);
-      await tester.pumpAndSettle();
-
-      verify(() => mockAuthService.continueAsGuest()).called(1);
+      // Should have Continue as Guest button and Skip for now action
+      expect(find.text('Continue as Guest'), findsOneWidget);
+      expect(find.text('Skip for now'), findsOneWidget);
     });
   });
 }

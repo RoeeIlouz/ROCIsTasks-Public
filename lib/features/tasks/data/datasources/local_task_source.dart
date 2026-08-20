@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart' hide Category;
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
+import 'package:rocis_tasks/features/tasks/domain/models/sub_task.dart';
+import 'package:rocis_tasks/features/tasks/domain/models/custom_field.dart';
 import 'package:rocis_tasks/features/categories/domain/models/category.dart';
 import 'package:rocis_tasks/core/services/logger_service.dart';
 
@@ -19,6 +21,13 @@ class LocalTaskSource {
     }
     if (!Hive.isAdapterRegistered(1)) Hive.registerAdapter(TaskAdapter());
     if (!Hive.isAdapterRegistered(2)) Hive.registerAdapter(CategoryAdapter());
+    if (!Hive.isAdapterRegistered(3)) Hive.registerAdapter(SubTaskAdapter());
+    if (!Hive.isAdapterRegistered(4)) {
+      Hive.registerAdapter(CustomFieldTypeAdapter());
+    }
+    if (!Hive.isAdapterRegistered(5)) {
+      Hive.registerAdapter(TaskCustomFieldAdapter());
+    }
 
     // Open boxes normally (unencrypted).
     await _openBoxes();

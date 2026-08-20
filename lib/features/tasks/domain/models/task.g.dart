@@ -8,7 +8,7 @@ part of 'task.dart';
 
 class TaskAdapter extends TypeAdapter<Task> {
   @override
-  final int typeId = 1;
+  final typeId = 1;
 
   @override
   Task read(BinaryReader reader) {
@@ -19,32 +19,37 @@ class TaskAdapter extends TypeAdapter<Task> {
     return Task(
       id: fields[0] as String?,
       title: fields[1] as String,
-      description: fields[2] as String,
-      isCompleted: fields[3] as bool,
+      description: fields[2] == null ? '' : fields[2] as String,
+      isCompleted: fields[3] == null ? false : fields[3] as bool,
       dueDate: fields[4] as DateTime?,
-      priority: fields[5] as TaskPriority,
+      priority: fields[5] == null
+          ? TaskPriority.medium
+          : fields[5] as TaskPriority,
       categoryId: fields[6] as String?,
       categoryIds: (fields[19] as List?)?.cast<String>(),
-      isDeleted: fields[7] as bool?,
-      isPinned: fields[8] as bool?,
+      isDeleted: fields[7] == null ? false : fields[7] as bool?,
+      isPinned: fields[8] == null ? false : fields[8] as bool?,
       subTasks: (fields[9] as List?)?.cast<SubTask>(),
       recurrenceRule: fields[10] as String?,
       completedAt: fields[11] as DateTime?,
       createdAt: fields[12] as DateTime?,
-      requireSubTasksBeforeReminders: fields[13] as bool,
-      syncWithGoogleTasks: fields[14] as bool,
+      requireSubTasksBeforeReminders: fields[13] == null
+          ? false
+          : fields[13] as bool,
+      syncWithGoogleTasks: fields[14] == null ? false : fields[14] as bool,
       googleTaskId: fields[15] as String?,
       googleTaskListId: fields[16] as String?,
       attachmentPaths: (fields[17] as List?)?.cast<String>(),
-      skipReminders: fields[18] as bool,
-      isGroceryList: fields[20] as bool,
+      skipReminders: fields[18] == null ? false : fields[18] as bool,
+      isGroceryList: fields[20] == null ? false : fields[20] as bool,
+      customFields: (fields[21] as List?)?.cast<TaskCustomField>(),
     );
   }
 
   @override
   void write(BinaryWriter writer, Task obj) {
     writer
-      ..writeByte(21)
+      ..writeByte(22)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -59,8 +64,6 @@ class TaskAdapter extends TypeAdapter<Task> {
       ..write(obj.priority)
       ..writeByte(6)
       ..write(obj.categoryId)
-      ..writeByte(19)
-      ..write(obj.categoryIds)
       ..writeByte(7)
       ..write(obj.isDeleted)
       ..writeByte(8)
@@ -85,8 +88,12 @@ class TaskAdapter extends TypeAdapter<Task> {
       ..write(obj.attachmentPaths)
       ..writeByte(18)
       ..write(obj.skipReminders)
+      ..writeByte(19)
+      ..write(obj.categoryIds)
       ..writeByte(20)
-      ..write(obj.isGroceryList);
+      ..write(obj.isGroceryList)
+      ..writeByte(21)
+      ..write(obj.customFields);
   }
 
   @override
@@ -102,7 +109,7 @@ class TaskAdapter extends TypeAdapter<Task> {
 
 class TaskPriorityAdapter extends TypeAdapter<TaskPriority> {
   @override
-  final int typeId = 0;
+  final typeId = 0;
 
   @override
   TaskPriority read(BinaryReader reader) {
@@ -123,13 +130,10 @@ class TaskPriorityAdapter extends TypeAdapter<TaskPriority> {
     switch (obj) {
       case TaskPriority.low:
         writer.writeByte(0);
-        break;
       case TaskPriority.medium:
         writer.writeByte(1);
-        break;
       case TaskPriority.high:
         writer.writeByte(2);
-        break;
     }
   }
 

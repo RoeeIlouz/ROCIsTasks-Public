@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:rocis_tasks/core/services/auth_service.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
+import 'package:go_router/go_router.dart';
 import 'package:rocis_tasks/features/auth/presentation/screens/register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -25,6 +25,24 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
+  void _onAuthSuccess() {
+    if (mounted) {
+      if (Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      } else {
+        context.go('/');
+      }
+    }
+  }
+
+  void _continueAsGuest() {
+    if (Navigator.of(context).canPop()) {
+      Navigator.of(context).pop();
+    } else {
+      context.go('/');
+    }
+  }
+
   Future<void> _signInWithGoogle() async {
     setState(() => _isLoading = true);
     final authService = Provider.of<AuthService>(context, listen: false);
@@ -33,11 +51,7 @@ class _LoginScreenState extends State<LoginScreen> {
     if (mounted) {
       setState(() => _isLoading = false);
       if (userCredential != null) {
-        if (Navigator.canPop(context)) {
-          Navigator.pop(context);
-        } else if (GoRouter.maybeOf(context) != null) {
-          context.go('/');
-        }
+        _onAuthSuccess();
       } else {
         final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(
@@ -54,17 +68,11 @@ class _LoginScreenState extends State<LoginScreen> {
     final authService = Provider.of<AuthService>(context, listen: false);
     
     try {
-      final userCredential = await authService.signInWithEmailAndPassword(
+      await authService.signInWithEmailAndPassword(
         _emailController.text.trim(),
         _passwordController.text,
       );
-      if (mounted && userCredential != null) {
-        if (Navigator.canPop(context)) {
-          Navigator.pop(context);
-        } else if (GoRouter.maybeOf(context) != null) {
-          context.go('/');
-        }
-      }
+      _onAuthSuccess();
     } catch (e) {
       if (mounted) {
         final l10n = AppLocalizations.of(context)!;
@@ -111,7 +119,29 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     debugPrint('LoginScreen: build called');
     final l10n = AppLocalizations.of(context)!;
+    final canPop = Navigator.of(context).canPop();
+
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: canPop
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () => Navigator.of(context).pop(),
+              )
+            : null,
+        actions: [
+          TextButton(
+            onPressed: _continueAsGuest,
+            child: Text(
+              l10n.skipForNow,
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
+          ),
+          const SizedBox(width: 8),
+        ],
+      ),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
@@ -214,26 +244,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           padding: const EdgeInsets.symmetric(vertical: 16),
                         ),
                       ),
-                      const SizedBox(height: 12),
-                      TextButton.icon(
-                        onPressed: () async {
-                          final authService = Provider.of<AuthService>(context, listen: false);
-                          await authService.continueAsGuest();
-                          if (context.mounted) {
-                            if (Navigator.canPop(context)) {
-                              Navigator.pop(context);
-                            } else if (GoRouter.maybeOf(context) != null) {
-                              context.go('/');
-                            }
-                          }
-                        },
-                        icon: const Icon(Icons.person_outline_rounded),
-                        label: Text(l10n.continueAsGuest),
-                        style: TextButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          foregroundColor: Theme.of(context).colorScheme.primary,
-                        ),
-                      ),
                       const SizedBox(height: 16),
                       TextButton(
                         onPressed: () {
@@ -245,6 +255,17 @@ class _LoginScreenState extends State<LoginScreen> {
                           );
                         },
                         child: Text(l10n.dontHaveAccount),
+                      ),
+                      const SizedBox(height: 8),
+                      OutlinedButton(
+                        onPressed: _continueAsGuest,
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          side: BorderSide(
+                            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5),
+                          ),
+                        ),
+                        child: Text(l10n.continueAsGuest),
                       ),
                     ],
                   ),

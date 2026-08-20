@@ -453,7 +453,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get recurringTasksDesc =>
-      'Automatiza tu rutina con reglas de repetición flexibles.';
+      'Automatiza tareas repetitivas con programaciones diarias, semanales, mensuales o personalizadas.';
 
   @override
   String get viewPricingPlans => 'Ver planes de precios';
@@ -535,26 +535,25 @@ class AppLocalizationsEs extends AppLocalizations {
   String get signInFailed => 'Error al iniciar sesión';
 
   @override
-  String get onboardingWelcomeTitle =>
-      'Sincronización con Google Tasks y Calendario';
+  String get onboardingWelcomeTitle => 'Bienvenido a ROCI\'s Tasks';
 
   @override
   String get onboardingWelcomeDesc =>
-      'Sincronización bidireccional perfecta con Google Tasks y bloqueo de tiempo en un solo lugar.';
+      'Organiza tu vida con eficiencia y estilo.';
 
   @override
-  String get onboardingSyncTitle => 'Estética Glassmorphism';
+  String get onboardingSyncTitle => 'Sincronización y modo sin conexión';
 
   @override
   String get onboardingSyncDesc =>
-      'Diseño moderno con colores dinámicos, insignias brillantes y animaciones fluidas.';
+      'Tus tareas te siguen a todas partes. Accede a ellas incluso sin conexión a internet.';
 
   @override
-  String get onboardingGesturesTitle => 'Widgets interactivos y hábitos';
+  String get onboardingGesturesTitle => 'Gestos inteligentes';
 
   @override
   String get onboardingGesturesDesc =>
-      'Completa tareas directamente desde tu pantalla de inicio y crea rutinas diarias.';
+      'Desliza a la izquierda para eliminar, a la derecha para completar. Mantén presionado para más opciones.';
 
   @override
   String get getStarted => 'Empezar';
@@ -1167,36 +1166,115 @@ class AppLocalizationsEs extends AppLocalizations {
   String get searchTimezone => 'Buscar zona horaria...';
 
   @override
-  String get continueAsGuest => 'Continuar como invitado';
+  String get repeatWeekdays => 'Días laborables (lun–vie)';
 
   @override
-  String get continueAsGuestSubtitle => 'Usar localmente sin una cuenta';
+  String get repeatYearly => 'Anualmente';
 
   @override
-  String get guestModeBannerTitle => 'Modo invitado sin conexión';
+  String get repeatCustom => 'Personalizado...';
 
   @override
-  String get guestModeBannerSubtitle =>
-      'Inicia sesión para sincronizar con Google Tasks y respaldar tus datos en la nube.';
+  String get repeatsEvery => 'Se repite cada';
 
   @override
-  String get signInNow => 'Iniciar sesión';
+  String get customRecurrence => 'Recurrencia personalizada';
+
+  @override
+  String get daySingular => 'día';
+
+  @override
+  String get daysPlural => 'días';
+
+  @override
+  String get weekSingular => 'semana';
+
+  @override
+  String get weeksPlural => 'semanas';
+
+  @override
+  String get monthSingular => 'mes';
+
+  @override
+  String get monthsPlural => 'meses';
+
+  @override
+  String get yearSingular => 'año';
+
+  @override
+  String get yearsPlural => 'años';
+
+  @override
+  String get selectRecurrence => 'Seleccionar recurrencia';
+
+  @override
+  String get guestMode => 'Modo invitado';
+
+  @override
+  String get guestModeSubtitle =>
+      'Todos los datos se guardan localmente en este dispositivo. Inicia sesión para hacer una copia de seguridad y sincronizar con la nube.';
 
   @override
   String get guestAccount => 'Cuenta de invitado';
 
   @override
-  String get linkAccount => 'Vincular / Iniciar sesión';
+  String get signInOrRegister => 'Iniciar sesión / Registrarse';
 
   @override
-  String get lifetimePlanTitle => 'Plan de por vida';
+  String get continueAsGuest => 'Continuar como invitado';
 
   @override
-  String get lifetimePlanPrice => '\$49.99 pago único';
+  String get skipForNow => 'Omitir por ahora';
 
   @override
-  String get lifetimePlanBadge => 'Mejor opción';
+  String get cloudSync => 'Copia de seguridad y sincronización en la nube';
 
   @override
-  String get lifetimePlanSaving => 'Pago único';
+  String get cloudSyncActive => 'Activo y sincronizado';
+
+  @override
+  String get customFields => 'Líneas personalizadas';
+
+  @override
+  String get customFieldsSubtitle =>
+      'Adjunta contactos, ubicaciones, enlaces o notas';
+
+  @override
+  String get addCustomField => 'Añadir línea';
+
+  @override
+  String get contact => 'Contacto';
+
+  @override
+  String get location => 'Ubicación';
+
+  @override
+  String get link => 'Enlace';
+
+  @override
+  String get note => 'Nota';
+
+  @override
+  String get fieldLabel => 'Etiqueta';
+
+  @override
+  String get fieldValue => 'Valor';
+
+  @override
+  String get enterContactInfo => 'Teléfono o correo electrónico';
+
+  @override
+  String get enterLocation => 'Dirección o lugar';
+
+  @override
+  String get enterUrl => 'Sitio web o URL';
+
+  @override
+  String get enterNote => 'Detalles personalizados';
+
+  @override
+  String get copiedToClipboard => 'Copiado al portapapeles';
+
+  @override
+  String get noCustomFieldsAdded => 'No hay líneas personalizadas';
 }

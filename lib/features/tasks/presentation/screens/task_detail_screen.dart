@@ -15,6 +15,8 @@ import 'package:rocis_tasks/core/services/security_service.dart';
 import 'package:rocis_tasks/features/tasks/presentation/widgets/task_unlock_dialog.dart';
 import 'package:rocis_tasks/core/services/subscription_service.dart';
 import 'package:rocis_tasks/core/utils/attachment_utils.dart';
+import 'package:rocis_tasks/features/tasks/domain/services/custom_field_action_service.dart';
+import 'package:rocis_tasks/features/tasks/domain/services/task_recurrence_service.dart';
 
 class TaskDetailScreen extends StatefulWidget {
   final Task task;
@@ -303,6 +305,27 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                               .withValues(alpha: 0.1),
                           side: BorderSide.none,
                         ),
+                        if (updatedTask.recurrenceRule != null &&
+                            updatedTask.recurrenceRule!.trim().isNotEmpty)
+                          Chip(
+                            avatar: Icon(
+                              Icons.repeat_rounded,
+                              size: 18,
+                              color: theme.colorScheme.primary,
+                            ),
+                            label: Text(
+                              TaskRecurrenceService.getRecurrenceLabel(
+                                updatedTask.recurrenceRule,
+                                l10n,
+                              ),
+                              style: TextStyle(
+                                color: theme.colorScheme.primary,
+                              ),
+                            ),
+                            backgroundColor: theme.colorScheme.primary
+                                .withValues(alpha: 0.1),
+                            side: BorderSide.none,
+                          ),
                       ],
                     ),
                   ),
@@ -383,6 +406,95 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                     ),
                   ),
                   const SizedBox(height: 24),
+                ],
+
+                if (updatedTask.customFields != null && updatedTask.customFields!.isNotEmpty) ...[
+                  Text(
+                    l10n.customFields,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: theme.colorScheme.primary,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  ...updatedTask.customFields!.map((field) {
+                    final icon = CustomFieldActionService.getIcon(field.type, field.value);
+                    final actionIcon = CustomFieldActionService.getActionIcon(field.type, field.value);
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 10.0),
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(16),
+                        onTap: () {
+                          HapticFeedback.lightImpact();
+                          CustomFieldActionService.performAction(context, field);
+                        },
+                        onLongPress: () {
+                          CustomFieldActionService.copyToClipboard(
+                            context,
+                            field.value,
+                            message: l10n.copiedToClipboard,
+                          );
+                        },
+                        child: GlassContainer(
+                          borderRadius: BorderRadius.circular(16),
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color: theme.colorScheme.primary.withValues(alpha: 0.12),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Icon(
+                                  icon,
+                                  size: 22,
+                                  color: theme.colorScheme.primary,
+                                ),
+                              ),
+                              const SizedBox(width: 14),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    if (field.label.isNotEmpty)
+                                      Text(
+                                        field.label,
+                                        style: GoogleFonts.outfit(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                          color: theme.colorScheme.primary,
+                                        ),
+                                      ),
+                                    Text(
+                                      field.value.isNotEmpty ? field.value : '—',
+                                      style: GoogleFonts.outfit(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                        color: theme.colorScheme.onSurface,
+                                      ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              IconButton(
+                                icon: Icon(actionIcon, size: 20),
+                                color: theme.colorScheme.primary,
+                                tooltip: field.value,
+                                onPressed: () {
+                                  HapticFeedback.lightImpact();
+                                  CustomFieldActionService.performAction(context, field);
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  }),
+                  const SizedBox(height: 16),
                 ],
 
                 if (updatedTask.attachmentPaths.isNotEmpty) ...[

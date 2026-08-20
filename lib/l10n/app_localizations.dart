@@ -958,7 +958,7 @@ abstract class AppLocalizations {
   /// No description provided for @recurringTasksDesc.
   ///
   /// In en, this message translates to:
-  /// **'Automate your routine with flexible repetition rules.'**
+  /// **'Automate repeating tasks with daily, weekly, monthly, or custom schedules.'**
   String get recurringTasksDesc;
 
   /// No description provided for @viewPricingPlans.
@@ -1114,37 +1114,37 @@ abstract class AppLocalizations {
   /// No description provided for @onboardingWelcomeTitle.
   ///
   /// In en, this message translates to:
-  /// **'Google Tasks & Calendar Sync'**
+  /// **'Welcome to ROCI\'s Tasks'**
   String get onboardingWelcomeTitle;
 
   /// No description provided for @onboardingWelcomeDesc.
   ///
   /// In en, this message translates to:
-  /// **'Seamless 2-way sync with Google Tasks and unified calendar time-blocking in one place.'**
+  /// **'Organize your life with efficiency and style.'**
   String get onboardingWelcomeDesc;
 
   /// No description provided for @onboardingSyncTitle.
   ///
   /// In en, this message translates to:
-  /// **'Glassmorphic Aesthetics'**
+  /// **'Sync & Offline'**
   String get onboardingSyncTitle;
 
   /// No description provided for @onboardingSyncDesc.
   ///
   /// In en, this message translates to:
-  /// **'A modern design engine with dynamic wallpaper colors, glowing priorities, and fluid animations.'**
+  /// **'Your tasks follow you everywhere. Access them even without an internet connection.'**
   String get onboardingSyncDesc;
 
   /// No description provided for @onboardingGesturesTitle.
   ///
   /// In en, this message translates to:
-  /// **'Interactive Widgets & Habits'**
+  /// **'Smart Gestures'**
   String get onboardingGesturesTitle;
 
   /// No description provided for @onboardingGesturesDesc.
   ///
   /// In en, this message translates to:
-  /// **'Complete tasks directly from your home screen and build lasting daily routines.'**
+  /// **'Swipe left to delete, swipe right to complete. Long press for more options.'**
   String get onboardingGesturesDesc;
 
   /// No description provided for @getStarted.
@@ -2263,35 +2263,101 @@ abstract class AppLocalizations {
   /// **'Search timezone...'**
   String get searchTimezone;
 
-  /// No description provided for @continueAsGuest.
+  /// No description provided for @repeatWeekdays.
   ///
   /// In en, this message translates to:
-  /// **'Continue as Guest'**
-  String get continueAsGuest;
+  /// **'Weekdays (Mon–Fri)'**
+  String get repeatWeekdays;
 
-  /// No description provided for @continueAsGuestSubtitle.
+  /// No description provided for @repeatYearly.
   ///
   /// In en, this message translates to:
-  /// **'Use locally without an account'**
-  String get continueAsGuestSubtitle;
+  /// **'Yearly'**
+  String get repeatYearly;
 
-  /// No description provided for @guestModeBannerTitle.
+  /// No description provided for @repeatCustom.
   ///
   /// In en, this message translates to:
-  /// **'Offline Guest Mode'**
-  String get guestModeBannerTitle;
+  /// **'Custom...'**
+  String get repeatCustom;
 
-  /// No description provided for @guestModeBannerSubtitle.
+  /// No description provided for @repeatsEvery.
   ///
   /// In en, this message translates to:
-  /// **'Sign in to sync with Google Tasks and backup your data across devices.'**
-  String get guestModeBannerSubtitle;
+  /// **'Repeats every'**
+  String get repeatsEvery;
 
-  /// No description provided for @signInNow.
+  /// No description provided for @customRecurrence.
   ///
   /// In en, this message translates to:
-  /// **'Sign In'**
-  String get signInNow;
+  /// **'Custom Recurrence'**
+  String get customRecurrence;
+
+  /// No description provided for @daySingular.
+  ///
+  /// In en, this message translates to:
+  /// **'day'**
+  String get daySingular;
+
+  /// No description provided for @daysPlural.
+  ///
+  /// In en, this message translates to:
+  /// **'days'**
+  String get daysPlural;
+
+  /// No description provided for @weekSingular.
+  ///
+  /// In en, this message translates to:
+  /// **'week'**
+  String get weekSingular;
+
+  /// No description provided for @weeksPlural.
+  ///
+  /// In en, this message translates to:
+  /// **'weeks'**
+  String get weeksPlural;
+
+  /// No description provided for @monthSingular.
+  ///
+  /// In en, this message translates to:
+  /// **'month'**
+  String get monthSingular;
+
+  /// No description provided for @monthsPlural.
+  ///
+  /// In en, this message translates to:
+  /// **'months'**
+  String get monthsPlural;
+
+  /// No description provided for @yearSingular.
+  ///
+  /// In en, this message translates to:
+  /// **'year'**
+  String get yearSingular;
+
+  /// No description provided for @yearsPlural.
+  ///
+  /// In en, this message translates to:
+  /// **'years'**
+  String get yearsPlural;
+
+  /// No description provided for @selectRecurrence.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Recurrence'**
+  String get selectRecurrence;
+
+  /// No description provided for @guestMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest Mode'**
+  String get guestMode;
+
+  /// No description provided for @guestModeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'All data is stored locally on this device. Sign in to back up and sync with the cloud.'**
+  String get guestModeSubtitle;
 
   /// No description provided for @guestAccount.
   ///
@@ -2299,35 +2365,125 @@ abstract class AppLocalizations {
   /// **'Guest Account'**
   String get guestAccount;
 
-  /// No description provided for @linkAccount.
+  /// No description provided for @signInOrRegister.
   ///
   /// In en, this message translates to:
-  /// **'Link / Sign In Account'**
-  String get linkAccount;
+  /// **'Sign In / Register'**
+  String get signInOrRegister;
 
-  /// No description provided for @lifetimePlanTitle.
+  /// No description provided for @continueAsGuest.
   ///
   /// In en, this message translates to:
-  /// **'Lifetime Plan'**
-  String get lifetimePlanTitle;
+  /// **'Continue as Guest'**
+  String get continueAsGuest;
 
-  /// No description provided for @lifetimePlanPrice.
+  /// No description provided for @skipForNow.
   ///
   /// In en, this message translates to:
-  /// **'\$49.99 one-time'**
-  String get lifetimePlanPrice;
+  /// **'Skip for now'**
+  String get skipForNow;
 
-  /// No description provided for @lifetimePlanBadge.
+  /// No description provided for @cloudSync.
   ///
   /// In en, this message translates to:
-  /// **'Best Value'**
-  String get lifetimePlanBadge;
+  /// **'Cloud Backup & Sync'**
+  String get cloudSync;
 
-  /// No description provided for @lifetimePlanSaving.
+  /// No description provided for @cloudSyncActive.
   ///
   /// In en, this message translates to:
-  /// **'Pay Once'**
-  String get lifetimePlanSaving;
+  /// **'Active & synced'**
+  String get cloudSyncActive;
+
+  /// No description provided for @customFields.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom Lines'**
+  String get customFields;
+
+  /// No description provided for @customFieldsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Attach contacts, locations, links, or notes'**
+  String get customFieldsSubtitle;
+
+  /// No description provided for @addCustomField.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Line'**
+  String get addCustomField;
+
+  /// No description provided for @contact.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact'**
+  String get contact;
+
+  /// No description provided for @location.
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get location;
+
+  /// No description provided for @link.
+  ///
+  /// In en, this message translates to:
+  /// **'Link'**
+  String get link;
+
+  /// No description provided for @note.
+  ///
+  /// In en, this message translates to:
+  /// **'Note'**
+  String get note;
+
+  /// No description provided for @fieldLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Label'**
+  String get fieldLabel;
+
+  /// No description provided for @fieldValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Value'**
+  String get fieldValue;
+
+  /// No description provided for @enterContactInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone number or email'**
+  String get enterContactInfo;
+
+  /// No description provided for @enterLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Address or place'**
+  String get enterLocation;
+
+  /// No description provided for @enterUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'Website or URL'**
+  String get enterUrl;
+
+  /// No description provided for @enterNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom details'**
+  String get enterNote;
+
+  /// No description provided for @copiedToClipboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Copied to clipboard'**
+  String get copiedToClipboard;
+
+  /// No description provided for @noCustomFieldsAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'No custom lines added'**
+  String get noCustomFieldsAdded;
 }
 
 class _AppLocalizationsDelegate

@@ -76,7 +76,9 @@
   "restoredTask": "המשימה \"{title}\" שוחזרה",
   "@restoredTask": {
     "placeholders": {
-      "title": { "type": "String" }
+      "title": {
+        "type": "String"
+      }
     }
   },
   "deletePermanently": "למחוק לצמיתות?",
@@ -109,7 +111,9 @@
   "exportFailed": "הייצוא נכשל: {error}",
   "@exportFailed": {
     "placeholders": {
-      "error": { "type": "String" }
+      "error": {
+        "type": "String"
+      }
     }
   },
   "importData": "ייבוא נתונים (JSON)",
@@ -121,7 +125,9 @@
   "importFailed": "הייבוא נכשל: {error}",
   "@importFailed": {
     "placeholders": {
-      "error": { "type": "String" }
+      "error": {
+        "type": "String"
+      }
     }
   },
   "privacyAndGdpr": "פרטיות ו-GDPR",
@@ -155,12 +161,12 @@
   "subtasksAndChecklists": "משימות משנה ורשימות תיוג",
   "subtasksAndChecklistsDesc": "פרק משימות מורכבות לצעדים קטנים וניתנים לניהול.",
   "recurringTasks": "משימות חוזרות",
-  "recurringTasksDesc": "אוטומט את השגרה שלך עם כללי חזרה גמישים.",
+  "recurringTasksDesc": "הפוך משימות לאוטומטיות בלוח זמנים יומי, שבועי, חודשי או מותאם אישית.",
   "viewPricingPlans": "צפה בתוכניות תמחור",
   "proSubscriptionActive": "מנוי Pro פעיל",
-  "welcomeToPro": "ברוכים הבאים ל-Pro!",
-  "pickAPlan": "בחר תוכנית",
-  "byContinuingAgreement": "בהמשך השימוש, הינך מסכים ל-",
+  "welcomeToPro": "ברוך הבא ל-Pro!",
+  "pickAPlan": "בחר תכנית",
+  "byContinuingAgreement": "בהמשך השימוש, הינך מסכים ל",
   "purchasesRestored": "הרכישות שוחזרו בהצלחה!",
   "noActiveSubscription": "לא נמצא מנוי פעיל עבור חשבון זה.",
   "failedToRestore": "שחזור הרכישות נכשל.",
@@ -181,12 +187,12 @@
   "signInToSync": "התחבר כדי לסנכרן את המשימות שלך בין מכשירים",
   "signInWithGoogle": "התחבר עם Google",
   "signInFailed": "ההתחברות נכשלה",
-  "onboardingWelcomeTitle": "סנכרון Google Tasks ולוח שנה",
-  "onboardingWelcomeDesc": "סנכרון דו-כיווני חלק עם Google Tasks וניהול לוח זמנים במקום אחד.",
-  "onboardingSyncTitle": "עיצוב זכוכית מודרני",
-  "onboardingSyncDesc": "ממשק פרימיום עם שקיפויות זכוכית, התאמת צבעים לרקע ואנימציות חלקות.",
-  "onboardingGesturesTitle": "ווידג'טים אינטראקטיביים והרגלים",
-  "onboardingGesturesDesc": "ניהול משימות מהיר ישירות ממסך הבית ומעקב אחר הרגלים יומיים.",
+  "onboardingWelcomeTitle": "ברוך הבא ל-ROCIs Tasks",
+  "onboardingWelcomeDesc": "ארגן את חייך ביעילות ובסגנון.",
+  "onboardingSyncTitle": "סנכרון ומצב לא מקוון",
+  "onboardingSyncDesc": "המשימות שלך עוקבות אחריך לכל מקום. גש אליהן גם ללא חיבור לאינטרנט.",
+  "onboardingGesturesTitle": "מחוות חכמות",
+  "onboardingGesturesDesc": "החלק שמאלה למחיקה, ימינה להשלמה. לחץ לחיצה ארוכה לאפשרויות נוספות.",
   "getStarted": "בוא נתחיל",
   "next": "הבא",
   "insights": "תובנות",
@@ -199,7 +205,9 @@
   "taskReminderTitle": "תזכורת למשימה: {title}",
   "@taskReminderTitle": {
     "placeholders": {
-      "title": { "type": "String" }
+      "title": {
+        "type": "String"
+      }
     }
   },
   "taskDueNowBody": "יש לך משימה שמועדה הגיע!",
@@ -213,20 +221,21 @@
   "nextOccurrenceSet": "המופע הבא של \"{title}\" נקבע ל-{date}",
   "@nextOccurrenceSet": {
     "placeholders": {
-      "title": { "type": "String" },
-      "date": { "type": "String" }
+      "title": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
     }
   },
   "initializationFailedError": "נכשל באתחול נתוני האפליקציה. אנא הפעל מחדש.",
-  "welcomeToPro": "ברוך הבא ל-Pro!",
   "noTaskDataAvailable": "אין נתוני משימות זמינים",
   "retryInitialization": "נסה שוב אתחול",
   "criticalErrorTitle": "שגיאה קריטית",
   "appStartupErrorBody": "ROCI's Tasks נתקלה בבעיה במהלך ההפעלה. הצוות שלנו קיבל הודעה.",
   "appTagline": "שמים לב לכל הפרטים",
-  "pickAPlan": "בחר תכנית",
   "termsOfService": "תנאי שימוש",
-  "byContinuingAgreement": "בהמשך השימוש, הינך מסכים ל",
   "allDay": "יום שלם",
   "event": "אירוע",
   "markAsIncomplete": "סמן כמשימה שלא הושלמה",
@@ -240,14 +249,18 @@
   "notificationUncompletedTasks": "{count} משימות שטרם הושלמו",
   "@notificationUncompletedTasks": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "notificationTasksRemaining": "משימות שנותרו",
   "notificationTasksSummary": "{count} משימות",
   "@notificationTasksSummary": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "skip": "דלג",
@@ -397,15 +410,41 @@
   "selectTimezone": "בחירת אזור זמן",
   "automaticTimezone": "אוטומטי (אזור זמן המכשיר)",
   "searchTimezone": "חיפוש אזור זמן...",
-  "continueAsGuest": "המשך כאורח",
-  "continueAsGuestSubtitle": "שימוש מקומי ללא צורך בחשבון",
-  "guestModeBannerTitle": "מצב אורח / לא מקוון",
-  "guestModeBannerSubtitle": "התחבר כדי לסנכרן עם Google Tasks ולגבות את המשימות בענן.",
-  "signInNow": "התחבר",
+  "repeatWeekdays": "ימי חול (א'–ה')",
+  "repeatYearly": "שנתי",
+  "repeatCustom": "מותאם אישית...",
+  "repeatsEvery": "חוזר כל",
+  "customRecurrence": "חזרה מותאמת אישית",
+  "daySingular": "יום",
+  "daysPlural": "ימים",
+  "weekSingular": "שבוע",
+  "weeksPlural": "שבועות",
+  "monthSingular": "חודש",
+  "monthsPlural": "חודשים",
+  "yearSingular": "שנה",
+  "yearsPlural": "שנים",
+  "selectRecurrence": "בחר חזרה",
+  "guestMode": "מצב אורח",
+  "guestModeSubtitle": "כל הנתונים נשמרים מקומית במכשיר זה. התחבר כדי לגבות ולסנכרן עם הענן.",
   "guestAccount": "חשבון אורח",
-  "linkAccount": "קישור / התחברות לחשבון",
-  "lifetimePlanTitle": "מנוי לכל החיים",
-  "lifetimePlanPrice": "$49.99 חד פעמי",
-  "lifetimePlanBadge": "משתלם ביותר",
-  "lifetimePlanSaving": "תשלום חד פעמי"
+  "signInOrRegister": "התחבר / הירשם",
+  "continueAsGuest": "המשך כאורח",
+  "skipForNow": "דלג לעת עתה",
+  "cloudSync": "גיבוי וסנכרון ענן",
+  "cloudSyncActive": "פעיל ומסונכרן",
+  "customFields": "שורות מותאמות אישית",
+  "customFieldsSubtitle": "צרף אנשי קשר, מיקומים, קישורים או הערות",
+  "addCustomField": "הוסף שורה",
+  "contact": "איש קשר",
+  "location": "מיקום",
+  "link": "קישור",
+  "note": "הערה",
+  "fieldLabel": "תווית",
+  "fieldValue": "ערך",
+  "enterContactInfo": "מספר טלפון או דוא\"ל",
+  "enterLocation": "כתובת או מקום",
+  "enterUrl": "כתובת אתר או קישור",
+  "enterNote": "פרטים נוספים",
+  "copiedToClipboard": "הועתק ללוח",
+  "noCustomFieldsAdded": "לא נוספו שורות מותאמות אישית"
 }

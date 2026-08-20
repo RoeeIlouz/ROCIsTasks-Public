@@ -5,13 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.2.7+75] - 2026-08-20
+## [0.2.8+78] - 2026-08-18
 
 ### Added
-- Guest Mode / Delayed Auth: try the full app instantly without signing in.
-- Lifetime Pro License tier option on web paywall.
-- Revamped onboarding highlighting Google Tasks 2-way sync and glassmorphism.
-- Multilingual support for all new guest and lifetime plan features.
+- Custom Lines: Add contacts, locations, web links, and custom notes to tasks.
+- Tap-to-Act: Tap phone numbers to dial, emails to mail, locations to open Maps, and URLs to open browser.
+- Interactive action cards on Task Details and compact indicators in task lists.
+
+## [0.2.7+77] - 2026-08-18
+
+### Added
+- Guest Mode: use the full app completely offline on-device without signing in.
+- Cloud Backup on Sign-In: automatically upload and back up local tasks and categories upon logging in or registering.
+- Continue as guest option on login and account management updates in Settings.
+
+## [0.2.6+76] - 2026-08-15
+
+### Added
+- Pro Recurring Tasks: schedule daily, weekday, weekly, monthly, yearly, or custom repeat rules with automatic next-task creation on completion.
+- Timezone selector in Settings with search and automatic device timezone detection.
+
+### Fixed
+- Fixed Google Calendar event display and permissions on Web.
+- Resolved web startup errors caused by browser ad-blockers.
+- Updated web app domain configuration to tasks.rocisapps.com.
 
 ## [0.2.6+74] - 2026-08-13
 

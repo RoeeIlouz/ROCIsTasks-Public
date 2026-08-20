@@ -12,6 +12,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:rocis_tasks/core/services/security_service.dart';
 import 'package:rocis_tasks/core/services/subscription_service.dart';
+import 'package:rocis_tasks/features/tasks/domain/services/task_recurrence_service.dart';
+import 'package:rocis_tasks/features/tasks/domain/services/custom_field_action_service.dart';
 import 'package:rocis_tasks/features/tasks/presentation/widgets/task_unlock_dialog.dart';
 
 class TaskTile extends StatelessWidget {
@@ -285,7 +287,7 @@ class TaskTile extends StatelessWidget {
                                   label: '${task.subTasks?.where((st) => st.isCompleted).length ?? 0}/${task.subTasks?.length ?? 0}',
                                   color: theme.colorScheme.primary,
                                 ),
-                              if (task.dueDate != null)
+                               if (task.dueDate != null)
                                 _buildChip(
                                   context,
                                   icon: Icons.access_time_rounded,
@@ -303,8 +305,42 @@ class TaskTile extends StatelessWidget {
                                       ? theme.colorScheme.error
                                       : theme.colorScheme.primary,
                                 ),
-                            ],
-                          ),
+                               if (task.recurrenceRule != null &&
+                                   task.recurrenceRule!.trim().isNotEmpty)
+                                 _buildChip(
+                                   context,
+                                   icon: Icons.repeat_rounded,
+                                   label: TaskRecurrenceService.getRecurrenceLabel(
+                                     task.recurrenceRule,
+                                     l10n,
+                                   ),
+                                   color: theme.colorScheme.primary,
+                                 ),
+                               if (task.customFields != null &&
+                                   task.customFields!.isNotEmpty)
+                                 ...task.customFields!
+                                     .where((cf) =>
+                                         cf.value.isNotEmpty ||
+                                         cf.label.isNotEmpty)
+                                     .map((cf) {
+                                   final icon =
+                                       CustomFieldActionService.getIcon(
+                                     cf.type,
+                                     cf.value,
+                                   );
+                                   final displayLabel =
+                                       cf.value.isNotEmpty
+                                           ? cf.value
+                                           : cf.label;
+                                   return _buildChip(
+                                     context,
+                                     icon: icon,
+                                     label: displayLabel,
+                                     color: theme.colorScheme.primary,
+                                   );
+                                 }),
+                             ],
+                           ),
                         ],
                       ),
                     ),

@@ -21,9 +21,9 @@ import 'package:rocis_tasks/features/home/presentation/screens/app_guide_screen.
 import 'package:rocis_tasks/shared/ui/widgets/easter_egg_spinner.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:rocis_tasks/features/auth/presentation/screens/security_settings_screen.dart';
+import 'package:rocis_tasks/features/auth/presentation/screens/login_screen.dart';
 import 'package:rocis_tasks/core/services/timezone_service.dart';
 import 'package:rocis_tasks/features/home/presentation/screens/widget_customization_screen.dart';
-import 'package:rocis_tasks/features/auth/presentation/screens/login_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -68,7 +68,7 @@ class SettingsScreen extends StatelessWidget {
       children: [
         _buildSectionHeader(context, l10n.account),
         _buildSectionCard(context, [
-          if (user != null)
+          if (user != null) ...[
             ListTile(
               leading: CircleAvatar(
                 backgroundColor: themeService.isDarkMode
@@ -83,17 +83,26 @@ class SettingsScreen extends StatelessWidget {
               ),
               title: Text(user.displayName ?? 'User'),
               subtitle: Text(user.email ?? ''),
-            )
-          else
+            ),
+            ListTile(
+              leading: _buildLeadingIcon(
+                context,
+                Icons.cloud_done_rounded,
+                Colors.teal,
+              ),
+              title: Text(l10n.cloudSync),
+              subtitle: Text(l10n.cloudSyncActive),
+            ),
+          ] else ...[
             ListTile(
               leading: _buildLeadingIcon(
                 context,
                 Icons.person_outline_rounded,
-                Colors.teal,
+                Colors.orangeAccent,
               ),
               title: Text(l10n.guestAccount),
-              subtitle: Text(l10n.guestModeBannerSubtitle),
-              trailing: ElevatedButton(
+              subtitle: Text(l10n.guestModeSubtitle),
+              trailing: FilledButton.tonal(
                 onPressed: () {
                   Navigator.push(
                     context,
@@ -102,12 +111,10 @@ class SettingsScreen extends StatelessWidget {
                     ),
                   );
                 },
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                ),
-                child: Text(l10n.signInNow),
+                child: Text(l10n.signInOrRegister),
               ),
             ),
+          ],
           ListTile(
             leading: _buildLeadingIcon(
               context,

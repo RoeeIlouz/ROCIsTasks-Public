@@ -235,54 +235,28 @@ class _WebPaywallViewState extends State<WebPaywallView> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 14),
-              LayoutBuilder(
-                builder: (context, constraints) {
-                  final isNarrow = constraints.maxWidth < 460;
-                  final cards = [
-                    _buildPlanCard(
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildPlanCard(
                       index: 0,
                       title: l10n.monthlyPlanTitle,
                       price: l10n.monthlyPlanPrice,
                       theme: theme,
                     ),
-                    _buildPlanCard(
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _buildPlanCard(
                       index: 1,
                       title: l10n.yearlyPlanTitle,
                       price: l10n.yearlyPlanPrice,
                       badge: l10n.yearlyPlanSaving,
                       theme: theme,
                     ),
-                    _buildPlanCard(
-                      index: 2,
-                      title: l10n.lifetimePlanTitle,
-                      price: l10n.lifetimePlanPrice,
-                      badge: l10n.lifetimePlanBadge,
-                      theme: theme,
-                    ),
-                  ];
-
-                  if (isNarrow) {
-                    return Column(
-                      children: cards
-                          .map((c) => Padding(
-                                padding: const EdgeInsets.only(bottom: 12),
-                                child: c,
-                              ))
-                          .toList(),
-                    );
-                  }
-
-                  return Row(
-                    children: [
-                      Expanded(child: cards[0]),
-                      const SizedBox(width: 8),
-                      Expanded(child: cards[1]),
-                      const SizedBox(width: 8),
-                      Expanded(child: cards[2]),
-                    ],
-                  );
-                },
+                  ),
+                ],
               ),
               const SizedBox(height: 28),
 
@@ -318,14 +292,9 @@ class _WebPaywallViewState extends State<WebPaywallView> {
                             return;
                           }
 
-                          final String baseUrl;
-                          if (_selectedPlanIndex == 0) {
-                            baseUrl = AppConfig.lemonSqueezyMonthlyUrl;
-                          } else if (_selectedPlanIndex == 1) {
-                            baseUrl = AppConfig.lemonSqueezyYearlyUrl;
-                          } else {
-                            baseUrl = AppConfig.lemonSqueezyLifetimeUrl;
-                          }
+                          final baseUrl = _selectedPlanIndex == 0
+                              ? AppConfig.lemonSqueezyMonthlyUrl
+                              : AppConfig.lemonSqueezyYearlyUrl;
 
                            final separator = baseUrl.contains('?') ? '&' : '?';
                            final checkoutUrl =

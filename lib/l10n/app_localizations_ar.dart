@@ -443,10 +443,11 @@ class AppLocalizationsAr extends AppLocalizations {
       'قسّم المهام المعقدة إلى خطوات أصغر يمكن إدارتها.';
 
   @override
-  String get recurringTasks => 'مهام متكررة';
+  String get recurringTasks => 'المهام المتكررة';
 
   @override
-  String get recurringTasksDesc => 'أتمتة روتينك بقواعد تكرار مرنة.';
+  String get recurringTasksDesc =>
+      'أتمتة المهام المتكررة بجداول يومية أو أسبوعية أو شهرية أو مخصصة.';
 
   @override
   String get viewPricingPlans => 'عرض خطط الأسعار';
@@ -524,25 +525,24 @@ class AppLocalizationsAr extends AppLocalizations {
   String get signInFailed => 'فشل تسجيل الدخول';
 
   @override
-  String get onboardingWelcomeTitle => 'مزامنة مهام وتقويم Google';
+  String get onboardingWelcomeTitle => 'مرحبًا بك في مهام ROCI';
 
   @override
-  String get onboardingWelcomeDesc =>
-      'مزامنة ثنائية سلسة مع مهام وتقويم Google في مكان واحد.';
+  String get onboardingWelcomeDesc => 'نظّم حياتك بكفاءة وأسلوب.';
 
   @override
-  String get onboardingSyncTitle => 'جماليات الزجاج المصنفر';
+  String get onboardingSyncTitle => 'المزامنة وعدم الاتصال';
 
   @override
   String get onboardingSyncDesc =>
-      'تصميم عصري مع ألوان ديناميكية، وشارات متوهجة وحركات سلسة.';
+      'مهامك معك أينما ذهبت. يمكنك الوصول إليها حتى بدون إنترنت.';
 
   @override
-  String get onboardingGesturesTitle => 'أدوات تفاعلية وعادات يومية';
+  String get onboardingGesturesTitle => 'إيماءات ذكية';
 
   @override
   String get onboardingGesturesDesc =>
-      'إدارة المهام مباشرة من الشاشة الرئيسية وبناء روتين يومي منتظم.';
+      'اسحب لليسار للحذف، ولليمين للإكمال. اضغط مطولًا لمزيد من الخيارات.';
 
   @override
   String get getStarted => 'ابدأ';
@@ -1136,36 +1136,115 @@ class AppLocalizationsAr extends AppLocalizations {
   String get searchTimezone => 'البحث عن منطقة زمنية...';
 
   @override
-  String get continueAsGuest => 'المتابعة كضيف';
+  String get repeatWeekdays => 'أيام الأسبوع (الإثنين–الجمعة)';
 
   @override
-  String get continueAsGuestSubtitle => 'الاستخدام محليًا بدون حساب';
+  String get repeatYearly => 'سنويًا';
 
   @override
-  String get guestModeBannerTitle => 'وضع الضيف بدون اتصال';
+  String get repeatCustom => 'مخصص...';
 
   @override
-  String get guestModeBannerSubtitle =>
-      'سجّل الدخول للمزامنة مع Google Tasks والنسخ الاحتياطي السحابي.';
+  String get repeatsEvery => 'يتكرر كل';
 
   @override
-  String get signInNow => 'تسجيل الدخول';
+  String get customRecurrence => 'تكرار مخصص';
+
+  @override
+  String get daySingular => 'يوم';
+
+  @override
+  String get daysPlural => 'أيام';
+
+  @override
+  String get weekSingular => 'أسبوع';
+
+  @override
+  String get weeksPlural => 'أسابيع';
+
+  @override
+  String get monthSingular => 'شهر';
+
+  @override
+  String get monthsPlural => 'أشهر';
+
+  @override
+  String get yearSingular => 'سنة';
+
+  @override
+  String get yearsPlural => 'سنوات';
+
+  @override
+  String get selectRecurrence => 'تحديد التكرار';
+
+  @override
+  String get guestMode => 'وضع الضيف';
+
+  @override
+  String get guestModeSubtitle =>
+      'يتم حفظ جميع البيانات محليًا على هذا الجهاز. سجّل الدخول لإجراء نسخ احتياطي والمزامنة مع السحابة.';
 
   @override
   String get guestAccount => 'حساب ضيف';
 
   @override
-  String get linkAccount => 'ربط / تسجيل الدخول للحساب';
+  String get signInOrRegister => 'تسجيل الدخول / التسجيل';
 
   @override
-  String get lifetimePlanTitle => 'الاشتراك مدى الحياة';
+  String get continueAsGuest => 'المتابعة كضيف';
 
   @override
-  String get lifetimePlanPrice => '49.99\$ لمرة واحدة';
+  String get skipForNow => 'تخطي الآن';
 
   @override
-  String get lifetimePlanBadge => 'القيمة الأفضل';
+  String get cloudSync => 'النسخ الاحتياطي والمزامنة السحابية';
 
   @override
-  String get lifetimePlanSaving => 'دفع لمرة واحدة';
+  String get cloudSyncActive => 'نشط ومزامن';
+
+  @override
+  String get customFields => 'أسطر مخصصة';
+
+  @override
+  String get customFieldsSubtitle =>
+      'إرفاق جهات اتصال أو مواقع أو روابط أو ملاحظات';
+
+  @override
+  String get addCustomField => 'إضافة سطر';
+
+  @override
+  String get contact => 'جهة اتصال';
+
+  @override
+  String get location => 'الموقع';
+
+  @override
+  String get link => 'رابط';
+
+  @override
+  String get note => 'ملاحظة';
+
+  @override
+  String get fieldLabel => 'التسمية';
+
+  @override
+  String get fieldValue => 'القيمة';
+
+  @override
+  String get enterContactInfo => 'رقم الهاتف أو البريد الإلكتروني';
+
+  @override
+  String get enterLocation => 'العنوان أو المكان';
+
+  @override
+  String get enterUrl => 'موقع الويب أو الرابط';
+
+  @override
+  String get enterNote => 'تفاصيل إضافية';
+
+  @override
+  String get copiedToClipboard => 'تم النسخ إلى الحافظة';
+
+  @override
+  String get noCustomFieldsAdded => 'لم تتم إضافة أسطر مخصصة';
 }

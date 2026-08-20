@@ -6,6 +6,8 @@ import 'package:file_picker/file_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/sub_task.dart';
+import 'package:rocis_tasks/features/tasks/domain/models/custom_field.dart';
+import 'package:rocis_tasks/features/tasks/domain/services/custom_field_action_service.dart';
 import 'package:rocis_tasks/core/services/subscription_service.dart';
 import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
 import 'package:rocis_tasks/core/services/auth_service.dart';
@@ -13,10 +15,13 @@ import 'package:rocis_tasks/core/services/validation_service.dart';
 import 'package:rocis_tasks/core/services/error_service.dart';
 import 'package:rocis_tasks/core/validation/validators.dart';
 import 'package:rocis_tasks/features/tasks/services/nlp_service.dart';
+import 'package:rocis_tasks/features/tasks/domain/services/task_recurrence_service.dart';
+import 'package:rocis_tasks/features/tasks/presentation/widgets/recurrence_picker_sheet.dart';
 
 import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:rocis_tasks/shared/ui/ui_kit.dart';
 import 'package:rocis_tasks/features/tasks/presentation/widgets/task_attachments_section.dart';
+import 'package:rocis_tasks/features/tasks/presentation/widgets/task_custom_fields_section.dart';
 
 import 'package:google_fonts/google_fonts.dart';
 
@@ -35,6 +40,8 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   late TextEditingController _descriptionController;
   DateTime? _selectedDate;
   bool _dateCleared = false;
+  String? _recurrenceRule;
+  bool _recurrenceCleared = false;
   TaskPriority _priority = TaskPriority.medium;
   List<String> _selectedCategoryIds = [];
   ui.TextDirection _titleDirection = ui.TextDirection.ltr;
@@ -47,6 +54,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   bool _skipReminders = false;
   bool _isGroceryList = false;
   List<String> _attachmentPaths = [];
+  List<TaskCustomField> _customFields = [];
 
   @override
   void initState() {
@@ -74,6 +82,9 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     _skipReminders = widget.task?.skipReminders ?? false;
     _isGroceryList = widget.task?.isGroceryList ?? false;
     _attachmentPaths = List<String>.from(widget.task?.attachmentPaths ?? const []);
+    _customFields =
+        widget.task?.customFields?.map((cf) => cf.copyWith()).toList() ?? [];
+    _recurrenceRule = widget.task?.recurrenceRule;
   }
 
   @override
@@ -162,6 +173,10 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
           _descriptionController.text,
         );
 
+        final validCustomFields = _customFields
+            .where((cf) => cf.label.trim().isNotEmpty || cf.value.trim().isNotEmpty)
+            .toList();
+
         if (widget.task != null) {
           Provider.of<TaskProvider>(context, listen: false).updateTask(
             widget.task!,
@@ -178,6 +193,9 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
             attachmentPaths: _attachmentPaths,
             skipReminders: _skipReminders,
             isGroceryList: _isGroceryList,
+            recurrenceRule: _recurrenceRule,
+            clearRecurrenceRule: _recurrenceCleared,
+            customFields: validCustomFields,
           );
         } else {
           Provider.of<TaskProvider>(context, listen: false).addTask(
@@ -193,6 +211,8 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
             attachmentPaths: _attachmentPaths,
             skipReminders: _skipReminders,
             isGroceryList: _isGroceryList,
+            recurrenceRule: _recurrenceRule,
+            customFields: validCustomFields,
           );
         }
         HapticFeedback.mediumImpact();
@@ -205,6 +225,34 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
           error: e,
         );
       }
+    }
+  }
+
+  void _addCustomField(CustomFieldType type) {
+    final l10n = AppLocalizations.of(context)!;
+    setState(() {
+      _customFields.add(
+        TaskCustomField(
+          type: type,
+          label: CustomFieldActionService.getDefaultLabel(type, l10n),
+          value: '',
+        ),
+      );
+    });
+    HapticFeedback.lightImpact();
+  }
+
+  void _removeCustomFieldAt(int index) {
+    setState(() {
+      _customFields.removeAt(index);
+    });
+    HapticFeedback.lightImpact();
+  }
+
+  void _updateCustomFieldAt(int index, String label, String value) {
+    if (index >= 0 && index < _customFields.length) {
+      _customFields[index].label = label;
+      _customFields[index].value = value;
     }
   }
 
@@ -292,6 +340,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final themeService = Provider.of<ThemeService>(context);
+    final subscriptionService = Provider.of<SubscriptionService>(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -395,6 +444,13 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                 onRemoveAttachment: _removeAttachmentAt,
               ),
               const SizedBox(height: 24),
+              TaskCustomFieldsSection(
+                customFields: _customFields,
+                onAddField: _addCustomField,
+                onRemoveField: _removeCustomFieldAt,
+                onUpdateField: _updateCustomFieldAt,
+              ),
+              const SizedBox(height: 24),
               Text(
                 l10n.dueDateAndTime,
                 style: GoogleFonts.outfit(
@@ -449,6 +505,114 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                                 setState(() {
                                   _selectedDate = null;
                                   _dateCleared = true;
+                                });
+                              },
+                              child: Icon(
+                                Icons.cancel_rounded,
+                                size: 20,
+                                color: theme.disabledColor,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    l10n.recurrence,
+                    style: GoogleFonts.outfit(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                      color: theme.colorScheme.primary,
+                    ),
+                  ),
+                  if (!subscriptionService.isPremium)
+                    Container(
+                      margin: const EdgeInsets.only(left: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.amber.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        'PRO',
+                        style: GoogleFonts.outfit(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.amber[800],
+                        ),
+                      ),
+                    ),
+                  const Spacer(),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Semantics(
+                label: l10n.recurrence,
+                hint: 'Double tap to configure recurrence',
+                button: true,
+                child: InkWell(
+                  onTap: () async {
+                    if (!subscriptionService.isPremium) {
+                      subscriptionService.showPaywall();
+                      return;
+                    }
+                    HapticFeedback.lightImpact();
+                    final selectedRule = await RecurrencePickerSheet.show(
+                      context,
+                      currentRule: _recurrenceRule,
+                    );
+                    if (selectedRule != _recurrenceRule) {
+                      setState(() {
+                        _recurrenceRule = selectedRule;
+                        _recurrenceCleared = selectedRule == null;
+                      });
+                    }
+                  },
+                  borderRadius: BorderRadius.circular(16),
+                  child: GlassContainer(
+                    borderRadius: BorderRadius.circular(16),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.repeat_rounded,
+                          size: 20,
+                          color: _recurrenceRule != null
+                              ? theme.colorScheme.primary
+                              : theme.disabledColor,
+                        ),
+                        const SizedBox(width: 12),
+                        Text(
+                          TaskRecurrenceService.getRecurrenceLabel(
+                            _recurrenceRule,
+                            l10n,
+                          ),
+                          style: GoogleFonts.outfit(
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const Spacer(),
+                        if (_recurrenceRule != null)
+                          Semantics(
+                            label: 'Clear recurrence',
+                            button: true,
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  _recurrenceRule = null;
+                                  _recurrenceCleared = true;
                                 });
                               },
                               child: Icon(

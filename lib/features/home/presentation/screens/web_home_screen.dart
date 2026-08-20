@@ -13,6 +13,11 @@ import 'package:rocis_tasks/features/tasks/presentation/widgets/task_skeleton.da
 import 'package:rocis_tasks/features/calendar/presentation/screens/calendar_screen.dart';
 import 'package:rocis_tasks/features/home/presentation/screens/settings_screen.dart';
 import 'package:rocis_tasks/features/categories/presentation/screens/categories_screen.dart';
+import 'package:flutter/services.dart';
+import 'package:rocis_tasks/features/tasks/domain/models/custom_field.dart';
+import 'package:rocis_tasks/features/tasks/domain/services/custom_field_action_service.dart';
+import 'package:rocis_tasks/features/tasks/presentation/widgets/task_custom_fields_section.dart';
+import 'package:rocis_tasks/features/auth/presentation/screens/login_screen.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -36,6 +41,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
   TaskPriority _priority = TaskPriority.medium;
   List<String> _categoryIds = [];
   List<SubTask> _subTasks = [];
+  List<TaskCustomField> _customFields = [];
   bool _syncWithGoogleTasks = false;
   bool _skipReminders = false;
 
@@ -72,6 +78,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
           _categoryIds.add(task.categoryId!);
         }
         _subTasks = task.subTasks?.map((st) => st.copyWith()).toList() ?? [];
+        _customFields = task.customFields?.map((cf) => cf.copyWith()).toList() ?? [];
         _syncWithGoogleTasks = task.syncWithGoogleTasks;
         _skipReminders = task.skipReminders;
       }
@@ -88,9 +95,38 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
       _priority = TaskPriority.medium;
       _categoryIds = [];
       _subTasks = [];
+      _customFields = [];
       _syncWithGoogleTasks = false;
       _skipReminders = false;
     });
+  }
+
+  void _addCustomField(CustomFieldType type) {
+    final l10n = AppLocalizations.of(context)!;
+    setState(() {
+      _customFields.add(
+        TaskCustomField(
+          type: type,
+          label: CustomFieldActionService.getDefaultLabel(type, l10n),
+          value: '',
+        ),
+      );
+    });
+    HapticFeedback.lightImpact();
+  }
+
+  void _removeCustomFieldAt(int index) {
+    setState(() {
+      _customFields.removeAt(index);
+    });
+    HapticFeedback.lightImpact();
+  }
+
+  void _updateCustomFieldAt(int index, String label, String value) {
+    if (index >= 0 && index < _customFields.length) {
+      _customFields[index].label = label;
+      _customFields[index].value = value;
+    }
   }
 
   void _saveInspectorTask(TaskProvider provider) {
@@ -98,6 +134,9 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
       final title = _titleController.text.trim();
       final desc = _descController.text.trim();
       final catId = _categoryIds.isNotEmpty ? _categoryIds.first : null;
+      final validCustomFields = _customFields
+          .where((cf) => cf.label.trim().isNotEmpty || cf.value.trim().isNotEmpty)
+          .toList();
 
       if (_selectedTask != null) {
         // Edit Mode
@@ -113,6 +152,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
           subTasks: _subTasks,
           syncWithGoogleTasks: _syncWithGoogleTasks,
           skipReminders: _skipReminders,
+          customFields: validCustomFields,
         );
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Task updated successfully')),
@@ -130,6 +170,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
           subTasks: _subTasks,
           syncWithGoogleTasks: _syncWithGoogleTasks,
           skipReminders: _skipReminders,
+          customFields: validCustomFields,
         );
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Task created successfully')),
@@ -493,6 +534,59 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                     icon: const Icon(Icons.logout, size: 18, color: Colors.redAccent),
                     onPressed: () => authService.signOut(),
                     tooltip: l10n.signOut,
+                  ),
+                ],
+              ),
+            )
+          else
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: isDark ? Colors.white10 : Colors.black12),
+              ),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 18,
+                    backgroundColor: Colors.orangeAccent.withValues(alpha: 0.1),
+                    child: const Icon(Icons.person_outline_rounded, size: 20, color: Colors.orangeAccent),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          l10n.guestAccount,
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Text(
+                          l10n.guestMode,
+                          style: TextStyle(fontSize: 11, color: theme.disabledColor),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                  FilledButton.tonal(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const LoginScreen(),
+                        ),
+                      );
+                    },
+                    style: FilledButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                    ),
+                    child: Text(l10n.signIn),
                   ),
                 ],
               ),
@@ -1061,6 +1155,15 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                       onChanged: (value) {
                         setState(() { _skipReminders = value; });
                       },
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Custom Lines Section
+                    TaskCustomFieldsSection(
+                      customFields: _customFields,
+                      onAddField: _addCustomField,
+                      onRemoveField: _removeCustomFieldAt,
+                      onUpdateField: _updateCustomFieldAt,
                     ),
                   ],
                 ),

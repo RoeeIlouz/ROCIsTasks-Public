@@ -445,7 +445,8 @@ class AppLocalizationsHe extends AppLocalizations {
   String get recurringTasks => 'משימות חוזרות';
 
   @override
-  String get recurringTasksDesc => 'אוטומט את השגרה שלך עם כללי חזרה גמישים.';
+  String get recurringTasksDesc =>
+      'הפוך משימות לאוטומטיות בלוח זמנים יומי, שבועי, חודשי או מותאם אישית.';
 
   @override
   String get viewPricingPlans => 'צפה בתוכניות תמחור';
@@ -523,25 +524,24 @@ class AppLocalizationsHe extends AppLocalizations {
   String get signInFailed => 'ההתחברות נכשלה';
 
   @override
-  String get onboardingWelcomeTitle => 'סנכרון Google Tasks ולוח שנה';
+  String get onboardingWelcomeTitle => 'ברוך הבא ל-ROCIs Tasks';
 
   @override
-  String get onboardingWelcomeDesc =>
-      'סנכרון דו-כיווני חלק עם Google Tasks וניהול לוח זמנים במקום אחד.';
+  String get onboardingWelcomeDesc => 'ארגן את חייך ביעילות ובסגנון.';
 
   @override
-  String get onboardingSyncTitle => 'עיצוב זכוכית מודרני';
+  String get onboardingSyncTitle => 'סנכרון ומצב לא מקוון';
 
   @override
   String get onboardingSyncDesc =>
-      'ממשק פרימיום עם שקיפויות זכוכית, התאמת צבעים לרקע ואנימציות חלקות.';
+      'המשימות שלך עוקבות אחריך לכל מקום. גש אליהן גם ללא חיבור לאינטרנט.';
 
   @override
-  String get onboardingGesturesTitle => 'ווידג\'טים אינטראקטיביים והרגלים';
+  String get onboardingGesturesTitle => 'מחוות חכמות';
 
   @override
   String get onboardingGesturesDesc =>
-      'ניהול משימות מהיר ישירות ממסך הבית ומעקב אחר הרגלים יומיים.';
+      'החלק שמאלה למחיקה, ימינה להשלמה. לחץ לחיצה ארוכה לאפשרויות נוספות.';
 
   @override
   String get getStarted => 'בוא נתחיל';
@@ -1136,36 +1136,114 @@ class AppLocalizationsHe extends AppLocalizations {
   String get searchTimezone => 'חיפוש אזור זמן...';
 
   @override
-  String get continueAsGuest => 'המשך כאורח';
+  String get repeatWeekdays => 'ימי חול (א\'–ה\')';
 
   @override
-  String get continueAsGuestSubtitle => 'שימוש מקומי ללא צורך בחשבון';
+  String get repeatYearly => 'שנתי';
 
   @override
-  String get guestModeBannerTitle => 'מצב אורח / לא מקוון';
+  String get repeatCustom => 'מותאם אישית...';
 
   @override
-  String get guestModeBannerSubtitle =>
-      'התחבר כדי לסנכרן עם Google Tasks ולגבות את המשימות בענן.';
+  String get repeatsEvery => 'חוזר כל';
 
   @override
-  String get signInNow => 'התחבר';
+  String get customRecurrence => 'חזרה מותאמת אישית';
+
+  @override
+  String get daySingular => 'יום';
+
+  @override
+  String get daysPlural => 'ימים';
+
+  @override
+  String get weekSingular => 'שבוע';
+
+  @override
+  String get weeksPlural => 'שבועות';
+
+  @override
+  String get monthSingular => 'חודש';
+
+  @override
+  String get monthsPlural => 'חודשים';
+
+  @override
+  String get yearSingular => 'שנה';
+
+  @override
+  String get yearsPlural => 'שנים';
+
+  @override
+  String get selectRecurrence => 'בחר חזרה';
+
+  @override
+  String get guestMode => 'מצב אורח';
+
+  @override
+  String get guestModeSubtitle =>
+      'כל הנתונים נשמרים מקומית במכשיר זה. התחבר כדי לגבות ולסנכרן עם הענן.';
 
   @override
   String get guestAccount => 'חשבון אורח';
 
   @override
-  String get linkAccount => 'קישור / התחברות לחשבון';
+  String get signInOrRegister => 'התחבר / הירשם';
 
   @override
-  String get lifetimePlanTitle => 'מנוי לכל החיים';
+  String get continueAsGuest => 'המשך כאורח';
 
   @override
-  String get lifetimePlanPrice => '\$49.99 חד פעמי';
+  String get skipForNow => 'דלג לעת עתה';
 
   @override
-  String get lifetimePlanBadge => 'משתלם ביותר';
+  String get cloudSync => 'גיבוי וסנכרון ענן';
 
   @override
-  String get lifetimePlanSaving => 'תשלום חד פעמי';
+  String get cloudSyncActive => 'פעיל ומסונכרן';
+
+  @override
+  String get customFields => 'שורות מותאמות אישית';
+
+  @override
+  String get customFieldsSubtitle => 'צרף אנשי קשר, מיקומים, קישורים או הערות';
+
+  @override
+  String get addCustomField => 'הוסף שורה';
+
+  @override
+  String get contact => 'איש קשר';
+
+  @override
+  String get location => 'מיקום';
+
+  @override
+  String get link => 'קישור';
+
+  @override
+  String get note => 'הערה';
+
+  @override
+  String get fieldLabel => 'תווית';
+
+  @override
+  String get fieldValue => 'ערך';
+
+  @override
+  String get enterContactInfo => 'מספר טלפון או דוא\"ל';
+
+  @override
+  String get enterLocation => 'כתובת או מקום';
+
+  @override
+  String get enterUrl => 'כתובת אתר או קישור';
+
+  @override
+  String get enterNote => 'פרטים נוספים';
+
+  @override
+  String get copiedToClipboard => 'הועתק ללוח';
+
+  @override
+  String get noCustomFieldsAdded => 'לא נוספו שורות מותאמות אישית';
 }

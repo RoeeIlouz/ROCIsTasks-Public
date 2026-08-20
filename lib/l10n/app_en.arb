@@ -77,7 +77,9 @@
   "restoredTask": "Restored {title}",
   "@restoredTask": {
     "placeholders": {
-      "title": { "type": "String" }
+      "title": {
+        "type": "String"
+      }
     }
   },
   "deletePermanently": "Delete Permanently?",
@@ -110,7 +112,9 @@
   "exportFailed": "Export failed: {error}",
   "@exportFailed": {
     "placeholders": {
-      "error": { "type": "String" }
+      "error": {
+        "type": "String"
+      }
     }
   },
   "importData": "Import Data (JSON)",
@@ -122,7 +126,9 @@
   "importFailed": "Import failed: {error}",
   "@importFailed": {
     "placeholders": {
-      "error": { "type": "String" }
+      "error": {
+        "type": "String"
+      }
     }
   },
   "privacyAndGdpr": "Privacy & GDPR",
@@ -156,7 +162,7 @@
   "subtasksAndChecklists": "Subtasks & Checklists",
   "subtasksAndChecklistsDesc": "Break down complex tasks into smaller, manageable steps.",
   "recurringTasks": "Recurring Tasks",
-  "recurringTasksDesc": "Automate your routine with flexible repetition rules.",
+  "recurringTasksDesc": "Automate repeating tasks with daily, weekly, monthly, or custom schedules.",
   "viewPricingPlans": "View Pricing Plans",
   "proSubscriptionActive": "Pro Subscription Active",
   "welcomeToPro": "Welcome to Pro!",
@@ -182,12 +188,12 @@
   "signInToSync": "Sign in to sync your tasks across devices",
   "signInWithGoogle": "Sign in with Google",
   "signInFailed": "Sign in failed",
-  "onboardingWelcomeTitle": "Google Tasks & Calendar Sync",
-  "onboardingWelcomeDesc": "Seamless 2-way sync with Google Tasks and unified calendar time-blocking in one place.",
-  "onboardingSyncTitle": "Glassmorphic Aesthetics",
-  "onboardingSyncDesc": "A modern design engine with dynamic wallpaper colors, glowing priorities, and fluid animations.",
-  "onboardingGesturesTitle": "Interactive Widgets & Habits",
-  "onboardingGesturesDesc": "Complete tasks directly from your home screen and build lasting daily routines.",
+  "onboardingWelcomeTitle": "Welcome to ROCI's Tasks",
+  "onboardingWelcomeDesc": "Organize your life with efficiency and style.",
+  "onboardingSyncTitle": "Sync & Offline",
+  "onboardingSyncDesc": "Your tasks follow you everywhere. Access them even without an internet connection.",
+  "onboardingGesturesTitle": "Smart Gestures",
+  "onboardingGesturesDesc": "Swipe left to delete, swipe right to complete. Long press for more options.",
   "getStarted": "Get Started",
   "next": "Next",
   "insights": "Insights",
@@ -200,7 +206,9 @@
   "taskReminderTitle": "Task Reminder: {title}",
   "@taskReminderTitle": {
     "placeholders": {
-      "title": { "type": "String" }
+      "title": {
+        "type": "String"
+      }
     }
   },
   "taskDueNowBody": "You have a task due now!",
@@ -214,20 +222,21 @@
   "nextOccurrenceSet": "Next occurrence of \"{title}\" set for {date}",
   "@nextOccurrenceSet": {
     "placeholders": {
-      "title": { "type": "String" },
-      "date": { "type": "String" }
+      "title": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
     }
   },
   "initializationFailedError": "Failed to initialize app data. Please restart.",
-  "welcomeToPro": "Welcome to Pro!",
   "noTaskDataAvailable": "No task data available",
   "retryInitialization": "Retry Initialization",
   "criticalErrorTitle": "CRITICAL ERROR",
   "appStartupErrorBody": "ROCI's Tasks encountered a problem during startup. Our team has been notified.",
   "appTagline": "Dotting the i's and crossing the t's",
-  "pickAPlan": "Pick a Plan",
   "termsOfService": "Terms of Service",
-  "byContinuingAgreement": "By continuing, you agree to our",
   "allDay": "All Day",
   "event": "Event",
   "markAsIncomplete": "Mark as incomplete",
@@ -241,14 +250,18 @@
   "notificationUncompletedTasks": "{count} Uncompleted Tasks",
   "@notificationUncompletedTasks": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "notificationTasksRemaining": "Tasks Remaining",
   "notificationTasksSummary": "{count} Tasks",
   "@notificationTasksSummary": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "skip": "Skip",
@@ -398,15 +411,41 @@
   "selectTimezone": "Select Timezone",
   "automaticTimezone": "Automatic (Device Timezone)",
   "searchTimezone": "Search timezone...",
-  "continueAsGuest": "Continue as Guest",
-  "continueAsGuestSubtitle": "Use locally without an account",
-  "guestModeBannerTitle": "Offline Guest Mode",
-  "guestModeBannerSubtitle": "Sign in to sync with Google Tasks and backup your data across devices.",
-  "signInNow": "Sign In",
+  "repeatWeekdays": "Weekdays (Mon–Fri)",
+  "repeatYearly": "Yearly",
+  "repeatCustom": "Custom...",
+  "repeatsEvery": "Repeats every",
+  "customRecurrence": "Custom Recurrence",
+  "daySingular": "day",
+  "daysPlural": "days",
+  "weekSingular": "week",
+  "weeksPlural": "weeks",
+  "monthSingular": "month",
+  "monthsPlural": "months",
+  "yearSingular": "year",
+  "yearsPlural": "years",
+  "selectRecurrence": "Select Recurrence",
+  "guestMode": "Guest Mode",
+  "guestModeSubtitle": "All data is stored locally on this device. Sign in to back up and sync with the cloud.",
   "guestAccount": "Guest Account",
-  "linkAccount": "Link / Sign In Account",
-  "lifetimePlanTitle": "Lifetime Plan",
-  "lifetimePlanPrice": "$49.99 one-time",
-  "lifetimePlanBadge": "Best Value",
-  "lifetimePlanSaving": "Pay Once"
+  "signInOrRegister": "Sign In / Register",
+  "continueAsGuest": "Continue as Guest",
+  "skipForNow": "Skip for now",
+  "cloudSync": "Cloud Backup & Sync",
+  "cloudSyncActive": "Active & synced",
+  "customFields": "Custom Lines",
+  "customFieldsSubtitle": "Attach contacts, locations, links, or notes",
+  "addCustomField": "Add Line",
+  "contact": "Contact",
+  "location": "Location",
+  "link": "Link",
+  "note": "Note",
+  "fieldLabel": "Label",
+  "fieldValue": "Value",
+  "enterContactInfo": "Phone number or email",
+  "enterLocation": "Address or place",
+  "enterUrl": "Website or URL",
+  "enterNote": "Custom details",
+  "copiedToClipboard": "Copied to clipboard",
+  "noCustomFieldsAdded": "No custom lines added"
 }

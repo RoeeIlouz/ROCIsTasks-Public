@@ -359,4 +359,27 @@ void main() {
       // Should not have a second text widget for description
     });
   });
+
+  group('TaskTile - Recurrence Chip', () {
+    testWidgets('shows recurrence chip when recurrenceRule is set', (tester) async {
+      final task = Task(
+        id: '1',
+        title: 'Recurring Task',
+        recurrenceRule: 'FREQ=DAILY;INTERVAL=1',
+      );
+      await tester.pumpWidget(createWidgetUnderTest(task));
+      expect(find.text('Daily'), findsOneWidget);
+      expect(find.byIcon(Icons.repeat_rounded), findsOneWidget);
+    });
+
+    testWidgets('does not show recurrence chip when recurrenceRule is null', (tester) async {
+      final task = Task(
+        id: '2',
+        title: 'Normal Task',
+        recurrenceRule: null,
+      );
+      await tester.pumpWidget(createWidgetUnderTest(task));
+      expect(find.byIcon(Icons.repeat_rounded), findsNothing);
+    });
+  });
 }

@@ -35,9 +35,6 @@ class AuthService extends ChangeNotifier {
   FirebaseAuth? _scheduleAuth;
   final ValueNotifier<String?> scheduleAuthError = ValueNotifier<String?>(null);
   StreamSubscription<User?>? _authStateSubscription;
-  bool _isGuestMode = false;
-
-  bool get isGuestMode => _isGuestMode && currentUser == null;
 
   AuthService(this._errorHandlingService) {
     _oauthManager = GoogleOAuthManager(_errorHandlingService);
@@ -45,17 +42,8 @@ class AuthService extends ChangeNotifier {
   }
 
   Future<void> _initAuth() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      _isGuestMode = prefs.getBool('is_guest_mode') ?? false;
-    } catch (e) {
-      AppLogger.warning('Failed to load guest mode from prefs', error: e, tag: 'Auth');
-    }
-
     _authStateSubscription = _auth.authStateChanges().listen((User? user) {
       if (user != null) {
-        _isGuestMode = false;
-        unawaited(_clearGuestModePref());
         unawaited(_syncEncryptionKey(user.uid));
         unawaited(ensureSecondaryAuth());
         unawaited(_restoreGoogleUser());
@@ -67,30 +55,6 @@ class AuthService extends ChangeNotifier {
 
       notifyListeners();
     });
-  }
-
-  Future<void> _clearGuestModePref() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('is_guest_mode', false);
-    } catch (_) {}
-  }
-
-  Future<void> continueAsGuest() async {
-    _isGuestMode = true;
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('is_guest_mode', true);
-    } catch (e) {
-      AppLogger.warning('Failed to save guest mode to prefs', error: e, tag: 'Auth');
-    }
-    notifyListeners();
-  }
-
-  Future<void> exitGuestMode() async {
-    _isGuestMode = false;
-    await _clearGuestModePref();
-    notifyListeners();
   }
 
   /// Proactively restores [_googleUser] on app startup so that
@@ -594,8 +558,6 @@ class AuthService extends ChangeNotifier {
 
   Future<void> signOut() async {
     try {
-      _isGuestMode = false;
-      await _clearGuestModePref();
       await _scheduleAuth?.signOut();
       _scheduleAuth = null;
 

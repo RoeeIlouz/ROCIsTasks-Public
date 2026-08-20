@@ -94,6 +94,19 @@ void main() {
       () => mockNotificationService.cancelAllNotifications(),
     ).thenAnswer((_) async => {});
     when(
+      () => mockNotificationService.cancelNotification(any()),
+    ).thenAnswer((_) async => {});
+    when(
+      () => mockNotificationService.scheduleNotification(
+        id: any(named: 'id'),
+        title: any(named: 'title'),
+        body: any(named: 'body'),
+        scheduledDate: any(named: 'scheduledDate'),
+        taskId: any(named: 'taskId'),
+        androidActions: any(named: 'androidActions'),
+      ),
+    ).thenAnswer((_) async => {});
+    when(
       () => mockNotificationService.showInfoNotification(
         title: any(named: 'title'),
         body: any(named: 'body'),
@@ -127,6 +140,9 @@ void main() {
         categoryId: any(named: 'categoryId'),
         hasDueDate: any(named: 'hasDueDate'),
       ),
+    ).thenAnswer((_) async => {});
+    when(
+      () => mockAnalyticsService.logTaskCompleted(),
     ).thenAnswer((_) async => {});
 
     taskProvider = TaskProvider(
@@ -222,6 +238,62 @@ void main() {
 
       await untilCalled(() => mockFirestoreService.getNextCompletedTasksBatch());
       verify(() => mockSource.addTask(completedTask)).called(1);
+    });
+  });
+
+  group('TaskProvider Recurring Tasks', () {
+    test('spawns next recurring task when completed by premium user', () async {
+      when(() => mockSubscriptionService.isPremium).thenReturn(true);
+      when(() => mockSource.addTask(any())).thenAnswer((_) async => {});
+      when(() => mockFirestoreService.updateTask(any())).thenAnswer((_) async => {});
+      when(() => mockFirestoreService.addTask(any())).thenAnswer((_) async => {});
+
+      await taskProvider.init();
+
+      final recurringTask = Task(
+        id: 'rec-1',
+        title: 'Daily Standup',
+        isCompleted: false,
+        dueDate: DateTime(2026, 8, 15, 9, 0),
+        recurrenceRule: 'FREQ=DAILY;INTERVAL=1',
+      );
+
+      await taskProvider.toggleTaskCompletion(recurringTask);
+
+      expect(recurringTask.isCompleted, isTrue);
+      // Verify adding the completed task and adding the next instance
+      final capturedTasks = verify(() => mockSource.addTask(captureAny())).captured;
+      expect(capturedTasks.length, 2);
+
+      final nextTask = capturedTasks[1] as Task;
+      expect(nextTask.title, 'Daily Standup');
+      expect(nextTask.isCompleted, isFalse);
+      expect(nextTask.recurrenceRule, 'FREQ=DAILY;INTERVAL=1');
+      expect(nextTask.dueDate, DateTime(2026, 8, 16, 9, 0));
+    });
+
+    test('does not spawn next recurring task when user is not premium', () async {
+      when(() => mockSubscriptionService.isPremium).thenReturn(false);
+      when(() => mockSource.addTask(any())).thenAnswer((_) async => {});
+      when(() => mockFirestoreService.updateTask(any())).thenAnswer((_) async => {});
+
+      await taskProvider.init();
+
+      final recurringTask = Task(
+        id: 'rec-2',
+        title: 'Daily Standup Free',
+        isCompleted: false,
+        dueDate: DateTime(2026, 8, 15, 9, 0),
+        recurrenceRule: 'FREQ=DAILY;INTERVAL=1',
+      );
+
+      await taskProvider.toggleTaskCompletion(recurringTask);
+
+      expect(recurringTask.isCompleted, isTrue);
+      // Only the completed task should be saved
+      final capturedTasks = verify(() => mockSource.addTask(captureAny())).captured;
+      expect(capturedTasks.length, 1);
+      expect((capturedTasks.first as Task).id, 'rec-2');
     });
   });
 }

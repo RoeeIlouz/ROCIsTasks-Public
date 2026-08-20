@@ -21,20 +21,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         _OnboardingPage(
           title: l10n.onboardingWelcomeTitle,
           description: l10n.onboardingWelcomeDesc,
-          icon: Icons.sync_alt_rounded,
-          color: const Color(0xFF38BDF8),
+          icon: Icons.check_circle_outline,
+          color: const Color(0xFF6C63FF),
         ),
         _OnboardingPage(
           title: l10n.onboardingSyncTitle,
           description: l10n.onboardingSyncDesc,
-          icon: Icons.auto_awesome_rounded,
-          color: const Color(0xFF6366F1),
+          icon: Icons.cloud_sync_outlined,
+          color: const Color(0xFF00BFA5),
         ),
         _OnboardingPage(
           title: l10n.onboardingGesturesTitle,
           description: l10n.onboardingGesturesDesc,
-          icon: Icons.widgets_rounded,
-          color: const Color(0xFF10B981),
+          icon: Icons.touch_app_outlined,
+          color: const Color(0xFFFF6D00),
         ),
       ];
 
