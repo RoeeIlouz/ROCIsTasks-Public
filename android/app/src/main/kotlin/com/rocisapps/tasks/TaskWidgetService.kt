@@ -35,7 +35,6 @@ class TaskWidgetFactory(private val context: Context) : RemoteViewsService.Remot
             val filterMode = widgetData.getInt(TaskWidgetProvider.PREF_FILTER_KEY, 0)
             val isPremium = widgetData.getBoolean("is_premium", false)
             
-            
             // Filter
             var processedList = parsedTasks.filter { task ->
                 when (filterMode) {
@@ -122,15 +121,10 @@ class TaskWidgetFactory(private val context: Context) : RemoteViewsService.Remot
         }
     }
 
-    /**
-     * Safely parse tasks JSON with comprehensive error handling
-     * Returns empty list on any parsing error to ensure graceful degradation
-     */
     private fun parseTasksJsonSafely(tasksJson: String): List<JSONObject> {
         val parsedTasks = mutableListOf<JSONObject>()
         
         try {
-            // Handle empty, null, or invalid JSON strings
             if (tasksJson.isEmpty() || tasksJson == "null" || tasksJson == "undefined") {
                 return parsedTasks
             }
@@ -140,32 +134,22 @@ class TaskWidgetFactory(private val context: Context) : RemoteViewsService.Remot
             for (i in 0 until jsonArray.length()) {
                 try {
                     val taskObj = jsonArray.getJSONObject(i)
-                    
-                    // Validate and standardize task data
                     val validatedTask = validateAndStandardizeTask(taskObj)
                     if (validatedTask != null) {
                         parsedTasks.add(validatedTask)
-                    } else {
                     }
-                } catch (e: Exception) {
-                    // Continue with other tasks instead of failing completely
+                } catch (_: Exception) {
                 }
             }
-        } catch (e: Exception) {
-            // Return empty list on any JSON parsing error
+        } catch (_: Exception) {
             return emptyList()
         }
         
         return parsedTasks
     }
 
-    /**
-     * Validate and standardize task data with fallback values
-     * Returns null if task is invalid (missing required fields)
-     */
     private fun validateAndStandardizeTask(taskObj: JSONObject): JSONObject? {
         try {
-            // Check for required fields
             if (!taskObj.has("id") || !taskObj.has("title")) {
                 return null
             }
@@ -173,12 +157,10 @@ class TaskWidgetFactory(private val context: Context) : RemoteViewsService.Remot
             val id = extractStringSafely(taskObj, "id", "")
             val title = extractStringSafely(taskObj, "title", "")
             
-            // Ensure required fields are not empty
             if (id.isEmpty() || title.isEmpty()) {
                 return null
             }
             
-            // Create standardized task object with validated data
             val standardizedTask = JSONObject()
             standardizedTask.put("id", id)
             standardizedTask.put("title", title)
@@ -197,9 +179,6 @@ class TaskWidgetFactory(private val context: Context) : RemoteViewsService.Remot
         }
     }
 
-    /**
-     * Safely extract string value with fallback
-     */
     private fun extractStringSafely(jsonObj: JSONObject, key: String, fallback: String): String {
         return try {
             val value = jsonObj.opt(key)
@@ -213,9 +192,6 @@ class TaskWidgetFactory(private val context: Context) : RemoteViewsService.Remot
         }
     }
 
-    /**
-     * Safely extract boolean value with fallback
-     */
     private fun extractBooleanSafely(jsonObj: JSONObject, key: String, fallback: Boolean): Boolean {
         return try {
             val value = jsonObj.opt(key)
@@ -231,9 +207,6 @@ class TaskWidgetFactory(private val context: Context) : RemoteViewsService.Remot
         }
     }
 
-    /**
-     * Safely extract and validate color value with fallback
-     */
     private fun extractColorSafely(jsonObj: JSONObject, key: String, fallback: String): String {
         return try {
             val value = jsonObj.opt(key)
@@ -242,24 +215,16 @@ class TaskWidgetFactory(private val context: Context) : RemoteViewsService.Remot
             }
             
             val colorStr = value as String
-            if (colorStr.isEmpty()) {
+            if (colorStr.isEmpty() || !colorStr.startsWith("#")) {
                 return fallback
             }
             
-            // Validate color format
-            if (!colorStr.startsWith("#")) {
-                return fallback
-            }
-            
-            // Check hex format (6 or 8 characters after #)
             val hexPart = colorStr.substring(1)
             if (hexPart.length != 6 && hexPart.length != 8) {
                 return fallback
             }
             
-            // Try to parse as hex to validate
             hexPart.toLong(16)
-            
             return colorStr
         } catch (e: Exception) {
             fallback
@@ -275,10 +240,8 @@ class TaskWidgetFactory(private val context: Context) : RemoteViewsService.Remot
     }
 
     override fun getViewAt(position: Int): RemoteViews {
-        
         val views = RemoteViews(context.packageName, R.layout.widget_task_item)
         
-        // Improved bounds checking and error handling
         if (position < 0 || position >= tasks.size) {
             return createFallbackView(views, "No tasks available")
         }
@@ -287,19 +250,14 @@ class TaskWidgetFactory(private val context: Context) : RemoteViewsService.Remot
             val task = tasks[position]
             populateTaskView(views, task)
         } catch (e: Exception) {
-            // Provide fallback content instead of crashing
             return createFallbackView(views, "Error loading task")
         }
         
         return views
     }
 
-    /**
-     * Populate RemoteViews with standardized task data and proper error handling
-     */
     private fun populateTaskView(views: RemoteViews, task: JSONObject) {
         try {
-            // Handle title with fallback (already validated, but double-check)
             val title = extractStringSafely(task, "title", "Untitled Task")
             views.setTextViewText(R.id.widget_task_title, title)
 
@@ -319,13 +277,10 @@ class TaskWidgetFactory(private val context: Context) : RemoteViewsService.Remot
                 views.setViewVisibility(R.id.widget_task_meta, android.view.View.GONE)
             }
             
-            // Handle due date with fallback and formatting
             val dueDate = extractStringSafely(task, "dueDate", "")
             val displayDate = if (dueDate.isEmpty()) "No due date" else dueDate
             views.setTextViewText(R.id.widget_task_date, displayDate)
             
-            
-            // Handle category color with improved error handling
             val colorHex = extractStringSafely(task, "category_color", "")
             if (colorHex.isNotEmpty()) {
                 try {
@@ -339,40 +294,48 @@ class TaskWidgetFactory(private val context: Context) : RemoteViewsService.Remot
                 views.setViewVisibility(R.id.widget_task_category_color, android.view.View.INVISIBLE)
             }
 
-            // Handle click intent with error handling
             val taskId = extractStringSafely(task, "id", "")
             if (taskId.isNotEmpty()) {
                 try {
+                    val isCompleted = task.optBoolean("isCompleted", false)
+                    if (isCompleted) {
+                        views.setImageViewResource(R.id.widget_task_check, R.drawable.ic_check_circle_filled)
+                    } else {
+                        views.setImageViewResource(R.id.widget_task_check, R.drawable.ic_circle_outline)
+                    }
+
+                    // Checkbox clicks trigger instant background task completion
+                    val checkFillInIntent = Intent().apply {
+                        action = Intent.ACTION_VIEW
+                        data = Uri.parse("rocistasks://complete?id=$taskId")
+                    }
+                    views.setOnClickFillInIntent(R.id.widget_task_check, checkFillInIntent)
+
+                    // Row container clicks open task details in the app
                     val fillInIntent = Intent().apply {
+                        action = Intent.ACTION_VIEW
                         data = Uri.parse("rocistasks://task_item?id=$taskId")
                     }
                     views.setOnClickFillInIntent(R.id.widget_task_container, fillInIntent)
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                 }
             }
         } catch (e: Exception) {
-            // If we can't populate the view, create a fallback
             createFallbackView(views, "Error displaying task")
         }
     }
 
-    /**
-     * Create a fallback view with error message
-     */
     private fun createFallbackView(views: RemoteViews, message: String): RemoteViews {
         try {
             views.setTextViewText(R.id.widget_task_title, message)
             views.setTextViewText(R.id.widget_task_date, "")
             views.setViewVisibility(R.id.widget_task_category_color, android.view.View.INVISIBLE)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
         }
         return views
     }
 
-    override fun getLoadingView(): RemoteViews? {
-        return null
-    }
-    
+    override fun getLoadingView(): RemoteViews? = null
     override fun getViewTypeCount(): Int = 1
     override fun getItemId(position: Int): Long = position.toLong()
     override fun hasStableIds(): Boolean = true

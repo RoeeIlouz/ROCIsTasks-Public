@@ -1071,6 +1071,55 @@ class AppLocalizationsHi extends AppLocalizations {
   String get widgetAccentColor => 'विजेट एक्सेंट रंग';
 
   @override
+  String get widgetSuiteTitle => 'उपलब्ध होम विजेट';
+
+  @override
+  String get widgetSuiteSubtitle =>
+      'हमारे विजेट्स में से चुनें। मुफ्त उपयोगकर्ता 1 विजेट लगा सकते हैं; Pro उपयोगकर्ता असीमित।';
+
+  @override
+  String get todayAgendaWidgetTitle => 'दैनिक एजेंडा';
+
+  @override
+  String get todayAgendaWidgetSubtitle =>
+      'कार्यों और घटनाओं का इंटरैक्टिव दैनिक दृश्य व त्वरित पूर्णता।';
+
+  @override
+  String get monthAgendaWidgetTitle => 'माह और एजेंडा';
+
+  @override
+  String get monthAgendaWidgetSubtitle =>
+      'मासिक कैलेंडर ग्रिड और चयनित तिथि एजेंडा का सैमसंग-स्टाइल लेआउट।';
+
+  @override
+  String get timelineAgendaWidgetTitle => 'शेड्यूल टाइमलाइन';
+
+  @override
+  String get timelineAgendaWidgetSubtitle =>
+      'आगामी कार्यों और घटनाओं की गूगल-स्टाइल निरंतर टाइमलाइन।';
+
+  @override
+  String get quickActionWidgetTitle => 'त्वरित क्रियाएँ और रिंग';
+
+  @override
+  String get quickActionWidgetSubtitle =>
+      'एक-टैप कार्य निर्माण और लाइव प्रगति ट्रैकिंग रिंग।';
+
+  @override
+  String get upNextWidgetTitle => 'अगला कार्य';
+
+  @override
+  String get upNextWidgetSubtitle =>
+      'उलटी गिनती के साथ आपका अगला महत्वपूर्ण कार्य या मीटिंग दिखाने वाला कार्ड।';
+
+  @override
+  String get tasksWidgetTitle => 'लंबित कार्य';
+
+  @override
+  String get tasksWidgetSubtitle =>
+      'एक-टैप पूर्णता और स्मार्ट फ़िल्टर के साथ स्क्रॉल करने योग्य कार्य सूची।';
+
+  @override
   String get googleTasksDisconnected => 'Google Tasks डिस्कनेक्ट हो गया';
 
   @override

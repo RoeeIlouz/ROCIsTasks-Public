@@ -6,6 +6,7 @@ import 'package:rocis_tasks/core/services/app_initializer.dart';
 import 'package:rocis_tasks/core/services/calendar_service.dart';
 import 'package:rocis_tasks/core/services/firestore_service.dart';
 import 'package:rocis_tasks/core/services/notification_service.dart';
+import 'package:rocis_tasks/core/services/widget_data_service.dart';
 import 'package:rocis_tasks/features/categories/domain/models/category.dart';
 import 'package:rocis_tasks/features/home/services/full_calendar_widget_service.dart';
 import 'package:rocis_tasks/features/tasks/data/datasources/local_task_source.dart';
@@ -39,6 +40,10 @@ class BackgroundHandler {
       if (taskId != null) {
         await _completeTaskInBackground(taskId);
       }
+    } else if (host.startsWith('today_agenda_')) {
+      await _handleTodayAgendaSync();
+    } else if (host.startsWith('month_agenda_')) {
+      await _handleMonthAgendaSync();
     } else if (host == 'full_calendar_prev' ||
         host == 'full_calendar_next' ||
         host == 'prev_month' ||
@@ -58,6 +63,66 @@ class BackgroundHandler {
       await _handleFullCalendarFilterToggle('rocis');
     } else {
       AppLogger.warning('Unknown host: $host', tag: 'Background');
+    }
+  }
+
+  static Future<void> _handleTodayAgendaSync() async {
+    try {
+      await AppInitializer.initialize(isBackground: true);
+      final calendarService = CalendarService();
+      await calendarService.init();
+
+      final taskSource = LocalTaskSource();
+      await taskSource.init();
+
+      final categories = taskSource.getCategories();
+      Category? getCategoryById(String? id) {
+        if (id == null || id.isEmpty) return null;
+        try {
+          return categories.firstWhere((c) => c.id == id);
+        } catch (_) {
+          return null;
+        }
+      }
+
+      final widgetDataService = WidgetDataService(calendarService);
+      await widgetDataService.updateTodayAgendaWidget(
+        taskSource.getTasks(),
+        getCategoryById,
+        userId: FirebaseAuth.instance.currentUser?.uid,
+      );
+    } catch (e, s) {
+      AppLogger.error('Error handling today agenda sync', error: e, stack: s, tag: 'Background');
+    }
+  }
+
+  static Future<void> _handleMonthAgendaSync() async {
+    try {
+      await AppInitializer.initialize(isBackground: true);
+      final calendarService = CalendarService();
+      await calendarService.init();
+
+      final taskSource = LocalTaskSource();
+      await taskSource.init();
+
+      final categories = taskSource.getCategories();
+      Category? getCategoryById(String? id) {
+        if (id == null || id.isEmpty) return null;
+        try {
+          return categories.firstWhere((c) => c.id == id);
+        } catch (_) {
+          return null;
+        }
+      }
+
+      final widgetDataService = WidgetDataService(calendarService);
+      await widgetDataService.updateMonthAgendaWidget(
+        taskSource.getTasks(),
+        getCategoryById,
+        userId: FirebaseAuth.instance.currentUser?.uid,
+      );
+    } catch (e, s) {
+      AppLogger.error('Error handling month agenda sync', error: e, stack: s, tag: 'Background');
     }
   }
 
@@ -267,6 +332,16 @@ class BackgroundHandler {
         box.values.toList(),
         getCategoryById,
         isDarkText: isDarkText,
+      );
+
+      // Update all new Android widgets in background
+      final calendarService = CalendarService();
+      await calendarService.init();
+      final widgetDataService = WidgetDataService(calendarService);
+      await widgetDataService.updateAllWidgets(
+        box.values.toList(),
+        getCategoryById,
+        userId: currentUser?.uid,
       );
 
       final languageCode = prefs.getString('language_code');

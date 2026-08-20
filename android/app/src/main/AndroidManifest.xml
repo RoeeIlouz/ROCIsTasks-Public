@@ -60,6 +60,63 @@
         <service android:name=".FullCalendarWidgetService"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
 
+        <!-- Today & Day-by-Day Agenda Widget -->
+        <receiver android:name=".TodayAgendaWidgetProvider" android:exported="true" android:label="Day Agenda">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/today_agenda_widget_info" />
+        </receiver>
+
+        <service android:name=".TodayAgendaWidgetService"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
+
+        <!-- Samsung-Style Month + Day Agenda Widget -->
+        <receiver android:name=".MonthAgendaWidgetProvider" android:exported="true" android:label="Month &amp; Agenda">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/month_agenda_widget_info" />
+        </receiver>
+
+        <service android:name=".MonthAgendaWidgetService"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
+
+        <service android:name=".MonthAgendaGridService"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
+
+        <!-- Google-Style Continuous Agenda Timeline Widget -->
+        <receiver android:name=".TimelineAgendaWidgetProvider" android:exported="true" android:label="Schedule Timeline">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/timeline_agenda_widget_info" />
+        </receiver>
+
+        <service android:name=".TimelineAgendaWidgetService"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
+
+        <!-- Quick Action & Progress Ring Widget -->
+        <receiver android:name=".QuickActionWidgetProvider" android:exported="true" android:label="Quick Actions">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/quick_action_widget_info" />
+        </receiver>
+
+        <!-- Up Next Minimalist Pill Widget -->
+        <receiver android:name=".UpNextWidgetProvider" android:exported="true" android:label="Up Next">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/up_next_widget_info" />
+        </receiver>
+
 
         <!-- HomeWidget Background Interactivity -->
         <receiver android:name="es.antonborri.home_widget.HomeWidgetBackgroundReceiver"

@@ -1087,6 +1087,55 @@ class AppLocalizationsDe extends AppLocalizations {
   String get widgetAccentColor => 'Widget-Akzentfarbe';
 
   @override
+  String get widgetSuiteTitle => 'Verfügbare Startbildschirm-Widgets';
+
+  @override
+  String get widgetSuiteSubtitle =>
+      'Wählen Sie aus unseren Widgets. Kostenlose Benutzer können 1 aktives Widget platzieren; Pro-Benutzer unbegrenzt.';
+
+  @override
+  String get todayAgendaWidgetTitle => 'Tagesagenda';
+
+  @override
+  String get todayAgendaWidgetSubtitle =>
+      'Interaktive Tagesübersicht für Aufgaben & Termine mit Direktabschluss.';
+
+  @override
+  String get monthAgendaWidgetTitle => 'Monat & Agenda';
+
+  @override
+  String get monthAgendaWidgetSubtitle =>
+      'Samsung-geteiltes Layout mit Monatskalender und Agenda für das gewählte Datum.';
+
+  @override
+  String get timelineAgendaWidgetTitle => 'Zeitplan-Timeline';
+
+  @override
+  String get timelineAgendaWidgetSubtitle =>
+      'Fortlaufende Google-Timeline für kommende Aufgaben und Termine.';
+
+  @override
+  String get quickActionWidgetTitle => 'Schnellaktionen & Fortschrittsring';
+
+  @override
+  String get quickActionWidgetSubtitle =>
+      'Aufgabenerstellung mit einem Fingertipp und Live-Fortschrittszähler.';
+
+  @override
+  String get upNextWidgetTitle => 'Als Nächstes';
+
+  @override
+  String get upNextWidgetSubtitle =>
+      'Minimalistische Karte für Ihre nächste dringende Aufgabe oder Besprechung mit Countdown.';
+
+  @override
+  String get tasksWidgetTitle => 'Offene Aufgaben';
+
+  @override
+  String get tasksWidgetSubtitle =>
+      'Scrollbare Aufgabenliste mit Direktabschluss und intelligenten Filtern.';
+
+  @override
   String get googleTasksDisconnected => 'Google Tasks getrennt';
 
   @override

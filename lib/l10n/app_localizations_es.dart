@@ -1085,6 +1085,55 @@ class AppLocalizationsEs extends AppLocalizations {
   String get widgetAccentColor => 'Color de acento del widget';
 
   @override
+  String get widgetSuiteTitle => 'Widgets de Pantalla de Inicio';
+
+  @override
+  String get widgetSuiteSubtitle =>
+      'Elige entre nuestra suite de widgets. Los usuarios gratuitos pueden colocar 1 widget activo; usuarios Pro sin límites.';
+
+  @override
+  String get todayAgendaWidgetTitle => 'Agenda del Día';
+
+  @override
+  String get todayAgendaWidgetSubtitle =>
+      'Visor interactivo diario de tareas y eventos con completado inmediato.';
+
+  @override
+  String get monthAgendaWidgetTitle => 'Mes y Agenda';
+
+  @override
+  String get monthAgendaWidgetSubtitle =>
+      'Diseño dividido estilo Samsung con cuadrícula de mes y agenda de la fecha elegida.';
+
+  @override
+  String get timelineAgendaWidgetTitle => 'Línea de Tiempo';
+
+  @override
+  String get timelineAgendaWidgetSubtitle =>
+      'Línea de tiempo continua estilo Google para tareas y eventos de los próximos días.';
+
+  @override
+  String get quickActionWidgetTitle => 'Acciones Rápidas y Anillo';
+
+  @override
+  String get quickActionWidgetSubtitle =>
+      'Crea tareas con un toque y contador de progreso en vivo.';
+
+  @override
+  String get upNextWidgetTitle => 'A Continuación';
+
+  @override
+  String get upNextWidgetSubtitle =>
+      'Tarjeta minimalista que muestra tu próxima tarea o reunión con cuenta regresiva.';
+
+  @override
+  String get tasksWidgetTitle => 'Tareas Pendientes';
+
+  @override
+  String get tasksWidgetSubtitle =>
+      'Lista desplazable de tareas con completado en 1 toque y filtros inteligentes.';
+
+  @override
   String get googleTasksDisconnected => 'Google Tasks Desconectado';
 
   @override

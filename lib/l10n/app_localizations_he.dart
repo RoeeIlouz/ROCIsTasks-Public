@@ -1055,6 +1055,55 @@ class AppLocalizationsHe extends AppLocalizations {
   String get widgetAccentColor => 'צבע הדגשה של הווידג\'ט';
 
   @override
+  String get widgetSuiteTitle => 'ווידג\'טים למסך הבית';
+
+  @override
+  String get widgetSuiteSubtitle =>
+      'בחר מתוך מגוון הווידג\'טים. משתמשים חינמיים יכולים להציב ווידג\'ט 1 פעיל; משתמשי Pro ללא הגבלה.';
+
+  @override
+  String get todayAgendaWidgetTitle => 'אג\'נדה יומית';
+
+  @override
+  String get todayAgendaWidgetSubtitle =>
+      'תצוגת משימות ואירועים יומית אינטראקטיבית עם סימון ביצוע מיידי.';
+
+  @override
+  String get monthAgendaWidgetTitle => 'חודש ואג\'נדה';
+
+  @override
+  String get monthAgendaWidgetSubtitle =>
+      'תצוגה מפוצלת של לוח שנה חודשי ואג\'נדה לתאריך הנבחר.';
+
+  @override
+  String get timelineAgendaWidgetTitle => 'ציר זמן של לו\"ז';
+
+  @override
+  String get timelineAgendaWidgetSubtitle =>
+      'ציר זמן רציף ונגלל של משימות ואירועים לימים הקרובים.';
+
+  @override
+  String get quickActionWidgetTitle => 'פעולות מהירות ומד התקדמות';
+
+  @override
+  String get quickActionWidgetSubtitle =>
+      'יצירת משימה מהירה בלחיצה אחת וטבעת התקדמות חיה.';
+
+  @override
+  String get upNextWidgetTitle => 'הבא בתור';
+
+  @override
+  String get upNextWidgetSubtitle =>
+      'כרטיס מינימליסטי המציג את המשימה או הפגישה הקרובה עם ספירה לאחור.';
+
+  @override
+  String get tasksWidgetTitle => 'משימות לביצוע';
+
+  @override
+  String get tasksWidgetSubtitle =>
+      'רשימת משימות נגללת עם השלמה בלחיצה אחת ומסננים חכמים.';
+
+  @override
   String get googleTasksDisconnected => 'Google Tasks מנותק';
 
   @override
