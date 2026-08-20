@@ -37,29 +37,38 @@ class TaskWidgetProvider : HomeWidgetProvider() {
         appWidgetId: Int,
         widgetData: SharedPreferences
     ) {
+        val isPremium = widgetData.getBoolean("is_premium", false)
+        val isAllowed = WidgetLimitHelper.isWidgetAllowed(context, appWidgetId, isPremium)
         val views = RemoteViews(context.packageName, R.layout.widget_layout)
-        
-        // Setup List Adapter
-        val intent = Intent(context, TaskWidgetService::class.java).apply {
-            putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-            data = Uri.parse("widget://rocis/task/$appWidgetId")
+
+        WidgetLimitHelper.setupProOverlay(context, views, isAllowed)
+
+        if (isAllowed) {
+            // Setup List Adapter
+            val intent = Intent(context, TaskWidgetService::class.java).apply {
+                putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+                data = Uri.parse("widget://rocis/task/$appWidgetId")
+            }
+            views.setRemoteAdapter(R.id.widget_list_view, intent)
+            views.setEmptyView(R.id.widget_list_view, R.id.empty_view)
+
+            // Setup Item Click Template
+            val appIntent = Intent(context, MainActivity::class.java).apply {
+                action = Intent.ACTION_VIEW
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            }
+            val appPendingIntent = android.app.PendingIntent.getActivity(
+                context,
+                201 + appWidgetId,
+                appIntent,
+                android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_MUTABLE
+            )
+            views.setPendingIntentTemplate(R.id.widget_list_view, appPendingIntent)
+
+            // Setup Sort/Filter Buttons
+            updateButtonState(views, widgetData)
+            setupButtonIntents(context, views, appWidgetId)
         }
-        views.setRemoteAdapter(R.id.widget_list_view, intent)
-        views.setEmptyView(R.id.widget_list_view, R.id.empty_view)
-
-        // Setup Item Click Template
-        val appIntent = Intent(context, MainActivity::class.java)
-        val appPendingIntent = android.app.PendingIntent.getActivity(
-            context,
-            201,
-            appIntent,
-            android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_MUTABLE
-        )
-        views.setPendingIntentTemplate(R.id.widget_list_view, appPendingIntent)
-
-        // Setup Sort/Filter Buttons
-        updateButtonState(views, widgetData)
-        setupButtonIntents(context, views, appWidgetId)
 
         appWidgetManager.updateAppWidget(appWidgetId, views)
         appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_list_view)

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_timeline_item_root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingStart="4dp"
+    android:paddingEnd="8dp"
+    android:paddingTop="5dp"
+    android:paddingBottom="5dp"
+    android:background="@drawable/widget_card_bg"
+    android:layout_marginTop="2dp"
+    android:layout_marginBottom="2dp">
+
+    <!-- Category / Event Color Strip -->
+    <View
+        android:id="@+id/widget_timeline_color_strip"
+        android:layout_width="4dp"
+        android:layout_height="32dp"
+        android:background="@color/widget_primary"
+        android:layout_marginEnd="8dp" />
+
+    <!-- Action Checkbox (Tasks) -->
+    <ImageView
+        android:id="@+id/widget_timeline_check"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/ic_circle_outline"
+        android:layout_marginEnd="8dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:contentDescription="Complete Task" />
+
+    <!-- Calendar Icon (Events) -->
+    <ImageView
+        android:id="@+id/widget_timeline_event_icon"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:src="@drawable/ic_calendar_event"
+        android:layout_marginEnd="8dp"
+        android:visibility="gone"
+        android:contentDescription="Calendar Event" />
+
+    <!-- Details Column -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/widget_timeline_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Timeline Item Title"
+                android:textColor="@color/widget_title_text"
+                android:textSize="13sp"
+                android:fontFamily="sans-serif-medium"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+            <TextView
+                android:id="@+id/widget_timeline_badge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="HIGH"
+                android:textSize="9sp"
+                android:textStyle="bold"
+                android:textColor="@color/widget_primary"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="2dp">
+
+            <TextView
+                android:id="@+id/widget_timeline_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="14:00 - 15:30"
+                android:textColor="@color/widget_secondary_text"
+                android:textSize="11sp"
+                android:layout_marginEnd="6dp" />
+
+            <TextView
+                android:id="@+id/widget_timeline_subtitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Work • Office"
+                android:textColor="@color/widget_secondary_text"
+                android:textSize="11sp"
+                android:maxLines="1"
+                android:ellipsize="end" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

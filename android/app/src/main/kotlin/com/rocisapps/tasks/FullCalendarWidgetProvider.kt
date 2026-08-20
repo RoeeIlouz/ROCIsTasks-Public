@@ -198,15 +198,22 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
                 )
                 views.setPendingIntentTemplate(R.id.widget_full_calendar_list, appPendingIntent)
 
-                // 6. Finalize Update
-                // Check Premium Status
+                // 6. Finalize Update - Check Widget Allowance (Free users get 1 active widget, Pro gets unlimited)
                 val isPremium = widgetData.getBoolean("is_premium", false)
-                if (!isPremium) {
+                val isAllowed = WidgetLimitHelper.isWidgetAllowed(context, appWidgetId, isPremium)
+                if (!isAllowed) {
                     views.setViewVisibility(R.id.widget_premium_overlay, android.view.View.VISIBLE)
                     views.setViewVisibility(R.id.widget_full_calendar_list, android.view.View.GONE)
                     views.setViewVisibility(R.id.widget_full_calendar_header, android.view.View.GONE)
                     views.setViewVisibility(R.id.widget_full_calendar_filters, android.view.View.GONE)
                     views.setViewVisibility(R.id.widget_full_calendar_weekdays, android.view.View.GONE)
+
+                    val paywallIntent = HomeWidgetLaunchIntent.getActivity(
+                        context,
+                        MainActivity::class.java,
+                        Uri.parse("rocistasks://paywall")
+                    )
+                    views.setOnClickPendingIntent(R.id.widget_premium_overlay, paywallIntent)
                 } else {
                     views.setViewVisibility(R.id.widget_premium_overlay, android.view.View.GONE)
                     views.setViewVisibility(R.id.widget_full_calendar_list, android.view.View.VISIBLE)

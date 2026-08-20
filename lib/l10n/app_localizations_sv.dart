@@ -1074,6 +1074,55 @@ class AppLocalizationsSv extends AppLocalizations {
   String get widgetAccentColor => 'Widget-accentfärg';
 
   @override
+  String get widgetSuiteTitle => 'Tillgängliga Startskärms-widgets';
+
+  @override
+  String get widgetSuiteSubtitle =>
+      'Välj bland våra widgets. Gratisanvändare kan placera 1 aktiv widget; Pro-användare obegränsat.';
+
+  @override
+  String get todayAgendaWidgetTitle => 'Dagsagenda';
+
+  @override
+  String get todayAgendaWidgetSubtitle =>
+      'Interaktiv dag-för-dag-översikt för uppgifter och händelser med direkt slutförande.';
+
+  @override
+  String get monthAgendaWidgetTitle => 'Månad & Agenda';
+
+  @override
+  String get monthAgendaWidgetSubtitle =>
+      'Samsung-delad layout med månadskalender och agenda för valt datum.';
+
+  @override
+  String get timelineAgendaWidgetTitle => 'Tidslinje';
+
+  @override
+  String get timelineAgendaWidgetSubtitle =>
+      'Kontinuerlig Google-tidslinje för kommande uppgifter och händelser.';
+
+  @override
+  String get quickActionWidgetTitle => 'Snabbåtgärder & Ring';
+
+  @override
+  String get quickActionWidgetSubtitle =>
+      'Skapa uppgifter med ett tryck och se framsteg i realtid.';
+
+  @override
+  String get upNextWidgetTitle => 'Nästa';
+
+  @override
+  String get upNextWidgetSubtitle =>
+      'Minimalistiskt kort som visar din nästa brådskande uppgift eller möte med nedräkning.';
+
+  @override
+  String get tasksWidgetTitle => 'Väntande Uppgifter';
+
+  @override
+  String get tasksWidgetSubtitle =>
+      'Rullbar uppgiftslista med slutförande med ett tryck och smarta filter.';
+
+  @override
   String get googleTasksDisconnected => 'Google Tasks bortkopplad';
 
   @override

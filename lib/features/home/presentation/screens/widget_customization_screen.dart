@@ -134,6 +134,20 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
           ),
           const SizedBox(height: 12),
           _buildTogglesCard(theme, l10n),
+          const SizedBox(height: 24),
+
+          // 5. Available Home Widgets Gallery
+          Text(
+            l10n.widgetSuiteTitle,
+            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            l10n.widgetSuiteSubtitle,
+            style: theme.textTheme.bodySmall?.copyWith(color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.7)),
+          ),
+          const SizedBox(height: 12),
+          _buildWidgetSuiteSection(theme, l10n),
         ],
       ),
     );
@@ -555,4 +569,121 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
       ),
     );
   }
+
+  Widget _buildWidgetSuiteSection(ThemeData theme, AppLocalizations l10n) {
+    final widgets = [
+      {
+        'title': l10n.todayAgendaWidgetTitle,
+        'subtitle': l10n.todayAgendaWidgetSubtitle,
+        'icon': Icons.view_agenda_rounded,
+        'tag': '4x3 / 4x2',
+        'color': const Color(0xFF6C63FF),
+      },
+      {
+        'title': l10n.monthAgendaWidgetTitle,
+        'subtitle': l10n.monthAgendaWidgetSubtitle,
+        'icon': Icons.calendar_view_month_rounded,
+        'tag': '4x4 / 4x3',
+        'color': const Color(0xFF10B981),
+      },
+      {
+        'title': l10n.timelineAgendaWidgetTitle,
+        'subtitle': l10n.timelineAgendaWidgetSubtitle,
+        'icon': Icons.timeline_rounded,
+        'tag': '4x3 / 4x4',
+        'color': const Color(0xFFF59E0B),
+      },
+      {
+        'title': l10n.quickActionWidgetTitle,
+        'subtitle': l10n.quickActionWidgetSubtitle,
+        'icon': Icons.add_task_rounded,
+        'tag': '2x2',
+        'color': const Color(0xFFEF4444),
+      },
+      {
+        'title': l10n.upNextWidgetTitle,
+        'subtitle': l10n.upNextWidgetSubtitle,
+        'icon': Icons.play_arrow_rounded,
+        'tag': '3x1 / 4x1',
+        'color': const Color(0xFF06B6D4),
+      },
+      {
+        'title': l10n.tasksWidgetTitle,
+        'subtitle': l10n.tasksWidgetSubtitle,
+        'icon': Icons.checklist_rounded,
+        'tag': '4x3',
+        'color': const Color(0xFFA855F7),
+      },
+    ];
+
+    return Column(
+      children: widgets.map((w) {
+        final iconColor = w['color'] as Color;
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: GlassContainer(
+            padding: const EdgeInsets.all(14),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: iconColor.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    w['icon'] as IconData,
+                    color: iconColor,
+                    size: 24,
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              w['title'] as String,
+                              style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              w['tag'] as String,
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                                color: theme.colorScheme.primary,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        w['subtitle'] as String,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.75),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
 }
+

@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_today_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_background"
+    android:padding="8dp">
+
+    <!-- Header Section -->
+    <LinearLayout
+        android:id="@+id/widget_today_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingBottom="6dp">
+
+        <TextView
+            android:id="@+id/widget_today_prev"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:gravity="center"
+            android:text="❮"
+            android:textColor="@color/widget_title_text"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?android:attr/selectableItemBackgroundBorderless" />
+
+        <LinearLayout
+            android:id="@+id/widget_today_title_container"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp">
+
+            <TextView
+                android:id="@+id/widget_today_date_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Thursday, Aug 20"
+                android:textColor="@color/widget_title_text"
+                android:textSize="15sp"
+                android:fontFamily="sans-serif-medium"
+                android:textStyle="bold"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+            <TextView
+                android:id="@+id/widget_today_date_subtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Today • 3 tasks, 2 events"
+                android:textColor="@color/widget_secondary_text"
+                android:textSize="11sp"
+                android:maxLines="1"
+                android:ellipsize="end" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/widget_today_next"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:gravity="center"
+            android:text="❯"
+            android:textColor="@color/widget_title_text"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?android:attr/selectableItemBackgroundBorderless" />
+
+        <TextView
+            android:id="@+id/widget_today_jump_btn"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:gravity="center"
+            android:text="⦿"
+            android:textColor="@color/widget_primary"
+            android:textSize="18sp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?android:attr/selectableItemBackgroundBorderless" />
+
+        <TextView
+            android:id="@+id/widget_today_add_btn"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:gravity="center"
+            android:text="+"
+            android:textColor="@color/widget_primary"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?android:attr/selectableItemBackgroundBorderless" />
+    </LinearLayout>
+
+    <!-- Divider Line -->
+    <View
+        android:id="@+id/widget_today_divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@id/widget_today_header"
+        android:background="#20888888"
+        android:layout_marginBottom="4dp" />
+
+    <!-- List View -->
+    <ListView
+        android:id="@+id/widget_today_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/widget_today_divider"
+        android:divider="@null"
+        android:dividerHeight="4dp" />
+
+    <!-- Empty State -->
+    <LinearLayout
+        android:id="@+id/widget_today_empty"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/widget_today_divider"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="16dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/widget_today_empty_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No tasks or events"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="@color/widget_secondary_text" />
+
+        <TextView
+            android:id="@+id/widget_today_empty_subtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tap + to add a task"
+            android:textSize="12sp"
+            android:textColor="@color/widget_secondary_text"
+            android:layout_marginTop="4dp" />
+    </LinearLayout>
+
+    <!-- Pro Limit / Upgrade Overlay -->
+    <RelativeLayout
+        android:id="@+id/widget_pro_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#E6121212"
+        android:padding="16dp"
+        android:gravity="center"
+        android:visibility="gone"
+        android:clickable="true"
+        android:focusable="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_lock_pro"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/widget_pro_overlay_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Free 1-Widget Limit"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:gravity="center" />
+
+            <TextView
+                android:id="@+id/widget_pro_overlay_desc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Free tier includes 1 active widget. Upgrade to Pro for unlimited home screen widgets!"
+                android:textColor="#CCCCCC"
+                android:textSize="12sp"
+                android:gravity="center"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="12dp" />
+
+            <TextView
+                android:id="@+id/widget_pro_overlay_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Unlock Unlimited Widgets"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:background="@drawable/widget_pill_bg"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:clickable="true"
+                android:focusable="true" />
+        </LinearLayout>
+    </RelativeLayout>
+
+</RelativeLayout>

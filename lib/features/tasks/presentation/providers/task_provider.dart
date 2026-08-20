@@ -770,13 +770,13 @@ class TaskProvider extends ChangeNotifier {
           _widgetDataService.setUserEmail(userEmail);
           _fullCalendarWidgetService.setUserEmail(userEmail);
 
-          await _widgetDataService.updateMonthEventsMap(
-            tasksForPublicSurfaces,
-            userId: userId,
-          );
-          await _widgetDataService.updateScheduleWidget(
+          await _widgetDataService.updateAllWidgets(
             tasksForPublicSurfaces,
             getCategoryById,
+            userId: userId,
+          );
+          await _widgetDataService.updateMonthEventsMap(
+            tasksForPublicSurfaces,
             userId: userId,
           );
           await _widgetDataService.updateCalendarListWidget(

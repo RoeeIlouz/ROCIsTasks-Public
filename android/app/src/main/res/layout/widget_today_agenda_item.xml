@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_agenda_item_root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingStart="4dp"
+    android:paddingEnd="8dp"
+    android:paddingTop="6dp"
+    android:paddingBottom="6dp"
+    android:background="@drawable/widget_card_bg">
+
+    <!-- Category / Calendar Color Strip -->
+    <View
+        android:id="@+id/widget_agenda_color_strip"
+        android:layout_width="4dp"
+        android:layout_height="32dp"
+        android:background="@color/widget_primary"
+        android:layout_marginEnd="8dp" />
+
+    <!-- Action Checkbox (Visible for Tasks) -->
+    <ImageView
+        android:id="@+id/widget_agenda_check"
+        android:layout_width="26dp"
+        android:layout_height="26dp"
+        android:src="@drawable/ic_circle_outline"
+        android:layout_marginEnd="8dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:contentDescription="Complete Task" />
+
+    <!-- Event Calendar Icon (Visible for Events) -->
+    <ImageView
+        android:id="@+id/widget_agenda_event_icon"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        android:src="@drawable/ic_calendar_event"
+        android:layout_marginEnd="8dp"
+        android:visibility="gone"
+        android:contentDescription="Calendar Event" />
+
+    <!-- Content Details -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/widget_agenda_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Task or Event Title"
+                android:textColor="@color/widget_title_text"
+                android:textSize="13sp"
+                android:fontFamily="sans-serif-medium"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+            <TextView
+                android:id="@+id/widget_agenda_badge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="HIGH"
+                android:textSize="9sp"
+                android:textStyle="bold"
+                android:textColor="@color/widget_primary"
+                android:paddingStart="4dp"
+                android:paddingEnd="4dp"
+                android:paddingTop="1dp"
+                android:paddingBottom="1dp"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="2dp">
+
+            <TextView
+                android:id="@+id/widget_agenda_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="09:00 - 10:00"
+                android:textColor="@color/widget_secondary_text"
+                android:textSize="11sp"
+                android:layout_marginEnd="6dp" />
+
+            <TextView
+                android:id="@+id/widget_agenda_subtitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Work • Conference Room"
+                android:textColor="@color/widget_secondary_text"
+                android:textSize="11sp"
+                android:maxLines="1"
+                android:ellipsize="end" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

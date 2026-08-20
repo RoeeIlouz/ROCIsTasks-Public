@@ -1086,6 +1086,55 @@ class AppLocalizationsFr extends AppLocalizations {
   String get widgetAccentColor => 'Couleur d\'accentuation du widget';
 
   @override
+  String get widgetSuiteTitle => 'Widgets d\'écran d\'accueil';
+
+  @override
+  String get widgetSuiteSubtitle =>
+      'Choisissez parmi notre collection de widgets. 1 widget actif pour les utilisateurs gratuits; illimité pour Pro.';
+
+  @override
+  String get todayAgendaWidgetTitle => 'Agenda du jour';
+
+  @override
+  String get todayAgendaWidgetSubtitle =>
+      'Affichage interactif des tâches et événements du jour avec validation instantanée.';
+
+  @override
+  String get monthAgendaWidgetTitle => 'Mois & Agenda';
+
+  @override
+  String get monthAgendaWidgetSubtitle =>
+      'Disposition fractionnée style Samsung avec grille mensuelle et agenda de la date sélectionnée.';
+
+  @override
+  String get timelineAgendaWidgetTitle => 'Chronologie du planning';
+
+  @override
+  String get timelineAgendaWidgetSubtitle =>
+      'Chronologie continue style Google pour vos tâches et événements à venir.';
+
+  @override
+  String get quickActionWidgetTitle => 'Actions rapides & Anneau';
+
+  @override
+  String get quickActionWidgetSubtitle =>
+      'Création de tâches en 1 clic avec anneau de progression en direct.';
+
+  @override
+  String get upNextWidgetTitle => 'À suivre';
+
+  @override
+  String get upNextWidgetSubtitle =>
+      'Carte minimaliste affichant votre prochaine tâche ou réunion avec compte à rebours.';
+
+  @override
+  String get tasksWidgetTitle => 'Tâches en attente';
+
+  @override
+  String get tasksWidgetSubtitle =>
+      'Liste de tâches défilante avec validation en un clic et filtres intelligents.';
+
+  @override
   String get googleTasksDisconnected => 'Google Tasks Déconnecté';
 
   @override

@@ -5,12 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.2.8+78] - 2026-08-18
+## [0.2.9+79] - 2026-08-20
 
 ### Added
-- Custom Lines: Add contacts, locations, web links, and custom notes to tasks.
-- Tap-to-Act: Tap phone numbers to dial, emails to mail, locations to open Maps, and URLs to open browser.
-- Interactive action cards on Task Details and compact indicators in task lists.
+- Complete Android Home Screen Widgets suite: Day Agenda, Samsung-style Month & Agenda, Google-style Schedule Timeline, Quick Actions, and Up Next Pill.
+- Direct one-tap task completion from all home widgets.
+- Freemium widget limits: 1 active widget on Free tier, unlimited widgets on Pro.
+
+## [0.2.8+78] - 2026-08-20
+
+### Added
+- Lifetime Pro plan tier on Web paywall ($49.99 one-time purchase).
+- Revamped Onboarding showcasing Google Tasks/Calendar sync and glassmorphism.
+- Guest Mode & Delayed Authentication: explore the full app without sign-in friction.
+- Custom action lines on tasks (contacts, locations, web links).
 
 ## [0.2.7+77] - 2026-08-18
 

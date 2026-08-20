@@ -1056,6 +1056,55 @@ class AppLocalizationsAr extends AppLocalizations {
   String get widgetAccentColor => 'لون تمييز الأداة';
 
   @override
+  String get widgetSuiteTitle => 'أدوات الشاشة الرئيسية';
+
+  @override
+  String get widgetSuiteSubtitle =>
+      'اختر من مجموعتنا من الأدوات. يمكن للمستخدمين المجانيين وضع أداة واحدة نشطة؛ ومستخدمو Pro بلا حدود.';
+
+  @override
+  String get todayAgendaWidgetTitle => 'أجندة اليوم';
+
+  @override
+  String get todayAgendaWidgetSubtitle =>
+      'عرض تفاعلي يومي للمهام والأحداث مع إكمال فوري.';
+
+  @override
+  String get monthAgendaWidgetTitle => 'الشهر والأجندة';
+
+  @override
+  String get monthAgendaWidgetSubtitle =>
+      'تصميم مقسم لشبكة التقويم الشهري وأجندة التاريخ المحدد.';
+
+  @override
+  String get timelineAgendaWidgetTitle => 'الجدول الزمني';
+
+  @override
+  String get timelineAgendaWidgetSubtitle =>
+      'جدول زمني متواصل وقابل للتمرير للمهام والأحداث القادمة.';
+
+  @override
+  String get quickActionWidgetTitle => 'إجراءات سريعة وحلقة التقدم';
+
+  @override
+  String get quickActionWidgetSubtitle =>
+      'إنشاء مهام بنقرة واحدة مع مؤشر تقدم حي.';
+
+  @override
+  String get upNextWidgetTitle => 'التالي مباشرة';
+
+  @override
+  String get upNextWidgetSubtitle =>
+      'بطاقة مبسطة تعرض مهمتك أو اجتماعك القادم مع عد تنازلي.';
+
+  @override
+  String get tasksWidgetTitle => 'المهام المعلقة';
+
+  @override
+  String get tasksWidgetSubtitle =>
+      'قائمة مهام قابلة للتمرير مع إكمال بنقرة واحدة وفلاتر ذكية.';
+
+  @override
   String get googleTasksDisconnected => 'تم قطع اتصال Google Tasks';
 
   @override

@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_up_next_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_background"
+    android:padding="8dp">
+
+    <LinearLayout
+        android:id="@+id/widget_up_next_main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <!-- Color Accent Strip -->
+        <View
+            android:id="@+id/widget_up_next_color_strip"
+            android:layout_width="4dp"
+            android:layout_height="match_parent"
+            android:background="@color/widget_primary"
+            android:layout_marginEnd="8dp" />
+
+        <!-- Checkbox / Action (for tasks) -->
+        <ImageView
+            android:id="@+id/widget_up_next_check"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:src="@drawable/ic_circle_outline"
+            android:layout_marginEnd="8dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="Complete Task" />
+
+        <!-- Event Icon (for events) -->
+        <ImageView
+            android:id="@+id/widget_up_next_event_icon"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:src="@drawable/ic_calendar_event"
+            android:layout_marginEnd="8dp"
+            android:visibility="gone"
+            android:contentDescription="Calendar Event" />
+
+        <!-- Title & Subtitle -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/widget_up_next_header_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="UP NEXT"
+                android:textColor="@color/widget_primary"
+                android:textSize="9sp"
+                android:fontFamily="sans-serif-medium"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/widget_up_next_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Next Task or Meeting"
+                android:textColor="@color/widget_title_text"
+                android:textSize="13sp"
+                android:fontFamily="sans-serif-medium"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+            <TextView
+                android:id="@+id/widget_up_next_subtitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Work • Office"
+                android:textColor="@color/widget_secondary_text"
+                android:textSize="11sp"
+                android:maxLines="1"
+                android:ellipsize="end" />
+        </LinearLayout>
+
+        <!-- Time Badge -->
+        <TextView
+            android:id="@+id/widget_up_next_time_badge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="In 25m"
+            android:textColor="@color/widget_primary"
+            android:textSize="11sp"
+            android:fontFamily="sans-serif-medium"
+            android:textStyle="bold"
+            android:background="@drawable/widget_pill_bg"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:layout_marginStart="6dp" />
+    </LinearLayout>
+
+    <!-- Pro Limit Overlay -->
+    <RelativeLayout
+        android:id="@+id/widget_pro_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#E6121212"
+        android:padding="8dp"
+        android:gravity="center"
+        android:visibility="gone"
+        android:clickable="true"
+        android:focusable="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_lock_pro"
+                android:layout_marginEnd="6dp" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="1-Widget Free Limit"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/widget_pro_overlay_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Unlock Pro"
+                android:textColor="#FFFFFF"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:background="@drawable/widget_pill_bg"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:clickable="true"
+                android:focusable="true" />
+        </LinearLayout>
+    </RelativeLayout>
+
+</RelativeLayout>

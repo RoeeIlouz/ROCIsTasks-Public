@@ -2113,6 +2113,90 @@ abstract class AppLocalizations {
   /// **'Widget Accent Color'**
   String get widgetAccentColor;
 
+  /// No description provided for @widgetSuiteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Available Home Widgets'**
+  String get widgetSuiteTitle;
+
+  /// No description provided for @widgetSuiteSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose from our suite of widgets. Free users can place 1 active widget on screen; Pro users can place unlimited widgets.'**
+  String get widgetSuiteSubtitle;
+
+  /// No description provided for @todayAgendaWidgetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Day Agenda'**
+  String get todayAgendaWidgetTitle;
+
+  /// No description provided for @todayAgendaWidgetSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Interactive day-by-day task & event viewer with instant completion.'**
+  String get todayAgendaWidgetSubtitle;
+
+  /// No description provided for @monthAgendaWidgetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Month & Agenda'**
+  String get monthAgendaWidgetTitle;
+
+  /// No description provided for @monthAgendaWidgetSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Samsung-style split layout with monthly calendar grid and selected date agenda.'**
+  String get monthAgendaWidgetSubtitle;
+
+  /// No description provided for @timelineAgendaWidgetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Schedule Timeline'**
+  String get timelineAgendaWidgetTitle;
+
+  /// No description provided for @timelineAgendaWidgetSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Google-style continuous multi-day scrollable agenda timeline.'**
+  String get timelineAgendaWidgetSubtitle;
+
+  /// No description provided for @quickActionWidgetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick Actions & Ring'**
+  String get quickActionWidgetTitle;
+
+  /// No description provided for @quickActionWidgetSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'One-tap task creation with live completion progress counter.'**
+  String get quickActionWidgetSubtitle;
+
+  /// No description provided for @upNextWidgetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Up Next Pill'**
+  String get upNextWidgetTitle;
+
+  /// No description provided for @upNextWidgetSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Minimalist card showing your next urgent task or meeting with countdown badge.'**
+  String get upNextWidgetSubtitle;
+
+  /// No description provided for @tasksWidgetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending Tasks'**
+  String get tasksWidgetTitle;
+
+  /// No description provided for @tasksWidgetSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Scrollable task list with one-tap completion and smart filters.'**
+  String get tasksWidgetSubtitle;
+
   /// No description provided for @googleTasksDisconnected.
   ///
   /// In en, this message translates to:

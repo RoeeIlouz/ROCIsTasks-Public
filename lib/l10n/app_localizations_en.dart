@@ -1063,6 +1063,55 @@ class AppLocalizationsEn extends AppLocalizations {
   String get widgetAccentColor => 'Widget Accent Color';
 
   @override
+  String get widgetSuiteTitle => 'Available Home Widgets';
+
+  @override
+  String get widgetSuiteSubtitle =>
+      'Choose from our suite of widgets. Free users can place 1 active widget on screen; Pro users can place unlimited widgets.';
+
+  @override
+  String get todayAgendaWidgetTitle => 'Day Agenda';
+
+  @override
+  String get todayAgendaWidgetSubtitle =>
+      'Interactive day-by-day task & event viewer with instant completion.';
+
+  @override
+  String get monthAgendaWidgetTitle => 'Month & Agenda';
+
+  @override
+  String get monthAgendaWidgetSubtitle =>
+      'Samsung-style split layout with monthly calendar grid and selected date agenda.';
+
+  @override
+  String get timelineAgendaWidgetTitle => 'Schedule Timeline';
+
+  @override
+  String get timelineAgendaWidgetSubtitle =>
+      'Google-style continuous multi-day scrollable agenda timeline.';
+
+  @override
+  String get quickActionWidgetTitle => 'Quick Actions & Ring';
+
+  @override
+  String get quickActionWidgetSubtitle =>
+      'One-tap task creation with live completion progress counter.';
+
+  @override
+  String get upNextWidgetTitle => 'Up Next Pill';
+
+  @override
+  String get upNextWidgetSubtitle =>
+      'Minimalist card showing your next urgent task or meeting with countdown badge.';
+
+  @override
+  String get tasksWidgetTitle => 'Pending Tasks';
+
+  @override
+  String get tasksWidgetSubtitle =>
+      'Scrollable task list with one-tap completion and smart filters.';
+
+  @override
   String get googleTasksDisconnected => 'Google Tasks Disconnected';
 
   @override
