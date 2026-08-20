@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.7+75] - 2026-08-20
+
+### Added
+- Guest Mode / Delayed Auth: try the full app instantly without signing in.
+- Lifetime Pro License tier option on web paywall.
+- Revamped onboarding highlighting Google Tasks 2-way sync and glassmorphism.
+- Multilingual support for all new guest and lifetime plan features.
+
 ## [0.2.6+74] - 2026-08-13
 
 ### Fixed

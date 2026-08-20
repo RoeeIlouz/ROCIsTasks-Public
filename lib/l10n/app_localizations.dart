@@ -1114,37 +1114,37 @@ abstract class AppLocalizations {
   /// No description provided for @onboardingWelcomeTitle.
   ///
   /// In en, this message translates to:
-  /// **'Welcome to ROCI\'s Tasks'**
+  /// **'Google Tasks & Calendar Sync'**
   String get onboardingWelcomeTitle;
 
   /// No description provided for @onboardingWelcomeDesc.
   ///
   /// In en, this message translates to:
-  /// **'Organize your life with efficiency and style.'**
+  /// **'Seamless 2-way sync with Google Tasks and unified calendar time-blocking in one place.'**
   String get onboardingWelcomeDesc;
 
   /// No description provided for @onboardingSyncTitle.
   ///
   /// In en, this message translates to:
-  /// **'Sync & Offline'**
+  /// **'Glassmorphic Aesthetics'**
   String get onboardingSyncTitle;
 
   /// No description provided for @onboardingSyncDesc.
   ///
   /// In en, this message translates to:
-  /// **'Your tasks follow you everywhere. Access them even without an internet connection.'**
+  /// **'A modern design engine with dynamic wallpaper colors, glowing priorities, and fluid animations.'**
   String get onboardingSyncDesc;
 
   /// No description provided for @onboardingGesturesTitle.
   ///
   /// In en, this message translates to:
-  /// **'Smart Gestures'**
+  /// **'Interactive Widgets & Habits'**
   String get onboardingGesturesTitle;
 
   /// No description provided for @onboardingGesturesDesc.
   ///
   /// In en, this message translates to:
-  /// **'Swipe left to delete, swipe right to complete. Long press for more options.'**
+  /// **'Complete tasks directly from your home screen and build lasting daily routines.'**
   String get onboardingGesturesDesc;
 
   /// No description provided for @getStarted.
@@ -2262,6 +2262,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Search timezone...'**
   String get searchTimezone;
+
+  /// No description provided for @continueAsGuest.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue as Guest'**
+  String get continueAsGuest;
+
+  /// No description provided for @continueAsGuestSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Use locally without an account'**
+  String get continueAsGuestSubtitle;
+
+  /// No description provided for @guestModeBannerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Offline Guest Mode'**
+  String get guestModeBannerTitle;
+
+  /// No description provided for @guestModeBannerSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to sync with Google Tasks and backup your data across devices.'**
+  String get guestModeBannerSubtitle;
+
+  /// No description provided for @signInNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign In'**
+  String get signInNow;
+
+  /// No description provided for @guestAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest Account'**
+  String get guestAccount;
+
+  /// No description provided for @linkAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Link / Sign In Account'**
+  String get linkAccount;
+
+  /// No description provided for @lifetimePlanTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Lifetime Plan'**
+  String get lifetimePlanTitle;
+
+  /// No description provided for @lifetimePlanPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'\$49.99 one-time'**
+  String get lifetimePlanPrice;
+
+  /// No description provided for @lifetimePlanBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Best Value'**
+  String get lifetimePlanBadge;
+
+  /// No description provided for @lifetimePlanSaving.
+  ///
+  /// In en, this message translates to:
+  /// **'Pay Once'**
+  String get lifetimePlanSaving;
 }
 
 class _AppLocalizationsDelegate

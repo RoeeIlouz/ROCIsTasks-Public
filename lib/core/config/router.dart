@@ -30,6 +30,8 @@ class AppRouter {
     ],
     redirect: (context, state) {
       final isLoggedIn = authService.currentUser != null;
+      final isGuest = authService.isGuestMode;
+      final hasAccess = isLoggedIn || isGuest;
       final isOnboardingComplete = onboardingService.hasSeenOnboarding;
       final isLoggingIn = state.uri.path == '/login';
       final isOnboarding = state.uri.path == '/onboarding';
@@ -38,11 +40,15 @@ class AppRouter {
         return isOnboarding ? null : '/onboarding';
       }
 
-      if (!isLoggedIn) {
+      if (!hasAccess) {
         return isLoggingIn ? null : '/login';
       }
 
-      if (isLoggingIn || isOnboarding) {
+      if (isOnboarding) {
+        return '/';
+      }
+
+      if (isLoggingIn && isLoggedIn) {
         return '/';
       }
 

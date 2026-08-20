@@ -530,25 +530,25 @@ class AppLocalizationsHi extends AppLocalizations {
   String get signInFailed => 'साइन इन विफल रहा';
 
   @override
-  String get onboardingWelcomeTitle => 'ROCI\'s Tasks में आपका स्वागत है';
+  String get onboardingWelcomeTitle => 'Google Tasks और कैलेंडर सिंक';
 
   @override
   String get onboardingWelcomeDesc =>
-      'दक्षता और शैली के साथ अपने जीवन को व्यवस्थित करें।';
+      'Google Tasks के साथ सहज 2-वे सिंक और एक ही स्थान पर समय प्रबंधन।';
 
   @override
-  String get onboardingSyncTitle => 'सिंक और ऑफ़लाइन';
+  String get onboardingSyncTitle => 'ग्लासमॉर्फ़िज्म डिज़ाइन';
 
   @override
   String get onboardingSyncDesc =>
-      'आपके कार्य हर जगह आपके साथ हैं। इंटरनेट कनेक्शन के बिना भी उन्हें एक्सेस करें।';
+      'डायनामिक वॉलपेपर रंगों, चमकदार प्राथमिकताओं और सहज एनिमेशन के साथ आधुनिक डिज़ाइन।';
 
   @override
-  String get onboardingGesturesTitle => 'स्मार्ट जेस्चर';
+  String get onboardingGesturesTitle => 'इंटरएक्टिव विजेट्स और आदतें';
 
   @override
   String get onboardingGesturesDesc =>
-      'हटाने के लिए बाएं स्वाइप करें, पूरा करने के लिए दाएं स्वाइप करें। अधिक विकल्पों के लिए दबाकर रखें।';
+      'अपनी होम स्क्रीन से सीधे कार्यों को पूरा करें और दैनिक आदतें बनाएं।';
 
   @override
   String get getStarted => 'प्रारंभ करें';
@@ -1150,4 +1150,39 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get searchTimezone => 'समय क्षेत्र खोजें...';
+
+  @override
+  String get continueAsGuest => 'अतिथि के रूप में जारी रखें';
+
+  @override
+  String get continueAsGuestSubtitle =>
+      'बिना खाते के स्थानीय रूप से उपयोग करें';
+
+  @override
+  String get guestModeBannerTitle => 'ऑफ़लाइन अतिथि मोड';
+
+  @override
+  String get guestModeBannerSubtitle =>
+      'Google Tasks के साथ सिंक करने और क्लाउड पर बैकअप लेने के लिए साइन इन करें।';
+
+  @override
+  String get signInNow => 'साइन इन करें';
+
+  @override
+  String get guestAccount => 'अतिथि खाता';
+
+  @override
+  String get linkAccount => 'खाता लिंक / साइन इन करें';
+
+  @override
+  String get lifetimePlanTitle => 'लाइफटाइम प्लान';
+
+  @override
+  String get lifetimePlanPrice => '\$49.99 एकमुश्त';
+
+  @override
+  String get lifetimePlanBadge => 'सर्वश्रेष्ठ मूल्य';
+
+  @override
+  String get lifetimePlanSaving => 'एक बार भुगतान करें';
 }

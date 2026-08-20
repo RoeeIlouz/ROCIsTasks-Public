@@ -531,25 +531,25 @@ class AppLocalizationsSv extends AppLocalizations {
   String get signInFailed => 'Inloggningen misslyckades';
 
   @override
-  String get onboardingWelcomeTitle => 'Välkommen till ROCI\'s Tasks';
+  String get onboardingWelcomeTitle => 'Synka Google Tasks & Kalender';
 
   @override
   String get onboardingWelcomeDesc =>
-      'Organisera ditt liv med effektivitet och stil.';
+      'Sömlös tvåvägssynk med Google Tasks och tidsblockering på ett ställe.';
 
   @override
-  String get onboardingSyncTitle => 'Synk & offline';
+  String get onboardingSyncTitle => 'Glassmorphism-estetik';
 
   @override
   String get onboardingSyncDesc =>
-      'Dina uppgifter följer med dig överallt. Få tillgång till dem även utan internetanslutning.';
+      'En modern design med dynamiska färger, lysande prioritetsikoner och mjuka animationer.';
 
   @override
-  String get onboardingGesturesTitle => 'Smarta gester';
+  String get onboardingGesturesTitle => 'Interaktiva widgets & vanor';
 
   @override
   String get onboardingGesturesDesc =>
-      'Svep åt höger för att slutföra en uppgift, svep åt vänster för att ta bort. Långpressa för fler alternativ.';
+      'Bocka av uppgifter direkt från hemskärmen och skapa dagliga rutiner.';
 
   @override
   String get getStarted => 'Kom igång';
@@ -1153,4 +1153,38 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get searchTimezone => 'Sök tidszon...';
+
+  @override
+  String get continueAsGuest => 'Fortsätt som gäst';
+
+  @override
+  String get continueAsGuestSubtitle => 'Använd lokalt utan konto';
+
+  @override
+  String get guestModeBannerTitle => 'Offlineläge som gäst';
+
+  @override
+  String get guestModeBannerSubtitle =>
+      'Logga in för att synka med Google Tasks och säkerhetskopiera till molnet.';
+
+  @override
+  String get signInNow => 'Logga in';
+
+  @override
+  String get guestAccount => 'Gästkonto';
+
+  @override
+  String get linkAccount => 'Koppla / Logga in konto';
+
+  @override
+  String get lifetimePlanTitle => 'Livstidsåtkomst';
+
+  @override
+  String get lifetimePlanPrice => '49,99 \$ engångsavgift';
+
+  @override
+  String get lifetimePlanBadge => 'Bästa värde';
+
+  @override
+  String get lifetimePlanSaving => 'Engångsbetalning';
 }

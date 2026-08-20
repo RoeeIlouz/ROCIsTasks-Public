@@ -116,5 +116,22 @@ void main() {
       // Should have a text button or similar for register navigation
       expect(find.byType(TextButton), findsWidgets);
     });
+
+    testWidgets('renders Continue as Guest button and calls continueAsGuest on tap', (tester) async {
+      when(() => mockAuthService.continueAsGuest()).thenAnswer((_) async {});
+
+      await tester.pumpWidget(createWidgetUnderTest());
+      await tester.pumpAndSettle();
+
+      final guestButton = find.widgetWithText(TextButton, 'Continue as Guest');
+      expect(guestButton, findsOneWidget);
+
+      await tester.ensureVisible(guestButton);
+      await tester.pumpAndSettle();
+      await tester.tap(guestButton);
+      await tester.pumpAndSettle();
+
+      verify(() => mockAuthService.continueAsGuest()).called(1);
+    });
   });
 }

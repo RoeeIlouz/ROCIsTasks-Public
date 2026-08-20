@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:rocis_tasks/core/services/auth_service.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
@@ -32,7 +33,11 @@ class _LoginScreenState extends State<LoginScreen> {
     if (mounted) {
       setState(() => _isLoading = false);
       if (userCredential != null) {
-        // Navigation is handled by the auth stream listener in main or wrapper
+        if (Navigator.canPop(context)) {
+          Navigator.pop(context);
+        } else if (GoRouter.maybeOf(context) != null) {
+          context.go('/');
+        }
       } else {
         final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(
@@ -49,11 +54,17 @@ class _LoginScreenState extends State<LoginScreen> {
     final authService = Provider.of<AuthService>(context, listen: false);
     
     try {
-      await authService.signInWithEmailAndPassword(
+      final userCredential = await authService.signInWithEmailAndPassword(
         _emailController.text.trim(),
         _passwordController.text,
       );
-      // Navigation is handled by the auth stream listener
+      if (mounted && userCredential != null) {
+        if (Navigator.canPop(context)) {
+          Navigator.pop(context);
+        } else if (GoRouter.maybeOf(context) != null) {
+          context.go('/');
+        }
+      }
     } catch (e) {
       if (mounted) {
         final l10n = AppLocalizations.of(context)!;
@@ -203,7 +214,27 @@ class _LoginScreenState extends State<LoginScreen> {
                           padding: const EdgeInsets.symmetric(vertical: 16),
                         ),
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 12),
+                      TextButton.icon(
+                        onPressed: () async {
+                          final authService = Provider.of<AuthService>(context, listen: false);
+                          await authService.continueAsGuest();
+                          if (context.mounted) {
+                            if (Navigator.canPop(context)) {
+                              Navigator.pop(context);
+                            } else if (GoRouter.maybeOf(context) != null) {
+                              context.go('/');
+                            }
+                          }
+                        },
+                        icon: const Icon(Icons.person_outline_rounded),
+                        label: Text(l10n.continueAsGuest),
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          foregroundColor: Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
                       TextButton(
                         onPressed: () {
                           Navigator.push(

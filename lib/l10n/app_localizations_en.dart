@@ -528,25 +528,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get signInFailed => 'Sign in failed';
 
   @override
-  String get onboardingWelcomeTitle => 'Welcome to ROCI\'s Tasks';
+  String get onboardingWelcomeTitle => 'Google Tasks & Calendar Sync';
 
   @override
   String get onboardingWelcomeDesc =>
-      'Organize your life with efficiency and style.';
+      'Seamless 2-way sync with Google Tasks and unified calendar time-blocking in one place.';
 
   @override
-  String get onboardingSyncTitle => 'Sync & Offline';
+  String get onboardingSyncTitle => 'Glassmorphic Aesthetics';
 
   @override
   String get onboardingSyncDesc =>
-      'Your tasks follow you everywhere. Access them even without an internet connection.';
+      'A modern design engine with dynamic wallpaper colors, glowing priorities, and fluid animations.';
 
   @override
-  String get onboardingGesturesTitle => 'Smart Gestures';
+  String get onboardingGesturesTitle => 'Interactive Widgets & Habits';
 
   @override
   String get onboardingGesturesDesc =>
-      'Swipe left to delete, swipe right to complete. Long press for more options.';
+      'Complete tasks directly from your home screen and build lasting daily routines.';
 
   @override
   String get getStarted => 'Get Started';
@@ -1142,4 +1142,38 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get searchTimezone => 'Search timezone...';
+
+  @override
+  String get continueAsGuest => 'Continue as Guest';
+
+  @override
+  String get continueAsGuestSubtitle => 'Use locally without an account';
+
+  @override
+  String get guestModeBannerTitle => 'Offline Guest Mode';
+
+  @override
+  String get guestModeBannerSubtitle =>
+      'Sign in to sync with Google Tasks and backup your data across devices.';
+
+  @override
+  String get signInNow => 'Sign In';
+
+  @override
+  String get guestAccount => 'Guest Account';
+
+  @override
+  String get linkAccount => 'Link / Sign In Account';
+
+  @override
+  String get lifetimePlanTitle => 'Lifetime Plan';
+
+  @override
+  String get lifetimePlanPrice => '\$49.99 one-time';
+
+  @override
+  String get lifetimePlanBadge => 'Best Value';
+
+  @override
+  String get lifetimePlanSaving => 'Pay Once';
 }

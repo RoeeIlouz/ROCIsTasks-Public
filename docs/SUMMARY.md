@@ -2,6 +2,34 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## Guest Mode, Lifetime Paywall Plan & Onboarding Revamp - 2026-08-20
+
+#### Goals / Requirements
+* Eliminate signup friction with **Guest Mode / Delayed Authentication** (try all features immediately).
+* Add a **Lifetime Pro Plan** on the Web Paywall to maximize conversion from users resisting subscriptions.
+* Revamp **Onboarding Screen** to emphasize Google Tasks & Calendar 2-Way Sync, Glassmorphism UI, and Widgets.
+* Maintain 100% localization (8 languages), unit tests, and version synchronization.
+
+#### Changes/Fixes
+1. **Guest Mode Core & Routing (`auth_service.dart`, `router.dart`)**:
+   - Added `isGuestMode`, `continueAsGuest()`, and `exitGuestMode()` in `AuthService` with persistent `SharedPreferences` flag `is_guest_mode`.
+   - Updated `AppRouter` redirect logic to grant immediate app access to guests (`hasAccess = isLoggedIn || isGuestMode`).
+   - Automatically cleans up guest mode upon Google/Email authentication or explicit sign-out.
+2. **Guest Mode UI & Banners (`login_screen.dart`, `settings_screen.dart`, `task_list_screen.dart`)**:
+   - Added *"Continue as Guest"* action with person icon on `LoginScreen`.
+   - Added guest status card in `SettingsScreen` with direct *"Sign In"* CTA and omitted unnecessary sign-out actions for guests.
+   - Added a dismissible/non-intrusive `GlassContainer` guest banner on `TaskListView` encouraging users to sign in to sync with Google Tasks and secure cloud backups.
+3. **Lifetime Pro Web Paywall (`app_config.dart`, `paywall_screen.dart`)**:
+   - Configured `AppConfig.lemonSqueezyLifetimeUrl` checkout link.
+   - Replaced 2-card web paywall layout with a 3-tier responsive selector (Monthly, Yearly with savings badge, Lifetime with Best Value badge).
+4. **Onboarding Screen Revamp (`onboarding_screen.dart`)**:
+   - Updated onboarding slides and iconography to showcase Google Tasks 2-way sync (`Icons.sync_alt_rounded`), Glassmorphic design (`Icons.auto_awesome_rounded`), and interactive widgets/habits (`Icons.widgets_rounded`).
+5. **Localization & Testing**:
+   - Added all new strings across 8 languages (`en`, `he`, `es`, `fr`, `de`, `ar`, `sv`, `hi`) and ran `flutter gen-l10n`.
+   - Added unit test in `login_screen_test.dart` for guest mode flow.
+   - Verified `flutter analyze` (0 issues) and `flutter test` (222/222 passing).
+   - Bumped version to `0.2.7+75` in `pubspec.yaml`, `app_config.dart`, and `docs/CHANGELOG.md`.
+
 ## Timezone Selection & Calendar Synchronization - 2026-08-15
 
 #### Goals / Requirements

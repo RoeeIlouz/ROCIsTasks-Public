@@ -535,25 +535,26 @@ class AppLocalizationsFr extends AppLocalizations {
   String get signInFailed => 'Échec de la connexion';
 
   @override
-  String get onboardingWelcomeTitle => 'Bienvenue sur ROCI\'s Tasks';
+  String get onboardingWelcomeTitle =>
+      'Synchronisation Google Tasks & Calendrier';
 
   @override
   String get onboardingWelcomeDesc =>
-      'Organisez votre vie avec efficacité et style.';
+      'Synchronisation bidirectionnelle fluide avec Google Tasks et gestion d\'agenda en un seul endroit.';
 
   @override
-  String get onboardingSyncTitle => 'Synchro & Hors ligne';
+  String get onboardingSyncTitle => 'Esthétique Glassmorphisme';
 
   @override
   String get onboardingSyncDesc =>
-      'Vos tâches vous suivent partout. Accédez-y même sans connexion Internet.';
+      'Un design moderne avec couleurs dynamiques, badges lumineux et animations fluides.';
 
   @override
-  String get onboardingGesturesTitle => 'Gestes intelligents';
+  String get onboardingGesturesTitle => 'Widgets interactifs & Habitudes';
 
   @override
   String get onboardingGesturesDesc =>
-      'Faites glisser vers la droite pour terminer une tâche, vers la gauche pour la supprimer. Appuyez longuement pour plus d\'options.';
+      'Gérez vos tâches directement depuis l\'écran d\'accueil et suivez vos routines quotidiennes.';
 
   @override
   String get getStarted => 'Démarrer';
@@ -1165,4 +1166,38 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get searchTimezone => 'Rechercher un fuseau horaire...';
+
+  @override
+  String get continueAsGuest => 'Continuer en tant qu\'invité';
+
+  @override
+  String get continueAsGuestSubtitle => 'Utiliser localement sans compte';
+
+  @override
+  String get guestModeBannerTitle => 'Mode invité hors ligne';
+
+  @override
+  String get guestModeBannerSubtitle =>
+      'Connectez-vous pour synchroniser avec Google Tasks et sauvegarder vos données dans le cloud.';
+
+  @override
+  String get signInNow => 'Se connecter';
+
+  @override
+  String get guestAccount => 'Compte invité';
+
+  @override
+  String get linkAccount => 'Associer / Se connecter';
+
+  @override
+  String get lifetimePlanTitle => 'Accès à vie';
+
+  @override
+  String get lifetimePlanPrice => '49,99 \$ paiement unique';
+
+  @override
+  String get lifetimePlanBadge => 'Meilleure offre';
+
+  @override
+  String get lifetimePlanSaving => 'Paiement unique';
 }

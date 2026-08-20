@@ -23,6 +23,7 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:rocis_tasks/features/auth/presentation/screens/security_settings_screen.dart';
 import 'package:rocis_tasks/core/services/timezone_service.dart';
 import 'package:rocis_tasks/features/home/presentation/screens/widget_customization_screen.dart';
+import 'package:rocis_tasks/features/auth/presentation/screens/login_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -82,6 +83,30 @@ class SettingsScreen extends StatelessWidget {
               ),
               title: Text(user.displayName ?? 'User'),
               subtitle: Text(user.email ?? ''),
+            )
+          else
+            ListTile(
+              leading: _buildLeadingIcon(
+                context,
+                Icons.person_outline_rounded,
+                Colors.teal,
+              ),
+              title: Text(l10n.guestAccount),
+              subtitle: Text(l10n.guestModeBannerSubtitle),
+              trailing: ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const LoginScreen(),
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                ),
+                child: Text(l10n.signInNow),
+              ),
             ),
           ListTile(
             leading: _buildLeadingIcon(
@@ -117,23 +142,24 @@ class SettingsScreen extends StatelessWidget {
                 await subscriptionService.manageSubscription();
               },
             ),
-          ListTile(
-            leading: _buildLeadingIcon(
-              context,
-              Icons.logout,
-              Theme.of(context).colorScheme.error,
+          if (user != null)
+            ListTile(
+              leading: _buildLeadingIcon(
+                context,
+                Icons.logout,
+                Theme.of(context).colorScheme.error,
+              ),
+              title: Text(
+                l10n.signOut,
+                style: TextStyle(color: Theme.of(context).colorScheme.error),
+              ),
+              onTap: () async {
+                await authService.signOut();
+                if (context.mounted) {
+                  Navigator.popUntil(context, (route) => route.isFirst);
+                }
+              },
             ),
-            title: Text(
-              l10n.signOut,
-              style: TextStyle(color: Theme.of(context).colorScheme.error),
-            ),
-            onTap: () async {
-              await authService.signOut();
-              if (context.mounted) {
-                Navigator.popUntil(context, (route) => route.isFirst);
-              }
-            },
-          ),
         ]),
         _buildSectionHeader(context, l10n.appearance),
         _buildSectionCard(context, [

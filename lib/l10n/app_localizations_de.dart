@@ -535,25 +535,25 @@ class AppLocalizationsDe extends AppLocalizations {
   String get signInFailed => 'Anmeldung fehlgeschlagen';
 
   @override
-  String get onboardingWelcomeTitle => 'Willkommen bei ROCI\'s Tasks';
+  String get onboardingWelcomeTitle => 'Google Tasks & Kalender-Sync';
 
   @override
   String get onboardingWelcomeDesc =>
-      'Organisieren Sie Ihr Leben mit Effizienz und Stil.';
+      'Nahtlose 2-Wege-Synchronisierung mit Google Tasks und Zeitplanung an einem Ort.';
 
   @override
-  String get onboardingSyncTitle => 'Synch & Offline';
+  String get onboardingSyncTitle => 'Glassmorphismus-Ästhetik';
 
   @override
   String get onboardingSyncDesc =>
-      'Ihre Aufgaben folgen Ihnen überall hin. Greifen Sie auch ohne Internetverbindung darauf zu.';
+      'Modernes Design mit dynamischen Farben, leuchtenden Prioritäten und flüssigen Animationen.';
 
   @override
-  String get onboardingGesturesTitle => 'Smarte Gesten';
+  String get onboardingGesturesTitle => 'Interaktive Widgets & Gewohnheiten';
 
   @override
   String get onboardingGesturesDesc =>
-      'Wischen Sie nach rechts, um eine Aufgabe zu erledigen, nach links, um sie zu löschen. Gedrückt halten für mehr Optionen.';
+      'Erledigen Sie Aufgaben direkt vom Startbildschirm und verfolgen Sie tägliche Gewohnheiten.';
 
   @override
   String get getStarted => 'Loslegen';
@@ -1166,4 +1166,38 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get searchTimezone => 'Zeitzone suchen...';
+
+  @override
+  String get continueAsGuest => 'Als Gast fortfahren';
+
+  @override
+  String get continueAsGuestSubtitle => 'Lokal ohne Konto verwenden';
+
+  @override
+  String get guestModeBannerTitle => 'Offline-Gastmodus';
+
+  @override
+  String get guestModeBannerSubtitle =>
+      'Melden Sie sich an, um mit Google Tasks zu synchronisieren und Daten in der Cloud zu sichern.';
+
+  @override
+  String get signInNow => 'Anmelden';
+
+  @override
+  String get guestAccount => 'Gastkonto';
+
+  @override
+  String get linkAccount => 'Konto verknüpfen / Anmelden';
+
+  @override
+  String get lifetimePlanTitle => 'Lebenslanger Zugriff';
+
+  @override
+  String get lifetimePlanPrice => '49,99 \$ einmalig';
+
+  @override
+  String get lifetimePlanBadge => 'Bester Wert';
+
+  @override
+  String get lifetimePlanSaving => 'Einmalzahlung';
 }

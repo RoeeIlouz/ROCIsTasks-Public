@@ -523,24 +523,25 @@ class AppLocalizationsHe extends AppLocalizations {
   String get signInFailed => 'ההתחברות נכשלה';
 
   @override
-  String get onboardingWelcomeTitle => 'ברוך הבא ל-ROCIs Tasks';
+  String get onboardingWelcomeTitle => 'סנכרון Google Tasks ולוח שנה';
 
   @override
-  String get onboardingWelcomeDesc => 'ארגן את חייך ביעילות ובסגנון.';
+  String get onboardingWelcomeDesc =>
+      'סנכרון דו-כיווני חלק עם Google Tasks וניהול לוח זמנים במקום אחד.';
 
   @override
-  String get onboardingSyncTitle => 'סנכרון ומצב לא מקוון';
+  String get onboardingSyncTitle => 'עיצוב זכוכית מודרני';
 
   @override
   String get onboardingSyncDesc =>
-      'המשימות שלך עוקבות אחריך לכל מקום. גש אליהן גם ללא חיבור לאינטרנט.';
+      'ממשק פרימיום עם שקיפויות זכוכית, התאמת צבעים לרקע ואנימציות חלקות.';
 
   @override
-  String get onboardingGesturesTitle => 'מחוות חכמות';
+  String get onboardingGesturesTitle => 'ווידג\'טים אינטראקטיביים והרגלים';
 
   @override
   String get onboardingGesturesDesc =>
-      'החלק שמאלה למחיקה, ימינה להשלמה. לחץ לחיצה ארוכה לאפשרויות נוספות.';
+      'ניהול משימות מהיר ישירות ממסך הבית ומעקב אחר הרגלים יומיים.';
 
   @override
   String get getStarted => 'בוא נתחיל';
@@ -1133,4 +1134,38 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get searchTimezone => 'חיפוש אזור זמן...';
+
+  @override
+  String get continueAsGuest => 'המשך כאורח';
+
+  @override
+  String get continueAsGuestSubtitle => 'שימוש מקומי ללא צורך בחשבון';
+
+  @override
+  String get guestModeBannerTitle => 'מצב אורח / לא מקוון';
+
+  @override
+  String get guestModeBannerSubtitle =>
+      'התחבר כדי לסנכרן עם Google Tasks ולגבות את המשימות בענן.';
+
+  @override
+  String get signInNow => 'התחבר';
+
+  @override
+  String get guestAccount => 'חשבון אורח';
+
+  @override
+  String get linkAccount => 'קישור / התחברות לחשבון';
+
+  @override
+  String get lifetimePlanTitle => 'מנוי לכל החיים';
+
+  @override
+  String get lifetimePlanPrice => '\$49.99 חד פעמי';
+
+  @override
+  String get lifetimePlanBadge => 'משתלם ביותר';
+
+  @override
+  String get lifetimePlanSaving => 'תשלום חד פעמי';
 }

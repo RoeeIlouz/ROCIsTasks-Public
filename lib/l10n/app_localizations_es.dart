@@ -535,25 +535,26 @@ class AppLocalizationsEs extends AppLocalizations {
   String get signInFailed => 'Error al iniciar sesión';
 
   @override
-  String get onboardingWelcomeTitle => 'Bienvenido a ROCI\'s Tasks';
+  String get onboardingWelcomeTitle =>
+      'Sincronización con Google Tasks y Calendario';
 
   @override
   String get onboardingWelcomeDesc =>
-      'Organiza tu vida con eficiencia y estilo.';
+      'Sincronización bidireccional perfecta con Google Tasks y bloqueo de tiempo en un solo lugar.';
 
   @override
-  String get onboardingSyncTitle => 'Sincronización y modo sin conexión';
+  String get onboardingSyncTitle => 'Estética Glassmorphism';
 
   @override
   String get onboardingSyncDesc =>
-      'Tus tareas te siguen a todas partes. Accede a ellas incluso sin conexión a internet.';
+      'Diseño moderno con colores dinámicos, insignias brillantes y animaciones fluidas.';
 
   @override
-  String get onboardingGesturesTitle => 'Gestos inteligentes';
+  String get onboardingGesturesTitle => 'Widgets interactivos y hábitos';
 
   @override
   String get onboardingGesturesDesc =>
-      'Desliza a la izquierda para eliminar, a la derecha para completar. Mantén presionado para más opciones.';
+      'Completa tareas directamente desde tu pantalla de inicio y crea rutinas diarias.';
 
   @override
   String get getStarted => 'Empezar';
@@ -1164,4 +1165,38 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get searchTimezone => 'Buscar zona horaria...';
+
+  @override
+  String get continueAsGuest => 'Continuar como invitado';
+
+  @override
+  String get continueAsGuestSubtitle => 'Usar localmente sin una cuenta';
+
+  @override
+  String get guestModeBannerTitle => 'Modo invitado sin conexión';
+
+  @override
+  String get guestModeBannerSubtitle =>
+      'Inicia sesión para sincronizar con Google Tasks y respaldar tus datos en la nube.';
+
+  @override
+  String get signInNow => 'Iniciar sesión';
+
+  @override
+  String get guestAccount => 'Cuenta de invitado';
+
+  @override
+  String get linkAccount => 'Vincular / Iniciar sesión';
+
+  @override
+  String get lifetimePlanTitle => 'Plan de por vida';
+
+  @override
+  String get lifetimePlanPrice => '\$49.99 pago único';
+
+  @override
+  String get lifetimePlanBadge => 'Mejor opción';
+
+  @override
+  String get lifetimePlanSaving => 'Pago único';
 }

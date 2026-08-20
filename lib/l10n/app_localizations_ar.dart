@@ -524,24 +524,25 @@ class AppLocalizationsAr extends AppLocalizations {
   String get signInFailed => 'فشل تسجيل الدخول';
 
   @override
-  String get onboardingWelcomeTitle => 'مرحبًا بك في مهام ROCI';
+  String get onboardingWelcomeTitle => 'مزامنة مهام وتقويم Google';
 
   @override
-  String get onboardingWelcomeDesc => 'نظّم حياتك بكفاءة وأسلوب.';
+  String get onboardingWelcomeDesc =>
+      'مزامنة ثنائية سلسة مع مهام وتقويم Google في مكان واحد.';
 
   @override
-  String get onboardingSyncTitle => 'المزامنة وعدم الاتصال';
+  String get onboardingSyncTitle => 'جماليات الزجاج المصنفر';
 
   @override
   String get onboardingSyncDesc =>
-      'مهامك معك أينما ذهبت. يمكنك الوصول إليها حتى بدون إنترنت.';
+      'تصميم عصري مع ألوان ديناميكية، وشارات متوهجة وحركات سلسة.';
 
   @override
-  String get onboardingGesturesTitle => 'إيماءات ذكية';
+  String get onboardingGesturesTitle => 'أدوات تفاعلية وعادات يومية';
 
   @override
   String get onboardingGesturesDesc =>
-      'اسحب لليسار للحذف، ولليمين للإكمال. اضغط مطولًا لمزيد من الخيارات.';
+      'إدارة المهام مباشرة من الشاشة الرئيسية وبناء روتين يومي منتظم.';
 
   @override
   String get getStarted => 'ابدأ';
@@ -1133,4 +1134,38 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get searchTimezone => 'البحث عن منطقة زمنية...';
+
+  @override
+  String get continueAsGuest => 'المتابعة كضيف';
+
+  @override
+  String get continueAsGuestSubtitle => 'الاستخدام محليًا بدون حساب';
+
+  @override
+  String get guestModeBannerTitle => 'وضع الضيف بدون اتصال';
+
+  @override
+  String get guestModeBannerSubtitle =>
+      'سجّل الدخول للمزامنة مع Google Tasks والنسخ الاحتياطي السحابي.';
+
+  @override
+  String get signInNow => 'تسجيل الدخول';
+
+  @override
+  String get guestAccount => 'حساب ضيف';
+
+  @override
+  String get linkAccount => 'ربط / تسجيل الدخول للحساب';
+
+  @override
+  String get lifetimePlanTitle => 'الاشتراك مدى الحياة';
+
+  @override
+  String get lifetimePlanPrice => '49.99\$ لمرة واحدة';
+
+  @override
+  String get lifetimePlanBadge => 'القيمة الأفضل';
+
+  @override
+  String get lifetimePlanSaving => 'دفع لمرة واحدة';
 }
