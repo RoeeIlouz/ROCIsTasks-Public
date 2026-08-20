@@ -1,5 +1,5 @@
 {
-"@@locale": "fr",
+  "@@locale": "fr",
   "appTitle": "ROCI's Tasks",
   "settings": "Paramètres",
   "account": "Compte",
@@ -33,9 +33,10 @@
   "english": "Anglais",
   "spanish": "Espagnol",
   "arabic": "Arabe",
-  "swedish": "Su\u00e9dois",
+  "swedish": "Suédois",
   "german": "Allemand",
-  "french": "Fran\u00e7ais",
+  "french": "Français",
+  "hindi": "Hindi",
   "tasks": "Tâches",
   "editTask": "Modifier la tâche",
   "newTask": "Nouvelle tâche",
@@ -76,7 +77,9 @@
   "restoredTask": "Tâche \"{title}\" restaurée",
   "@restoredTask": {
     "placeholders": {
-      "title": { "type": "String" }
+      "title": {
+        "type": "String"
+      }
     }
   },
   "deletePermanently": "Supprimer définitivement ?",
@@ -109,7 +112,9 @@
   "exportFailed": "Échec de l'exportation : {error}",
   "@exportFailed": {
     "placeholders": {
-      "error": { "type": "String" }
+      "error": {
+        "type": "String"
+      }
     }
   },
   "importData": "Importer les données (JSON)",
@@ -121,7 +126,9 @@
   "importFailed": "Importation terminée !",
   "@importFailed": {
     "placeholders": {
-      "error": { "type": "String" }
+      "error": {
+        "type": "String"
+      }
     }
   },
   "privacyAndGdpr": "Confidentialité & RGPD",
@@ -155,7 +162,7 @@
   "subtasksAndChecklists": "Sous-tâches & Listes de contrôle",
   "subtasksAndChecklistsDesc": "Divisez les tâches complexes en étapes plus simples.",
   "recurringTasks": "Tâches récurrentes",
-  "recurringTasksDesc": "Automatisez votre routine avec des règles de répétition flexibles.",
+  "recurringTasksDesc": "Automatisez les tâches répétitives avec des fréquences quotidiennes, hebdomadaires, mensuelles ou personnalisées.",
   "viewPricingPlans": "Voir les tarifs",
   "proSubscriptionActive": "Abonnement Pro actif",
   "welcomeToPro": "Bienvenue sur Pro !",
@@ -199,7 +206,9 @@
   "taskReminderTitle": "Rappel de tâche : {title}",
   "@taskReminderTitle": {
     "placeholders": {
-      "title": { "type": "String" }
+      "title": {
+        "type": "String"
+      }
     }
   },
   "taskDueNowBody": "Vous avez une tâche à faire maintenant !",
@@ -213,8 +222,12 @@
   "nextOccurrenceSet": "Prochaine échéance de \"{title}\" fixée au {date}",
   "@nextOccurrenceSet": {
     "placeholders": {
-      "title": { "type": "String" },
-      "date": { "type": "String" }
+      "title": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
     }
   },
   "initializationFailedError": "Échec de l'initialisation des données. Veuillez redémarrer.",
@@ -237,14 +250,18 @@
   "notificationUncompletedTasks": "{count} tâches non terminées",
   "@notificationUncompletedTasks": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "notificationTasksRemaining": "Tâches restantes",
   "notificationTasksSummary": "{count} tâches",
   "@notificationTasksSummary": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "skip": "Passer",
@@ -354,5 +371,81 @@
   "glassmorphismEffectsSubtitle": "Appliquer un effet verre dépoli aux cartes",
   "noEventsForThisDay": "Aucun événement pour ce jour",
   "searchSymbols": "Symboles de recherche",
-  "searchSymbolsDesc": "Utilisez des symboles pour filtrer les tâches : @catégorie (ex. @travail), #titre (ex. #réunion), !priorité (ex. !haute), %date (ex. %2025-06-15), &sous-tâche (ex. &correction bug), *statut (*fait ou *en cours), ? (tâches d'aujourd'hui). Combiner plusieurs symboles."
+  "searchSymbolsDesc": "Utilisez des symboles pour filtrer les tâches : @catégorie (ex. @travail), #titre (ex. #réunion), !priorité (ex. !haute), %date (ex. %2025-06-15), &sous-tâche (ex. &correction bug), *statut (*fait ou *en cours), ? (tâches d'aujourd'hui). Combiner plusieurs symboles.",
+  "monday": "Lundi",
+  "saturday": "Samedi",
+  "showWeekNumbers": "Afficher les numéros de semaine",
+  "startOfWeek": "Début de la semaine",
+  "sunday": "Dimanche",
+  "weekendHighlights": "Mettre en évidence les week-ends",
+  "widgetAccentColor": "Couleur d'accentuation du widget",
+  "widgetSettings": "Personnalisation du widget",
+  "widgetSettingsSubtitle": "Configurer les couleurs, le thème et les fonctionnalités",
+  "widgetTheme": "Thème du widget",
+  "widgetThemeDark": "Sombre uni",
+  "widgetThemeGlassmorphic": "Effet verre dépoli",
+  "widgetThemeLight": "Clair uni",
+  "widgetThemeSystem": "Par défaut du système",
+  "googleTasksDisconnected": "Google Tasks Déconnecté",
+  "googleTasksDisconnectedSubtitle": "Appuyez pour vous reconnecter et reprendre la synchronisation",
+  "reconnect": "Se reconnecter",
+  "webPaywallTitle": "Débloquez ROCIs Tasks Pro sur le Web",
+  "webPaywallSubtitle": "Passez à la version premium pour accéder à toutes les fonctionnalités avancées sur n'importe quelle plateforme.",
+  "webSimulatedUpgradeBtn": "Mettre à niveau vers Pro",
+  "webPaywallNotice": "Les paiements sont traités en toute sécurité par Lemon Squeezy. Votre abonnement sera activé automatiquement.",
+  "monthlyPlanTitle": "Forfait Mensuel",
+  "monthlyPlanPrice": "4,99 $ / mois",
+  "yearlyPlanTitle": "Forfait Annuel",
+  "yearlyPlanPrice": "39,99 $ / an",
+  "yearlyPlanSaving": "Économisez 33%",
+  "groceryListMode": "Liste de tâches",
+  "groceryListModeSubtitle": "Formater la tâche sous forme de liste de tâches interactive",
+  "itemsInCart": "{completed}/{total} terminées",
+  "toBuy": "À faire",
+  "inCart": "Terminées",
+  "resetCart": "Réinitialiser la liste",
+  "clearCartItems": "Vider la liste",
+  "addItemHint": "Ajouter un élément...",
+  "quantityHint": "Qté",
+  "timezone": "Fuseau horaire",
+  "selectTimezone": "Sélectionner le fuseau horaire",
+  "automaticTimezone": "Automatique (Fuseau de l'appareil)",
+  "searchTimezone": "Rechercher un fuseau horaire...",
+  "repeatWeekdays": "Jours de semaine (lun–ven)",
+  "repeatYearly": "Annuel",
+  "repeatCustom": "Personnalisé...",
+  "repeatsEvery": "Se répète tous les",
+  "customRecurrence": "Récurrence personnalisée",
+  "daySingular": "jour",
+  "daysPlural": "jours",
+  "weekSingular": "semaine",
+  "weeksPlural": "semaines",
+  "monthSingular": "mois",
+  "monthsPlural": "mois",
+  "yearSingular": "an",
+  "yearsPlural": "ans",
+  "selectRecurrence": "Sélectionner la récurrence",
+  "guestMode": "Mode invité",
+  "guestModeSubtitle": "Toutes les données sont stockées localement sur cet appareil. Connectez-vous pour sauvegarder et synchroniser avec le cloud.",
+  "guestAccount": "Compte invité",
+  "signInOrRegister": "Connexion / Inscription",
+  "continueAsGuest": "Continuer en tant qu'invité",
+  "skipForNow": "Passer pour le moment",
+  "cloudSync": "Sauvegarde et synchronisation dans le cloud",
+  "cloudSyncActive": "Actif et synchronisé",
+  "customFields": "Lignes personnalisées",
+  "customFieldsSubtitle": "Joindre des contacts, lieux, liens ou notes",
+  "addCustomField": "Ajouter une ligne",
+  "contact": "Contact",
+  "location": "Lieu",
+  "link": "Lien",
+  "note": "Note",
+  "fieldLabel": "Étiquette",
+  "fieldValue": "Valeur",
+  "enterContactInfo": "Numéro de téléphone ou e-mail",
+  "enterLocation": "Adresse ou lieu",
+  "enterUrl": "Site web ou URL",
+  "enterNote": "Détails personnalisés",
+  "copiedToClipboard": "Copié dans le presse-papiers",
+  "noCustomFieldsAdded": "Aucune ligne personnalisée ajoutée"
 }

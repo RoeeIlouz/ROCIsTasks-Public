@@ -117,6 +117,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get french => 'Francés';
 
   @override
+  String get hindi => 'Hindi';
+
+  @override
   String get tasks => 'Tareas';
 
   @override
@@ -450,7 +453,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get recurringTasksDesc =>
-      'Automatiza tu rutina con reglas de repetición flexibles.';
+      'Automatiza tareas repetitivas con programaciones diarias, semanales, mensuales o personalizadas.';
 
   @override
   String get viewPricingPlans => 'Ver planes de precios';
@@ -1080,4 +1083,198 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get widgetAccentColor => 'Color de acento del widget';
+
+  @override
+  String get googleTasksDisconnected => 'Google Tasks Desconectado';
+
+  @override
+  String get googleTasksDisconnectedSubtitle =>
+      'Toca para reconectar y reanudar la sincronización';
+
+  @override
+  String get reconnect => 'Reconectar';
+
+  @override
+  String get webPaywallTitle => 'Desbloquea ROCIs Tasks Pro en la Web';
+
+  @override
+  String get webPaywallSubtitle =>
+      'Actualiza a premium para acceder a todas las funciones avanzadas en cualquier plataforma.';
+
+  @override
+  String get webSimulatedUpgradeBtn => 'Actualizar a Pro';
+
+  @override
+  String get webPaywallNotice =>
+      'Los pagos se procesan de forma segura por Lemon Squeezy. Tu suscripción se activará automáticamente.';
+
+  @override
+  String get monthlyPlanTitle => 'Plan Mensual';
+
+  @override
+  String get monthlyPlanPrice => '\$4.99 / mes';
+
+  @override
+  String get yearlyPlanTitle => 'Plan Anual';
+
+  @override
+  String get yearlyPlanPrice => '\$39.99 / año';
+
+  @override
+  String get yearlyPlanSaving => 'Ahorra 33%';
+
+  @override
+  String get groceryListMode => 'Lista de tareas';
+
+  @override
+  String get groceryListModeSubtitle =>
+      'Formatear tarea como una lista de tareas interactiva';
+
+  @override
+  String itemsInCart(Object completed, Object total) {
+    return '$completed/$total completadas';
+  }
+
+  @override
+  String get toBuy => 'Pendientes';
+
+  @override
+  String get inCart => 'Completadas';
+
+  @override
+  String get resetCart => 'Reiniciar lista';
+
+  @override
+  String get clearCartItems => 'Limpiar elementos';
+
+  @override
+  String get addItemHint => 'Añadir elemento...';
+
+  @override
+  String get quantityHint => 'Cant.';
+
+  @override
+  String get timezone => 'Zona horaria';
+
+  @override
+  String get selectTimezone => 'Seleccionar zona horaria';
+
+  @override
+  String get automaticTimezone => 'Automático (Zona del dispositivo)';
+
+  @override
+  String get searchTimezone => 'Buscar zona horaria...';
+
+  @override
+  String get repeatWeekdays => 'Días laborables (lun–vie)';
+
+  @override
+  String get repeatYearly => 'Anualmente';
+
+  @override
+  String get repeatCustom => 'Personalizado...';
+
+  @override
+  String get repeatsEvery => 'Se repite cada';
+
+  @override
+  String get customRecurrence => 'Recurrencia personalizada';
+
+  @override
+  String get daySingular => 'día';
+
+  @override
+  String get daysPlural => 'días';
+
+  @override
+  String get weekSingular => 'semana';
+
+  @override
+  String get weeksPlural => 'semanas';
+
+  @override
+  String get monthSingular => 'mes';
+
+  @override
+  String get monthsPlural => 'meses';
+
+  @override
+  String get yearSingular => 'año';
+
+  @override
+  String get yearsPlural => 'años';
+
+  @override
+  String get selectRecurrence => 'Seleccionar recurrencia';
+
+  @override
+  String get guestMode => 'Modo invitado';
+
+  @override
+  String get guestModeSubtitle =>
+      'Todos los datos se guardan localmente en este dispositivo. Inicia sesión para hacer una copia de seguridad y sincronizar con la nube.';
+
+  @override
+  String get guestAccount => 'Cuenta de invitado';
+
+  @override
+  String get signInOrRegister => 'Iniciar sesión / Registrarse';
+
+  @override
+  String get continueAsGuest => 'Continuar como invitado';
+
+  @override
+  String get skipForNow => 'Omitir por ahora';
+
+  @override
+  String get cloudSync => 'Copia de seguridad y sincronización en la nube';
+
+  @override
+  String get cloudSyncActive => 'Activo y sincronizado';
+
+  @override
+  String get customFields => 'Líneas personalizadas';
+
+  @override
+  String get customFieldsSubtitle =>
+      'Adjunta contactos, ubicaciones, enlaces o notas';
+
+  @override
+  String get addCustomField => 'Añadir línea';
+
+  @override
+  String get contact => 'Contacto';
+
+  @override
+  String get location => 'Ubicación';
+
+  @override
+  String get link => 'Enlace';
+
+  @override
+  String get note => 'Nota';
+
+  @override
+  String get fieldLabel => 'Etiqueta';
+
+  @override
+  String get fieldValue => 'Valor';
+
+  @override
+  String get enterContactInfo => 'Teléfono o correo electrónico';
+
+  @override
+  String get enterLocation => 'Dirección o lugar';
+
+  @override
+  String get enterUrl => 'Sitio web o URL';
+
+  @override
+  String get enterNote => 'Detalles personalizados';
+
+  @override
+  String get copiedToClipboard => 'Copiado al portapapeles';
+
+  @override
+  String get noCustomFieldsAdded => 'No hay líneas personalizadas';
 }

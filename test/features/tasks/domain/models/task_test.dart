@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/sub_task.dart';
+import 'package:rocis_tasks/features/tasks/domain/models/custom_field.dart';
 
 void main() {
   group('Task Model', () {
@@ -210,6 +211,84 @@ void main() {
         expect(TaskPriority.low.index, 0);
         expect(TaskPriority.medium.index, 1);
         expect(TaskPriority.high.index, 2);
+      });
+    });
+
+    group('customFields', () {
+      test('should copy with customFields', () {
+        final task = Task(id: '1', title: 'Task with custom fields');
+        final customFields = [
+          TaskCustomField(
+            id: 'cf-1',
+            type: CustomFieldType.contact,
+            label: 'Phone',
+            value: '+15551234',
+          ),
+          TaskCustomField(
+            id: 'cf-2',
+            type: CustomFieldType.location,
+            label: 'Office',
+            value: 'Main Street 10',
+          ),
+        ];
+
+        final copy = task.copyWith(customFields: customFields);
+        expect(copy.customFields, hasLength(2));
+        expect(copy.customFields![0].type, CustomFieldType.contact);
+        expect(copy.customFields![0].value, '+15551234');
+        expect(copy.customFields![1].type, CustomFieldType.location);
+        expect(copy.customFields![1].value, 'Main Street 10');
+      });
+
+      test('should roundtrip customFields in toMap and fromMap', () {
+        final task = Task(
+          id: 'task-cf',
+          title: 'Custom Lines Task',
+          customFields: [
+            TaskCustomField(
+              id: 'cf-url',
+              type: CustomFieldType.url,
+              label: 'Website',
+              value: 'https://flutter.dev',
+            ),
+            TaskCustomField(
+              id: 'cf-text',
+              type: CustomFieldType.text,
+              label: 'Access code',
+              value: '4321',
+            ),
+          ],
+        );
+
+        final map = task.toMap();
+        final restored = Task.fromMap(map);
+
+        expect(restored.customFields, hasLength(2));
+        expect(restored.customFields![0].id, 'cf-url');
+        expect(restored.customFields![0].type, CustomFieldType.url);
+        expect(restored.customFields![0].value, 'https://flutter.dev');
+        expect(restored.customFields![1].id, 'cf-text');
+        expect(restored.customFields![1].type, CustomFieldType.text);
+        expect(restored.customFields![1].value, '4321');
+      });
+
+      test('should include customFields in toFirestoreMap', () {
+        final task = Task(
+          id: 'task-fs',
+          title: 'FS Task',
+          customFields: [
+            TaskCustomField(
+              id: 'cf-1',
+              type: CustomFieldType.contact,
+              label: 'Email',
+              value: 'test@example.com',
+            ),
+          ],
+        );
+
+        final map = task.toFirestoreMap();
+        expect(map['customFields'], isA<List>());
+        expect((map['customFields'] as List).first['value'], 'test@example.com');
       });
     });
   });

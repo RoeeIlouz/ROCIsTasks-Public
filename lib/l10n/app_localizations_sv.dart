@@ -117,6 +117,9 @@ class AppLocalizationsSv extends AppLocalizations {
   String get french => 'Franska';
 
   @override
+  String get hindi => 'Hindi';
+
+  @override
   String get tasks => 'Uppgifter';
 
   @override
@@ -446,7 +449,7 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get recurringTasksDesc =>
-      'Automatisera dina rutiner med flexibla upprepningsregler.';
+      'Automatisera återkommande uppgifter med dagliga, veckovisa, månatliga eller anpassade scheman.';
 
   @override
   String get viewPricingPlans => 'Visa prisplaner';
@@ -1028,44 +1031,239 @@ class AppLocalizationsSv extends AppLocalizations {
       'Använd symboler för att filtrera uppgifter: @kategori (t.ex. @arbete), #titel (t.ex. #möte), !prioritet (t.ex. !hög), %datum (t.ex. %2025-06-15), &deluppgift (t.ex. &bugfix), *status (*klar eller *pågående), ? (uppgifter idag). Kombinera flera symboler.';
 
   @override
-  String get widgetSettings => 'Widget Customization';
+  String get widgetSettings => 'Widget-anpassning';
 
   @override
-  String get widgetSettingsSubtitle => 'Configure colors, theme, and features';
+  String get widgetSettingsSubtitle =>
+      'Konfigurera färger, tema och funktioner';
 
   @override
-  String get widgetTheme => 'Widget Theme';
+  String get widgetTheme => 'Widget-tema';
 
   @override
-  String get widgetThemeSystem => 'System Default';
+  String get widgetThemeSystem => 'Systemstandard';
 
   @override
-  String get widgetThemeLight => 'Solid Light';
+  String get widgetThemeLight => 'Solid ljus';
 
   @override
-  String get widgetThemeDark => 'Solid Dark';
+  String get widgetThemeDark => 'Solid mörk';
 
   @override
-  String get widgetThemeGlassmorphic => 'Glassmorphism';
+  String get widgetThemeGlassmorphic => 'Glasmorfism';
 
   @override
-  String get showWeekNumbers => 'Show Week Numbers';
+  String get showWeekNumbers => 'Visa veckonummer';
 
   @override
-  String get weekendHighlights => 'Highlight Weekends';
+  String get weekendHighlights => 'Markera helger';
 
   @override
-  String get startOfWeek => 'Start of Week';
+  String get startOfWeek => 'Start på veckan';
 
   @override
-  String get sunday => 'Sunday';
+  String get sunday => 'Söndag';
 
   @override
-  String get monday => 'Monday';
+  String get monday => 'Måndag';
 
   @override
-  String get saturday => 'Saturday';
+  String get saturday => 'Lördag';
 
   @override
-  String get widgetAccentColor => 'Widget Accent Color';
+  String get widgetAccentColor => 'Widget-accentfärg';
+
+  @override
+  String get googleTasksDisconnected => 'Google Tasks bortkopplad';
+
+  @override
+  String get googleTasksDisconnectedSubtitle =>
+      'Tryck för att ansluta igen och återuppta synkroniseringen';
+
+  @override
+  String get reconnect => 'Återanslut';
+
+  @override
+  String get webPaywallTitle => 'Lås upp ROCIs Tasks Pro på webben';
+
+  @override
+  String get webPaywallSubtitle =>
+      'Uppgradera till premium för att få tillgång till alla avancerade funktioner på valfri plattform.';
+
+  @override
+  String get webSimulatedUpgradeBtn => 'Uppgradera till Pro';
+
+  @override
+  String get webPaywallNotice =>
+      'Betalningar behandlas säkert av Lemon Squeezy. Ditt abonnemang kommer att aktiveras automatiskt.';
+
+  @override
+  String get monthlyPlanTitle => 'Månadsplan';
+
+  @override
+  String get monthlyPlanPrice => '4,99 \$ / månad';
+
+  @override
+  String get yearlyPlanTitle => 'Årsplan';
+
+  @override
+  String get yearlyPlanPrice => '39,99 \$ / år';
+
+  @override
+  String get yearlyPlanSaving => 'Spara 33%';
+
+  @override
+  String get groceryListMode => 'Uppgiftslista';
+
+  @override
+  String get groceryListModeSubtitle =>
+      'Formatera uppgiften som en interaktiv uppgiftslista';
+
+  @override
+  String itemsInCart(Object completed, Object total) {
+    return '$completed/$total klara';
+  }
+
+  @override
+  String get toBuy => 'Att göra';
+
+  @override
+  String get inCart => 'Klara';
+
+  @override
+  String get resetCart => 'Återställ lista';
+
+  @override
+  String get clearCartItems => 'Töm listan';
+
+  @override
+  String get addItemHint => 'Lägg till objekt...';
+
+  @override
+  String get quantityHint => 'Antal';
+
+  @override
+  String get timezone => 'Tidszon';
+
+  @override
+  String get selectTimezone => 'Välj tidszon';
+
+  @override
+  String get automaticTimezone => 'Automatisk (Enhetens tidszon)';
+
+  @override
+  String get searchTimezone => 'Sök tidszon...';
+
+  @override
+  String get repeatWeekdays => 'Vardagar (mån–fre)';
+
+  @override
+  String get repeatYearly => 'Årligen';
+
+  @override
+  String get repeatCustom => 'Anpassad...';
+
+  @override
+  String get repeatsEvery => 'Upprepas var';
+
+  @override
+  String get customRecurrence => 'Anpassad upprepning';
+
+  @override
+  String get daySingular => 'dag';
+
+  @override
+  String get daysPlural => 'dagar';
+
+  @override
+  String get weekSingular => 'vecka';
+
+  @override
+  String get weeksPlural => 'veckor';
+
+  @override
+  String get monthSingular => 'månad';
+
+  @override
+  String get monthsPlural => 'månader';
+
+  @override
+  String get yearSingular => 'år';
+
+  @override
+  String get yearsPlural => 'år';
+
+  @override
+  String get selectRecurrence => 'Välj upprepning';
+
+  @override
+  String get guestMode => 'Gästläge';
+
+  @override
+  String get guestModeSubtitle =>
+      'All data sparas lokalt på denna enhet. Logga in för att säkerhetskopiera och synkronisera med molnet.';
+
+  @override
+  String get guestAccount => 'Gästkonto';
+
+  @override
+  String get signInOrRegister => 'Logga in / Registrera';
+
+  @override
+  String get continueAsGuest => 'Fortsätt som gäst';
+
+  @override
+  String get skipForNow => 'Hoppa över tills vidare';
+
+  @override
+  String get cloudSync => 'Molnsäkerhetskopiering & Synk';
+
+  @override
+  String get cloudSyncActive => 'Aktiv & synkad';
+
+  @override
+  String get customFields => 'Anpassade rader';
+
+  @override
+  String get customFieldsSubtitle =>
+      'Bifoga kontakter, platser, länkar eller anteckningar';
+
+  @override
+  String get addCustomField => 'Lägg till rad';
+
+  @override
+  String get contact => 'Kontakt';
+
+  @override
+  String get location => 'Plats';
+
+  @override
+  String get link => 'Länk';
+
+  @override
+  String get note => 'Anteckning';
+
+  @override
+  String get fieldLabel => 'Etikett';
+
+  @override
+  String get fieldValue => 'Värde';
+
+  @override
+  String get enterContactInfo => 'Telefonnummer eller e-post';
+
+  @override
+  String get enterLocation => 'Adress eller plats';
+
+  @override
+  String get enterUrl => 'Webbplats eller länk';
+
+  @override
+  String get enterNote => 'Anpassade detaljer';
+
+  @override
+  String get copiedToClipboard => 'Kopierat till urklipp';
+
+  @override
+  String get noCustomFieldsAdded => 'Inga anpassade rader tillagda';
 }

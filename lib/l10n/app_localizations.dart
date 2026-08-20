@@ -1,17 +1,17 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
-import 'app_localizations_ar.dart';
-import 'app_localizations_de.dart';
-import 'app_localizations_en.dart';
-import 'app_localizations_es.dart';
-import 'app_localizations_fr.dart';
-import 'app_localizations_he.dart';
-import 'app_localizations_sv.dart';
+import 'app_localizations_ar.dart' deferred as app_localizations_ar;
+import 'app_localizations_de.dart' deferred as app_localizations_de;
+import 'app_localizations_en.dart' deferred as app_localizations_en;
+import 'app_localizations_es.dart' deferred as app_localizations_es;
+import 'app_localizations_fr.dart' deferred as app_localizations_fr;
+import 'app_localizations_he.dart' deferred as app_localizations_he;
+import 'app_localizations_hi.dart' deferred as app_localizations_hi;
+import 'app_localizations_sv.dart' deferred as app_localizations_sv;
 
 // ignore_for_file: type=lint
 
@@ -105,6 +105,7 @@ abstract class AppLocalizations {
     Locale('es'),
     Locale('fr'),
     Locale('he'),
+    Locale('hi'),
     Locale('sv'),
   ];
 
@@ -323,6 +324,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'French'**
   String get french;
+
+  /// No description provided for @hindi.
+  ///
+  /// In en, this message translates to:
+  /// **'Hindi'**
+  String get hindi;
 
   /// No description provided for @tasks.
   ///
@@ -951,7 +958,7 @@ abstract class AppLocalizations {
   /// No description provided for @recurringTasksDesc.
   ///
   /// In en, this message translates to:
-  /// **'Automate your routine with flexible repetition rules.'**
+  /// **'Automate repeating tasks with daily, weekly, monthly, or custom schedules.'**
   String get recurringTasksDesc;
 
   /// No description provided for @viewPricingPlans.
@@ -2105,6 +2112,378 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Widget Accent Color'**
   String get widgetAccentColor;
+
+  /// No description provided for @googleTasksDisconnected.
+  ///
+  /// In en, this message translates to:
+  /// **'Google Tasks Disconnected'**
+  String get googleTasksDisconnected;
+
+  /// No description provided for @googleTasksDisconnectedSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to reconnect and resume sync'**
+  String get googleTasksDisconnectedSubtitle;
+
+  /// No description provided for @reconnect.
+  ///
+  /// In en, this message translates to:
+  /// **'Reconnect'**
+  String get reconnect;
+
+  /// No description provided for @webPaywallTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock ROCIs Tasks Pro on Web'**
+  String get webPaywallTitle;
+
+  /// No description provided for @webPaywallSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade to premium to access all advanced features on any platform.'**
+  String get webPaywallSubtitle;
+
+  /// No description provided for @webSimulatedUpgradeBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade to Pro'**
+  String get webSimulatedUpgradeBtn;
+
+  /// No description provided for @webPaywallNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Payments are securely processed by Lemon Squeezy. Your subscription will be activated automatically.'**
+  String get webPaywallNotice;
+
+  /// No description provided for @monthlyPlanTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly Plan'**
+  String get monthlyPlanTitle;
+
+  /// No description provided for @monthlyPlanPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'\$4.99 / month'**
+  String get monthlyPlanPrice;
+
+  /// No description provided for @yearlyPlanTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Yearly Plan'**
+  String get yearlyPlanTitle;
+
+  /// No description provided for @yearlyPlanPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'\$39.99 / year'**
+  String get yearlyPlanPrice;
+
+  /// No description provided for @yearlyPlanSaving.
+  ///
+  /// In en, this message translates to:
+  /// **'Save 33%'**
+  String get yearlyPlanSaving;
+
+  /// No description provided for @groceryListMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Task List'**
+  String get groceryListMode;
+
+  /// No description provided for @groceryListModeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Format task as an interactive task list'**
+  String get groceryListModeSubtitle;
+
+  /// No description provided for @itemsInCart.
+  ///
+  /// In en, this message translates to:
+  /// **'{completed}/{total} completed'**
+  String itemsInCart(Object completed, Object total);
+
+  /// No description provided for @toBuy.
+  ///
+  /// In en, this message translates to:
+  /// **'To Do'**
+  String get toBuy;
+
+  /// No description provided for @inCart.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get inCart;
+
+  /// No description provided for @resetCart.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset List'**
+  String get resetCart;
+
+  /// No description provided for @clearCartItems.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear List Items'**
+  String get clearCartItems;
+
+  /// No description provided for @addItemHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Add item...'**
+  String get addItemHint;
+
+  /// No description provided for @quantityHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Qty'**
+  String get quantityHint;
+
+  /// No description provided for @timezone.
+  ///
+  /// In en, this message translates to:
+  /// **'Timezone'**
+  String get timezone;
+
+  /// No description provided for @selectTimezone.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Timezone'**
+  String get selectTimezone;
+
+  /// No description provided for @automaticTimezone.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatic (Device Timezone)'**
+  String get automaticTimezone;
+
+  /// No description provided for @searchTimezone.
+  ///
+  /// In en, this message translates to:
+  /// **'Search timezone...'**
+  String get searchTimezone;
+
+  /// No description provided for @repeatWeekdays.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekdays (Mon–Fri)'**
+  String get repeatWeekdays;
+
+  /// No description provided for @repeatYearly.
+  ///
+  /// In en, this message translates to:
+  /// **'Yearly'**
+  String get repeatYearly;
+
+  /// No description provided for @repeatCustom.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom...'**
+  String get repeatCustom;
+
+  /// No description provided for @repeatsEvery.
+  ///
+  /// In en, this message translates to:
+  /// **'Repeats every'**
+  String get repeatsEvery;
+
+  /// No description provided for @customRecurrence.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom Recurrence'**
+  String get customRecurrence;
+
+  /// No description provided for @daySingular.
+  ///
+  /// In en, this message translates to:
+  /// **'day'**
+  String get daySingular;
+
+  /// No description provided for @daysPlural.
+  ///
+  /// In en, this message translates to:
+  /// **'days'**
+  String get daysPlural;
+
+  /// No description provided for @weekSingular.
+  ///
+  /// In en, this message translates to:
+  /// **'week'**
+  String get weekSingular;
+
+  /// No description provided for @weeksPlural.
+  ///
+  /// In en, this message translates to:
+  /// **'weeks'**
+  String get weeksPlural;
+
+  /// No description provided for @monthSingular.
+  ///
+  /// In en, this message translates to:
+  /// **'month'**
+  String get monthSingular;
+
+  /// No description provided for @monthsPlural.
+  ///
+  /// In en, this message translates to:
+  /// **'months'**
+  String get monthsPlural;
+
+  /// No description provided for @yearSingular.
+  ///
+  /// In en, this message translates to:
+  /// **'year'**
+  String get yearSingular;
+
+  /// No description provided for @yearsPlural.
+  ///
+  /// In en, this message translates to:
+  /// **'years'**
+  String get yearsPlural;
+
+  /// No description provided for @selectRecurrence.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Recurrence'**
+  String get selectRecurrence;
+
+  /// No description provided for @guestMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest Mode'**
+  String get guestMode;
+
+  /// No description provided for @guestModeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'All data is stored locally on this device. Sign in to back up and sync with the cloud.'**
+  String get guestModeSubtitle;
+
+  /// No description provided for @guestAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest Account'**
+  String get guestAccount;
+
+  /// No description provided for @signInOrRegister.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign In / Register'**
+  String get signInOrRegister;
+
+  /// No description provided for @continueAsGuest.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue as Guest'**
+  String get continueAsGuest;
+
+  /// No description provided for @skipForNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip for now'**
+  String get skipForNow;
+
+  /// No description provided for @cloudSync.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud Backup & Sync'**
+  String get cloudSync;
+
+  /// No description provided for @cloudSyncActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Active & synced'**
+  String get cloudSyncActive;
+
+  /// No description provided for @customFields.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom Lines'**
+  String get customFields;
+
+  /// No description provided for @customFieldsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Attach contacts, locations, links, or notes'**
+  String get customFieldsSubtitle;
+
+  /// No description provided for @addCustomField.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Line'**
+  String get addCustomField;
+
+  /// No description provided for @contact.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact'**
+  String get contact;
+
+  /// No description provided for @location.
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get location;
+
+  /// No description provided for @link.
+  ///
+  /// In en, this message translates to:
+  /// **'Link'**
+  String get link;
+
+  /// No description provided for @note.
+  ///
+  /// In en, this message translates to:
+  /// **'Note'**
+  String get note;
+
+  /// No description provided for @fieldLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Label'**
+  String get fieldLabel;
+
+  /// No description provided for @fieldValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Value'**
+  String get fieldValue;
+
+  /// No description provided for @enterContactInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone number or email'**
+  String get enterContactInfo;
+
+  /// No description provided for @enterLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Address or place'**
+  String get enterLocation;
+
+  /// No description provided for @enterUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'Website or URL'**
+  String get enterUrl;
+
+  /// No description provided for @enterNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom details'**
+  String get enterNote;
+
+  /// No description provided for @copiedToClipboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Copied to clipboard'**
+  String get copiedToClipboard;
+
+  /// No description provided for @noCustomFieldsAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'No custom lines added'**
+  String get noCustomFieldsAdded;
 }
 
 class _AppLocalizationsDelegate
@@ -2113,7 +2492,7 @@ class _AppLocalizationsDelegate
 
   @override
   Future<AppLocalizations> load(Locale locale) {
-    return SynchronousFuture<AppLocalizations>(lookupAppLocalizations(locale));
+    return lookupAppLocalizations(locale);
   }
 
   @override
@@ -2124,6 +2503,7 @@ class _AppLocalizationsDelegate
     'es',
     'fr',
     'he',
+    'hi',
     'sv',
   ].contains(locale.languageCode);
 
@@ -2131,23 +2511,41 @@ class _AppLocalizationsDelegate
   bool shouldReload(_AppLocalizationsDelegate old) => false;
 }
 
-AppLocalizations lookupAppLocalizations(Locale locale) {
+Future<AppLocalizations> lookupAppLocalizations(Locale locale) {
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
     case 'ar':
-      return AppLocalizationsAr();
+      return app_localizations_ar.loadLibrary().then(
+        (dynamic _) => app_localizations_ar.AppLocalizationsAr(),
+      );
     case 'de':
-      return AppLocalizationsDe();
+      return app_localizations_de.loadLibrary().then(
+        (dynamic _) => app_localizations_de.AppLocalizationsDe(),
+      );
     case 'en':
-      return AppLocalizationsEn();
+      return app_localizations_en.loadLibrary().then(
+        (dynamic _) => app_localizations_en.AppLocalizationsEn(),
+      );
     case 'es':
-      return AppLocalizationsEs();
+      return app_localizations_es.loadLibrary().then(
+        (dynamic _) => app_localizations_es.AppLocalizationsEs(),
+      );
     case 'fr':
-      return AppLocalizationsFr();
+      return app_localizations_fr.loadLibrary().then(
+        (dynamic _) => app_localizations_fr.AppLocalizationsFr(),
+      );
     case 'he':
-      return AppLocalizationsHe();
+      return app_localizations_he.loadLibrary().then(
+        (dynamic _) => app_localizations_he.AppLocalizationsHe(),
+      );
+    case 'hi':
+      return app_localizations_hi.loadLibrary().then(
+        (dynamic _) => app_localizations_hi.AppLocalizationsHi(),
+      );
     case 'sv':
-      return AppLocalizationsSv();
+      return app_localizations_sv.loadLibrary().then(
+        (dynamic _) => app_localizations_sv.AppLocalizationsSv(),
+      );
   }
 
   throw FlutterError(

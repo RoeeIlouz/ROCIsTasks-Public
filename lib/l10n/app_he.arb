@@ -35,6 +35,7 @@
   "swedish": "שוודית",
   "german": "גרמנית",
   "french": "צרפתית",
+  "hindi": "הינדי",
   "tasks": "משימות",
   "editTask": "ערוך משימה",
   "newTask": "משימה חדשה",
@@ -75,7 +76,9 @@
   "restoredTask": "המשימה \"{title}\" שוחזרה",
   "@restoredTask": {
     "placeholders": {
-      "title": { "type": "String" }
+      "title": {
+        "type": "String"
+      }
     }
   },
   "deletePermanently": "למחוק לצמיתות?",
@@ -108,7 +111,9 @@
   "exportFailed": "הייצוא נכשל: {error}",
   "@exportFailed": {
     "placeholders": {
-      "error": { "type": "String" }
+      "error": {
+        "type": "String"
+      }
     }
   },
   "importData": "ייבוא נתונים (JSON)",
@@ -120,7 +125,9 @@
   "importFailed": "הייבוא נכשל: {error}",
   "@importFailed": {
     "placeholders": {
-      "error": { "type": "String" }
+      "error": {
+        "type": "String"
+      }
     }
   },
   "privacyAndGdpr": "פרטיות ו-GDPR",
@@ -154,12 +161,12 @@
   "subtasksAndChecklists": "משימות משנה ורשימות תיוג",
   "subtasksAndChecklistsDesc": "פרק משימות מורכבות לצעדים קטנים וניתנים לניהול.",
   "recurringTasks": "משימות חוזרות",
-  "recurringTasksDesc": "אוטומט את השגרה שלך עם כללי חזרה גמישים.",
+  "recurringTasksDesc": "הפוך משימות לאוטומטיות בלוח זמנים יומי, שבועי, חודשי או מותאם אישית.",
   "viewPricingPlans": "צפה בתוכניות תמחור",
   "proSubscriptionActive": "מנוי Pro פעיל",
-  "welcomeToPro": "ברוכים הבאים ל-Pro!",
-  "pickAPlan": "בחר תוכנית",
-  "byContinuingAgreement": "בהמשך השימוש, הינך מסכים ל-",
+  "welcomeToPro": "ברוך הבא ל-Pro!",
+  "pickAPlan": "בחר תכנית",
+  "byContinuingAgreement": "בהמשך השימוש, הינך מסכים ל",
   "purchasesRestored": "הרכישות שוחזרו בהצלחה!",
   "noActiveSubscription": "לא נמצא מנוי פעיל עבור חשבון זה.",
   "failedToRestore": "שחזור הרכישות נכשל.",
@@ -198,7 +205,9 @@
   "taskReminderTitle": "תזכורת למשימה: {title}",
   "@taskReminderTitle": {
     "placeholders": {
-      "title": { "type": "String" }
+      "title": {
+        "type": "String"
+      }
     }
   },
   "taskDueNowBody": "יש לך משימה שמועדה הגיע!",
@@ -212,20 +221,21 @@
   "nextOccurrenceSet": "המופע הבא של \"{title}\" נקבע ל-{date}",
   "@nextOccurrenceSet": {
     "placeholders": {
-      "title": { "type": "String" },
-      "date": { "type": "String" }
+      "title": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
     }
   },
   "initializationFailedError": "נכשל באתחול נתוני האפליקציה. אנא הפעל מחדש.",
-  "welcomeToPro": "ברוך הבא ל-Pro!",
   "noTaskDataAvailable": "אין נתוני משימות זמינים",
   "retryInitialization": "נסה שוב אתחול",
   "criticalErrorTitle": "שגיאה קריטית",
   "appStartupErrorBody": "ROCI's Tasks נתקלה בבעיה במהלך ההפעלה. הצוות שלנו קיבל הודעה.",
   "appTagline": "שמים לב לכל הפרטים",
-  "pickAPlan": "בחר תכנית",
   "termsOfService": "תנאי שימוש",
-  "byContinuingAgreement": "בהמשך השימוש, הינך מסכים ל",
   "allDay": "יום שלם",
   "event": "אירוע",
   "markAsIncomplete": "סמן כמשימה שלא הושלמה",
@@ -239,14 +249,18 @@
   "notificationUncompletedTasks": "{count} משימות שטרם הושלמו",
   "@notificationUncompletedTasks": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "notificationTasksRemaining": "משימות שנותרו",
   "notificationTasksSummary": "{count} משימות",
   "@notificationTasksSummary": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "skip": "דלג",
@@ -370,5 +384,67 @@
   "sunday": "יום ראשון",
   "monday": "יום שני",
   "saturday": "יום שבת",
-  "widgetAccentColor": "צבע הדגשה של הווידג'ט"
+  "widgetAccentColor": "צבע הדגשה של הווידג'ט",
+  "googleTasksDisconnected": "Google Tasks מנותק",
+  "googleTasksDisconnectedSubtitle": "הקש כדי להתחבר מחדש ולחדש את הסנכרון",
+  "reconnect": "התחבר מחדש",
+  "webPaywallTitle": "פתחו את ROCIs Tasks Pro בווב",
+  "webPaywallSubtitle": "שדרגו לפרימיום כדי לגשת לכל התכונות המתקדמות בכל פלטפורמה.",
+  "webSimulatedUpgradeBtn": "שדרוג לפרו",
+  "webPaywallNotice": "התשלומים מאובטחים ומעובדים על ידי Lemon Squeezy. המנוי שלך יופעל באופן אוטומטי.",
+  "monthlyPlanTitle": "תוכנית חודשית",
+  "monthlyPlanPrice": "$4.99 / חודש",
+  "yearlyPlanTitle": "תוכנית שנתית",
+  "yearlyPlanPrice": "$39.99 / שנה",
+  "yearlyPlanSaving": "חסוך 33%",
+  "groceryListMode": "רשימת משימות",
+  "groceryListModeSubtitle": "עיצוב המשימה כרשימת משימות אינטראקטיבית",
+  "itemsInCart": "{completed}/{total} הושלמו",
+  "toBuy": "לביצוע",
+  "inCart": "הושלמו",
+  "resetCart": "איפוס רשימה",
+  "clearCartItems": "ניקוי פריטים ברשימה",
+  "addItemHint": "הוספת פריט...",
+  "quantityHint": "כמות",
+  "timezone": "אזור זמן",
+  "selectTimezone": "בחירת אזור זמן",
+  "automaticTimezone": "אוטומטי (אזור זמן המכשיר)",
+  "searchTimezone": "חיפוש אזור זמן...",
+  "repeatWeekdays": "ימי חול (א'–ה')",
+  "repeatYearly": "שנתי",
+  "repeatCustom": "מותאם אישית...",
+  "repeatsEvery": "חוזר כל",
+  "customRecurrence": "חזרה מותאמת אישית",
+  "daySingular": "יום",
+  "daysPlural": "ימים",
+  "weekSingular": "שבוע",
+  "weeksPlural": "שבועות",
+  "monthSingular": "חודש",
+  "monthsPlural": "חודשים",
+  "yearSingular": "שנה",
+  "yearsPlural": "שנים",
+  "selectRecurrence": "בחר חזרה",
+  "guestMode": "מצב אורח",
+  "guestModeSubtitle": "כל הנתונים נשמרים מקומית במכשיר זה. התחבר כדי לגבות ולסנכרן עם הענן.",
+  "guestAccount": "חשבון אורח",
+  "signInOrRegister": "התחבר / הירשם",
+  "continueAsGuest": "המשך כאורח",
+  "skipForNow": "דלג לעת עתה",
+  "cloudSync": "גיבוי וסנכרון ענן",
+  "cloudSyncActive": "פעיל ומסונכרן",
+  "customFields": "שורות מותאמות אישית",
+  "customFieldsSubtitle": "צרף אנשי קשר, מיקומים, קישורים או הערות",
+  "addCustomField": "הוסף שורה",
+  "contact": "איש קשר",
+  "location": "מיקום",
+  "link": "קישור",
+  "note": "הערה",
+  "fieldLabel": "תווית",
+  "fieldValue": "ערך",
+  "enterContactInfo": "מספר טלפון או דוא\"ל",
+  "enterLocation": "כתובת או מקום",
+  "enterUrl": "כתובת אתר או קישור",
+  "enterNote": "פרטים נוספים",
+  "copiedToClipboard": "הועתק ללוח",
+  "noCustomFieldsAdded": "לא נוספו שורות מותאמות אישית"
 }

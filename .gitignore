@@ -19,6 +19,7 @@ migrate_working_dir/
 .dbg/
 .kilocode/
 .mimocode/
+.github/copilot-instructions.md
 .agents/
 # IntelliJ related
 *.iml
@@ -38,10 +39,14 @@ migrate_working_dir/
 .flutter-plugins-dependencies
 .pub-cache/
 .pub/
-/build/
+build/
+**/build/
+android/app/build/
+android/build/
 /coverage/
 .agent/
 .kilocode/
+repomix-output.xml
 # Symbolication related
 app.*.symbols
 
@@ -54,7 +59,12 @@ app.*.map.json
 /android/app/release
 /lib/firebase_options.dart
 /lib/firebase_schedule_options.dart
-
+/docs/SUMMARY.md
+graphify-out/
+.serena/
+functions/
+assets/screenshots/*
+docs/notebooklm/
 # Environment and Security Files
 .env
 .env.local

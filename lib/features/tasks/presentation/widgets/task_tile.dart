@@ -12,6 +12,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:rocis_tasks/core/services/security_service.dart';
 import 'package:rocis_tasks/core/services/subscription_service.dart';
+import 'package:rocis_tasks/features/tasks/domain/services/task_recurrence_service.dart';
+import 'package:rocis_tasks/features/tasks/domain/services/custom_field_action_service.dart';
 import 'package:rocis_tasks/features/tasks/presentation/widgets/task_unlock_dialog.dart';
 
 class TaskTile extends StatelessWidget {
@@ -119,29 +121,56 @@ class TaskTile extends StatelessWidget {
             ? (categories.isNotEmpty ? Color(categories.first.colorValue) : theme.colorScheme.primary)
             : null,
         child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 10,
+          padding: const EdgeInsets.only(
+            left: 6,
+            right: 16,
+            top: 10,
+            bottom: 10,
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 2),
-                child: GestureDetector(
-                  onTap: isSelectionMode
-                      ? () => onLongPress?.call()
-                      : () {
-                          if (themeService.taskCompletionFeedback) {
-                            // Stronger impact when completing, lighter when un-completing
-                            if (!task.isCompleted) {
-                              HapticFeedback.mediumImpact();
-                            } else {
-                              HapticFeedback.lightImpact();
-                            }
+              if (!isSelectionMode && task.isGroceryList)
+                Padding(
+                  padding: const EdgeInsets.only(
+                    left: 10,
+                    right: 10,
+                    top: 2,
+                    bottom: 18,
+                  ),
+                  child: Icon(
+                    task.isCompleted ? Icons.check_circle_rounded : Icons.checklist_rounded,
+                    color: task.isCompleted
+                        ? theme.colorScheme.primary
+                        : (categories.isNotEmpty
+                            ? Color(categories.first.colorValue)
+                            : theme.colorScheme.primary).withValues(alpha: 0.7),
+                    size: 26,
+                  ),
+                )
+              else
+                GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: isSelectionMode
+                    ? () => onLongPress?.call()
+                    : () {
+                        if (themeService.taskCompletionFeedback) {
+                          // Stronger impact when completing, lighter when un-completing
+                          if (!task.isCompleted) {
+                            HapticFeedback.mediumImpact();
+                          } else {
+                            HapticFeedback.lightImpact();
                           }
-                          onToggle();
-                        },
+                        }
+                        onToggle();
+                      },
+                child: Padding(
+                  padding: const EdgeInsets.only(
+                    left: 10,
+                    right: 10,
+                    top: 2,
+                    bottom: 18,
+                  ),
                   child: Semantics(
                     label: isSelectionMode
                         ? (isSelected ? 'Selected' : 'Not selected')
@@ -181,7 +210,7 @@ class TaskTile extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 6),
               Expanded(
                 child: InkWell(
                   onTap: isSelectionMode ? onLongPress : onTap,
@@ -251,7 +280,14 @@ class TaskTile extends StatelessWidget {
                                 label: c.name,
                                 color: Color(c.colorValue),
                               )),
-                              if (task.dueDate != null)
+                              if (task.isGroceryList)
+                                _buildChip(
+                                  context,
+                                  icon: Icons.checklist_rounded,
+                                  label: '${task.subTasks?.where((st) => st.isCompleted).length ?? 0}/${task.subTasks?.length ?? 0}',
+                                  color: theme.colorScheme.primary,
+                                ),
+                               if (task.dueDate != null)
                                 _buildChip(
                                   context,
                                   icon: Icons.access_time_rounded,
@@ -269,8 +305,42 @@ class TaskTile extends StatelessWidget {
                                       ? theme.colorScheme.error
                                       : theme.colorScheme.primary,
                                 ),
-                            ],
-                          ),
+                               if (task.recurrenceRule != null &&
+                                   task.recurrenceRule!.trim().isNotEmpty)
+                                 _buildChip(
+                                   context,
+                                   icon: Icons.repeat_rounded,
+                                   label: TaskRecurrenceService.getRecurrenceLabel(
+                                     task.recurrenceRule,
+                                     l10n,
+                                   ),
+                                   color: theme.colorScheme.primary,
+                                 ),
+                               if (task.customFields != null &&
+                                   task.customFields!.isNotEmpty)
+                                 ...task.customFields!
+                                     .where((cf) =>
+                                         cf.value.isNotEmpty ||
+                                         cf.label.isNotEmpty)
+                                     .map((cf) {
+                                   final icon =
+                                       CustomFieldActionService.getIcon(
+                                     cf.type,
+                                     cf.value,
+                                   );
+                                   final displayLabel =
+                                       cf.value.isNotEmpty
+                                           ? cf.value
+                                           : cf.label;
+                                   return _buildChip(
+                                     context,
+                                     icon: icon,
+                                     label: displayLabel,
+                                     color: theme.colorScheme.primary,
+                                   );
+                                 }),
+                             ],
+                           ),
                         ],
                       ),
                     ),
@@ -305,32 +375,52 @@ class TaskTile extends StatelessWidget {
                             listen: false,
                           ).toggleTaskPin(task);
                         },
-                        constraints: const BoxConstraints(),
-                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+                        padding: const EdgeInsets.all(8),
                       ),
                     )
                   else
                     const SizedBox(height: 40),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 8),
                   Semantics(
                     label: '${l10n.priority}: ${task.priority.name}',
                     child: Container(
-                      width: 10,
-                      height: 10,
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                       decoration: BoxDecoration(
-                        color: _getPriorityColor(
-                          context,
-                          task.priority,
+                        color: _getPriorityColor(context, task.priority).withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(
+                          color: _getPriorityColor(context, task.priority).withValues(alpha: 0.3),
+                          width: 1,
                         ),
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: _getPriorityColor(
-                              context,
-                              task.priority,
-                            ).withValues(alpha: 0.4),
-                            blurRadius: 6,
-                            spreadRadius: 1,
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            width: 6,
+                            height: 6,
+                            decoration: BoxDecoration(
+                              color: _getPriorityColor(context, task.priority),
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: _getPriorityColor(context, task.priority).withValues(alpha: 0.6),
+                                  blurRadius: 4,
+                                  spreadRadius: 1,
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            task.priority.name.toUpperCase(),
+                            style: GoogleFonts.outfit(
+                              fontSize: 9,
+                              fontWeight: FontWeight.bold,
+                              color: _getPriorityColor(context, task.priority),
+                              letterSpacing: 0.5,
+                            ),
                           ),
                         ],
                       ),

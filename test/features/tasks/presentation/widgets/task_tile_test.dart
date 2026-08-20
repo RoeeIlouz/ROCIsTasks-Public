@@ -14,6 +14,22 @@ import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:rocis_tasks/core/services/subscription_service.dart';
 import 'package:rocis_tasks/core/services/security_service.dart';
 
+import 'package:flutter/foundation.dart' hide Category;
+import 'package:rocis_tasks/l10n/app_localizations_en.dart';
+
+class SynchronousAppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
+  const SynchronousAppLocalizationsDelegate();
+
+  @override
+  bool isSupported(Locale locale) => true;
+
+  @override
+  Future<AppLocalizations> load(Locale locale) => SynchronousFuture(AppLocalizationsEn());
+
+  @override
+  bool shouldReload(SynchronousAppLocalizationsDelegate old) => false;
+}
+
 class MockTaskProvider extends Mock implements TaskProvider {}
 
 class MockThemeService extends Mock implements ThemeService {}
@@ -38,6 +54,7 @@ void main() {
     when(() => mockThemeService.isDarkMode).thenReturn(false);
     when(() => mockThemeService.useGlassmorphism).thenReturn(true);
     when(() => mockThemeService.taskCompletionFeedback).thenReturn(false);
+    when(() => mockThemeService.useMaterialTheme).thenReturn(true);
     when(() => mockSubscriptionService.isPremium).thenReturn(true);
     when(() => mockPrivateModeService.shouldHidePrivateContent)
         .thenReturn(false);
@@ -67,7 +84,7 @@ void main() {
       child: MaterialApp(
         theme: AppTheme.lightTheme,
         localizationsDelegates: const [
-          AppLocalizations.delegate,
+          SynchronousAppLocalizationsDelegate(),
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
@@ -340,6 +357,29 @@ void main() {
       await tester.pumpWidget(createWidgetUnderTest(task));
       expect(find.text('No Desc'), findsOneWidget);
       // Should not have a second text widget for description
+    });
+  });
+
+  group('TaskTile - Recurrence Chip', () {
+    testWidgets('shows recurrence chip when recurrenceRule is set', (tester) async {
+      final task = Task(
+        id: '1',
+        title: 'Recurring Task',
+        recurrenceRule: 'FREQ=DAILY;INTERVAL=1',
+      );
+      await tester.pumpWidget(createWidgetUnderTest(task));
+      expect(find.text('Daily'), findsOneWidget);
+      expect(find.byIcon(Icons.repeat_rounded), findsOneWidget);
+    });
+
+    testWidgets('does not show recurrence chip when recurrenceRule is null', (tester) async {
+      final task = Task(
+        id: '2',
+        title: 'Normal Task',
+        recurrenceRule: null,
+      );
+      await tester.pumpWidget(createWidgetUnderTest(task));
+      expect(find.byIcon(Icons.repeat_rounded), findsNothing);
     });
   });
 }

@@ -30,6 +30,7 @@ import 'package:rocis_tasks/core/services/logger_service.dart';
 import 'package:rocis_tasks/core/services/analytics_service.dart';
 import 'package:rocis_tasks/core/services/backup_service.dart';
 import 'package:rocis_tasks/core/services/quick_actions_service.dart';
+import 'package:rocis_tasks/core/services/timezone_service.dart';
 import 'package:rocis_tasks/core/services/security_service.dart';
 
 Future<void> main() async {
@@ -60,6 +61,7 @@ class _AppRootState extends State<AppRoot> {
   late final _authService = AuthService(_errorHandlingService);
   final _calendarService = CalendarService();
   final _themeService = ThemeService();
+  final _timezoneService = TimezoneService();
   final _calendarColorService = CalendarColorService();
   final _scheduleService = ScheduleFirestoreService();
   final _privateModeService = PrivateModeService();
@@ -95,6 +97,7 @@ class _AppRootState extends State<AppRoot> {
     debugPrint('AppRoot: _initServices started');
     _onboardingService = OnboardingService();
     _appRouter = AppRouter(_authService, _onboardingService);
+    _calendarService.setAuthService(_authService);
 
     try {
       await Future.wait([
@@ -122,6 +125,13 @@ class _AppRootState extends State<AppRoot> {
         _themeService.init().catchError(
           (e, stack) => AppLogger.error(
             'Failed to init theme service',
+            error: e,
+            stack: stack,
+          ),
+        ),
+        _timezoneService.init().catchError(
+          (e, stack) => AppLogger.error(
+            'Failed to init timezone service',
             error: e,
             stack: stack,
           ),
@@ -197,6 +207,7 @@ class _AppRootState extends State<AppRoot> {
     _subscriptionService.dispose();
     _connectivityService.dispose();
     _themeService.dispose();
+    _timezoneService.dispose();
     _calendarColorService.dispose();
     super.dispose();
   }
@@ -347,6 +358,7 @@ class _AppRootState extends State<AppRoot> {
         return MultiProvider(
           providers: [
             ChangeNotifierProvider.value(value: _themeService),
+            ChangeNotifierProvider.value(value: _timezoneService),
             ChangeNotifierProvider.value(value: _calendarColorService),
             ChangeNotifierProvider.value(value: _authService),
             ChangeNotifierProvider.value(value: _taskProvider),
@@ -359,7 +371,7 @@ class _AppRootState extends State<AppRoot> {
               create: (_) => CalendarProvider(
                 _calendarService,
                 _fullCalendarWidgetService,
-              )..loadEvents(),
+              ),
             ),
             ChangeNotifierProvider.value(value: _onboardingService),
             Provider.value(value: _appRouter!),

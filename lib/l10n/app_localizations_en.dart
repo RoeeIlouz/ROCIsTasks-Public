@@ -117,6 +117,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get french => 'French';
 
   @override
+  String get hindi => 'Hindi';
+
+  @override
   String get tasks => 'Tasks';
 
   @override
@@ -445,7 +448,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get recurringTasksDesc =>
-      'Automate your routine with flexible repetition rules.';
+      'Automate repeating tasks with daily, weekly, monthly, or custom schedules.';
 
   @override
   String get viewPricingPlans => 'View Pricing Plans';
@@ -1058,4 +1061,198 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get widgetAccentColor => 'Widget Accent Color';
+
+  @override
+  String get googleTasksDisconnected => 'Google Tasks Disconnected';
+
+  @override
+  String get googleTasksDisconnectedSubtitle =>
+      'Tap to reconnect and resume sync';
+
+  @override
+  String get reconnect => 'Reconnect';
+
+  @override
+  String get webPaywallTitle => 'Unlock ROCIs Tasks Pro on Web';
+
+  @override
+  String get webPaywallSubtitle =>
+      'Upgrade to premium to access all advanced features on any platform.';
+
+  @override
+  String get webSimulatedUpgradeBtn => 'Upgrade to Pro';
+
+  @override
+  String get webPaywallNotice =>
+      'Payments are securely processed by Lemon Squeezy. Your subscription will be activated automatically.';
+
+  @override
+  String get monthlyPlanTitle => 'Monthly Plan';
+
+  @override
+  String get monthlyPlanPrice => '\$4.99 / month';
+
+  @override
+  String get yearlyPlanTitle => 'Yearly Plan';
+
+  @override
+  String get yearlyPlanPrice => '\$39.99 / year';
+
+  @override
+  String get yearlyPlanSaving => 'Save 33%';
+
+  @override
+  String get groceryListMode => 'Task List';
+
+  @override
+  String get groceryListModeSubtitle =>
+      'Format task as an interactive task list';
+
+  @override
+  String itemsInCart(Object completed, Object total) {
+    return '$completed/$total completed';
+  }
+
+  @override
+  String get toBuy => 'To Do';
+
+  @override
+  String get inCart => 'Completed';
+
+  @override
+  String get resetCart => 'Reset List';
+
+  @override
+  String get clearCartItems => 'Clear List Items';
+
+  @override
+  String get addItemHint => 'Add item...';
+
+  @override
+  String get quantityHint => 'Qty';
+
+  @override
+  String get timezone => 'Timezone';
+
+  @override
+  String get selectTimezone => 'Select Timezone';
+
+  @override
+  String get automaticTimezone => 'Automatic (Device Timezone)';
+
+  @override
+  String get searchTimezone => 'Search timezone...';
+
+  @override
+  String get repeatWeekdays => 'Weekdays (Mon–Fri)';
+
+  @override
+  String get repeatYearly => 'Yearly';
+
+  @override
+  String get repeatCustom => 'Custom...';
+
+  @override
+  String get repeatsEvery => 'Repeats every';
+
+  @override
+  String get customRecurrence => 'Custom Recurrence';
+
+  @override
+  String get daySingular => 'day';
+
+  @override
+  String get daysPlural => 'days';
+
+  @override
+  String get weekSingular => 'week';
+
+  @override
+  String get weeksPlural => 'weeks';
+
+  @override
+  String get monthSingular => 'month';
+
+  @override
+  String get monthsPlural => 'months';
+
+  @override
+  String get yearSingular => 'year';
+
+  @override
+  String get yearsPlural => 'years';
+
+  @override
+  String get selectRecurrence => 'Select Recurrence';
+
+  @override
+  String get guestMode => 'Guest Mode';
+
+  @override
+  String get guestModeSubtitle =>
+      'All data is stored locally on this device. Sign in to back up and sync with the cloud.';
+
+  @override
+  String get guestAccount => 'Guest Account';
+
+  @override
+  String get signInOrRegister => 'Sign In / Register';
+
+  @override
+  String get continueAsGuest => 'Continue as Guest';
+
+  @override
+  String get skipForNow => 'Skip for now';
+
+  @override
+  String get cloudSync => 'Cloud Backup & Sync';
+
+  @override
+  String get cloudSyncActive => 'Active & synced';
+
+  @override
+  String get customFields => 'Custom Lines';
+
+  @override
+  String get customFieldsSubtitle =>
+      'Attach contacts, locations, links, or notes';
+
+  @override
+  String get addCustomField => 'Add Line';
+
+  @override
+  String get contact => 'Contact';
+
+  @override
+  String get location => 'Location';
+
+  @override
+  String get link => 'Link';
+
+  @override
+  String get note => 'Note';
+
+  @override
+  String get fieldLabel => 'Label';
+
+  @override
+  String get fieldValue => 'Value';
+
+  @override
+  String get enterContactInfo => 'Phone number or email';
+
+  @override
+  String get enterLocation => 'Address or place';
+
+  @override
+  String get enterUrl => 'Website or URL';
+
+  @override
+  String get enterNote => 'Custom details';
+
+  @override
+  String get copiedToClipboard => 'Copied to clipboard';
+
+  @override
+  String get noCustomFieldsAdded => 'No custom lines added';
 }

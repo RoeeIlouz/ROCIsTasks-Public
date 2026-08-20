@@ -6,7 +6,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:rocis_tasks/core/models/schedule_data.dart';
 import 'package:rocis_tasks/core/services/logger_service.dart';
 import 'package:firebase_performance/firebase_performance.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 
 /// Service to fetch schedule data from the ROCIs-Schedule Firestore database.
 ///

@@ -4,7 +4,7 @@
 
 <div align="center">
 
-[![Web App](https://img.shields.io/badge/Web_Version-rocis--todo.web.app-blue?style=for-the-badge&logo=googlechrome&logoColor=white)](https://rocis-todo.web.app)
+[![Web App](https://img.shields.io/badge/Web_Version-tasks.rocisapps.com-blue?style=for-the-badge&logo=googlechrome&logoColor=white)](https://tasks.rocisapps.com)
 [![Android App](https://img.shields.io/badge/Android_Version-Google_Play-green?style=for-the-badge&logo=android&logoColor=white)](https://play.google.com/store/apps/details?id=com.rocisapps.tasks)
 
 </div>

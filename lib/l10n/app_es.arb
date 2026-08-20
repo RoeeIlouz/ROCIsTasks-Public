@@ -33,8 +33,9 @@
   "spanish": "Español",
   "arabic": "Árabe",
   "swedish": "Sueco",
-  "german": "Alem\u00e1n",
-  "french": "Franc\u00e9s",
+  "german": "Alemán",
+  "french": "Francés",
+  "hindi": "Hindi",
   "tasks": "Tareas",
   "editTask": "Editar tarea",
   "newTask": "Nueva tarea",
@@ -75,7 +76,9 @@
   "restoredTask": "Tarea \"{title}\" restaurada",
   "@restoredTask": {
     "placeholders": {
-      "title": { "type": "String" }
+      "title": {
+        "type": "String"
+      }
     }
   },
   "deletePermanently": "¿Eliminar permanentemente?",
@@ -108,7 +111,9 @@
   "exportFailed": "Error al exportar: {error}",
   "@exportFailed": {
     "placeholders": {
-      "error": { "type": "String" }
+      "error": {
+        "type": "String"
+      }
     }
   },
   "importData": "Importar datos (JSON)",
@@ -120,7 +125,9 @@
   "importFailed": "Error al importar: {error}",
   "@importFailed": {
     "placeholders": {
-      "error": { "type": "String" }
+      "error": {
+        "type": "String"
+      }
     }
   },
   "privacyAndGdpr": "Privacidad y GDPR",
@@ -154,12 +161,12 @@
   "subtasksAndChecklists": "Subtareas y listas de verificación",
   "subtasksAndChecklistsDesc": "Divide las tareas complejas en pasos más pequeños y manejables.",
   "recurringTasks": "Tareas recurrentes",
-  "recurringTasksDesc": "Automatiza tu rutina con reglas de repetición flexibles.",
+  "recurringTasksDesc": "Automatiza tareas repetitivas con programaciones diarias, semanales, mensuales o personalizadas.",
   "viewPricingPlans": "Ver planes de precios",
   "proSubscriptionActive": "Suscripción Pro activa",
   "welcomeToPro": "¡Bienvenido a Pro!",
   "pickAPlan": "Elige un plan",
-  "byContinuingAgreement": "Al continuar, aceptas nuestro",
+  "byContinuingAgreement": "Al continuar, aceptas nuestros",
   "purchasesRestored": "¡Compras restauradas correctamente!",
   "noActiveSubscription": "No se encontró suscripción activa para esta cuenta.",
   "failedToRestore": "No se pudieron restaurar las compras.",
@@ -198,7 +205,9 @@
   "taskReminderTitle": "Recordatorio de tarea: {title}",
   "@taskReminderTitle": {
     "placeholders": {
-      "title": { "type": "String" }
+      "title": {
+        "type": "String"
+      }
     }
   },
   "taskDueNowBody": "¡Tienes una tarea que vence ahora!",
@@ -212,20 +221,21 @@
   "nextOccurrenceSet": "Siguiente ocurrencia de \"{title}\" establecida para {date}",
   "@nextOccurrenceSet": {
     "placeholders": {
-      "title": { "type": "String" },
-      "date": { "type": "String" }
+      "title": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
     }
   },
   "initializationFailedError": "Error al inicializar los datos de la aplicación. Por favor, reinicie.",
-  "welcomeToPro": "¡Bienvenido a Pro!",
   "noTaskDataAvailable": "No hay datos de tareas disponibles",
   "retryInitialization": "Reintentar inicialización",
   "criticalErrorTitle": "ERROR CRÍTICO",
   "appStartupErrorBody": "ROCI's Tasks encontró un problema durante el inicio. Nuestro equipo ha sido notificado.",
   "appTagline": "Cuidando cada detalle",
-  "pickAPlan": "Elige un plan",
   "termsOfService": "Términos de servicio",
-  "byContinuingAgreement": "Al continuar, aceptas nuestros",
   "allDay": "Todo el día",
   "event": "Evento",
   "markAsIncomplete": "Marcar como incompleta",
@@ -239,14 +249,18 @@
   "notificationUncompletedTasks": "{count} tareas sin completar",
   "@notificationUncompletedTasks": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "notificationTasksRemaining": "Tareas restantes",
   "notificationTasksSummary": "{count} tareas",
   "@notificationTasksSummary": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "skip": "Omitir",
@@ -370,5 +384,67 @@
   "sunday": "Domingo",
   "monday": "Lunes",
   "saturday": "Sábado",
-  "widgetAccentColor": "Color de acento del widget"
+  "widgetAccentColor": "Color de acento del widget",
+  "googleTasksDisconnected": "Google Tasks Desconectado",
+  "googleTasksDisconnectedSubtitle": "Toca para reconectar y reanudar la sincronización",
+  "reconnect": "Reconectar",
+  "webPaywallTitle": "Desbloquea ROCIs Tasks Pro en la Web",
+  "webPaywallSubtitle": "Actualiza a premium para acceder a todas las funciones avanzadas en cualquier plataforma.",
+  "webSimulatedUpgradeBtn": "Actualizar a Pro",
+  "webPaywallNotice": "Los pagos se procesan de forma segura por Lemon Squeezy. Tu suscripción se activará automáticamente.",
+  "monthlyPlanTitle": "Plan Mensual",
+  "monthlyPlanPrice": "$4.99 / mes",
+  "yearlyPlanTitle": "Plan Anual",
+  "yearlyPlanPrice": "$39.99 / año",
+  "yearlyPlanSaving": "Ahorra 33%",
+  "groceryListMode": "Lista de tareas",
+  "groceryListModeSubtitle": "Formatear tarea como una lista de tareas interactiva",
+  "itemsInCart": "{completed}/{total} completadas",
+  "toBuy": "Pendientes",
+  "inCart": "Completadas",
+  "resetCart": "Reiniciar lista",
+  "clearCartItems": "Limpiar elementos",
+  "addItemHint": "Añadir elemento...",
+  "quantityHint": "Cant.",
+  "timezone": "Zona horaria",
+  "selectTimezone": "Seleccionar zona horaria",
+  "automaticTimezone": "Automático (Zona del dispositivo)",
+  "searchTimezone": "Buscar zona horaria...",
+  "repeatWeekdays": "Días laborables (lun–vie)",
+  "repeatYearly": "Anualmente",
+  "repeatCustom": "Personalizado...",
+  "repeatsEvery": "Se repite cada",
+  "customRecurrence": "Recurrencia personalizada",
+  "daySingular": "día",
+  "daysPlural": "días",
+  "weekSingular": "semana",
+  "weeksPlural": "semanas",
+  "monthSingular": "mes",
+  "monthsPlural": "meses",
+  "yearSingular": "año",
+  "yearsPlural": "años",
+  "selectRecurrence": "Seleccionar recurrencia",
+  "guestMode": "Modo invitado",
+  "guestModeSubtitle": "Todos los datos se guardan localmente en este dispositivo. Inicia sesión para hacer una copia de seguridad y sincronizar con la nube.",
+  "guestAccount": "Cuenta de invitado",
+  "signInOrRegister": "Iniciar sesión / Registrarse",
+  "continueAsGuest": "Continuar como invitado",
+  "skipForNow": "Omitir por ahora",
+  "cloudSync": "Copia de seguridad y sincronización en la nube",
+  "cloudSyncActive": "Activo y sincronizado",
+  "customFields": "Líneas personalizadas",
+  "customFieldsSubtitle": "Adjunta contactos, ubicaciones, enlaces o notas",
+  "addCustomField": "Añadir línea",
+  "contact": "Contacto",
+  "location": "Ubicación",
+  "link": "Enlace",
+  "note": "Nota",
+  "fieldLabel": "Etiqueta",
+  "fieldValue": "Valor",
+  "enterContactInfo": "Teléfono o correo electrónico",
+  "enterLocation": "Dirección o lugar",
+  "enterUrl": "Sitio web o URL",
+  "enterNote": "Detalles personalizados",
+  "copiedToClipboard": "Copiado al portapapeles",
+  "noCustomFieldsAdded": "No hay líneas personalizadas"
 }

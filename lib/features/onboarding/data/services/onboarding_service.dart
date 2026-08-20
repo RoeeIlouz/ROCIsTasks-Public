@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:rocis_tasks/core/services/analytics_service.dart';
 
 class OnboardingService extends ChangeNotifier {

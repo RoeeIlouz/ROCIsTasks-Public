@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:rocis_tasks/features/home/presentation/screens/web_home_screen.dart';
 import 'package:rocis_tasks/features/calendar/presentation/screens/calendar_screen.dart';
@@ -45,23 +46,21 @@ class _HomeScreenState extends State<HomeScreen> {
   String? _lastHandledUri;
   DateTime? _lastHandledTime;
 
-  final List<Widget> _screens = const [
-    TaskListView(),
-    CalendarScreen(),
-    SettingsScreen(),
-  ];
+
 
   @override
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: _currentIndex);
 
-    // Handle Click Intents from Home Widgets (HomeWidget plugin)
-    hw.HomeWidget.initiallyLaunchedFromHomeWidget().then(_handleWidgetLaunch);
-    hw.HomeWidget.widgetClicked.listen(_handleWidgetLaunch);
+    if (!kIsWeb) {
+      // Handle Click Intents from Home Widgets (HomeWidget plugin)
+      hw.HomeWidget.initiallyLaunchedFromHomeWidget().then(_handleWidgetLaunch);
+      hw.HomeWidget.widgetClicked.listen(_handleWidgetLaunch);
 
-    // Handle widget deep links via method channel (for fill-in intents)
-    _widgetChannel.setMethodCallHandler(_handleWidgetMethodCall);
+      // Handle widget deep links via method channel (for fill-in intents)
+      _widgetChannel.setMethodCallHandler(_handleWidgetMethodCall);
+    }
 
     // Handle Notification Actions
     _notificationActionSubscription = NotificationService().onAction.listen((
@@ -159,6 +158,9 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _currentIndex = index;
     });
+    if (index == 0) {
+      Provider.of<TaskProvider>(context, listen: false).syncGoogleTasksToLocal();
+    }
   }
 
   void _onItemTapped(int index) {
@@ -387,7 +389,14 @@ class _HomeScreenState extends State<HomeScreen> {
               controller: _pageController,
               onPageChanged: _onPageChanged,
               physics: const BouncingScrollPhysics(),
-              children: _screens,
+              children: [
+                const TaskListView(),
+                LazyInitializationWidget(
+                  isVisible: _currentIndex == 1,
+                  child: const CalendarScreen(),
+                ),
+                const SettingsScreen(),
+              ],
             ),
           ),
         ],
@@ -643,5 +652,41 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
     );
+  }
+}
+
+class LazyInitializationWidget extends StatefulWidget {
+  final Widget child;
+  final bool isVisible;
+
+  const LazyInitializationWidget({
+    super.key,
+    required this.child,
+    required this.isVisible,
+  });
+
+  @override
+  State<LazyInitializationWidget> createState() => _LazyInitializationWidgetState();
+}
+
+class _LazyInitializationWidgetState extends State<LazyInitializationWidget> {
+  bool _initialized = false;
+
+  @override
+  void didUpdateWidget(covariant LazyInitializationWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isVisible && !_initialized) {
+      setState(() {
+        _initialized = true;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.isVisible) {
+      _initialized = true;
+    }
+    return _initialized ? widget.child : const SizedBox.shrink();
   }
 }

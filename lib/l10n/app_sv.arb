@@ -1,5 +1,5 @@
 {
-"@@locale": "sv",
+  "@@locale": "sv",
   "appTitle": "ROCI's Tasks",
   "settings": "Inställningar",
   "account": "Konto",
@@ -36,6 +36,7 @@
   "swedish": "Svenska",
   "german": "Tyska",
   "french": "Franska",
+  "hindi": "Hindi",
   "tasks": "Uppgifter",
   "editTask": "Redigera uppgift",
   "newTask": "Ny uppgift",
@@ -76,7 +77,9 @@
   "restoredTask": "Återställde {title}",
   "@restoredTask": {
     "placeholders": {
-      "title": { "type": "String" }
+      "title": {
+        "type": "String"
+      }
     }
   },
   "deletePermanently": "Ta bort permanent?",
@@ -109,7 +112,9 @@
   "exportFailed": "Exporten misslyckades: {error}",
   "@exportFailed": {
     "placeholders": {
-      "error": { "type": "String" }
+      "error": {
+        "type": "String"
+      }
     }
   },
   "importData": "Importera data (JSON)",
@@ -121,7 +126,9 @@
   "importFailed": "Importen misslyckades: {error}",
   "@importFailed": {
     "placeholders": {
-      "error": { "type": "String" }
+      "error": {
+        "type": "String"
+      }
     }
   },
   "privacyAndGdpr": "Integritet & GDPR",
@@ -155,7 +162,7 @@
   "subtasksAndChecklists": "Underuppgifter & checklistor",
   "subtasksAndChecklistsDesc": "Dela upp komplexa uppgifter i mindre steg.",
   "recurringTasks": "Återkommande uppgifter",
-  "recurringTasksDesc": "Automatisera dina rutiner med flexibla upprepningsregler.",
+  "recurringTasksDesc": "Automatisera återkommande uppgifter med dagliga, veckovisa, månatliga eller anpassade scheman.",
   "viewPricingPlans": "Visa prisplaner",
   "proSubscriptionActive": "Pro-prenumeration aktiv",
   "welcomeToPro": "Välkommen till Pro!",
@@ -199,7 +206,9 @@
   "taskReminderTitle": "Påminnelse: {title}",
   "@taskReminderTitle": {
     "placeholders": {
-      "title": { "type": "String" }
+      "title": {
+        "type": "String"
+      }
     }
   },
   "taskDueNowBody": "Du har en uppgift som förfaller nu!",
@@ -213,8 +222,12 @@
   "nextOccurrenceSet": "Nästa förekomst av \"{title}\" satt till {date}",
   "@nextOccurrenceSet": {
     "placeholders": {
-      "title": { "type": "String" },
-      "date": { "type": "String" }
+      "title": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
     }
   },
   "initializationFailedError": "Misslyckades med att initiera appdata. Starta om appen.",
@@ -237,14 +250,18 @@
   "notificationUncompletedTasks": "{count} oavslutade uppgifter",
   "@notificationUncompletedTasks": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "notificationTasksRemaining": "Uppgifter kvar",
   "notificationTasksSummary": "{count} uppgifter",
   "@notificationTasksSummary": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "skip": "Hoppa över",
@@ -354,5 +371,81 @@
   "glassmorphismEffectsSubtitle": "Använd frostat glas på kort",
   "noEventsForThisDay": "Inga händelser för denna dag",
   "searchSymbols": "Sök symboler",
-  "searchSymbolsDesc": "Använd symboler för att filtrera uppgifter: @kategori (t.ex. @arbete), #titel (t.ex. #möte), !prioritet (t.ex. !hög), %datum (t.ex. %2025-06-15), &deluppgift (t.ex. &bugfix), *status (*klar eller *pågående), ? (uppgifter idag). Kombinera flera symboler."
+  "searchSymbolsDesc": "Använd symboler för att filtrera uppgifter: @kategori (t.ex. @arbete), #titel (t.ex. #möte), !prioritet (t.ex. !hög), %datum (t.ex. %2025-06-15), &deluppgift (t.ex. &bugfix), *status (*klar eller *pågående), ? (uppgifter idag). Kombinera flera symboler.",
+  "monday": "Måndag",
+  "saturday": "Lördag",
+  "showWeekNumbers": "Visa veckonummer",
+  "startOfWeek": "Start på veckan",
+  "sunday": "Söndag",
+  "weekendHighlights": "Markera helger",
+  "widgetAccentColor": "Widget-accentfärg",
+  "widgetSettings": "Widget-anpassning",
+  "widgetSettingsSubtitle": "Konfigurera färger, tema och funktioner",
+  "widgetTheme": "Widget-tema",
+  "widgetThemeDark": "Solid mörk",
+  "widgetThemeGlassmorphic": "Glasmorfism",
+  "widgetThemeLight": "Solid ljus",
+  "widgetThemeSystem": "Systemstandard",
+  "googleTasksDisconnected": "Google Tasks bortkopplad",
+  "googleTasksDisconnectedSubtitle": "Tryck för att ansluta igen och återuppta synkroniseringen",
+  "reconnect": "Återanslut",
+  "webPaywallTitle": "Lås upp ROCIs Tasks Pro på webben",
+  "webPaywallSubtitle": "Uppgradera till premium för att få tillgång till alla avancerade funktioner på valfri plattform.",
+  "webSimulatedUpgradeBtn": "Uppgradera till Pro",
+  "webPaywallNotice": "Betalningar behandlas säkert av Lemon Squeezy. Ditt abonnemang kommer att aktiveras automatiskt.",
+  "monthlyPlanTitle": "Månadsplan",
+  "monthlyPlanPrice": "4,99 $ / månad",
+  "yearlyPlanTitle": "Årsplan",
+  "yearlyPlanPrice": "39,99 $ / år",
+  "yearlyPlanSaving": "Spara 33%",
+  "groceryListMode": "Uppgiftslista",
+  "groceryListModeSubtitle": "Formatera uppgiften som en interaktiv uppgiftslista",
+  "itemsInCart": "{completed}/{total} klara",
+  "toBuy": "Att göra",
+  "inCart": "Klara",
+  "resetCart": "Återställ lista",
+  "clearCartItems": "Töm listan",
+  "addItemHint": "Lägg till objekt...",
+  "quantityHint": "Antal",
+  "timezone": "Tidszon",
+  "selectTimezone": "Välj tidszon",
+  "automaticTimezone": "Automatisk (Enhetens tidszon)",
+  "searchTimezone": "Sök tidszon...",
+  "repeatWeekdays": "Vardagar (mån–fre)",
+  "repeatYearly": "Årligen",
+  "repeatCustom": "Anpassad...",
+  "repeatsEvery": "Upprepas var",
+  "customRecurrence": "Anpassad upprepning",
+  "daySingular": "dag",
+  "daysPlural": "dagar",
+  "weekSingular": "vecka",
+  "weeksPlural": "veckor",
+  "monthSingular": "månad",
+  "monthsPlural": "månader",
+  "yearSingular": "år",
+  "yearsPlural": "år",
+  "selectRecurrence": "Välj upprepning",
+  "guestMode": "Gästläge",
+  "guestModeSubtitle": "All data sparas lokalt på denna enhet. Logga in för att säkerhetskopiera och synkronisera med molnet.",
+  "guestAccount": "Gästkonto",
+  "signInOrRegister": "Logga in / Registrera",
+  "continueAsGuest": "Fortsätt som gäst",
+  "skipForNow": "Hoppa över tills vidare",
+  "cloudSync": "Molnsäkerhetskopiering & Synk",
+  "cloudSyncActive": "Aktiv & synkad",
+  "customFields": "Anpassade rader",
+  "customFieldsSubtitle": "Bifoga kontakter, platser, länkar eller anteckningar",
+  "addCustomField": "Lägg till rad",
+  "contact": "Kontakt",
+  "location": "Plats",
+  "link": "Länk",
+  "note": "Anteckning",
+  "fieldLabel": "Etikett",
+  "fieldValue": "Värde",
+  "enterContactInfo": "Telefonnummer eller e-post",
+  "enterLocation": "Adress eller plats",
+  "enterUrl": "Webbplats eller länk",
+  "enterNote": "Anpassade detaljer",
+  "copiedToClipboard": "Kopierat till urklipp",
+  "noCustomFieldsAdded": "Inga anpassade rader tillagda"
 }

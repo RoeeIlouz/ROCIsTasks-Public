@@ -17,9 +17,9 @@ class ErrorService {
 
   /// Initialize global error handling
   static void initialize() {
-    // Initialize Firebase services if available
+    // Initialize Firebase services if available (native only)
     try {
-      if (AppConfig.enableCrashReporting) {
+      if (AppConfig.enableCrashReporting && !kIsWeb) {
         _crashlytics = FirebaseCrashlytics.instance;
         _analytics = FirebaseAnalytics.instance;
       }

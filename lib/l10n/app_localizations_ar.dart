@@ -117,6 +117,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get french => 'الفرنسية';
 
   @override
+  String get hindi => 'الهندية';
+
+  @override
   String get tasks => 'المهام';
 
   @override
@@ -440,10 +443,11 @@ class AppLocalizationsAr extends AppLocalizations {
       'قسّم المهام المعقدة إلى خطوات أصغر يمكن إدارتها.';
 
   @override
-  String get recurringTasks => 'مهام متكررة';
+  String get recurringTasks => 'المهام المتكررة';
 
   @override
-  String get recurringTasksDesc => 'أتمتة روتينك بقواعد تكرار مرنة.';
+  String get recurringTasksDesc =>
+      'أتمتة المهام المتكررة بجداول يومية أو أسبوعية أو شهرية أو مخصصة.';
 
   @override
   String get viewPricingPlans => 'عرض خطط الأسعار';
@@ -1010,44 +1014,237 @@ class AppLocalizationsAr extends AppLocalizations {
       'استخدم الرموز لتصفية المهام: @فئة (مثلاً @عمل)، #عنوان (مثلاً #اجتماع)، !أولوية (مثلاً !عالية)، %تاريخ (مثلاً %2025-06-15)، &مهمة فرعية (مثلاً &إصلاح خطأ)، *حالة (*منجز أو *معلق)، ? (مهام اليوم). يمكن دمج عدة رموز.';
 
   @override
-  String get widgetSettings => 'Widget Customization';
+  String get widgetSettings => 'تخصيص الأداة';
 
   @override
-  String get widgetSettingsSubtitle => 'Configure colors, theme, and features';
+  String get widgetSettingsSubtitle => 'تكوين الألوان، المظهر، والميزات';
 
   @override
-  String get widgetTheme => 'Widget Theme';
+  String get widgetTheme => 'مظهر الأداة';
 
   @override
-  String get widgetThemeSystem => 'System Default';
+  String get widgetThemeSystem => 'الافتراضي للنظام';
 
   @override
-  String get widgetThemeLight => 'Solid Light';
+  String get widgetThemeLight => 'فاتح مصمت';
 
   @override
-  String get widgetThemeDark => 'Solid Dark';
+  String get widgetThemeDark => 'داكن مصمت';
 
   @override
-  String get widgetThemeGlassmorphic => 'Glassmorphism';
+  String get widgetThemeGlassmorphic => 'تأثير زجاجي';
 
   @override
-  String get showWeekNumbers => 'Show Week Numbers';
+  String get showWeekNumbers => 'عرض أرقام الأسابيع';
 
   @override
-  String get weekendHighlights => 'Highlight Weekends';
+  String get weekendHighlights => 'تمييز عطلة نهاية الأسبوع';
 
   @override
-  String get startOfWeek => 'Start of Week';
+  String get startOfWeek => 'بداية الأسبوع';
 
   @override
-  String get sunday => 'Sunday';
+  String get sunday => 'الأحد';
 
   @override
-  String get monday => 'Monday';
+  String get monday => 'الإثنين';
 
   @override
-  String get saturday => 'Saturday';
+  String get saturday => 'السبت';
 
   @override
-  String get widgetAccentColor => 'Widget Accent Color';
+  String get widgetAccentColor => 'لون تمييز الأداة';
+
+  @override
+  String get googleTasksDisconnected => 'تم قطع اتصال Google Tasks';
+
+  @override
+  String get googleTasksDisconnectedSubtitle =>
+      'انقر لإعادة الاتصال واستئناف المزامنة';
+
+  @override
+  String get reconnect => 'إعادة الاتصال';
+
+  @override
+  String get webPaywallTitle => 'افتح ROCIs Tasks Pro على الويب';
+
+  @override
+  String get webPaywallSubtitle =>
+      'قم بالترقية إلى بريميوم للوصول إلى جميع الميزات المتقدمة على أي منصة.';
+
+  @override
+  String get webSimulatedUpgradeBtn => 'الترقية إلى برو';
+
+  @override
+  String get webPaywallNotice =>
+      'يتم معالجة المدفوعات بشكل آمن بواسطة Lemon Squeezy. سيتم تفعيل اشتراكك تلقائيًا.';
+
+  @override
+  String get monthlyPlanTitle => 'الخطة الشهرية';
+
+  @override
+  String get monthlyPlanPrice => '4.99 \$ / شهر';
+
+  @override
+  String get yearlyPlanTitle => 'الخطة السنوية';
+
+  @override
+  String get yearlyPlanPrice => '39.99 \$ / سنة';
+
+  @override
+  String get yearlyPlanSaving => 'وفر 33%';
+
+  @override
+  String get groceryListMode => 'قائمة المهام';
+
+  @override
+  String get groceryListModeSubtitle => 'تنسيق المهمة كقائمة مهام تفاعلية';
+
+  @override
+  String itemsInCart(Object completed, Object total) {
+    return '$completed/$total مكتمل';
+  }
+
+  @override
+  String get toBuy => 'قيد الانتظار';
+
+  @override
+  String get inCart => 'مكتمل';
+
+  @override
+  String get resetCart => 'إعادة ضبط القائمة';
+
+  @override
+  String get clearCartItems => 'مسح عناصر القائمة';
+
+  @override
+  String get addItemHint => 'إضافة عنصر...';
+
+  @override
+  String get quantityHint => 'الكمية';
+
+  @override
+  String get timezone => 'المنطقة الزمنية';
+
+  @override
+  String get selectTimezone => 'تحديد المنطقة الزمنية';
+
+  @override
+  String get automaticTimezone => 'تلقائي (منطقة الجهاز الزمنية)';
+
+  @override
+  String get searchTimezone => 'البحث عن منطقة زمنية...';
+
+  @override
+  String get repeatWeekdays => 'أيام الأسبوع (الإثنين–الجمعة)';
+
+  @override
+  String get repeatYearly => 'سنويًا';
+
+  @override
+  String get repeatCustom => 'مخصص...';
+
+  @override
+  String get repeatsEvery => 'يتكرر كل';
+
+  @override
+  String get customRecurrence => 'تكرار مخصص';
+
+  @override
+  String get daySingular => 'يوم';
+
+  @override
+  String get daysPlural => 'أيام';
+
+  @override
+  String get weekSingular => 'أسبوع';
+
+  @override
+  String get weeksPlural => 'أسابيع';
+
+  @override
+  String get monthSingular => 'شهر';
+
+  @override
+  String get monthsPlural => 'أشهر';
+
+  @override
+  String get yearSingular => 'سنة';
+
+  @override
+  String get yearsPlural => 'سنوات';
+
+  @override
+  String get selectRecurrence => 'تحديد التكرار';
+
+  @override
+  String get guestMode => 'وضع الضيف';
+
+  @override
+  String get guestModeSubtitle =>
+      'يتم حفظ جميع البيانات محليًا على هذا الجهاز. سجّل الدخول لإجراء نسخ احتياطي والمزامنة مع السحابة.';
+
+  @override
+  String get guestAccount => 'حساب ضيف';
+
+  @override
+  String get signInOrRegister => 'تسجيل الدخول / التسجيل';
+
+  @override
+  String get continueAsGuest => 'المتابعة كضيف';
+
+  @override
+  String get skipForNow => 'تخطي الآن';
+
+  @override
+  String get cloudSync => 'النسخ الاحتياطي والمزامنة السحابية';
+
+  @override
+  String get cloudSyncActive => 'نشط ومزامن';
+
+  @override
+  String get customFields => 'أسطر مخصصة';
+
+  @override
+  String get customFieldsSubtitle =>
+      'إرفاق جهات اتصال أو مواقع أو روابط أو ملاحظات';
+
+  @override
+  String get addCustomField => 'إضافة سطر';
+
+  @override
+  String get contact => 'جهة اتصال';
+
+  @override
+  String get location => 'الموقع';
+
+  @override
+  String get link => 'رابط';
+
+  @override
+  String get note => 'ملاحظة';
+
+  @override
+  String get fieldLabel => 'التسمية';
+
+  @override
+  String get fieldValue => 'القيمة';
+
+  @override
+  String get enterContactInfo => 'رقم الهاتف أو البريد الإلكتروني';
+
+  @override
+  String get enterLocation => 'العنوان أو المكان';
+
+  @override
+  String get enterUrl => 'موقع الويب أو الرابط';
+
+  @override
+  String get enterNote => 'تفاصيل إضافية';
+
+  @override
+  String get copiedToClipboard => 'تم النسخ إلى الحافظة';
+
+  @override
+  String get noCustomFieldsAdded => 'لم تتم إضافة أسطر مخصصة';
 }

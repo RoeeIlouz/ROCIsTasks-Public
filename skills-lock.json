@@ -1,0 +1,55 @@
+{
+  "version": 1,
+  "skills": {
+    "accessibility": {
+      "source": "addyosmani/web-quality-skills",
+      "sourceType": "autoskills-registry",
+      "computedHash": "bffe3d08cfe92ebad63699f74ce29e35c19850ebfbf474c1463183cfe34d6a09"
+    },
+    "bash-defensive-patterns": {
+      "source": "wshobson/agents",
+      "sourceType": "autoskills-registry",
+      "computedHash": "1f566c2d9c3b50a784b05d08f6b08ebfeb31f038e4d4173f2d488484edb058a6"
+    },
+    "dart-best-practices": {
+      "source": "kevmoo/dash_skills",
+      "sourceType": "autoskills-registry",
+      "computedHash": "37da3773e51308a56bfc011659ba609b658be3308f9282b4e4d028da88bdeba2"
+    },
+    "flutter-animations": {
+      "source": "madteacher/mad-agents-skills",
+      "sourceType": "autoskills-registry",
+      "computedHash": "bb61dc664754acb797b37ffe2ce2a42212eb7f92eeab575797a05413b2ef134b"
+    },
+    "flutter-expert": {
+      "source": "jeffallan/claude-skills",
+      "sourceType": "autoskills-registry",
+      "computedHash": "71285453d40e4949865bf47cf63b7f41dd4461f44cd1a3970eb3eb0e76b9025b"
+    },
+    "flutter-testing": {
+      "source": "madteacher/mad-agents-skills",
+      "sourceType": "autoskills-registry",
+      "computedHash": "9de813d81db8ad38630a28b893494c1ebfe5def0e5d47cfb46c632ea7d2d92e5"
+    },
+    "frontend-design": {
+      "source": "anthropics/skills",
+      "sourceType": "autoskills-registry",
+      "computedHash": "82fb11a63fb1e35ee2469516ed02d54695f783115b1540c0e783197af4240a3a"
+    },
+    "java-coding-standards": {
+      "source": "affaan-m/everything-claude-code",
+      "sourceType": "autoskills-registry",
+      "computedHash": "1c417544249186f66c1110e7812e5bee4402ae5012442847b287b4d6e6dd9c55"
+    },
+    "java-docs": {
+      "source": "github/awesome-copilot",
+      "sourceType": "autoskills-registry",
+      "computedHash": "966d266801cce0b8d9039cb77a85249e8f318148be5ae5cbac09e45175b7fe5e"
+    },
+    "seo": {
+      "source": "addyosmani/web-quality-skills",
+      "sourceType": "autoskills-registry",
+      "computedHash": "c184da724d1c61ad077f27418ea8e7e88fd54bcdf98165e18be7e4681cbd5e20"
+    }
+  }
+}

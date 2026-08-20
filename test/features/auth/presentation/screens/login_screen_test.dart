@@ -9,6 +9,22 @@ import 'package:rocis_tasks/core/services/error_handling_service.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:rocis_tasks/shared/ui/theme/app_theme.dart';
 
+import 'package:flutter/foundation.dart';
+import 'package:rocis_tasks/l10n/app_localizations_en.dart';
+
+class SynchronousAppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
+  const SynchronousAppLocalizationsDelegate();
+
+  @override
+  bool isSupported(Locale locale) => true;
+
+  @override
+  Future<AppLocalizations> load(Locale locale) => SynchronousFuture(AppLocalizationsEn());
+
+  @override
+  bool shouldReload(SynchronousAppLocalizationsDelegate old) => false;
+}
+
 class MockAuthService extends Mock implements AuthService {}
 
 class MockErrorHandlingService extends Mock implements ErrorHandlingService {}
@@ -32,7 +48,7 @@ void main() {
       child: MaterialApp(
         theme: AppTheme.lightTheme,
         localizationsDelegates: const [
-          AppLocalizations.delegate,
+          SynchronousAppLocalizationsDelegate(),
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
@@ -99,6 +115,15 @@ void main() {
 
       // Should have a text button or similar for register navigation
       expect(find.byType(TextButton), findsWidgets);
+    });
+
+    testWidgets('renders continue as guest and skip buttons', (tester) async {
+      await tester.pumpWidget(createWidgetUnderTest());
+      await tester.pumpAndSettle();
+
+      // Should have Continue as Guest button and Skip for now action
+      expect(find.text('Continue as Guest'), findsOneWidget);
+      expect(find.text('Skip for now'), findsOneWidget);
     });
   });
 }

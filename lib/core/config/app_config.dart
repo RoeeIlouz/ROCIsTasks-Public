@@ -9,15 +9,20 @@ class AppConfig {
 
   // App information
   static const String appName = 'ROCI\'s Tasks';
-  static const String appVersion = '0.2.1';
-  static const String supportEmail = 'support@ilouz.xyz';
-  static const String privacyPolicyUrl =
-      'https://rocisapps.ilouz.xyz/privacy.html';
-  static const String termsOfServiceUrl =
-      'https://rocisapps.ilouz.xyz/terms.html';
-  static const String websiteUrl = 'https://rocisapps.ilouz.xyz';
+  static const String appVersion = '0.2.8';
+  static const String supportEmail = 'support@rocisapps.com';
+  static const String privacyPolicyUrl = 'https://rocisapps.com/privacy.html';
+  static const String termsOfServiceUrl = 'https://rocisapps.com/terms.html';
+  static const String websiteUrl = 'https://rocisapps.com';
+  static const String webAppUrl = 'https://tasks.rocisapps.com';
   static const String githubUrl =
       'https://github.com/RoeeIlouz/ROCIsTasks-public';
+
+  // Lemon Squeezy Web Checkout URLs
+  static const String lemonSqueezyMonthlyUrl =
+      'https://rocisapps.lemonsqueezy.com/checkout/buy/126bd435-f3ff-4414-8100-2e06815bdd51?embed=1&discount=0';
+  static const String lemonSqueezyYearlyUrl =
+      'https://rocisapps.lemonsqueezy.com/checkout/buy/700631d4-2b55-4986-a594-18b89293711f?embed=1&discount=0';
 
   // Feature flags
   static const bool enableAnalytics = isProduction;

@@ -117,6 +117,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get french => 'Français';
 
   @override
+  String get hindi => 'Hindi';
+
+  @override
   String get tasks => 'Tâches';
 
   @override
@@ -450,7 +453,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get recurringTasksDesc =>
-      'Automatisez votre routine avec des règles de répétition flexibles.';
+      'Automatisez les tâches répétitives avec des fréquences quotidiennes, hebdomadaires, mensuelles ou personnalisées.';
 
   @override
   String get viewPricingPlans => 'Voir les tarifs';
@@ -1040,44 +1043,239 @@ class AppLocalizationsFr extends AppLocalizations {
       'Utilisez des symboles pour filtrer les tâches : @catégorie (ex. @travail), #titre (ex. #réunion), !priorité (ex. !haute), %date (ex. %2025-06-15), &sous-tâche (ex. &correction bug), *statut (*fait ou *en cours), ? (tâches d\'aujourd\'hui). Combiner plusieurs symboles.';
 
   @override
-  String get widgetSettings => 'Widget Customization';
+  String get widgetSettings => 'Personnalisation du widget';
 
   @override
-  String get widgetSettingsSubtitle => 'Configure colors, theme, and features';
+  String get widgetSettingsSubtitle =>
+      'Configurer les couleurs, le thème et les fonctionnalités';
 
   @override
-  String get widgetTheme => 'Widget Theme';
+  String get widgetTheme => 'Thème du widget';
 
   @override
-  String get widgetThemeSystem => 'System Default';
+  String get widgetThemeSystem => 'Par défaut du système';
 
   @override
-  String get widgetThemeLight => 'Solid Light';
+  String get widgetThemeLight => 'Clair uni';
 
   @override
-  String get widgetThemeDark => 'Solid Dark';
+  String get widgetThemeDark => 'Sombre uni';
 
   @override
-  String get widgetThemeGlassmorphic => 'Glassmorphism';
+  String get widgetThemeGlassmorphic => 'Effet verre dépoli';
 
   @override
-  String get showWeekNumbers => 'Show Week Numbers';
+  String get showWeekNumbers => 'Afficher les numéros de semaine';
 
   @override
-  String get weekendHighlights => 'Highlight Weekends';
+  String get weekendHighlights => 'Mettre en évidence les week-ends';
 
   @override
-  String get startOfWeek => 'Start of Week';
+  String get startOfWeek => 'Début de la semaine';
 
   @override
-  String get sunday => 'Sunday';
+  String get sunday => 'Dimanche';
 
   @override
-  String get monday => 'Monday';
+  String get monday => 'Lundi';
 
   @override
-  String get saturday => 'Saturday';
+  String get saturday => 'Samedi';
 
   @override
-  String get widgetAccentColor => 'Widget Accent Color';
+  String get widgetAccentColor => 'Couleur d\'accentuation du widget';
+
+  @override
+  String get googleTasksDisconnected => 'Google Tasks Déconnecté';
+
+  @override
+  String get googleTasksDisconnectedSubtitle =>
+      'Appuyez pour vous reconnecter et reprendre la synchronisation';
+
+  @override
+  String get reconnect => 'Se reconnecter';
+
+  @override
+  String get webPaywallTitle => 'Débloquez ROCIs Tasks Pro sur le Web';
+
+  @override
+  String get webPaywallSubtitle =>
+      'Passez à la version premium pour accéder à toutes les fonctionnalités avancées sur n\'importe quelle plateforme.';
+
+  @override
+  String get webSimulatedUpgradeBtn => 'Mettre à niveau vers Pro';
+
+  @override
+  String get webPaywallNotice =>
+      'Les paiements sont traités en toute sécurité par Lemon Squeezy. Votre abonnement sera activé automatiquement.';
+
+  @override
+  String get monthlyPlanTitle => 'Forfait Mensuel';
+
+  @override
+  String get monthlyPlanPrice => '4,99 \$ / mois';
+
+  @override
+  String get yearlyPlanTitle => 'Forfait Annuel';
+
+  @override
+  String get yearlyPlanPrice => '39,99 \$ / an';
+
+  @override
+  String get yearlyPlanSaving => 'Économisez 33%';
+
+  @override
+  String get groceryListMode => 'Liste de tâches';
+
+  @override
+  String get groceryListModeSubtitle =>
+      'Formater la tâche sous forme de liste de tâches interactive';
+
+  @override
+  String itemsInCart(Object completed, Object total) {
+    return '$completed/$total terminées';
+  }
+
+  @override
+  String get toBuy => 'À faire';
+
+  @override
+  String get inCart => 'Terminées';
+
+  @override
+  String get resetCart => 'Réinitialiser la liste';
+
+  @override
+  String get clearCartItems => 'Vider la liste';
+
+  @override
+  String get addItemHint => 'Ajouter un élément...';
+
+  @override
+  String get quantityHint => 'Qté';
+
+  @override
+  String get timezone => 'Fuseau horaire';
+
+  @override
+  String get selectTimezone => 'Sélectionner le fuseau horaire';
+
+  @override
+  String get automaticTimezone => 'Automatique (Fuseau de l\'appareil)';
+
+  @override
+  String get searchTimezone => 'Rechercher un fuseau horaire...';
+
+  @override
+  String get repeatWeekdays => 'Jours de semaine (lun–ven)';
+
+  @override
+  String get repeatYearly => 'Annuel';
+
+  @override
+  String get repeatCustom => 'Personnalisé...';
+
+  @override
+  String get repeatsEvery => 'Se répète tous les';
+
+  @override
+  String get customRecurrence => 'Récurrence personnalisée';
+
+  @override
+  String get daySingular => 'jour';
+
+  @override
+  String get daysPlural => 'jours';
+
+  @override
+  String get weekSingular => 'semaine';
+
+  @override
+  String get weeksPlural => 'semaines';
+
+  @override
+  String get monthSingular => 'mois';
+
+  @override
+  String get monthsPlural => 'mois';
+
+  @override
+  String get yearSingular => 'an';
+
+  @override
+  String get yearsPlural => 'ans';
+
+  @override
+  String get selectRecurrence => 'Sélectionner la récurrence';
+
+  @override
+  String get guestMode => 'Mode invité';
+
+  @override
+  String get guestModeSubtitle =>
+      'Toutes les données sont stockées localement sur cet appareil. Connectez-vous pour sauvegarder et synchroniser avec le cloud.';
+
+  @override
+  String get guestAccount => 'Compte invité';
+
+  @override
+  String get signInOrRegister => 'Connexion / Inscription';
+
+  @override
+  String get continueAsGuest => 'Continuer en tant qu\'invité';
+
+  @override
+  String get skipForNow => 'Passer pour le moment';
+
+  @override
+  String get cloudSync => 'Sauvegarde et synchronisation dans le cloud';
+
+  @override
+  String get cloudSyncActive => 'Actif et synchronisé';
+
+  @override
+  String get customFields => 'Lignes personnalisées';
+
+  @override
+  String get customFieldsSubtitle =>
+      'Joindre des contacts, lieux, liens ou notes';
+
+  @override
+  String get addCustomField => 'Ajouter une ligne';
+
+  @override
+  String get contact => 'Contact';
+
+  @override
+  String get location => 'Lieu';
+
+  @override
+  String get link => 'Lien';
+
+  @override
+  String get note => 'Note';
+
+  @override
+  String get fieldLabel => 'Étiquette';
+
+  @override
+  String get fieldValue => 'Valeur';
+
+  @override
+  String get enterContactInfo => 'Numéro de téléphone ou e-mail';
+
+  @override
+  String get enterLocation => 'Adresse ou lieu';
+
+  @override
+  String get enterUrl => 'Site web ou URL';
+
+  @override
+  String get enterNote => 'Détails personnalisés';
+
+  @override
+  String get copiedToClipboard => 'Copié dans le presse-papiers';
+
+  @override
+  String get noCustomFieldsAdded => 'Aucune ligne personnalisée ajoutée';
 }

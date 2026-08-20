@@ -117,6 +117,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get french => 'Französisch';
 
   @override
+  String get hindi => 'Hindi';
+
+  @override
   String get tasks => 'Aufgaben';
 
   @override
@@ -449,7 +452,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get recurringTasksDesc =>
-      'Automatisieren Sie Ihre Routine mit flexiblen Wiederholungsregeln.';
+      'Automatisiere wiederkehrende Aufgaben mit täglichen, wöchentlichen, monatlichen oder benutzerdefinierten Intervallen.';
 
   @override
   String get viewPricingPlans => 'Preise anzeigen';
@@ -1041,44 +1044,240 @@ class AppLocalizationsDe extends AppLocalizations {
       'Verwenden Sie Symbole zum Filtern von Aufgaben: @Kategorie (z.B. @Arbeit), #Titel (z.B. #Besprechung), !Priorität (z.B. !hoch), %Datum (z.B. %2025-06-15), &Unteraufgabe (z.B. &Bugfix), !Status (*erledigt oder *ausstehend), ? (Aufgaben heute). Kombinieren Sie mehrere Symbole.';
 
   @override
-  String get widgetSettings => 'Widget Customization';
+  String get widgetSettings => 'Widget-Anpassung';
 
   @override
-  String get widgetSettingsSubtitle => 'Configure colors, theme, and features';
+  String get widgetSettingsSubtitle =>
+      'Farben, Design und Funktionen konfigurieren';
 
   @override
-  String get widgetTheme => 'Widget Theme';
+  String get widgetTheme => 'Widget-Design';
 
   @override
-  String get widgetThemeSystem => 'System Default';
+  String get widgetThemeSystem => 'Systemstandard';
 
   @override
-  String get widgetThemeLight => 'Solid Light';
+  String get widgetThemeLight => 'Einfarbig Hell';
 
   @override
-  String get widgetThemeDark => 'Solid Dark';
+  String get widgetThemeDark => 'Einfarbig Dunkel';
 
   @override
-  String get widgetThemeGlassmorphic => 'Glassmorphism';
+  String get widgetThemeGlassmorphic => 'Glassmorphismus';
 
   @override
-  String get showWeekNumbers => 'Show Week Numbers';
+  String get showWeekNumbers => 'Wochennummern anzeigen';
 
   @override
-  String get weekendHighlights => 'Highlight Weekends';
+  String get weekendHighlights => 'Wochenenden hervorheben';
 
   @override
-  String get startOfWeek => 'Start of Week';
+  String get startOfWeek => 'Wochenbeginn';
 
   @override
-  String get sunday => 'Sunday';
+  String get sunday => 'Sonntag';
 
   @override
-  String get monday => 'Monday';
+  String get monday => 'Montag';
 
   @override
-  String get saturday => 'Saturday';
+  String get saturday => 'Samstag';
 
   @override
-  String get widgetAccentColor => 'Widget Accent Color';
+  String get widgetAccentColor => 'Widget-Akzentfarbe';
+
+  @override
+  String get googleTasksDisconnected => 'Google Tasks getrennt';
+
+  @override
+  String get googleTasksDisconnectedSubtitle =>
+      'Tippen Sie, um die Verbindung wiederherzustellen und die Synchronisierung fortzusetzen';
+
+  @override
+  String get reconnect => 'Verbinden';
+
+  @override
+  String get webPaywallTitle => 'ROCIs Tasks Pro im Web freischalten';
+
+  @override
+  String get webPaywallSubtitle =>
+      'Upgrade auf Premium, um auf allen Plattformen auf alle erweiterten Funktionen zuzugreifen.';
+
+  @override
+  String get webSimulatedUpgradeBtn => 'Auf Pro upgraden';
+
+  @override
+  String get webPaywallNotice =>
+      'Zahlungen werden sicher von Lemon Squeezy verarbeitet. Ihr Abonnement wird automatisch aktiviert.';
+
+  @override
+  String get monthlyPlanTitle => 'Monatlicher Plan';
+
+  @override
+  String get monthlyPlanPrice => '4,99 \$ / Monat';
+
+  @override
+  String get yearlyPlanTitle => 'Jährlicher Plan';
+
+  @override
+  String get yearlyPlanPrice => '39,99 \$ / Jahr';
+
+  @override
+  String get yearlyPlanSaving => '33 % sparen';
+
+  @override
+  String get groceryListMode => 'Aufgabenliste';
+
+  @override
+  String get groceryListModeSubtitle =>
+      'Aufgabe als interaktive Aufgabenliste formatieren';
+
+  @override
+  String itemsInCart(Object completed, Object total) {
+    return '$completed/$total erledigt';
+  }
+
+  @override
+  String get toBuy => 'Offen';
+
+  @override
+  String get inCart => 'Erledigt';
+
+  @override
+  String get resetCart => 'Liste zurücksetzen';
+
+  @override
+  String get clearCartItems => 'Einträge löschen';
+
+  @override
+  String get addItemHint => 'Eintrag hinzufügen...';
+
+  @override
+  String get quantityHint => 'Menge';
+
+  @override
+  String get timezone => 'Zeitzone';
+
+  @override
+  String get selectTimezone => 'Zeitzone auswählen';
+
+  @override
+  String get automaticTimezone => 'Automatisch (Gerätezeitzone)';
+
+  @override
+  String get searchTimezone => 'Zeitzone suchen...';
+
+  @override
+  String get repeatWeekdays => 'Wochentage (Mo–Fr)';
+
+  @override
+  String get repeatYearly => 'Jährlich';
+
+  @override
+  String get repeatCustom => 'Benutzerdefiniert...';
+
+  @override
+  String get repeatsEvery => 'Wiederholt sich alle';
+
+  @override
+  String get customRecurrence => 'Benutzerdefinierte Wiederholung';
+
+  @override
+  String get daySingular => 'Tag';
+
+  @override
+  String get daysPlural => 'Tage';
+
+  @override
+  String get weekSingular => 'Woche';
+
+  @override
+  String get weeksPlural => 'Wochen';
+
+  @override
+  String get monthSingular => 'Monat';
+
+  @override
+  String get monthsPlural => 'Monate';
+
+  @override
+  String get yearSingular => 'Jahr';
+
+  @override
+  String get yearsPlural => 'Jahre';
+
+  @override
+  String get selectRecurrence => 'Wiederholung auswählen';
+
+  @override
+  String get guestMode => 'Gastmodus';
+
+  @override
+  String get guestModeSubtitle =>
+      'Alle Daten werden lokal auf diesem Gerät gespeichert. Melden Sie sich an, um ein Backup zu erstellen und mit der Cloud zu synchronisieren.';
+
+  @override
+  String get guestAccount => 'Gastkonto';
+
+  @override
+  String get signInOrRegister => 'Anmelden / Registrieren';
+
+  @override
+  String get continueAsGuest => 'Als Gast fortfahren';
+
+  @override
+  String get skipForNow => 'Vorläufig überspringen';
+
+  @override
+  String get cloudSync => 'Cloud-Backup & Synchronisierung';
+
+  @override
+  String get cloudSyncActive => 'Aktiv & synchronisiert';
+
+  @override
+  String get customFields => 'Benutzerdefinierte Zeilen';
+
+  @override
+  String get customFieldsSubtitle =>
+      'Kontakte, Orte, Links oder Notizen anhängen';
+
+  @override
+  String get addCustomField => 'Zeile hinzufügen';
+
+  @override
+  String get contact => 'Kontakt';
+
+  @override
+  String get location => 'Ort';
+
+  @override
+  String get link => 'Link';
+
+  @override
+  String get note => 'Notiz';
+
+  @override
+  String get fieldLabel => 'Bezeichnung';
+
+  @override
+  String get fieldValue => 'Wert';
+
+  @override
+  String get enterContactInfo => 'Telefonnummer oder E-Mail';
+
+  @override
+  String get enterLocation => 'Adresse oder Ort';
+
+  @override
+  String get enterUrl => 'Website oder URL';
+
+  @override
+  String get enterNote => 'Zusätzliche Details';
+
+  @override
+  String get copiedToClipboard => 'In die Zwischenablage kopiert';
+
+  @override
+  String get noCustomFieldsAdded =>
+      'Keine benutzerdefinierten Zeilen hinzugefügt';
 }

@@ -117,6 +117,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get french => 'צרפתית';
 
   @override
+  String get hindi => 'הינדי';
+
+  @override
   String get tasks => 'משימות';
 
   @override
@@ -442,7 +445,8 @@ class AppLocalizationsHe extends AppLocalizations {
   String get recurringTasks => 'משימות חוזרות';
 
   @override
-  String get recurringTasksDesc => 'אוטומט את השגרה שלך עם כללי חזרה גמישים.';
+  String get recurringTasksDesc =>
+      'הפוך משימות לאוטומטיות בלוח זמנים יומי, שבועי, חודשי או מותאם אישית.';
 
   @override
   String get viewPricingPlans => 'צפה בתוכניות תמחור';
@@ -1049,4 +1053,197 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get widgetAccentColor => 'צבע הדגשה של הווידג\'ט';
+
+  @override
+  String get googleTasksDisconnected => 'Google Tasks מנותק';
+
+  @override
+  String get googleTasksDisconnectedSubtitle =>
+      'הקש כדי להתחבר מחדש ולחדש את הסנכרון';
+
+  @override
+  String get reconnect => 'התחבר מחדש';
+
+  @override
+  String get webPaywallTitle => 'פתחו את ROCIs Tasks Pro בווב';
+
+  @override
+  String get webPaywallSubtitle =>
+      'שדרגו לפרימיום כדי לגשת לכל התכונות המתקדמות בכל פלטפורמה.';
+
+  @override
+  String get webSimulatedUpgradeBtn => 'שדרוג לפרו';
+
+  @override
+  String get webPaywallNotice =>
+      'התשלומים מאובטחים ומעובדים על ידי Lemon Squeezy. המנוי שלך יופעל באופן אוטומטי.';
+
+  @override
+  String get monthlyPlanTitle => 'תוכנית חודשית';
+
+  @override
+  String get monthlyPlanPrice => '\$4.99 / חודש';
+
+  @override
+  String get yearlyPlanTitle => 'תוכנית שנתית';
+
+  @override
+  String get yearlyPlanPrice => '\$39.99 / שנה';
+
+  @override
+  String get yearlyPlanSaving => 'חסוך 33%';
+
+  @override
+  String get groceryListMode => 'רשימת משימות';
+
+  @override
+  String get groceryListModeSubtitle =>
+      'עיצוב המשימה כרשימת משימות אינטראקטיבית';
+
+  @override
+  String itemsInCart(Object completed, Object total) {
+    return '$completed/$total הושלמו';
+  }
+
+  @override
+  String get toBuy => 'לביצוע';
+
+  @override
+  String get inCart => 'הושלמו';
+
+  @override
+  String get resetCart => 'איפוס רשימה';
+
+  @override
+  String get clearCartItems => 'ניקוי פריטים ברשימה';
+
+  @override
+  String get addItemHint => 'הוספת פריט...';
+
+  @override
+  String get quantityHint => 'כמות';
+
+  @override
+  String get timezone => 'אזור זמן';
+
+  @override
+  String get selectTimezone => 'בחירת אזור זמן';
+
+  @override
+  String get automaticTimezone => 'אוטומטי (אזור זמן המכשיר)';
+
+  @override
+  String get searchTimezone => 'חיפוש אזור זמן...';
+
+  @override
+  String get repeatWeekdays => 'ימי חול (א\'–ה\')';
+
+  @override
+  String get repeatYearly => 'שנתי';
+
+  @override
+  String get repeatCustom => 'מותאם אישית...';
+
+  @override
+  String get repeatsEvery => 'חוזר כל';
+
+  @override
+  String get customRecurrence => 'חזרה מותאמת אישית';
+
+  @override
+  String get daySingular => 'יום';
+
+  @override
+  String get daysPlural => 'ימים';
+
+  @override
+  String get weekSingular => 'שבוע';
+
+  @override
+  String get weeksPlural => 'שבועות';
+
+  @override
+  String get monthSingular => 'חודש';
+
+  @override
+  String get monthsPlural => 'חודשים';
+
+  @override
+  String get yearSingular => 'שנה';
+
+  @override
+  String get yearsPlural => 'שנים';
+
+  @override
+  String get selectRecurrence => 'בחר חזרה';
+
+  @override
+  String get guestMode => 'מצב אורח';
+
+  @override
+  String get guestModeSubtitle =>
+      'כל הנתונים נשמרים מקומית במכשיר זה. התחבר כדי לגבות ולסנכרן עם הענן.';
+
+  @override
+  String get guestAccount => 'חשבון אורח';
+
+  @override
+  String get signInOrRegister => 'התחבר / הירשם';
+
+  @override
+  String get continueAsGuest => 'המשך כאורח';
+
+  @override
+  String get skipForNow => 'דלג לעת עתה';
+
+  @override
+  String get cloudSync => 'גיבוי וסנכרון ענן';
+
+  @override
+  String get cloudSyncActive => 'פעיל ומסונכרן';
+
+  @override
+  String get customFields => 'שורות מותאמות אישית';
+
+  @override
+  String get customFieldsSubtitle => 'צרף אנשי קשר, מיקומים, קישורים או הערות';
+
+  @override
+  String get addCustomField => 'הוסף שורה';
+
+  @override
+  String get contact => 'איש קשר';
+
+  @override
+  String get location => 'מיקום';
+
+  @override
+  String get link => 'קישור';
+
+  @override
+  String get note => 'הערה';
+
+  @override
+  String get fieldLabel => 'תווית';
+
+  @override
+  String get fieldValue => 'ערך';
+
+  @override
+  String get enterContactInfo => 'מספר טלפון או דוא\"ל';
+
+  @override
+  String get enterLocation => 'כתובת או מקום';
+
+  @override
+  String get enterUrl => 'כתובת אתר או קישור';
+
+  @override
+  String get enterNote => 'פרטים נוספים';
+
+  @override
+  String get copiedToClipboard => 'הועתק ללוח';
+
+  @override
+  String get noCustomFieldsAdded => 'לא נוספו שורות מותאמות אישית';
 }

@@ -1,70 +1,143 @@
 import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter/foundation.dart';
-import 'package:rocis_tasks/core/services/error_handling_service.dart';
-import 'package:rocis_tasks/core/services/logger_service.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:rocis_tasks/core/services/encryption_service.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class GoogleTokenExpiredException implements Exception {
-  final String message;
-  GoogleTokenExpiredException([this.message = 'Google Calendar access token expired or invalid.']);
-  
-  @override
-  String toString() => message;
-}
+import 'package:rocis_tasks/core/services/auth/google_oauth_manager.dart';
+import 'package:rocis_tasks/core/services/encryption_service.dart';
+import 'package:rocis_tasks/core/services/error_handling_service.dart';
+import 'package:rocis_tasks/core/services/logger_service.dart';
+
+export 'package:rocis_tasks/core/services/auth/google_oauth_manager.dart'
+    show GoogleTokenExpiredException;
 
 class AuthService extends ChangeNotifier {
   final ErrorHandlingService _errorHandlingService;
+  late final GoogleOAuthManager _oauthManager;
+
   FirebaseAuth get _auth => FirebaseAuth.instance;
-  final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
   final Completer<void> _initCompleter = Completer<void>();
 
-  /// Future that completes when the first auth state has been determined
+  bool get isGoogleTasksTokenExpired => _oauthManager.isGoogleTasksTokenExpired;
+
+  void setGoogleTasksTokenExpired(bool expired) {
+    _oauthManager.setGoogleTasksTokenExpired(
+      expired,
+      onStateChanged: notifyListeners,
+    );
+  }
+
   Future<void> get initialized => _initCompleter.future;
 
-  // Secondary Firebase Auth for ROCIs-Schedule
   FirebaseAuth? _scheduleAuth;
-
-  /// Exposes secondary auth errors so UI can show a non-blocking banner.
-  /// null means no error.
   final ValueNotifier<String?> scheduleAuthError = ValueNotifier<String?>(null);
-
   StreamSubscription<User?>? _authStateSubscription;
 
   AuthService(this._errorHandlingService) {
+    _oauthManager = GoogleOAuthManager(_errorHandlingService);
     _initAuth();
   }
 
   Future<void> _initAuth() async {
-    // On Web, explicitly set persistence so the session survives page refresh.
-    // Android/iOS handle persistence natively — no extra config needed.
-    if (kIsWeb) {
-      // No need to set persistence explicitly — Firebase Auth uses local
-      // persistence (indexedDB) by default on web, and native persistence
-      // on mobile. The old setPersistence() method was removed from the SDK.
-    }
-
     _authStateSubscription = _auth.authStateChanges().listen((User? user) {
       if (user != null) {
         unawaited(_syncEncryptionKey(user.uid));
         unawaited(ensureSecondaryAuth());
+        unawaited(_restoreGoogleUser());
       }
 
-      // Complete init on the FIRST auth state event.
-      // On Android/iOS, the first event from authStateChanges() IS the
-      // persisted auth state — either the restored user or truly null.
-      // Using a timer here caused a race: the timer could fire before
-      // Firebase emitted the restored session, flashing the login screen.
       if (!_initCompleter.isCompleted) {
         _initCompleter.complete();
       }
 
       notifyListeners();
     });
+  }
+
+  /// Proactively restores [_googleUser] on app startup so that
+  /// [_performSilentTokenRefresh] can call [authorizationForScopes] without
+  /// requiring the user to tap "Sign in with Google" again.
+  Future<void> _restoreGoogleUser() async {
+    if (_oauthManager.googleUser != null) return;
+    try {
+      final user = currentUser;
+      if (user == null) return;
+
+      final isGoogleUser = user.providerData.any(
+        (p) => p.providerId == 'google.com',
+      );
+      final prefs = await SharedPreferences.getInstance();
+      final hasCachedToken = prefs.containsKey('google_access_token');
+      final token = prefs.getString('google_access_token');
+      final expiresAtStr = prefs.getString('google_access_token_expires_at');
+      final isTokenValid = token != null &&
+          expiresAtStr != null &&
+          DateTime.tryParse(expiresAtStr)?.isAfter(DateTime.now()) == true;
+
+      // Only attempt startup lightweight authentication if user signed in via Google
+      // or has linked Google Tasks, avoiding unwanted prompts for Email/Password users.
+      if (!isGoogleUser && !hasCachedToken) {
+        return;
+      }
+
+      // Skip automatic lightweight authentication on startup if cached token exists
+      // or on Web to prevent native Credential Manager bottom sheet popups on app launch.
+      if (isTokenValid || hasCachedToken || kIsWeb) {
+        AppLogger.info(
+          'Google access token cached or Web. Skipping startup lightweight authentication.',
+          tag: 'Auth',
+        );
+        return;
+      }
+
+      await _oauthManager.ensureGoogleSignInInitialized();
+      final restored = await _oauthManager.googleSignIn
+          .attemptLightweightAuthentication();
+      if (restored != null) {
+        _oauthManager.setGoogleUser(restored);
+        AppLogger.info('Google user restored on startup.', tag: 'Auth');
+      }
+    } catch (e) {
+      AppLogger.warning(
+        'Could not restore Google user on startup: $e',
+        tag: 'Auth',
+      );
+    }
+  }
+
+  Future<String?> _resolveWebGoogleAccessToken({String? popupToken}) async {
+    if (!kIsWeb) return popupToken;
+    if (popupToken != null && popupToken.isNotEmpty) return popupToken;
+
+    try {
+      await _oauthManager.ensureGoogleSignInInitialized();
+      final restored = await _oauthManager.googleSignIn
+          .attemptLightweightAuthentication();
+      if (restored != null) {
+        _oauthManager.setGoogleUser(restored);
+        final clientAuth =
+            await restored.authorizationClient.authorizationForScopes(
+              GoogleOAuthManager.googleTasksScopes,
+            ) ??
+            await restored.authorizationClient.authorizeScopes(
+              GoogleOAuthManager.googleTasksScopes,
+            );
+
+        if (clientAuth.accessToken.isNotEmpty) {
+          return clientAuth.accessToken;
+        }
+      }
+    } catch (e) {
+      AppLogger.warning(
+        'Could not resolve web token via GoogleSignIn after popup: $e',
+        tag: 'Auth',
+      );
+    }
+
+    return _oauthManager.getGoogleAccessToken();
   }
 
   @override
@@ -78,71 +151,78 @@ class AuthService extends ChangeNotifier {
 
   Stream<User?> get authStateChanges => _auth.authStateChanges();
 
-  /// Get the secondary Firebase Auth instance for ROCIs-Schedule
   FirebaseAuth? get scheduleAuth => _scheduleAuth;
 
-  /// Check if user is authenticated in the secondary Firebase app
   bool get isAuthenticatedInSchedule => _scheduleAuth?.currentUser != null;
 
   Future<UserCredential?> signInWithGoogle() async {
-    try {
-      if (kIsWeb) {
+    if (kIsWeb) {
+      try {
         final GoogleAuthProvider googleProvider = GoogleAuthProvider();
-        googleProvider.addScope('email');
-        googleProvider.addScope('profile');
-        googleProvider.addScope('https://www.googleapis.com/auth/tasks');
-        
-        final UserCredential userCredential = await _auth.signInWithPopup(googleProvider);
-        
-        // Extract Google OAuth Access Token on Web
-        final OAuthCredential? oAuthCred = userCredential.credential as OAuthCredential?;
-        final String? accessToken = oAuthCred?.accessToken;
-        
-        if (accessToken != null) {
-          try {
-            final prefs = await SharedPreferences.getInstance();
-            await prefs.setString('google_access_token', accessToken);
-            // Google OAuth token lasts 1 hour. Store it with a 55 minutes expiration.
-            final expiresAt = DateTime.now().add(const Duration(minutes: 55));
-            await prefs.setString('google_access_token_expires_at', expiresAt.toIso8601String());
-            AppLogger.info('Web Google Calendar access token saved.', tag: 'Auth');
-          } catch (e) {
-            AppLogger.error('Failed to save Web Google access token', error: e, tag: 'Auth');
+        for (final scope in GoogleOAuthManager.googleTasksScopes) {
+          if (scope != 'email' && scope != 'profile') {
+            googleProvider.addScope(scope);
           }
         }
-        
-        // Sync encryption key immediately after sign in and WAIT for it
-        if (userCredential.user != null) {
-          AppLogger.info(
-            'Web Google Sign in successful. Starting critical key sync...',
-            tag: 'Auth',
-          );
-          await _syncEncryptionKey(userCredential.user!.uid);
-          AppLogger.info('Key sync complete.', tag: 'Auth');
+        // Force consent so Google issues access tokens with all required scopes.
+        googleProvider.setCustomParameters({'prompt': 'consent'});
+
+        final UserCredential userCredential = await _auth.signInWithPopup(
+          googleProvider,
+        );
+        final OAuthCredential? oAuthCred =
+            userCredential.credential as OAuthCredential?;
+        final resolvedToken = await _resolveWebGoogleAccessToken(
+          popupToken: oAuthCred?.accessToken,
+        );
+
+        if (resolvedToken != null && resolvedToken.isNotEmpty) {
+          await _oauthManager.cacheGoogleAccessToken(resolvedToken);
+          setGoogleTasksTokenExpired(false);
         }
-        
+
+        if (userCredential.user != null) {
+          await _syncEncryptionKey(userCredential.user!.uid);
+        }
+
         notifyListeners();
         return userCredential;
+      } catch (webErr, webStack) {
+        _errorHandlingService.logError(
+          webErr,
+          webStack,
+          reason: 'Sign in with Google Web Popup',
+        );
+        return null;
       }
+    }
 
-      await _googleSignIn.initialize();
+    try {
+      await _oauthManager.ensureGoogleSignInInitialized();
 
-      final GoogleSignInAccount? googleUser =
-          await _googleSignIn.attemptLightweightAuthentication();
-      if (googleUser == null) return null; // User canceled
+      GoogleSignInAccount? googleUser = _oauthManager.googleUser;
+      if (googleUser == null) {
+        googleUser = await _oauthManager.googleSignIn.authenticate(
+          scopeHint: GoogleOAuthManager.googleTasksScopes,
+        );
+        _oauthManager.setGoogleUser(googleUser);
+      }
 
       final GoogleSignInAuthentication googleAuth = googleUser.authentication;
 
-      // Obtain access token via authorization client
-      final clientAuth = await googleUser.authorizationClient
-          .authorizationForScopes([
-        'email',
-        'profile',
-        'https://www.googleapis.com/auth/tasks',
-      ]);
+      var clientAuth = await googleUser.authorizationClient
+          .authorizationForScopes(GoogleOAuthManager.googleTasksScopes);
+      clientAuth ??= await googleUser.authorizationClient.authorizeScopes(
+        GoogleOAuthManager.googleTasksScopes,
+      );
+
+      final String accessToken = clientAuth.accessToken;
+      if (accessToken.isNotEmpty) {
+        await _oauthManager.cacheGoogleAccessToken(accessToken);
+      }
 
       final AuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: clientAuth?.accessToken,
+        accessToken: accessToken.isNotEmpty ? accessToken : null,
         idToken: googleAuth.idToken,
       );
 
@@ -150,17 +230,15 @@ class AuthService extends ChangeNotifier {
         credential,
       );
 
-      // Sync encryption key immediately after sign in and WAIT for it
       if (userCredential.user != null) {
         AppLogger.info(
-          'Sign in successful. Starting critical key sync...',
+          'Sign in with Google successful. Starting critical key sync...',
           tag: 'Auth',
         );
         await _syncEncryptionKey(userCredential.user!.uid);
         AppLogger.info('Key sync complete.', tag: 'Auth');
       }
 
-      // Also sign in to the secondary Firebase app (ROCIs-Schedule)
       await _signInToSecondaryFirebase(credential);
 
       notifyListeners();
@@ -234,7 +312,6 @@ class AuthService extends ChangeNotifier {
     }
   }
 
-  /// Sync encryption key with Cloud Firestore to prevent data loss on reinstall
   Future<void> _syncEncryptionKey(String userId) async {
     try {
       final userSettingsRef = FirebaseFirestore.instance
@@ -251,8 +328,6 @@ class AuthService extends ChangeNotifier {
           doc.data()!.containsKey('encryptionKey')) {
         final cloudKey = doc.data()!['encryptionKey'] as String;
 
-        // If cloud has a key, and it differs from local, RESTORE it
-        // This fixes the "DECRYPTION_ERROR" after reinstall
         if (localKey != cloudKey) {
           AppLogger.info(
             'Restoring encryption key from cloud backup',
@@ -261,7 +336,6 @@ class AuthService extends ChangeNotifier {
           await EncryptionService.setKey(cloudKey);
         }
       } else {
-        // If cloud has no key, backup the current local key
         if (localKey != null) {
           AppLogger.info('Backing up encryption key to cloud', tag: 'Auth');
           await userSettingsRef.set({
@@ -271,20 +345,16 @@ class AuthService extends ChangeNotifier {
         }
       }
     } catch (e) {
-      // Don't block auth if this fails, but log it
       AppLogger.error('Key sync failed', error: e, tag: 'Auth');
     }
   }
 
-  /// Sign in to the secondary Firebase app (ROCIs-Schedule) using the same credentials
   Future<void> _signInToSecondaryFirebase(AuthCredential credential) async {
     if (kIsWeb) return;
     try {
-      // Get the secondary Firebase app
       final scheduleApp = Firebase.app('rocis-schedule');
       _scheduleAuth = FirebaseAuth.instanceFor(app: scheduleApp);
 
-      // Sign in with the same Google credential
       await _scheduleAuth!.signInWithCredential(credential);
       AppLogger.info(
         'Signed in to secondary Firebase (rocis-schedule) successfully',
@@ -349,7 +419,6 @@ class AuthService extends ChangeNotifier {
     }
   }
 
-  /// Re-authenticate to secondary Firebase if needed (e.g., after app restart)
   Future<void> ensureSecondaryAuth() async {
     if (kIsWeb) return;
     try {
@@ -364,23 +433,19 @@ class AuthService extends ChangeNotifier {
       return;
     }
 
-    // If user is signed in to primary but not secondary, try to sign in
-    if (_auth.currentUser != null) {
+    if (_auth.currentUser != null && _oauthManager.googleUser != null) {
       try {
-        // Try to get fresh Google credentials
-        final googleUser = await _googleSignIn.attemptLightweightAuthentication();
-        if (googleUser != null) {
-          final googleAuth = googleUser.authentication;
-          final clientAuth = await googleUser.authorizationClient
-              .authorizationForScopes(['email', 'profile']);
-          final credential = GoogleAuthProvider.credential(
-            accessToken: clientAuth?.accessToken,
-            idToken: googleAuth.idToken,
-          );
-          await _signInToSecondaryFirebase(credential);
-          if (_scheduleAuth?.currentUser != null) {
-            scheduleAuthError.value = null;
-          }
+        final googleUser = _oauthManager.googleUser!;
+        final googleAuth = googleUser.authentication;
+        final clientAuth = await googleUser.authorizationClient
+            .authorizationForScopes(['email', 'profile']);
+        final credential = GoogleAuthProvider.credential(
+          accessToken: clientAuth?.accessToken,
+          idToken: googleAuth.idToken,
+        );
+        await _signInToSecondaryFirebase(credential);
+        if (_scheduleAuth?.currentUser != null) {
+          scheduleAuthError.value = null;
         }
       } catch (e) {
         AppLogger.warning(
@@ -394,58 +459,110 @@ class AuthService extends ChangeNotifier {
     }
   }
 
-  /// Opens a Google popup to refresh tasks scopes and retrieve a new Access Token on Web.
-  Future<bool> linkGoogleTasksOnWeb() async {
-    if (!kIsWeb) return false;
-    try {
-      final user = currentUser;
-      if (user == null) return false;
+  Future<bool> linkGoogleTasks() async {
+    if (kIsWeb) {
+      try {
+        final user = currentUser;
+        final GoogleAuthProvider googleProvider = GoogleAuthProvider();
+        for (final scope in GoogleOAuthManager.googleTasksScopes) {
+          if (scope != 'email' && scope != 'profile') {
+            googleProvider.addScope(scope);
+          }
+        }
+        // Force consent so reconnect flow can recover missing calendar/task scopes.
+        googleProvider.setCustomParameters({'prompt': 'consent'});
 
-      final GoogleAuthProvider googleProvider = GoogleAuthProvider();
-      googleProvider.addScope('email');
-      googleProvider.addScope('profile');
-      googleProvider.addScope('https://www.googleapis.com/auth/tasks');
+        AppLogger.info(
+          'Opening Google popup to refresh access token on Web...',
+          tag: 'Auth',
+        );
+        UserCredential userCredential;
+        if (user != null) {
+          try {
+            userCredential = await user.reauthenticateWithPopup(googleProvider);
+          } catch (_) {
+            try {
+              userCredential = await user.linkWithPopup(googleProvider);
+            } catch (_) {
+              userCredential = await _auth.signInWithPopup(googleProvider);
+            }
+          }
+        } else {
+          userCredential = await _auth.signInWithPopup(googleProvider);
+        }
 
-      AppLogger.info('Opening Google popup to refresh Tasks access token...', tag: 'Auth');
-      final UserCredential userCredential = await user.reauthenticateWithPopup(googleProvider);
-      
-      final OAuthCredential? oAuthCred = userCredential.credential as OAuthCredential?;
-      final String? accessToken = oAuthCred?.accessToken;
+        final OAuthCredential? oAuthCred =
+            userCredential.credential as OAuthCredential?;
+        final resolvedToken = await _resolveWebGoogleAccessToken(
+          popupToken: oAuthCred?.accessToken,
+        );
 
-      if (accessToken != null) {
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('google_access_token', accessToken);
-        final expiresAt = DateTime.now().add(const Duration(minutes: 55));
-        await prefs.setString('google_access_token_expires_at', expiresAt.toIso8601String());
-        AppLogger.info('Web Google Tasks access token refreshed successfully.', tag: 'Auth');
+        if (resolvedToken != null && resolvedToken.isNotEmpty) {
+          await _oauthManager.cacheGoogleAccessToken(resolvedToken);
+          setGoogleTasksTokenExpired(false);
+          notifyListeners();
+          return true;
+        }
+      } catch (e, s) {
+        AppLogger.error(
+          'Error refreshing Google Tasks access token on Web',
+          error: e,
+          stack: s,
+          tag: 'Auth',
+        );
+      }
+      return false;
+    } else {
+      try {
+        await _oauthManager.ensureGoogleSignInInitialized();
+
+        GoogleSignInAccount? googleUser =
+            _oauthManager.googleUser ??
+            await _oauthManager.googleSignIn.attemptLightweightAuthentication();
+        googleUser ??= await _oauthManager.googleSignIn.authenticate(
+          scopeHint: GoogleOAuthManager.googleTasksScopes,
+        );
+        _oauthManager.setGoogleUser(googleUser);
+
+        final clientAuth =
+            await googleUser.authorizationClient.authorizationForScopes(
+              GoogleOAuthManager.googleTasksScopes,
+            ) ??
+            await googleUser.authorizationClient.authorizeScopes(
+              GoogleOAuthManager.googleTasksScopes,
+            );
+
+        await _oauthManager.cacheGoogleAccessToken(clientAuth.accessToken);
+
+        AppLogger.info(
+          'Mobile Google Tasks & Calendar authorized. Token cached.',
+          tag: 'Auth',
+        );
+        setGoogleTasksTokenExpired(false);
         notifyListeners();
         return true;
+      } catch (e, s) {
+        AppLogger.error(
+          'Error authorizing Google Tasks access token on Mobile',
+          error: e,
+          stack: s,
+          tag: 'Auth',
+        );
       }
-    } catch (e, s) {
-      AppLogger.error('Error refreshing Google Tasks access token on Web', error: e, stack: s, tag: 'Auth');
+      return false;
     }
-    return false;
   }
+
+  @Deprecated('Use linkGoogleTasks() instead')
+  Future<bool> linkGoogleTasksOnWeb() => linkGoogleTasks();
 
   Future<void> signOut() async {
     try {
-      // Sign out from secondary Firebase first
       await _scheduleAuth?.signOut();
       _scheduleAuth = null;
 
-      if (!kIsWeb) {
-        await _googleSignIn.signOut();
-      } else {
-        // Clear stored Google Calendar access token on Web
-        try {
-          final prefs = await SharedPreferences.getInstance();
-          await prefs.remove('google_access_token');
-          await prefs.remove('google_access_token_expires_at');
-          AppLogger.info('Cleared Web Google Calendar tokens from SharedPreferences.', tag: 'Auth');
-        } catch (e) {
-          AppLogger.error('Failed to clear Web Google access token on sign out', error: e, tag: 'Auth');
-        }
-      }
+      await _oauthManager.signOut();
+
       await _auth.signOut();
       notifyListeners();
     } catch (e, s) {
@@ -453,7 +570,6 @@ class AuthService extends ChangeNotifier {
     }
   }
 
-  /// Delete account and all associated data (GDPR requirement)
   Future<bool> deleteAccount({String? password}) async {
     final user = currentUser;
     if (user == null) return false;
@@ -470,13 +586,6 @@ class AuthService extends ChangeNotifier {
         return false;
       }
 
-      // 1. Delete Firestore data
-      AppLogger.info(
-        'Starting GDPR data deletion for user: $userId',
-        tag: 'Auth',
-      );
-
-      // Delete tasks subcollection
       final tasks = await firestore
           .collection('users')
           .doc(userId)
@@ -486,7 +595,6 @@ class AuthService extends ChangeNotifier {
         await doc.reference.delete();
       }
 
-      // Delete categories subcollection
       final categories = await firestore
           .collection('users')
           .doc(userId)
@@ -496,7 +604,6 @@ class AuthService extends ChangeNotifier {
         await doc.reference.delete();
       }
 
-      // Delete settings subcollection
       final settings = await firestore
           .collection('users')
           .doc(userId)
@@ -506,10 +613,8 @@ class AuthService extends ChangeNotifier {
         await doc.reference.delete();
       }
 
-      // Delete the main user document
       await firestore.collection('users').doc(userId).delete();
 
-      // 2. Delete Auth Account
       try {
         await user.delete();
       } on FirebaseAuthException catch (e) {
@@ -530,7 +635,6 @@ class AuthService extends ChangeNotifier {
       return true;
     } catch (e, s) {
       _errorHandlingService.logError(e, s, reason: 'Delete account');
-      // If it's a "recent-login-required" error, we should ideally handle it
       return false;
     }
   }
@@ -553,8 +657,8 @@ class AuthService extends ChangeNotifier {
           return true;
         }
 
-        final GoogleSignInAccount? googleUser =
-            await _googleSignIn.attemptLightweightAuthentication();
+        final GoogleSignInAccount? googleUser = await _oauthManager.googleSignIn
+            .attemptLightweightAuthentication();
         if (googleUser == null) return false;
         final GoogleSignInAuthentication googleAuth = googleUser.authentication;
         final clientAuth = await googleUser.authorizationClient
@@ -579,7 +683,9 @@ class AuthService extends ChangeNotifier {
       final email = user.email;
       final normalizedPassword = password?.trim();
       if (email == null || email.isEmpty) return false;
-      if (normalizedPassword == null || normalizedPassword.isEmpty) return false;
+      if (normalizedPassword == null || normalizedPassword.isEmpty) {
+        return false;
+      }
       try {
         final credential = EmailAuthProvider.credential(
           email: email,
@@ -600,37 +706,7 @@ class AuthService extends ChangeNotifier {
     return false;
   }
 
-  /// Get active Google Access Token for calling API.
   Future<String?> getGoogleAccessToken() async {
-    if (kIsWeb) {
-      try {
-        final prefs = await SharedPreferences.getInstance();
-        final token = prefs.getString('google_access_token');
-        final expiresAtStr = prefs.getString('google_access_token_expires_at');
-        if (token == null || expiresAtStr == null) return null;
-        final expiresAt = DateTime.parse(expiresAtStr);
-        if (DateTime.now().isAfter(expiresAt)) return null;
-        return token;
-      } catch (e) {
-        AppLogger.error('Error reading access token from prefs', error: e, tag: 'Auth');
-      }
-      return null;
-    } else {
-      try {
-        final googleUser = await _googleSignIn.attemptLightweightAuthentication();
-        if (googleUser != null) {
-          final clientAuth = await googleUser.authorizationClient
-              .authorizationForScopes([
-            'email',
-            'profile',
-            'https://www.googleapis.com/auth/tasks',
-          ]);
-          return clientAuth?.accessToken;
-        }
-      } catch (e) {
-        AppLogger.warning('Failed to retrieve Google access token silently on mobile', error: e, tag: 'Auth');
-      }
-      return null;
-    }
+    return _oauthManager.getGoogleAccessToken();
   }
 }

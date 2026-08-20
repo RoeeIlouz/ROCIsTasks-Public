@@ -36,6 +36,7 @@
   "swedish": "Swedish",
   "german": "German",
   "french": "French",
+  "hindi": "Hindi",
   "tasks": "Tasks",
   "editTask": "Edit Task",
   "newTask": "New Task",
@@ -76,7 +77,9 @@
   "restoredTask": "Restored {title}",
   "@restoredTask": {
     "placeholders": {
-      "title": { "type": "String" }
+      "title": {
+        "type": "String"
+      }
     }
   },
   "deletePermanently": "Delete Permanently?",
@@ -109,7 +112,9 @@
   "exportFailed": "Export failed: {error}",
   "@exportFailed": {
     "placeholders": {
-      "error": { "type": "String" }
+      "error": {
+        "type": "String"
+      }
     }
   },
   "importData": "Import Data (JSON)",
@@ -121,7 +126,9 @@
   "importFailed": "Import failed: {error}",
   "@importFailed": {
     "placeholders": {
-      "error": { "type": "String" }
+      "error": {
+        "type": "String"
+      }
     }
   },
   "privacyAndGdpr": "Privacy & GDPR",
@@ -155,7 +162,7 @@
   "subtasksAndChecklists": "Subtasks & Checklists",
   "subtasksAndChecklistsDesc": "Break down complex tasks into smaller, manageable steps.",
   "recurringTasks": "Recurring Tasks",
-  "recurringTasksDesc": "Automate your routine with flexible repetition rules.",
+  "recurringTasksDesc": "Automate repeating tasks with daily, weekly, monthly, or custom schedules.",
   "viewPricingPlans": "View Pricing Plans",
   "proSubscriptionActive": "Pro Subscription Active",
   "welcomeToPro": "Welcome to Pro!",
@@ -199,7 +206,9 @@
   "taskReminderTitle": "Task Reminder: {title}",
   "@taskReminderTitle": {
     "placeholders": {
-      "title": { "type": "String" }
+      "title": {
+        "type": "String"
+      }
     }
   },
   "taskDueNowBody": "You have a task due now!",
@@ -213,20 +222,21 @@
   "nextOccurrenceSet": "Next occurrence of \"{title}\" set for {date}",
   "@nextOccurrenceSet": {
     "placeholders": {
-      "title": { "type": "String" },
-      "date": { "type": "String" }
+      "title": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
     }
   },
   "initializationFailedError": "Failed to initialize app data. Please restart.",
-  "welcomeToPro": "Welcome to Pro!",
   "noTaskDataAvailable": "No task data available",
   "retryInitialization": "Retry Initialization",
   "criticalErrorTitle": "CRITICAL ERROR",
   "appStartupErrorBody": "ROCI's Tasks encountered a problem during startup. Our team has been notified.",
   "appTagline": "Dotting the i's and crossing the t's",
-  "pickAPlan": "Pick a Plan",
   "termsOfService": "Terms of Service",
-  "byContinuingAgreement": "By continuing, you agree to our",
   "allDay": "All Day",
   "event": "Event",
   "markAsIncomplete": "Mark as incomplete",
@@ -240,14 +250,18 @@
   "notificationUncompletedTasks": "{count} Uncompleted Tasks",
   "@notificationUncompletedTasks": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "notificationTasksRemaining": "Tasks Remaining",
   "notificationTasksSummary": "{count} Tasks",
   "@notificationTasksSummary": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "skip": "Skip",
@@ -371,5 +385,67 @@
   "sunday": "Sunday",
   "monday": "Monday",
   "saturday": "Saturday",
-  "widgetAccentColor": "Widget Accent Color"
+  "widgetAccentColor": "Widget Accent Color",
+  "googleTasksDisconnected": "Google Tasks Disconnected",
+  "googleTasksDisconnectedSubtitle": "Tap to reconnect and resume sync",
+  "reconnect": "Reconnect",
+  "webPaywallTitle": "Unlock ROCIs Tasks Pro on Web",
+  "webPaywallSubtitle": "Upgrade to premium to access all advanced features on any platform.",
+  "webSimulatedUpgradeBtn": "Upgrade to Pro",
+  "webPaywallNotice": "Payments are securely processed by Lemon Squeezy. Your subscription will be activated automatically.",
+  "monthlyPlanTitle": "Monthly Plan",
+  "monthlyPlanPrice": "$4.99 / month",
+  "yearlyPlanTitle": "Yearly Plan",
+  "yearlyPlanPrice": "$39.99 / year",
+  "yearlyPlanSaving": "Save 33%",
+  "groceryListMode": "Task List",
+  "groceryListModeSubtitle": "Format task as an interactive task list",
+  "itemsInCart": "{completed}/{total} completed",
+  "toBuy": "To Do",
+  "inCart": "Completed",
+  "resetCart": "Reset List",
+  "clearCartItems": "Clear List Items",
+  "addItemHint": "Add item...",
+  "quantityHint": "Qty",
+  "timezone": "Timezone",
+  "selectTimezone": "Select Timezone",
+  "automaticTimezone": "Automatic (Device Timezone)",
+  "searchTimezone": "Search timezone...",
+  "repeatWeekdays": "Weekdays (Mon–Fri)",
+  "repeatYearly": "Yearly",
+  "repeatCustom": "Custom...",
+  "repeatsEvery": "Repeats every",
+  "customRecurrence": "Custom Recurrence",
+  "daySingular": "day",
+  "daysPlural": "days",
+  "weekSingular": "week",
+  "weeksPlural": "weeks",
+  "monthSingular": "month",
+  "monthsPlural": "months",
+  "yearSingular": "year",
+  "yearsPlural": "years",
+  "selectRecurrence": "Select Recurrence",
+  "guestMode": "Guest Mode",
+  "guestModeSubtitle": "All data is stored locally on this device. Sign in to back up and sync with the cloud.",
+  "guestAccount": "Guest Account",
+  "signInOrRegister": "Sign In / Register",
+  "continueAsGuest": "Continue as Guest",
+  "skipForNow": "Skip for now",
+  "cloudSync": "Cloud Backup & Sync",
+  "cloudSyncActive": "Active & synced",
+  "customFields": "Custom Lines",
+  "customFieldsSubtitle": "Attach contacts, locations, links, or notes",
+  "addCustomField": "Add Line",
+  "contact": "Contact",
+  "location": "Location",
+  "link": "Link",
+  "note": "Note",
+  "fieldLabel": "Label",
+  "fieldValue": "Value",
+  "enterContactInfo": "Phone number or email",
+  "enterLocation": "Address or place",
+  "enterUrl": "Website or URL",
+  "enterNote": "Custom details",
+  "copiedToClipboard": "Copied to clipboard",
+  "noCustomFieldsAdded": "No custom lines added"
 }

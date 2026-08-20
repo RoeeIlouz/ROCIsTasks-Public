@@ -36,6 +36,7 @@
   "swedish": "السويدية",
   "german": "الألمانية",
   "french": "الفرنسية",
+  "hindi": "الهندية",
   "tasks": "المهام",
   "editTask": "تعديل المهمة",
   "newTask": "مهمة جديدة",
@@ -76,7 +77,9 @@
   "restoredTask": "تمت استعادة {title}",
   "@restoredTask": {
     "placeholders": {
-      "title": { "type": "String" }
+      "title": {
+        "type": "String"
+      }
     }
   },
   "deletePermanently": "حذف نهائيًا؟",
@@ -109,7 +112,9 @@
   "exportFailed": "فشل التصدير: {error}",
   "@exportFailed": {
     "placeholders": {
-      "error": { "type": "String" }
+      "error": {
+        "type": "String"
+      }
     }
   },
   "importData": "استيراد البيانات (JSON)",
@@ -121,7 +126,9 @@
   "importFailed": "فشل الاستيراد: {error}",
   "@importFailed": {
     "placeholders": {
-      "error": { "type": "String" }
+      "error": {
+        "type": "String"
+      }
     }
   },
   "privacyAndGdpr": "الخصوصية وGDPR",
@@ -154,8 +161,8 @@
   "premiumWidgetsDesc": "الوصول إلى ويدجت الشهر والتقويم الكامل على الشاشة الرئيسية.",
   "subtasksAndChecklists": "مهام فرعية وقوائم تحقق",
   "subtasksAndChecklistsDesc": "قسّم المهام المعقدة إلى خطوات أصغر يمكن إدارتها.",
-  "recurringTasks": "مهام متكررة",
-  "recurringTasksDesc": "أتمتة روتينك بقواعد تكرار مرنة.",
+  "recurringTasks": "المهام المتكررة",
+  "recurringTasksDesc": "أتمتة المهام المتكررة بجداول يومية أو أسبوعية أو شهرية أو مخصصة.",
   "viewPricingPlans": "عرض خطط الأسعار",
   "proSubscriptionActive": "اشتراك Pro نشط",
   "welcomeToPro": "مرحبًا بك في Pro!",
@@ -199,7 +206,9 @@
   "taskReminderTitle": "تذكير بالمهمة: {title}",
   "@taskReminderTitle": {
     "placeholders": {
-      "title": { "type": "String" }
+      "title": {
+        "type": "String"
+      }
     }
   },
   "taskDueNowBody": "لديك مهمة مستحقة الآن!",
@@ -213,8 +222,12 @@
   "nextOccurrenceSet": "تم تحديد المرة التالية لـ \"{title}\" في {date}",
   "@nextOccurrenceSet": {
     "placeholders": {
-      "title": { "type": "String" },
-      "date": { "type": "String" }
+      "title": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
     }
   },
   "initializationFailedError": "فشل تهيئة بيانات التطبيق. يرجى إعادة التشغيل.",
@@ -237,14 +250,18 @@
   "notificationUncompletedTasks": "{count} مهام غير مكتملة",
   "@notificationUncompletedTasks": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "notificationTasksRemaining": "المهام المتبقية",
   "notificationTasksSummary": "{count} مهام",
   "@notificationTasksSummary": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "skip": "تخطي",
@@ -354,5 +371,81 @@
   "glassmorphismEffectsSubtitle": "تطبيق تأثير الزجاج البلوري على البطاقات",
   "noEventsForThisDay": "لا توجد فعاليات لهذا اليوم",
   "searchSymbols": "رموز البحث",
-  "searchSymbolsDesc": "استخدم الرموز لتصفية المهام: @فئة (مثلاً @عمل)، #عنوان (مثلاً #اجتماع)، !أولوية (مثلاً !عالية)، %تاريخ (مثلاً %2025-06-15)، &مهمة فرعية (مثلاً &إصلاح خطأ)، *حالة (*منجز أو *معلق)، ? (مهام اليوم). يمكن دمج عدة رموز."
+  "searchSymbolsDesc": "استخدم الرموز لتصفية المهام: @فئة (مثلاً @عمل)، #عنوان (مثلاً #اجتماع)، !أولوية (مثلاً !عالية)، %تاريخ (مثلاً %2025-06-15)، &مهمة فرعية (مثلاً &إصلاح خطأ)، *حالة (*منجز أو *معلق)، ? (مهام اليوم). يمكن دمج عدة رموز.",
+  "monday": "الإثنين",
+  "saturday": "السبت",
+  "showWeekNumbers": "عرض أرقام الأسابيع",
+  "startOfWeek": "بداية الأسبوع",
+  "sunday": "الأحد",
+  "weekendHighlights": "تمييز عطلة نهاية الأسبوع",
+  "widgetAccentColor": "لون تمييز الأداة",
+  "widgetSettings": "تخصيص الأداة",
+  "widgetSettingsSubtitle": "تكوين الألوان، المظهر، والميزات",
+  "widgetTheme": "مظهر الأداة",
+  "widgetThemeDark": "داكن مصمت",
+  "widgetThemeGlassmorphic": "تأثير زجاجي",
+  "widgetThemeLight": "فاتح مصمت",
+  "widgetThemeSystem": "الافتراضي للنظام",
+  "googleTasksDisconnected": "تم قطع اتصال Google Tasks",
+  "googleTasksDisconnectedSubtitle": "انقر لإعادة الاتصال واستئناف المزامنة",
+  "reconnect": "إعادة الاتصال",
+  "webPaywallTitle": "افتح ROCIs Tasks Pro على الويب",
+  "webPaywallSubtitle": "قم بالترقية إلى بريميوم للوصول إلى جميع الميزات المتقدمة على أي منصة.",
+  "webSimulatedUpgradeBtn": "الترقية إلى برو",
+  "webPaywallNotice": "يتم معالجة المدفوعات بشكل آمن بواسطة Lemon Squeezy. سيتم تفعيل اشتراكك تلقائيًا.",
+  "monthlyPlanTitle": "الخطة الشهرية",
+  "monthlyPlanPrice": "4.99 $ / شهر",
+  "yearlyPlanTitle": "الخطة السنوية",
+  "yearlyPlanPrice": "39.99 $ / سنة",
+  "yearlyPlanSaving": "وفر 33%",
+  "groceryListMode": "قائمة المهام",
+  "groceryListModeSubtitle": "تنسيق المهمة كقائمة مهام تفاعلية",
+  "itemsInCart": "{completed}/{total} مكتمل",
+  "toBuy": "قيد الانتظار",
+  "inCart": "مكتمل",
+  "resetCart": "إعادة ضبط القائمة",
+  "clearCartItems": "مسح عناصر القائمة",
+  "addItemHint": "إضافة عنصر...",
+  "quantityHint": "الكمية",
+  "timezone": "المنطقة الزمنية",
+  "selectTimezone": "تحديد المنطقة الزمنية",
+  "automaticTimezone": "تلقائي (منطقة الجهاز الزمنية)",
+  "searchTimezone": "البحث عن منطقة زمنية...",
+  "repeatWeekdays": "أيام الأسبوع (الإثنين–الجمعة)",
+  "repeatYearly": "سنويًا",
+  "repeatCustom": "مخصص...",
+  "repeatsEvery": "يتكرر كل",
+  "customRecurrence": "تكرار مخصص",
+  "daySingular": "يوم",
+  "daysPlural": "أيام",
+  "weekSingular": "أسبوع",
+  "weeksPlural": "أسابيع",
+  "monthSingular": "شهر",
+  "monthsPlural": "أشهر",
+  "yearSingular": "سنة",
+  "yearsPlural": "سنوات",
+  "selectRecurrence": "تحديد التكرار",
+  "guestMode": "وضع الضيف",
+  "guestModeSubtitle": "يتم حفظ جميع البيانات محليًا على هذا الجهاز. سجّل الدخول لإجراء نسخ احتياطي والمزامنة مع السحابة.",
+  "guestAccount": "حساب ضيف",
+  "signInOrRegister": "تسجيل الدخول / التسجيل",
+  "continueAsGuest": "المتابعة كضيف",
+  "skipForNow": "تخطي الآن",
+  "cloudSync": "النسخ الاحتياطي والمزامنة السحابية",
+  "cloudSyncActive": "نشط ومزامن",
+  "customFields": "أسطر مخصصة",
+  "customFieldsSubtitle": "إرفاق جهات اتصال أو مواقع أو روابط أو ملاحظات",
+  "addCustomField": "إضافة سطر",
+  "contact": "جهة اتصال",
+  "location": "الموقع",
+  "link": "رابط",
+  "note": "ملاحظة",
+  "fieldLabel": "التسمية",
+  "fieldValue": "القيمة",
+  "enterContactInfo": "رقم الهاتف أو البريد الإلكتروني",
+  "enterLocation": "العنوان أو المكان",
+  "enterUrl": "موقع الويب أو الرابط",
+  "enterNote": "تفاصيل إضافية",
+  "copiedToClipboard": "تم النسخ إلى الحافظة",
+  "noCustomFieldsAdded": "لم تتم إضافة أسطر مخصصة"
 }

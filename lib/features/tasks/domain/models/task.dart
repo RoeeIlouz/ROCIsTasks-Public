@@ -1,8 +1,9 @@
-import 'package:hive/hive.dart';
+import 'package:hive_ce/hive.dart';
 import 'package:uuid/uuid.dart';
 import 'package:cloud_firestore/cloud_firestore.dart' show Timestamp;
 
 import 'package:rocis_tasks/features/tasks/domain/models/sub_task.dart';
+import 'package:rocis_tasks/features/tasks/domain/models/custom_field.dart';
 
 part 'task.g.dart';
 
@@ -78,6 +79,12 @@ class Task extends HiveObject {
   @HiveField(18)
   bool skipReminders;
 
+  @HiveField(20)
+  bool isGroceryList;
+
+  @HiveField(21)
+  List<TaskCustomField>? customFields;
+
   Task({
     String? id,
     required this.title,
@@ -99,10 +106,13 @@ class Task extends HiveObject {
     this.googleTaskListId,
     List<String>? attachmentPaths,
     this.skipReminders = false,
+    this.isGroceryList = false,
+    List<TaskCustomField>? customFields,
   }) : id = id ?? const Uuid().v4(),
        createdAt = createdAt ?? DateTime.now(),
        attachmentPaths = attachmentPaths ?? <String>[],
-       categoryIds = categoryIds ?? <String>[];
+       categoryIds = categoryIds ?? <String>[],
+       customFields = customFields ?? <TaskCustomField>[];
 
   Task copyWith({
     String? title,
@@ -124,6 +134,8 @@ class Task extends HiveObject {
     String? googleTaskListId,
     List<String>? attachmentPaths,
     bool? skipReminders,
+    bool? isGroceryList,
+    List<TaskCustomField>? customFields,
   }) {
     return Task(
       id: id,
@@ -148,6 +160,8 @@ class Task extends HiveObject {
       googleTaskListId: googleTaskListId ?? this.googleTaskListId,
       attachmentPaths: attachmentPaths ?? this.attachmentPaths,
       skipReminders: skipReminders ?? this.skipReminders,
+      isGroceryList: isGroceryList ?? this.isGroceryList,
+      customFields: customFields ?? this.customFields,
     );
   }
 
@@ -173,6 +187,8 @@ class Task extends HiveObject {
       'googleTaskListId': googleTaskListId,
       'attachmentPaths': attachmentPaths,
       'skipReminders': skipReminders,
+      'isGroceryList': isGroceryList,
+      'customFields': customFields?.map((cf) => cf.toMap()).toList(),
     };
   }
 
@@ -197,6 +213,8 @@ class Task extends HiveObject {
       'googleTaskId': googleTaskId,
       'googleTaskListId': googleTaskListId,
       'skipReminders': skipReminders,
+      'isGroceryList': isGroceryList,
+      'customFields': customFields?.map((cf) => cf.toMap()).toList(),
     };
   }
 
@@ -235,6 +253,10 @@ class Task extends HiveObject {
       attachmentPaths:
           (map['attachmentPaths'] as List?)?.whereType<String>().toList(),
       skipReminders: map['skipReminders'] ?? false,
+      isGroceryList: map['isGroceryList'] ?? false,
+      customFields: (map['customFields'] as List?)
+          ?.map((cf) => TaskCustomField.fromMap(cf as Map<String, dynamic>))
+          .toList(),
     );
   }
 }

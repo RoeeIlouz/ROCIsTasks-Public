@@ -9,9 +9,15 @@ import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/sub_task.dart';
 import 'package:rocis_tasks/features/categories/domain/models/category.dart';
 import 'package:rocis_tasks/features/tasks/presentation/widgets/task_tile.dart';
+import 'package:rocis_tasks/features/tasks/presentation/widgets/task_skeleton.dart';
 import 'package:rocis_tasks/features/calendar/presentation/screens/calendar_screen.dart';
 import 'package:rocis_tasks/features/home/presentation/screens/settings_screen.dart';
 import 'package:rocis_tasks/features/categories/presentation/screens/categories_screen.dart';
+import 'package:flutter/services.dart';
+import 'package:rocis_tasks/features/tasks/domain/models/custom_field.dart';
+import 'package:rocis_tasks/features/tasks/domain/services/custom_field_action_service.dart';
+import 'package:rocis_tasks/features/tasks/presentation/widgets/task_custom_fields_section.dart';
+import 'package:rocis_tasks/features/auth/presentation/screens/login_screen.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -35,6 +41,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
   TaskPriority _priority = TaskPriority.medium;
   List<String> _categoryIds = [];
   List<SubTask> _subTasks = [];
+  List<TaskCustomField> _customFields = [];
   bool _syncWithGoogleTasks = false;
   bool _skipReminders = false;
 
@@ -47,15 +54,6 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
     super.initState();
     _titleController = TextEditingController();
     _descController = TextEditingController();
-    
-    // Request calendar reload on startup
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final calendarProvider = Provider.of<CalendarProvider>(context, listen: false);
-      final authService = Provider.of<AuthService>(context, listen: false);
-      calendarProvider.setUserId(authService.currentUser?.uid);
-      calendarProvider.loadFilters();
-      calendarProvider.loadEvents();
-    });
   }
 
   @override
@@ -80,6 +78,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
           _categoryIds.add(task.categoryId!);
         }
         _subTasks = task.subTasks?.map((st) => st.copyWith()).toList() ?? [];
+        _customFields = task.customFields?.map((cf) => cf.copyWith()).toList() ?? [];
         _syncWithGoogleTasks = task.syncWithGoogleTasks;
         _skipReminders = task.skipReminders;
       }
@@ -96,9 +95,38 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
       _priority = TaskPriority.medium;
       _categoryIds = [];
       _subTasks = [];
+      _customFields = [];
       _syncWithGoogleTasks = false;
       _skipReminders = false;
     });
+  }
+
+  void _addCustomField(CustomFieldType type) {
+    final l10n = AppLocalizations.of(context)!;
+    setState(() {
+      _customFields.add(
+        TaskCustomField(
+          type: type,
+          label: CustomFieldActionService.getDefaultLabel(type, l10n),
+          value: '',
+        ),
+      );
+    });
+    HapticFeedback.lightImpact();
+  }
+
+  void _removeCustomFieldAt(int index) {
+    setState(() {
+      _customFields.removeAt(index);
+    });
+    HapticFeedback.lightImpact();
+  }
+
+  void _updateCustomFieldAt(int index, String label, String value) {
+    if (index >= 0 && index < _customFields.length) {
+      _customFields[index].label = label;
+      _customFields[index].value = value;
+    }
   }
 
   void _saveInspectorTask(TaskProvider provider) {
@@ -106,6 +134,9 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
       final title = _titleController.text.trim();
       final desc = _descController.text.trim();
       final catId = _categoryIds.isNotEmpty ? _categoryIds.first : null;
+      final validCustomFields = _customFields
+          .where((cf) => cf.label.trim().isNotEmpty || cf.value.trim().isNotEmpty)
+          .toList();
 
       if (_selectedTask != null) {
         // Edit Mode
@@ -121,6 +152,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
           subTasks: _subTasks,
           syncWithGoogleTasks: _syncWithGoogleTasks,
           skipReminders: _skipReminders,
+          customFields: validCustomFields,
         );
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Task updated successfully')),
@@ -138,6 +170,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
           subTasks: _subTasks,
           syncWithGoogleTasks: _syncWithGoogleTasks,
           skipReminders: _skipReminders,
+          customFields: validCustomFields,
         );
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Task created successfully')),
@@ -226,6 +259,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
   ) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final taskProvider = Provider.of<TaskProvider>(context, listen: false);
 
     return Container(
       width: 260,
@@ -259,7 +293,10 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
             icon: Icons.task_alt_rounded,
             label: l10n.tasks,
             isActive: _activeTab == 'tasks',
-            onTap: () => setState(() { _activeTab = 'tasks'; _selectTask(null); }),
+            onTap: () {
+              setState(() { _activeTab = 'tasks'; _selectTask(null); });
+              Provider.of<TaskProvider>(context, listen: false).syncGoogleTasksToLocal();
+            },
           ),
           _buildSidebarTab(
             icon: Icons.calendar_month_rounded,
@@ -314,9 +351,11 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                   const SizedBox(height: 8),
                   ElevatedButton(
                     onPressed: () async {
-                      final success = await authService.linkGoogleTasksOnWeb();
+                      calendarProvider.resetTokenExpiredState();
+                      final success = await authService.linkGoogleTasks();
                       if (success) {
                         calendarProvider.loadEvents();
+                        taskProvider.syncGoogleTasksToLocal();
                       }
                     },
                     style: ElevatedButton.styleFrom(
@@ -327,6 +366,58 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                       elevation: 0,
                     ),
                     child: const Text('Reconnect', style: TextStyle(fontSize: 11)),
+                  ),
+                ],
+              ),
+            ),
+
+          // Google Tasks Connection Status banner
+          if (authService.isGoogleTasksTokenExpired)
+            Container(
+              margin: const EdgeInsets.only(bottom: 16),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.errorContainer.withValues(alpha: 0.4),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: theme.colorScheme.error.withValues(alpha: 0.3)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.warning_amber_rounded, color: theme.colorScheme.error, size: 18),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          l10n.googleTasksDisconnected,
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: theme.colorScheme.onErrorContainer,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  ElevatedButton(
+                    onPressed: () async {
+                      final success = await authService.linkGoogleTasks();
+                      if (success) {
+                        calendarProvider.resetTokenExpiredState();
+                        calendarProvider.loadEvents();
+                        taskProvider.syncGoogleTasksToLocal();
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      visualDensity: VisualDensity.compact,
+                      backgroundColor: theme.colorScheme.error,
+                      foregroundColor: theme.colorScheme.onError,
+                      elevation: 0,
+                    ),
+                    child: Text(l10n.reconnect, style: const TextStyle(fontSize: 11)),
                   ),
                 ],
               ),
@@ -443,6 +534,59 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                     icon: const Icon(Icons.logout, size: 18, color: Colors.redAccent),
                     onPressed: () => authService.signOut(),
                     tooltip: l10n.signOut,
+                  ),
+                ],
+              ),
+            )
+          else
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: isDark ? Colors.white10 : Colors.black12),
+              ),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 18,
+                    backgroundColor: Colors.orangeAccent.withValues(alpha: 0.1),
+                    child: const Icon(Icons.person_outline_rounded, size: 20, color: Colors.orangeAccent),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          l10n.guestAccount,
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Text(
+                          l10n.guestMode,
+                          style: TextStyle(fontSize: 11, color: theme.disabledColor),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                  FilledButton.tonal(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const LoginScreen(),
+                        ),
+                      );
+                    },
+                    style: FilledButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                    ),
+                    child: Text(l10n.signIn),
                   ),
                 ],
               ),
@@ -773,17 +917,19 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
         ),
         const SizedBox(height: 12),
         Expanded(
-          child: tasks.isEmpty
-              ? Container(
-                  decoration: BoxDecoration(
-                    color: theme.brightness == Brightness.dark ? Colors.white.withValues(alpha: 0.01) : Colors.grey[100],
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Center(
-                    child: Text('No tasks in this section', style: TextStyle(color: theme.disabledColor, fontSize: 13)),
-                  ),
-                )
-              : ListView.builder(
+          child: provider.isLoading
+              ? const TaskListSkeleton()
+              : tasks.isEmpty
+                  ? Container(
+                      decoration: BoxDecoration(
+                        color: theme.brightness == Brightness.dark ? Colors.white.withValues(alpha: 0.01) : Colors.grey[100],
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Center(
+                        child: Text('No tasks in this section', style: TextStyle(color: theme.disabledColor, fontSize: 13)),
+                      ),
+                    )
+                  : ListView.builder(
                   itemCount: tasks.length,
                   itemBuilder: (context, index) {
                     final task = tasks[index];
@@ -1009,6 +1155,15 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                       onChanged: (value) {
                         setState(() { _skipReminders = value; });
                       },
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Custom Lines Section
+                    TaskCustomFieldsSection(
+                      customFields: _customFields,
+                      onAddField: _addCustomField,
+                      onRemoveField: _removeCustomFieldAt,
+                      onUpdateField: _updateCustomFieldAt,
                     ),
                   ],
                 ),

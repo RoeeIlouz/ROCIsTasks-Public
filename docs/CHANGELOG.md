@@ -5,12 +5,139 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.2.1+50] - 2026-07-03
+## [0.2.8+78] - 2026-08-18
+
+### Added
+- Custom Lines: Add contacts, locations, web links, and custom notes to tasks.
+- Tap-to-Act: Tap phone numbers to dial, emails to mail, locations to open Maps, and URLs to open browser.
+- Interactive action cards on Task Details and compact indicators in task lists.
+
+## [0.2.7+77] - 2026-08-18
+
+### Added
+- Guest Mode: use the full app completely offline on-device without signing in.
+- Cloud Backup on Sign-In: automatically upload and back up local tasks and categories upon logging in or registering.
+- Continue as guest option on login and account management updates in Settings.
+
+## [0.2.6+76] - 2026-08-15
+
+### Added
+- Pro Recurring Tasks: schedule daily, weekday, weekly, monthly, yearly, or custom repeat rules with automatic next-task creation on completion.
+- Timezone selector in Settings with search and automatic device timezone detection.
+
+### Fixed
+- Fixed Google Calendar event display and permissions on Web.
+- Resolved web startup errors caused by browser ad-blockers.
+- Updated web app domain configuration to tasks.rocisapps.com.
+
+## [0.2.6+74] - 2026-08-13
+
+### Fixed
+- Improved Google reconnect reliability on Web by forcing OAuth consent when re-linking/signing in.
+- Treated HTTP 403 responses from Google Calendar/Tasks APIs as reconnect-required token/scope rejection, improving disconnection detection and recovery.
+
+## [0.2.5+73] - 2026-08-05
+
+### Fixed
+- Fixed Google sign-in persistence so users no longer get prompted to re-authenticate when reopening the app.
+- Improved background token refresh and calendar sync reliability across Web and Android.
+
+## [0.2.5+72] - 2026-08-01
+
+### Added
+- Interactive priority selector grid with haptic feedback on the Add Task screen.
+- Glowing gradient priority pills on task cards for quick visual urgency recognition.
+- Interactive full-screen image lightbox previews and uppercase file type badges on attachments.
+- Enlarged 48dp touch targets on pin and removal controls.
+
+## [0.2.5+71] - 2026-08-01
+
+### Added
+- Interactive task attachment previews (tap to view full-screen images or open documents).
+- Visual file type badges on attachments for quick file identification.
+
+### Improved
+- Ergonomic 48dp touch targets on attachment controls for easier tapping.
+- Visual theme polish and dynamic glassmorphism performance.
+
+## [0.2.4+70] - 2026-08-01
+
+### Improved
+- Upgraded offline storage engine for faster task loading and enhanced stability.
+- Optimized background notification scheduling and Google account sync performance.
+
+## [0.2.4+69] - 2026-08-01
+
+### Changed
+- Maintenance update and version sync.
+
+## [0.2.4+68] - 2026-07-30
+
+### Fixed
+- Seamless background Google account re-authentication without popups.
+- Resolved an issue where task lists could occasionally freeze after checking off items.
+
+## [0.2.4+67] - 2026-07-24
+
+### Added
+- Interactive Task List mode with item checklists, auto-completion, progress tracking, and one-tap reset.
+- Full Hindi (🇮🇳 हिंदी) language localization.
+- Full-screen pinch-to-zoom image viewer for task attachments.
+
+### Fixed
+- Eliminated redundant Google Sign-In prompts on startup.
+- Preserved task due time (hours/minutes) during Google Tasks synchronization.
+
+## [0.2.3+65] - 2026-07-18
+
+### Added
+- Lemon Squeezy web checkout overlay modal for seamless web subscriptions.
+- Cross-platform subscription sync between Web and Mobile apps.
+
+### Improved
+- Touch target hit area expanded to 48dp on task tiles.
+- Wallpaper-aware dynamic color blending on glass containers.
+- Faster list transition animations.
+
+## [0.2.2+64] - 2026-07-18
+
+### Fixed
+- Web paywall stability and billing checkout sync.
+- Pulsing loading skeletons to eliminate screen flickering.
+
+### Added
+- Background Google Tasks synchronization.
+
+## [0.2.2+63] - 2026-07-17
+
+### Added
+- Two-way Google Tasks sync: completions and deletions propagate automatically.
+- Reconnect notification banners when Google access token expires.
+
+## [0.2.2+60] - 2026-07-16
+
+### Fixed
+- Resolved redundant Google Sign-In prompts on mobile by securely caching access tokens.
+
+## [0.2.2+58] - 2026-07-16
+
+### Added
+- Google Calendar integration support for Web authentication and linking flows.
+
+### Fixed
+- Google Tasks scope permissions during mobile sign-in.
+
+## [0.2.1+54] - 2026-07-04
+
+### Added
+
+- Full web version release.
+- Custom theme, week number, and weekend options for the calendar widget.
 
 ### Changed
 
-- Full web version release.
-- New UI options to customize the app and home screen widget.
+- Replaced widget selected day border with a bold brand-colored text style to avoid solid color block rendering bugs.
+- Retained today's soft 10% opacity tint highlight.
 
 ## [0.1.20+49] - 2026-07-02
 
