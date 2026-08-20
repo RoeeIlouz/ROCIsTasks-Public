@@ -2,6 +2,29 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## Custom Lines, Recurring Tasks, CI SHA Pinning & Open-Source Public Release - 2026-08-20
+
+#### Goals / Requirements
+* Implement **Custom Lines** (interactive contacts, locations, web links, custom notes) with tap-to-act support.
+* Implement **Pro Recurring Tasks** (daily, weekday, weekly, monthly, yearly, custom repeat rules) with auto-creation on completion.
+* Prepare the repository for public release (`ROCIsTasks-Public`), scrub private keys/secrets, and resolve CI action deprecations and analyzer issues.
+
+#### Changes/Fixes
+1. **Custom Lines (`custom_field.dart`, `custom_field_action_service.dart`, `task_custom_fields_section.dart`)**:
+   - Built domain model `CustomField` and action dispatcher `CustomFieldActionService` to launch dialer, mail client, maps, and web links.
+   - Built interactive UI section with quick-add chips in task details and creation screen.
+2. **Recurring Tasks (`task_recurrence_service.dart`, `recurrence_picker_sheet.dart`)**:
+   - Implemented recurrence calculation engine and picker bottom sheet for daily, weekday, weekly, monthly, yearly, and custom schedules.
+   - Automatically generates the next recurring instance upon completing a task for Pro users.
+3. **CI & Workflow Hardening (`.github/workflows/flutter-ci.yml`, `.gitignore`)**:
+   - Added pre-build template copy step (`.env.example`, `firebase_options.dart.example`, `firebase_schedule_options.dart.example`) to resolve missing config in CI clones.
+   - Upgraded `actions/cache` to `v4.2.2` (`d4323d4df104b026a6aa633fdb11d772146be0bf`) and pinned all actions to immutable 40-character commit SHAs.
+   - Replaced `.github/` ignore rule with `.github/copilot-instructions.md` so GitHub Actions workflows are tracked properly.
+4. **Testing & Synchronization**:
+   - 256/256 unit and widget tests passing (`flutter test`).
+   - 0 static analysis issues found (`flutter analyze`).
+   - Clean orphan open-source release pushed to public repo `remote/main` and complete development branch pushed to `AG/Public`.
+
 ## Guest Mode, Lifetime Paywall Plan & Onboarding Revamp - 2026-08-20
 
 #### Goals / Requirements
