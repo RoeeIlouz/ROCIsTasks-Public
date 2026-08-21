@@ -61,41 +61,70 @@ class _TaskListViewState extends State<TaskListView> {
           final theme = Theme.of(context);
           mainContent = Expanded(
             child: Center(
-              child: GlassContainer(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.task_alt_rounded,
-                      size: 80,
-                      color: theme.disabledColor.withValues(alpha: 0.2),
-                    ),
-                    const SizedBox(height: 24),
-                    Text(
-                      l10n.noTasksYet,
-                      style: GoogleFonts.outfit(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: GlassContainer(
+                  padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 32),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.primary.withValues(alpha: 0.12),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.checklist_rtl_rounded,
+                          size: 56,
+                          color: theme.colorScheme.primary,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 24),
-                    FilledButton.icon(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const AddTaskScreen(),
-                            fullscreenDialog: true,
+                      const SizedBox(height: 20),
+                      Text(
+                        l10n.noTasksYet,
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.outfit(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: theme.colorScheme.onSurface,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Keep your mind clear and your day organized.',
+                        textAlign: TextAlign.center,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.65),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      FilledButton.icon(
+                        onPressed: () {
+                          HapticFeedback.lightImpact();
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const AddTaskScreen(),
+                              fullscreenDialog: true,
+                            ),
+                          );
+                        },
+                        style: FilledButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
                           ),
-                        );
-                      },
-                      icon: const Icon(Icons.add),
-                      label: Text(l10n.createFirstTask),
-                    ),
-                  ],
+                        ),
+                        icon: const Icon(Icons.add_rounded, size: 20),
+                        label: Text(
+                          l10n.createFirstTask,
+                          style: const TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

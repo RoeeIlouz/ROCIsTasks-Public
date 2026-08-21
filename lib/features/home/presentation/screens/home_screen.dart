@@ -155,15 +155,21 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _onPageChanged(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
+    if (_currentIndex != index) {
+      HapticFeedback.selectionClick();
+      setState(() {
+        _currentIndex = index;
+      });
+    }
     if (index == 0) {
       Provider.of<TaskProvider>(context, listen: false).syncGoogleTasksToLocal();
     }
   }
 
   void _onItemTapped(int index) {
+    if (_currentIndex != index) {
+      HapticFeedback.selectionClick();
+    }
     if (_isSearching) {
       setState(() {
         _isSearching = false;
@@ -173,7 +179,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
     _pageController.animateToPage(
       index,
-      duration: const Duration(milliseconds: 400),
+      duration: const Duration(milliseconds: 350),
       curve: Curves.fastOutSlowIn,
     );
   }
@@ -413,7 +419,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Material(
                   color: Colors.transparent,
                   child: InkWell(
-                    onTap: _navigateToAddTask,
+                    onTap: () {
+                      HapticFeedback.lightImpact();
+                      _navigateToAddTask();
+                    },
                     borderRadius: BorderRadius.circular(16),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(

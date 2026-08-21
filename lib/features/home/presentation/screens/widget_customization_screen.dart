@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -23,6 +24,7 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
   int _startOfWeek = 7;
   String _highlightColor = '#6C63FF';
   bool _isLoading = true;
+  int _selectedPreviewIndex = 0;
 
   @override
   void initState() {
@@ -100,11 +102,33 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
         children: [
-          // 1. Live Preview Section
-          Text(
-            'Live Preview',
-            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+          // 1. Live Preview Section & Switcher
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Live Widget Preview',
+                style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  _getWidgetTag(_selectedPreviewIndex),
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.primary,
+                  ),
+                ),
+              ),
+            ],
           ),
+          const SizedBox(height: 10),
+          _buildWidgetSwitcher(theme, l10n),
           const SizedBox(height: 12),
           _buildLivePreview(theme, isDark, isGlass),
           const SizedBox(height: 24),
@@ -127,9 +151,9 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
           _buildColorPicker(theme),
           const SizedBox(height: 24),
 
-          // 4. Toggles & Behavior
+          // 4. Toggles & Behavior (Active for Calendar widgets)
           Text(
-            'Behavior & Layout',
+            'Calendar Widget Behavior',
             style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 12),
@@ -149,6 +173,97 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
           const SizedBox(height: 12),
           _buildWidgetSuiteSection(theme, l10n),
         ],
+      ),
+    );
+  }
+
+  String _getWidgetTag(int index) {
+    switch (index) {
+      case 0:
+        return '4x4 Full Calendar';
+      case 1:
+        return '4x3 Day Agenda';
+      case 2:
+        return '4x4 Month & Agenda';
+      case 3:
+        return '4x3 Timeline';
+      case 4:
+        return '2x2 Quick Actions';
+      case 5:
+        return '3x1 Up Next Pill';
+      default:
+        return 'Widget';
+    }
+  }
+
+  Widget _buildWidgetSwitcher(ThemeData theme, AppLocalizations l10n) {
+    final tabs = [
+      {'icon': Icons.calendar_month_rounded, 'name': 'Calendar'},
+      {'icon': Icons.view_agenda_rounded, 'name': 'Day Agenda'},
+      {'icon': Icons.calendar_view_month_rounded, 'name': 'Month & List'},
+      {'icon': Icons.timeline_rounded, 'name': 'Timeline'},
+      {'icon': Icons.add_task_rounded, 'name': 'Quick Actions'},
+      {'icon': Icons.play_arrow_rounded, 'name': 'Up Next'},
+    ];
+
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      physics: const BouncingScrollPhysics(),
+      child: Row(
+        children: List.generate(tabs.length, (i) {
+          final isSelected = _selectedPreviewIndex == i;
+          final item = tabs[i];
+          return Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: InkWell(
+              onTap: () {
+                HapticFeedback.selectionClick();
+                setState(() {
+                  _selectedPreviewIndex = i;
+                });
+              },
+              borderRadius: BorderRadius.circular(12),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.surfaceContainerLow,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: isSelected
+                        ? theme.colorScheme.primary
+                        : theme.dividerColor.withValues(alpha: 0.15),
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      item['icon'] as IconData,
+                      size: 16,
+                      color: isSelected
+                          ? Colors.white
+                          : theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      item['name'] as String,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                        color: isSelected
+                            ? Colors.white
+                            : theme.colorScheme.onSurface.withValues(alpha: 0.8),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        }),
       ),
     );
   }
@@ -174,166 +289,456 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
       previewBg = const Color(0xFFFFFFFF);
       textColor = const Color(0xFF1C1C1E);
       secondaryTextColor = const Color(0xFF8E8E93);
-      border = Border.all(color: Colors.black.withValues(alpha: 0.05), width: 1);
+      border = Border.all(color: Colors.black.withValues(alpha: 0.08), width: 1);
     }
 
-    final todayColor = Color(int.parse(_highlightColor.replaceAll('#', '0xff')));
+    final accentColor = Color(int.parse(_highlightColor.replaceAll('#', '0xff')));
 
-    return Container(
-      padding: const EdgeInsets.all(16),
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 250),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: previewBg,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(18),
         border: border,
         boxShadow: isGlass 
             ? [] 
             : [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.05),
-                  blurRadius: 10,
+                  color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.06),
+                  blurRadius: 12,
                   offset: const Offset(0, 4),
                 )
               ],
       ),
-      child: Column(
-        children: [
-          // Header Mock
-          Row(
-            children: [
-              Text('❮', style: TextStyle(color: textColor, fontWeight: FontWeight.bold)),
+      child: _buildSelectedWidgetMock(theme, textColor, secondaryTextColor, accentColor),
+    );
+  }
+
+  Widget _buildSelectedWidgetMock(ThemeData theme, Color textColor, Color secondaryTextColor, Color accentColor) {
+    switch (_selectedPreviewIndex) {
+      case 0:
+        return _buildFullCalendarMock(theme, textColor, secondaryTextColor, accentColor);
+      case 1:
+        return _buildDayAgendaMock(theme, textColor, secondaryTextColor, accentColor);
+      case 2:
+        return _buildMonthAgendaMock(theme, textColor, secondaryTextColor, accentColor);
+      case 3:
+        return _buildTimelineMock(theme, textColor, secondaryTextColor, accentColor);
+      case 4:
+        return _buildQuickActionsMock(theme, textColor, secondaryTextColor, accentColor);
+      case 5:
+        return _buildUpNextMock(theme, textColor, secondaryTextColor, accentColor);
+      default:
+        return _buildFullCalendarMock(theme, textColor, secondaryTextColor, accentColor);
+    }
+  }
+
+  Widget _buildFullCalendarMock(ThemeData theme, Color textColor, Color secondaryTextColor, Color accentColor) {
+    return Column(
+      children: [
+        // Header Mock
+        Row(
+          children: [
+            Text('❮', style: TextStyle(color: textColor, fontWeight: FontWeight.bold, fontSize: 13)),
+            Expanded(
+              child: Text(
+                'August 2026',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: textColor, fontWeight: FontWeight.bold, fontSize: 15),
+              ),
+            ),
+            Text('❯', style: TextStyle(color: textColor, fontWeight: FontWeight.bold, fontSize: 13)),
+            const SizedBox(width: 10),
+            Text('⦿', style: TextStyle(color: accentColor, fontSize: 15)),
+            const SizedBox(width: 10),
+            Text('+', style: TextStyle(color: accentColor, fontSize: 20, fontWeight: FontWeight.bold)),
+          ],
+        ),
+        const SizedBox(height: 10),
+
+        // Filters Mock
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _buildMockFilter('Tasks', _showTasks, textColor, theme),
+            const SizedBox(width: 6),
+            _buildMockFilter('Google', _showGoogle, textColor, theme),
+          ],
+        ),
+        const SizedBox(height: 10),
+
+        // Weekdays Header Mock
+        Row(
+          children: [
+            if (_showWeekNumbers)
               Expanded(
-                child: Text(
-                  'July 2026',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: textColor, fontWeight: FontWeight.bold, fontSize: 16),
+                child: Center(
+                  child: Text('#', style: TextStyle(color: secondaryTextColor, fontSize: 11, fontStyle: FontStyle.italic)),
                 ),
               ),
-              Text('❯', style: TextStyle(color: textColor, fontWeight: FontWeight.bold)),
-              const SizedBox(width: 12),
-              Text('⦿', style: TextStyle(color: todayColor, fontSize: 16)),
-              const SizedBox(width: 12),
-              Text('+', style: TextStyle(color: todayColor, fontSize: 22, fontWeight: FontWeight.bold)),
-            ],
-          ),
-          const SizedBox(height: 12),
-
-          // Filters Mock
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _buildMockFilter('Tasks', _showTasks, textColor, theme),
-              const SizedBox(width: 6),
-              _buildMockFilter('Google', _showGoogle, textColor, theme),
-            ],
-          ),
-          const SizedBox(height: 12),
-
-          // Weekdays Header Mock
-          Row(
-            children: [
-              if (_showWeekNumbers)
-                Expanded(
-                  child: Center(
-                    child: Text('#', style: TextStyle(color: secondaryTextColor, fontSize: 11, fontStyle: FontStyle.italic)),
-                  ),
-                ),
-              ...List.generate(7, (index) {
-                final dayOfWeek = (_startOfWeek + index - 1) % 7 + 1;
-                final dayLetter = ['M', 'T', 'W', 'T', 'F', 'S', 'S'][dayOfWeek - 1];
-                final Color dayColor;
-                if (_weekendHighlight) {
-                  if (dayOfWeek == 7) {
-                    dayColor = Colors.redAccent;
-                  } else if (dayOfWeek == 6) {
-                    dayColor = Colors.blueAccent;
-                  } else {
-                    dayColor = textColor;
-                  }
+            ...List.generate(7, (index) {
+              final dayOfWeek = (_startOfWeek + index - 1) % 7 + 1;
+              final dayLetter = ['M', 'T', 'W', 'T', 'F', 'S', 'S'][dayOfWeek - 1];
+              final Color dayColor;
+              if (_weekendHighlight) {
+                if (dayOfWeek == 7) {
+                  dayColor = Colors.redAccent;
+                } else if (dayOfWeek == 6) {
+                  dayColor = Colors.blueAccent;
                 } else {
                   dayColor = textColor;
                 }
+              } else {
+                dayColor = textColor;
+              }
 
-                return Expanded(
-                  child: Center(
-                    child: Text(
-                      dayLetter,
-                      style: TextStyle(color: dayColor, fontWeight: FontWeight.bold, fontSize: 12),
-                    ),
-                  ),
-                );
-              }),
-            ],
-          ),
-          const SizedBox(height: 8),
-
-          // Mini Calendar Grid Mock (1 row)
-          Row(
-            children: [
-              if (_showWeekNumbers)
-                Expanded(
-                  child: Center(
-                    child: Text('27', style: TextStyle(color: secondaryTextColor, fontSize: 11, fontStyle: FontStyle.italic)),
+              return Expanded(
+                child: Center(
+                  child: Text(
+                    dayLetter,
+                    style: TextStyle(color: dayColor, fontWeight: FontWeight.bold, fontSize: 11),
                   ),
                 ),
-              // Render 7 days in the mock row
-              ...List.generate(7, (index) {
-                final dayOfWeek = (_startOfWeek + index - 1) % 7 + 1;
-                final dayNum = index + 1;
-                final isToday = dayNum == 2; // Mock today is 2nd
-                final isSelected = dayNum == 4; // Mock selected is 4th
-                final isSun = dayOfWeek == 7;
-                final isSat = dayOfWeek == 6;
+              );
+            }),
+          ],
+        ),
+        const SizedBox(height: 6),
 
-                final Color dayTextColor;
-                if (isToday || isSelected) {
-                  dayTextColor = todayColor;
-                } else if (_weekendHighlight && isSun) {
-                  dayTextColor = Colors.redAccent;
-                } else if (_weekendHighlight && isSat) {
-                  dayTextColor = Colors.blueAccent;
-                } else {
-                  dayTextColor = textColor;
-                }
+        // Mini Calendar Grid Mock (1 row)
+        Row(
+          children: [
+            if (_showWeekNumbers)
+              Expanded(
+                child: Center(
+                  child: Text('34', style: TextStyle(color: secondaryTextColor, fontSize: 11, fontStyle: FontStyle.italic)),
+                ),
+              ),
+            ...List.generate(7, (index) {
+              final dayOfWeek = (_startOfWeek + index - 1) % 7 + 1;
+              final dayNum = 17 + index;
+              final isToday = dayNum == 21;
+              final isSelected = dayNum == 21;
+              final isSun = dayOfWeek == 7;
+              final isSat = dayOfWeek == 6;
 
-                BoxDecoration? cellDec;
-                if (isToday && isSelected) {
-                  cellDec = BoxDecoration(
-                    color: todayColor.withValues(alpha: 0.1),
-                    border: Border.all(color: todayColor, width: 1.5),
-                    borderRadius: BorderRadius.circular(8),
-                  );
-                } else if (isSelected) {
-                  cellDec = BoxDecoration(
-                    border: Border.all(color: todayColor, width: 1.5),
-                    borderRadius: BorderRadius.circular(8),
-                  );
-                } else if (isToday) {
-                  cellDec = BoxDecoration(
-                    color: todayColor.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  );
-                }
+              final Color dayTextColor;
+              if (isToday || isSelected) {
+                dayTextColor = accentColor;
+              } else if (_weekendHighlight && isSun) {
+                dayTextColor = Colors.redAccent;
+              } else if (_weekendHighlight && isSat) {
+                dayTextColor = Colors.blueAccent;
+              } else {
+                dayTextColor = textColor;
+              }
 
-                return Expanded(
-                  child: AspectRatio(
-                    aspectRatio: 1,
-                    child: Container(
-                      margin: const EdgeInsets.all(2),
-                      decoration: cellDec,
-                      child: Center(
-                        child: Text(
-                          '$dayNum',
-                          style: TextStyle(color: dayTextColor, fontWeight: FontWeight.bold, fontSize: 12),
-                        ),
+              BoxDecoration? cellDec;
+              if (isToday) {
+                cellDec = BoxDecoration(
+                  color: accentColor.withValues(alpha: 0.12),
+                  border: Border.all(color: accentColor, width: 1.5),
+                  borderRadius: BorderRadius.circular(8),
+                );
+              }
+
+              return Expanded(
+                child: AspectRatio(
+                  aspectRatio: 1,
+                  child: Container(
+                    margin: const EdgeInsets.all(2),
+                    decoration: cellDec,
+                    child: Center(
+                      child: Text(
+                        '$dayNum',
+                        style: TextStyle(color: dayTextColor, fontWeight: FontWeight.bold, fontSize: 11),
                       ),
                     ),
                   ),
-                );
-              }),
+                ),
+              );
+            }),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDayAgendaMock(ThemeData theme, Color textColor, Color secondaryTextColor, Color accentColor) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Text('❮', style: TextStyle(color: secondaryTextColor, fontWeight: FontWeight.bold)),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Friday, Aug 21',
+                    style: TextStyle(color: textColor, fontWeight: FontWeight.bold, fontSize: 14),
+                  ),
+                  Text(
+                    'Today · 3 tasks remaining',
+                    style: TextStyle(color: accentColor, fontSize: 11, fontWeight: FontWeight.w600),
+                  ),
+                ],
+              ),
+            ),
+            Text('❯', style: TextStyle(color: secondaryTextColor, fontWeight: FontWeight.bold)),
+            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: accentColor.withValues(alpha: 0.15),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.add, size: 16, color: accentColor),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        _buildAgendaRowMock('Design Review & Handoff', '10:00 AM', accentColor, textColor, secondaryTextColor, isDone: false),
+        const SizedBox(height: 6),
+        _buildAgendaRowMock('Update Flutter Dependencies', '02:30 PM', const Color(0xFF10B981), textColor, secondaryTextColor, isDone: true),
+      ],
+    );
+  }
+
+  Widget _buildMonthAgendaMock(ThemeData theme, Color textColor, Color secondaryTextColor, Color accentColor) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Left mini month
+        Expanded(
+          flex: 4,
+          child: Column(
+            children: [
+              Text('August 2026', style: TextStyle(color: textColor, fontWeight: FontWeight.bold, fontSize: 12)),
+              const SizedBox(height: 4),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: ['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d) => Text(d, style: TextStyle(fontSize: 9, color: secondaryTextColor, fontWeight: FontWeight.bold))).toList(),
+              ),
+              const SizedBox(height: 4),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [17, 18, 19, 20, 21, 22, 23].map((d) {
+                  final isToday = d == 21;
+                  return Container(
+                    padding: const EdgeInsets.all(2),
+                    decoration: isToday ? BoxDecoration(color: accentColor, shape: BoxShape.circle) : null,
+                    child: Text('$d', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: isToday ? Colors.white : textColor)),
+                  );
+                }).toList(),
+              ),
             ],
           ),
-        ],
-      ),
+        ),
+        const SizedBox(width: 10),
+        Container(width: 1, height: 60, color: secondaryTextColor.withValues(alpha: 0.2)),
+        const SizedBox(width: 10),
+        // Right side agenda
+        Expanded(
+          flex: 5,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Agenda (21st)', style: TextStyle(color: accentColor, fontWeight: FontWeight.bold, fontSize: 11)),
+              const SizedBox(height: 4),
+              _buildAgendaRowMock('Sprint Planning', '09:00 AM', accentColor, textColor, secondaryTextColor, isDone: false, compact: true),
+              const SizedBox(height: 4),
+              _buildAgendaRowMock('Grocery Shopping', '06:00 PM', const Color(0xFFF59E0B), textColor, secondaryTextColor, isDone: false, compact: true),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTimelineMock(ThemeData theme, Color textColor, Color secondaryTextColor, Color accentColor) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              decoration: BoxDecoration(
+                color: accentColor.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Text(
+                'TODAY · Fri, Aug 21',
+                style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: accentColor),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        _buildTimelineRowMock('09:00 AM', 'Daily Standup Call', 'Google Meet · Team', accentColor, textColor, secondaryTextColor),
+        const SizedBox(height: 6),
+        _buildTimelineRowMock('11:30 AM', 'Prepare Release v0.2.9', 'Product Tasks', const Color(0xFF10B981), textColor, secondaryTextColor),
+      ],
+    );
+  }
+
+  Widget _buildQuickActionsMock(ThemeData theme, Color textColor, Color secondaryTextColor, Color accentColor) {
+    final actions = [
+      {'icon': Icons.add_task_rounded, 'label': 'New Task', 'color': accentColor},
+      {'icon': Icons.shopping_basket_rounded, 'label': 'Grocery', 'color': const Color(0xFF10B981)},
+      {'icon': Icons.calendar_month_rounded, 'label': 'Calendar', 'color': const Color(0xFFF59E0B)},
+      {'icon': Icons.lock_outline_rounded, 'label': 'Private', 'color': const Color(0xFFEF4444)},
+    ];
+
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text('Quick Launch', style: TextStyle(color: textColor, fontWeight: FontWeight.bold, fontSize: 13)),
+            Text('09:41 AM', style: TextStyle(color: secondaryTextColor, fontSize: 11, fontWeight: FontWeight.w600)),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Row(
+          children: actions.map((a) {
+            final aColor = a['color'] as Color;
+            return Expanded(
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 3),
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                decoration: BoxDecoration(
+                  color: aColor.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: aColor.withValues(alpha: 0.25)),
+                ),
+                child: Column(
+                  children: [
+                    Icon(a['icon'] as IconData, size: 18, color: aColor),
+                    const SizedBox(height: 3),
+                    Text(
+                      a['label'] as String,
+                      style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: textColor),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildUpNextMock(ThemeData theme, Color textColor, Color secondaryTextColor, Color accentColor) {
+    return Row(
+      children: [
+        Container(
+          width: 4,
+          height: 36,
+          decoration: BoxDecoration(
+            color: accentColor,
+            borderRadius: BorderRadius.circular(2),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Icon(Icons.check_circle_outline_rounded, color: accentColor, size: 22),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Next: Product Launch Review',
+                style: TextStyle(color: textColor, fontWeight: FontWeight.bold, fontSize: 13),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              Text(
+                'Starts in 25 min · 11:00 AM',
+                style: TextStyle(color: secondaryTextColor, fontSize: 11),
+              ),
+            ],
+          ),
+        ),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: accentColor.withValues(alpha: 0.15),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Text(
+            'Up Next',
+            style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: accentColor),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAgendaRowMock(String title, String time, Color tagColor, Color textColor, Color secondaryTextColor, {required bool isDone, bool compact = false}) {
+    return Row(
+      children: [
+        Icon(
+          isDone ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded,
+          size: compact ? 14 : 18,
+          color: isDone ? tagColor : secondaryTextColor,
+        ),
+        const SizedBox(width: 6),
+        Expanded(
+          child: Text(
+            title,
+            style: TextStyle(
+              color: isDone ? secondaryTextColor : textColor,
+              fontSize: compact ? 10 : 12,
+              fontWeight: FontWeight.w600,
+              decoration: isDone ? TextDecoration.lineThrough : null,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+        const SizedBox(width: 4),
+        Text(
+          time,
+          style: TextStyle(color: secondaryTextColor, fontSize: compact ? 9 : 10),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTimelineRowMock(String time, String title, String subtitle, Color tagColor, Color textColor, Color secondaryTextColor) {
+    return Row(
+      children: [
+        SizedBox(
+          width: 58,
+          child: Text(
+            time,
+            style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: secondaryTextColor),
+          ),
+        ),
+        Container(
+          width: 3,
+          height: 28,
+          decoration: BoxDecoration(color: tagColor, borderRadius: BorderRadius.circular(2)),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title, style: TextStyle(color: textColor, fontWeight: FontWeight.bold, fontSize: 11), maxLines: 1),
+              Text(subtitle, style: TextStyle(color: secondaryTextColor, fontSize: 9), maxLines: 1),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
@@ -377,6 +782,7 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
               final isSel = _widgetTheme == t['id'];
               return GestureDetector(
                 onTap: () {
+                  HapticFeedback.selectionClick();
                   setState(() {
                     _widgetTheme = t['id'] as String;
                   });
@@ -443,35 +849,33 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
 
           return GestureDetector(
             onTap: () {
+              HapticFeedback.selectionClick();
               setState(() {
                 _highlightColor = c['hex'] as String;
               });
               _saveSetting('full_calendar_highlight_color', c['hex']);
             },
-            child: Container(
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
               width: 36,
               height: 36,
               decoration: BoxDecoration(
                 color: itemColor,
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: isSelected 
-                      ? (theme.brightness == Brightness.dark ? Colors.white : Colors.black87) 
-                      : Colors.transparent,
-                  width: 2.5,
+                  color: isSelected ? Colors.white : Colors.transparent,
+                  width: 3,
                 ),
-                boxShadow: isSelected 
-                    ? [
-                        BoxShadow(
-                          color: itemColor.withValues(alpha: 0.4),
-                          blurRadius: 8,
-                          spreadRadius: 1,
-                        )
-                      ] 
-                    : [],
+                boxShadow: [
+                  BoxShadow(
+                    color: itemColor.withValues(alpha: isSelected ? 0.6 : 0.2),
+                    blurRadius: isSelected ? 8 : 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
-              child: isSelected 
-                  ? const Icon(Icons.check, color: Colors.white, size: 18) 
+              child: isSelected
+                  ? const Icon(Icons.check, color: Colors.white, size: 18)
                   : null,
             ),
           );
@@ -491,6 +895,7 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
             title: Text(l10n.showWeekNumbers),
             value: _showWeekNumbers,
             onChanged: (val) {
+              HapticFeedback.selectionClick();
               setState(() {
                 _showWeekNumbers = val;
               });
@@ -505,6 +910,7 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
             title: Text(l10n.weekendHighlights),
             value: _weekendHighlight,
             onChanged: (val) {
+              HapticFeedback.selectionClick();
               setState(() {
                 _weekendHighlight = val;
               });
@@ -519,6 +925,7 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
             title: Text(l10n.showCalendarTasks),
             value: _showTasks,
             onChanged: (val) {
+              HapticFeedback.selectionClick();
               setState(() {
                 _showTasks = val;
               });
@@ -533,6 +940,7 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
             title: Text(l10n.showGoogleCalendar),
             value: _showGoogle,
             onChanged: (val) {
+              HapticFeedback.selectionClick();
               setState(() {
                 _showGoogle = val;
               });
@@ -557,6 +965,7 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
               ],
               onChanged: (val) {
                 if (val != null) {
+                  HapticFeedback.selectionClick();
                   setState(() {
                     _startOfWeek = val;
                   });
@@ -578,6 +987,7 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
         'icon': Icons.view_agenda_rounded,
         'tag': '4x3 / 4x2',
         'color': const Color(0xFF6C63FF),
+        'previewIndex': 1,
       },
       {
         'title': l10n.monthAgendaWidgetTitle,
@@ -585,6 +995,7 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
         'icon': Icons.calendar_view_month_rounded,
         'tag': '4x4 / 4x3',
         'color': const Color(0xFF10B981),
+        'previewIndex': 2,
       },
       {
         'title': l10n.timelineAgendaWidgetTitle,
@@ -592,6 +1003,7 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
         'icon': Icons.timeline_rounded,
         'tag': '4x3 / 4x4',
         'color': const Color(0xFFF59E0B),
+        'previewIndex': 3,
       },
       {
         'title': l10n.quickActionWidgetTitle,
@@ -599,6 +1011,7 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
         'icon': Icons.add_task_rounded,
         'tag': '2x2',
         'color': const Color(0xFFEF4444),
+        'previewIndex': 4,
       },
       {
         'title': l10n.upNextWidgetTitle,
@@ -606,6 +1019,7 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
         'icon': Icons.play_arrow_rounded,
         'tag': '3x1 / 4x1',
         'color': const Color(0xFF06B6D4),
+        'previewIndex': 5,
       },
       {
         'title': l10n.tasksWidgetTitle,
@@ -613,72 +1027,83 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
         'icon': Icons.checklist_rounded,
         'tag': '4x3',
         'color': const Color(0xFFA855F7),
+        'previewIndex': 0,
       },
     ];
 
     return Column(
       children: widgets.map((w) {
         final iconColor = w['color'] as Color;
+        final previewIndex = w['previewIndex'] as int;
         return Padding(
           padding: const EdgeInsets.only(bottom: 12),
-          child: GlassContainer(
-            padding: const EdgeInsets.all(14),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: iconColor.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(12),
+          child: InkWell(
+            onTap: () {
+              HapticFeedback.selectionClick();
+              setState(() {
+                _selectedPreviewIndex = previewIndex;
+              });
+            },
+            borderRadius: BorderRadius.circular(16),
+            child: GlassContainer(
+              padding: const EdgeInsets.all(14),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: iconColor.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      w['icon'] as IconData,
+                      color: iconColor,
+                      size: 24,
+                    ),
                   ),
-                  child: Icon(
-                    w['icon'] as IconData,
-                    color: iconColor,
-                    size: 24,
-                  ),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              w['title'] as String,
-                              style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: theme.colorScheme.primary.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              w['tag'] as String,
-                              style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                                color: theme.colorScheme.primary,
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                w['title'] as String,
+                                style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        w['subtitle'] as String,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.75),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                w['tag'] as String,
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  color: theme.colorScheme.primary,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 4),
+                        Text(
+                          w['subtitle'] as String,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.75),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );
@@ -686,4 +1111,3 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
     );
   }
 }
-
