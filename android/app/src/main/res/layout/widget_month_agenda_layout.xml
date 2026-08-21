@@ -25,8 +25,7 @@
             android:textSize="14sp"
             android:textStyle="bold"
             android:clickable="true"
-            android:focusable="true"
-            android:background="?android:attr/selectableItemBackgroundBorderless" />
+            android:focusable="true" />
 
         <TextView
             android:id="@+id/widget_month_agenda_month_title"
@@ -50,8 +49,7 @@
             android:textSize="14sp"
             android:textStyle="bold"
             android:clickable="true"
-            android:focusable="true"
-            android:background="?android:attr/selectableItemBackgroundBorderless" />
+            android:focusable="true" />
 
         <TextView
             android:id="@+id/widget_month_agenda_today_btn"
@@ -62,8 +60,7 @@
             android:textColor="@color/widget_primary"
             android:textSize="16sp"
             android:clickable="true"
-            android:focusable="true"
-            android:background="?android:attr/selectableItemBackgroundBorderless" />
+            android:focusable="true" />
 
         <TextView
             android:id="@+id/widget_month_agenda_add_btn"
@@ -75,8 +72,7 @@
             android:textSize="22sp"
             android:textStyle="bold"
             android:clickable="true"
-            android:focusable="true"
-            android:background="?android:attr/selectableItemBackgroundBorderless" />
+            android:focusable="true" />
     </LinearLayout>
 
     <!-- Split Main Container -->
@@ -122,7 +118,7 @@
         </LinearLayout>
 
         <!-- Vertical Divider -->
-        <View
+        <FrameLayout
             android:layout_width="1dp"
             android:layout_height="match_parent"
             android:background="#25888888"

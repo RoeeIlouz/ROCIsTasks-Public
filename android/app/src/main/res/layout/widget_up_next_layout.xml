@@ -14,7 +14,7 @@
         android:gravity="center_vertical">
 
         <!-- Color Accent Strip -->
-        <View
+        <FrameLayout
             android:id="@+id/widget_up_next_color_strip"
             android:layout_width="4dp"
             android:layout_height="match_parent"

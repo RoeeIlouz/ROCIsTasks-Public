@@ -30,3 +30,8 @@
 
 # Flutter Deferred Components / Play Core (ignore missing Play Core classes if not using deferred components)
 -dontwarn com.google.android.play.core.**
+
+# AppWidget and RemoteViews rules
+-keep class * extends android.appwidget.AppWidgetProvider { *; }
+-keep class * extends android.widget.RemoteViewsService { *; }
+-keep class com.rocisapps.tasks.** { *; }

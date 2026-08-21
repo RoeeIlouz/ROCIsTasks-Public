@@ -2,6 +2,82 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## ROCIs-Schedule: 8-Language Localization Suite Parity - 2026-08-20
+
+#### Goals / Requirements
+* **8-Language Parity with ROCIs-tasks**:
+  * Implemented complete localized translations for all 8 supported languages: **English (`en`)**, **Hebrew (`he`)**, **Spanish (`es`)**, **German (`de`)**, **French (`fr`)**, **Arabic (`ar`)**, **Hindi (`hi`)**, and **Swedish (`sv`)**.
+  * Full support for Right-To-Left (RTL) layouts in Arabic and Hebrew.
+  * Added language selector modal in `SettingsScreen` supporting System Default and all 8 languages with native display names (English, עברית, Español, Deutsch, Français, العربية, हिन्दी, Svenska).
+  * Registered `AppLocalizations.supportedLocales` in `MaterialApp.router`.
+* **Automated Testing**: Added `test/unit/l10n_test.dart` verifying all 8 language translations and delegates. 36/36 tests passing in `ROCIs-Schedule` with 0 analyzer issues across both projects.
+
+## ROCIs-Schedule: Full Auth Suite & Guest Mode Parity - 2026-08-20
+
+#### Goals / Requirements
+* **Release Keystore Error Resolution**: Fixed trailing whitespace in `ROCIs-Schedule/android/key.properties` (`storePassword=roee14il `) and verified keystore fingerprints via `keytool` (SHA-1: `90:98:BD:98:55:EB:EB:4E:E7:3C:1A:40:4E:DA:55:D1:06:CC:5E:E8`).
+* **Complete Auth Feature Parity with ROCIs-tasks**:
+  * Added Email & Password authentication (`signInWithEmailAndPassword`, `signUpWithEmailAndPassword`, and `sendPasswordResetEmail`) in `AuthService`.
+  * Implemented seamless **Guest Mode** (`continueAsGuest`, `isGuest`, `effectiveUserId = 'guest'`) allowing offline local use of the app without mandatory login.
+  * Overhauled `LoginScreen` with top-bar "Skip for now" / Guest action, email & password fields with password visibility toggle, forgot password action, divider, Google Sign-In button, and link to register.
+  * Created `RegisterScreen` (`/register`) with matching password validation and smooth onboarding redirection.
+  * Updated `ProfileScreen` and `SettingsScreen` to handle guest mode gracefully with dedicated call-to-action cards ("Sign in to sync your schedule").
+  * Added localized strings in English and Hebrew in `app_localizations.dart`.
+* **Automated Testing**: 26/26 tests passing in `ROCIs-Schedule` and 262/262 tests passing in `ROCIs-tasks` with 0 analyzer issues across both codebases.
+
+## ROCIsApps Ecosystem: ROCIs Schedule Cross-App Synergy & Deep Linking - 2026-08-20
+
+#### Goals / Requirements
+* **Deep Linking URL Scheme**: Configured `rocisschedule://` custom URI scheme and `https://schedule.rocisapps.com` app links in Android Manifest with query visibility (`<queries>`) for `com.rocisapps.tasks` and `rocistasks://`.
+* **CrossAppBridgeService**: Created `CrossAppBridgeService` in `ROCIs-Schedule` enabling 1-tap assignment export (`sendAssignmentToTasks`) and launching `ROCIs-tasks` with automated fallback to Google Play Store and web.
+* **Assignment Export UI**: Added "Send to ROCIs Tasks" button on assignment cards in `AssignmentListScreen` with micro-haptic response and feedback snackbars.
+* **Ecosystem Settings**: Added "ROCIs Suite Ecosystem" section in `SettingsScreen` allowing direct cross-app navigation to `ROCIs Tasks`.
+* **Automated Testing**: 22/22 tests passing in `ROCIs-Schedule` and 262/262 tests passing in `ROCIs-tasks` with 0 analyzer issues across both projects.
+
+## ROCIsApps Ecosystem: ROCIs Schedule Feature Suite & rocisapps.com Showcase - 2026-08-20
+
+#### Goals / Requirements
+* **Smart Notifications**: Created `NotificationService` for `ROCIs-Schedule` supporting pre-class alarms (10/15/30 min prior), location & instructor alerts, and assignment due date reminders.
+* **Exam Countdown Carousel**: Added pinned, live countdown banner to `ScheduleScreen` for upcoming exams (days/hours left with crimson accent glow and location tag).
+* **GPA & Academic Calculator**: Added `grade` property to `Course` model, SQLite database schema migration (v3), and top glassmorphic **Academic Overview** metric cards (Total Credits, 4.0 GPA, and Average Grade) in `CourseListScreen`.
+* **University .ICS Calendar Importer**: Created `IcsImportService` to parse standard `.ics` / iCalendar exports from Canvas/Moodle, automatically extracting recurring weekly rules, locations, event types (Exam, Lab, Class), and deduplicating courses.
+* **rocisapps.com Ecosystem Showcase**: Added dedicated **ROCIs Schedule** showcase section on `rocisapps.com` (`ROCIsApp.github.io`) with interactive simulator preview, feature list, and glowing `[ In Active Development • Coming Soon ]` badge.
+* **Automated Testing**: 20/20 unit and widget tests passing in `ROCIs-Schedule` and 262/262 tests passing in `ROCIs-tasks` with 0 analyzer issues across both projects.
+
+## ROCIsApps Ecosystem Expansion: ROCIs Schedule Phase 2 (UI/UX & Glassmorphism Transformation) - 2026-08-20
+
+#### Goals / Requirements
+* Ported `GlassContainer` with Gaussian backdrop blur, 10–18% dynamic color tinting based on course or primary theme color, and subtle tinted borders to `ROCIs-Schedule`.
+* Added `useGlassmorphism` preference to `ThemeProvider` with toggle in `SettingsScreen` and complete localized translations in English and Hebrew (`app_localizations.dart`).
+* Overhauled `ScheduleScreen`: replaced static containers with `GlassContainer` widgets tinted by individual course colors, added course color glow indicators, week strip selector with glowing selection pill, and formatted time/event-type badges.
+* Overhauled `AssignmentListScreen`: wrapped items in course-tinted `GlassContainer`, added priority badge pills (`HIGH`, `MED`, `LOW`), swipe-to-delete dismissible, and micro-haptic pulses (`HapticFeedback.lightImpact()`) on assignment completion.
+* Overhauled `CourseListScreen`: added glassmorphic course cards with circular initials badge, event counts, credit badges, and draggable modal bottom sheet for course details.
+* Automated testing: Added comprehensive unit and widget screen tests (`test/unit/glass_container_test.dart`, `test/unit/screens_smoke_test.dart`, `test/unit/sync_and_models_test.dart`). 15/15 tests passing in `ROCIs-Schedule` and 262/262 tests passing in `ROCIs-Tasks` with 0 analyzer issues across both projects.
+
+## ROCIsApps Ecosystem Expansion: ROCIs Schedule Phase 1 (Sync & Auth Reliability) - 2026-08-20
+
+#### Goals / Requirements
+* Cloned and configured `ROCIs-Schedule` (`https://github.com/RoeeIlouz/ROCIs-Schedule`) in parent directory `c:\Users\roeei\Documents\rocis_apps\ROCIs-Schedule` as part of the unified ROCIsApps ecosystem.
+* Resolved `material_color_utilities: ^0.13.0` dependency conflict with Flutter SDK.
+* Implemented Phase 1: bidirectional Firestore download & merge for Courses, Events, and Assignments, offline SQLite database isolation per user (`rocis_schedule_<uid>.db`), safe sign-out cache clearance in `LocalDbService.clearCache()`, sync-safe provider methods without re-triggering remote loops, and unit tests (7/7 passing).
+* Established alignment with `ROCIs-Tasks`'s existing `ScheduleFirestoreService` for cross-app timetable and assignment synchronization.
+
+## Fix: Android RemoteViews Inflation Crash ("Couldn't load widget") - 2026-08-20
+
+#### Problem
+* Placing any of the new home screen widgets resulted in the Android launcher displaying `"Couldn't load widget"` in the top left corner of the widget frame.
+
+#### Root Cause
+* Android's `RemoteViews` enforces a strict whitelist of view classes that can be inflated in the launcher process. Using `<View ... />` (which is not annotated with `@RemoteView`) causes an immediate `android.view.InflateException: Class not allowed to be inflated in RemoteViews: android.view.View`.
+* The new layouts used `<View>` for dividers and category/accent color strips (`widget_today_agenda_layout.xml`, `widget_today_agenda_item.xml`, `widget_month_agenda_layout.xml`, `widget_timeline_agenda_layout.xml`, `widget_timeline_header_item.xml`, `widget_timeline_event_item.xml`, and `widget_up_next_layout.xml`).
+* In addition, `android:background="?android:attr/selectableItemBackgroundBorderless"` was used in button headers (which causes theme resolution failures on third-party launchers) and `android:tint` was used in `widget_quick_action_layout.xml` on `ImageView`.
+
+#### Solution
+1. Replaced all `<View>` tags with `<FrameLayout>` (which is on the `RemoteViews` whitelist and supports background colors/drawables).
+2. Removed `?android:attr/selectableItemBackgroundBorderless` and `android:tint` from RemoteViews layout XMLs.
+3. Added ProGuard/R8 keep rules for `AppWidgetProvider` and `RemoteViewsService` in `proguard-rules.pro`.
+4. Verified with `flutter analyze` (0 issues) and `flutter test` (262/262 passed).
+
 ## Android Home Screen Widgets Suite, Direct Task Completion & Freemium 1-Widget Limit - 2026-08-20
 
 #### Goals / Requirements
