@@ -91,3 +91,4 @@ config/secrets/
 
 # Improvement Plan
 IMPROVEMENT_PLAN.md
+ignored/

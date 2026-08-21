@@ -61,7 +61,9 @@ class MonthAgendaGridFactory(private val context: Context) : RemoteViewsService.
 
     override fun getViewAt(position: Int): RemoteViews {
         val rowViews = RemoteViews(context.packageName, R.layout.widget_month_agenda_row)
-        rowViews.removeAllViews(R.id.widget_month_agenda_row_root)
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            rowViews.removeAllViews(R.id.widget_month_agenda_row_root)
+        }
 
         val startIndex = position * 7
         for (i in 0 until 7) {

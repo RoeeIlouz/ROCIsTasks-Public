@@ -98,7 +98,9 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
     override fun getViewAt(position: Int): RemoteViews {
         val rowViews = RemoteViews(context.packageName, R.layout.widget_full_calendar_row)
         try {
-            rowViews.removeAllViews(R.id.widget_full_calendar_row_container)
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                rowViews.removeAllViews(R.id.widget_full_calendar_row_container)
+            }
 
             val startIndex = position * 8
             for (i in 0 until 8) {
