@@ -1144,6 +1144,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get yearlyPlanSaving => 'وفر 33%';
 
   @override
+  String get lifetimePlanTitle => 'مدى الحياة';
+
+  @override
+  String get lifetimePlanPrice => '49.99 \$ مرة واحدة';
+
+  @override
+  String get lifetimePlanBadge => 'أفضل قيمة';
+
+  @override
   String get groceryListMode => 'قائمة المهام';
 
   @override
@@ -1296,4 +1305,72 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get noCustomFieldsAdded => 'لم تتم إضافة أسطر مخصصة';
+
+  @override
+  String get quickDateToday => 'اليوم';
+
+  @override
+  String get quickDateTomorrow => 'غداً';
+
+  @override
+  String get quickDateThisWeekend => 'عطلة نهاية الأسبوع';
+
+  @override
+  String get quickDateNextWeek => 'الأسبوع القادم';
+
+  @override
+  String get templateStarterTitle => 'قوالب سريعة للبدء';
+
+  @override
+  String get templateGroceryTitle => 'قائمة البقالة والتسوق';
+
+  @override
+  String get templateGroceryDesc => 'قائمة تحقق للبقالة والأساسيات';
+
+  @override
+  String get templateWorkTitle => 'مهمة عمل عاجلة';
+
+  @override
+  String get templateWorkDesc => 'مرحلة مهمة ذات أولوية عالية';
+
+  @override
+  String get templateRoutineTitle => 'روتين يومي';
+
+  @override
+  String get templateRoutineDesc => 'عادة صباحية يومية متكررة';
+
+  @override
+  String get templateStudyTitle => 'دراسة وواجبات';
+
+  @override
+  String get templateStudyDesc => 'تتبع القراءة والتمارين';
+
+  @override
+  String completedTasksHeader(int count) {
+    return 'المكتملة ($count)';
+  }
+
+  @override
+  String get allCaughtUpToday => 'تم إنجاز كل شيء لليوم! 🎉';
+
+  @override
+  String get allCaughtUpSubtitle => 'عمل رائع! خذ استراحة أو أضف مهمة جديدة.';
+
+  @override
+  String get resetFilters => 'إعادة تعيين الكل';
+
+  @override
+  String get rescheduleTask => 'إعادة الجدولة';
+
+  @override
+  String get plusOneDay => '+يوم واحد';
+
+  @override
+  String get plusOneWeek => '+أسبوع واحد';
+
+  @override
+  String get moveToToday => 'الانتقال إلى اليوم';
+
+  @override
+  String get activeTasks => 'المهام النشطة';
 }

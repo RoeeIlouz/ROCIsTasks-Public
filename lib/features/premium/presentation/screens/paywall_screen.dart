@@ -246,13 +246,23 @@ class _WebPaywallViewState extends State<WebPaywallView> {
                       theme: theme,
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: _buildPlanCard(
                       index: 1,
                       title: l10n.yearlyPlanTitle,
                       price: l10n.yearlyPlanPrice,
                       badge: l10n.yearlyPlanSaving,
+                      theme: theme,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: _buildPlanCard(
+                      index: 2,
+                      title: l10n.lifetimePlanTitle,
+                      price: l10n.lifetimePlanPrice,
+                      badge: l10n.lifetimePlanBadge,
                       theme: theme,
                     ),
                   ),
@@ -292,9 +302,12 @@ class _WebPaywallViewState extends State<WebPaywallView> {
                             return;
                           }
 
-                          final baseUrl = _selectedPlanIndex == 0
-                              ? AppConfig.lemonSqueezyMonthlyUrl
-                              : AppConfig.lemonSqueezyYearlyUrl;
+                          final baseUrl = switch (_selectedPlanIndex) {
+                            0 => AppConfig.lemonSqueezyMonthlyUrl,
+                            1 => AppConfig.lemonSqueezyYearlyUrl,
+                            2 => AppConfig.lemonSqueezyLifetimeUrl,
+                            _ => AppConfig.lemonSqueezyYearlyUrl,
+                          };
 
                            final separator = baseUrl.contains('?') ? '&' : '?';
                            final checkoutUrl =
@@ -418,7 +431,7 @@ class _WebPaywallViewState extends State<WebPaywallView> {
       },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 20),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
         decoration: BoxDecoration(
           color: isSelected
               ? theme.colorScheme.primary.withValues(alpha: isDark ? 0.15 : 0.08)
@@ -436,39 +449,50 @@ class _WebPaywallViewState extends State<WebPaywallView> {
           children: [
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  title,
-                  style: GoogleFonts.outfit(
-                    fontSize: 13,
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                    color: isSelected ? theme.colorScheme.primary : null,
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    title,
+                    style: GoogleFonts.outfit(
+                      fontSize: 13,
+                      fontWeight:
+                          isSelected ? FontWeight.bold : FontWeight.normal,
+                      color: isSelected ? theme.colorScheme.primary : null,
+                    ),
                   ),
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  price,
-                  style: GoogleFonts.outfit(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                const SizedBox(height: 6),
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    price,
+                    style: GoogleFonts.outfit(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ],
             ),
             if (badge != null)
               Positioned(
-                top: -30,
-                right: -8,
+                top: -26,
+                right: -6,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                   decoration: BoxDecoration(
                     color: theme.colorScheme.tertiary,
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
                     badge,
                     style: GoogleFonts.outfit(
-                      fontSize: 10,
+                      fontSize: 9,
                       fontWeight: FontWeight.bold,
                       color: theme.colorScheme.onTertiary,
                     ),

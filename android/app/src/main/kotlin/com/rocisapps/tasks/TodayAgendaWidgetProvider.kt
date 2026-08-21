@@ -44,135 +44,137 @@ class TodayAgendaWidgetProvider : HomeWidgetProvider() {
                 val isAllowed = WidgetLimitHelper.isWidgetAllowed(context, appWidgetId, isPremium)
                 val views = RemoteViews(context.packageName, R.layout.widget_today_agenda_layout)
 
-                // 1. Check Pro limit
-                WidgetLimitHelper.setupProOverlay(context, views, isAllowed)
+                // 1. Read Theme Settings
+                val theme = widgetData.getString("full_calendar_theme", "system") ?: "system"
+                val rootBgRes = when (theme) {
+                    "light" -> R.drawable.widget_background_light
+                    "dark" -> R.drawable.widget_background_dark
+                    "glassmorphic" -> R.drawable.widget_background_glass
+                    else -> R.drawable.widget_background
+                }
+                views.setInt(R.id.widget_today_root, "setBackgroundResource", rootBgRes)
 
-                if (isAllowed) {
-                    // 2. Read Theme Settings
-                    val theme = widgetData.getString("full_calendar_theme", "system") ?: "system"
-                    val rootBgRes = when (theme) {
-                        "light" -> R.drawable.widget_background_light
-                        "dark" -> R.drawable.widget_background_dark
-                        "glassmorphic" -> R.drawable.widget_background_glass
-                        else -> R.drawable.widget_background
-                    }
-                    views.setInt(R.id.widget_today_root, "setBackgroundResource", rootBgRes)
-
-                    val textColor = when (theme) {
-                        "light" -> android.graphics.Color.parseColor("#1C1C1E")
-                        "dark", "glassmorphic" -> android.graphics.Color.parseColor("#FFFFFF")
-                        else -> context.getColor(R.color.widget_title_text)
-                    }
-                    val secondaryColor = when (theme) {
-                        "light" -> android.graphics.Color.parseColor("#8E8E93")
-                        "dark", "glassmorphic" -> android.graphics.Color.parseColor("#AEAEB2")
-                        else -> context.getColor(R.color.widget_secondary_text)
-                    }
-
-                    views.setTextColor(R.id.widget_today_date_title, textColor)
-                    views.setTextColor(R.id.widget_today_date_subtitle, secondaryColor)
-                    views.setTextColor(R.id.widget_today_prev, textColor)
-                    views.setTextColor(R.id.widget_today_next, textColor)
-
-                    // 3. Calculate and Render Date Headers
-                    val offset = widgetData.getInt(PREF_TODAY_OFFSET, 0)
-                    val cal = Calendar.getInstance()
-                    if (offset != 0) {
-                        cal.add(Calendar.DAY_OF_YEAR, offset)
-                    }
-
-                    val titleFormat = SimpleDateFormat("EEEE, MMM d", Locale.getDefault())
-                    val titleStr = titleFormat.format(cal.time)
-
-                    val subtitleStr = when (offset) {
-                        0 -> "Today"
-                        1 -> "Tomorrow"
-                        -1 -> "Yesterday"
-                        else -> {
-                            val diffFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-                            diffFormat.format(cal.time)
-                        }
-                    }
-
-                    views.setTextViewText(R.id.widget_today_date_title, titleStr)
-                    views.setTextViewText(R.id.widget_today_date_subtitle, subtitleStr)
-
-                    // 4. Setup Navigation Pending Intents
-                    val prevIntent = Intent(context, TodayAgendaWidgetProvider::class.java).apply {
-                        action = ACTION_PREV_DAY
-                        putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-                    }
-                    views.setOnClickPendingIntent(
-                        R.id.widget_today_prev,
-                        PendingIntent.getBroadcast(
-                            context,
-                            REQ_PREV_DAY,
-                            prevIntent,
-                            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                        )
-                    )
-
-                    val nextIntent = Intent(context, TodayAgendaWidgetProvider::class.java).apply {
-                        action = ACTION_NEXT_DAY
-                        putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-                    }
-                    views.setOnClickPendingIntent(
-                        R.id.widget_today_next,
-                        PendingIntent.getBroadcast(
-                            context,
-                            REQ_NEXT_DAY,
-                            nextIntent,
-                            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                        )
-                    )
-
-                    val todayIntent = Intent(context, TodayAgendaWidgetProvider::class.java).apply {
-                        action = ACTION_JUMP_TODAY
-                        putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-                    }
-                    views.setOnClickPendingIntent(
-                        R.id.widget_today_jump_btn,
-                        PendingIntent.getBroadcast(
-                            context,
-                            REQ_JUMP_TODAY,
-                            todayIntent,
-                            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                        )
-                    )
-
-                    // 5. Add Task Button
-                    val addTaskPendingIntent = HomeWidgetLaunchIntent.getActivity(
-                        context,
-                        MainActivity::class.java,
-                        Uri.parse("rocistasks://add_task")
-                    )
-                    views.setOnClickPendingIntent(R.id.widget_today_add_btn, addTaskPendingIntent)
-
-                    // 6. ListView Adapter Setup
-                    val serviceIntent = Intent(context, TodayAgendaWidgetService::class.java).apply {
-                        putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-                        data = Uri.parse("widget://rocis/today_agenda/$appWidgetId/$offset")
-                    }
-                    views.setRemoteAdapter(R.id.widget_today_list, serviceIntent)
-                    views.setEmptyView(R.id.widget_today_list, R.id.widget_today_empty)
-
-                    // 7. Item Click Template (handles both item tap and task completion)
-                    val appIntent = Intent(context, MainActivity::class.java).apply {
-                        action = Intent.ACTION_VIEW
-                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                    }
-                    val itemPendingIntent = PendingIntent.getActivity(
-                        context,
-                        600 + appWidgetId,
-                        appIntent,
-                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
-                    )
-                    views.setPendingIntentTemplate(R.id.widget_today_list, itemPendingIntent)
+                val textColor = when (theme) {
+                    "light" -> android.graphics.Color.parseColor("#1C1C1E")
+                    "dark", "glassmorphic" -> android.graphics.Color.parseColor("#FFFFFF")
+                    else -> context.getColor(R.color.widget_title_text)
+                }
+                val secondaryColor = when (theme) {
+                    "light" -> android.graphics.Color.parseColor("#8E8E93")
+                    "dark", "glassmorphic" -> android.graphics.Color.parseColor("#AEAEB2")
+                    else -> context.getColor(R.color.widget_secondary_text)
                 }
 
+                views.setTextColor(R.id.widget_today_date_title, textColor)
+                views.setTextColor(R.id.widget_today_date_subtitle, secondaryColor)
+                views.setTextColor(R.id.widget_today_prev, textColor)
+                views.setTextColor(R.id.widget_today_next, textColor)
+
+                // 2. Calculate and Render Date Headers
+                val offset = widgetData.getInt(PREF_TODAY_OFFSET, 0)
+                val cal = Calendar.getInstance()
+                if (offset != 0) {
+                    cal.add(Calendar.DAY_OF_YEAR, offset)
+                }
+
+                val titleFormat = SimpleDateFormat("EEEE, MMM d", Locale.getDefault())
+                val titleStr = titleFormat.format(cal.time)
+
+                val subtitleStr = when (offset) {
+                    0 -> "Today"
+                    1 -> "Tomorrow"
+                    -1 -> "Yesterday"
+                    else -> {
+                        val diffFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                        diffFormat.format(cal.time)
+                    }
+                }
+
+                views.setTextViewText(R.id.widget_today_date_title, titleStr)
+                views.setTextViewText(R.id.widget_today_date_subtitle, subtitleStr)
+
+                // 3. Navigation Pending Intents
+                val prevIntent = Intent(context, TodayAgendaWidgetProvider::class.java).apply {
+                    action = ACTION_PREV_DAY
+                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+                }
+                views.setOnClickPendingIntent(
+                    R.id.widget_today_prev,
+                    PendingIntent.getBroadcast(
+                        context,
+                        REQ_PREV_DAY,
+                        prevIntent,
+                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                    )
+                )
+
+                val nextIntent = Intent(context, TodayAgendaWidgetProvider::class.java).apply {
+                    action = ACTION_NEXT_DAY
+                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+                }
+                views.setOnClickPendingIntent(
+                    R.id.widget_today_next,
+                    PendingIntent.getBroadcast(
+                        context,
+                        REQ_NEXT_DAY,
+                        nextIntent,
+                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                    )
+                )
+
+                val todayIntent = Intent(context, TodayAgendaWidgetProvider::class.java).apply {
+                    action = ACTION_JUMP_TODAY
+                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+                }
+                views.setOnClickPendingIntent(
+                    R.id.widget_today_jump_btn,
+                    PendingIntent.getBroadcast(
+                        context,
+                        REQ_JUMP_TODAY,
+                        todayIntent,
+                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                    )
+                )
+
+                // 4. Add Task Button
+                val addTaskPendingIntent = HomeWidgetLaunchIntent.getActivity(
+                    context,
+                    MainActivity::class.java,
+                    Uri.parse("rocistasks://add_task")
+                )
+                views.setOnClickPendingIntent(R.id.widget_today_add_btn, addTaskPendingIntent)
+
+                // 5. ListView Adapter Setup (always bound so launcher never encounters uninitialized adapter)
+                val serviceIntent = Intent(context, TodayAgendaWidgetService::class.java).apply {
+                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+                    data = Uri.parse("widget://rocis/today_agenda/$appWidgetId/$offset")
+                }
+                views.setRemoteAdapter(R.id.widget_today_list, serviceIntent)
+                views.setEmptyView(R.id.widget_today_list, R.id.widget_today_empty)
+
+                // 6. Item Click Template (handles both item tap and task completion)
+                val appIntent = Intent(context, MainActivity::class.java).apply {
+                    action = Intent.ACTION_VIEW
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                }
+                val itemPendingIntent = PendingIntent.getActivity(
+                    context,
+                    600 + appWidgetId,
+                    appIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
+                )
+                views.setPendingIntentTemplate(R.id.widget_today_list, itemPendingIntent)
+
+                // 7. Pro Overlay Setup
+                WidgetLimitHelper.setupProOverlay(context, views, isAllowed)
+
                 appWidgetManager.updateAppWidget(appWidgetId, views)
-                appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_today_list)
-            } catch (_: Exception) {}
+                if (isAllowed) {
+                    appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_today_list)
+                }
+            } catch (e: Exception) {
+                android.util.Log.e("TodayAgendaWidget", "Error updating widget $appWidgetId", e)
+            }
         }
     }
 

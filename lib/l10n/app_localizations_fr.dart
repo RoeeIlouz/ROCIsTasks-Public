@@ -1174,6 +1174,15 @@ class AppLocalizationsFr extends AppLocalizations {
   String get yearlyPlanSaving => 'Économisez 33%';
 
   @override
+  String get lifetimePlanTitle => 'À vie';
+
+  @override
+  String get lifetimePlanPrice => '49,99 \$ unique';
+
+  @override
+  String get lifetimePlanBadge => 'Meilleure offre';
+
+  @override
   String get groceryListMode => 'Liste de tâches';
 
   @override
@@ -1327,4 +1336,74 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get noCustomFieldsAdded => 'Aucune ligne personnalisée ajoutée';
+
+  @override
+  String get quickDateToday => 'Aujourd\'hui';
+
+  @override
+  String get quickDateTomorrow => 'Demain';
+
+  @override
+  String get quickDateThisWeekend => 'Ce week-end';
+
+  @override
+  String get quickDateNextWeek => 'La semaine prochaine';
+
+  @override
+  String get templateStarterTitle => 'Modèles de démarrage rapide';
+
+  @override
+  String get templateGroceryTitle => 'Liste de courses';
+
+  @override
+  String get templateGroceryDesc =>
+      'Liste de contrôle pour les courses et l\'essentiel';
+
+  @override
+  String get templateWorkTitle => 'Tâche de travail';
+
+  @override
+  String get templateWorkDesc => 'Étape de projet prioritaire';
+
+  @override
+  String get templateRoutineTitle => 'Routine quotidienne';
+
+  @override
+  String get templateRoutineDesc => 'Habitude matinale quotidienne récurrente';
+
+  @override
+  String get templateStudyTitle => 'Études et devoirs';
+
+  @override
+  String get templateStudyDesc => 'Suivi des lectures et des exercices';
+
+  @override
+  String completedTasksHeader(int count) {
+    return 'Terminées ($count)';
+  }
+
+  @override
+  String get allCaughtUpToday => 'Tout est fait pour aujourd\'hui ! 🎉';
+
+  @override
+  String get allCaughtUpSubtitle =>
+      'Excellent travail ! Faites une pause ou ajoutez une nouvelle tâche.';
+
+  @override
+  String get resetFilters => 'Tout réinitialiser';
+
+  @override
+  String get rescheduleTask => 'Reprogrammer';
+
+  @override
+  String get plusOneDay => '+1 Jour';
+
+  @override
+  String get plusOneWeek => '+1 Semaine';
+
+  @override
+  String get moveToToday => 'Déplacer à aujourd\'hui';
+
+  @override
+  String get activeTasks => 'Tâches actives';
 }

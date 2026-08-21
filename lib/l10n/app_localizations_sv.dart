@@ -1162,6 +1162,15 @@ class AppLocalizationsSv extends AppLocalizations {
   String get yearlyPlanSaving => 'Spara 33%';
 
   @override
+  String get lifetimePlanTitle => 'Livstid';
+
+  @override
+  String get lifetimePlanPrice => '49,99 \$ en gång';
+
+  @override
+  String get lifetimePlanBadge => 'Bästa värde';
+
+  @override
   String get groceryListMode => 'Uppgiftslista';
 
   @override
@@ -1315,4 +1324,74 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get noCustomFieldsAdded => 'Inga anpassade rader tillagda';
+
+  @override
+  String get quickDateToday => 'Idag';
+
+  @override
+  String get quickDateTomorrow => 'Imorgon';
+
+  @override
+  String get quickDateThisWeekend => 'I helgen';
+
+  @override
+  String get quickDateNextWeek => 'Nästa vecka';
+
+  @override
+  String get templateStarterTitle => 'Snabbstartsmallar';
+
+  @override
+  String get templateGroceryTitle => 'Inköpslista & Matvaror';
+
+  @override
+  String get templateGroceryDesc =>
+      'Checklista för matvaror och nödvändigheter';
+
+  @override
+  String get templateWorkTitle => 'Arbetsuppgift';
+
+  @override
+  String get templateWorkDesc => 'Högprioriterad projektmilstolpe';
+
+  @override
+  String get templateRoutineTitle => 'Daglig rutin';
+
+  @override
+  String get templateRoutineDesc => 'Återkommande daglig morgonvana';
+
+  @override
+  String get templateStudyTitle => 'Studier & Uppgifter';
+
+  @override
+  String get templateStudyDesc => 'Följ kursläsning och övningar';
+
+  @override
+  String completedTasksHeader(int count) {
+    return 'Slutförda ($count)';
+  }
+
+  @override
+  String get allCaughtUpToday => 'Allt klart för idag! 🎉';
+
+  @override
+  String get allCaughtUpSubtitle =>
+      'Bra jobbat! Ta en paus eller lägg till en ny uppgift.';
+
+  @override
+  String get resetFilters => 'Återställ alla';
+
+  @override
+  String get rescheduleTask => 'Schemalägg om';
+
+  @override
+  String get plusOneDay => '+1 Dag';
+
+  @override
+  String get plusOneWeek => '+1 Vecka';
+
+  @override
+  String get moveToToday => 'Flytta till idag';
+
+  @override
+  String get activeTasks => 'Aktiva uppgifter';
 }

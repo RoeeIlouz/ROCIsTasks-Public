@@ -65,6 +65,33 @@ class _CalendarScreenState extends State<CalendarScreen> {
     return [...tasks, ...events];
   }
 
+  Color _getEventColor(
+    dynamic event,
+    TaskProvider taskProvider,
+    CalendarProvider calendarProvider,
+    CalendarColorService colorService,
+  ) {
+    if (event is Task) {
+      Category? category;
+      try {
+        category = taskProvider.categories.firstWhere(
+          (cat) => event.categoryIds.isNotEmpty
+              ? event.categoryIds.contains(cat.id)
+              : cat.id == event.categoryId,
+        );
+      } catch (_) {}
+      if (category != null) return Color(category.colorValue);
+      return colorService.taskColor;
+    } else if (event is Event) {
+      final cal = calendarProvider.availableCalendars.firstWhere(
+        (c) => c.id == event.calendarId,
+        orElse: Calendar.new,
+      );
+      return cal.color != null ? Color(cal.color!) : colorService.googleColor;
+    }
+    return colorService.taskColor;
+  }
+
   Widget _buildCalendarCell(
     DateTime day, {
     bool isSelected = false,
@@ -312,44 +339,27 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       if (events.length == 1) {
                         final event = events.first;
                         String title = '';
-                        Color c = colorService.taskColor;
+                        final c = _getEventColor(event, taskProvider, calendarProvider, colorService);
                         if (event is Task) {
                           title = event.title;
-                          Category? category;
-                          try {
-                            category = taskProvider.categories.firstWhere(
-                              (cat) => event.categoryIds.isNotEmpty
-                                  ? event.categoryIds.contains(cat.id)
-                                  : cat.id == event.categoryId,
-                            );
-                          } catch (_) {}
-                          if (category != null) c = Color(category.colorValue);
                         } else if (event is Event) {
                           title = event.title ?? 'No Title';
-                          final cal = calendarProvider.availableCalendars
-                              .firstWhere(
-                                (c) => c.id == event.calendarId,
-                                orElse: Calendar.new,
-                              );
-                          c = cal.color != null
-                              ? Color(cal.color!)
-                              : colorService.googleColor;
                         }
 
                         return Positioned(
-                          top: 25,
+                          bottom: 4,
                           left: 2,
                           right: 2,
                           child: Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 4,
-                              vertical: 1,
+                              vertical: 1.5,
                             ),
                             decoration: BoxDecoration(
-                              color: c.withValues(alpha: 0.12),
+                              color: c.withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(4),
                               border: Border.all(
-                                color: c.withValues(alpha: 0.25),
+                                color: c.withValues(alpha: 0.35),
                                 width: 0.5,
                               ),
                             ),
@@ -358,7 +368,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
-                                fontSize: 7.5,
+                                fontSize: 8.0,
                                 fontWeight: FontWeight.w600,
                                 color: c,
                                 height: 1.1,
@@ -369,54 +379,39 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         );
                       }
 
-                      final markers = <Widget>[];
-                      for (final event in events.take(3)) {
-                        Color c = colorService.taskColor;
-                        if (event is Task) {
-                          Category? category;
-                          try {
-                            category = taskProvider.categories.firstWhere(
-                              (cat) => event.categoryIds.isNotEmpty
-                                  ? event.categoryIds.contains(cat.id)
-                                  : cat.id == event.categoryId,
-                            );
-                          } catch (_) {}
-                          if (category != null) c = Color(category.colorValue);
-                        } else if (event is Event) {
-                          final cal = calendarProvider.availableCalendars
-                              .firstWhere(
-                                (c) => c.id == event.calendarId,
-                                orElse: Calendar.new,
-                              );
-                          c = cal.color != null
-                              ? Color(cal.color!)
-                              : colorService.googleColor;
-                        }
-                        markers.add(
+                      final dotWidgets = <Widget>[];
+                      final visibleEvents = events.take(3).toList();
+                      for (final event in visibleEvents) {
+                        final c = _getEventColor(event, taskProvider, calendarProvider, colorService);
+                        dotWidgets.add(
                           Container(
-                            margin: const EdgeInsets.symmetric(
-                              vertical: 1,
-                              horizontal: 8,
-                            ),
-                            height: 4,
+                            width: 6,
+                            height: 6,
+                            margin: const EdgeInsets.symmetric(horizontal: 1.5),
                             decoration: BoxDecoration(
                               color: c,
-                              borderRadius: BorderRadius.circular(2),
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: c.withValues(alpha: 0.4),
+                                  blurRadius: 2,
+                                  spreadRadius: 0.5,
+                                ),
+                              ],
                             ),
                           ),
                         );
                       }
 
                       if (events.length > 3) {
-                        markers.add(
+                        dotWidgets.add(
                           Padding(
-                            padding: const EdgeInsets.only(top: 1),
+                            padding: const EdgeInsets.only(left: 2),
                             child: Text(
                               '+${events.length - 3}',
-                              textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 8,
-                                color: Theme.of(context).colorScheme.onSurface,
+                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -425,13 +420,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       }
 
                       return Positioned(
-                        top: 25,
+                        bottom: 6,
                         left: 0,
                         right: 0,
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: markers,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: dotWidgets,
                         ),
                       );
                     },
@@ -453,10 +448,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   child: TaskListSkeleton(),
                 )
               : selectedItems.isEmpty
-                  ? Align(
-                      alignment: Alignment.topCenter,
+                  ? SingleChildScrollView(
                       child: Padding(
-                        padding: const EdgeInsets.only(top: 16.0),
+                        padding: const EdgeInsets.only(top: 16.0, bottom: 16.0),
                         child: GlassContainer(
                           margin: const EdgeInsets.symmetric(horizontal: 16),
                           padding: const EdgeInsets.symmetric(

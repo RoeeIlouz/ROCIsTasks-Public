@@ -302,6 +302,157 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     HapticFeedback.lightImpact();
   }
 
+  DateTime _getQuickDateToday() {
+    final now = DateTime.now();
+    if (now.hour >= 18) {
+      return DateTime(now.year, now.month, now.day, 23, 59);
+    }
+    return DateTime(now.year, now.month, now.day, 18, 0);
+  }
+
+  DateTime _getQuickDateTomorrow() {
+    final now = DateTime.now();
+    final tomorrow = now.add(const Duration(days: 1));
+    return DateTime(tomorrow.year, tomorrow.month, tomorrow.day, 9, 0);
+  }
+
+  DateTime _getQuickDateThisWeekend() {
+    final now = DateTime.now();
+    int daysUntilSaturday = (DateTime.saturday - now.weekday) % 7;
+    if (daysUntilSaturday == 0 && now.hour >= 12) {
+      daysUntilSaturday = 1;
+    }
+    final weekendDay = now.add(Duration(days: daysUntilSaturday));
+    return DateTime(weekendDay.year, weekendDay.month, weekendDay.day, 10, 0);
+  }
+
+  DateTime _getQuickDateNextWeek() {
+    final now = DateTime.now();
+    int daysUntilNextMonday = (DateTime.monday - now.weekday + 7) % 7;
+    if (daysUntilNextMonday == 0) {
+      daysUntilNextMonday = 7;
+    }
+    final nextMonday = now.add(Duration(days: daysUntilNextMonday));
+    return DateTime(nextMonday.year, nextMonday.month, nextMonday.day, 9, 0);
+  }
+
+  bool _isSameDay(DateTime? a, DateTime? b) {
+    if (a == null || b == null) return false;
+    return a.year == b.year && a.month == b.month && a.day == b.day;
+  }
+
+  void _onQuickDateTap(DateTime targetDate) {
+    HapticFeedback.lightImpact();
+    setState(() {
+      if (_selectedDate != null && _isSameDay(_selectedDate, targetDate)) {
+        _selectedDate = null;
+        _dateCleared = true;
+      } else {
+        _selectedDate = targetDate;
+        _dateCleared = false;
+      }
+    });
+  }
+
+  Widget _buildQuickDateChips(BuildContext context, AppLocalizations l10n, ThemeData theme) {
+    final today = _getQuickDateToday();
+    final tomorrow = _getQuickDateTomorrow();
+    final weekend = _getQuickDateThisWeekend();
+    final nextWeek = _getQuickDateNextWeek();
+
+    final isToday = _isSameDay(_selectedDate, today);
+    final isTomorrow = _isSameDay(_selectedDate, tomorrow);
+    final isWeekend = _isSameDay(_selectedDate, weekend);
+    final isNextWeek = _isSameDay(_selectedDate, nextWeek);
+
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: [
+          _buildQuickDateChip(
+            label: l10n.quickDateToday,
+            icon: Icons.today_rounded,
+            isSelected: isToday,
+            onTap: () => _onQuickDateTap(today),
+            theme: theme,
+          ),
+          const SizedBox(width: 8),
+          _buildQuickDateChip(
+            label: l10n.quickDateTomorrow,
+            icon: Icons.wb_sunny_outlined,
+            isSelected: isTomorrow,
+            onTap: () => _onQuickDateTap(tomorrow),
+            theme: theme,
+          ),
+          const SizedBox(width: 8),
+          _buildQuickDateChip(
+            label: l10n.quickDateThisWeekend,
+            icon: Icons.weekend_outlined,
+            isSelected: isWeekend,
+            onTap: () => _onQuickDateTap(weekend),
+            theme: theme,
+          ),
+          const SizedBox(width: 8),
+          _buildQuickDateChip(
+            label: l10n.quickDateNextWeek,
+            icon: Icons.next_week_outlined,
+            isSelected: isNextWeek,
+            onTap: () => _onQuickDateTap(nextWeek),
+            theme: theme,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQuickDateChip({
+    required String label,
+    required IconData icon,
+    required bool isSelected,
+    required VoidCallback onTap,
+    required ThemeData theme,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? theme.colorScheme.primary.withValues(alpha: 0.18)
+              : theme.colorScheme.surfaceContainerLow,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected
+                ? theme.colorScheme.primary
+                : theme.dividerColor.withValues(alpha: 0.2),
+            width: isSelected ? 1.5 : 1.0,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              isSelected ? Icons.check_circle_rounded : icon,
+              size: 16,
+              color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurfaceVariant,
+            ),
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: GoogleFonts.outfit(
+                fontSize: 12,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurface,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   ui.TextDirection _getTextDirection(String text) {
     return Bidi.detectRtlDirectionality(text)
         ? ui.TextDirection.rtl
@@ -460,7 +611,9 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   color: theme.colorScheme.primary,
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 10),
+              _buildQuickDateChips(context, l10n, theme),
+              const SizedBox(height: 10),
               Semantics(
                 label: l10n.dueDateAndTime,
                 hint: 'Double tap to open date and time picker',

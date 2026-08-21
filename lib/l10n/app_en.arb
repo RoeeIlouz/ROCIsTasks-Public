@@ -412,6 +412,9 @@
   "yearlyPlanTitle": "Yearly Plan",
   "yearlyPlanPrice": "$39.99 / year",
   "yearlyPlanSaving": "Save 33%",
+  "lifetimePlanTitle": "Lifetime",
+  "lifetimePlanPrice": "$49.99 once",
+  "lifetimePlanBadge": "Best Value",
   "groceryListMode": "Task List",
   "groceryListModeSubtitle": "Format task as an interactive task list",
   "itemsInCart": "{completed}/{total} completed",
@@ -461,5 +464,34 @@
   "enterUrl": "Website or URL",
   "enterNote": "Custom details",
   "copiedToClipboard": "Copied to clipboard",
-  "noCustomFieldsAdded": "No custom lines added"
+  "noCustomFieldsAdded": "No custom lines added",
+  "quickDateToday": "Today",
+  "quickDateTomorrow": "Tomorrow",
+  "quickDateThisWeekend": "This Weekend",
+  "quickDateNextWeek": "Next Week",
+  "templateStarterTitle": "Quick Starter Templates",
+  "templateGroceryTitle": "Grocery & Shopping List",
+  "templateGroceryDesc": "Checklist for groceries & essentials",
+  "templateWorkTitle": "Work Sprint Task",
+  "templateWorkDesc": "High-priority project milestone",
+  "templateRoutineTitle": "Daily Routine",
+  "templateRoutineDesc": "Recurring daily morning habit",
+  "templateStudyTitle": "Study & Assignment",
+  "templateStudyDesc": "Track course reading & exercises",
+  "completedTasksHeader": "Completed ({count})",
+  "@completedTasksHeader": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "allCaughtUpToday": "All done for today! 🎉",
+  "allCaughtUpSubtitle": "Great job! Take a break or add a new task.",
+  "resetFilters": "Reset All",
+  "rescheduleTask": "Reschedule",
+  "plusOneDay": "+1 Day",
+  "plusOneWeek": "+1 Week",
+  "moveToToday": "Move to Today",
+  "activeTasks": "Active Tasks"
 }

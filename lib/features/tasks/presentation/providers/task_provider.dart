@@ -555,6 +555,23 @@ class TaskProvider extends ChangeNotifier {
     _saveCategoryFilters();
   }
 
+  void resetAllFilters() {
+    _filterService.currentSortOption = TaskSortOption.dueDate;
+    _filterService.currentDateFilter = DateTimeFilterOption.all;
+    _filterService.clearCategoryFilters();
+    _filterService.showCompleted = true;
+    _refreshPagination();
+    notifyListeners();
+    _saveCategoryFilters();
+    SharedPreferences.getInstance().then((prefs) {
+      prefs.setInt('sort_option', TaskSortOption.dueDate.index);
+      prefs.setInt('date_filter', DateTimeFilterOption.all.index);
+      prefs.setBool('show_completed', true);
+    }).catchError((e, s) {
+      _errorHandlingService.logError(e, s, reason: 'Resetting filters');
+    });
+  }
+
   void _saveCategoryFilters() {
     SharedPreferences.getInstance()
         .then((prefs) {

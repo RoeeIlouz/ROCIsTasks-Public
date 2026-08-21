@@ -41,7 +41,7 @@
                     android:text="3"
                     android:textColor="@color/widget_title_text"
                     android:textSize="18sp"
-                    android:fontFamily="sans-serif-bold"
+                    android:fontFamily="sans-serif"
                     android:textStyle="bold" />
 
                 <TextView

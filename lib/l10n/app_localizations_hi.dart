@@ -1159,6 +1159,15 @@ class AppLocalizationsHi extends AppLocalizations {
   String get yearlyPlanSaving => '33% बचाएं';
 
   @override
+  String get lifetimePlanTitle => 'आजीवन';
+
+  @override
+  String get lifetimePlanPrice => '\$49.99 एक बार';
+
+  @override
+  String get lifetimePlanBadge => 'सर्वोत्तम मूल्य';
+
+  @override
   String get groceryListMode => 'कार्य सूची';
 
   @override
@@ -1311,4 +1320,73 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get noCustomFieldsAdded => 'कोई कस्टम पंक्ति नहीं जोड़ी गई';
+
+  @override
+  String get quickDateToday => 'आज';
+
+  @override
+  String get quickDateTomorrow => 'कल';
+
+  @override
+  String get quickDateThisWeekend => 'इस सप्ताहांत';
+
+  @override
+  String get quickDateNextWeek => 'अगले सप्ताह';
+
+  @override
+  String get templateStarterTitle => 'त्वरित स्टार्टर टेम्पलेट';
+
+  @override
+  String get templateGroceryTitle => 'किराने का सामान और खरीदारी सूची';
+
+  @override
+  String get templateGroceryDesc => 'किराने और आवश्यक वस्तुओं के लिए चेकलिस्ट';
+
+  @override
+  String get templateWorkTitle => 'कार्य स्प्रिंट कार्य';
+
+  @override
+  String get templateWorkDesc => 'उच्च प्राथमिकता वाली परियोजना मील का पत्थर';
+
+  @override
+  String get templateRoutineTitle => 'दैनिक दिनचर्या';
+
+  @override
+  String get templateRoutineDesc => 'आवर्ती दैनिक सुबह की आदत';
+
+  @override
+  String get templateStudyTitle => 'अध्ययन और असाइनमेंट';
+
+  @override
+  String get templateStudyDesc => 'पाठ्यक्रम पढ़ने और अभ्यासों को ट्रैक करें';
+
+  @override
+  String completedTasksHeader(int count) {
+    return 'पूर्ण ($count)';
+  }
+
+  @override
+  String get allCaughtUpToday => 'आज के लिए सब पूरा हो गया! 🎉';
+
+  @override
+  String get allCaughtUpSubtitle =>
+      'शानदार काम! थोड़ा विराम लें या कोई नया कार्य जोड़ें।';
+
+  @override
+  String get resetFilters => 'सभी रीसेट करें';
+
+  @override
+  String get rescheduleTask => 'पुनर्निर्धारित करें';
+
+  @override
+  String get plusOneDay => '+1 दिन';
+
+  @override
+  String get plusOneWeek => '+1 सप्ताह';
+
+  @override
+  String get moveToToday => 'आज पर ले जाएं';
+
+  @override
+  String get activeTasks => 'सक्रिय कार्य';
 }

@@ -304,6 +304,9 @@ class TaskTile extends StatelessWidget {
                                           ))
                                       ? theme.colorScheme.error
                                       : theme.colorScheme.primary,
+                                  onTap: isSelectionMode || task.isCompleted
+                                      ? null
+                                      : () => _showRescheduleSheet(context, task, l10n, theme),
                                 ),
                                if (task.recurrenceRule != null &&
                                    task.recurrenceRule!.trim().isNotEmpty)
@@ -435,13 +438,171 @@ class TaskTile extends StatelessWidget {
     );
   }
 
+  void _showRescheduleSheet(
+    BuildContext context,
+    Task task,
+    AppLocalizations l10n,
+    ThemeData theme,
+  ) {
+    HapticFeedback.lightImpact();
+    final provider = Provider.of<TaskProvider>(context, listen: false);
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return GlassContainer(
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(
+                    color: theme.dividerColor.withValues(alpha: 0.5),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              Row(
+                children: [
+                  Icon(
+                    Icons.schedule_rounded,
+                    color: theme.colorScheme.primary,
+                    size: 22,
+                  ),
+                  const SizedBox(width: 10),
+                  Text(
+                    l10n.rescheduleTask,
+                    style: GoogleFonts.outfit(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: theme.colorScheme.onSurface,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Material(
+                type: MaterialType.transparency,
+                child: ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.wb_sunny_outlined,
+                      color: theme.colorScheme.primary,
+                      size: 20,
+                    ),
+                  ),
+                  title: Text(
+                    l10n.plusOneDay,
+                    style: GoogleFonts.outfit(fontWeight: FontWeight.w600),
+                  ),
+                  subtitle: Text(
+                    DateFormat.yMMMd().format(
+                      (task.dueDate ?? DateTime.now()).add(const Duration(days: 1)),
+                    ),
+                    style: GoogleFonts.outfit(fontSize: 12),
+                  ),
+                  onTap: () {
+                    final base = task.dueDate ?? DateTime.now();
+                    final newDate = base.add(const Duration(days: 1));
+                    provider.updateTask(task, dueDate: newDate);
+                    HapticFeedback.lightImpact();
+                    Navigator.pop(ctx);
+                  },
+                ),
+              ),
+              Material(
+                type: MaterialType.transparency,
+                child: ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.next_week_outlined,
+                      color: theme.colorScheme.primary,
+                      size: 20,
+                    ),
+                  ),
+                  title: Text(
+                    l10n.plusOneWeek,
+                    style: GoogleFonts.outfit(fontWeight: FontWeight.w600),
+                  ),
+                  subtitle: Text(
+                    DateFormat.yMMMd().format(
+                      (task.dueDate ?? DateTime.now()).add(const Duration(days: 7)),
+                    ),
+                    style: GoogleFonts.outfit(fontSize: 12),
+                  ),
+                  onTap: () {
+                    final base = task.dueDate ?? DateTime.now();
+                    final newDate = base.add(const Duration(days: 7));
+                    provider.updateTask(task, dueDate: newDate);
+                    HapticFeedback.lightImpact();
+                    Navigator.pop(ctx);
+                  },
+                ),
+              ),
+              if (task.dueDate != null && task.dueDate!.isBefore(DateTime.now()))
+                Material(
+                  type: MaterialType.transparency,
+                  child: ListTile(
+                    leading: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.green.withValues(alpha: 0.15),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.today_rounded,
+                        color: Colors.green,
+                        size: 20,
+                      ),
+                    ),
+                    title: Text(
+                      l10n.moveToToday,
+                      style: GoogleFonts.outfit(fontWeight: FontWeight.w600),
+                    ),
+                    subtitle: Text(
+                      DateFormat.yMMMd().format(DateTime.now()),
+                      style: GoogleFonts.outfit(fontSize: 12),
+                    ),
+                    onTap: () {
+                      final now = DateTime.now();
+                      final newDate = DateTime(now.year, now.month, now.day, 18, 0);
+                      provider.updateTask(task, dueDate: newDate);
+                      HapticFeedback.lightImpact();
+                      Navigator.pop(ctx);
+                    },
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildChip(
     BuildContext context, {
     required IconData icon,
     required String label,
     required Color color,
+    VoidCallback? onTap,
   }) {
-    return Container(
+    final chip = Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
@@ -463,6 +624,15 @@ class TaskTile extends StatelessWidget {
         ],
       ),
     );
+
+    if (onTap != null) {
+      return InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        child: chip,
+      );
+    }
+    return chip;
   }
 
   Widget _buildSubTasksList(BuildContext context) {

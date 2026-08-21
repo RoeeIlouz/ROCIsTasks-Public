@@ -2269,6 +2269,24 @@ abstract class AppLocalizations {
   /// **'Save 33%'**
   String get yearlyPlanSaving;
 
+  /// No description provided for @lifetimePlanTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Lifetime'**
+  String get lifetimePlanTitle;
+
+  /// No description provided for @lifetimePlanPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'\$49.99 once'**
+  String get lifetimePlanPrice;
+
+  /// No description provided for @lifetimePlanBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Best Value'**
+  String get lifetimePlanBadge;
+
   /// No description provided for @groceryListMode.
   ///
   /// In en, this message translates to:
@@ -2568,6 +2586,138 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No custom lines added'**
   String get noCustomFieldsAdded;
+
+  /// No description provided for @quickDateToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get quickDateToday;
+
+  /// No description provided for @quickDateTomorrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Tomorrow'**
+  String get quickDateTomorrow;
+
+  /// No description provided for @quickDateThisWeekend.
+  ///
+  /// In en, this message translates to:
+  /// **'This Weekend'**
+  String get quickDateThisWeekend;
+
+  /// No description provided for @quickDateNextWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'Next Week'**
+  String get quickDateNextWeek;
+
+  /// No description provided for @templateStarterTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick Starter Templates'**
+  String get templateStarterTitle;
+
+  /// No description provided for @templateGroceryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Grocery & Shopping List'**
+  String get templateGroceryTitle;
+
+  /// No description provided for @templateGroceryDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Checklist for groceries & essentials'**
+  String get templateGroceryDesc;
+
+  /// No description provided for @templateWorkTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Work Sprint Task'**
+  String get templateWorkTitle;
+
+  /// No description provided for @templateWorkDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'High-priority project milestone'**
+  String get templateWorkDesc;
+
+  /// No description provided for @templateRoutineTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Routine'**
+  String get templateRoutineTitle;
+
+  /// No description provided for @templateRoutineDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Recurring daily morning habit'**
+  String get templateRoutineDesc;
+
+  /// No description provided for @templateStudyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Study & Assignment'**
+  String get templateStudyTitle;
+
+  /// No description provided for @templateStudyDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Track course reading & exercises'**
+  String get templateStudyDesc;
+
+  /// No description provided for @completedTasksHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed ({count})'**
+  String completedTasksHeader(int count);
+
+  /// No description provided for @allCaughtUpToday.
+  ///
+  /// In en, this message translates to:
+  /// **'All done for today! 🎉'**
+  String get allCaughtUpToday;
+
+  /// No description provided for @allCaughtUpSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Great job! Take a break or add a new task.'**
+  String get allCaughtUpSubtitle;
+
+  /// No description provided for @resetFilters.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset All'**
+  String get resetFilters;
+
+  /// No description provided for @rescheduleTask.
+  ///
+  /// In en, this message translates to:
+  /// **'Reschedule'**
+  String get rescheduleTask;
+
+  /// No description provided for @plusOneDay.
+  ///
+  /// In en, this message translates to:
+  /// **'+1 Day'**
+  String get plusOneDay;
+
+  /// No description provided for @plusOneWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'+1 Week'**
+  String get plusOneWeek;
+
+  /// No description provided for @moveToToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Move to Today'**
+  String get moveToToday;
+
+  /// No description provided for @activeTasks.
+  ///
+  /// In en, this message translates to:
+  /// **'Active Tasks'**
+  String get activeTasks;
 }
 
 class _AppLocalizationsDelegate
