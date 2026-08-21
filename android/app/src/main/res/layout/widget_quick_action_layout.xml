@@ -113,10 +113,10 @@
                 android:focusable="true">
 
                 <ImageView
+                    android:id="@+id/widget_quick_calendar_icon"
                     android:layout_width="14dp"
                     android:layout_height="14dp"
                     android:src="@drawable/ic_calendar_event"
-                    android:tint="@color/widget_primary"
                     android:layout_marginEnd="6dp" />
 
                 <TextView

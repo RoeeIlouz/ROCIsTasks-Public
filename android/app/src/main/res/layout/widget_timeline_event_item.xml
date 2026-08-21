@@ -14,7 +14,7 @@
     android:layout_marginBottom="2dp">
 
     <!-- Category / Event Color Strip -->
-    <View
+    <FrameLayout
         android:id="@+id/widget_timeline_color_strip"
         android:layout_width="4dp"
         android:layout_height="32dp"

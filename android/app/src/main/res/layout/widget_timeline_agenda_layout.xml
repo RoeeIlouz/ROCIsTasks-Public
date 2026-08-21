@@ -35,8 +35,7 @@
             android:textColor="@color/widget_primary"
             android:textSize="18sp"
             android:clickable="true"
-            android:focusable="true"
-            android:background="?android:attr/selectableItemBackgroundBorderless" />
+            android:focusable="true" />
 
         <TextView
             android:id="@+id/widget_timeline_add_btn"
@@ -48,11 +47,10 @@
             android:textSize="26sp"
             android:textStyle="bold"
             android:clickable="true"
-            android:focusable="true"
-            android:background="?android:attr/selectableItemBackgroundBorderless" />
+            android:focusable="true" />
     </LinearLayout>
 
-    <View
+    <FrameLayout
         android:id="@+id/widget_timeline_divider"
         android:layout_width="match_parent"
         android:layout_height="1dp"

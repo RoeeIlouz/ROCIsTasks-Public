@@ -12,7 +12,7 @@
     android:background="@drawable/widget_card_bg">
 
     <!-- Category / Calendar Color Strip -->
-    <View
+    <FrameLayout
         android:id="@+id/widget_agenda_color_strip"
         android:layout_width="4dp"
         android:layout_height="32dp"

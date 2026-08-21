@@ -42,12 +42,12 @@ class QuickActionWidgetProvider : HomeWidgetProvider() {
                     val textColor = when (theme) {
                         "light" -> Color.parseColor("#1C1C1E")
                         "dark", "glassmorphic" -> Color.parseColor("#FFFFFF")
-                        else -> context.getColor(R.color.widget_title_text)
+                        else -> Color.parseColor("#1C1C1E")
                     }
                     val secondaryColor = when (theme) {
                         "light" -> Color.parseColor("#8E8E93")
                         "dark", "glassmorphic" -> Color.parseColor("#AEAEB2")
-                        else -> context.getColor(R.color.widget_secondary_text)
+                        else -> Color.parseColor("#8E8E93")
                     }
 
                     views.setTextColor(R.id.widget_quick_stat_number, textColor)
