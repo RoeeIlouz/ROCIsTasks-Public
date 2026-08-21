@@ -9,7 +9,7 @@ class AppConfig {
 
   // App information
   static const String appName = 'ROCI\'s Tasks';
-  static const String appVersion = '0.2.9';
+  static const String appVersion = '0.2.10';
   static const String supportEmail = 'support@rocisapps.com';
   static const String privacyPolicyUrl = 'https://rocisapps.com/privacy.html';
   static const String termsOfServiceUrl = 'https://rocisapps.com/terms.html';
@@ -20,11 +20,11 @@ class AppConfig {
 
   // Lemon Squeezy Web Checkout URLs
   static const String lemonSqueezyMonthlyUrl =
-      'https://rocisapps.lemonsqueezy.com/checkout/buy/126bd435-f3ff-4414-8100-2e06815bdd51?embed=1&discount=0';
+      'https://rocisapps.lemonsqueezy.com/checkout/buy/5833ecbc-c8c9-4044-974c-782c1fd47e4b?embed=1&discount=0';
   static const String lemonSqueezyYearlyUrl =
-      'https://rocisapps.lemonsqueezy.com/checkout/buy/700631d4-2b55-4986-a594-18b89293711f?embed=1&discount=0';
+      'https://rocisapps.lemonsqueezy.com/checkout/buy/9afcddf6-d31c-4031-8d49-38e4afdbcee4?embed=1&discount=0';
   static const String lemonSqueezyLifetimeUrl =
-      'https://rocisapps.lemonsqueezy.com/checkout/buy/d892ef65-680c-43be-8e01-9a7465360c7f?embed=1&discount=0';
+      'https://rocisapps.lemonsqueezy.com/checkout/buy/40f6b2af-ab2f-4bef-ab3f-32da7f417930?embed=1&discount=0';
 
   // Feature flags
   static const bool enableAnalytics = isProduction;

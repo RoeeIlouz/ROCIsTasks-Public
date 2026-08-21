@@ -1143,6 +1143,15 @@ class AppLocalizationsHe extends AppLocalizations {
   String get yearlyPlanSaving => 'חסוך 33%';
 
   @override
+  String get lifetimePlanTitle => 'לכל החיים';
+
+  @override
+  String get lifetimePlanPrice => '\$49.99 חד-פעמי';
+
+  @override
+  String get lifetimePlanBadge => 'המשתלם ביותר';
+
+  @override
   String get groceryListMode => 'רשימת משימות';
 
   @override
@@ -1295,4 +1304,73 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get noCustomFieldsAdded => 'לא נוספו שורות מותאמות אישית';
+
+  @override
+  String get quickDateToday => 'היום';
+
+  @override
+  String get quickDateTomorrow => 'מחר';
+
+  @override
+  String get quickDateThisWeekend => 'סוף השבוע';
+
+  @override
+  String get quickDateNextWeek => 'שבוע הבא';
+
+  @override
+  String get templateStarterTitle => 'תבניות מהירות';
+
+  @override
+  String get templateGroceryTitle => 'רשימת קניות ומצרכים';
+
+  @override
+  String get templateGroceryDesc => 'רשימת בדיקה לקניות ומצרכים';
+
+  @override
+  String get templateWorkTitle => 'משימת עבודה דחופה';
+
+  @override
+  String get templateWorkDesc => 'אבן דרך בפרויקט בעדיפות גבוהה';
+
+  @override
+  String get templateRoutineTitle => 'שגרה יומית';
+
+  @override
+  String get templateRoutineDesc => 'הרגל בוקר יומי חוזר';
+
+  @override
+  String get templateStudyTitle => 'לימודים ומטלות';
+
+  @override
+  String get templateStudyDesc => 'מעקב אחר קריאה ותרגילים';
+
+  @override
+  String completedTasksHeader(int count) {
+    return 'הושלמו ($count)';
+  }
+
+  @override
+  String get allCaughtUpToday => 'הכל הושלם להיום! 🎉';
+
+  @override
+  String get allCaughtUpSubtitle =>
+      'עבודה מצוינת! קח הפסקה או הוסף משימה חדשה.';
+
+  @override
+  String get resetFilters => 'איפוס הכל';
+
+  @override
+  String get rescheduleTask => 'תזמן מחדש';
+
+  @override
+  String get plusOneDay => '+יום אחד';
+
+  @override
+  String get plusOneWeek => '+שבוע אחד';
+
+  @override
+  String get moveToToday => 'העבר להיום';
+
+  @override
+  String get activeTasks => 'משימות פעילות';
 }

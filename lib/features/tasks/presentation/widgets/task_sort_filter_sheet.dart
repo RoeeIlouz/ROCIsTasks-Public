@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:rocis_tasks/shared/ui/widgets/glass_container.dart';
@@ -13,19 +15,25 @@ class TaskSortFilterSheet extends StatelessWidget {
       builder: (context, provider, child) {
         final categories = provider.categories;
         final l10n = AppLocalizations.of(context)!;
+        final theme = Theme.of(context);
+
+        final hasActiveFilters = provider.selectedCategoryIds.isNotEmpty ||
+            provider.currentDateFilter != DateTimeFilterOption.all ||
+            provider.currentSortOption != TaskSortOption.dueDate ||
+            !provider.showCompleted;
 
         return DraggableScrollableSheet(
-          initialChildSize: 0.7,
-          minChildSize: 0.5,
-          maxChildSize: 0.9,
+          initialChildSize: 0.65,
+          minChildSize: 0.45,
+          maxChildSize: 0.85,
           expand: false,
           builder: (context, scrollController) {
             return GlassContainer(
-              opacity: 0.9,
+              opacity: 0.95,
               borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(20),
+                top: Radius.circular(24),
               ),
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
               child: ListView(
                 controller: scrollController,
                 children: [
@@ -33,69 +41,90 @@ class TaskSortFilterSheet extends StatelessWidget {
                     child: Container(
                       width: 40,
                       height: 4,
-                      margin: const EdgeInsets.only(bottom: 20),
+                      margin: const EdgeInsets.only(bottom: 16),
                       decoration: BoxDecoration(
-                        color: Theme.of(context).dividerColor,
+                        color: theme.dividerColor.withValues(alpha: 0.5),
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
                   ),
-                  Text(
-                    l10n.sortAndFilter,
-                    style: Theme.of(context).textTheme.headlineSmall,
-                    textAlign: TextAlign.center,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        l10n.sortAndFilter,
+                        style: GoogleFonts.outfit(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: theme.colorScheme.onSurface,
+                        ),
+                      ),
+                      if (hasActiveFilters)
+                        TextButton.icon(
+                          onPressed: () {
+                            HapticFeedback.lightImpact();
+                            provider.resetAllFilters();
+                          },
+                          icon: const Icon(Icons.refresh_rounded, size: 16),
+                          label: Text(
+                            l10n.resetFilters,
+                            style: GoogleFonts.outfit(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 13,
+                            ),
+                          ),
+                          style: TextButton.styleFrom(
+                            visualDensity: VisualDensity.compact,
+                            foregroundColor: theme.colorScheme.primary,
+                          ),
+                        ),
+                    ],
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 20),
 
                   // Sorting Section
                   Text(
                     l10n.sortBy,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    style: GoogleFonts.outfit(
+                      fontSize: 14,
                       fontWeight: FontWeight.bold,
+                      color: theme.colorScheme.primary,
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  GlassContainer(
-                    borderRadius: BorderRadius.circular(12),
-                    child: RadioGroup<TaskSortOption>(
-                      groupValue: provider.currentSortOption,
-                      onChanged: (value) {
-                        if (value != null) {
-                          provider.setSortOption(value);
-                        }
-                      },
-                      child: Column(
-                        children: [
-                          _buildSortOption(
-                            context,
-                            l10n.date,
-                            TaskSortOption.dueDate,
-                            provider,
-                          ),
-                          const Divider(height: 1),
-                          _buildSortOption(
-                            context,
-                            l10n.priority,
-                            TaskSortOption.priority,
-                            provider,
-                          ),
-                          const Divider(height: 1),
-                          _buildSortOption(
-                            context,
-                            l10n.title,
-                            TaskSortOption.title,
-                            provider,
-                          ),
-                          const Divider(height: 1),
-                          _buildSortOption(
-                            context,
-                            l10n.createdDate,
-                            TaskSortOption.dateCreated,
-                            provider,
-                          ),
-                        ],
+                  const SizedBox(height: 10),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      _buildSortPill(
+                        context,
+                        label: l10n.date,
+                        icon: Icons.calendar_today_rounded,
+                        option: TaskSortOption.dueDate,
+                        provider: provider,
                       ),
-                    ),
+                      _buildSortPill(
+                        context,
+                        label: l10n.priority,
+                        icon: Icons.flag_rounded,
+                        option: TaskSortOption.priority,
+                        provider: provider,
+                      ),
+                      _buildSortPill(
+                        context,
+                        label: l10n.title,
+                        icon: Icons.sort_by_alpha_rounded,
+                        option: TaskSortOption.title,
+                        provider: provider,
+                      ),
+                      _buildSortPill(
+                        context,
+                        label: l10n.createdDate,
+                        icon: Icons.history_rounded,
+                        option: TaskSortOption.dateCreated,
+                        provider: provider,
+                      ),
+                    ],
                   ),
 
                   const SizedBox(height: 24),
@@ -103,11 +132,13 @@ class TaskSortFilterSheet extends StatelessWidget {
                   // Date Filtering Section
                   Text(
                     l10n.dateRange,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    style: GoogleFonts.outfit(
+                      fontSize: 14,
                       fontWeight: FontWeight.bold,
+                      color: theme.colorScheme.primary,
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 10),
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
@@ -125,37 +156,42 @@ class TaskSortFilterSheet extends StatelessWidget {
                   // Filtering Section
                   Text(
                     l10n.filterByCategory,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    style: GoogleFonts.outfit(
+                      fontSize: 14,
                       fontWeight: FontWeight.bold,
+                      color: theme.colorScheme.primary,
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 10),
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
                     children: [
                       FilterChip(
-                        label: Text(l10n.all),
+                        label: Text(l10n.all, style: GoogleFonts.outfit()),
                         selected: provider.selectedCategoryIds.isEmpty,
                         onSelected: (selected) {
                           if (selected) {
+                            HapticFeedback.lightImpact();
                             provider.clearCategoryFilters();
                           }
                         },
                       ),
                       ...categories.map((category) {
+                        final isSelected = provider.selectedCategoryIds.contains(category.id);
                         return FilterChip(
-                          label: Text(category.name),
-                          backgroundColor: Color(
-                            category.colorValue,
-                          ).withValues(alpha: 0.1),
-                          selectedColor: Color(
-                            category.colorValue,
-                          ).withValues(alpha: 0.3),
-                          selected: provider.selectedCategoryIds.contains(
-                            category.id,
+                          avatar: Container(
+                            width: 10,
+                            height: 10,
+                            decoration: BoxDecoration(
+                              color: Color(category.colorValue),
+                              shape: BoxShape.circle,
+                            ),
                           ),
+                          label: Text(category.name, style: GoogleFonts.outfit()),
+                          selected: isSelected,
                           onSelected: (selected) {
+                            HapticFeedback.lightImpact();
                             provider.toggleCategoryFilter(category.id);
                           },
                         );
@@ -166,22 +202,46 @@ class TaskSortFilterSheet extends StatelessWidget {
                   const SizedBox(height: 24),
 
                   // Show Completed Toggle
-                  SwitchListTile(
-                    title: Text(l10n.showCompletedTasks),
-                    value: provider.showCompleted,
-                    onChanged: (value) => provider.toggleShowCompleted(value),
-                    secondary: const Icon(Icons.check_circle_outline),
+                  Material(
+                    type: MaterialType.transparency,
+                    child: SwitchListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(
+                        l10n.showCompletedTasks,
+                        style: GoogleFonts.outfit(fontWeight: FontWeight.w600),
+                      ),
+                      value: provider.showCompleted,
+                      onChanged: (value) {
+                        HapticFeedback.lightImpact();
+                        provider.toggleShowCompleted(value);
+                      },
+                      secondary: const Icon(Icons.check_circle_outline),
+                    ),
                   ),
 
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 20),
                   SizedBox(
                     width: double.infinity,
                     child: FilledButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: Text(l10n.done),
+                      onPressed: () {
+                        HapticFeedback.lightImpact();
+                        Navigator.pop(context);
+                      },
+                      style: FilledButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      child: Text(
+                        l10n.done,
+                        style: GoogleFonts.outfit(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 24),
                 ],
               ),
             );
@@ -191,16 +251,61 @@ class TaskSortFilterSheet extends StatelessWidget {
     );
   }
 
-  Widget _buildSortOption(
-    BuildContext context,
-    String title,
-    TaskSortOption option,
-    TaskProvider provider,
-  ) {
-    return RadioListTile<TaskSortOption>(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
-      title: Text(title),
-      value: option,
+  Widget _buildSortPill(
+    BuildContext context, {
+    required String label,
+    required IconData icon,
+    required TaskSortOption option,
+    required TaskProvider provider,
+  }) {
+    final isSelected = provider.currentSortOption == option;
+    final theme = Theme.of(context);
+
+    return InkWell(
+      onTap: () {
+        HapticFeedback.lightImpact();
+        provider.setSortOption(option);
+      },
+      borderRadius: BorderRadius.circular(16),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? theme.colorScheme.primary.withValues(alpha: 0.18)
+              : theme.colorScheme.surfaceContainerLow,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isSelected
+                ? theme.colorScheme.primary
+                : theme.dividerColor.withValues(alpha: 0.2),
+            width: isSelected ? 1.5 : 1.0,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 16,
+              color: isSelected
+                  ? theme.colorScheme.primary
+                  : theme.colorScheme.onSurfaceVariant,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: GoogleFonts.outfit(
+                fontSize: 13,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                color: isSelected
+                    ? theme.colorScheme.primary
+                    : theme.colorScheme.onSurface,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -212,9 +317,12 @@ class TaskSortFilterSheet extends StatelessWidget {
   ) {
     final isSelected = provider.currentDateFilter == option;
     return FilterChip(
-      label: Text(label),
+      label: Text(label, style: GoogleFonts.outfit()),
       selected: isSelected,
-      onSelected: (_) => provider.setDateFilter(option),
+      onSelected: (_) {
+        HapticFeedback.lightImpact();
+        provider.setDateFilter(option);
+      },
     );
   }
 }

@@ -45,148 +45,150 @@ class MonthAgendaWidgetProvider : HomeWidgetProvider() {
                 val isAllowed = WidgetLimitHelper.isWidgetAllowed(context, appWidgetId, isPremium)
                 val views = RemoteViews(context.packageName, R.layout.widget_month_agenda_layout)
 
-                // Pro limit overlay
-                WidgetLimitHelper.setupProOverlay(context, views, isAllowed)
+                val theme = widgetData.getString("full_calendar_theme", "system") ?: "system"
+                val rootBgRes = when (theme) {
+                    "light" -> R.drawable.widget_background_light
+                    "dark" -> R.drawable.widget_background_dark
+                    "glassmorphic" -> R.drawable.widget_background_glass
+                    else -> R.drawable.widget_background
+                }
+                views.setInt(R.id.widget_month_agenda_root, "setBackgroundResource", rootBgRes)
 
-                if (isAllowed) {
-                    val theme = widgetData.getString("full_calendar_theme", "system") ?: "system"
-                    val rootBgRes = when (theme) {
-                        "light" -> R.drawable.widget_background_light
-                        "dark" -> R.drawable.widget_background_dark
-                        "glassmorphic" -> R.drawable.widget_background_glass
-                        else -> R.drawable.widget_background
-                    }
-                    views.setInt(R.id.widget_month_agenda_root, "setBackgroundResource", rootBgRes)
-
-                    val textColor = when (theme) {
-                        "light" -> android.graphics.Color.parseColor("#1C1C1E")
-                        "dark", "glassmorphic" -> android.graphics.Color.parseColor("#FFFFFF")
-                        else -> context.getColor(R.color.widget_title_text)
-                    }
-
-                    views.setTextColor(R.id.widget_month_agenda_month_title, textColor)
-                    views.setTextColor(R.id.widget_month_agenda_selected_title, textColor)
-                    views.setTextColor(R.id.widget_month_agenda_prev, textColor)
-                    views.setTextColor(R.id.widget_month_agenda_next, textColor)
-
-                    val offset = widgetData.getInt(PREF_MONTH_OFFSET, 0)
-                    val cal = Calendar.getInstance()
-                    if (offset != 0) {
-                        cal.add(Calendar.MONTH, offset)
-                    }
-                    val monthTitleStr = SimpleDateFormat("MMMM yyyy", Locale.getDefault()).format(cal.time)
-                    views.setTextViewText(R.id.widget_month_agenda_month_title, monthTitleStr)
-
-                    // Selected Date Display
-                    val selectedDate = widgetData.getString(PREF_SELECTED_DATE, "") ?: ""
-                    val selectedDateDisplay = if (selectedDate.isNotEmpty()) {
-                        try {
-                            val parsed = SimpleDateFormat("yyyy-MM-dd", Locale.US).parse(selectedDate)
-                            SimpleDateFormat("EEE, MMM d", Locale.getDefault()).format(parsed!!)
-                        } catch (_: Exception) {
-                            "Today"
-                        }
-                    } else {
-                        "Today"
-                    }
-                    views.setTextViewText(R.id.widget_month_agenda_selected_title, selectedDateDisplay)
-
-                    // Navigation pending intents
-                    val prevIntent = Intent(context, MonthAgendaWidgetProvider::class.java).apply {
-                        action = ACTION_PREV_MONTH
-                        putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-                    }
-                    views.setOnClickPendingIntent(
-                        R.id.widget_month_agenda_prev,
-                        PendingIntent.getBroadcast(
-                            context,
-                            REQ_PREV_MONTH,
-                            prevIntent,
-                            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                        )
-                    )
-
-                    val nextIntent = Intent(context, MonthAgendaWidgetProvider::class.java).apply {
-                        action = ACTION_NEXT_MONTH
-                        putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-                    }
-                    views.setOnClickPendingIntent(
-                        R.id.widget_month_agenda_next,
-                        PendingIntent.getBroadcast(
-                            context,
-                            REQ_NEXT_MONTH,
-                            nextIntent,
-                            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                        )
-                    )
-
-                    val todayIntent = Intent(context, MonthAgendaWidgetProvider::class.java).apply {
-                        action = ACTION_TODAY
-                        putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-                    }
-                    views.setOnClickPendingIntent(
-                        R.id.widget_month_agenda_today_btn,
-                        PendingIntent.getBroadcast(
-                            context,
-                            REQ_TODAY,
-                            todayIntent,
-                            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                        )
-                    )
-
-                    val addIntent = HomeWidgetLaunchIntent.getActivity(
-                        context,
-                        MainActivity::class.java,
-                        Uri.parse("rocistasks://add_task")
-                    )
-                    views.setOnClickPendingIntent(R.id.widget_month_agenda_add_btn, addIntent)
-
-                    // Month Grid List (Left half)
-                    val gridServiceIntent = Intent(context, MonthAgendaGridService::class.java).apply {
-                        putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-                        data = Uri.parse("widget://rocis/month_agenda_grid/$appWidgetId/$offset")
-                    }
-                    views.setRemoteAdapter(R.id.widget_month_grid_list, gridServiceIntent)
-
-                    // Grid Item Click Template
-                    val gridClickIntent = Intent(context, MonthAgendaWidgetProvider::class.java).apply {
-                        action = ACTION_SELECT_DATE
-                        putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-                    }
-                    val gridPendingIntent = PendingIntent.getBroadcast(
-                        context,
-                        750 + appWidgetId,
-                        gridClickIntent,
-                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
-                    )
-                    views.setPendingIntentTemplate(R.id.widget_month_grid_list, gridPendingIntent)
-
-                    // Day Agenda List (Right half)
-                    val agendaServiceIntent = Intent(context, MonthAgendaWidgetService::class.java).apply {
-                        putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-                        data = Uri.parse("widget://rocis/month_agenda_list/$appWidgetId/$selectedDate")
-                    }
-                    views.setRemoteAdapter(R.id.widget_month_agenda_list, agendaServiceIntent)
-                    views.setEmptyView(R.id.widget_month_agenda_list, R.id.widget_month_agenda_empty)
-
-                    // Day Agenda Item Click Template (direct completion or view)
-                    val itemAppIntent = Intent(context, MainActivity::class.java).apply {
-                        action = Intent.ACTION_VIEW
-                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                    }
-                    val itemPendingIntent = PendingIntent.getActivity(
-                        context,
-                        780 + appWidgetId,
-                        itemAppIntent,
-                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
-                    )
-                    views.setPendingIntentTemplate(R.id.widget_month_agenda_list, itemPendingIntent)
+                val textColor = when (theme) {
+                    "light" -> android.graphics.Color.parseColor("#1C1C1E")
+                    "dark", "glassmorphic" -> android.graphics.Color.parseColor("#FFFFFF")
+                    else -> context.getColor(R.color.widget_title_text)
                 }
 
+                views.setTextColor(R.id.widget_month_agenda_month_title, textColor)
+                views.setTextColor(R.id.widget_month_agenda_selected_title, textColor)
+                views.setTextColor(R.id.widget_month_agenda_prev, textColor)
+                views.setTextColor(R.id.widget_month_agenda_next, textColor)
+
+                val offset = widgetData.getInt(PREF_MONTH_OFFSET, 0)
+                val cal = Calendar.getInstance()
+                if (offset != 0) {
+                    cal.add(Calendar.MONTH, offset)
+                }
+                val monthTitleStr = SimpleDateFormat("MMMM yyyy", Locale.getDefault()).format(cal.time)
+                views.setTextViewText(R.id.widget_month_agenda_month_title, monthTitleStr)
+
+                // Selected Date Display
+                val selectedDate = widgetData.getString(PREF_SELECTED_DATE, "") ?: ""
+                val selectedDateDisplay = if (selectedDate.isNotEmpty()) {
+                    try {
+                        val parsed = SimpleDateFormat("yyyy-MM-dd", Locale.US).parse(selectedDate)
+                        SimpleDateFormat("EEE, MMM d", Locale.getDefault()).format(parsed!!)
+                    } catch (_: Exception) {
+                        "Today"
+                    }
+                } else {
+                    "Today"
+                }
+                views.setTextViewText(R.id.widget_month_agenda_selected_title, selectedDateDisplay)
+
+                // Navigation pending intents
+                val prevIntent = Intent(context, MonthAgendaWidgetProvider::class.java).apply {
+                    action = ACTION_PREV_MONTH
+                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+                }
+                views.setOnClickPendingIntent(
+                    R.id.widget_month_agenda_prev,
+                    PendingIntent.getBroadcast(
+                        context,
+                        REQ_PREV_MONTH,
+                        prevIntent,
+                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                    )
+                )
+
+                val nextIntent = Intent(context, MonthAgendaWidgetProvider::class.java).apply {
+                    action = ACTION_NEXT_MONTH
+                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+                }
+                views.setOnClickPendingIntent(
+                    R.id.widget_month_agenda_next,
+                    PendingIntent.getBroadcast(
+                        context,
+                        REQ_NEXT_MONTH,
+                        nextIntent,
+                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                    )
+                )
+
+                val todayIntent = Intent(context, MonthAgendaWidgetProvider::class.java).apply {
+                    action = ACTION_TODAY
+                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+                }
+                views.setOnClickPendingIntent(
+                    R.id.widget_month_agenda_today_btn,
+                    PendingIntent.getBroadcast(
+                        context,
+                        REQ_TODAY,
+                        todayIntent,
+                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                    )
+                )
+
+                val addIntent = HomeWidgetLaunchIntent.getActivity(
+                    context,
+                    MainActivity::class.java,
+                    Uri.parse("rocistasks://add_task")
+                )
+                views.setOnClickPendingIntent(R.id.widget_month_agenda_add_btn, addIntent)
+
+                // Month Grid List (Left half) - Always configure adapter
+                val gridServiceIntent = Intent(context, MonthAgendaGridService::class.java).apply {
+                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+                    data = Uri.parse("widget://rocis/month_agenda_grid/$appWidgetId/$offset")
+                }
+                views.setRemoteAdapter(R.id.widget_month_grid_list, gridServiceIntent)
+
+                // Grid Item Click Template
+                val gridClickIntent = Intent(context, MonthAgendaWidgetProvider::class.java).apply {
+                    action = ACTION_SELECT_DATE
+                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+                }
+                val gridPendingIntent = PendingIntent.getBroadcast(
+                    context,
+                    750 + appWidgetId,
+                    gridClickIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
+                )
+                views.setPendingIntentTemplate(R.id.widget_month_grid_list, gridPendingIntent)
+
+                // Day Agenda List (Right half) - Always configure adapter
+                val agendaServiceIntent = Intent(context, MonthAgendaWidgetService::class.java).apply {
+                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+                    data = Uri.parse("widget://rocis/month_agenda_list/$appWidgetId/$selectedDate")
+                }
+                views.setRemoteAdapter(R.id.widget_month_agenda_list, agendaServiceIntent)
+                views.setEmptyView(R.id.widget_month_agenda_list, R.id.widget_month_agenda_empty)
+
+                // Day Agenda Item Click Template (direct completion or view)
+                val itemAppIntent = Intent(context, MainActivity::class.java).apply {
+                    action = Intent.ACTION_VIEW
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                }
+                val itemPendingIntent = PendingIntent.getActivity(
+                    context,
+                    780 + appWidgetId,
+                    itemAppIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
+                )
+                views.setPendingIntentTemplate(R.id.widget_month_agenda_list, itemPendingIntent)
+
+                // Pro Limit Overlay
+                WidgetLimitHelper.setupProOverlay(context, views, isAllowed)
+
                 appWidgetManager.updateAppWidget(appWidgetId, views)
-                appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_month_grid_list)
-                appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_month_agenda_list)
-            } catch (_: Exception) {}
+                if (isAllowed) {
+                    appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_month_grid_list)
+                    appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_month_agenda_list)
+                }
+            } catch (e: Exception) {
+                android.util.Log.e("MonthAgendaWidget", "Error updating widget $appWidgetId", e)
+            }
         }
     }
 

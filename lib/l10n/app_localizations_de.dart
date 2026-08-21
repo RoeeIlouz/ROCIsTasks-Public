@@ -1175,6 +1175,15 @@ class AppLocalizationsDe extends AppLocalizations {
   String get yearlyPlanSaving => '33 % sparen';
 
   @override
+  String get lifetimePlanTitle => 'Lebenslang';
+
+  @override
+  String get lifetimePlanPrice => '49,99 \$ einmalig';
+
+  @override
+  String get lifetimePlanBadge => 'Bester Wert';
+
+  @override
   String get groceryListMode => 'Aufgabenliste';
 
   @override
@@ -1329,4 +1338,73 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get noCustomFieldsAdded =>
       'Keine benutzerdefinierten Zeilen hinzugefügt';
+
+  @override
+  String get quickDateToday => 'Heute';
+
+  @override
+  String get quickDateTomorrow => 'Morgen';
+
+  @override
+  String get quickDateThisWeekend => 'Dieses Wochenende';
+
+  @override
+  String get quickDateNextWeek => 'Nächste Woche';
+
+  @override
+  String get templateStarterTitle => 'Schnellstart-Vorlagen';
+
+  @override
+  String get templateGroceryTitle => 'Einkaufs- & Lebensmittelliste';
+
+  @override
+  String get templateGroceryDesc => 'Checkliste für Einkäufe & Vorräte';
+
+  @override
+  String get templateWorkTitle => 'Arbeitssprint-Aufgabe';
+
+  @override
+  String get templateWorkDesc => 'Projektmeilenstein mit hoher Priorität';
+
+  @override
+  String get templateRoutineTitle => 'Tägliche Routine';
+
+  @override
+  String get templateRoutineDesc => 'Wiederkehrende morgendliche Gewohnheit';
+
+  @override
+  String get templateStudyTitle => 'Lernen & Aufgaben';
+
+  @override
+  String get templateStudyDesc => 'Kurslektüre & Übungen verfolgen';
+
+  @override
+  String completedTasksHeader(int count) {
+    return 'Erledigt ($count)';
+  }
+
+  @override
+  String get allCaughtUpToday => 'Alles für heute erledigt! 🎉';
+
+  @override
+  String get allCaughtUpSubtitle =>
+      'Gute Arbeit! Machen Sie eine Pause oder fügen Sie eine neue Aufgabe hinzu.';
+
+  @override
+  String get resetFilters => 'Alles zurücksetzen';
+
+  @override
+  String get rescheduleTask => 'Neu planen';
+
+  @override
+  String get plusOneDay => '+1 Tag';
+
+  @override
+  String get plusOneWeek => '+1 Woche';
+
+  @override
+  String get moveToToday => 'Auf heute verschieben';
+
+  @override
+  String get activeTasks => 'Aktive Aufgaben';
 }

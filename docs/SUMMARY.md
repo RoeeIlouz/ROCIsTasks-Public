@@ -2,7 +2,66 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
-## UI/UX Pro Max: Multi-Widget Live Preview Switcher & Tactile Haptics - 2026-08-21
+## Android Home Screen Widgets Inflation & Limit Fix - 2026-08-21
+
+#### Issue Encountered
+* Android system launchers displayed "Couldn't load widget" on newly added home screen widgets (`TodayAgendaWidget`, `MonthAgendaWidget`, `TimelineAgendaWidget`, `QuickActionWidget`, `UpNextWidget`).
+
+#### Root Cause Analysis
+1. **Uninitialized `ListView` / RemoteAdapter**: When `WidgetLimitHelper.isWidgetAllowed` returned `false` for additional widgets on the free tier, the providers skipped `setRemoteAdapter` while leaving `ListView` instances un-adapted and immediately calling `notifyAppWidgetViewDataChanged`. This caused system launcher `AppWidgetHostView` inflation exceptions.
+2. **Invalid Font Resource Identifier**: XML layout files (`widget_full_calendar_layout.xml` and `widget_quick_action_layout.xml`) contained `android:fontFamily="sans-serif-bold"` (which is not a valid Android platform font family name and throws `InflateException` on OEM launchers).
+3. **Vector Drawable Color Attribute Resolvers**: `ic_check_circle_outline.xml` and `dot_indicator.xml` used `@android:color/white` instead of explicit hex color `#FFFFFF`, which can fail resolution across launcher cross-process RemoteViews boundaries.
+
+#### Solutions & Verification
+* Refactored all 5 widget providers to unconditionally bind their `RemoteViewsService` adapters and pending intent templates prior to setting overlay visibility.
+* Protected `notifyAppWidgetViewDataChanged` invocations so they only trigger for active allowed widgets.
+* Fixed font families to valid Android values (`sans-serif` + `android:textStyle="bold"`).
+* Ensured vector drawables use explicit hex colors.
+* Added all 7 widget providers to `SubscriptionService._updatePremiumState` broadcast list.
+* Verified with `flutter analyze` (0 issues), `flutter test` (271/271 passing), and Android `./gradlew assembleDebug` (BUILD SUCCESSFUL).
+
+
+## Lemon Squeezy Production Checkout URLs & Lifetime Web Paywall UI - 2026-08-21
+
+#### Goals / Requirements
+* **Production Lemon Squeezy URLs**:
+  * Updated [lib/core/config/app_config.dart](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/config/app_config.dart) with live Lemon Squeezy checkout URLs for Monthly (`5833ecbc-c8c9-4044-974c-782c1fd47e4b`), Yearly (`9afcddf6-d31c-4031-8d49-38e4afdbcee4`), and Lifetime (`40f6b2af-ab2f-4bef-ab3f-32da7f417930`) plans.
+* **3-Tier Web Paywall UI**:
+  * Integrated **Lifetime Pro** option (`_buildPlanCard` index 2) alongside Monthly and Yearly in [lib/features/premium/presentation/screens/paywall_screen.dart](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/premium/presentation/screens/paywall_screen.dart).
+  * Added responsive `FittedBox` text scaling, compact padding, and "Best Value" badge.
+  * Added full localization for Lifetime plan title, price, and badge across all 8 supported languages (`en`, `he`, `es`, `fr`, `de`, `ar`, `sv`, `hi`).
+* **Verification**:
+  * `flutter analyze` completed with 0 issues.
+  * All 271/271 unit and widget tests passed (100%).
+
+## Version 0.2.10+81 & Kotlin 2.2.20 Upgrade - 2026-08-21
+
+#### Goals / Requirements
+* **Version Alignment**:
+  * Synchronized app version across [pubspec.yaml](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/pubspec.yaml) (`0.2.10+81`), [lib/core/config/app_config.dart](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/config/app_config.dart) (`0.2.10`), and [docs/CHANGELOG.md](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/docs/CHANGELOG.md) (`## [0.2.10+81] - 2026-08-21`).
+* **Android Build Fix**:
+  * Upgraded Kotlin Gradle Plugin (`org.jetbrains.kotlin.android`) in [android/settings.gradle.kts](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/settings.gradle.kts) from `2.1.10` to `2.2.20` to fulfill Flutter's minimum supported version requirement for Android Gradle builds.
+
+## UI/UX Pro Max: 5-Pillar App-Wide Interaction & Aesthetics Enhancement Suite - 2026-08-21
+
+#### Goals / Requirements
+* **Quick Date Chips in Task Creation & Edit (`add_task_screen.dart`)**:
+  * Added 1-tap dynamic date chips (`Today`, `Tomorrow`, `This Weekend`, `Next Week`) above the custom date picker with active selection highlighting, checkmark toggle, and tactile haptic response.
+* **Multi-Color Category Calendar Dots (`calendar_screen.dart`)**:
+  * Upgraded calendar markers from stacked uniform bars to a centered horizontal cluster of distinct colored dots derived from task category colors and device/Google calendar colors with `+N` badge support when >3 events.
+  * Added `SingleChildScrollView` wrapper to empty state prevents any bottom overflow on smaller heights.
+* **Empty State Starter Templates & Collapsible Completed Section (`task_list_screen.dart`)**:
+  * Added 4 interactive quick-starter templates (`🛒 Grocery & Shopping List`, `💻 Work Sprint Task`, `🌅 Daily Routine`, `📚 Study & Assignment`) with subtasks and instant 1-tap creation.
+  * Re-architected task list into active tasks and an accordion-style `ExpansionTile` for completed tasks (`Completed (X)`), keeping focus on pending work.
+  * Added celebratory `_buildCelebrationBanner` ("All done for today! 🎉") when all tasks are complete.
+* **Modern Segmented Pills in Sort & Filter Sheet (`task_sort_filter_sheet.dart` & `task_provider.dart`)**:
+  * Replaced vertical radio buttons with horizontal segmented sort pill buttons.
+  * Added `resetAllFilters()` method in `TaskProvider` and a 1-tap "Reset All" action in the header when filters/sort are active.
+* **Inline Quick Reschedule Menu on Task Tiles (`task_tile.dart`)**:
+  * Enabled direct tap interaction on due date chips opening a quick reschedule bottom sheet with `+1 Day`, `+1 Week`, and contextual `Move to Today` options.
+* **Automated Verification**:
+  * `flutter analyze` completed with **0 issues found** (clean codebase).
+  * Full test suite: **271/271 tests passing (100%)** including new widget tests in `test/features/tasks/presentation/widgets/quick_date_chips_test.dart`, `task_sort_filter_sheet_test.dart`, `task_tile_reschedule_test.dart`, and `test/features/calendar/presentation/calendar_screen_test.dart`.
 
 #### Goals / Requirements
 * **Multi-Widget Live Preview Switcher in `WidgetCustomizationScreen`**:

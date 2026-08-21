@@ -412,6 +412,9 @@
   "yearlyPlanTitle": "الخطة السنوية",
   "yearlyPlanPrice": "39.99 $ / سنة",
   "yearlyPlanSaving": "وفر 33%",
+  "lifetimePlanTitle": "مدى الحياة",
+  "lifetimePlanPrice": "49.99 $ مرة واحدة",
+  "lifetimePlanBadge": "أفضل قيمة",
   "groceryListMode": "قائمة المهام",
   "groceryListModeSubtitle": "تنسيق المهمة كقائمة مهام تفاعلية",
   "itemsInCart": "{completed}/{total} مكتمل",
@@ -461,5 +464,34 @@
   "enterUrl": "موقع الويب أو الرابط",
   "enterNote": "تفاصيل إضافية",
   "copiedToClipboard": "تم النسخ إلى الحافظة",
-  "noCustomFieldsAdded": "لم تتم إضافة أسطر مخصصة"
+  "noCustomFieldsAdded": "لم تتم إضافة أسطر مخصصة",
+  "quickDateToday": "اليوم",
+  "quickDateTomorrow": "غداً",
+  "quickDateThisWeekend": "عطلة نهاية الأسبوع",
+  "quickDateNextWeek": "الأسبوع القادم",
+  "templateStarterTitle": "قوالب سريعة للبدء",
+  "templateGroceryTitle": "قائمة البقالة والتسوق",
+  "templateGroceryDesc": "قائمة تحقق للبقالة والأساسيات",
+  "templateWorkTitle": "مهمة عمل عاجلة",
+  "templateWorkDesc": "مرحلة مهمة ذات أولوية عالية",
+  "templateRoutineTitle": "روتين يومي",
+  "templateRoutineDesc": "عادة صباحية يومية متكررة",
+  "templateStudyTitle": "دراسة وواجبات",
+  "templateStudyDesc": "تتبع القراءة والتمارين",
+  "completedTasksHeader": "المكتملة ({count})",
+  "@completedTasksHeader": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "allCaughtUpToday": "تم إنجاز كل شيء لليوم! 🎉",
+  "allCaughtUpSubtitle": "عمل رائع! خذ استراحة أو أضف مهمة جديدة.",
+  "resetFilters": "إعادة تعيين الكل",
+  "rescheduleTask": "إعادة الجدولة",
+  "plusOneDay": "+يوم واحد",
+  "plusOneWeek": "+أسبوع واحد",
+  "moveToToday": "الانتقال إلى اليوم",
+  "activeTasks": "المهام النشطة"
 }

@@ -412,6 +412,9 @@
   "yearlyPlanTitle": "Årsplan",
   "yearlyPlanPrice": "39,99 $ / år",
   "yearlyPlanSaving": "Spara 33%",
+  "lifetimePlanTitle": "Livstid",
+  "lifetimePlanPrice": "49,99 $ en gång",
+  "lifetimePlanBadge": "Bästa värde",
   "groceryListMode": "Uppgiftslista",
   "groceryListModeSubtitle": "Formatera uppgiften som en interaktiv uppgiftslista",
   "itemsInCart": "{completed}/{total} klara",
@@ -461,5 +464,34 @@
   "enterUrl": "Webbplats eller länk",
   "enterNote": "Anpassade detaljer",
   "copiedToClipboard": "Kopierat till urklipp",
-  "noCustomFieldsAdded": "Inga anpassade rader tillagda"
+  "noCustomFieldsAdded": "Inga anpassade rader tillagda",
+  "quickDateToday": "Idag",
+  "quickDateTomorrow": "Imorgon",
+  "quickDateThisWeekend": "I helgen",
+  "quickDateNextWeek": "Nästa vecka",
+  "templateStarterTitle": "Snabbstartsmallar",
+  "templateGroceryTitle": "Inköpslista & Matvaror",
+  "templateGroceryDesc": "Checklista för matvaror och nödvändigheter",
+  "templateWorkTitle": "Arbetsuppgift",
+  "templateWorkDesc": "Högprioriterad projektmilstolpe",
+  "templateRoutineTitle": "Daglig rutin",
+  "templateRoutineDesc": "Återkommande daglig morgonvana",
+  "templateStudyTitle": "Studier & Uppgifter",
+  "templateStudyDesc": "Följ kursläsning och övningar",
+  "completedTasksHeader": "Slutförda ({count})",
+  "@completedTasksHeader": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "allCaughtUpToday": "Allt klart för idag! 🎉",
+  "allCaughtUpSubtitle": "Bra jobbat! Ta en paus eller lägg till en ny uppgift.",
+  "resetFilters": "Återställ alla",
+  "rescheduleTask": "Schemalägg om",
+  "plusOneDay": "+1 Dag",
+  "plusOneWeek": "+1 Vecka",
+  "moveToToday": "Flytta till idag",
+  "activeTasks": "Aktiva uppgifter"
 }

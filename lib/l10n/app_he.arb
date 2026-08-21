@@ -411,6 +411,9 @@
   "yearlyPlanTitle": "תוכנית שנתית",
   "yearlyPlanPrice": "$39.99 / שנה",
   "yearlyPlanSaving": "חסוך 33%",
+  "lifetimePlanTitle": "לכל החיים",
+  "lifetimePlanPrice": "$49.99 חד-פעמי",
+  "lifetimePlanBadge": "המשתלם ביותר",
   "groceryListMode": "רשימת משימות",
   "groceryListModeSubtitle": "עיצוב המשימה כרשימת משימות אינטראקטיבית",
   "itemsInCart": "{completed}/{total} הושלמו",
@@ -460,5 +463,34 @@
   "enterUrl": "כתובת אתר או קישור",
   "enterNote": "פרטים נוספים",
   "copiedToClipboard": "הועתק ללוח",
-  "noCustomFieldsAdded": "לא נוספו שורות מותאמות אישית"
+  "noCustomFieldsAdded": "לא נוספו שורות מותאמות אישית",
+  "quickDateToday": "היום",
+  "quickDateTomorrow": "מחר",
+  "quickDateThisWeekend": "סוף השבוע",
+  "quickDateNextWeek": "שבוע הבא",
+  "templateStarterTitle": "תבניות מהירות",
+  "templateGroceryTitle": "רשימת קניות ומצרכים",
+  "templateGroceryDesc": "רשימת בדיקה לקניות ומצרכים",
+  "templateWorkTitle": "משימת עבודה דחופה",
+  "templateWorkDesc": "אבן דרך בפרויקט בעדיפות גבוהה",
+  "templateRoutineTitle": "שגרה יומית",
+  "templateRoutineDesc": "הרגל בוקר יומי חוזר",
+  "templateStudyTitle": "לימודים ומטלות",
+  "templateStudyDesc": "מעקב אחר קריאה ותרגילים",
+  "completedTasksHeader": "הושלמו ({count})",
+  "@completedTasksHeader": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "allCaughtUpToday": "הכל הושלם להיום! 🎉",
+  "allCaughtUpSubtitle": "עבודה מצוינת! קח הפסקה או הוסף משימה חדשה.",
+  "resetFilters": "איפוס הכל",
+  "rescheduleTask": "תזמן מחדש",
+  "plusOneDay": "+יום אחד",
+  "plusOneWeek": "+שבוע אחד",
+  "moveToToday": "העבר להיום",
+  "activeTasks": "משימות פעילות"
 }

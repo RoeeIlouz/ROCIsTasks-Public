@@ -411,6 +411,9 @@
   "yearlyPlanTitle": "Plan Anual",
   "yearlyPlanPrice": "$39.99 / año",
   "yearlyPlanSaving": "Ahorra 33%",
+  "lifetimePlanTitle": "De por vida",
+  "lifetimePlanPrice": "$49.99 único",
+  "lifetimePlanBadge": "Mejor valor",
   "groceryListMode": "Lista de tareas",
   "groceryListModeSubtitle": "Formatear tarea como una lista de tareas interactiva",
   "itemsInCart": "{completed}/{total} completadas",
@@ -460,5 +463,34 @@
   "enterUrl": "Sitio web o URL",
   "enterNote": "Detalles personalizados",
   "copiedToClipboard": "Copiado al portapapeles",
-  "noCustomFieldsAdded": "No hay líneas personalizadas"
+  "noCustomFieldsAdded": "No hay líneas personalizadas",
+  "quickDateToday": "Hoy",
+  "quickDateTomorrow": "Mañana",
+  "quickDateThisWeekend": "Este fin de semana",
+  "quickDateNextWeek": "La próxima semana",
+  "templateStarterTitle": "Plantillas rápidas de inicio",
+  "templateGroceryTitle": "Lista de compras",
+  "templateGroceryDesc": "Lista de verificación para compras",
+  "templateWorkTitle": "Tarea de trabajo",
+  "templateWorkDesc": "Hito de proyecto de alta prioridad",
+  "templateRoutineTitle": "Rutina diaria",
+  "templateRoutineDesc": "Hábito matutino diario recurrente",
+  "templateStudyTitle": "Estudio y tareas",
+  "templateStudyDesc": "Seguimiento de lecturas y ejercicios",
+  "completedTasksHeader": "Completadas ({count})",
+  "@completedTasksHeader": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "allCaughtUpToday": "¡Todo listo por hoy! 🎉",
+  "allCaughtUpSubtitle": "¡Gran trabajo! Tómate un descanso o añade una nueva tarea.",
+  "resetFilters": "Restablecer todo",
+  "rescheduleTask": "Reprogramar",
+  "plusOneDay": "+1 Día",
+  "plusOneWeek": "+1 Semana",
+  "moveToToday": "Mover a hoy",
+  "activeTasks": "Tareas activas"
 }

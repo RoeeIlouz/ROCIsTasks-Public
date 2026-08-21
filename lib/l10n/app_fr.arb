@@ -412,6 +412,9 @@
   "yearlyPlanTitle": "Forfait Annuel",
   "yearlyPlanPrice": "39,99 $ / an",
   "yearlyPlanSaving": "Économisez 33%",
+  "lifetimePlanTitle": "À vie",
+  "lifetimePlanPrice": "49,99 $ unique",
+  "lifetimePlanBadge": "Meilleure offre",
   "groceryListMode": "Liste de tâches",
   "groceryListModeSubtitle": "Formater la tâche sous forme de liste de tâches interactive",
   "itemsInCart": "{completed}/{total} terminées",
@@ -461,5 +464,34 @@
   "enterUrl": "Site web ou URL",
   "enterNote": "Détails personnalisés",
   "copiedToClipboard": "Copié dans le presse-papiers",
-  "noCustomFieldsAdded": "Aucune ligne personnalisée ajoutée"
+  "noCustomFieldsAdded": "Aucune ligne personnalisée ajoutée",
+  "quickDateToday": "Aujourd'hui",
+  "quickDateTomorrow": "Demain",
+  "quickDateThisWeekend": "Ce week-end",
+  "quickDateNextWeek": "La semaine prochaine",
+  "templateStarterTitle": "Modèles de démarrage rapide",
+  "templateGroceryTitle": "Liste de courses",
+  "templateGroceryDesc": "Liste de contrôle pour les courses et l'essentiel",
+  "templateWorkTitle": "Tâche de travail",
+  "templateWorkDesc": "Étape de projet prioritaire",
+  "templateRoutineTitle": "Routine quotidienne",
+  "templateRoutineDesc": "Habitude matinale quotidienne récurrente",
+  "templateStudyTitle": "Études et devoirs",
+  "templateStudyDesc": "Suivi des lectures et des exercices",
+  "completedTasksHeader": "Terminées ({count})",
+  "@completedTasksHeader": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "allCaughtUpToday": "Tout est fait pour aujourd'hui ! 🎉",
+  "allCaughtUpSubtitle": "Excellent travail ! Faites une pause ou ajoutez une nouvelle tâche.",
+  "resetFilters": "Tout réinitialiser",
+  "rescheduleTask": "Reprogrammer",
+  "plusOneDay": "+1 Jour",
+  "plusOneWeek": "+1 Semaine",
+  "moveToToday": "Déplacer à aujourd'hui",
+  "activeTasks": "Tâches actives"
 }

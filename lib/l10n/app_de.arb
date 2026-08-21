@@ -412,6 +412,9 @@
   "yearlyPlanTitle": "Jährlicher Plan",
   "yearlyPlanPrice": "39,99 $ / Jahr",
   "yearlyPlanSaving": "33 % sparen",
+  "lifetimePlanTitle": "Lebenslang",
+  "lifetimePlanPrice": "49,99 $ einmalig",
+  "lifetimePlanBadge": "Bester Wert",
   "groceryListMode": "Aufgabenliste",
   "groceryListModeSubtitle": "Aufgabe als interaktive Aufgabenliste formatieren",
   "itemsInCart": "{completed}/{total} erledigt",
@@ -461,5 +464,34 @@
   "enterUrl": "Website oder URL",
   "enterNote": "Zusätzliche Details",
   "copiedToClipboard": "In die Zwischenablage kopiert",
-  "noCustomFieldsAdded": "Keine benutzerdefinierten Zeilen hinzugefügt"
+  "noCustomFieldsAdded": "Keine benutzerdefinierten Zeilen hinzugefügt",
+  "quickDateToday": "Heute",
+  "quickDateTomorrow": "Morgen",
+  "quickDateThisWeekend": "Dieses Wochenende",
+  "quickDateNextWeek": "Nächste Woche",
+  "templateStarterTitle": "Schnellstart-Vorlagen",
+  "templateGroceryTitle": "Einkaufs- & Lebensmittelliste",
+  "templateGroceryDesc": "Checkliste für Einkäufe & Vorräte",
+  "templateWorkTitle": "Arbeitssprint-Aufgabe",
+  "templateWorkDesc": "Projektmeilenstein mit hoher Priorität",
+  "templateRoutineTitle": "Tägliche Routine",
+  "templateRoutineDesc": "Wiederkehrende morgendliche Gewohnheit",
+  "templateStudyTitle": "Lernen & Aufgaben",
+  "templateStudyDesc": "Kurslektüre & Übungen verfolgen",
+  "completedTasksHeader": "Erledigt ({count})",
+  "@completedTasksHeader": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "allCaughtUpToday": "Alles für heute erledigt! 🎉",
+  "allCaughtUpSubtitle": "Gute Arbeit! Machen Sie eine Pause oder fügen Sie eine neue Aufgabe hinzu.",
+  "resetFilters": "Alles zurücksetzen",
+  "rescheduleTask": "Neu planen",
+  "plusOneDay": "+1 Tag",
+  "plusOneWeek": "+1 Woche",
+  "moveToToday": "Auf heute verschieben",
+  "activeTasks": "Aktive Aufgaben"
 }

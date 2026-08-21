@@ -198,18 +198,18 @@ class SubscriptionService extends ChangeNotifier {
       // Sync to HomeWidget
       try {
         HomeWidget.saveWidgetData<bool>('is_premium', _isPremium);
-        HomeWidget.updateWidget(
-          name: 'MonthWidgetProvider',
-          iOSName: 'MonthWidget',
-        );
-        HomeWidget.updateWidget(
-          name: 'TaskWidgetProvider',
-          iOSName: 'TaskWidget',
-        );
-        HomeWidget.updateWidget(
-          name: 'FullCalendarWidgetProvider',
-          iOSName: 'FullCalendarWidget',
-        );
+        final providers = [
+          ('TaskWidgetProvider', 'TaskWidget'),
+          ('FullCalendarWidgetProvider', 'FullCalendarWidget'),
+          ('TodayAgendaWidgetProvider', 'TodayAgendaWidget'),
+          ('MonthAgendaWidgetProvider', 'MonthAgendaWidget'),
+          ('TimelineAgendaWidgetProvider', 'TimelineAgendaWidget'),
+          ('QuickActionWidgetProvider', 'QuickActionWidget'),
+          ('UpNextWidgetProvider', 'UpNextWidget'),
+        ];
+        for (final p in providers) {
+          HomeWidget.updateWidget(name: p.$1, iOSName: p.$2);
+        }
       } catch (e) {
         // Ignore widget update errors
       }
