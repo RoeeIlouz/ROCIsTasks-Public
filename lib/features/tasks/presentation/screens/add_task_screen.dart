@@ -27,8 +27,9 @@ import 'package:google_fonts/google_fonts.dart';
 
 class AddTaskScreen extends StatefulWidget {
   final Task? task;
+  final DateTime? initialDueDate;
 
-  const AddTaskScreen({super.key, this.task});
+  const AddTaskScreen({super.key, this.task, this.initialDueDate});
 
   @override
   State<AddTaskScreen> createState() => _AddTaskScreenState();
@@ -63,7 +64,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     _descriptionController = TextEditingController(
       text: widget.task?.description ?? '',
     );
-    _selectedDate = widget.task?.dueDate;
+    _selectedDate = widget.task?.dueDate ?? widget.initialDueDate;
     _priority = widget.task?.priority ?? TaskPriority.medium;
     _selectedCategoryIds = widget.task?.categoryIds.toList() ?? [];
     if (_selectedCategoryIds.isEmpty && widget.task?.categoryId != null) {
