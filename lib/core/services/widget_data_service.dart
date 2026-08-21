@@ -135,10 +135,14 @@ class WidgetDataService {
       await HomeWidget.saveWidgetData<String>('today_agenda_data', '[]');
     }
 
-    await HomeWidget.updateWidget(
-      name: 'TodayAgendaWidgetProvider',
-      iOSName: 'TodayAgendaWidget',
-    );
+    try {
+      await HomeWidget.updateWidget(
+        name: 'TodayAgendaWidgetProvider',
+        iOSName: 'TodayAgendaWidget',
+      );
+    } catch (e) {
+      AppLogger.debug('Failed to update today agenda widget: $e');
+    }
   }
 
   /// Update Samsung-style Month + Day Agenda Split Widget
@@ -205,10 +209,14 @@ class WidgetDataService {
         HomeWidget.saveWidgetData<String>('month_agenda_month_title', DateFormat('MMMM yyyy').format(targetMonth)),
       ]);
 
-      await HomeWidget.updateWidget(
-        name: 'MonthAgendaWidgetProvider',
-        iOSName: 'MonthAgendaWidget',
-      );
+      try {
+        await HomeWidget.updateWidget(
+          name: 'MonthAgendaWidgetProvider',
+          iOSName: 'MonthAgendaWidget',
+        );
+      } catch (e) {
+        AppLogger.debug('Failed to update month agenda widget: $e');
+      }
     } catch (e, stack) {
       AppLogger.error('Error updating MonthAgendaWidget: $e', error: e, stack: stack);
     }
@@ -338,10 +346,14 @@ class WidgetDataService {
       await HomeWidget.saveWidgetData<String>('timeline_agenda_data', '[]');
     }
 
-    await HomeWidget.updateWidget(
-      name: 'TimelineAgendaWidgetProvider',
-      iOSName: 'TimelineAgendaWidget',
-    );
+    try {
+      await HomeWidget.updateWidget(
+        name: 'TimelineAgendaWidgetProvider',
+        iOSName: 'TimelineAgendaWidget',
+      );
+    } catch (e) {
+      AppLogger.debug('Failed to update timeline agenda widget: $e');
+    }
   }
 
   /// Update Quick Action & Progress Ring Widget
@@ -368,10 +380,14 @@ class WidgetDataService {
       HomeWidget.saveWidgetData<int>('quick_action_completed_count', completedCount),
     ]);
 
-    await HomeWidget.updateWidget(
-      name: 'QuickActionWidgetProvider',
-      iOSName: 'QuickActionWidget',
-    );
+    try {
+      await HomeWidget.updateWidget(
+        name: 'QuickActionWidgetProvider',
+        iOSName: 'QuickActionWidget',
+      );
+    } catch (e) {
+      AppLogger.debug('Failed to update quick action widget: $e');
+    }
   }
 
   /// Update Up Next Minimalist Pill Widget
@@ -460,10 +476,14 @@ class WidgetDataService {
       ]);
     }
 
-    await HomeWidget.updateWidget(
-      name: 'UpNextWidgetProvider',
-      iOSName: 'UpNextWidget',
-    );
+    try {
+      await HomeWidget.updateWidget(
+        name: 'UpNextWidgetProvider',
+        iOSName: 'UpNextWidget',
+      );
+    } catch (e) {
+      AppLogger.debug('Failed to update up next widget: $e');
+    }
   }
 
   Future<void> updateScheduleWidget(
@@ -549,10 +569,14 @@ class WidgetDataService {
       await HomeWidget.saveWidgetData<String>('schedule_list', '[]');
     }
 
-    await HomeWidget.updateWidget(
-      name: 'ScheduleWidgetProvider',
-      iOSName: 'ScheduleWidget',
-    );
+    try {
+      await HomeWidget.updateWidget(
+        name: 'TimelineAgendaWidgetProvider',
+        iOSName: 'ScheduleWidget',
+      );
+    } catch (e) {
+      AppLogger.debug('Failed to update schedule widget: $e');
+    }
   }
 
   Future<void> updateCalendarListWidget(
@@ -613,10 +637,14 @@ class WidgetDataService {
         'calendar_list_data',
         jsonEncode(calendarListEvents),
       );
-      await HomeWidget.updateWidget(
-        name: 'CalendarWidgetProvider',
-        iOSName: 'CalendarListWidget',
-      );
+      try {
+        await HomeWidget.updateWidget(
+          name: 'FullCalendarWidgetProvider',
+          iOSName: 'CalendarListWidget',
+        );
+      } catch (e) {
+        AppLogger.debug('Failed to update calendar list widget: $e');
+      }
     } catch (e, s) {
       AppLogger.error(
         'Error updating calendar list widget',
@@ -689,10 +717,14 @@ class WidgetDataService {
       await HomeWidget.saveWidgetData<String>('month_events_map', '{}');
     }
 
-    await HomeWidget.updateWidget(
-      name: 'CalendarWidgetProvider',
-      iOSName: 'CalendarWidget',
-    );
+    try {
+      await HomeWidget.updateWidget(
+        name: 'FullCalendarWidgetProvider',
+        iOSName: 'CalendarWidget',
+      );
+    } catch (e) {
+      AppLogger.debug('Failed to update month events map: $e');
+    }
   }
 
   void clearScheduleCache() {

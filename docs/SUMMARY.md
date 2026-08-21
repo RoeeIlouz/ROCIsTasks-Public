@@ -2,23 +2,20 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
-## Android Home Screen Widgets Inflation & Limit Fix - 2026-08-21
+## Android Home Screen Widgets Inflation & Platform Channel Fix - 2026-08-22
 
 #### Issue Encountered
-* Android system launchers displayed "Couldn't load widget" on newly added home screen widgets (`TodayAgendaWidget`, `MonthAgendaWidget`, `TimelineAgendaWidget`, `QuickActionWidget`, `UpNextWidget`).
+* Flutter debug console threw `StandardMethodCodec.decodeEnvelope` / `MethodChannel._invokeMethod` at `WidgetDataService.updateScheduleWidget` (line 552), causing `updateAllWidgets` to fail.
 
 #### Root Cause Analysis
-1. **Uninitialized `ListView` / RemoteAdapter**: When `WidgetLimitHelper.isWidgetAllowed` returned `false` for additional widgets on the free tier, the providers skipped `setRemoteAdapter` while leaving `ListView` instances un-adapted and immediately calling `notifyAppWidgetViewDataChanged`. This caused system launcher `AppWidgetHostView` inflation exceptions.
-2. **Invalid Font Resource Identifier**: XML layout files (`widget_full_calendar_layout.xml` and `widget_quick_action_layout.xml`) contained `android:fontFamily="sans-serif-bold"` (which is not a valid Android platform font family name and throws `InflateException` on OEM launchers).
-3. **Vector Drawable Color Attribute Resolvers**: `ic_check_circle_outline.xml` and `dot_indicator.xml` used `@android:color/white` instead of explicit hex color `#FFFFFF`, which can fail resolution across launcher cross-process RemoteViews boundaries.
+1. `WidgetDataService.updateScheduleWidget` and `updateCalendarListWidget` attempted to invoke `HomeWidget.updateWidget(name: 'ScheduleWidgetProvider')` and `HomeWidget.updateWidget(name: 'CalendarWidgetProvider')`. Neither receiver exists in `AndroidManifest.xml` or Kotlin codebase, throwing `ClassNotFoundException` across the Flutter Platform MethodChannel.
+2. In `updateAllWidgets`, `Future.wait` failed whenever this channel call failed, preventing proper widget background synchronization.
 
 #### Solutions & Verification
-* Refactored all 5 widget providers to unconditionally bind their `RemoteViewsService` adapters and pending intent templates prior to setting overlay visibility.
-* Protected `notifyAppWidgetViewDataChanged` invocations so they only trigger for active allowed widgets.
-* Fixed font families to valid Android values (`sans-serif` + `android:textStyle="bold"`).
-* Ensured vector drawables use explicit hex colors.
-* Added all 7 widget providers to `SubscriptionService._updatePremiumState` broadcast list.
-* Verified with `flutter analyze` (0 issues), `flutter test` (271/271 passing), and Android `./gradlew assembleDebug` (BUILD SUCCESSFUL).
+* Fixed invalid provider names to active Android receivers (`TimelineAgendaWidgetProvider` and `FullCalendarWidgetProvider`).
+* Wrapped all `HomeWidget.updateWidget` calls with robust try-catch blocks and debug loggers across `WidgetDataService` and `MonthWidgetService`.
+* Verified with `flutter analyze` (0 issues) and `flutter test` (271/271 passing).
+
 
 
 ## Lemon Squeezy Production Checkout URLs & Lifetime Web Paywall UI - 2026-08-21

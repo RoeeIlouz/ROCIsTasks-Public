@@ -177,10 +177,14 @@ class MonthWidgetService {
         DateFormat('MMMM yyyy').format(targetMonth),
       );
 
-      await HomeWidget.updateWidget(
-        name: 'MonthWidgetProvider',
-        iOSName: 'MonthWidget',
-      );
+      try {
+        await HomeWidget.updateWidget(
+          name: 'MonthAgendaWidgetProvider',
+          iOSName: 'MonthWidget',
+        );
+      } catch (e) {
+        AppLogger.debug('Failed to update Month Widget: $e');
+      }
     } catch (e, stack) {
       AppLogger.error('Error updating Month Widget', error: e, stack: stack);
     }
