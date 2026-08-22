@@ -92,6 +92,9 @@ class SubscriptionService extends ChangeNotifier {
 
       _configurationError = null;
       _isInitialized = true;
+      try {
+        HomeWidget.saveWidgetData<bool>('is_premium', _isPremium);
+      } catch (_) {}
       notifyListeners();
     } catch (e, s) {
       _errorHandlingService.logError(
@@ -103,6 +106,9 @@ class SubscriptionService extends ChangeNotifier {
       // but premium will be false.
       _configurationError ??= 'Subscriptions failed to initialize.';
       _isInitialized = true;
+      try {
+        HomeWidget.saveWidgetData<bool>('is_premium', false);
+      } catch (_) {}
       notifyListeners();
     }
   }
