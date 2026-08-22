@@ -39,11 +39,44 @@ jobs:
             ${{ runner.os }}-gradle-
 
       - name: Setup configuration templates
+        env:
+          GOOGLE_SERVICES_JSON_BASE64: ${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}
+          ENV_FILE_BASE64: ${{ secrets.ENV_FILE_BASE64 }}
+          FIREBASE_OPTIONS_BASE64: ${{ secrets.FIREBASE_OPTIONS_BASE64 }}
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEY_PROPERTIES_BASE64: ${{ secrets.KEY_PROPERTIES_BASE64 }}
         run: |
-          cp .env.example .env
-          cp lib/firebase_options.dart.example lib/firebase_options.dart
+          # 1. .env
+          if [ -n "$ENV_FILE_BASE64" ]; then
+            echo "$ENV_FILE_BASE64" | base64 --decode > .env
+          else
+            cp .env.example .env
+          fi
+
+          # 2. firebase_options.dart
+          if [ -n "$FIREBASE_OPTIONS_BASE64" ]; then
+            echo "$FIREBASE_OPTIONS_BASE64" | base64 --decode > lib/firebase_options.dart
+          else
+            cp lib/firebase_options.dart.example lib/firebase_options.dart
+          fi
+
+          # 3. firebase_schedule_options.dart
           cp lib/firebase_schedule_options.dart.example lib/firebase_schedule_options.dart
-          cp android/app/google-services.json.example android/app/google-services.json
+
+          # 4. google-services.json
+          if [ -n "$GOOGLE_SERVICES_JSON_BASE64" ]; then
+            echo "$GOOGLE_SERVICES_JSON_BASE64" | base64 --decode > android/app/google-services.json
+          else
+            cp android/app/google-services.json.example android/app/google-services.json
+          fi
+
+          # 5. Keystore & key.properties
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "$KEYSTORE_BASE64" | base64 --decode > android/app/upload-keystore.jks
+          fi
+          if [ -n "$KEY_PROPERTIES_BASE64" ]; then
+            echo "$KEY_PROPERTIES_BASE64" | base64 --decode > android/key.properties
+          fi
 
       - name: Install dependencies
         run: flutter pub get
