@@ -361,31 +361,42 @@ class _HomeScreenState extends State<HomeScreen> {
           Consumer<ConnectivityService>(
             builder: (context, connectivity, child) {
               if (connectivity.isOnline) return const SizedBox.shrink();
-              return Container(
-                width: double.infinity,
+              return Material(
                 color: Theme.of(context).colorScheme.errorContainer,
-                padding: const EdgeInsets.symmetric(
-                  vertical: 8,
-                  horizontal: 16,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.cloud_off_rounded,
-                      size: 16,
-                      color: Theme.of(context).colorScheme.onErrorContainer,
+                child: InkWell(
+                  onTap: () => connectivity.refresh(),
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 8,
+                      horizontal: 16,
                     ),
-                    const SizedBox(width: 8),
-                    Text(
-                      l10n.offlineMode, // Ensure string exists or use literal
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onErrorContainer,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 12,
-                      ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.cloud_off_rounded,
+                          size: 16,
+                          color: Theme.of(context).colorScheme.onErrorContainer,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          l10n.offlineMode,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onErrorContainer,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 12,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Icon(
+                          Icons.refresh_rounded,
+                          size: 14,
+                          color: Theme.of(context).colorScheme.onErrorContainer.withValues(alpha: 0.7),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               );
             },
