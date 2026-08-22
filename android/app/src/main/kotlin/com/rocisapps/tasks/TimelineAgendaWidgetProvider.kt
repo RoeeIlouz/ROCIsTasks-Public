@@ -78,13 +78,15 @@ class TimelineAgendaWidgetProvider : HomeWidgetProvider() {
                 )
                 views.setPendingIntentTemplate(R.id.widget_timeline_list, itemPendingIntent)
 
-                // Pro limit overlay
                 WidgetLimitHelper.setupProOverlay(context, views, isAllowed)
 
                 appWidgetManager.updateAppWidget(appWidgetId, views)
-                if (isAllowed) {
-                    appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_timeline_list)
-                }
+                appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_timeline_list)
+                android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                    try {
+                        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_timeline_list)
+                    } catch (_: Exception) {}
+                }, 300)
             } catch (e: Exception) {
                 android.util.Log.e("TimelineAgendaWidget", "Error updating widget $appWidgetId", e)
             }

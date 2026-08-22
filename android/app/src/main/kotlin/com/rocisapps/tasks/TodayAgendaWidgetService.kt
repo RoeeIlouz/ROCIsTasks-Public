@@ -49,7 +49,8 @@ class TodayAgendaWidgetFactory(private val context: Context) : RemoteViewsServic
             for (i in 0 until jsonArray.length()) {
                 val item = jsonArray.optJSONObject(i) ?: continue
                 val itemDate = item.optString("date", "")
-                if (itemDate.startsWith(targetDateStr)) {
+                val itemDateDisplay = item.optString("dateDisplay", "")
+                if (itemDateDisplay == targetDateStr || itemDate.startsWith(targetDateStr)) {
                     dayItems.add(item)
                 }
             }
@@ -169,13 +170,6 @@ class TodayAgendaWidgetFactory(private val context: Context) : RemoteViewsServic
                 views.setViewVisibility(R.id.widget_agenda_check, View.GONE)
                 views.setViewVisibility(R.id.widget_agenda_event_icon, View.VISIBLE)
                 views.setViewVisibility(R.id.widget_agenda_badge, View.GONE)
-
-                if (colorHex.isNotEmpty() && colorHex.startsWith("#")) {
-                    try {
-                        val color = Color.parseColor(colorHex)
-                        views.setInt(R.id.widget_agenda_event_icon, "setColorFilter", color)
-                    } catch (_: Exception) {}
-                }
 
                 // Row click opens calendar in app
                 val rowIntent = Intent().apply {

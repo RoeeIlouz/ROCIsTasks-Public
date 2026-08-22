@@ -178,14 +178,17 @@ class MonthAgendaWidgetProvider : HomeWidgetProvider() {
                 )
                 views.setPendingIntentTemplate(R.id.widget_month_agenda_list, itemPendingIntent)
 
-                // Pro Limit Overlay
                 WidgetLimitHelper.setupProOverlay(context, views, isAllowed)
 
                 appWidgetManager.updateAppWidget(appWidgetId, views)
-                if (isAllowed) {
-                    appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_month_grid_list)
-                    appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_month_agenda_list)
-                }
+                appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_month_grid_list)
+                appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_month_agenda_list)
+                android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                    try {
+                        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_month_grid_list)
+                        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_month_agenda_list)
+                    } catch (_: Exception) {}
+                }, 300)
             } catch (e: Exception) {
                 android.util.Log.e("MonthAgendaWidget", "Error updating widget $appWidgetId", e)
             }

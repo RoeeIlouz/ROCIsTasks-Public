@@ -145,22 +145,28 @@
                 android:textStyle="bold"
                 android:paddingBottom="4dp" />
 
-            <ListView
-                android:id="@+id/widget_month_agenda_list"
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:divider="@null"
-                android:dividerHeight="3dp" />
+                android:layout_height="0dp"
+                android:layout_weight="1">
 
-            <TextView
-                android:id="@+id/widget_month_agenda_empty"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:text="No events or tasks"
-                android:textColor="@color/widget_secondary_text"
-                android:textSize="11sp"
-                android:visibility="gone" />
+                <ListView
+                    android:id="@+id/widget_month_agenda_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:divider="@null"
+                    android:dividerHeight="3dp" />
+
+                <TextView
+                    android:id="@+id/widget_month_agenda_empty"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="No events or tasks"
+                    android:textColor="@color/widget_secondary_text"
+                    android:textSize="11sp"
+                    android:visibility="gone" />
+            </FrameLayout>
         </LinearLayout>
     </LinearLayout>
 

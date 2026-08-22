@@ -165,13 +165,15 @@ class TodayAgendaWidgetProvider : HomeWidgetProvider() {
                 )
                 views.setPendingIntentTemplate(R.id.widget_today_list, itemPendingIntent)
 
-                // 7. Pro Overlay Setup
                 WidgetLimitHelper.setupProOverlay(context, views, isAllowed)
 
                 appWidgetManager.updateAppWidget(appWidgetId, views)
-                if (isAllowed) {
-                    appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_today_list)
-                }
+                appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_today_list)
+                android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                    try {
+                        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_today_list)
+                    } catch (_: Exception) {}
+                }, 300)
             } catch (e: Exception) {
                 android.util.Log.e("TodayAgendaWidget", "Error updating widget $appWidgetId", e)
             }
