@@ -27,7 +27,8 @@ object WidgetLimitHelper {
      * Free users are permitted 1 active home screen widget.
      */
     fun isWidgetAllowed(context: Context, appWidgetId: Int, isPremium: Boolean): Boolean {
-        if (isPremium || BuildConfig.DEBUG) return true
+        val isDebug = (context.applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE) != 0
+        if (isPremium || isDebug) return true
 
         try {
             val appWidgetManager = AppWidgetManager.getInstance(context)
