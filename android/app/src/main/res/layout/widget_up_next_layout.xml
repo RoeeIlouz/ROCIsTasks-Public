@@ -56,7 +56,7 @@
                 android:text="UP NEXT"
                 android:textColor="@color/widget_primary"
                 android:textSize="9sp"
-                android:fontFamily="sans-serif-medium"
+                android:fontFamily="sans-serif"
                 android:textStyle="bold" />
 
             <TextView
@@ -66,7 +66,8 @@
                 android:text="Next Task or Meeting"
                 android:textColor="@color/widget_title_text"
                 android:textSize="13sp"
-                android:fontFamily="sans-serif-medium"
+                android:fontFamily="sans-serif"
+                android:textStyle="bold"
                 android:maxLines="1"
                 android:ellipsize="end" />
 
@@ -89,7 +90,7 @@
             android:text="In 25m"
             android:textColor="@color/widget_primary"
             android:textSize="11sp"
-            android:fontFamily="sans-serif-medium"
+            android:fontFamily="sans-serif"
             android:textStyle="bold"
             android:background="@drawable/widget_pill_bg"
             android:paddingStart="8dp"

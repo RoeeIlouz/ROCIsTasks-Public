@@ -81,75 +81,78 @@ class TrashScreen extends StatelessWidget {
               return GlassContainer(
                 margin: const EdgeInsets.only(bottom: 12),
                 borderRadius: BorderRadius.circular(16),
-                child: ListTile(
-                  title: Text(
-                    task.title,
-                    style: const TextStyle(
-                      decoration: TextDecoration.lineThrough,
-                      fontWeight: FontWeight.w600,
+                child: Material(
+                  type: MaterialType.transparency,
+                  child: ListTile(
+                    title: Text(
+                      task.title,
+                      style: const TextStyle(
+                        decoration: TextDecoration.lineThrough,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                  ),
-                  subtitle: task.dueDate != null
-                      ? Text(
-                          DateFormat.yMMMd().format(task.dueDate!),
-                          style: TextStyle(
-                            color: Theme.of(context).disabledColor,
+                    subtitle: task.dueDate != null
+                        ? Text(
+                            DateFormat.yMMMd().format(task.dueDate!),
+                            style: TextStyle(
+                              color: Theme.of(context).disabledColor,
+                            ),
+                          )
+                        : null,
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: Icon(
+                            Icons.restore,
+                            color: Theme.of(context).colorScheme.secondary,
                           ),
-                        )
-                      : null,
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: Icon(
-                          Icons.restore,
-                          color: Theme.of(context).colorScheme.secondary,
+                          onPressed: () {
+                            provider.restoreTask(task);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(l10n.restoredTask(task.title)),
+                                behavior: SnackBarBehavior.floating,
+                              ),
+                            );
+                          },
                         ),
-                        onPressed: () {
-                          provider.restoreTask(task);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(l10n.restoredTask(task.title)),
-                              behavior: SnackBarBehavior.floating,
-                            ),
-                          );
-                        },
-                      ),
-                      IconButton(
-                        icon: Icon(
-                          Icons.delete_forever_outlined,
-                          color: Theme.of(context).colorScheme.error,
-                        ),
-                        onPressed: () {
-                          // Confirm Dialog
-                          showDialog(
-                            context: context,
-                            builder: (ctx) => AlertDialog(
-                              title: Text(l10n.deletePermanently),
-                              content: Text(l10n.actionUndone),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.pop(ctx),
-                                  child: Text(l10n.cancel),
-                                ),
-                                FilledButton(
-                                  onPressed: () {
-                                    provider.deleteTaskPermanently(task.id);
-                                    Navigator.pop(ctx);
-                                  },
-                                  style: FilledButton.styleFrom(
-                                    backgroundColor: Theme.of(
-                                      context,
-                                    ).colorScheme.error,
+                        IconButton(
+                          icon: Icon(
+                            Icons.delete_forever_outlined,
+                            color: Theme.of(context).colorScheme.error,
+                          ),
+                          onPressed: () {
+                            // Confirm Dialog
+                            showDialog(
+                              context: context,
+                              builder: (ctx) => AlertDialog(
+                                title: Text(l10n.deletePermanently),
+                                content: Text(l10n.actionUndone),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(ctx),
+                                    child: Text(l10n.cancel),
                                   ),
-                                  child: Text(l10n.delete),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
-                    ],
+                                  FilledButton(
+                                    onPressed: () {
+                                      provider.deleteTaskPermanently(task.id);
+                                      Navigator.pop(ctx);
+                                    },
+                                    style: FilledButton.styleFrom(
+                                      backgroundColor: Theme.of(
+                                        context,
+                                      ).colorScheme.error,
+                                    ),
+                                    child: Text(l10n.delete),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               );

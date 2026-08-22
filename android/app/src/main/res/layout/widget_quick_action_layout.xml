@@ -94,7 +94,8 @@
                     android:text="New Task"
                     android:textColor="@color/widget_title_text"
                     android:textSize="12sp"
-                    android:fontFamily="sans-serif-medium" />
+                    android:fontFamily="sans-serif"
+                    android:textStyle="bold" />
             </LinearLayout>
 
             <!-- Calendar Shortcut -->
@@ -125,7 +126,8 @@
                     android:text="Calendar"
                     android:textColor="@color/widget_title_text"
                     android:textSize="12sp"
-                    android:fontFamily="sans-serif-medium" />
+                    android:fontFamily="sans-serif"
+                    android:textStyle="bold" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
