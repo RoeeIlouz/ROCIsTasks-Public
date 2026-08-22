@@ -1,0 +1,25 @@
+{
+  "project_info": {
+    "project_number": "123456789012",
+    "project_id": "YOUR_PROJECT_ID",
+    "storage_bucket": "YOUR_PROJECT.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:123456789012:android:966d4a50b5b02d4e8d1c53",
+        "android_client_info": {
+          "package_name": "com.rocisapps.tasks"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "YOUR_ANDROID_API_KEY"
+        }
+      ],
+      "services": {}
+    }
+  ],
+  "configuration_version": "1"
+}

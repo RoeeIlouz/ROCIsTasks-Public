@@ -2,15 +2,18 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
-## CI/CD FirebaseConfig Test Failure Resolution - 2026-08-22
+## CI/CD Google Services & FirebaseConfig Resolution - 2026-08-22
 
 #### Issue / Enhancement
-* CI build step `Run flutter test` failed on `test/core/config/firebase_config_test.dart`: `FirebaseConfig should use default Firebase options when no .env file (failed)`.
-* Root cause: CI workflow step `Setup configuration templates` copies `lib/firebase_options.dart.example` (containing placeholder `'YOUR_PROJECT_ID'`) over `lib/firebase_options.dart`. The test previously asserted a hardcoded `'rocis-todo'` string instead of verifying fallback against `DefaultFirebaseOptions.currentPlatform.projectId`.
+* CI build failed on `Execution failed for task ':app:processReleaseGoogleServices' > File google-services.json is missing.` during `flutter build appbundle --release`.
+* Root cause: `android/app/google-services.json` was ignored in `.gitignore` for security/open-source cleanliness, but no template `.example` file existed to be copied during the CI setup step.
+* In addition, `FirebaseConfig should use default Firebase options when no .env file` had previously failed due to template placeholder mismatches.
 
 #### Solutions & Verification
+* Created [android/app/google-services.json.example](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/google-services.json.example) containing valid schema placeholders for package `com.rocisapps.tasks`.
+* Updated [.github/workflows/flutter-ci.yml](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/.github/workflows/flutter-ci.yml) `Setup configuration templates` step to copy `android/app/google-services.json.example` to `android/app/google-services.json`.
 * Updated [test/core/config/firebase_config_test.dart](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/test/core/config/firebase_config_test.dart) to compare `options.projectId` dynamically against `default_options.DefaultFirebaseOptions.currentPlatform.projectId`.
-* Verified with `flutter test` (all 271 tests passing) and `flutter analyze` (0 issues).
+* Verified with `flutter test` (271/271 passing) and `flutter analyze` (0 issues).
 
 ## Android Free 1-Widget Limit & Side-by-Side Calendar Integration - 2026-08-22
 
