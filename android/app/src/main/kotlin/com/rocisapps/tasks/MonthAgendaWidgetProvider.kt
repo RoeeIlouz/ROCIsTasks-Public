@@ -54,6 +54,13 @@ class MonthAgendaWidgetProvider : HomeWidgetProvider() {
                 }
                 views.setInt(R.id.widget_month_agenda_root, "setBackgroundResource", rootBgRes)
 
+                val highlightColorHex = widgetData.getString("full_calendar_highlight_color", "#6366F1") ?: "#6366F1"
+                val highlightColor = try {
+                    android.graphics.Color.parseColor(highlightColorHex)
+                } catch (_: Exception) {
+                    android.graphics.Color.parseColor("#6366F1")
+                }
+
                 val textColor = when (theme) {
                     "light" -> android.graphics.Color.parseColor("#0F172A")
                     else -> android.graphics.Color.parseColor("#FFFFFF")
@@ -63,6 +70,8 @@ class MonthAgendaWidgetProvider : HomeWidgetProvider() {
                 views.setTextColor(R.id.widget_month_agenda_selected_title, textColor)
                 views.setTextColor(R.id.widget_month_agenda_prev, textColor)
                 views.setTextColor(R.id.widget_month_agenda_next, textColor)
+                views.setTextColor(R.id.widget_month_agenda_today_btn, highlightColor)
+                views.setTextColor(R.id.widget_month_agenda_add_btn, highlightColor)
 
                 val offset = widgetData.getInt(PREF_MONTH_OFFSET, 0)
                 val cal = Calendar.getInstance()
@@ -73,15 +82,14 @@ class MonthAgendaWidgetProvider : HomeWidgetProvider() {
                 views.setTextViewText(R.id.widget_month_agenda_month_title, monthTitleStr)
 
                 // Selected Date Display
-                val selectedDate = widgetData.getString(PREF_SELECTED_DATE, "") ?: ""
-                val selectedDateDisplay = if (selectedDate.isNotEmpty()) {
-                    try {
-                        val parsed = SimpleDateFormat("yyyy-MM-dd", Locale.US).parse(selectedDate)
-                        SimpleDateFormat("EEE, MMM d", Locale.getDefault()).format(parsed!!)
-                    } catch (_: Exception) {
-                        "Today"
-                    }
-                } else {
+                var selectedDate = widgetData.getString(PREF_SELECTED_DATE, "") ?: ""
+                if (selectedDate.isEmpty()) {
+                    selectedDate = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Calendar.getInstance().time)
+                }
+                val selectedDateDisplay = try {
+                    val parsed = SimpleDateFormat("yyyy-MM-dd", Locale.US).parse(selectedDate)
+                    SimpleDateFormat("EEE, MMM d", Locale.getDefault()).format(parsed!!)
+                } catch (_: Exception) {
                     "Today"
                 }
                 views.setTextViewText(R.id.widget_month_agenda_selected_title, selectedDateDisplay)

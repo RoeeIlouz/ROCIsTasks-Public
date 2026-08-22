@@ -14,13 +14,13 @@ class CalendarColorService extends ChangeNotifier {
   // Default colors
   static const Color defaultTaskColor = Color(0xFF9E9E9E); // Gray
   static const Color defaultGoogleColor = Color(0xFF4285F4); // Google Blue
-  static const Color defaultScheduleColor = Color(0xFF9C27B0); // Purple
+  static const Color defaultScheduleColor = Color(0xFF0284C7); // Sky Blue
   static const Color defaultAssignmentColor = Color(0xFFFF9800); // Orange
 
   // Default hex colors for widget use
   static const String defaultTaskColorHex = '#FF9E9E9E';
   static const String defaultGoogleColorHex = '#FF4285F4';
-  static const String defaultScheduleColorHex = '#FF9C27B0';
+  static const String defaultScheduleColorHex = '#FF0284C7';
   static const String defaultAssignmentColorHex = '#FFFF9800';
 
   Color _taskColor = defaultTaskColor;

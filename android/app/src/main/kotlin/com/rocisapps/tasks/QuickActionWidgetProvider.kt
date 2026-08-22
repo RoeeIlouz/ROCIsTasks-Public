@@ -36,6 +36,13 @@ class QuickActionWidgetProvider : HomeWidgetProvider() {
                 }
                 views.setInt(R.id.widget_quick_action_root, "setBackgroundResource", rootBgRes)
 
+                val highlightColorHex = widgetData.getString("full_calendar_highlight_color", "#6366F1") ?: "#6366F1"
+                val highlightColor = try {
+                    Color.parseColor(highlightColorHex)
+                } catch (_: Exception) {
+                    Color.parseColor("#6366F1")
+                }
+
                 val textColor = when (theme) {
                     "light" -> Color.parseColor("#0F172A")
                     else -> Color.parseColor("#FFFFFF")
@@ -47,6 +54,8 @@ class QuickActionWidgetProvider : HomeWidgetProvider() {
 
                 views.setTextColor(R.id.widget_quick_stat_number, textColor)
                 views.setTextColor(R.id.widget_quick_stat_label, secondaryColor)
+                views.setTextColor(R.id.widget_quick_btn_add_task, highlightColor)
+                views.setTextColor(R.id.widget_quick_btn_calendar, highlightColor)
 
                 // Load Circular Chart if available, otherwise show number fallback
                 val chartPath = widgetData.getString("chart_image_path", null)

@@ -35,6 +35,13 @@ class UpNextWidgetProvider : HomeWidgetProvider() {
                 }
                 views.setInt(R.id.widget_up_next_root, "setBackgroundResource", rootBgRes)
 
+                val highlightColorHex = widgetData.getString("full_calendar_highlight_color", "#6366F1") ?: "#6366F1"
+                val highlightColor = try {
+                    Color.parseColor(highlightColorHex)
+                } catch (_: Exception) {
+                    Color.parseColor("#6366F1")
+                }
+
                 val textColor = when (theme) {
                     "light" -> Color.parseColor("#0F172A")
                     else -> Color.parseColor("#FFFFFF")
@@ -46,6 +53,7 @@ class UpNextWidgetProvider : HomeWidgetProvider() {
 
                 views.setTextColor(R.id.widget_up_next_title, textColor)
                 views.setTextColor(R.id.widget_up_next_subtitle, secondaryColor)
+                views.setTextColor(R.id.widget_up_next_time_badge, highlightColor)
 
                 val type = widgetData.getString("up_next_type", "task") ?: "task"
                 val id = widgetData.getString("up_next_id", "") ?: ""
@@ -64,8 +72,12 @@ class UpNextWidgetProvider : HomeWidgetProvider() {
                         views.setInt(R.id.widget_up_next_color_strip, "setBackgroundColor", color)
                         views.setViewVisibility(R.id.widget_up_next_color_strip, View.VISIBLE)
                     } catch (_: Exception) {
-                        views.setViewVisibility(R.id.widget_up_next_color_strip, View.INVISIBLE)
+                        views.setInt(R.id.widget_up_next_color_strip, "setBackgroundColor", highlightColor)
+                        views.setViewVisibility(R.id.widget_up_next_color_strip, View.VISIBLE)
                     }
+                } else if (id.isNotEmpty()) {
+                    views.setInt(R.id.widget_up_next_color_strip, "setBackgroundColor", highlightColor)
+                    views.setViewVisibility(R.id.widget_up_next_color_strip, View.VISIBLE)
                 } else {
                     views.setViewVisibility(R.id.widget_up_next_color_strip, View.INVISIBLE)
                 }
@@ -89,6 +101,7 @@ class UpNextWidgetProvider : HomeWidgetProvider() {
                 } else if (type == "event") {
                     views.setViewVisibility(R.id.widget_up_next_check, View.GONE)
                     views.setViewVisibility(R.id.widget_up_next_event_icon, View.VISIBLE)
+                    views.setInt(R.id.widget_up_next_event_icon, "setColorFilter", highlightColor)
 
                     val itemIntent = HomeWidgetLaunchIntent.getActivity(
                         context,

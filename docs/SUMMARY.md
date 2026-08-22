@@ -2,6 +2,22 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## Side-by-Side Calendar Month Navigation, Date Selection & Dynamic Accent Colors - 2026-08-22
+
+#### Issue / Enhancement
+* Side-by-side Month + Agenda widget was not switching month grid when pressing next/previous month (title changed but grid stayed static) because Kotlin was relying on Dart's static cached grid for offset 0.
+* Day click in the month grid always defaulted to Sunday because all 7 child day views in `widget_month_agenda_row.xml` shared the same view ID dynamically added via `addView`, causing Android RemoteViews click dispatcher to match the first child.
+* Switching to the Calendar or Settings screen inside the app crashed due to `LazyInitializationWidget` state violations, `displayName?[0]` RangeError on empty strings, and unsafe `availableCalendars` lookup.
+* Widget highlight colors still showed purple references instead of reading and applying the user's chosen accent color from Widget Customization settings.
+
+#### Solutions & Verification
+* **Native Month Grid Generation**: In [MonthAgendaWidgetService.kt](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/kotlin/com/rocisapps/tasks/MonthAgendaWidgetService.kt), `MonthAgendaGridFactory` now natively computes the 42-day month grid using `Calendar` + `PREF_MONTH_OFFSET`, instantly updating the grid on next/prev month clicks and cross-referencing event dots from agenda data.
+* **Unique Day Cell View IDs**: In [widget_month_agenda_row.xml](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/layout/widget_month_agenda_row.xml), defined 7 static child cells with unique IDs (`widget_month_day_0` .. `widget_month_day_6`, `widget_month_bg_0` .. `widget_month_bg_6`, `widget_month_text_0` .. `widget_month_text_6`, `widget_month_dot_0` .. `widget_month_dot_6`), enabling 100% accurate per-day selection via fill-in intents.
+* **In-App Navigation Stability**: In [home_screen.dart](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/home/presentation/screens/home_screen.dart), removed `LazyInitializationWidget` and mounted `CalendarScreen` directly in `PageView`. In [settings_screen.dart](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/home/presentation/screens/settings_screen.dart) and [web_home_screen.dart](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/home/presentation/screens/web_home_screen.dart), added `displayName.isNotEmpty` checks before accessing `[0]`. In [calendar_screen.dart](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/calendar/presentation/screens/calendar_screen.dart), made calendar lookups safe and bounded TableCalendar dates.
+* **Dynamic Widget Accent Color**: In `MonthAgendaWidgetService.kt`, `TodayAgendaWidgetService.kt`, `TimelineAgendaWidgetService.kt`, `UpNextWidgetProvider.kt`, `QuickActionWidgetProvider.kt`, and `widget_customization_screen.dart`, all widgets read `full_calendar_highlight_color` (defaulting to Modern Indigo `#6366F1`) and dynamically apply it to highlights, indicators, priority badges, and button tints. Replaced default purple in `CalendarColorService` with Sky Blue (`#0284C7`).
+* **Verification**: Ran `flutter analyze` (0 issues), `flutter test` (271/271 passed), and `gradlew compileDebugKotlin` (BUILD SUCCESSFUL).
+
+
 ## Android Widgets Task Filtering, Contrast & Layout Collision Resolution - 2026-08-22
 
 #### Issue / Enhancement

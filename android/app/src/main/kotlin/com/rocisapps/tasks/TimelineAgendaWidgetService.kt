@@ -20,6 +20,7 @@ class TimelineAgendaWidgetService : RemoteViewsService() {
 class TimelineAgendaWidgetFactory(private val context: Context) : RemoteViewsService.RemoteViewsFactory {
     private val items = ArrayList<JSONObject>()
     private var widgetTheme = "system"
+    private var highlightColor = Color.parseColor("#6366F1")
 
     override fun onCreate() {
         onDataSetChanged()
@@ -30,6 +31,12 @@ class TimelineAgendaWidgetFactory(private val context: Context) : RemoteViewsSer
         try {
             val widgetData = HomeWidgetPlugin.getData(context)
             widgetTheme = widgetData.getString("full_calendar_theme", "system") ?: "system"
+            val colorHex = widgetData.getString("full_calendar_highlight_color", "#6366F1") ?: "#6366F1"
+            highlightColor = try {
+                Color.parseColor(colorHex)
+            } catch (_: Exception) {
+                Color.parseColor("#6366F1")
+            }
 
             val rawJson = widgetData.getString("timeline_agenda_data", "[]") ?: "[]"
             val jsonArray = JSONArray(rawJson)
@@ -72,6 +79,7 @@ class TimelineAgendaWidgetFactory(private val context: Context) : RemoteViewsSer
             val dateDisplay = item.optString("dateDisplay", "")
 
             views.setTextViewText(R.id.widget_timeline_header_day, dayLabel)
+            views.setTextColor(R.id.widget_timeline_header_day, highlightColor)
             views.setTextViewText(R.id.widget_timeline_header_date, dateDisplay)
             views.setTextColor(R.id.widget_timeline_header_date, secondaryColor)
             return views
@@ -99,10 +107,12 @@ class TimelineAgendaWidgetFactory(private val context: Context) : RemoteViewsSer
                     views.setInt(R.id.widget_timeline_color_strip, "setBackgroundColor", color)
                     views.setViewVisibility(R.id.widget_timeline_color_strip, View.VISIBLE)
                 } catch (_: Exception) {
-                    views.setViewVisibility(R.id.widget_timeline_color_strip, View.INVISIBLE)
+                    views.setInt(R.id.widget_timeline_color_strip, "setBackgroundColor", highlightColor)
+                    views.setViewVisibility(R.id.widget_timeline_color_strip, View.VISIBLE)
                 }
             } else {
-                views.setViewVisibility(R.id.widget_timeline_color_strip, View.INVISIBLE)
+                views.setInt(R.id.widget_timeline_color_strip, "setBackgroundColor", highlightColor)
+                views.setViewVisibility(R.id.widget_timeline_color_strip, View.VISIBLE)
             }
 
             if (type == "task") {
@@ -140,6 +150,7 @@ class TimelineAgendaWidgetFactory(private val context: Context) : RemoteViewsSer
             } else {
                 views.setViewVisibility(R.id.widget_timeline_check, View.GONE)
                 views.setViewVisibility(R.id.widget_timeline_event_icon, View.VISIBLE)
+                views.setInt(R.id.widget_timeline_event_icon, "setColorFilter", highlightColor)
                 views.setViewVisibility(R.id.widget_timeline_badge, View.GONE)
 
                 val rowIntent = Intent().apply {

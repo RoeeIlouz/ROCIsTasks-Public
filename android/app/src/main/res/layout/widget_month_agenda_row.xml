@@ -4,4 +4,251 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:gravity="center_vertical" />
+    android:gravity="center_vertical">
+
+    <!-- Day 0 (Sunday/Day 1) -->
+    <FrameLayout
+        android:id="@+id/widget_month_day_0"
+        android:layout_width="0dp"
+        android:layout_height="32dp"
+        android:layout_weight="1"
+        android:padding="1dp"
+        android:clickable="true"
+        android:focusable="true">
+        <ImageView
+            android:id="@+id/widget_month_bg_0"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_gravity="center"
+            android:src="@drawable/widget_today_circle"
+            android:scaleType="fitCenter"
+            android:visibility="gone" />
+        <TextView
+            android:id="@+id/widget_month_text_0"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="1"
+            android:textSize="11sp"
+            android:textColor="@color/widget_title_text" />
+        <ImageView
+            android:id="@+id/widget_month_dot_0"
+            android:layout_width="4dp"
+            android:layout_height="4dp"
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_marginBottom="2dp"
+            android:src="@drawable/dot_indicator"
+            android:visibility="gone" />
+    </FrameLayout>
+
+    <!-- Day 1 -->
+    <FrameLayout
+        android:id="@+id/widget_month_day_1"
+        android:layout_width="0dp"
+        android:layout_height="32dp"
+        android:layout_weight="1"
+        android:padding="1dp"
+        android:clickable="true"
+        android:focusable="true">
+        <ImageView
+            android:id="@+id/widget_month_bg_1"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_gravity="center"
+            android:src="@drawable/widget_today_circle"
+            android:scaleType="fitCenter"
+            android:visibility="gone" />
+        <TextView
+            android:id="@+id/widget_month_text_1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="2"
+            android:textSize="11sp"
+            android:textColor="@color/widget_title_text" />
+        <ImageView
+            android:id="@+id/widget_month_dot_1"
+            android:layout_width="4dp"
+            android:layout_height="4dp"
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_marginBottom="2dp"
+            android:src="@drawable/dot_indicator"
+            android:visibility="gone" />
+    </FrameLayout>
+
+    <!-- Day 2 -->
+    <FrameLayout
+        android:id="@+id/widget_month_day_2"
+        android:layout_width="0dp"
+        android:layout_height="32dp"
+        android:layout_weight="1"
+        android:padding="1dp"
+        android:clickable="true"
+        android:focusable="true">
+        <ImageView
+            android:id="@+id/widget_month_bg_2"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_gravity="center"
+            android:src="@drawable/widget_today_circle"
+            android:scaleType="fitCenter"
+            android:visibility="gone" />
+        <TextView
+            android:id="@+id/widget_month_text_2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="3"
+            android:textSize="11sp"
+            android:textColor="@color/widget_title_text" />
+        <ImageView
+            android:id="@+id/widget_month_dot_2"
+            android:layout_width="4dp"
+            android:layout_height="4dp"
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_marginBottom="2dp"
+            android:src="@drawable/dot_indicator"
+            android:visibility="gone" />
+    </FrameLayout>
+
+    <!-- Day 3 -->
+    <FrameLayout
+        android:id="@+id/widget_month_day_3"
+        android:layout_width="0dp"
+        android:layout_height="32dp"
+        android:layout_weight="1"
+        android:padding="1dp"
+        android:clickable="true"
+        android:focusable="true">
+        <ImageView
+            android:id="@+id/widget_month_bg_3"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_gravity="center"
+            android:src="@drawable/widget_today_circle"
+            android:scaleType="fitCenter"
+            android:visibility="gone" />
+        <TextView
+            android:id="@+id/widget_month_text_3"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="4"
+            android:textSize="11sp"
+            android:textColor="@color/widget_title_text" />
+        <ImageView
+            android:id="@+id/widget_month_dot_3"
+            android:layout_width="4dp"
+            android:layout_height="4dp"
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_marginBottom="2dp"
+            android:src="@drawable/dot_indicator"
+            android:visibility="gone" />
+    </FrameLayout>
+
+    <!-- Day 4 -->
+    <FrameLayout
+        android:id="@+id/widget_month_day_4"
+        android:layout_width="0dp"
+        android:layout_height="32dp"
+        android:layout_weight="1"
+        android:padding="1dp"
+        android:clickable="true"
+        android:focusable="true">
+        <ImageView
+            android:id="@+id/widget_month_bg_4"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_gravity="center"
+            android:src="@drawable/widget_today_circle"
+            android:scaleType="fitCenter"
+            android:visibility="gone" />
+        <TextView
+            android:id="@+id/widget_month_text_4"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="5"
+            android:textSize="11sp"
+            android:textColor="@color/widget_title_text" />
+        <ImageView
+            android:id="@+id/widget_month_dot_4"
+            android:layout_width="4dp"
+            android:layout_height="4dp"
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_marginBottom="2dp"
+            android:src="@drawable/dot_indicator"
+            android:visibility="gone" />
+    </FrameLayout>
+
+    <!-- Day 5 -->
+    <FrameLayout
+        android:id="@+id/widget_month_day_5"
+        android:layout_width="0dp"
+        android:layout_height="32dp"
+        android:layout_weight="1"
+        android:padding="1dp"
+        android:clickable="true"
+        android:focusable="true">
+        <ImageView
+            android:id="@+id/widget_month_bg_5"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_gravity="center"
+            android:src="@drawable/widget_today_circle"
+            android:scaleType="fitCenter"
+            android:visibility="gone" />
+        <TextView
+            android:id="@+id/widget_month_text_5"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="6"
+            android:textSize="11sp"
+            android:textColor="@color/widget_title_text" />
+        <ImageView
+            android:id="@+id/widget_month_dot_5"
+            android:layout_width="4dp"
+            android:layout_height="4dp"
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_marginBottom="2dp"
+            android:src="@drawable/dot_indicator"
+            android:visibility="gone" />
+    </FrameLayout>
+
+    <!-- Day 6 -->
+    <FrameLayout
+        android:id="@+id/widget_month_day_6"
+        android:layout_width="0dp"
+        android:layout_height="32dp"
+        android:layout_weight="1"
+        android:padding="1dp"
+        android:clickable="true"
+        android:focusable="true">
+        <ImageView
+            android:id="@+id/widget_month_bg_6"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_gravity="center"
+            android:src="@drawable/widget_today_circle"
+            android:scaleType="fitCenter"
+            android:visibility="gone" />
+        <TextView
+            android:id="@+id/widget_month_text_6"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="7"
+            android:textSize="11sp"
+            android:textColor="@color/widget_title_text" />
+        <ImageView
+            android:id="@+id/widget_month_dot_6"
+            android:layout_width="4dp"
+            android:layout_height="4dp"
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_marginBottom="2dp"
+            android:src="@drawable/dot_indicator"
+            android:visibility="gone" />
+    </FrameLayout>
+
+</LinearLayout>

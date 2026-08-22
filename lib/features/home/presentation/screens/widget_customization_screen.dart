@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rocis_tasks/features/home/services/full_calendar_widget_service.dart';
+import 'package:rocis_tasks/core/services/widget_data_service.dart';
+import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
 import 'package:rocis_tasks/core/services/auth_service.dart';
 import 'package:rocis_tasks/shared/ui/ui_kit.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
@@ -66,11 +68,19 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
         await HomeWidget.saveWidgetData<int>(key, value);
       }
 
-      // Update widget dynamically
+      // Update widgets dynamically
       if (mounted) {
-        final service = Provider.of<FullCalendarWidgetService>(context, listen: false);
+        final fullCalendarService = Provider.of<FullCalendarWidgetService>(context, listen: false);
+        final widgetDataService = Provider.of<WidgetDataService>(context, listen: false);
+        final taskProvider = Provider.of<TaskProvider>(context, listen: false);
         final authService = Provider.of<AuthService>(context, listen: false);
-        await service.updateFullCalendarWidget(userId: authService.currentUser?.uid);
+
+        await fullCalendarService.updateFullCalendarWidget(userId: authService.currentUser?.uid);
+        await widgetDataService.updateAllWidgets(
+          taskProvider.tasks,
+          taskProvider.getCategoryById,
+          userId: authService.currentUser?.uid,
+        );
       }
     } catch (_) {}
   }
@@ -1026,7 +1036,7 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
         'subtitle': l10n.tasksWidgetSubtitle,
         'icon': Icons.checklist_rounded,
         'tag': '4x3',
-        'color': const Color(0xFFA855F7),
+        'color': const Color(0xFF0284C7),
         'previewIndex': 0,
       },
     ];

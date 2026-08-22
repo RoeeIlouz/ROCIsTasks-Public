@@ -34,15 +34,21 @@ class _CalendarScreenState extends State<CalendarScreen> {
   void initState() {
     super.initState();
     final provider = Provider.of<CalendarProvider>(context, listen: false);
-    _focusedDay = provider.selectedDate;
+    final selected = provider.selectedDate;
+    if (selected.isBefore(DateTime(2020, 1, 1)) || selected.isAfter(DateTime(2035, 12, 31))) {
+      _focusedDay = DateTime.now();
+    } else {
+      _focusedDay = selected;
+    }
 
     // Reload events when entering the screen to ensure we have the latest data
     // and to retry if permissions were previously denied
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      // Set user ID and email for schedule data fetching (must be done after build to avoid setState during build)
+      if (!mounted) return;
       final authService = Provider.of<AuthService>(context, listen: false);
       provider.setUserId(authService.currentUser?.uid);
       await provider.loadFilters();
+      if (!mounted) return;
       await provider.loadEvents();
     });
   }
@@ -83,11 +89,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
       if (category != null) return Color(category.colorValue);
       return colorService.taskColor;
     } else if (event is Event) {
-      final cal = calendarProvider.availableCalendars.firstWhere(
+      final matches = calendarProvider.availableCalendars.where(
         (c) => c.id == event.calendarId,
-        orElse: Calendar.new,
       );
-      return cal.color != null ? Color(cal.color!) : colorService.googleColor;
+      if (matches.isNotEmpty && matches.first.color != null) {
+        return Color(matches.first.color!);
+      }
+      return colorService.googleColor;
     }
     return colorService.taskColor;
   }
@@ -274,8 +282,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 ),
                 TableCalendar(
                   headerVisible: false,
-                  firstDay: DateTime(2020, 10, 16),
-                  lastDay: DateTime(2030, 3, 14),
+                  firstDay: DateTime(2020, 1, 1),
+                  lastDay: DateTime(2035, 12, 31),
                   focusedDay: _focusedDay,
                   calendarFormat: _calendarFormat,
                   daysOfWeekHeight: 24,

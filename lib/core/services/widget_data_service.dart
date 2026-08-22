@@ -187,7 +187,7 @@ class WidgetDataService {
     if (kIsWeb) return;
     try {
       final prefs = await SharedPreferences.getInstance();
-      final int offset = prefs.getInt('month_agenda_offset') ?? 0;
+      final int offset = (await HomeWidget.getWidgetData<int>('month_agenda_offset')) ?? 0;
       final now = DateTime.now();
       final targetMonth = DateTime(now.year, now.month + offset, 1);
 

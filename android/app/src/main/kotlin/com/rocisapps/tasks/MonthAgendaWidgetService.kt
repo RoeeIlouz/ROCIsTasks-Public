@@ -25,6 +25,24 @@ class MonthAgendaGridFactory(private val context: Context) : RemoteViewsService.
     private val days = ArrayList<JSONObject>()
     private var selectedDateStr = ""
     private var widgetTheme = "system"
+    private var highlightColor = Color.parseColor("#6366F1")
+
+    private data class DayCellIds(
+        val rootId: Int,
+        val bgId: Int,
+        val textId: Int,
+        val dotId: Int
+    )
+
+    private val cellIdsList = arrayOf(
+        DayCellIds(R.id.widget_month_day_0, R.id.widget_month_bg_0, R.id.widget_month_text_0, R.id.widget_month_dot_0),
+        DayCellIds(R.id.widget_month_day_1, R.id.widget_month_bg_1, R.id.widget_month_text_1, R.id.widget_month_dot_1),
+        DayCellIds(R.id.widget_month_day_2, R.id.widget_month_bg_2, R.id.widget_month_text_2, R.id.widget_month_dot_2),
+        DayCellIds(R.id.widget_month_day_3, R.id.widget_month_bg_3, R.id.widget_month_text_3, R.id.widget_month_dot_3),
+        DayCellIds(R.id.widget_month_day_4, R.id.widget_month_bg_4, R.id.widget_month_text_4, R.id.widget_month_dot_4),
+        DayCellIds(R.id.widget_month_day_5, R.id.widget_month_bg_5, R.id.widget_month_text_5, R.id.widget_month_dot_5),
+        DayCellIds(R.id.widget_month_day_6, R.id.widget_month_bg_6, R.id.widget_month_text_6, R.id.widget_month_dot_6),
+    )
 
     override fun onCreate() {
         onDataSetChanged()
@@ -35,18 +53,106 @@ class MonthAgendaGridFactory(private val context: Context) : RemoteViewsService.
         try {
             val widgetData = HomeWidgetPlugin.getData(context)
             widgetTheme = widgetData.getString("full_calendar_theme", "system") ?: "system"
+            val colorHex = widgetData.getString("full_calendar_highlight_color", "#6366F1") ?: "#6366F1"
+            highlightColor = try {
+                Color.parseColor(colorHex)
+            } catch (_: Exception) {
+                Color.parseColor("#6366F1")
+            }
+
             selectedDateStr = widgetData.getString(MonthAgendaWidgetProvider.PREF_SELECTED_DATE, "") ?: ""
             if (selectedDateStr.isEmpty()) {
                 selectedDateStr = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Calendar.getInstance().time)
             }
 
-            val rawGrid = widgetData.getString("month_agenda_grid_data", "[]") ?: "[]"
-            val jsonArray = JSONArray(rawGrid)
-            for (i in 0 until jsonArray.length()) {
-                val obj = jsonArray.optJSONObject(i) ?: continue
-                if (!obj.optBoolean("isWeekNumber", false)) {
-                    days.add(obj)
+            val offset = widgetData.getInt(MonthAgendaWidgetProvider.PREF_MONTH_OFFSET, 0)
+            val cal = Calendar.getInstance()
+            val todayYear = cal.get(Calendar.YEAR)
+            val todayMonth = cal.get(Calendar.MONTH)
+            val todayDay = cal.get(Calendar.DAY_OF_MONTH)
+            val todayStr = String.format(Locale.US, "%04d-%02d-%02d", todayYear, todayMonth + 1, todayDay)
+
+            if (offset != 0) {
+                cal.add(Calendar.MONTH, offset)
+            }
+            val targetYear = cal.get(Calendar.YEAR)
+            val targetMonth = cal.get(Calendar.MONTH)
+
+            // Set to 1st of the target month
+            val firstDayCal = Calendar.getInstance().apply {
+                set(Calendar.YEAR, targetYear)
+                set(Calendar.MONTH, targetMonth)
+                set(Calendar.DAY_OF_MONTH, 1)
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }
+
+            val startOfWeek = widgetData.getInt("full_calendar_start_of_week", 7) // 7 = Sunday, 1 = Monday
+            val dayOfWeek = firstDayCal.get(Calendar.DAY_OF_WEEK) // 1 = Sun, 2 = Mon ...
+
+            val diff = if (startOfWeek == 1) {
+                (dayOfWeek - Calendar.MONDAY + 7) % 7
+            } else {
+                (dayOfWeek - Calendar.SUNDAY + 7) % 7
+            }
+
+            val gridCal = (firstDayCal.clone() as Calendar).apply {
+                add(Calendar.DAY_OF_MONTH, -diff)
+            }
+
+            // Gather event dates from agenda and grid data
+            val eventDates = HashSet<String>()
+            val rawAgenda = widgetData.getString("today_agenda_data", "[]") ?: "[]"
+            try {
+                val agendaArray = JSONArray(rawAgenda)
+                for (i in 0 until agendaArray.length()) {
+                    val item = agendaArray.optJSONObject(i) ?: continue
+                    val d = item.optString("date", "")
+                    if (d.length >= 10) {
+                        eventDates.add(d.substring(0, 10))
+                    }
+                    val dateOnly = item.optString("dateOnly", "")
+                    if (dateOnly.length >= 10) {
+                        eventDates.add(dateOnly.substring(0, 10))
+                    }
                 }
+            } catch (_: Exception) {}
+
+            try {
+                val rawGrid = widgetData.getString("month_agenda_grid_data", "[]") ?: "[]"
+                val jsonArray = JSONArray(rawGrid)
+                for (i in 0 until jsonArray.length()) {
+                    val obj = jsonArray.optJSONObject(i) ?: continue
+                    if (obj.optBoolean("hasEvents", false)) {
+                        val d = obj.optString("date", "")
+                        if (d.length >= 10) {
+                            eventDates.add(d.substring(0, 10))
+                        }
+                    }
+                }
+            } catch (_: Exception) {}
+
+            // Generate exactly 42 days (6 weeks x 7 days)
+            for (i in 0 until 42) {
+                val year = gridCal.get(Calendar.YEAR)
+                val month = gridCal.get(Calendar.MONTH)
+                val day = gridCal.get(Calendar.DAY_OF_MONTH)
+                val dateStr = String.format(Locale.US, "%04d-%02d-%02d", year, month + 1, day)
+                val isCurrentMonth = (month == targetMonth)
+                val isToday = (dateStr == todayStr)
+                val hasEvents = eventDates.contains(dateStr)
+
+                val dayObj = JSONObject().apply {
+                    put("day", day)
+                    put("date", dateStr)
+                    put("isCurrentMonth", isCurrentMonth)
+                    put("isToday", isToday)
+                    put("hasEvents", hasEvents)
+                }
+                days.add(dayObj)
+                gridCal.add(Calendar.DAY_OF_MONTH, 1)
             }
         } catch (_: Exception) {
             days.clear()
@@ -61,18 +167,18 @@ class MonthAgendaGridFactory(private val context: Context) : RemoteViewsService.
 
     override fun getViewAt(position: Int): RemoteViews {
         val rowViews = RemoteViews(context.packageName, R.layout.widget_month_agenda_row)
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
-            rowViews.removeAllViews(R.id.widget_month_agenda_row_root)
-        }
-
         val startIndex = position * 7
+
         for (i in 0 until 7) {
+            val cellIds = cellIdsList[i]
             val cellIndex = startIndex + i
-            if (cellIndex >= days.size) break
+            if (cellIndex >= days.size) {
+                rowViews.setViewVisibility(cellIds.rootId, View.INVISIBLE)
+                continue
+            }
+            rowViews.setViewVisibility(cellIds.rootId, View.VISIBLE)
 
             val day = days[cellIndex]
-            val cellViews = RemoteViews(context.packageName, R.layout.widget_month_agenda_day_item)
-
             val dayNum = day.optInt("day", 1)
             val dateStr = day.optString("date", "")
             val isCurrentMonth = day.optBoolean("isCurrentMonth", true)
@@ -80,30 +186,36 @@ class MonthAgendaGridFactory(private val context: Context) : RemoteViewsService.
             val hasEvents = day.optBoolean("hasEvents", false)
             val isSelected = dateStr.isNotEmpty() && dateStr == selectedDateStr
 
-            cellViews.setTextViewText(R.id.widget_month_day_text, dayNum.toString())
+            rowViews.setTextViewText(cellIds.textId, dayNum.toString())
 
             // Text colors
             val textColor = when {
                 !isCurrentMonth -> Color.parseColor("#50888888")
-                isSelected || isToday -> Color.parseColor("#6366F1")
+                isSelected || isToday -> highlightColor
                 else -> when (widgetTheme) {
                     "light" -> Color.parseColor("#0F172A")
                     else -> Color.parseColor("#FFFFFF")
                 }
             }
-            cellViews.setTextColor(R.id.widget_month_day_text, textColor)
+            rowViews.setTextColor(cellIds.textId, textColor)
 
             if (isSelected) {
-                cellViews.setViewVisibility(R.id.widget_month_day_bg, View.VISIBLE)
-                cellViews.setInt(R.id.widget_month_day_bg, "setImageAlpha", 0x33)
+                rowViews.setViewVisibility(cellIds.bgId, View.VISIBLE)
+                rowViews.setInt(cellIds.bgId, "setColorFilter", highlightColor)
+                rowViews.setInt(cellIds.bgId, "setImageAlpha", 0x44)
+            } else if (isToday) {
+                rowViews.setViewVisibility(cellIds.bgId, View.VISIBLE)
+                rowViews.setInt(cellIds.bgId, "setColorFilter", highlightColor)
+                rowViews.setInt(cellIds.bgId, "setImageAlpha", 0x22)
             } else {
-                cellViews.setViewVisibility(R.id.widget_month_day_bg, View.GONE)
+                rowViews.setViewVisibility(cellIds.bgId, View.GONE)
             }
 
             if (hasEvents) {
-                cellViews.setViewVisibility(R.id.widget_month_day_dot, View.VISIBLE)
+                rowViews.setViewVisibility(cellIds.dotId, View.VISIBLE)
+                rowViews.setInt(cellIds.dotId, "setColorFilter", highlightColor)
             } else {
-                cellViews.setViewVisibility(R.id.widget_month_day_dot, View.GONE)
+                rowViews.setViewVisibility(cellIds.dotId, View.GONE)
             }
 
             // Fill-in broadcast intent to select this day
@@ -111,10 +223,8 @@ class MonthAgendaGridFactory(private val context: Context) : RemoteViewsService.
                 val fillIntent = Intent().apply {
                     putExtra("date", dateStr)
                 }
-                cellViews.setOnClickFillInIntent(R.id.widget_month_day_root, fillIntent)
+                rowViews.setOnClickFillInIntent(cellIds.rootId, fillIntent)
             }
-
-            rowViews.addView(R.id.widget_month_agenda_row_root, cellViews)
         }
 
         return rowViews
@@ -136,6 +246,7 @@ class MonthAgendaWidgetService : RemoteViewsService() {
 class MonthAgendaListFactory(private val context: Context) : RemoteViewsService.RemoteViewsFactory {
     private val items = ArrayList<JSONObject>()
     private var widgetTheme = "system"
+    private var highlightColor = Color.parseColor("#6366F1")
 
     override fun onCreate() {
         onDataSetChanged()
@@ -146,6 +257,13 @@ class MonthAgendaListFactory(private val context: Context) : RemoteViewsService.
         try {
             val widgetData = HomeWidgetPlugin.getData(context)
             widgetTheme = widgetData.getString("full_calendar_theme", "system") ?: "system"
+            val colorHex = widgetData.getString("full_calendar_highlight_color", "#6366F1") ?: "#6366F1"
+            highlightColor = try {
+                Color.parseColor(colorHex)
+            } catch (_: Exception) {
+                Color.parseColor("#6366F1")
+            }
+
             var selectedDate = widgetData.getString(MonthAgendaWidgetProvider.PREF_SELECTED_DATE, "") ?: ""
             if (selectedDate.isEmpty()) {
                 selectedDate = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Calendar.getInstance().time)
@@ -157,8 +275,9 @@ class MonthAgendaListFactory(private val context: Context) : RemoteViewsService.
             for (i in 0 until jsonArray.length()) {
                 val item = jsonArray.optJSONObject(i) ?: continue
                 val itemDate = item.optString("date", "")
+                val itemDateOnly = item.optString("dateOnly", "")
                 val itemDateDisplay = item.optString("dateDisplay", "")
-                if (itemDateDisplay == selectedDate || itemDate.startsWith(selectedDate)) {
+                if (itemDateOnly == selectedDate || itemDate.startsWith(selectedDate) || itemDateDisplay == selectedDate) {
                     items.add(item)
                 }
             }
@@ -222,10 +341,12 @@ class MonthAgendaListFactory(private val context: Context) : RemoteViewsService.
                     views.setInt(R.id.widget_agenda_color_strip, "setBackgroundColor", color)
                     views.setViewVisibility(R.id.widget_agenda_color_strip, View.VISIBLE)
                 } catch (_: Exception) {
-                    views.setViewVisibility(R.id.widget_agenda_color_strip, View.INVISIBLE)
+                    views.setInt(R.id.widget_agenda_color_strip, "setBackgroundColor", highlightColor)
+                    views.setViewVisibility(R.id.widget_agenda_color_strip, View.VISIBLE)
                 }
             } else {
-                views.setViewVisibility(R.id.widget_agenda_color_strip, View.INVISIBLE)
+                views.setInt(R.id.widget_agenda_color_strip, "setBackgroundColor", highlightColor)
+                views.setViewVisibility(R.id.widget_agenda_color_strip, View.VISIBLE)
             }
 
             if (type == "task") {
@@ -263,6 +384,7 @@ class MonthAgendaListFactory(private val context: Context) : RemoteViewsService.
             } else {
                 views.setViewVisibility(R.id.widget_agenda_check, View.GONE)
                 views.setViewVisibility(R.id.widget_agenda_event_icon, View.VISIBLE)
+                views.setInt(R.id.widget_agenda_event_icon, "setColorFilter", highlightColor)
                 views.setViewVisibility(R.id.widget_agenda_badge, View.GONE)
 
                 val rowIntent = Intent().apply {

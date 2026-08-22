@@ -54,6 +54,13 @@ class TodayAgendaWidgetProvider : HomeWidgetProvider() {
                 }
                 views.setInt(R.id.widget_today_root, "setBackgroundResource", rootBgRes)
 
+                val highlightColorHex = widgetData.getString("full_calendar_highlight_color", "#6366F1") ?: "#6366F1"
+                val highlightColor = try {
+                    android.graphics.Color.parseColor(highlightColorHex)
+                } catch (_: Exception) {
+                    android.graphics.Color.parseColor("#6366F1")
+                }
+
                 val textColor = when (theme) {
                     "light" -> android.graphics.Color.parseColor("#0F172A")
                     else -> android.graphics.Color.parseColor("#FFFFFF")
@@ -67,6 +74,8 @@ class TodayAgendaWidgetProvider : HomeWidgetProvider() {
                 views.setTextColor(R.id.widget_today_date_subtitle, secondaryColor)
                 views.setTextColor(R.id.widget_today_prev, textColor)
                 views.setTextColor(R.id.widget_today_next, textColor)
+                views.setTextColor(R.id.widget_today_jump_btn, highlightColor)
+                views.setTextColor(R.id.widget_today_add_btn, highlightColor)
 
                 // 2. Calculate and Render Date Headers
                 val offset = widgetData.getInt(PREF_TODAY_OFFSET, 0)
@@ -142,7 +151,7 @@ class TodayAgendaWidgetProvider : HomeWidgetProvider() {
                 )
                 views.setOnClickPendingIntent(R.id.widget_today_add_btn, addTaskPendingIntent)
 
-                // 5. ListView Adapter Setup (always bound so launcher never encounters uninitialized adapter)
+                // 5. RemoteViewsService for ListView
                 val serviceIntent = Intent(context, TodayAgendaWidgetService::class.java).apply {
                     putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
                     data = Uri.parse("widget://rocis/today_agenda/$appWidgetId/$offset")
@@ -150,19 +159,20 @@ class TodayAgendaWidgetProvider : HomeWidgetProvider() {
                 views.setRemoteAdapter(R.id.widget_today_list, serviceIntent)
                 views.setEmptyView(R.id.widget_today_list, R.id.widget_today_empty)
 
-                // 6. Item Click Template (handles both item tap and task completion)
-                val appIntent = Intent(context, MainActivity::class.java).apply {
+                // 6. Template PendingIntent for list items
+                val itemAppIntent = Intent(context, MainActivity::class.java).apply {
                     action = Intent.ACTION_VIEW
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
                 }
                 val itemPendingIntent = PendingIntent.getActivity(
                     context,
-                    600 + appWidgetId,
-                    appIntent,
+                    550 + appWidgetId,
+                    itemAppIntent,
                     PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
                 )
                 views.setPendingIntentTemplate(R.id.widget_today_list, itemPendingIntent)
 
+                // Apply limit overlay
                 WidgetLimitHelper.setupProOverlay(context, views, isAllowed)
 
                 appWidgetManager.updateAppWidget(appWidgetId, views)
@@ -185,21 +195,24 @@ class TodayAgendaWidgetProvider : HomeWidgetProvider() {
         if (action == ACTION_PREV_DAY || action == ACTION_NEXT_DAY || action == ACTION_JUMP_TODAY) {
             val widgetData = HomeWidgetPlugin.getData(context)
             val currentOffset = widgetData.getInt(PREF_TODAY_OFFSET, 0)
-            val newOffset = when (action) {
-                ACTION_PREV_DAY -> currentOffset - 1
-                ACTION_NEXT_DAY -> currentOffset + 1
-                ACTION_JUMP_TODAY -> 0
-                else -> currentOffset
+
+            when (action) {
+                ACTION_PREV_DAY -> {
+                    widgetData.edit().putInt(PREF_TODAY_OFFSET, currentOffset - 1).apply()
+                }
+                ACTION_NEXT_DAY -> {
+                    widgetData.edit().putInt(PREF_TODAY_OFFSET, currentOffset + 1).apply()
+                }
+                ACTION_JUMP_TODAY -> {
+                    widgetData.edit().putInt(PREF_TODAY_OFFSET, 0).apply()
+                }
             }
 
-            widgetData.edit().putInt(PREF_TODAY_OFFSET, newOffset).apply()
-
-            // Trigger Dart background synchronization
+            // Sync with Dart background handler
             val uriStr = when (action) {
                 ACTION_PREV_DAY -> "rocistasks://today_agenda_prev"
                 ACTION_NEXT_DAY -> "rocistasks://today_agenda_next"
-                ACTION_JUMP_TODAY -> "rocistasks://today_agenda_today"
-                else -> "rocistasks://today_agenda_refresh"
+                else -> "rocistasks://today_agenda_today"
             }
             try {
                 val backgroundIntent = HomeWidgetBackgroundIntent.getBroadcast(
@@ -208,7 +221,6 @@ class TodayAgendaWidgetProvider : HomeWidgetProvider() {
                 backgroundIntent.send()
             } catch (_: Exception) {}
 
-            // Re-render widgets immediately
             val appWidgetManager = AppWidgetManager.getInstance(context)
             val thisWidget = ComponentName(context, TodayAgendaWidgetProvider::class.java)
             val ids = appWidgetManager.getAppWidgetIds(thisWidget)

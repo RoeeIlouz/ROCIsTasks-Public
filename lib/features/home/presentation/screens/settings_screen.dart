@@ -78,10 +78,20 @@ class SettingsScreen extends StatelessWidget {
                     ? CachedNetworkImageProvider(user.photoURL!)
                     : null,
                 child: user.photoURL == null
-                    ? Text(user.displayName?[0].toUpperCase() ?? 'U')
+                    ? Text(
+                        (user.displayName != null && user.displayName!.isNotEmpty)
+                            ? user.displayName![0].toUpperCase()
+                            : (user.email != null && user.email!.isNotEmpty
+                                ? user.email![0].toUpperCase()
+                                : 'U'),
+                      )
                     : null,
               ),
-              title: Text(user.displayName ?? 'User'),
+              title: Text(
+                (user.displayName != null && user.displayName!.isNotEmpty)
+                    ? user.displayName!
+                    : 'User',
+              ),
               subtitle: Text(user.email ?? ''),
             ),
             ListTile(
@@ -174,7 +184,7 @@ class SettingsScreen extends StatelessWidget {
             leading: _buildLeadingIcon(
               context,
               Icons.brightness_medium,
-              Colors.purple,
+              theme.colorScheme.primary,
             ),
             title: Text(l10n.theme),
             subtitle: Text(
@@ -707,7 +717,7 @@ class SettingsScreen extends StatelessWidget {
                 secondary: _buildLeadingIcon(
                   context,
                   Icons.notifications_active_outlined,
-                  Colors.purple,
+                  theme.colorScheme.primary,
                 ),
                 title: Text(l10n.advancedReminders),
                 subtitle: Text(l10n.advancedRemindersSubtitle),

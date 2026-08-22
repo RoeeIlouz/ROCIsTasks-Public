@@ -508,7 +508,14 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                   CircleAvatar(
                     radius: 18,
                     backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
-                    child: Text(user.displayName?[0].toUpperCase() ?? 'U', style: TextStyle(color: theme.colorScheme.primary, fontWeight: FontWeight.bold)),
+                    child: Text(
+                      (user.displayName != null && user.displayName!.isNotEmpty)
+                          ? user.displayName![0].toUpperCase()
+                          : (user.email != null && user.email!.isNotEmpty
+                              ? user.email![0].toUpperCase()
+                              : 'U'),
+                      style: TextStyle(color: theme.colorScheme.primary, fontWeight: FontWeight.bold),
+                    ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
@@ -516,7 +523,9 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          user.displayName ?? 'User',
+                          (user.displayName != null && user.displayName!.isNotEmpty)
+                              ? user.displayName!
+                              : 'User',
                           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,

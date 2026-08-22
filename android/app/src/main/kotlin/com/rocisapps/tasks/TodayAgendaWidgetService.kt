@@ -3,7 +3,6 @@ package com.rocisapps.tasks
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
-import android.graphics.Paint
 import android.net.Uri
 import android.view.View
 import android.widget.RemoteViews
@@ -24,6 +23,7 @@ class TodayAgendaWidgetService : RemoteViewsService() {
 class TodayAgendaWidgetFactory(private val context: Context) : RemoteViewsService.RemoteViewsFactory {
     private val items = ArrayList<JSONObject>()
     private var widgetTheme = "system"
+    private var highlightColor = Color.parseColor("#6366F1")
 
     override fun onCreate() {
         onDataSetChanged()
@@ -34,6 +34,13 @@ class TodayAgendaWidgetFactory(private val context: Context) : RemoteViewsServic
         try {
             val widgetData = HomeWidgetPlugin.getData(context)
             widgetTheme = widgetData.getString("full_calendar_theme", "system") ?: "system"
+            val colorHex = widgetData.getString("full_calendar_highlight_color", "#6366F1") ?: "#6366F1"
+            highlightColor = try {
+                Color.parseColor(colorHex)
+            } catch (_: Exception) {
+                Color.parseColor("#6366F1")
+            }
+
             val offset = widgetData.getInt(TodayAgendaWidgetProvider.PREF_TODAY_OFFSET, 0)
 
             val cal = Calendar.getInstance()
@@ -49,8 +56,9 @@ class TodayAgendaWidgetFactory(private val context: Context) : RemoteViewsServic
             for (i in 0 until jsonArray.length()) {
                 val item = jsonArray.optJSONObject(i) ?: continue
                 val itemDate = item.optString("date", "")
+                val itemDateOnly = item.optString("dateOnly", "")
                 val itemDateDisplay = item.optString("dateDisplay", "")
-                if (itemDateDisplay == targetDateStr || itemDate.startsWith(targetDateStr)) {
+                if (itemDateOnly == targetDateStr || itemDate.startsWith(targetDateStr) || itemDateDisplay == targetDateStr) {
                     dayItems.add(item)
                 }
             }
@@ -118,10 +126,12 @@ class TodayAgendaWidgetFactory(private val context: Context) : RemoteViewsServic
                     views.setInt(R.id.widget_agenda_color_strip, "setBackgroundColor", color)
                     views.setViewVisibility(R.id.widget_agenda_color_strip, View.VISIBLE)
                 } catch (_: Exception) {
-                    views.setViewVisibility(R.id.widget_agenda_color_strip, View.INVISIBLE)
+                    views.setInt(R.id.widget_agenda_color_strip, "setBackgroundColor", highlightColor)
+                    views.setViewVisibility(R.id.widget_agenda_color_strip, View.VISIBLE)
                 }
             } else {
-                views.setViewVisibility(R.id.widget_agenda_color_strip, View.INVISIBLE)
+                views.setInt(R.id.widget_agenda_color_strip, "setBackgroundColor", highlightColor)
+                views.setViewVisibility(R.id.widget_agenda_color_strip, View.VISIBLE)
             }
 
             // Task vs Event handling
@@ -167,6 +177,7 @@ class TodayAgendaWidgetFactory(private val context: Context) : RemoteViewsServic
                 // Calendar Event
                 views.setViewVisibility(R.id.widget_agenda_check, View.GONE)
                 views.setViewVisibility(R.id.widget_agenda_event_icon, View.VISIBLE)
+                views.setInt(R.id.widget_agenda_event_icon, "setColorFilter", highlightColor)
                 views.setViewVisibility(R.id.widget_agenda_badge, View.GONE)
 
                 // Row click opens calendar in app
