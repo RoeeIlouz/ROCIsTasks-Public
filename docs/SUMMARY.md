@@ -2,6 +2,16 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## CI/CD FirebaseConfig Test Failure Resolution - 2026-08-22
+
+#### Issue / Enhancement
+* CI build step `Run flutter test` failed on `test/core/config/firebase_config_test.dart`: `FirebaseConfig should use default Firebase options when no .env file (failed)`.
+* Root cause: CI workflow step `Setup configuration templates` copies `lib/firebase_options.dart.example` (containing placeholder `'YOUR_PROJECT_ID'`) over `lib/firebase_options.dart`. The test previously asserted a hardcoded `'rocis-todo'` string instead of verifying fallback against `DefaultFirebaseOptions.currentPlatform.projectId`.
+
+#### Solutions & Verification
+* Updated [test/core/config/firebase_config_test.dart](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/test/core/config/firebase_config_test.dart) to compare `options.projectId` dynamically against `default_options.DefaultFirebaseOptions.currentPlatform.projectId`.
+* Verified with `flutter test` (all 271 tests passing) and `flutter analyze` (0 issues).
+
 ## Android Free 1-Widget Limit & Side-by-Side Calendar Integration - 2026-08-22
 
 #### Issue / Enhancement

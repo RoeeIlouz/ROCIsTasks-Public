@@ -435,9 +435,7 @@ class _MyAppState extends State<MyApp> {
         return MaterialApp.router(
           title: "ROCI's Tasks",
           debugShowCheckedModeBanner: false,
-          theme: AppTheme.createLightTheme(
-            lightScheme,
-          ),
+          theme: AppTheme.createLightTheme(lightScheme),
           darkTheme: AppTheme.createDarkTheme(
             darkScheme,
             isAmoled: themeService.useAmoledTheme,

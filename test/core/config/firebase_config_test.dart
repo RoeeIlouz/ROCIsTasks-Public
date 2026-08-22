@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:rocis_tasks/core/config/firebase_config.dart';
+import 'package:rocis_tasks/firebase_options.dart' as default_options;
 
 void main() {
   group('FirebaseConfig', () {
@@ -14,7 +15,10 @@ void main() {
       final options = FirebaseConfig.currentPlatform;
 
       // Should use default configuration
-      expect(options.projectId, 'rocis-todo');
+      expect(
+        options.projectId,
+        default_options.DefaultFirebaseOptions.currentPlatform.projectId,
+      );
     });
 
     test('should use environment config when valid .env is loaded', () {
