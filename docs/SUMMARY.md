@@ -2,19 +2,21 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
-## Android Home Screen Widgets Inflation & Platform Channel Fix - 2026-08-22
+## Android RemoteViews Font Inflation & ListTile Material Fix - 2026-08-22
 
 #### Issue Encountered
-* Flutter debug console threw `StandardMethodCodec.decodeEnvelope` / `MethodChannel._invokeMethod` at `WidgetDataService.updateScheduleWidget` (line 552), causing `updateAllWidgets` to fail.
+* Android home screen widgets (Quick Actions, Up Next, Month Agenda task list, Today Agenda list) showed "Couldn't add widget." or failed to render tasks.
+* Flutter framework threw `ListTile background color or ink splashes may be invisible` warning when `ListTile` was wrapped in `GlassContainer`.
 
 #### Root Cause Analysis
-1. `WidgetDataService.updateScheduleWidget` and `updateCalendarListWidget` attempted to invoke `HomeWidget.updateWidget(name: 'ScheduleWidgetProvider')` and `HomeWidget.updateWidget(name: 'CalendarWidgetProvider')`. Neither receiver exists in `AndroidManifest.xml` or Kotlin codebase, throwing `ClassNotFoundException` across the Flutter Platform MethodChannel.
-2. In `updateAllWidgets`, `Future.wait` failed whenever this channel call failed, preventing proper widget background synchronization.
+1. `widget_up_next_layout.xml`, `widget_quick_action_layout.xml`, `widget_today_agenda_layout.xml`, `widget_today_agenda_item.xml`, `widget_timeline_header_item.xml`, `widget_timeline_event_item.xml`, `widget_timeline_agenda_layout.xml`, and `widget_month_agenda_layout.xml` used `android:fontFamily="sans-serif-medium"`. On Android RemoteViews layouts, `sans-serif-medium` causes `android.view.InflateException` in launcher processes (e.g. Pixel Launcher, One UI), causing "Couldn't add widget." inside `ListView` collections or complete widget render failure.
+2. `ListTile` instances in `categories_screen.dart` and `trash_screen.dart` were inside `GlassContainer` (which renders background `BoxDecoration`) without an immediate `Material` ancestor.
 
 #### Solutions & Verification
-* Fixed invalid provider names to active Android receivers (`TimelineAgendaWidgetProvider` and `FullCalendarWidgetProvider`).
-* Wrapped all `HomeWidget.updateWidget` calls with robust try-catch blocks and debug loggers across `WidgetDataService` and `MonthWidgetService`.
+* Replaced all occurrences of `android:fontFamily="sans-serif-medium"` with `android:fontFamily="sans-serif"` and explicit `android:textStyle="bold"` where appropriate.
+* Wrapped `ListTile` widgets in `Material(type: MaterialType.transparency)` in `categories_screen.dart` and `trash_screen.dart`.
 * Verified with `flutter analyze` (0 issues) and `flutter test` (271/271 passing).
+
 
 
 

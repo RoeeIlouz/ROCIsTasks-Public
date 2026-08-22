@@ -83,61 +83,64 @@ class CategoriesScreen extends StatelessWidget {
                 child: Semantics(
                   label: 'Category: ${category.name}',
                   hint: 'Double tap to edit category',
-                  child: ListTile(
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 4,
-                    ),
-                    onTap: () =>
-                        _showCategorySheet(context, category: category),
-                    leading: Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: Color(
-                          category.colorValue,
-                        ).withValues(alpha: 0.1),
-                        shape: BoxShape.circle,
+                  child: Material(
+                    type: MaterialType.transparency,
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 4,
                       ),
-                      child: Icon(
-                        IconUtils.getIconData(category.iconCode),
-                        color: Color(category.colorValue),
-                        size: 24,
+                      onTap: () =>
+                          _showCategorySheet(context, category: category),
+                      leading: Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Color(
+                            category.colorValue,
+                          ).withValues(alpha: 0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          IconUtils.getIconData(category.iconCode),
+                          color: Color(category.colorValue),
+                          size: 24,
+                        ),
                       ),
-                    ),
-                    title: Text(
-                      category.name,
-                      style: GoogleFonts.outfit(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                      title: Text(
+                        category.name,
+                        style: GoogleFonts.outfit(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
                       ),
-                    ),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (category.isPrivate)
-                          Icon(
-                            Icons.lock_rounded,
-                            color: theme.colorScheme.primary.withValues(
-                              alpha: 0.7,
-                            ),
-                            size: 18,
-                          ),
-                        Semantics(
-                          label: 'Delete category',
-                          button: true,
-                          child: IconButton(
-                            icon: Icon(
-                              Icons.delete_outline_rounded,
-                              color: theme.colorScheme.error.withValues(
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (category.isPrivate)
+                            Icon(
+                              Icons.lock_rounded,
+                              color: theme.colorScheme.primary.withValues(
                                 alpha: 0.7,
                               ),
+                              size: 18,
                             ),
-                            onPressed: () {
-                              provider.deleteCategory(category.id);
-                            },
+                          Semantics(
+                            label: 'Delete category',
+                            button: true,
+                            child: IconButton(
+                              icon: Icon(
+                                Icons.delete_outline_rounded,
+                                color: theme.colorScheme.error.withValues(
+                                  alpha: 0.7,
+                                ),
+                              ),
+                              onPressed: () {
+                                provider.deleteCategory(category.id);
+                              },
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
