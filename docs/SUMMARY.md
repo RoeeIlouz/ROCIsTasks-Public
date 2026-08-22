@@ -7,15 +7,18 @@ This file summarizes errors encountered and changes made to the codebase, ensuri
 #### Issue Encountered
 * 5 new Android homescreen widgets (Quick Actions, Up Next, Day Agenda, Month & Agenda, Schedule Timeline) either did not render tasks or failed to load.
 * Month & Agenda widget right panel displayed "Couldn't add widget." when loading task collections.
+* Android logcat threw `Resources$NotFoundException` & `IllegalArgumentException: a needs to be followed by a multiple of 7 floats` during widget host inflation.
 
 #### Root Cause Analysis
-1. **`WidgetLimitHelper` Multi-Widget Blocking**: When `isPremium` is false (in dev/debug or free mode), adding a 2nd/3rd widget caused `isWidgetAllowed` to return false for all new widgets, skipping `notifyAppWidgetViewDataChanged` and covering widgets with the Pro overlay.
-2. **Invalid RemoteViews Methods**: `TodayAgendaWidgetService`, `MonthAgendaWidgetService`, and `TimelineAgendaWidgetService` called `views.setInt(..., "setColorFilter", color)` on `ImageView` instances, which throws `RemoteViews.ActionException` at runtime because `setColorFilter(int)` on `ImageView` is not a valid RemoteView method, crashing item inflation.
-3. **Timezone & Date String Mismatch**: `WidgetDataService.dart` passed ISO 8601 UTC timestamps under `date`, while Kotlin factories checked `itemDate.startsWith(targetDateStr)` (e.g. `2026-08-21T21:00...` vs `2026-08-22`), causing date-matching to fail for local time zones.
-4. **Undated Task Filtering**: `WidgetDataService.dart` previously excluded all tasks with `dueDate == null`, preventing undated tasks from showing in Day/Month Agenda.
-5. **Collection Update Timing**: RemoteViews notifications were called synchronously without postDelayed handler, occasionally reading stale cache before SharedPreferences flushed to disk.
+1. **Corrupt VectorDrawable Path (`ic_calendar_event.xml`)**: `ic_calendar_event.xml` contained an invalid SVG arc instruction (`a2,0 0,0 2,2`) with only 6 floats instead of 7. Android's native `VectorDrawable` / `PathParser` threw `IllegalArgumentException` on inflation, crashing every widget layout and list item referencing `@drawable/ic_calendar_event`.
+2. **`WidgetLimitHelper` Multi-Widget Blocking**: When `isPremium` is false (in dev/debug or free mode), adding a 2nd/3rd widget caused `isWidgetAllowed` to return false for all new widgets, skipping `notifyAppWidgetViewDataChanged` and covering widgets with the Pro overlay.
+3. **Invalid RemoteViews Methods**: `TodayAgendaWidgetService`, `MonthAgendaWidgetService`, and `TimelineAgendaWidgetService` called `views.setInt(..., "setColorFilter", color)` on `ImageView` instances, which throws `RemoteViews.ActionException` at runtime because `setColorFilter(int)` on `ImageView` is not a valid RemoteView method, crashing item inflation.
+4. **Timezone & Date String Mismatch**: `WidgetDataService.dart` passed ISO 8601 UTC timestamps under `date`, while Kotlin factories checked `itemDate.startsWith(targetDateStr)` (e.g. `2026-08-21T21:00...` vs `2026-08-22`), causing date-matching to fail for local time zones.
+5. **Undated Task Filtering**: `WidgetDataService.dart` previously excluded all tasks with `dueDate == null`, preventing undated tasks from showing in Day/Month Agenda.
+6. **Collection Update Timing**: RemoteViews notifications were called synchronously without postDelayed handler, occasionally reading stale cache before SharedPreferences flushed to disk.
 
 #### Solutions & Verification
+* Fixed `ic_calendar_event.xml` with standard Material Design vector path coordinates.
 * Updated `WidgetLimitHelper.isWidgetAllowed` to allow debug/dev builds and ensure adapter views are always initialized.
 * Removed invalid `setColorFilter` RemoteViews calls and aligned styling with `TaskWidgetService.kt`.
 * Updated date matching in Kotlin factories to match on both `dateDisplay` (`yyyy-MM-dd`) and `date`.
