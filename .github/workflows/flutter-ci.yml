@@ -90,17 +90,17 @@ jobs:
       - name: Run tests
         run: flutter test
 
-      - name: Build App Bundle (Release)
+      - name: Build Android APK (Release)
         shell: bash
         run: |
           set -euo pipefail
           ( while true; do echo "Build still running..."; sleep 240; done ) &
           KEEPALIVE_PID=$!
           trap 'kill $KEEPALIVE_PID' EXIT
-          flutter build appbundle --release --dart-define=REVENUECAT_API_KEY_ANDROID="$REVENUECAT_API_KEY_ANDROID"
+          flutter build apk --release --dart-define=REVENUECAT_API_KEY_ANDROID="$REVENUECAT_API_KEY_ANDROID"
 
-      - name: Upload Android artifact (AAB)
+      - name: Upload Android APK
         uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
         with:
-          name: app-release-aab
-          path: build/app/outputs/bundle/release/app-release.aab
+          name: app-release-apk
+          path: build/app/outputs/flutter-apk/app-release.apk

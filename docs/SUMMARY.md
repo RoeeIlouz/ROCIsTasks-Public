@@ -12,7 +12,7 @@ This file summarizes errors encountered and changes made to the codebase, ensuri
 #### Solutions & Verification
 * Created [android/app/google-services.json.example](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/google-services.json.example) containing valid schema placeholders for package `com.rocisapps.tasks`.
 * Updated [.github/workflows/flutter-ci.yml](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/.github/workflows/flutter-ci.yml) `Setup configuration templates` step to copy `android/app/google-services.json.example` to `android/app/google-services.json`.
-* Updated [test/core/config/firebase_config_test.dart](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/test/core/config/firebase_config_test.dart) to compare `options.projectId` dynamically against `default_options.DefaultFirebaseOptions.currentPlatform.projectId`.
+* Updated [.github/workflows/flutter-ci.yml](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/.github/workflows/flutter-ci.yml) to build release APK (`flutter build apk --release`) and upload `app-release.apk` artifact instead of AAB.
 * Verified with `flutter test` (271/271 passing) and `flutter analyze` (0 issues).
 
 ## Android Free 1-Widget Limit & Side-by-Side Calendar Integration - 2026-08-22
