@@ -1132,22 +1132,22 @@ class AppLocalizationsAr extends AppLocalizations {
   String get monthlyPlanTitle => 'الخطة الشهرية';
 
   @override
-  String get monthlyPlanPrice => '4.99 \$ / شهر';
+  String get monthlyPlanPrice => '2.99 \$ / شهر';
 
   @override
   String get yearlyPlanTitle => 'الخطة السنوية';
 
   @override
-  String get yearlyPlanPrice => '39.99 \$ / سنة';
+  String get yearlyPlanPrice => '29.99 \$ / سنة';
 
   @override
-  String get yearlyPlanSaving => 'وفر 33%';
+  String get yearlyPlanSaving => 'وفر 16%';
 
   @override
   String get lifetimePlanTitle => 'مدى الحياة';
 
   @override
-  String get lifetimePlanPrice => '49.99 \$ مرة واحدة';
+  String get lifetimePlanPrice => '69.99 \$ مرة واحدة';
 
   @override
   String get lifetimePlanBadge => 'أفضل قيمة';

@@ -9,6 +9,7 @@ import 'package:rocis_tasks/features/categories/domain/models/category.dart';
 import 'package:rocis_tasks/features/tasks/services/task_widget_service.dart';
 import 'package:rocis_tasks/core/services/logger_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:device_calendar/device_calendar.dart';
 
 class WidgetDataService {
   final CalendarService _calendarService;
@@ -17,6 +18,28 @@ class WidgetDataService {
 
   WidgetDataService(this._calendarService)
     : _scheduleService = ScheduleFirestoreService();
+
+  /// Fetch only events from calendars that are turned ON by the user
+  Future<List<Event>> _getFilteredCalendarEvents({
+    DateTime? startDate,
+    DateTime? endDate,
+  }) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final showGoogle = prefs.getBool('full_calendar_show_google') ?? true;
+      if (!showGoogle) return [];
+
+      final selectedIds = prefs.getStringList('full_calendar_selected_ids');
+      return await _calendarService.getEvents(
+        startDate: startDate,
+        endDate: endDate,
+        calendarIds: selectedIds,
+      );
+    } catch (e) {
+      AppLogger.debug('Failed to load filtered calendar events for widgets: $e');
+      return [];
+    }
+  }
 
   /// Initialize the schedule service (call once after Firebase is ready)
   Future<void> initScheduleService() async {
@@ -102,7 +125,7 @@ class WidgetDataService {
         calendarColors = await _calendarService.getCalendarColors();
       } catch (_) {}
 
-      final calendarEvents = await _calendarService.getEvents(
+      final calendarEvents = await _getFilteredCalendarEvents(
         startDate: rangeStart,
         endDate: rangeEnd,
       );
@@ -199,7 +222,7 @@ class WidgetDataService {
 
       var events = <dynamic>[];
       try {
-        events = await _calendarService.getEvents(
+        events = await _getFilteredCalendarEvents(
           startDate: startDate,
           endDate: endDate,
         );
@@ -316,7 +339,7 @@ class WidgetDataService {
         calendarColors = await _calendarService.getCalendarColors();
       } catch (_) {}
 
-      final calendarEvents = await _calendarService.getEvents(
+      final calendarEvents = await _getFilteredCalendarEvents(
         startDate: rangeStart,
         endDate: rangeEnd,
       );
@@ -491,7 +514,7 @@ class WidgetDataService {
 
     // 2. Calendar Events
     try {
-      final calendarEvents = await _calendarService.getEvents(
+      final calendarEvents = await _getFilteredCalendarEvents(
         startDate: now,
         endDate: now.add(const Duration(days: 3)),
       );
@@ -596,7 +619,7 @@ class WidgetDataService {
 
     // Fetch device calendar events
     try {
-      final calendarEvents = await _calendarService.getEvents(
+      final calendarEvents = await _getFilteredCalendarEvents(
         startDate: scheduleStart,
         endDate: scheduleEnd,
       );

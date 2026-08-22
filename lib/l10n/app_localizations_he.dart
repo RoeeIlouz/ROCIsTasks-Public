@@ -1131,22 +1131,22 @@ class AppLocalizationsHe extends AppLocalizations {
   String get monthlyPlanTitle => 'תוכנית חודשית';
 
   @override
-  String get monthlyPlanPrice => '\$4.99 / חודש';
+  String get monthlyPlanPrice => '\$2.99 / חודש';
 
   @override
   String get yearlyPlanTitle => 'תוכנית שנתית';
 
   @override
-  String get yearlyPlanPrice => '\$39.99 / שנה';
+  String get yearlyPlanPrice => '\$29.99 / שנה';
 
   @override
-  String get yearlyPlanSaving => 'חסוך 33%';
+  String get yearlyPlanSaving => 'חסוך 16%';
 
   @override
   String get lifetimePlanTitle => 'לכל החיים';
 
   @override
-  String get lifetimePlanPrice => '\$49.99 חד-פעמי';
+  String get lifetimePlanPrice => '\$69.99 חד-פעמי';
 
   @override
   String get lifetimePlanBadge => 'המשתלם ביותר';

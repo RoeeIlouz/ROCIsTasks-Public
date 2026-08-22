@@ -83,11 +83,11 @@ class AuthService extends ChangeNotifier {
         return;
       }
 
-      // Skip automatic lightweight authentication on startup if cached token exists
-      // or on Web to prevent native Credential Manager bottom sheet popups on app launch.
-      if (isTokenValid || hasCachedToken || kIsWeb) {
+      // On Mobile/Android, avoid Credential Manager bottom sheet popup if token is already valid.
+      // On Web, lightweight authentication is silent (checks browser cookie/session), so we restore _googleUser.
+      if (!kIsWeb && isTokenValid) {
         AppLogger.info(
-          'Google access token cached or Web. Skipping startup lightweight authentication.',
+          'Mobile Google access token cached and valid. Skipping startup lightweight authentication.',
           tag: 'Auth',
         );
         return;
@@ -99,6 +99,16 @@ class AuthService extends ChangeNotifier {
       if (restored != null) {
         _oauthManager.setGoogleUser(restored);
         AppLogger.info('Google user restored on startup.', tag: 'Auth');
+        if (!isTokenValid) {
+          final clientAuth = await restored.authorizationClient
+                  .authorizationForScopes(GoogleOAuthManager.googleTasksScopes) ??
+              await restored.authorizationClient
+                  .authorizeScopes(GoogleOAuthManager.googleTasksScopes);
+          if (clientAuth.accessToken.isNotEmpty) {
+            await _oauthManager.cacheGoogleAccessToken(clientAuth.accessToken);
+            setGoogleTasksTokenExpired(false);
+          }
+        }
       }
     } catch (e) {
       AppLogger.warning(
@@ -110,7 +120,6 @@ class AuthService extends ChangeNotifier {
 
   Future<String?> _resolveWebGoogleAccessToken({String? popupToken}) async {
     if (!kIsWeb) return popupToken;
-    if (popupToken != null && popupToken.isNotEmpty) return popupToken;
 
     try {
       await _oauthManager.ensureGoogleSignInInitialized();
@@ -118,23 +127,32 @@ class AuthService extends ChangeNotifier {
           .attemptLightweightAuthentication();
       if (restored != null) {
         _oauthManager.setGoogleUser(restored);
-        final clientAuth =
-            await restored.authorizationClient.authorizationForScopes(
-              GoogleOAuthManager.googleTasksScopes,
-            ) ??
-            await restored.authorizationClient.authorizeScopes(
-              GoogleOAuthManager.googleTasksScopes,
-            );
-
-        if (clientAuth.accessToken.isNotEmpty) {
-          return clientAuth.accessToken;
-        }
       }
     } catch (e) {
       AppLogger.warning(
         'Could not resolve web token via GoogleSignIn after popup: $e',
         tag: 'Auth',
       );
+    }
+
+    if (popupToken != null && popupToken.isNotEmpty) {
+      return popupToken;
+    }
+
+    if (_oauthManager.googleUser != null) {
+      try {
+        final clientAuth =
+            await _oauthManager.googleUser!.authorizationClient.authorizationForScopes(
+              GoogleOAuthManager.googleTasksScopes,
+            ) ??
+            await _oauthManager.googleUser!.authorizationClient.authorizeScopes(
+              GoogleOAuthManager.googleTasksScopes,
+            );
+
+        if (clientAuth.accessToken.isNotEmpty) {
+          return clientAuth.accessToken;
+        }
+      } catch (_) {}
     }
 
     return _oauthManager.getGoogleAccessToken();

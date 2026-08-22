@@ -1163,22 +1163,22 @@ class AppLocalizationsDe extends AppLocalizations {
   String get monthlyPlanTitle => 'Monatlicher Plan';
 
   @override
-  String get monthlyPlanPrice => '4,99 \$ / Monat';
+  String get monthlyPlanPrice => '2,99 \$ / Monat';
 
   @override
   String get yearlyPlanTitle => 'Jährlicher Plan';
 
   @override
-  String get yearlyPlanPrice => '39,99 \$ / Jahr';
+  String get yearlyPlanPrice => '29,99 \$ / Jahr';
 
   @override
-  String get yearlyPlanSaving => '33 % sparen';
+  String get yearlyPlanSaving => '16 % sparen';
 
   @override
   String get lifetimePlanTitle => 'Lebenslang';
 
   @override
-  String get lifetimePlanPrice => '49,99 \$ einmalig';
+  String get lifetimePlanPrice => '69,99 \$ einmalig';
 
   @override
   String get lifetimePlanBadge => 'Bester Wert';

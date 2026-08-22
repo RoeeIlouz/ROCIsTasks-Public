@@ -1162,22 +1162,22 @@ class AppLocalizationsFr extends AppLocalizations {
   String get monthlyPlanTitle => 'Forfait Mensuel';
 
   @override
-  String get monthlyPlanPrice => '4,99 \$ / mois';
+  String get monthlyPlanPrice => '2,99 \$ / mois';
 
   @override
   String get yearlyPlanTitle => 'Forfait Annuel';
 
   @override
-  String get yearlyPlanPrice => '39,99 \$ / an';
+  String get yearlyPlanPrice => '29,99 \$ / an';
 
   @override
-  String get yearlyPlanSaving => 'Économisez 33%';
+  String get yearlyPlanSaving => 'Économisez 16%';
 
   @override
   String get lifetimePlanTitle => 'À vie';
 
   @override
-  String get lifetimePlanPrice => '49,99 \$ unique';
+  String get lifetimePlanPrice => '69,99 \$ unique';
 
   @override
   String get lifetimePlanBadge => 'Meilleure offre';

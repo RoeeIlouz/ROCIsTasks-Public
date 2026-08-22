@@ -143,6 +143,20 @@ class GoogleOAuthManager {
   Future<String?> _performSilentTokenRefresh() async {
     try {
       if (_googleUser == null) {
+        await ensureGoogleSignInInitialized();
+        if (_googleSignIn.supportsAuthenticate()) {
+          try {
+            _googleUser = await _googleSignIn.attemptLightweightAuthentication();
+            if (_googleUser != null) {
+              AppLogger.info('Silent refresh: restored Google user via lightweight auth.', tag: 'Auth');
+            }
+          } catch (e) {
+            AppLogger.info('Silent refresh: lightweight auth attempt failed: $e', tag: 'Auth');
+          }
+        }
+      }
+
+      if (_googleUser == null) {
         AppLogger.info('Silent refresh: no Google user available.', tag: 'Auth');
         return null;
       }

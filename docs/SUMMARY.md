@@ -2,6 +2,20 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## Google Calendar Web Visibility & OAuth Session Fix - 2026-08-22
+
+#### Issue / Enhancement
+* Users on Web could not see their Google Calendar even after re-authenticating and granting all required scopes.
+* Root cause 1: In `CalendarService.getEvents()`, URLs were constructed via string interpolation and parsed with `Uri.parse()`. Subscribed calendars containing `#` in their ID (such as `he.israel#holiday@group.v.calendar.google.com` or `addressbook#contacts`) had their path split at the `#` fragment boundary by browsers, sending malformed requests to Google Calendar API that returned HTTP `404`/`403`.
+* Root cause 2: `CalendarService.getEvents()` threw an unhandled `GoogleTokenExpiredException` when *any* secondary/subscribed calendar failed with `403` or `404`, which caused `CalendarProvider.loadEvents()` to wipe out all events (including successfully fetched primary calendar events) and display the disconnected banner.
+* Root cause 3: In `AuthService._restoreGoogleUser()`, restoring `_googleUser` was skipped on Web (`kIsWeb`), preventing silent token renewal after the initial 55-minute OAuth token expired.
+
+#### Solutions & Verification
+* **REST URL Safety with `Uri.https`**: In [CalendarService.dart](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/services/calendar_service.dart), migrated all REST API endpoints (`calendarList`, `events`, `createOrUpdateTaskEvent`, `deleteEvent`) to `Uri.https` with query parameter maps, preventing URI fragment truncation.
+* **Resilient Multi-Calendar Error Isolation**: In `CalendarService.getEvents()`, isolated secondary calendar `403`/`404` errors to log warnings and skip individual secondary calendars without aborting the loop or discarding primary calendar events. Only actual `401` responses (or complete primary failures) throw `GoogleTokenExpiredException`.
+* **Web OAuth Session Hydration & Silent Refresh**: In [AuthService.dart](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/services/auth_service.dart) and [GoogleOAuthManager.dart](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/services/auth/google_oauth_manager.dart), enabled silent lightweight authentication on Web startup and in `_performSilentTokenRefresh()` so `_googleUser` is restored and access tokens renew automatically.
+* **Verification**: `flutter analyze` completed with 0 issues; all 271/271 unit, widget, and service tests passed.
+
 ## R8 / ProGuard Keep Rules Optimization - 2026-08-22
 
 #### Issue / Enhancement

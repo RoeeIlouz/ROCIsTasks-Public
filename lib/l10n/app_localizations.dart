@@ -2248,7 +2248,7 @@ abstract class AppLocalizations {
   /// No description provided for @monthlyPlanPrice.
   ///
   /// In en, this message translates to:
-  /// **'\$4.99 / month'**
+  /// **'\$2.99 / month'**
   String get monthlyPlanPrice;
 
   /// No description provided for @yearlyPlanTitle.
@@ -2260,13 +2260,13 @@ abstract class AppLocalizations {
   /// No description provided for @yearlyPlanPrice.
   ///
   /// In en, this message translates to:
-  /// **'\$39.99 / year'**
+  /// **'\$29.99 / year'**
   String get yearlyPlanPrice;
 
   /// No description provided for @yearlyPlanSaving.
   ///
   /// In en, this message translates to:
-  /// **'Save 33%'**
+  /// **'Save 16%'**
   String get yearlyPlanSaving;
 
   /// No description provided for @lifetimePlanTitle.
@@ -2278,7 +2278,7 @@ abstract class AppLocalizations {
   /// No description provided for @lifetimePlanPrice.
   ///
   /// In en, this message translates to:
-  /// **'\$49.99 once'**
+  /// **'\$69.99 once'**
   String get lifetimePlanPrice;
 
   /// No description provided for @lifetimePlanBadge.

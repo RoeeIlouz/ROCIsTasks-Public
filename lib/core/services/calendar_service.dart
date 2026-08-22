@@ -86,16 +86,30 @@ class CalendarService {
           );
         }
 
+        final uri = Uri.https(
+          'www.googleapis.com',
+          '/calendar/v3/users/me/calendarList',
+        );
+
         final response = await http.get(
-          Uri.parse(
-            'https://www.googleapis.com/calendar/v3/users/me/calendarList',
-          ),
+          uri,
           headers: {'Authorization': 'Bearer $token'},
         );
 
-        if (response.statusCode == 401 || response.statusCode == 403) {
+        if (response.statusCode == 401) {
           AppLogger.warning(
-            'Google Calendar list API returned ${response.statusCode}. Falling back to primary calendar.',
+            'Google Calendar list API returned 401 (Unauthorized).',
+            tag: 'Calendar',
+          );
+          throw GoogleTokenExpiredException(
+            'Google Calendar token rejected by server (401).',
+            true,
+          );
+        }
+
+        if (response.statusCode == 403) {
+          AppLogger.warning(
+            'Google Calendar list API returned 403. Falling back to primary calendar.',
             tag: 'Calendar',
           );
           return [
@@ -116,6 +130,8 @@ class CalendarService {
           for (final item in items) {
             final id = item['id'] as String?;
             if (id == null) continue;
+            if (item['deleted'] == true || item['hidden'] == true) continue;
+
             final name = item['summary'] as String? ?? 'Unnamed Calendar';
             final accessRole = item['accessRole'] as String?;
             final isReadOnly =
@@ -135,6 +151,17 @@ class CalendarService {
                 isReadOnly: isReadOnly,
                 isDefault: item['primary'] == true,
                 color: colorVal,
+              ),
+            );
+          }
+
+          if (calendars.isEmpty) {
+            calendars.add(
+              Calendar(
+                id: 'primary',
+                name: 'Google Calendar',
+                isDefault: true,
+                color: 0xFF6366F1,
               ),
             );
           }
@@ -203,48 +230,62 @@ class CalendarService {
         final end = endDate ?? now.add(const Duration(days: 365));
         final List<Event> allEvents = [];
 
-        final cals = await getAvailableCalendars();
-        final availableIds = cals.map((c) => c.id).whereType<String>().toSet();
-
         List<String> targetCalendarIds = calendarIds ?? [];
         if (targetCalendarIds.isEmpty) {
-          targetCalendarIds = availableIds.toList();
-        } else {
-          targetCalendarIds = targetCalendarIds
-              .where(availableIds.contains)
-              .toList();
-          if (targetCalendarIds.isEmpty) {
-            targetCalendarIds = availableIds.toList();
-          }
+          final cals = await getAvailableCalendars();
+          targetCalendarIds = cals.map((c) => c.id).whereType<String>().toList();
         }
         if (targetCalendarIds.isEmpty) {
           targetCalendarIds = ['primary'];
         }
 
+        int failedSecondaryCalendars = 0;
+
         for (final calendarId in targetCalendarIds) {
           try {
-            final encodedId = Uri.encodeComponent(calendarId);
-            final timeMin = Uri.encodeComponent(start.toUtc().toIso8601String());
-            final timeMax = Uri.encodeComponent(end.toUtc().toIso8601String());
+            final queryParams = {
+              'timeMin': start.toUtc().toIso8601String(),
+              'timeMax': end.toUtc().toIso8601String(),
+              'singleEvents': 'true',
+              'orderBy': 'startTime',
+            };
 
-            final url =
-                'https://www.googleapis.com/calendar/v3/calendars/$encodedId/events'
-                '?timeMin=$timeMin&timeMax=$timeMax&singleEvents=true&orderBy=startTime';
+            final uri = Uri.https(
+              'www.googleapis.com',
+              '/calendar/v3/calendars/$calendarId/events',
+              queryParams,
+            );
 
             final response = await http.get(
-              Uri.parse(url),
+              uri,
               headers: {'Authorization': 'Bearer $token'},
             );
 
-            if (response.statusCode == 401 || response.statusCode == 403) {
+            if (response.statusCode == 401) {
               AppLogger.warning(
-                'Google Calendar API request returned ${response.statusCode}: ${response.body}',
+                'Google Calendar API request returned 401 for $calendarId: ${response.body}',
                 tag: 'Calendar',
               );
               throw GoogleTokenExpiredException(
-                'Google Calendar token rejected by server (${response.statusCode}).',
+                'Google Calendar token rejected by server (401).',
                 true,
               );
+            }
+
+            if (response.statusCode == 403 || response.statusCode == 404) {
+              AppLogger.warning(
+                'Google Calendar API request returned ${response.statusCode} for calendar $calendarId. Skipping secondary calendar.',
+                tag: 'Calendar',
+              );
+              failedSecondaryCalendars++;
+              // Only throw if the primary/only calendar failed with 403 and no events fetched
+              if (calendarId == 'primary' && targetCalendarIds.length == 1 && allEvents.isEmpty) {
+                throw GoogleTokenExpiredException(
+                  'Primary Google Calendar token rejected by server (403).',
+                  true,
+                );
+              }
+              continue;
             }
 
             if (response.statusCode == 200) {
@@ -252,6 +293,8 @@ class CalendarService {
               final items = data['items'] as List<dynamic>? ?? [];
 
               for (final item in items) {
+                if (item['status'] == 'cancelled') continue;
+
                 final id = item['id'] as String?;
                 final title = item['summary'] as String? ?? 'No Title';
                 final desc = item['description'] as String?;
@@ -333,6 +376,11 @@ class CalendarService {
             );
           }
         }
+
+        if (allEvents.isEmpty && failedSecondaryCalendars == targetCalendarIds.length && targetCalendarIds.isNotEmpty) {
+          AppLogger.warning('All targeted calendars failed with 403/404 on Web.', tag: 'Calendar');
+        }
+
         return allEvents;
       } on GoogleTokenExpiredException {
         rethrow;
@@ -443,18 +491,22 @@ class CalendarService {
 
         http.Response response;
         if (eventId != null) {
+          final uri = Uri.https(
+            'www.googleapis.com',
+            '/calendar/v3/calendars/$calendarId/events/$eventId',
+          );
           response = await http.put(
-            Uri.parse(
-              'https://www.googleapis.com/calendar/v3/calendars/$calendarId/events/$eventId',
-            ),
+            uri,
             headers: headers,
             body: json.encode(body),
           );
         } else {
+          final uri = Uri.https(
+            'www.googleapis.com',
+            '/calendar/v3/calendars/$calendarId/events',
+          );
           response = await http.post(
-            Uri.parse(
-              'https://www.googleapis.com/calendar/v3/calendars/$calendarId/events',
-            ),
+            uri,
             headers: headers,
             body: json.encode(body),
           );
@@ -525,10 +577,13 @@ class CalendarService {
       try {
         final token = await _getWebAccessToken();
 
+        final uri = Uri.https(
+          'www.googleapis.com',
+          '/calendar/v3/calendars/$calendarId/events/$eventId',
+        );
+
         final response = await http.delete(
-          Uri.parse(
-            'https://www.googleapis.com/calendar/v3/calendars/$calendarId/events/$eventId',
-          ),
+          uri,
           headers: {'Authorization': 'Bearer $token'},
         );
 

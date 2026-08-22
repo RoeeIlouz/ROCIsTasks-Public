@@ -1147,22 +1147,22 @@ class AppLocalizationsHi extends AppLocalizations {
   String get monthlyPlanTitle => 'मासिक योजना';
 
   @override
-  String get monthlyPlanPrice => '\$4.99 / माह';
+  String get monthlyPlanPrice => '\$2.99 / माह';
 
   @override
   String get yearlyPlanTitle => 'वार्षिक योजना';
 
   @override
-  String get yearlyPlanPrice => '\$39.99 / वर्ष';
+  String get yearlyPlanPrice => '\$29.99 / वर्ष';
 
   @override
-  String get yearlyPlanSaving => '33% बचाएं';
+  String get yearlyPlanSaving => '16% बचाएं';
 
   @override
   String get lifetimePlanTitle => 'आजीवन';
 
   @override
-  String get lifetimePlanPrice => '\$49.99 एक बार';
+  String get lifetimePlanPrice => '\$69.99 एक बार';
 
   @override
   String get lifetimePlanBadge => 'सर्वोत्तम मूल्य';
