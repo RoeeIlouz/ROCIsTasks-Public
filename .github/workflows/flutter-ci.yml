@@ -43,6 +43,7 @@ jobs:
           cp .env.example .env
           cp lib/firebase_options.dart.example lib/firebase_options.dart
           cp lib/firebase_schedule_options.dart.example lib/firebase_schedule_options.dart
+          cp android/app/google-services.json.example android/app/google-services.json
 
       - name: Install dependencies
         run: flutter pub get
