@@ -57,6 +57,8 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+/android/.kotlin/
+.kotlin/
 /lib/firebase_options.dart
 /lib/firebase_schedule_options.dart
 /docs/SUMMARY.md
