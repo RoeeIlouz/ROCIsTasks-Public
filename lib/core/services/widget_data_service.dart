@@ -93,6 +93,11 @@ class WidgetDataService {
 
     // 2. Calendar Events
     try {
+      Map<String, String> calendarColors = {};
+      try {
+        calendarColors = await _calendarService.getCalendarColors();
+      } catch (_) {}
+
       final calendarEvents = await _calendarService.getEvents(
         startDate: rangeStart,
         endDate: rangeEnd,
@@ -106,19 +111,40 @@ class WidgetDataService {
                   ? '${DateFormat('HH:mm').format(event.start!)}-${DateFormat('HH:mm').format(event.end!)}'
                   : DateFormat('HH:mm').format(event.start!));
 
-          agendaItems.add({
-            'type': 'event',
-            'id': event.eventId ?? '',
-            'title': event.title ?? 'No Title',
-            'subtitle': event.location ?? '',
-            'date': event.start!.toIso8601String(),
-            'dateDisplay': TaskWidgetService.formatDateForDisplay(event.start!),
-            'timeDisplay': timeDisplay,
-            'isAllDay': isAllDay,
-            'isCompleted': false,
-            'category_color': '#4285F4',
-            'priority': '',
-          });
+          final eventStart = DateTime(
+            event.start!.year,
+            event.start!.month,
+            event.start!.day,
+          );
+          final end = event.end ?? event.start!.add(const Duration(hours: 1));
+          final endDay = DateTime(end.year, end.month, end.day);
+          final calColor = calendarColors[event.calendarId] ?? '#4285F4';
+
+          var day = eventStart;
+          while (!day.isAfter(endDay)) {
+            if (day == endDay &&
+                !isAllDay &&
+                end.hour == 0 &&
+                end.minute == 0 &&
+                end.second == 0) {
+              break;
+            }
+            final dayFormatted = DateFormat('yyyy-MM-dd').format(day);
+            agendaItems.add({
+              'type': 'event',
+              'id': event.eventId ?? '',
+              'title': event.title ?? 'No Title',
+              'subtitle': event.location ?? (isAllDay ? 'All day' : timeDisplay),
+              'date': day.toIso8601String(),
+              'dateDisplay': dayFormatted,
+              'timeDisplay': timeDisplay,
+              'isAllDay': isAllDay,
+              'isCompleted': false,
+              'category_color': calColor,
+              'priority': '',
+            });
+            day = day.add(const Duration(days: 1));
+          }
         }
       }
     } catch (e) {
@@ -178,8 +204,26 @@ class WidgetDataService {
       final eventsByDate = <String, bool>{};
       for (final event in events) {
         if (event.start != null) {
-          final key = DateFormat('yyyy-MM-dd').format(event.start!);
-          eventsByDate[key] = true;
+          final eventStart = DateTime(
+            event.start!.year,
+            event.start!.month,
+            event.start!.day,
+          );
+          final end = event.end ?? event.start!.add(const Duration(hours: 1));
+          final endDay = DateTime(end.year, end.month, end.day);
+          var day = eventStart;
+          while (!day.isAfter(endDay)) {
+            if (day == endDay &&
+                event.allDay != true &&
+                end.hour == 0 &&
+                end.minute == 0 &&
+                end.second == 0) {
+              break;
+            }
+            final key = DateFormat('yyyy-MM-dd').format(day);
+            eventsByDate[key] = true;
+            day = day.add(const Duration(days: 1));
+          }
         }
       }
 
