@@ -25,6 +25,10 @@ android {
         isCoreLibraryDesugaringEnabled = true
     }
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     signingConfigs {
         getByName("debug") {
             // Use debug signing by default
