@@ -12,7 +12,8 @@ This file summarizes errors encountered and changes made to the codebase, ensuri
 #### Solutions & Verification
 * Created [android/app/google-services.json.example](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/google-services.json.example) containing valid schema placeholders for package `com.rocisapps.tasks`.
 * Configured `mappingFileUploadEnabled = false` inside `buildTypes.release` in [android/app/build.gradle.kts](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/build.gradle.kts) to prevent offline release packaging failures.
-* Updated [.github/workflows/flutter-ci.yml](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/.github/workflows/flutter-ci.yml) to decode secrets when present and build installable release APKs (`app-release.apk`).
+* Created `scripts/setup_ci_configs.py` with multi-format validation (Base64 vs raw string, JSON syntax check, and automatic example fallback) to eliminate CI `MalformedJsonException` errors.
+* Updated [.github/workflows/flutter-ci.yml](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/.github/workflows/flutter-ci.yml) to run `python scripts/setup_ci_configs.py` and build installable release APKs (`app-release.apk`).
 * Verified with `flutter build appbundle --release` (successfully compiled in 181.7s) and `flutter test` (271/271 passing).
 
 ## Android Free 1-Widget Limit & Side-by-Side Calendar Integration - 2026-08-22
