@@ -55,9 +55,8 @@ class MonthAgendaWidgetProvider : HomeWidgetProvider() {
                 views.setInt(R.id.widget_month_agenda_root, "setBackgroundResource", rootBgRes)
 
                 val textColor = when (theme) {
-                    "light" -> android.graphics.Color.parseColor("#1C1C1E")
-                    "dark", "glassmorphic" -> android.graphics.Color.parseColor("#FFFFFF")
-                    else -> context.getColor(R.color.widget_title_text)
+                    "light" -> android.graphics.Color.parseColor("#0F172A")
+                    else -> android.graphics.Color.parseColor("#FFFFFF")
                 }
 
                 views.setTextColor(R.id.widget_month_agenda_month_title, textColor)

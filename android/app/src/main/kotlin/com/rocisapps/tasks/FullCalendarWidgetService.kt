@@ -23,7 +23,7 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
     private var widgetTheme = "system"
     private var showWeekNumbers = true
     private var weekendHighlight = true
-    private var highlightColorStr = "#6C63FF"
+    private var highlightColorStr = "#6366F1"
 
     override fun onCreate() {
         onDataSetChanged()
@@ -48,7 +48,7 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
             widgetTheme = widgetData.getString("full_calendar_theme", "system") ?: "system"
             showWeekNumbers = widgetData.getBoolean("full_calendar_show_week_numbers", true)
             weekendHighlight = widgetData.getBoolean("full_calendar_weekend_highlight", true)
-            highlightColorStr = widgetData.getString("full_calendar_highlight_color", "#6C63FF") ?: "#6C63FF"
+            highlightColorStr = widgetData.getString("full_calendar_highlight_color", "#6366F1") ?: "#6366F1"
             
             val gridDataJson = widgetData.getString("full_calendar_grid_data", "[]")
             val gridData = JSONArray(gridDataJson)
@@ -164,11 +164,11 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
                        }
                        cellViews.setTextViewText(R.id.widget_full_calendar_day_text, finalSpannable)
                        
-                       val colorStr = highlightColorStr
-                       var highlightColor = android.graphics.Color.parseColor("#6C63FF")
-                       try {
-                           highlightColor = android.graphics.Color.parseColor(colorStr)
-                       } catch (_: Exception) {}
+                        val colorStr = highlightColorStr
+                        var highlightColor = android.graphics.Color.parseColor("#6366F1")
+                        try {
+                            highlightColor = android.graphics.Color.parseColor(colorStr)
+                        } catch (_: Exception) {}
 
                        // Reset text background circle
                        cellViews.setInt(R.id.widget_full_calendar_day_text, "setBackgroundResource", 0)

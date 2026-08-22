@@ -84,12 +84,11 @@ class MonthAgendaGridFactory(private val context: Context) : RemoteViewsService.
 
             // Text colors
             val textColor = when {
-                !isCurrentMonth -> Color.parseColor("#60888888")
-                isSelected || isToday -> Color.parseColor("#6C63FF")
+                !isCurrentMonth -> Color.parseColor("#50888888")
+                isSelected || isToday -> Color.parseColor("#6366F1")
                 else -> when (widgetTheme) {
-                    "light" -> Color.parseColor("#1C1C1E")
-                    "dark", "glassmorphic" -> Color.parseColor("#FFFFFF")
-                    else -> context.getColor(R.color.widget_title_text)
+                    "light" -> Color.parseColor("#0F172A")
+                    else -> Color.parseColor("#FFFFFF")
                 }
             }
             cellViews.setTextColor(R.id.widget_month_day_text, textColor)
@@ -202,14 +201,12 @@ class MonthAgendaListFactory(private val context: Context) : RemoteViewsService.
             val colorHex = item.optString("category_color", "")
 
             val textColor = when (widgetTheme) {
-                "light" -> Color.parseColor("#1C1C1E")
-                "dark", "glassmorphic" -> Color.parseColor("#FFFFFF")
-                else -> Color.parseColor("#1C1C1E")
+                "light" -> Color.parseColor("#0F172A")
+                else -> Color.parseColor("#FFFFFF")
             }
             val secondaryColor = when (widgetTheme) {
-                "light" -> Color.parseColor("#8E8E93")
-                "dark", "glassmorphic" -> Color.parseColor("#AEAEB2")
-                else -> Color.parseColor("#8E8E93")
+                "light" -> Color.parseColor("#64748B")
+                else -> Color.parseColor("#94A3B8")
             }
 
             views.setTextViewText(R.id.widget_agenda_title, title)

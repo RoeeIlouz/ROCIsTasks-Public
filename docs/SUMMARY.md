@@ -2,6 +2,22 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## Android Widgets Task Filtering, Contrast & Layout Collision Resolution - 2026-08-22
+
+#### Issue / Enhancement
+* Completed/deleted tasks were appearing in Today Agenda, Month Agenda, and Timeline widgets because `isCompleted` was not filtered. Undated tasks were leaking across date filters.
+* Widget text was unreadable in default/system theme because Kotlin services evaluated `else` to `#1C1C1E` (dark grey) on top of `#B3000000` (dark glass background).
+* Default widget color fallbacks in `WidgetDataService.dart`, `colors.xml`, and drawables used purple `#6C63FF` / `#BB86FC` (violating Purple Ban).
+* Quick Actions widget was displaying stat number text directly on top of the circular chart bitmap image due to conflicting FrameLayout positioning.
+* Side-by-side calendar was missing event dates because `updateTodayAgendaWidget` range was restricted to 30 days and had invisible dark text.
+
+#### Solutions & Verification
+* **Task Filtering**: In [lib/core/services/widget_data_service.dart](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/services/widget_data_service.dart), filtered out all completed (`!t.isCompleted`) and deleted tasks across all widget update methods. Bound undated tasks specifically to today (`dateDisplay: yyyy-MM-dd`) and expanded the sync window to [-60, +120] days.
+* **Contrast & Purple Ban**: Updated `values/colors.xml`, `values-night/colors.xml`, and all widget drawables (`widget_pill_bg.xml`, `widget_selected_background.xml`, `widget_selected_today_background.xml`, `widget_today_background.xml`, `ic_check_circle_filled.xml`) with Modern Indigo (`#6366F1`) and pure white text (`#FFFFFF`) with `#94A3B8` secondary contrast.
+* **Kotlin Services Text Color**: In `MonthAgendaWidgetService.kt`, `TodayAgendaWidgetService.kt`, `TimelineAgendaWidgetService.kt`, `UpNextWidgetProvider.kt`, and `QuickActionWidgetProvider.kt`, default/dark themes resolve text to `#FFFFFF` for guaranteed contrast on dark glass backgrounds.
+* **Quick Actions Overlap**: In `QuickActionWidgetProvider.kt` and `widget_quick_action_layout.xml`, conditionally hide the stat text container when the circular chart bitmap is rendered.
+* **Verification**: Ran `flutter analyze` (0 issues) and `flutter test` (271/271 tests passing).
+
 ## CI/CD Google Services, FirebaseConfig & Crashlytics Mapping Resolution - 2026-08-22
 
 #### Issue / Enhancement

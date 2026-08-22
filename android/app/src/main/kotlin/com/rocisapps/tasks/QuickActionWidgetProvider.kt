@@ -37,31 +37,35 @@ class QuickActionWidgetProvider : HomeWidgetProvider() {
                 views.setInt(R.id.widget_quick_action_root, "setBackgroundResource", rootBgRes)
 
                 val textColor = when (theme) {
-                    "light" -> Color.parseColor("#1C1C1E")
-                    "dark", "glassmorphic" -> Color.parseColor("#FFFFFF")
-                    else -> Color.parseColor("#1C1C1E")
+                    "light" -> Color.parseColor("#0F172A")
+                    else -> Color.parseColor("#FFFFFF")
                 }
                 val secondaryColor = when (theme) {
-                    "light" -> Color.parseColor("#8E8E93")
-                    "dark", "glassmorphic" -> Color.parseColor("#AEAEB2")
-                    else -> Color.parseColor("#8E8E93")
+                    "light" -> Color.parseColor("#64748B")
+                    else -> Color.parseColor("#94A3B8")
                 }
 
                 views.setTextColor(R.id.widget_quick_stat_number, textColor)
                 views.setTextColor(R.id.widget_quick_stat_label, secondaryColor)
 
-                // Read stats
-                val pendingCount = widgetData.getInt("quick_action_pending_count", 0)
-                views.setTextViewText(R.id.widget_quick_stat_number, if (pendingCount > 99) "99+" else "$pendingCount")
-
-                // Load Circular Chart if available
+                // Load Circular Chart if available, otherwise show number fallback
                 val chartPath = widgetData.getString("chart_image_path", null)
+                var hasChart = false
                 if (chartPath != null && File(chartPath).exists()) {
                     val bitmap = BitmapFactory.decodeFile(chartPath)
                     if (bitmap != null) {
                         views.setImageViewBitmap(R.id.widget_quick_chart_img, bitmap)
                         views.setViewVisibility(R.id.widget_quick_chart_img, View.VISIBLE)
+                        views.setViewVisibility(R.id.widget_quick_stat_container, View.GONE)
+                        hasChart = true
                     }
+                }
+
+                if (!hasChart) {
+                    views.setViewVisibility(R.id.widget_quick_chart_img, View.GONE)
+                    views.setViewVisibility(R.id.widget_quick_stat_container, View.VISIBLE)
+                    val pendingCount = widgetData.getInt("quick_action_pending_count", 0)
+                    views.setTextViewText(R.id.widget_quick_stat_number, if (pendingCount > 99) "99+" else "$pendingCount")
                 }
 
                 // Button actions

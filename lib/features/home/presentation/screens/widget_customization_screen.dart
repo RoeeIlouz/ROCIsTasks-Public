@@ -22,7 +22,7 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
   bool _showTasks = true;
   bool _showGoogle = true;
   int _startOfWeek = 7;
-  String _highlightColor = '#6C63FF';
+  String _highlightColor = '#6366F1';
   bool _isLoading = true;
   int _selectedPreviewIndex = 0;
 
@@ -42,7 +42,7 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
         _showTasks = prefs.getBool('full_calendar_show_tasks') ?? true;
         _showGoogle = prefs.getBool('full_calendar_show_google') ?? true;
         _startOfWeek = prefs.getInt('full_calendar_start_of_week') ?? 7;
-        _highlightColor = prefs.getString('full_calendar_highlight_color') ?? '#6C63FF';
+        _highlightColor = prefs.getString('full_calendar_highlight_color') ?? '#6366F1';
         _isLoading = false;
       });
     } catch (_) {
@@ -831,12 +831,12 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
 
   Widget _buildColorPicker(ThemeData theme) {
     final colors = [
-      {'hex': '#6C63FF', 'name': 'Indigo', 'color': const Color(0xFF6C63FF)},
+      {'hex': '#6366F1', 'name': 'Indigo', 'color': const Color(0xFF6366F1)},
       {'hex': '#10B981', 'name': 'Emerald', 'color': const Color(0xFF10B981)},
       {'hex': '#F59E0B', 'name': 'Orange', 'color': const Color(0xFFF59E0B)},
       {'hex': '#EF4444', 'name': 'Red', 'color': const Color(0xFFEF4444)},
       {'hex': '#06B6D4', 'name': 'Cyan', 'color': const Color(0xFF06B6D4)},
-      {'hex': '#A855F7', 'name': 'Purple', 'color': const Color(0xFFA855F7)},
+      {'hex': '#0284C7', 'name': 'Sky', 'color': const Color(0xFF0284C7)},
     ];
 
     return GlassContainer(
@@ -986,7 +986,7 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
         'subtitle': l10n.todayAgendaWidgetSubtitle,
         'icon': Icons.view_agenda_rounded,
         'tag': '4x3 / 4x2',
-        'color': const Color(0xFF6C63FF),
+        'color': const Color(0xFF6366F1),
         'previewIndex': 1,
       },
       {

@@ -59,21 +59,25 @@ class WidgetDataService {
   }) async {
     if (kIsWeb) return;
     final now = DateTime.now();
-    final rangeStart = now.subtract(const Duration(days: 30));
-    final rangeEnd = now.add(const Duration(days: 60));
+    final today = DateTime(now.year, now.month, now.day);
+    final rangeStart = today.subtract(const Duration(days: 60));
+    final rangeEnd = today.add(const Duration(days: 120));
     final agendaItems = <Map<String, dynamic>>[];
 
-    // 1. Tasks
-    final activeTasks = allTasks.where((t) {
-      if (t.isDeleted ?? false) return false;
+    // 1. Pending Tasks Only (Filter out completed & deleted)
+    final pendingTasks = allTasks.where((t) {
+      if (t.isCompleted || (t.isDeleted ?? false)) return false;
       if (t.dueDate == null) return true;
       return t.dueDate!.isAfter(rangeStart) && t.dueDate!.isBefore(rangeEnd);
     });
 
-    for (final t in activeTasks) {
+    for (final t in pendingTasks) {
       final cat = getCategoryById(t.categoryId);
-      final taskDate = t.dueDate ?? now;
       final isAllDay = t.dueDate == null;
+      // Undated tasks default to today so they don't leak into future/past dates
+      final taskDate = t.dueDate ?? today;
+      final dateOnlyFormatted = DateFormat('yyyy-MM-dd').format(taskDate);
+
       agendaItems.add({
         'type': 'task',
         'id': t.id,
@@ -81,12 +85,12 @@ class WidgetDataService {
         'subtitle': cat?.name ?? '',
         'category_color': cat != null
             ? '#${cat.colorValue.toRadixString(16).padLeft(8, '0')}'
-            : '#6C63FF',
+            : '#6366F1',
         'date': taskDate.toIso8601String(),
-        'dateDisplay': TaskWidgetService.formatDateForDisplay(taskDate),
+        'dateDisplay': dateOnlyFormatted,
         'timeDisplay': isAllDay ? 'All Day' : DateFormat('HH:mm').format(taskDate),
         'isAllDay': isAllDay,
-        'isCompleted': t.isCompleted,
+        'isCompleted': false,
         'priority': t.priority.name,
       });
     }
@@ -227,7 +231,7 @@ class WidgetDataService {
         }
       }
 
-      for (final t in allTasks.where((t) => !(t.isDeleted ?? false) && t.dueDate != null)) {
+      for (final t in allTasks.where((t) => !t.isCompleted && !(t.isDeleted ?? false) && t.dueDate != null)) {
         final key = DateFormat('yyyy-MM-dd').format(t.dueDate!);
         eventsByDate[key] = true;
       }
@@ -283,8 +287,8 @@ class WidgetDataService {
 
     final rawItems = <Map<String, dynamic>>[];
 
-    // 1. Active Tasks
-    for (final t in allTasks.where((t) => !(t.isDeleted ?? false))) {
+    // 1. Pending Tasks Only (Filter out completed & deleted)
+    for (final t in allTasks.where((t) => !t.isCompleted && !(t.isDeleted ?? false))) {
       final taskDate = t.dueDate ?? today;
       if (taskDate.isAfter(rangeStart) && taskDate.isBefore(rangeEnd)) {
         final cat = getCategoryById(t.categoryId);
@@ -295,18 +299,23 @@ class WidgetDataService {
           'subtitle': cat?.name ?? '',
           'category_color': cat != null
               ? '#${cat.colorValue.toRadixString(16).padLeft(8, '0')}'
-              : '#6C63FF',
+              : '#6366F1',
           'date': taskDate.toIso8601String(),
           'dateOnly': DateFormat('yyyy-MM-dd').format(taskDate),
           'timeDisplay': t.dueDate != null ? DateFormat('HH:mm').format(t.dueDate!) : 'All Day',
-          'isCompleted': t.isCompleted,
+          'isCompleted': false,
           'priority': t.priority.name,
         });
       }
     }
 
-    // 2. Events
+    // 2. Calendar Events
     try {
+      Map<String, String> calendarColors = {};
+      try {
+        calendarColors = await _calendarService.getCalendarColors();
+      } catch (_) {}
+
       final calendarEvents = await _calendarService.getEvents(
         startDate: rangeStart,
         endDate: rangeEnd,
@@ -320,18 +329,38 @@ class WidgetDataService {
                   ? '${DateFormat('HH:mm').format(event.start!)}-${DateFormat('HH:mm').format(event.end!)}'
                   : DateFormat('HH:mm').format(event.start!));
 
-          rawItems.add({
-            'type': 'event',
-            'id': event.eventId ?? '',
-            'title': event.title ?? 'No Title',
-            'subtitle': event.location ?? '',
-            'date': event.start!.toIso8601String(),
-            'dateOnly': DateFormat('yyyy-MM-dd').format(event.start!),
-            'timeDisplay': timeDisplay,
-            'isCompleted': false,
-            'category_color': '#4285F4',
-            'priority': '',
-          });
+          final eventStart = DateTime(
+            event.start!.year,
+            event.start!.month,
+            event.start!.day,
+          );
+          final end = event.end ?? event.start!.add(const Duration(hours: 1));
+          final endDay = DateTime(end.year, end.month, end.day);
+          final calColor = calendarColors[event.calendarId] ?? '#4285F4';
+
+          var day = eventStart;
+          while (!day.isAfter(endDay)) {
+            if (day == endDay &&
+                !isAllDay &&
+                end.hour == 0 &&
+                end.minute == 0 &&
+                end.second == 0) {
+              break;
+            }
+            rawItems.add({
+              'type': 'event',
+              'id': event.eventId ?? '',
+              'title': event.title ?? 'No Title',
+              'subtitle': event.location ?? (isAllDay ? 'All day' : timeDisplay),
+              'date': day.toIso8601String(),
+              'dateOnly': DateFormat('yyyy-MM-dd').format(day),
+              'timeDisplay': timeDisplay,
+              'isCompleted': false,
+              'category_color': calColor,
+              'priority': '',
+            });
+            day = day.add(const Duration(days: 1));
+          }
         }
       }
     } catch (_) {}
@@ -348,41 +377,29 @@ class WidgetDataService {
       final dateOnly = item['dateOnly'] as String;
       if (dateOnly != currentGroupKey) {
         currentGroupKey = dateOnly;
-        final itemDate = DateTime.parse(dateOnly);
-        final diffDays = itemDate.difference(today).inDays;
+        final parsedDate = DateTime.parse(dateOnly);
+        final isToday = parsedDate.year == now.year &&
+            parsedDate.month == now.month &&
+            parsedDate.day == now.day;
+        final isTomorrow = parsedDate.year == now.year &&
+            parsedDate.month == now.month &&
+            parsedDate.day == now.day + 1;
 
-        final String dayLabel;
-        if (diffDays == 0) {
-          dayLabel = 'TODAY';
-        } else if (diffDays == 1) {
-          dayLabel = 'TOMORROW';
-        } else if (diffDays == -1) {
-          dayLabel = 'YESTERDAY';
-        } else {
-          dayLabel = DateFormat('EEEE').format(itemDate).toUpperCase();
-        }
-
-        final dateDisplay = DateFormat('EEE, MMM d').format(itemDate);
+        final dayLabel = isToday
+            ? 'TODAY'
+            : (isTomorrow
+                ? 'TOMORROW'
+                : DateFormat('EEEE').format(parsedDate).toUpperCase());
+        final dateDisplay = DateFormat('MMM d').format(parsedDate);
 
         timelineData.add({
           'isHeader': true,
           'dayLabel': dayLabel,
           'dateDisplay': dateDisplay,
-          'date': dateOnly,
         });
       }
 
-      timelineData.add({
-        'isHeader': false,
-        'type': item['type'],
-        'id': item['id'],
-        'title': item['title'],
-        'subtitle': item['subtitle'],
-        'category_color': item['category_color'],
-        'timeDisplay': item['timeDisplay'],
-        'isCompleted': item['isCompleted'],
-        'priority': item['priority'],
-      });
+      timelineData.add(item);
     }
 
     try {
@@ -390,7 +407,7 @@ class WidgetDataService {
         'timeline_agenda_data',
         jsonEncode(timelineData),
       );
-    } catch (_) {
+    } catch (e) {
       await HomeWidget.saveWidgetData<String>('timeline_agenda_data', '[]');
     }
 
@@ -404,28 +421,33 @@ class WidgetDataService {
     }
   }
 
-  /// Update Quick Action & Progress Ring Widget
+  /// Update Quick Actions Control Center Widget
   Future<void> updateQuickActionWidget(
     List<Task> allTasks, {
     String? userId,
   }) async {
     if (kIsWeb) return;
-    int pendingCount = 0;
-    int completedCount = 0;
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final tomorrow = today.add(const Duration(days: 1));
 
-    for (final task in allTasks) {
-      if (!(task.isDeleted ?? false)) {
-        if (task.isCompleted) {
-          completedCount++;
-        } else {
-          pendingCount++;
-        }
-      }
-    }
+    final pendingToday = allTasks.where((t) {
+      if (t.isCompleted || (t.isDeleted ?? false)) return false;
+      if (t.dueDate == null) return true;
+      return t.dueDate!.isAfter(today.subtract(const Duration(seconds: 1))) &&
+          t.dueDate!.isBefore(tomorrow);
+    }).length;
+
+    final completedToday = allTasks.where((t) {
+      if (!t.isCompleted || (t.isDeleted ?? false)) return false;
+      if (t.dueDate == null) return true;
+      return t.dueDate!.isAfter(today.subtract(const Duration(seconds: 1))) &&
+          t.dueDate!.isBefore(tomorrow);
+    }).length;
 
     await Future.wait([
-      HomeWidget.saveWidgetData<int>('quick_action_pending_count', pendingCount),
-      HomeWidget.saveWidgetData<int>('quick_action_completed_count', completedCount),
+      HomeWidget.saveWidgetData<int>('quick_action_pending_count', pendingToday),
+      HomeWidget.saveWidgetData<int>('quick_action_completed_count', completedToday),
     ]);
 
     try {
@@ -460,7 +482,7 @@ class WidgetDataService {
           'subtitle': cat?.name ?? 'Task',
           'category_color': cat != null
               ? '#${cat.colorValue.toRadixString(16).padLeft(8, '0')}'
-              : '#6C63FF',
+              : '#6366F1',
           'date': taskDate,
           'timeDisplay': t.dueDate != null ? DateFormat('HH:mm').format(t.dueDate!) : 'Today',
         });

@@ -96,14 +96,12 @@ class TodayAgendaWidgetFactory(private val context: Context) : RemoteViewsServic
 
             // Text colors based on theme
             val textColor = when (widgetTheme) {
-                "light" -> Color.parseColor("#1C1C1E")
-                "dark", "glassmorphic" -> Color.parseColor("#FFFFFF")
-                else -> Color.parseColor("#1C1C1E")
+                "light" -> Color.parseColor("#0F172A")
+                else -> Color.parseColor("#FFFFFF")
             }
             val secondaryColor = when (widgetTheme) {
-                "light" -> Color.parseColor("#8E8E93")
-                "dark", "glassmorphic" -> Color.parseColor("#AEAEB2")
-                else -> Color.parseColor("#8E8E93")
+                "light" -> Color.parseColor("#64748B")
+                else -> Color.parseColor("#94A3B8")
             }
 
             views.setTextViewText(R.id.widget_agenda_title, title)

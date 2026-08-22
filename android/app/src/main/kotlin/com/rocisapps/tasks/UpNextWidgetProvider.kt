@@ -36,14 +36,12 @@ class UpNextWidgetProvider : HomeWidgetProvider() {
                 views.setInt(R.id.widget_up_next_root, "setBackgroundResource", rootBgRes)
 
                 val textColor = when (theme) {
-                    "light" -> Color.parseColor("#1C1C1E")
-                    "dark", "glassmorphic" -> Color.parseColor("#FFFFFF")
-                    else -> Color.parseColor("#1C1C1E")
+                    "light" -> Color.parseColor("#0F172A")
+                    else -> Color.parseColor("#FFFFFF")
                 }
                 val secondaryColor = when (theme) {
-                    "light" -> Color.parseColor("#8E8E93")
-                    "dark", "glassmorphic" -> Color.parseColor("#AEAEB2")
-                    else -> Color.parseColor("#8E8E93")
+                    "light" -> Color.parseColor("#64748B")
+                    else -> Color.parseColor("#94A3B8")
                 }
 
                 views.setTextColor(R.id.widget_up_next_title, textColor)

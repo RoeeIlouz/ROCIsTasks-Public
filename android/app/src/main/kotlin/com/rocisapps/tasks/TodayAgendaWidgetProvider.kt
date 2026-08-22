@@ -55,14 +55,12 @@ class TodayAgendaWidgetProvider : HomeWidgetProvider() {
                 views.setInt(R.id.widget_today_root, "setBackgroundResource", rootBgRes)
 
                 val textColor = when (theme) {
-                    "light" -> android.graphics.Color.parseColor("#1C1C1E")
-                    "dark", "glassmorphic" -> android.graphics.Color.parseColor("#FFFFFF")
-                    else -> context.getColor(R.color.widget_title_text)
+                    "light" -> android.graphics.Color.parseColor("#0F172A")
+                    else -> android.graphics.Color.parseColor("#FFFFFF")
                 }
                 val secondaryColor = when (theme) {
-                    "light" -> android.graphics.Color.parseColor("#8E8E93")
-                    "dark", "glassmorphic" -> android.graphics.Color.parseColor("#AEAEB2")
-                    else -> context.getColor(R.color.widget_secondary_text)
+                    "light" -> android.graphics.Color.parseColor("#64748B")
+                    else -> android.graphics.Color.parseColor("#94A3B8")
                 }
 
                 views.setTextColor(R.id.widget_today_date_title, textColor)
