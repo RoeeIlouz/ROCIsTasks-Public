@@ -2,18 +2,18 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
-## CI/CD Google Services & FirebaseConfig Resolution - 2026-08-22
+## CI/CD Google Services, FirebaseConfig & Crashlytics Mapping Resolution - 2026-08-22
 
 #### Issue / Enhancement
 * CI build failed on `Execution failed for task ':app:processReleaseGoogleServices' > File google-services.json is missing.` during `flutter build appbundle --release`.
-* Root cause: `android/app/google-services.json` was ignored in `.gitignore` for security/open-source cleanliness, but no template `.example` file existed to be copied during the CI setup step.
-* In addition, `FirebaseConfig should use default Firebase options when no .env file` had previously failed due to template placeholder mismatches.
+* Local release builds failed on `Execution failed for task ':app:uploadCrashlyticsMappingFileRelease' > java.net.UnknownHostException (firebasecrashlyticssymbols.googleapis.com)` during offline/restricted internet builds.
+* Root cause: `android/app/google-services.json` was ignored in `.gitignore` without a template file, and Crashlytics attempted network uploads of obfuscation maps synchronously during Gradle packaging.
 
 #### Solutions & Verification
 * Created [android/app/google-services.json.example](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/google-services.json.example) containing valid schema placeholders for package `com.rocisapps.tasks`.
-* Updated [.github/workflows/flutter-ci.yml](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/.github/workflows/flutter-ci.yml) `Setup configuration templates` step to copy `android/app/google-services.json.example` to `android/app/google-services.json`.
-* Updated [.github/workflows/flutter-ci.yml](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/.github/workflows/flutter-ci.yml) to build release APK (`flutter build apk --release`) and upload `app-release.apk` artifact instead of AAB.
-* Verified with `flutter test` (271/271 passing) and `flutter analyze` (0 issues).
+* Configured `mappingFileUploadEnabled = false` inside `buildTypes.release` in [android/app/build.gradle.kts](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/build.gradle.kts) to prevent offline release packaging failures.
+* Updated [.github/workflows/flutter-ci.yml](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/.github/workflows/flutter-ci.yml) to decode secrets when present and build installable release APKs (`app-release.apk`).
+* Verified with `flutter build appbundle --release` (successfully compiled in 181.7s) and `flutter test` (271/271 passing).
 
 ## Android Free 1-Widget Limit & Side-by-Side Calendar Integration - 2026-08-22
 

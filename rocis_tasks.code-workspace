@@ -6,6 +6,13 @@
 	],
 	"settings": {
 		"kiroAgent.configureMCP": "Disabled",
-		"agentSystem.advanced.logCommands": true
+		"agentSystem.advanced.logCommands": true,
+		"files.watcherExclude": {
+			"**/windows/flutter/ephemeral/**": true,
+			"**/.dart_tool/**": true
+		},
+		"search.exclude": {
+			"**/windows/flutter/ephemeral": true
+		}
 	}
 }
