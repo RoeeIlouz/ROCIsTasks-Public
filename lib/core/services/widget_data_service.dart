@@ -65,12 +65,15 @@ class WidgetDataService {
 
     // 1. Tasks
     final activeTasks = allTasks.where((t) {
-      if ((t.isDeleted ?? false) || t.dueDate == null) return false;
+      if (t.isDeleted ?? false) return false;
+      if (t.dueDate == null) return true;
       return t.dueDate!.isAfter(rangeStart) && t.dueDate!.isBefore(rangeEnd);
     });
 
     for (final t in activeTasks) {
       final cat = getCategoryById(t.categoryId);
+      final taskDate = t.dueDate ?? now;
+      final isAllDay = t.dueDate == null;
       agendaItems.add({
         'type': 'task',
         'id': t.id,
@@ -79,10 +82,10 @@ class WidgetDataService {
         'category_color': cat != null
             ? '#${cat.colorValue.toRadixString(16).padLeft(8, '0')}'
             : '#6C63FF',
-        'date': t.dueDate!.toIso8601String(),
-        'dateDisplay': TaskWidgetService.formatDateForDisplay(t.dueDate!),
-        'timeDisplay': DateFormat('HH:mm').format(t.dueDate!),
-        'isAllDay': false,
+        'date': taskDate.toIso8601String(),
+        'dateDisplay': TaskWidgetService.formatDateForDisplay(taskDate),
+        'timeDisplay': isAllDay ? 'All Day' : DateFormat('HH:mm').format(taskDate),
+        'isAllDay': isAllDay,
         'isCompleted': t.isCompleted,
         'priority': t.priority.name,
       });
@@ -237,8 +240,9 @@ class WidgetDataService {
     final rawItems = <Map<String, dynamic>>[];
 
     // 1. Active Tasks
-    for (final t in allTasks.where((t) => !(t.isDeleted ?? false) && t.dueDate != null)) {
-      if (t.dueDate!.isAfter(rangeStart) && t.dueDate!.isBefore(rangeEnd)) {
+    for (final t in allTasks.where((t) => !(t.isDeleted ?? false))) {
+      final taskDate = t.dueDate ?? today;
+      if (taskDate.isAfter(rangeStart) && taskDate.isBefore(rangeEnd)) {
         final cat = getCategoryById(t.categoryId);
         rawItems.add({
           'type': 'task',
@@ -248,9 +252,9 @@ class WidgetDataService {
           'category_color': cat != null
               ? '#${cat.colorValue.toRadixString(16).padLeft(8, '0')}'
               : '#6C63FF',
-          'date': t.dueDate!.toIso8601String(),
-          'dateOnly': DateFormat('yyyy-MM-dd').format(t.dueDate!),
-          'timeDisplay': DateFormat('HH:mm').format(t.dueDate!),
+          'date': taskDate.toIso8601String(),
+          'dateOnly': DateFormat('yyyy-MM-dd').format(taskDate),
+          'timeDisplay': t.dueDate != null ? DateFormat('HH:mm').format(t.dueDate!) : 'All Day',
           'isCompleted': t.isCompleted,
           'priority': t.priority.name,
         });
@@ -401,8 +405,9 @@ class WidgetDataService {
     final upcomingList = <Map<String, dynamic>>[];
 
     // 1. Pending Tasks
-    for (final t in allTasks.where((t) => !t.isCompleted && !(t.isDeleted ?? false) && t.dueDate != null)) {
-      if (t.dueDate!.isAfter(now.subtract(const Duration(hours: 1)))) {
+    for (final t in allTasks.where((t) => !t.isCompleted && !(t.isDeleted ?? false))) {
+      final taskDate = t.dueDate ?? now;
+      if (t.dueDate == null || taskDate.isAfter(now.subtract(const Duration(hours: 1)))) {
         final cat = getCategoryById(t.categoryId);
         upcomingList.add({
           'type': 'task',
@@ -412,8 +417,8 @@ class WidgetDataService {
           'category_color': cat != null
               ? '#${cat.colorValue.toRadixString(16).padLeft(8, '0')}'
               : '#6C63FF',
-          'date': t.dueDate!,
-          'timeDisplay': DateFormat('HH:mm').format(t.dueDate!),
+          'date': taskDate,
+          'timeDisplay': t.dueDate != null ? DateFormat('HH:mm').format(t.dueDate!) : 'Today',
         });
       }
     }

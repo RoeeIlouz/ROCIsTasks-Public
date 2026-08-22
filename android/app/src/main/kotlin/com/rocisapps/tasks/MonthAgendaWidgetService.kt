@@ -158,7 +158,8 @@ class MonthAgendaListFactory(private val context: Context) : RemoteViewsService.
             for (i in 0 until jsonArray.length()) {
                 val item = jsonArray.optJSONObject(i) ?: continue
                 val itemDate = item.optString("date", "")
-                if (itemDate.startsWith(selectedDate)) {
+                val itemDateDisplay = item.optString("dateDisplay", "")
+                if (itemDateDisplay == selectedDate || itemDate.startsWith(selectedDate)) {
                     items.add(item)
                 }
             }
@@ -266,13 +267,6 @@ class MonthAgendaListFactory(private val context: Context) : RemoteViewsService.
                 views.setViewVisibility(R.id.widget_agenda_check, View.GONE)
                 views.setViewVisibility(R.id.widget_agenda_event_icon, View.VISIBLE)
                 views.setViewVisibility(R.id.widget_agenda_badge, View.GONE)
-
-                if (colorHex.isNotEmpty() && colorHex.startsWith("#")) {
-                    try {
-                        val color = Color.parseColor(colorHex)
-                        views.setInt(R.id.widget_agenda_event_icon, "setColorFilter", color)
-                    } catch (_: Exception) {}
-                }
 
                 val rowIntent = Intent().apply {
                     action = Intent.ACTION_VIEW

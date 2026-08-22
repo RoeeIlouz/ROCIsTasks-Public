@@ -2,20 +2,27 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
-## Android RemoteViews Font Inflation & ListTile Material Fix - 2026-08-22
+## Android Home Screen Widgets Data Sync & RemoteViews Fixes - 2026-08-22
 
 #### Issue Encountered
-* Android home screen widgets (Quick Actions, Up Next, Month Agenda task list, Today Agenda list) showed "Couldn't add widget." or failed to render tasks.
-* Flutter framework threw `ListTile background color or ink splashes may be invisible` warning when `ListTile` was wrapped in `GlassContainer`.
+* 5 new Android homescreen widgets (Quick Actions, Up Next, Day Agenda, Month & Agenda, Schedule Timeline) either did not render tasks or failed to load.
+* Month & Agenda widget right panel displayed "Couldn't add widget." when loading task collections.
 
 #### Root Cause Analysis
-1. `widget_up_next_layout.xml`, `widget_quick_action_layout.xml`, `widget_today_agenda_layout.xml`, `widget_today_agenda_item.xml`, `widget_timeline_header_item.xml`, `widget_timeline_event_item.xml`, `widget_timeline_agenda_layout.xml`, and `widget_month_agenda_layout.xml` used `android:fontFamily="sans-serif-medium"`. On Android RemoteViews layouts, `sans-serif-medium` causes `android.view.InflateException` in launcher processes (e.g. Pixel Launcher, One UI), causing "Couldn't add widget." inside `ListView` collections or complete widget render failure.
-2. `ListTile` instances in `categories_screen.dart` and `trash_screen.dart` were inside `GlassContainer` (which renders background `BoxDecoration`) without an immediate `Material` ancestor.
+1. **`WidgetLimitHelper` Multi-Widget Blocking**: When `isPremium` is false (in dev/debug or free mode), adding a 2nd/3rd widget caused `isWidgetAllowed` to return false for all new widgets, skipping `notifyAppWidgetViewDataChanged` and covering widgets with the Pro overlay.
+2. **Invalid RemoteViews Methods**: `TodayAgendaWidgetService`, `MonthAgendaWidgetService`, and `TimelineAgendaWidgetService` called `views.setInt(..., "setColorFilter", color)` on `ImageView` instances, which throws `RemoteViews.ActionException` at runtime because `setColorFilter(int)` on `ImageView` is not a valid RemoteView method, crashing item inflation.
+3. **Timezone & Date String Mismatch**: `WidgetDataService.dart` passed ISO 8601 UTC timestamps under `date`, while Kotlin factories checked `itemDate.startsWith(targetDateStr)` (e.g. `2026-08-21T21:00...` vs `2026-08-22`), causing date-matching to fail for local time zones.
+4. **Undated Task Filtering**: `WidgetDataService.dart` previously excluded all tasks with `dueDate == null`, preventing undated tasks from showing in Day/Month Agenda.
+5. **Collection Update Timing**: RemoteViews notifications were called synchronously without postDelayed handler, occasionally reading stale cache before SharedPreferences flushed to disk.
 
 #### Solutions & Verification
-* Replaced all occurrences of `android:fontFamily="sans-serif-medium"` with `android:fontFamily="sans-serif"` and explicit `android:textStyle="bold"` where appropriate.
-* Wrapped `ListTile` widgets in `Material(type: MaterialType.transparency)` in `categories_screen.dart` and `trash_screen.dart`.
+* Updated `WidgetLimitHelper.isWidgetAllowed` to allow debug/dev builds and ensure adapter views are always initialized.
+* Removed invalid `setColorFilter` RemoteViews calls and aligned styling with `TaskWidgetService.kt`.
+* Updated date matching in Kotlin factories to match on both `dateDisplay` (`yyyy-MM-dd`) and `date`.
+* Updated `WidgetDataService.dart` to support undated pending tasks.
+* Added `postDelayed(300ms)` `notifyAppWidgetViewDataChanged` across all providers, matching `FullCalendarWidgetProvider.kt`.
 * Verified with `flutter analyze` (0 issues) and `flutter test` (271/271 passing).
+
 
 
 

@@ -144,13 +144,6 @@ class TimelineAgendaWidgetFactory(private val context: Context) : RemoteViewsSer
                 views.setViewVisibility(R.id.widget_timeline_event_icon, View.VISIBLE)
                 views.setViewVisibility(R.id.widget_timeline_badge, View.GONE)
 
-                if (colorHex.isNotEmpty() && colorHex.startsWith("#")) {
-                    try {
-                        val color = Color.parseColor(colorHex)
-                        views.setInt(R.id.widget_timeline_event_icon, "setColorFilter", color)
-                    } catch (_: Exception) {}
-                }
-
                 val rowIntent = Intent().apply {
                     action = Intent.ACTION_VIEW
                     data = Uri.parse("rocistasks://calendar")
