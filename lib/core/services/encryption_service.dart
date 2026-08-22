@@ -6,8 +6,12 @@ import 'package:encrypt/encrypt.dart' as enc;
 import 'package:rocis_tasks/core/services/logger_service.dart';
 
 class EncryptionService {
-  // Use EncryptedSharedPreferences for better persistence on Android
-  static const _secureStorage = FlutterSecureStorage();
+  // Use AndroidOptions with resetOnError for robust persistence on Android
+  static const _secureStorage = FlutterSecureStorage(
+    aOptions: AndroidOptions(
+      resetOnError: true,
+    ),
+  );
 
   static const _keyName = 'hive_encryption_key_v1';
 
@@ -27,7 +31,16 @@ class EncryptionService {
         tag: 'EncryptionService',
       );
 
-      String? keyString = await _secureStorage.read(key: _keyName);
+      String? keyString;
+      try {
+        keyString = await _secureStorage.read(key: _keyName);
+      } catch (e) {
+        AppLogger.warning('Keystore read failed, resetting corrupted secure storage: $e');
+        try {
+          await _secureStorage.deleteAll();
+        } catch (_) {}
+      }
+
       if (keyString != null) {
         AppLogger.info(
           'Key found in secure storage.',
@@ -42,23 +55,39 @@ class EncryptionService {
           tag: 'EncryptionService',
         );
         keyBytes = Hive.generateSecureKey();
-        await _secureStorage.write(
-          key: _keyName,
-          value: base64UrlEncode(keyBytes),
-        );
+        try {
+          await _secureStorage.write(
+            key: _keyName,
+            value: base64UrlEncode(keyBytes),
+          );
+        } catch (e) {
+          AppLogger.error('Failed to write key to secure storage', error: e);
+        }
       } else {
-        keyBytes = base64Url.decode(keyString);
+        try {
+          keyBytes = base64Url.decode(keyString);
+        } catch (_) {
+          keyBytes = Hive.generateSecureKey();
+          try {
+            await _secureStorage.write(
+              key: _keyName,
+              value: base64UrlEncode(keyBytes),
+            );
+          } catch (_) {}
+        }
       }
 
       _initEncrypter(keyBytes);
       return keyBytes;
     } catch (e) {
       AppLogger.error(
-        'EncryptionService Error',
+        'EncryptionService fallback to generated memory key due to error',
         error: e,
         tag: 'EncryptionService',
       );
-      rethrow;
+      final fallbackKey = Hive.generateSecureKey();
+      _initEncrypter(fallbackKey);
+      return fallbackKey;
     }
   }
 

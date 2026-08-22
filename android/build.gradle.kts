@@ -24,32 +24,27 @@ subprojects {
     fun configureProject() {
         project.extensions.findByName("android")?.let { android ->
             try {
-                val androidExtension = android as com.android.build.gradle.BaseExtension
-                
-                if (androidExtension.namespace == null) {
-                    androidExtension.namespace = project.group.toString().takeIf { it.isNotEmpty() && it != "null" }
-                        ?: "com.example.${project.name.replace("-", "_")}"
+                val androidExtension = android as? com.android.build.api.dsl.CommonExtension
+                if (androidExtension != null) {
+                    if (androidExtension.namespace == null) {
+                        androidExtension.namespace = project.group.toString().takeIf { it.isNotEmpty() && it != "null" }
+                            ?: "com.example.${project.name.replace("-", "_")}"
+                    }
+                    
+                    androidExtension.compileOptions.sourceCompatibility = JavaVersion.VERSION_17
+                    androidExtension.compileOptions.targetCompatibility = JavaVersion.VERSION_17
+                    androidExtension.compileSdk = 36
                 }
-                
-                androidExtension.compileOptions {
-                    sourceCompatibility = JavaVersion.VERSION_17
-                    targetCompatibility = JavaVersion.VERSION_17
-                }
-                
-                androidExtension.compileSdkVersion(36)
-
             } catch (e: Exception) {
                 // Fallback for non-standard android extensions
             }
         }
         
         // Force Kotlin JVM Target
-        project.plugins.withId("org.jetbrains.kotlin.android") {
-            tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile::class.java).configureEach {
-                 compilerOptions {
-                     jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
-                     freeCompilerArgs.add("-Xjdk-release=17")
-                 }
+        tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile::class.java).configureEach {
+            compilerOptions {
+                jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+                freeCompilerArgs.add("-Xjdk-release=17")
             }
         }
     }

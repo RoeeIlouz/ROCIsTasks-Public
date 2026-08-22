@@ -35,13 +35,21 @@ import 'package:rocis_tasks/core/services/security_service.dart';
 
 Future<void> main() async {
   // Initialize App (Core, Firebase, Hive)
-  await AppInitializer.initialize();
+  try {
+    await AppInitializer.initialize();
+  } catch (e, stack) {
+    debugPrint('main(): AppInitializer.initialize critical exception: $e\n$stack');
+  }
 
   // Register callback for home widget interactivity
   if (!kIsWeb) {
-    HomeWidget.registerInteractivityCallback(
-      BackgroundHandler.handleInteractivity,
-    );
+    try {
+      HomeWidget.registerInteractivityCallback(
+        BackgroundHandler.handleInteractivity,
+      );
+    } catch (e) {
+      debugPrint('main(): HomeWidget.registerInteractivityCallback failed: $e');
+    }
   }
   debugPrint('main(): calling runApp(AppRoot)');
   runApp(const AppRoot());

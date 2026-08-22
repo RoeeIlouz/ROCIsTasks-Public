@@ -14,27 +14,31 @@ class QuickActionsService {
 
   void initialize(BuildContext context) {
     if (kIsWeb) return;
-    _quickActions.initialize((String shortcutType) {
-      _handleShortcut(context, shortcutType);
-    });
+    try {
+      _quickActions.initialize((String shortcutType) {
+        _handleShortcut(context, shortcutType);
+      });
 
-    _quickActions.setShortcutItems(<ShortcutItem>[
-      const ShortcutItem(
-        type: 'action_new_task',
-        localizedTitle: 'New Task',
-        icon: 'ic_add',
-      ),
-      const ShortcutItem(
-        type: 'action_empty_trash',
-        localizedTitle: 'Empty Trash',
-        icon: 'ic_delete',
-      ),
-      const ShortcutItem(
-        type: 'action_sync',
-        localizedTitle: 'Sync Now',
-        icon: 'ic_sync',
-      ),
-    ]);
+      _quickActions.setShortcutItems(<ShortcutItem>[
+        const ShortcutItem(
+          type: 'action_new_task',
+          localizedTitle: 'New Task',
+          icon: 'ic_add',
+        ),
+        const ShortcutItem(
+          type: 'action_empty_trash',
+          localizedTitle: 'Empty Trash',
+          icon: 'ic_delete',
+        ),
+        const ShortcutItem(
+          type: 'action_sync',
+          localizedTitle: 'Sync Now',
+          icon: 'ic_sync',
+        ),
+      ]);
+    } catch (e) {
+      debugPrint('QuickActionsService failed to initialize: $e');
+    }
   }
 
   void _handleShortcut(BuildContext context, String type) {

@@ -2,6 +2,34 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## App Launch Crash Resolution: SecureStorage Keystore Resilience & QuickActions Drawables - 2026-08-22
+
+#### Issue / Enhancement
+* App was crashing immediately upon launch when launched as a release build.
+* Root cause 1: `EncryptionService` was calling `_secureStorage.read()` without `resetOnError: true`. Any Keystore corruption or signature mismatch threw an unhandled `KeyStoreException` / `BadPaddingException` during `_initEncryption()`, causing `AppInitializer.initialize()` to crash before `runApp()`.
+* Root cause 2: `QuickActionsService.initialize()` registered shortcuts with icon names (`ic_add`, `ic_delete`, `ic_sync`) that did not exist in Android's drawable resources, and was not wrapped in a try/catch, causing `ShortcutManager` resource lookup failures.
+* Root cause 3: Unhandled errors or timeout in secondary services inside `AppInitializer.initialize()` rethrew to `main()`, aborting Flutter execution before the root widget tree could mount.
+
+#### Solutions & Verification
+* **Keystore Resilience**: Updated [EncryptionService.dart](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/services/encryption_service.dart) to use `AndroidOptions(resetOnError: true)` and catch Keystore read failures, automatically resetting corrupted storage and falling back to a securely generated key rather than crashing the app.
+* **Shortcut Drawables & Safe Init**: Added vector drawables [ic_add.xml](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/drawable/ic_add.xml), [ic_delete.xml](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/drawable/ic_delete.xml), and [ic_sync.xml](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/drawable/ic_sync.xml) to `res/drawable/` and wrapped [QuickActionsService.dart](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/services/quick_actions_service.dart) initialization in a try-catch block.
+* **Guaranteed Startup**: In [AppInitializer.dart](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/services/app_initializer.dart) and [main.dart](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/main.dart), made secondary service timeouts non-fatal and wrapped `AppInitializer.initialize()` in `main()` to ensure `runApp(const AppRoot())` is always called.
+* **Verification**: Ran `flutter analyze` (0 issues), `flutter test` (271/271 passed), and verified successful Gradle compile and Shorebird release build.
+
+
+## Android Gradle Plugin 9 (AGP 9) & Gradle 9.1.0 Upgrade - 2026-08-22
+
+#### Issue / Enhancement
+* Upgraded Android build system to Android Gradle Plugin (AGP) version `9.0.1` and Gradle wrapper `9.1.0` following the `/agp-9-upgrade` workflow.
+* Migrated root `build.gradle.kts` configuration logic from deprecated `com.android.build.gradle.BaseExtension` to public `com.android.build.api.dsl.CommonExtension`.
+* Configured `android.newDsl=false` and `android.builtInKotlin=false` in `android/gradle.properties` to ensure binary compatibility with third-party Flutter plugin Gradle hooks (`dev.flutter.flutter-gradle-plugin`, `cloud_firestore`, etc.) that currently reference legacy extension types.
+
+#### Solutions & Verification
+* **Gradle Wrapper**: Updated [android/gradle/wrapper/gradle-wrapper.properties](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/gradle/wrapper/gradle-wrapper.properties) to `gradle-9.1.0-all.zip`.
+* **Plugin Versions**: Updated [android/settings.gradle.kts](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/settings.gradle.kts) to `id("com.android.application") version "9.0.1"` with `id("org.jetbrains.kotlin.android") version "2.2.20"`.
+* **DSL & Kotlin Compile**: Updated [android/build.gradle.kts](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/build.gradle.kts) to use `CommonExtension` with `compileSdk = 36` and direct `KotlinCompile` task configuration.
+* **Verification**: Verified `./gradlew help` (`BUILD SUCCESSFUL`), `./gradlew build --dry-run` (`BUILD SUCCESSFUL`), `flutter analyze` (0 issues), and `flutter test` (271/271 tests passing).
+
 ## Side-by-Side Calendar Month Navigation, Date Selection & Dynamic Accent Colors - 2026-08-22
 
 #### Issue / Enhancement

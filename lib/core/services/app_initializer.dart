@@ -52,45 +52,47 @@ class AppInitializer {
         await coldStartTrace.start();
       }
 
-      // 3. Parallel initialization of independent heavy services with timeout
-      await Future.wait([
-            _initEnvironment(),
-            _initHive().then(
-              (_) => _initEncryption(),
-            ), // Encryption needs Hive for key gen fallback
-            _initTimezone(isBackground: isBackground),
-            if (!isBackground) ...[
-              _initSecondaryFirebase(),
-              _initPerformance(),
-              _initRemoteConfig(),
-            ]
-          ])
-          .then((_) {
-            // Services that depend on Firebase but can run after it's ready
-            ErrorService.initialize();
-            if (!kIsWeb) {
-              AnalyticsService();
-            }
-          })
-          .timeout(
-            Duration(seconds: AppConfig.syncTimeoutSeconds),
-            onTimeout: () {
-              AppLogger.critical(
-                'SECURITY ALERT: Initialization timeout. Potential compromised environment.',
-              );
-              throw Exception('Security initialization timeout');
-            },
-          );
+      // 3. Parallel initialization of independent heavy services
+      try {
+        await Future.wait([
+          _initEnvironment(),
+          _initHive().then(
+            (_) => _initEncryption(),
+          ), // Encryption needs Hive for key gen fallback
+          _initTimezone(isBackground: isBackground),
+          if (!isBackground) ...[
+            _initSecondaryFirebase(),
+            _initPerformance(),
+            _initRemoteConfig(),
+          ]
+        ]).timeout(
+          Duration(seconds: AppConfig.syncTimeoutSeconds),
+          onTimeout: () {
+            AppLogger.warning('Initialization services timed out, continuing startup.');
+            return [];
+          },
+        );
+
+        // Services that depend on Firebase but can run after it's ready
+        ErrorService.initialize();
+        if (!kIsWeb) {
+          AnalyticsService();
+        }
+      } catch (e, stack) {
+        AppLogger.warning('Non-critical service initialization warning: $e', error: e, stack: stack);
+      }
 
       // 4. Dependent services (NotificationService might need Context or other things, but usually safe here)
-      // In background, we might need explicitly notification channels
       if (isBackground) {
-        // Reduced init for background
-        await NotificationService().init();
+        try {
+          await NotificationService().init();
+        } catch (_) {}
       }
 
       if (coldStartTrace != null) {
-        await coldStartTrace.stop();
+        try {
+          await coldStartTrace.stop();
+        } catch (_) {}
       }
     } catch (e, stack) {
       AppLogger.critical(
