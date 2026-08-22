@@ -2,6 +2,23 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## R8 / ProGuard Keep Rules Optimization - 2026-08-22
+
+#### Issue / Enhancement
+* Executed `/r8-analyzer optimize` workflow to audit and streamline ProGuard / R8 keep rules in `android/app/proguard-rules.pro`.
+* Identified overly broad and redundant keep rules that hindered R8 compiler optimizations (inlining, class merging, member stripping, and obfuscation).
+* Removed broad blanket rules:
+  * Package-wide `-keep class com.rocisapps.tasks.** { *; }` (AAPT2 natively extracts and retains all declared components from `AndroidManifest.xml`).
+  * Package-wide `-keep class io.flutter.** { *; }` and subpackage rules (embedded automatically by Flutter engine/plugin AARs).
+  * Google Play Services Auth & Common rules (embedded in respective library AAR consumer rules).
+  * Redundant `AppWidgetProvider` and `RemoteViewsService` keeps (handled natively by AAPT2 manifest rules).
+  * Inapplicable Dart Hive rules.
+* Retained `-assumenosideeffects class android.util.Log` (log stripping in release) and `-dontwarn com.google.android.play.core.**`.
+
+#### Solutions & Verification
+* **Optimized Rules**: Updated [android/app/proguard-rules.pro](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/proguard-rules.pro) with minimal, surgical rules.
+* **Verification**: Ran `flutter analyze` (0 issues), `flutter test` (271/271 passed, 100%), and `flutter build appbundle --release` (successfully built `app-release.aab` with R8 Full Mode optimization).
+
 ## App Launch Crash Resolution: SecureStorage Keystore Resilience & QuickActions Drawables - 2026-08-22
 
 #### Issue / Enhancement

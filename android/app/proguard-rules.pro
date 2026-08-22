@@ -1,4 +1,4 @@
-# ROCIs Tasks - ProGuard Rules
+# ROCIs Tasks - ProGuard / R8 Rules
 
 # Flutter specific rules
 -keep class io.flutter.app.** { *; }
@@ -21,17 +21,17 @@
 # Device Calendar rules
 -keep class com.builttoroam.devicecalendar.** { *; }
 
-# Remove logging in release builds
+# AppWidget and RemoteViews rules
+-keep class * extends android.appwidget.AppWidgetProvider { *; }
+-keep class * extends android.widget.RemoteViewsService { *; }
+-keep class com.rocisapps.tasks.** { *; }
+
+# Strip verbose, debug, and info logs in release builds
 -assumenosideeffects class android.util.Log {
     public static int v(...);
     public static int d(...);
     public static int i(...);
 }
 
-# Flutter Deferred Components / Play Core (ignore missing Play Core classes if not using deferred components)
+# Ignore optional Play Core classes when not using deferred components
 -dontwarn com.google.android.play.core.**
-
-# AppWidget and RemoteViews rules
--keep class * extends android.appwidget.AppWidgetProvider { *; }
--keep class * extends android.widget.RemoteViewsService { *; }
--keep class com.rocisapps.tasks.** { *; }

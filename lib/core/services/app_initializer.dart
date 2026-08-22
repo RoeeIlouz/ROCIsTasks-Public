@@ -4,7 +4,7 @@ import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:rocis_tasks/firebase_options.dart' as default_options;
+import 'package:rocis_tasks/core/config/firebase_config.dart';
 import 'package:rocis_tasks/firebase_schedule_options.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/sub_task.dart';
@@ -38,24 +38,26 @@ class AppInitializer {
       // 1. Core Binding (Required first)
       WidgetsFlutterBinding.ensureInitialized();
 
-      // 2. Initialize DEFAULT Firebase first sequentially
-      // This prevents race conditions where loggers or other services
-      // try to access Firebase before it is ready.
+      // 2. Load Environment Variables First
+      await _initEnvironment();
+
+      // 3. Initialize DEFAULT Firebase
       await _initFirebase();
 
       // Start custom cold start trace for performance monitoring (disabled on Web for adblockers)
       Trace? coldStartTrace;
       if (!isBackground && !kIsWeb && AppConfig.enablePerformanceMonitoring) {
-        coldStartTrace = FirebasePerformance.instance.newTrace(
-          'app_cold_start',
-        );
-        await coldStartTrace.start();
+        try {
+          coldStartTrace = FirebasePerformance.instance.newTrace(
+            'app_cold_start',
+          );
+          await coldStartTrace.start();
+        } catch (_) {}
       }
 
-      // 3. Parallel initialization of independent heavy services
+      // 4. Parallel initialization of independent heavy services
       try {
         await Future.wait([
-          _initEnvironment(),
           _initHive().then(
             (_) => _initEncryption(),
           ), // Encryption needs Hive for key gen fallback
@@ -154,11 +156,11 @@ class AppInitializer {
         return;
       }
 
-      AppLogger.info('Initializing Firebase with default configuration...');
+      AppLogger.info('Initializing Firebase with configuration...');
 
-      // Use default Firebase configuration directly to avoid any environment variable issues
+      // Use FirebaseConfig (reads from .env if present, fallback to default_options)
       await Firebase.initializeApp(
-        options: default_options.DefaultFirebaseOptions.currentPlatform,
+        options: FirebaseConfig.currentPlatform,
       );
 
       AppLogger.info('Firebase initialized successfully');
