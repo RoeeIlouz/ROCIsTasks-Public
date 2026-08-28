@@ -61,12 +61,12 @@ class SubscriptionService extends ChangeNotifier {
         apiKey = fromDefine.isNotEmpty ? fromDefine : null;
       }
 
-      if (apiKey == null) {
-      if (Platform.isAndroid) {
-        apiKey = dotenv.env['REVENUECAT_API_KEY_ANDROID'];
-      } else if (Platform.isIOS) {
-        apiKey = dotenv.env['REVENUECAT_API_KEY_IOS'];
-      }
+      if (apiKey == null && dotenv.isInitialized) {
+        if (Platform.isAndroid) {
+          apiKey = dotenv.env['REVENUECAT_API_KEY_ANDROID'];
+        } else if (Platform.isIOS) {
+          apiKey = dotenv.env['REVENUECAT_API_KEY_IOS'];
+        }
       }
 
       if (apiKey == null || apiKey.isEmpty) {

@@ -1389,4 +1389,53 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get activeTasks => 'सक्रिय कार्य';
+
+  @override
+  String get boardView => 'बोर्ड';
+
+  @override
+  String get listView => 'सूची';
+
+  @override
+  String get groupBy => 'इसके अनुसार समूहित करें';
+
+  @override
+  String get groupByStatus => 'स्थिति';
+
+  @override
+  String get groupByPriority => 'प्राथमिकता';
+
+  @override
+  String get groupByCategory => 'श्रेणी';
+
+  @override
+  String get columnToDo => 'करने के लिए';
+
+  @override
+  String get columnInFocus => 'फोकस में';
+
+  @override
+  String get columnDone => 'पूर्ण';
+
+  @override
+  String get emptyColumn => 'इस कॉलम में कोई कार्य नहीं है';
+
+  @override
+  String get uncategorized => 'अवर्गीकृत';
+
+  @override
+  String get highPriority => 'उच्च प्राथमिकता';
+
+  @override
+  String get mediumPriority => 'मध्यम प्राथमिकता';
+
+  @override
+  String get lowPriority => 'कम प्राथमिकता';
+
+  @override
+  String get kanbanWidget => 'कैनबन बोर्ड';
+
+  @override
+  String get kanbanWidgetDesc =>
+      'कार्य, फोकस और पूर्ण कॉलम के साथ इंटरएक्टिव कैनबन बोर्ड';
 }

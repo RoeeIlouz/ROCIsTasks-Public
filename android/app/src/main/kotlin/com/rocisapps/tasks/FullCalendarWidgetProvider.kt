@@ -47,6 +47,11 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
                 val theme = widgetData.getString("full_calendar_theme", "system") ?: "system"
                 val showWeekNumbers = widgetData.getBoolean("full_calendar_show_week_numbers", true)
                 val weekendHighlight = widgetData.getBoolean("full_calendar_weekend_highlight", true)
+                val highlightColorStr = widgetData.getString("full_calendar_highlight_color", "#EF3842") ?: "#EF3842"
+                var primaryColor = android.graphics.Color.parseColor("#EF3842")
+                try {
+                    primaryColor = android.graphics.Color.parseColor(highlightColorStr)
+                } catch (_: Exception) {}
 
                 // 1. Apply Widget Theme Background
                 val rootBgRes = when (theme) {
@@ -66,6 +71,8 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
                 views.setTextColor(R.id.widget_full_calendar_title, textColor)
                 views.setTextColor(R.id.widget_full_calendar_prev, textColor)
                 views.setTextColor(R.id.widget_full_calendar_next, textColor)
+                views.setTextColor(R.id.widget_full_calendar_today, primaryColor)
+                views.setTextColor(R.id.widget_add_task_btn, primaryColor)
 
                 // Weekday headers text colors
                 val weekdayColor = when (theme) {
@@ -102,9 +109,9 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
 
                     val color = if (weekendHighlight) {
                         if (dayOfWeek == 7) {
-                            android.graphics.Color.parseColor("#FF5252") // Red for Sunday
+                            android.graphics.Color.parseColor("#EF4444") // Red/Coral for Sunday (matches in-app calendar)
                         } else if (dayOfWeek == 6) {
-                            android.graphics.Color.parseColor("#448AFF") // Blue for Saturday
+                            android.graphics.Color.parseColor("#3B82F6") // Blue/Cyan for Saturday (matches in-app calendar)
                         } else {
                             weekdayColor
                         }
@@ -118,10 +125,18 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
                 views.setViewVisibility(R.id.widget_weekday_num_header, if (showWeekNumbers) android.view.View.VISIBLE else android.view.View.GONE)
 
                 // 3. Title Update
-                val monthName = widgetData.getString("full_calendar_month_name", "Calendar")
+                val savedMonthName = widgetData.getString("full_calendar_month_name", null)
+                val monthName = if (!savedMonthName.isNullOrEmpty()) {
+                    savedMonthName
+                } else {
+                    val cal = java.util.Calendar.getInstance()
+                    val offset = widgetData.getInt(PREF_OFFSET, 0)
+                    cal.add(java.util.Calendar.MONTH, offset)
+                    java.text.SimpleDateFormat("MMMM yyyy", java.util.Locale.getDefault()).format(cal.time)
+                }
                 views.setTextViewText(R.id.widget_full_calendar_title, monthName)
 
-                // 2. Navigation Buttons - use direct broadcast for more reliability
+                // 4. Header Navigation Buttons
                 val prevIntent = Intent(context, FullCalendarWidgetProvider::class.java).apply {
                     action = ACTION_PREV_MONTH
                     putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
@@ -152,7 +167,15 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
                 )
                 views.setOnClickPendingIntent(R.id.widget_full_calendar_today, todayPendingIntent)
 
-                // 3. Add Task Button - Use HomeWidgetLaunchIntent for proper Flutter handling
+                // Open calendar tab when tapping the month title
+                val calendarTabIntent = HomeWidgetLaunchIntent.getActivity(
+                    context,
+                    MainActivity::class.java,
+                    Uri.parse("rocistasks://calendar")
+                )
+                views.setOnClickPendingIntent(R.id.widget_full_calendar_title, calendarTabIntent)
+
+                // Add Task Button
                 val addTaskPendingIntent = HomeWidgetLaunchIntent.getActivity(
                     context,
                     MainActivity::class.java,
@@ -160,23 +183,32 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
                 )
                 views.setOnClickPendingIntent(R.id.widget_add_task_btn, addTaskPendingIntent)
 
-                // 4. Filter Buttons - read state and setup click handlers
+                // 5. Filter Buttons - Pill toggle design
                 val showTasks = widgetData.getBoolean(PREF_SHOW_TASKS, true)
                 val showGoogle = widgetData.getBoolean(PREF_SHOW_GOOGLE, true)
 
-                // Update filter button appearance based on state (alpha for enabled/disabled)
-                // Tasks filter
-                views.setFloat(R.id.widget_filter_tasks, "setAlpha", if (showTasks) 1.0f else 0.4f)
+                // Background pills
+                views.setInt(
+                    R.id.widget_filter_tasks,
+                    "setBackgroundResource",
+                    if (showTasks) R.drawable.widget_filter_button_active_bg else R.drawable.widget_filter_button_bg
+                )
+                views.setInt(
+                    R.id.widget_filter_google,
+                    "setBackgroundResource",
+                    if (showGoogle) R.drawable.widget_filter_button_active_bg else R.drawable.widget_filter_button_bg
+                )
 
-                // Google filter
-                views.setFloat(R.id.widget_filter_google, "setAlpha", if (showGoogle) 1.0f else 0.4f)
+                // Text colors
+                views.setTextColor(R.id.widget_filter_tasks, if (showTasks) primaryColor else weekdaySecondaryColor)
+                views.setTextColor(R.id.widget_filter_google, if (showGoogle) primaryColor else weekdaySecondaryColor)
 
                 views.setViewVisibility(R.id.widget_filter_rocis, android.view.View.GONE)
 
-                // Filter button click handlers - broadcast to this widget provider
+                // Filter button click handlers
                 setupFilterButtonIntents(context, views, appWidgetId)
 
-                // 5. List Adapter
+                // 6. List Adapter
                 val serviceIntent = Intent(context, FullCalendarWidgetService::class.java).apply {
                     putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
                     data = Uri.parse("widget://rocis/full_calendar/$appWidgetId")
@@ -184,21 +216,19 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
                 views.setRemoteAdapter(R.id.widget_full_calendar_list, serviceIntent)
                 views.setEmptyView(R.id.widget_full_calendar_list, R.id.empty_full_calendar_view)
 
-                // Use a mutable PendingIntent template that can be combined with fill-in intents
-                // The fill-in intent will provide the specific date URI
                 val appIntent = Intent(context, MainActivity::class.java).apply {
                     action = Intent.ACTION_VIEW
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
                 }
                 val appPendingIntent = android.app.PendingIntent.getActivity(
                     context,
-                    100 + appWidgetId, // Unique request code per widget
+                    100 + appWidgetId,
                     appIntent,
                     android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_MUTABLE
                 )
                 views.setPendingIntentTemplate(R.id.widget_full_calendar_list, appPendingIntent)
 
-                // 6. Finalize Update - Check Widget Allowance (Free users get 1 active widget, Pro gets unlimited)
+                // 7. Finalize Update - Check Widget Allowance
                 val isPremium = widgetData.getBoolean("is_premium", false)
                 val isAllowed = WidgetLimitHelper.isWidgetAllowed(context, appWidgetId, isPremium)
                 if (!isAllowed) {
@@ -223,22 +253,21 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
                 }
 
                 appWidgetManager.updateAppWidget(appWidgetId, views)
+                try {
+                    appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_full_calendar_list)
+                } catch (_: Exception) {}
 
-                // Delay the data-changed notification to ensure SharedPreferences
-                // writes from Dart have been flushed to disk before the
-                // RemoteViewsFactory reads them in onDataSetChanged().
                 android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
                     try {
                         appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_full_calendar_list)
                     } catch (_: Exception) {}
-                }, 300)
+                }, 200)
             } catch (e: Exception) {
             }
         }
     }
 
     private fun setupFilterButtonIntents(context: Context, views: RemoteViews, appWidgetId: Int) {
-        // Tasks filter button
         val filterTasksIntent = Intent(context, FullCalendarWidgetProvider::class.java).apply {
             action = ACTION_FILTER_TASKS
             putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
@@ -249,7 +278,6 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
         )
         views.setOnClickPendingIntent(R.id.widget_filter_tasks, filterTasksPendingIntent)
 
-        // Google filter button
         val filterGoogleIntent = Intent(context, FullCalendarWidgetProvider::class.java).apply {
             action = ACTION_FILTER_GOOGLE
             putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
@@ -285,7 +313,6 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
                     val currentOffset = widgetData.getInt(PREF_OFFSET, 0)
                     editor.putInt(PREF_OFFSET, currentOffset - 1)
                     
-                    // Trigger Dart background update
                     val backgroundIntent = es.antonborri.home_widget.HomeWidgetBackgroundIntent.getBroadcast(
                         context, Uri.parse("rocistasks://full_calendar_prev")
                     )
@@ -297,7 +324,6 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
                     val currentOffset = widgetData.getInt(PREF_OFFSET, 0)
                     editor.putInt(PREF_OFFSET, currentOffset + 1)
                     
-                    // Trigger Dart background update
                     val backgroundIntent = es.antonborri.home_widget.HomeWidgetBackgroundIntent.getBroadcast(
                         context, Uri.parse("rocistasks://full_calendar_next")
                     )
@@ -306,10 +332,8 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
                     } catch (e: Exception) {}
                 }
                 ACTION_TODAY -> {
-                    // Reset offset in widget data
                     editor.putInt(PREF_OFFSET, 0)
                     
-                    // Trigger Dart background update
                     val backgroundIntent = es.antonborri.home_widget.HomeWidgetBackgroundIntent.getBroadcast(
                         context, Uri.parse("rocistasks://full_calendar_today")
                     )
@@ -320,7 +344,6 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
             }
             editor.apply()
             
-            // Update all widgets to reflect the new state
             val appWidgetManager = AppWidgetManager.getInstance(context)
             val thisAppWidget = android.content.ComponentName(context, FullCalendarWidgetProvider::class.java)
             val appWidgetIds = appWidgetManager.getAppWidgetIds(thisAppWidget)

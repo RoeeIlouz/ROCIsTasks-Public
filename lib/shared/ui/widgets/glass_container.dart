@@ -85,7 +85,12 @@ class GlassContainer extends StatelessWidget {
         border: useGlass ? glassBorder : (isSelected ? glassBorder : Border.all(color: Colors.transparent)),
         boxShadow: shadow,
       ),
-      child: child,
+      child: Material(
+        type: MaterialType.transparency,
+        borderRadius: radius,
+        clipBehavior: Clip.antiAlias,
+        child: child,
+      ),
     );
 
     if (!useGlass) {

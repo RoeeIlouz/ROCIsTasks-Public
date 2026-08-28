@@ -2718,6 +2718,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Active Tasks'**
   String get activeTasks;
+
+  /// No description provided for @boardView.
+  ///
+  /// In en, this message translates to:
+  /// **'Board'**
+  String get boardView;
+
+  /// No description provided for @listView.
+  ///
+  /// In en, this message translates to:
+  /// **'List'**
+  String get listView;
+
+  /// No description provided for @groupBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Group By'**
+  String get groupBy;
+
+  /// No description provided for @groupByStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get groupByStatus;
+
+  /// No description provided for @groupByPriority.
+  ///
+  /// In en, this message translates to:
+  /// **'Priority'**
+  String get groupByPriority;
+
+  /// No description provided for @groupByCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get groupByCategory;
+
+  /// No description provided for @columnToDo.
+  ///
+  /// In en, this message translates to:
+  /// **'To Do'**
+  String get columnToDo;
+
+  /// No description provided for @columnInFocus.
+  ///
+  /// In en, this message translates to:
+  /// **'In Focus'**
+  String get columnInFocus;
+
+  /// No description provided for @columnDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get columnDone;
+
+  /// No description provided for @emptyColumn.
+  ///
+  /// In en, this message translates to:
+  /// **'No tasks in this column'**
+  String get emptyColumn;
+
+  /// No description provided for @uncategorized.
+  ///
+  /// In en, this message translates to:
+  /// **'Uncategorized'**
+  String get uncategorized;
+
+  /// No description provided for @highPriority.
+  ///
+  /// In en, this message translates to:
+  /// **'High Priority'**
+  String get highPriority;
+
+  /// No description provided for @mediumPriority.
+  ///
+  /// In en, this message translates to:
+  /// **'Medium Priority'**
+  String get mediumPriority;
+
+  /// No description provided for @lowPriority.
+  ///
+  /// In en, this message translates to:
+  /// **'Low Priority'**
+  String get lowPriority;
+
+  /// No description provided for @kanbanWidget.
+  ///
+  /// In en, this message translates to:
+  /// **'Kanban Board'**
+  String get kanbanWidget;
+
+  /// No description provided for @kanbanWidgetDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Interactive Kanban board with To Do, In Focus, and Done columns'**
+  String get kanbanWidgetDesc;
 }
 
 class _AppLocalizationsDelegate

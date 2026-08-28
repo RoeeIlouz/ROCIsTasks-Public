@@ -492,5 +492,21 @@
   "plusOneDay": "+1 Día",
   "plusOneWeek": "+1 Semana",
   "moveToToday": "Mover a hoy",
-  "activeTasks": "Tareas activas"
+  "activeTasks": "Tareas activas",
+  "boardView": "Tablero",
+  "listView": "Lista",
+  "groupBy": "Agrupar por",
+  "groupByStatus": "Estado",
+  "groupByPriority": "Prioridad",
+  "groupByCategory": "Categoría",
+  "columnToDo": "Por hacer",
+  "columnInFocus": "En foco",
+  "columnDone": "Hecho",
+  "emptyColumn": "No hay tareas en esta columna",
+  "uncategorized": "Sin categoría",
+  "highPriority": "Alta prioridad",
+  "mediumPriority": "Media prioridad",
+  "lowPriority": "Baja prioridad",
+  "kanbanWidget": "Tablero Kanban",
+  "kanbanWidgetDesc": "Tablero Kanban interactivo con columnas Por hacer, En foco y Hecho"
 }

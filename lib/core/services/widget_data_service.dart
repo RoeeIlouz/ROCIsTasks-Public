@@ -68,6 +68,7 @@ class WidgetDataService {
         updateQuickActionWidget(allTasks, userId: userId),
         updateUpNextWidget(allTasks, getCategoryById, userId: userId),
         updateScheduleWidget(allTasks, getCategoryById, userId: userId),
+        updateKanbanWidget(allTasks, getCategoryById, userId: userId),
       ]);
     } catch (e, stack) {
       AppLogger.error('Error updating all widgets: $e', error: e, stack: stack);
@@ -818,6 +819,90 @@ class WidgetDataService {
       );
     } catch (e) {
       AppLogger.debug('Failed to update month events map: $e');
+    }
+  }
+
+  /// Update Kanban Board Widget
+  Future<void> updateKanbanWidget(
+    List<Task> allTasks,
+    Category? Function(String?) getCategoryById, {
+    String? userId,
+  }) async {
+    if (kIsWeb) return;
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final tomorrow = today.add(const Duration(days: 1));
+
+    final todoTasks = <Map<String, dynamic>>[];
+    final inFocusTasks = <Map<String, dynamic>>[];
+    final doneTasks = <Map<String, dynamic>>[];
+
+    // Filter active and completed (ignore deleted)
+    final validTasks = allTasks.where((t) => !(t.isDeleted ?? false)).toList();
+
+    for (final t in validTasks) {
+      final cat = getCategoryById(t.categoryId);
+      final isOverdue = !t.isCompleted && t.dueDate != null && t.dueDate!.isBefore(today);
+      final isToday = t.dueDate != null && _isSameDay(t.dueDate!, today);
+      final isTomorrow = t.dueDate != null && _isSameDay(t.dueDate!, tomorrow);
+
+      String dateDisplay = '';
+      if (t.dueDate != null) {
+        if (isToday) {
+          dateDisplay = 'Today';
+        } else if (isTomorrow) {
+          dateDisplay = 'Tomorrow';
+        } else if (isOverdue) {
+          dateDisplay = 'Overdue (${DateFormat('MMM d').format(t.dueDate!)})';
+        } else {
+          dateDisplay = DateFormat('MMM d').format(t.dueDate!);
+        }
+      }
+
+      final item = {
+        'id': t.id,
+        'title': t.title,
+        'category': cat?.name ?? '',
+        'category_color': cat != null
+            ? '#${cat.colorValue.toRadixString(16).padLeft(8, '0')}'
+            : '#6366F1',
+        'priority': t.priority.name,
+        'isCompleted': t.isCompleted,
+        'isOverdue': isOverdue,
+        'dateDisplay': dateDisplay,
+      };
+
+      if (t.isCompleted) {
+        doneTasks.add(item);
+      } else if (isToday || isOverdue || t.priority == TaskPriority.high) {
+        inFocusTasks.add(item);
+      } else {
+        todoTasks.add(item);
+      }
+    }
+
+    final kanbanData = {
+      'column_todo': todoTasks,
+      'column_infocus': inFocusTasks,
+      'column_done': doneTasks,
+    };
+
+    try {
+      await HomeWidget.saveWidgetData<String>(
+        'kanban_data',
+        jsonEncode(kanbanData),
+      );
+    } catch (e) {
+      await HomeWidget.saveWidgetData<String>('kanban_data', '{}');
+    }
+
+    try {
+      await HomeWidget.updateWidget(
+        name: 'KanbanWidgetProvider',
+        iOSName: 'KanbanWidget',
+      );
+    } catch (e) {
+      AppLogger.debug('Failed to update KanbanWidget: $e');
     }
   }
 

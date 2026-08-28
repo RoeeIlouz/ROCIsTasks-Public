@@ -493,5 +493,21 @@
   "plusOneDay": "+يوم واحد",
   "plusOneWeek": "+أسبوع واحد",
   "moveToToday": "الانتقال إلى اليوم",
-  "activeTasks": "المهام النشطة"
+  "activeTasks": "المهام النشطة",
+  "boardView": "لوحة",
+  "listView": "قائمة",
+  "groupBy": "تجميع حسب",
+  "groupByStatus": "الحالة",
+  "groupByPriority": "الأولوية",
+  "groupByCategory": "التصنيف",
+  "columnToDo": "قيد الانتظار",
+  "columnInFocus": "في التركيز",
+  "columnDone": "مكتمل",
+  "emptyColumn": "لا توجد مهام في هذا العمود",
+  "uncategorized": "بدون تصنيف",
+  "highPriority": "أولوية عالية",
+  "mediumPriority": "أولوية متوسطة",
+  "lowPriority": "أولوية منخفضة",
+  "kanbanWidget": "لوحة كانبان",
+  "kanbanWidgetDesc": "لوحة كانبان تفاعلية تحتوي على أعمدة المهام وفي التركيز والمكتملة"
 }

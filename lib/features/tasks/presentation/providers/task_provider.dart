@@ -194,16 +194,28 @@ class TaskProvider extends ChangeNotifier {
     );
     _widgetDataService = WidgetDataService(_calendarService);
 
-    await _widgetDataService.initScheduleService();
-    await _fullCalendarWidgetService.initScheduleService();
+    // Initialize widget schedule integration asynchronously
+    unawaited(
+      Future.wait([
+        _widgetDataService.initScheduleService().catchError((e, s) {
+          AppLogger.warning('Widget schedule init warning: $e');
+        }),
+        _fullCalendarWidgetService.initScheduleService().catchError((e, s) {
+          AppLogger.warning('FullCalendar schedule init warning: $e');
+        }),
+      ]),
+    );
 
     _taskPagination = PaginationService<Task>(_getFilteredAndSortedTasks);
 
     try {
       await _source.init();
       _taskPagination.initialize();
+      // Ensure notification service is initialized without blocking UI on permission prompt
       await _notificationService.init();
-      await _notificationService.requestPermissions();
+      unawaited(_notificationService.requestPermissions().catchError((e) {
+        AppLogger.warning('Permission request warning: $e');
+      }));
     } catch (e, s) {
       _errorHandlingService.logError(e, s, reason: 'Initialization failed');
       _setError(_l10n.initializationFailedError);
@@ -211,11 +223,11 @@ class TaskProvider extends ChangeNotifier {
 
     _refreshPagination();
 
-    await _notificationService.cancelAllNotifications();
-    await _subscriptionService.init();
-
     _subscriptionService.addListener(notifyListeners);
     _privateModeService.addListener(_onPrivateModeChanged);
+
+    // Populate all home screen widgets with initial data
+    unawaited(_updateWidgets(showNotification: false));
 
     Future.delayed(const Duration(seconds: 2), () async {
       final allTasks = _source.getTasks();

@@ -2,6 +2,158 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## Startup Load Times & App Size Optimization - 2026-08-28
+
+#### Improvements & Fixes
+* **Offline Typography & Local Font Bundling**:
+  * Downloaded and bundled Google Fonts `Outfit` (`Outfit-Regular.ttf`, `Outfit-Medium.ttf`, `Outfit-SemiBold.ttf`, `Outfit-Bold.ttf`) into `assets/fonts/` and `google_fonts/`.
+  * Registered font paths in `pubspec.yaml`.
+  * Set `GoogleFonts.config.allowRuntimeFetching = false` in `AppInitializer.initialize()`, enforcing zero-network local font loading and eliminating layout shifts / FOUT on startup.
+* **Non-Blocking Startup Lifecycle**:
+  * In `AppInitializer._initRemoteConfig()`, configured local defaults immediately and converted `fetchAndActivate()` into an asynchronous background task (`unawaited`), removing startup network blocking.
+  * In `main.dart`, changed `_subscriptionService.syncWithAuthUserId(...)` to run asynchronously in the background, allowing `MaterialApp.router` to mount and display local tasks immediately.
+  * In `TaskProvider.init()`, removed redundant duplicate `_subscriptionService.init()` calls, and converted widget schedule service initialization and notification permission requests to non-blocking background routines.
+* **Surgical Android R8 / ProGuard Optimization**:
+  * Refined `android/app/proguard-rules.pro` by removing broad blanket rules (`-keep class io.flutter.**` and `-keep class com.rocisapps.tasks.**`), allowing R8 full-mode optimization to aggressively inline, merge classes, and strip unused bytecode.
+* **Verification**:
+  * `flutter analyze` completed with 0 issues.
+  * `flutter test` passed 277/277 tests (100%).
+
+## FullCalendar Widget Visual Polish, Smart Event Cells & Homescreen Widgets Skill Update - 2026-08-28
+
+#### Improvements & Fixes
+* **In-Cell Event Badges with Colored Border & Tint Fill**:
+  * Created [`widget_event_badge_fill.xml`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/drawable/widget_event_badge_fill.xml) and [`widget_event_badge_stroke.xml`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/drawable/widget_event_badge_stroke.xml).
+  * In [`widget_full_calendar_row.xml`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/layout/widget_full_calendar_row.xml) and [`FullCalendarWidgetService.kt`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/kotlin/com/rocisapps/tasks/FullCalendarWidgetService.kt), configured dynamic color-filtering on each event badge: 15% opacity tint fill + 50% opacity colored border + event color text matching the in-app `BoxDecoration` calendar styling.
+* **Refined Header Controls to Match App Design**:
+  * Added [`widget_nav_icon_bg.xml`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/drawable/widget_nav_icon_bg.xml) circular glass backdrops for previous (`‹`), next (`›`), today (`⦿`), and add (`+`) buttons.
+  * Synchronized month/year title, chevrons, and today action colors with the theme and brand scheme.
+* **Homescreen Widgets AI Skill (`flutter-homescreen-widgets`) Updated**:
+  * Added Section 7 detailing critical rules: RemoteViews XML tag whitelisting (never `<View>`), static XML row templates for ListView adapters, self-healing native calendar generation, smart in-cell information density (snippets vs. dots), transparent sub-headers, and brand color alignment.
+* **Eliminated Glaring Weekdays White Background**:
+  * Removed `@drawable/widget_item_background` from the weekdays strip in [`widget_full_calendar_layout.xml`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/layout/widget_full_calendar_layout.xml), providing seamless transparent blending with dark and glass themes.
+* **Eliminated Purple/Indigo from All Widget Drawables**:
+  * Updated [`widget_filter_button_active_bg.xml`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/drawable/widget_filter_button_active_bg.xml), [`widget_pill_bg.xml`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/drawable/widget_pill_bg.xml), [`widget_selected_today_background.xml`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/drawable/widget_selected_today_background.xml), [`widget_today_background.xml`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/drawable/widget_today_background.xml), [`values/colors.xml`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/values/colors.xml), and [`values-night/colors.xml`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/values-night/colors.xml) to use ROCIs brand Crimson Red (`#EF3842`).
+* **Verification**: `flutter analyze` passed with 0 issues; `flutter test` passed 277/277 tests (100%).
+
+## Application Startup Exceptions & Android Widget Fixes - 2026-08-28
+
+#### Issues
+* `Couldn't add widget` / `Error inflating RemoteViews`: Android's `RemoteViews` threw `android.view.InflateException: Class not allowed to be inflated android.view.View` because `<View>` tags were used as vertical spacers in `widget_full_calendar_row.xml` and `widget_full_calendar_day_item.xml`.
+* `DotEnv has not been initialized` error occurred when `SubscriptionService` or `FirebaseConfig` accessed `dotenv.env` before or without dotenv loading.
+* `Location with the name "GMT" doesn't exist` crashed `NotificationService.init` when device returned non-standard IANA identifier `"GMT"`.
+* Flutter framework assertion: `ListTile background color or ink splashes may be invisible` because `ListTile` inside `GlassContainer` lacked an immediate `Material` parent.
+
+#### Solutions & Verification
+* **Eliminated Forbidden `<View>` Tags in RemoteViews Layouts**:
+  * Replaced all `<View>` spacer tags with whitelisted `<FrameLayout>` tags in [`widget_full_calendar_row.xml`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/layout/widget_full_calendar_row.xml) and [`widget_full_calendar_day_item.xml`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/layout/widget_full_calendar_day_item.xml). Verified zero `<View>` tags remain across all layout XML files.
+* **DotEnv Safe Access**: Added `dotenv.isInitialized` checks before accessing `dotenv.env` in [`SubscriptionService.dart`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/services/subscription_service.dart) and [`FirebaseConfig.dart`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/config/firebase_config.dart).
+* **Timezone GMT/Alias Fallback**: In [`NotificationService.dart`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/services/notification_service.dart), checked `tz.timeZoneDatabase.locations.containsKey(timeZoneName)` with safe fallback to `UTC`.
+* **GlassContainer Material Hierarchy**: Wrapped `child` with `Material(type: MaterialType.transparency, borderRadius: radius, clipBehavior: Clip.antiAlias)` inside [`GlassContainer.dart`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/shared/ui/widgets/glass_container.dart).
+* **Native Android Calendar Self-Healing & Startup Update**:
+  * Implemented `generateFallbackCalendar()` in [`FullCalendarWidgetService.kt`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/kotlin/com/rocisapps/tasks/FullCalendarWidgetService.kt) to compute and render calendar grid even before Dart writes data.
+  * Added fallback month title formatting in [`FullCalendarWidgetProvider.kt`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/kotlin/com/rocisapps/tasks/FullCalendarWidgetProvider.kt).
+  * Triggered initial home screen widget sync in [`TaskProvider.init()`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/tasks/presentation/providers/task_provider.dart).
+* **Verification**: `flutter analyze` 0 issues, `flutter test` 277/277 passed (100%).
+
+## ROCIs Brand Identity System & `/brand` Workflow - 2026-08-28
+
+#### Issue / Enhancement
+* Users requested updating the brand identity and design tokens to align with the official ROCIs app icon (signature stylized 'R' clipboard with vibrant Crimson Red checkmark on deep Onyx slate).
+
+#### Solutions & Verification
+* **Aligned Brand Guidelines (`docs/brand-guidelines.md`)**:
+  * Updated primary brand color to **ROCIs Crimson Red** (`#EF3842`) mirroring the app icon's signature checkmark.
+  * Defined deep Onyx Slate dark surfaces (`#2E3138` / `#1E2026`) matching the icon's background circle.
+  * Retained secondary Emerald (`#10B981`), Amber (`#F59E0B`), Electric Blue (`#3B82F6`), and Indigo (`#6366F1`) accents.
+* **Synchronized Tokens (`assets/design-tokens.json`, `assets/design-tokens.css`)**:
+  * Re-synced design tokens using `sync-brand-to-tokens.cjs` to generate updated CSS and JSON token scales for `#EF3842`.
+
+## FullCalendar Android Home Screen Widget Redesign & Loading Fix - 2026-08-28
+
+#### Issue / Enhancement
+* The updated FullCalendar home screen widget was stuck showing "Loading" instead of rendering days, caused by dynamic nested `RemoteViews.addView()` calls inside the ListView's `RemoteViewsFactory.getViewAt()`.
+* Users requested fixing the loading error and elevating the UI/UX design following `/ui-ux-pro-max`, `/atomic-design-system-auditor`, and `/mobile-design`.
+
+#### Solutions & Verification
+* **Static Row Architecture (`widget_full_calendar_row.xml`)**:
+  * Replaced dynamic `addView()` and nested RemoteViews inflation with a single, high-performance static XML row layout containing the 8 pre-defined columns (1 week number + 7 days with soft fills, strokes, day labels, and micro-dot indicators).
+  * Completely eliminated Binder transaction bottlenecks and `RemoteViewsAdapter` inflation crashes, allowing the widget to load immediately with zero lag.
+* **Refined Design & Visual Tokens (`FullCalendarWidgetService.kt`, `widget_full_calendar_layout.xml`)**:
+  * Clean day alignment: Exact column weights matching between weekday header strip (`weight="1.0"`) and row day cells.
+  * Today highlight: Soft primary rounded card fill (`12dp` radius, 20% opacity) with bold primary day number.
+  * Selected date highlight: Refined outline stroke.
+  * Weekend accents: Coral Red (`#EF4444`) for Sunday and Electric Blue (`#3B82F6`) for Saturday.
+  * Outside month fade: 30% faded opacity (`#4DFFFFFF` / `#4D1C1C1E`) providing instant month separation.
+  * Event micro-dots: Symmetrical 4dp colored dots mapped to category and Google Calendar colors.
+* **Testing & Verification**:
+  * Ran full test suite `flutter test`: all 277/277 tests passed (100%).
+  * Ran `flutter analyze`: 0 issues found.
+
+## Android Home Screen Kanban Board Widget - 2026-08-27
+
+#### Issue / Enhancement
+* Users requested a dedicated Android Home Screen Widget for the Kanban Board, allowing them to view and navigate columns (*To Do*, *In Focus*, *Done*), complete tasks, and jump into the app's Kanban board directly from their launcher.
+
+#### Solutions & Verification
+* **Native Android RemoteViews & Service**:
+  * Implemented `KanbanWidgetProvider` (`android/app/src/main/kotlin/com/rocisapps/tasks/KanbanWidgetProvider.kt`) supporting theme-adaptive backgrounds (light/dark/amoled/glass), column switching (`To Do`, `In Focus`, `Done`), segment pill indicators with count badges, and deep link intents.
+  * Native state shift: Calculates and persists active column index shifts in SharedPreferences directly in Kotlin before notifying Dart, adhering to Android Home Widget project rules.
+  * Implemented `KanbanWidgetService` (`android/app/src/main/kotlin/com/rocisapps/tasks/KanbanWidgetService.kt`) with `RemoteViewsFactory` to parse `kanban_data` JSON and render cards with category strips, due date chips, priority tags, and interactive checkmarks.
+  * Created XML layouts and metadata: `res/layout/widget_kanban_layout.xml`, `res/layout/widget_kanban_item.xml`, `res/xml/kanban_widget_info.xml`.
+  * Registered provider and service in `AndroidManifest.xml`.
+* **Dart Data Serialization & Deep Linking**:
+  * Implemented `WidgetDataService.updateKanbanWidget()` in `lib/core/services/widget_data_service.dart` to split tasks into `column_todo`, `column_infocus`, and `column_done` and push payload to HomeWidget.
+  * Connected `kanban_sync` handler in `lib/core/services/background_handler.dart`.
+  * Added `open_kanban` and `task_detail` deep link handling in `lib/features/home/presentation/screens/home_screen.dart` to instantly launch and switch to Kanban board view.
+* **Testing & Verification**:
+  * Added unit test `test/core/services/widget_data_service_kanban_test.dart` verifying data serialization and column distribution.
+  * Ran full test suite `flutter test`: all 277/277 tests passed (100%).
+  * Ran `flutter analyze`: 0 issues found.
+
+## Interactive Kanban Board View Feature - 2026-08-27
+
+#### Issue / Enhancement
+* Users requested a visual, interactive Kanban Board view (`/enhance` Option 3) to organize tasks horizontally across customizable columns, supporting drag-and-drop workflow updates on both mobile and web.
+
+#### Solutions & Verification
+* **Glassmorphic Kanban Cards & Columns**:
+  * Implemented `KanbanCard` (`lib/features/tasks/presentation/widgets/kanban/kanban_card.dart`) with `LongPressDraggable<Task>` (mobile touch-safe) and feedback preview, category tinting (10-18% tint via `GlassContainer`), priority indicators, due date badges, subtask indicators, and tap-to-open detail view.
+  * Implemented `KanbanColumn` (`lib/features/tasks/presentation/widgets/kanban/kanban_column.dart`) with `DragTarget<Task>`, empty placeholder state, scrollable task list, and quick task creation button.
+* **Flexible Multi-Dimensional Groupings**:
+  * Implemented `KanbanBoardView` (`lib/features/tasks/presentation/widgets/kanban/kanban_board_view.dart`) supporting 3 grouping modes:
+    1. **Status**: `To Do`, `In Focus` (today/overdue/pinned), `Done` (drops toggle completion).
+    2. **Priority**: `High`, `Medium`, `Low` (drops re-prioritize task).
+    3. **Category**: Dynamic columns per custom category + `Uncategorized` (drops re-categorize task).
+* **Multi-Platform Navigation Integration**:
+  * **Web**: Added dedicated "Board" tab in `WebHomeScreen` sidebar (`lib/features/home/presentation/screens/web_home_screen.dart`).
+  * **Mobile**: Added view switcher toggle icon in `HomeScreen` AppBar (`lib/features/home/presentation/screens/home_screen.dart`), toggling seamlessly between List View and Kanban Board View.
+* **Localization (i18n)**:
+  * Added full localization for all new keys (`boardView`, `listView`, `groupBy`, `groupByStatus`, `groupByPriority`, `groupByCategory`, `columnToDo`, `columnInFocus`, `columnDone`, `emptyColumn`, `uncategorized`, `highPriority`, `mediumPriority`, `lowPriority`) across all 8 supported languages (`en`, `he`, `es`, `de`, `fr`, `sv`, `ar`, `hi`).
+* **Testing & Verification**:
+  * Added widget tests in `test/features/tasks/presentation/widgets/kanban_board_test.dart` covering card rendering, column generation, mode switching (Status, Priority, Category), and task completion interactions.
+  * Ran `flutter test` (all 276/276 tests passing, 100%).
+  * Ran `flutter analyze` (0 issues found).
+
+## Mobile Auth Reprompt Elimination & Android Navigation Bar Insets Fix - 2026-08-27
+
+#### Issue / Enhancement
+* On mobile devices, the app was repeatedly presenting users with interactive Google authentication / authorization dialogs on startup and during background sync.
+* Root cause 1: `GoogleOAuthManager._performSilentTokenRefresh()` and `AuthService._restoreGoogleUser()` were calling `authorizationClient.authorizeScopes(...)`, which triggers interactive system dialogs/activities in background startup and silent token refresh flows.
+* Root cause 2: `GoogleOAuthManager.googleTasksScopes` requested sensitive Web Calendar REST API scopes (`calendar`, `calendar.readonly`, `calendar.events`) on mobile devices, even though mobile handles Google Calendar natively via Android's `device_calendar` plugin.
+* On Android devices using 3-button navigation (Back, Home, Recents), the system navigation bar (height ~48dp) was covering and overlapping the app's floating glass bottom navigation bar.
+* Root cause 3: In `home_screen.dart`, `bottomNavigationBar` was wrapped in a fixed `EdgeInsets.only(bottom: 12)` without respecting `SafeArea` or system window bottom insets.
+
+#### Solutions & Verification
+* **Platform-Aware OAuth Scopes**: In [GoogleOAuthManager.dart](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/services/auth/google_oauth_manager.dart), configured `googleTasksScopes` to only request `email` and `https://www.googleapis.com/auth/tasks` on mobile, while keeping full REST API calendar scopes on Web (`kIsWeb`).
+* **Non-Interactive Silent Token Refresh**: In [GoogleOAuthManager.dart](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/services/auth/google_oauth_manager.dart) and [AuthService.dart](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/services/auth_service.dart), removed `authorizeScopes(...)` fallbacks from background token refresh and startup restoration routines. Background token fetching now strictly queries non-interactive `authorizationForScopes(...)`.
+* **System Window Insets Safe Navigation**: In [home_screen.dart](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/home/presentation/screens/home_screen.dart), wrapped `bottomNavigationBar` in `SafeArea(top: false, ...)` so that the floating glass navigation bar and Floating Action Button (FAB) are dynamically offset above both 3-button system navigation bars and gesture navigation bars.
+* **Testing & Verification**:
+  * Added `test/features/home/home_screen_navigation_test.dart` verifying `HomeScreen` bottom navigation bar `SafeArea` protection under Android 3-button navigation insets.
+  * Updated `test/core/services/auth/google_oauth_manager_test.dart` verifying platform-specific mobile scopes.
+  * Ran `flutter test` (all 272/272 unit, widget, and property tests passing, 100%).
+  * Ran `flutter analyze` with 0 issues found.
+
 ## Google Calendar Web Visibility & OAuth Session Fix - 2026-08-22
 
 #### Issue / Enhancement
@@ -48,16 +200,16 @@ This file summarizes errors encountered and changes made to the codebase, ensuri
 * **Verification**: Ran `flutter analyze` (0 issues), `flutter test` (271/271 passed), and verified successful Gradle compile and Shorebird release build.
 
 
-## Android Gradle Plugin 9 (AGP 9) & Gradle 9.1.0 Upgrade - 2026-08-22
+## Android Gradle Plugin 9 (AGP 9), Gradle 9.1.0 & Kotlin 2.3.20 Upgrade - 2026-08-22
 
 #### Issue / Enhancement
-* Upgraded Android build system to Android Gradle Plugin (AGP) version `9.0.1` and Gradle wrapper `9.1.0` following the `/agp-9-upgrade` workflow.
+* Upgraded Android build system to Android Gradle Plugin (AGP) version `9.0.1`, Gradle wrapper `9.1.0`, and Kotlin Gradle Plugin `2.3.20` following the `/agp-9-upgrade` workflow.
 * Migrated root `build.gradle.kts` configuration logic from deprecated `com.android.build.gradle.BaseExtension` to public `com.android.build.api.dsl.CommonExtension`.
 * Configured `android.newDsl=false` and `android.builtInKotlin=false` in `android/gradle.properties` to ensure binary compatibility with third-party Flutter plugin Gradle hooks (`dev.flutter.flutter-gradle-plugin`, `cloud_firestore`, etc.) that currently reference legacy extension types.
 
 #### Solutions & Verification
 * **Gradle Wrapper**: Updated [android/gradle/wrapper/gradle-wrapper.properties](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/gradle/wrapper/gradle-wrapper.properties) to `gradle-9.1.0-all.zip`.
-* **Plugin Versions**: Updated [android/settings.gradle.kts](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/settings.gradle.kts) to `id("com.android.application") version "9.0.1"` with `id("org.jetbrains.kotlin.android") version "2.2.20"`.
+* **Plugin Versions**: Updated [android/settings.gradle.kts](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/settings.gradle.kts) to `id("com.android.application") version "9.0.1"` with `id("org.jetbrains.kotlin.android") version "2.3.20"`.
 * **DSL & Kotlin Compile**: Updated [android/build.gradle.kts](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/build.gradle.kts) to use `CommonExtension` with `compileSdk = 36` and direct `KotlinCompile` task configuration.
 * **Verification**: Verified `./gradlew help` (`BUILD SUCCESSFUL`), `./gradlew build --dry-run` (`BUILD SUCCESSFUL`), `flutter analyze` (0 issues), and `flutter test` (271/271 tests passing).
 

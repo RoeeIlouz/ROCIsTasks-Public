@@ -1373,4 +1373,53 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get activeTasks => 'משימות פעילות';
+
+  @override
+  String get boardView => 'לוח';
+
+  @override
+  String get listView => 'רשימה';
+
+  @override
+  String get groupBy => 'קבץ לפי';
+
+  @override
+  String get groupByStatus => 'סטטוס';
+
+  @override
+  String get groupByPriority => 'עדיפות';
+
+  @override
+  String get groupByCategory => 'קטגוריה';
+
+  @override
+  String get columnToDo => 'לביצוע';
+
+  @override
+  String get columnInFocus => 'במיקוד';
+
+  @override
+  String get columnDone => 'הושלם';
+
+  @override
+  String get emptyColumn => 'אין משימות בעמודה זו';
+
+  @override
+  String get uncategorized => 'ללא קטגוריה';
+
+  @override
+  String get highPriority => 'עדיפות גבוהה';
+
+  @override
+  String get mediumPriority => 'עדיפות בינונית';
+
+  @override
+  String get lowPriority => 'עדיפות נמוכה';
+
+  @override
+  String get kanbanWidget => 'לוח קנבן';
+
+  @override
+  String get kanbanWidgetDesc =>
+      'לוח קנבן אינטראקטיבי עם עמודות משימות, במיקוד והושלם';
 }

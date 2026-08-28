@@ -94,3 +94,8 @@ config/secrets/
 # Improvement Plan
 IMPROVEMENT_PLAN.md
 ignored/
+
+# Brand Guide
+docs/brand-guidelines.md
+assets/design-tokens.css
+assets/design-tokens.json

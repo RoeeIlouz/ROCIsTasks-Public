@@ -1407,4 +1407,53 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get activeTasks => 'Aktive Aufgaben';
+
+  @override
+  String get boardView => 'Board';
+
+  @override
+  String get listView => 'Liste';
+
+  @override
+  String get groupBy => 'Gruppieren nach';
+
+  @override
+  String get groupByStatus => 'Status';
+
+  @override
+  String get groupByPriority => 'Priorität';
+
+  @override
+  String get groupByCategory => 'Kategorie';
+
+  @override
+  String get columnToDo => 'Zu erledigen';
+
+  @override
+  String get columnInFocus => 'Im Fokus';
+
+  @override
+  String get columnDone => 'Erledigt';
+
+  @override
+  String get emptyColumn => 'Keine Aufgaben in dieser Spalte';
+
+  @override
+  String get uncategorized => 'Ohne Kategorie';
+
+  @override
+  String get highPriority => 'Hohe Priorität';
+
+  @override
+  String get mediumPriority => 'Mittlere Priorität';
+
+  @override
+  String get lowPriority => 'Niedrige Priorität';
+
+  @override
+  String get kanbanWidget => 'Kanban-Board';
+
+  @override
+  String get kanbanWidgetDesc =>
+      'Interaktives Kanban-Board mit Spalten Zu erledigen, Im Fokus und Erledigt';
 }

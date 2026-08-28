@@ -493,5 +493,21 @@
   "plusOneDay": "+1 दिन",
   "plusOneWeek": "+1 सप्ताह",
   "moveToToday": "आज पर ले जाएं",
-  "activeTasks": "सक्रिय कार्य"
+  "activeTasks": "सक्रिय कार्य",
+  "boardView": "बोर्ड",
+  "listView": "सूची",
+  "groupBy": "इसके अनुसार समूहित करें",
+  "groupByStatus": "स्थिति",
+  "groupByPriority": "प्राथमिकता",
+  "groupByCategory": "श्रेणी",
+  "columnToDo": "करने के लिए",
+  "columnInFocus": "फोकस में",
+  "columnDone": "पूर्ण",
+  "emptyColumn": "इस कॉलम में कोई कार्य नहीं है",
+  "uncategorized": "अवर्गीकृत",
+  "highPriority": "उच्च प्राथमिकता",
+  "mediumPriority": "मध्यम प्राथमिकता",
+  "lowPriority": "कम प्राथमिकता",
+  "kanbanWidget": "कैनबन बोर्ड",
+  "kanbanWidgetDesc": "कार्य, फोकस और पूर्ण कॉलम के साथ इंटरएक्टिव कैनबन बोर्ड"
 }

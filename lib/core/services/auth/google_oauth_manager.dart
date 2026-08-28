@@ -24,13 +24,18 @@ class GoogleTokenExpiredException implements Exception {
 }
 
 class GoogleOAuthManager {
-  static List<String> get googleTasksScopes => const [
-        'email',
-        'https://www.googleapis.com/auth/tasks',
-        'https://www.googleapis.com/auth/calendar',
-        'https://www.googleapis.com/auth/calendar.readonly',
-        'https://www.googleapis.com/auth/calendar.events',
-      ];
+  static List<String> get googleTasksScopes => kIsWeb
+      ? const [
+          'email',
+          'https://www.googleapis.com/auth/tasks',
+          'https://www.googleapis.com/auth/calendar',
+          'https://www.googleapis.com/auth/calendar.readonly',
+          'https://www.googleapis.com/auth/calendar.events',
+        ]
+      : const [
+          'email',
+          'https://www.googleapis.com/auth/tasks',
+        ];
 
   final ErrorHandlingService _errorHandlingService;
   final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
@@ -161,14 +166,17 @@ class GoogleOAuthManager {
         return null;
       }
 
-      var clientAuth = await _googleUser!.authorizationClient.authorizationForScopes(googleTasksScopes);
-      clientAuth ??= await _googleUser!.authorizationClient.authorizeScopes(googleTasksScopes);
+      final clientAuth = await _googleUser!.authorizationClient
+          .authorizationForScopes(googleTasksScopes);
 
-      if (clientAuth.accessToken.isNotEmpty) {
+      if (clientAuth != null && clientAuth.accessToken.isNotEmpty) {
         await cacheGoogleAccessToken(clientAuth.accessToken);
         return clientAuth.accessToken;
       }
-      AppLogger.info('Silent refresh: authorizationClient returned null.', tag: 'Auth');
+      AppLogger.info(
+        'Silent refresh: authorizationClient returned null or empty token.',
+        tag: 'Auth',
+      );
       return null;
     } catch (e) {
       AppLogger.warning('Silent Google token refresh failed: $e', tag: 'Auth');

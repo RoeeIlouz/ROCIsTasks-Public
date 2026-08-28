@@ -1373,4 +1373,53 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get activeTasks => 'المهام النشطة';
+
+  @override
+  String get boardView => 'لوحة';
+
+  @override
+  String get listView => 'قائمة';
+
+  @override
+  String get groupBy => 'تجميع حسب';
+
+  @override
+  String get groupByStatus => 'الحالة';
+
+  @override
+  String get groupByPriority => 'الأولوية';
+
+  @override
+  String get groupByCategory => 'التصنيف';
+
+  @override
+  String get columnToDo => 'قيد الانتظار';
+
+  @override
+  String get columnInFocus => 'في التركيز';
+
+  @override
+  String get columnDone => 'مكتمل';
+
+  @override
+  String get emptyColumn => 'لا توجد مهام في هذا العمود';
+
+  @override
+  String get uncategorized => 'بدون تصنيف';
+
+  @override
+  String get highPriority => 'أولوية عالية';
+
+  @override
+  String get mediumPriority => 'أولوية متوسطة';
+
+  @override
+  String get lowPriority => 'أولوية منخفضة';
+
+  @override
+  String get kanbanWidget => 'لوحة كانبان';
+
+  @override
+  String get kanbanWidgetDesc =>
+      'لوحة كانبان تفاعلية تحتوي على أعمدة المهام وفي التركيز والمكتملة';
 }

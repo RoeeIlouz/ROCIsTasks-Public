@@ -5,6 +5,7 @@ import 'package:rocis_tasks/features/home/presentation/screens/web_home_screen.d
 import 'package:rocis_tasks/features/calendar/presentation/screens/calendar_screen.dart';
 import 'package:rocis_tasks/features/categories/presentation/screens/categories_screen.dart';
 import 'package:rocis_tasks/features/tasks/presentation/screens/add_task_screen.dart';
+import 'package:rocis_tasks/features/tasks/presentation/screens/task_detail_screen.dart';
 import 'package:rocis_tasks/features/tasks/presentation/screens/task_list_screen.dart';
 import 'package:rocis_tasks/features/tasks/presentation/widgets/task_sort_filter_sheet.dart';
 import 'package:rocis_tasks/features/home/presentation/screens/settings_screen.dart';
@@ -23,6 +24,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:rocis_tasks/shared/ui/widgets/glass_container.dart';
 import 'package:rocis_tasks/shared/ui/theme/theme_service.dart';
 import 'package:rocis_tasks/shared/ui/widgets/easter_egg_spinner.dart';
+import 'package:rocis_tasks/features/tasks/presentation/widgets/kanban/kanban_board_view.dart';
 import 'package:rocis_tasks/core/services/subscription_service.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -37,6 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
   late final PageController _pageController;
   StreamSubscription? _notificationActionSubscription;
   bool _isSearching = false;
+  bool _isBoardView = false;
   final TextEditingController _searchController = TextEditingController();
 
   // Widget channel for receiving deep links from Android
@@ -115,6 +118,31 @@ class _HomeScreenState extends State<HomeScreen> {
 
     if (uri.host == 'add_task') {
       _navigateToAddTask();
+      return;
+    }
+
+    if (uri.host == 'open_kanban' || uri.path.contains('open_kanban') || uri.host == 'kanban') {
+      _onItemTapped(0);
+      setState(() {
+        _isBoardView = true;
+      });
+      return;
+    }
+
+    if (uri.host == 'task_detail') {
+      final taskId = uri.queryParameters['id'];
+      if (taskId != null) {
+        final taskProvider = Provider.of<TaskProvider>(context, listen: false);
+        try {
+          final task = taskProvider.tasks.firstWhere((t) => t.id == taskId);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => TaskDetailScreen(task: task),
+            ),
+          );
+        } catch (_) {}
+      }
       return;
     }
 
@@ -292,7 +320,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     )
                   : Text(
                       _currentIndex == 0
-                          ? l10n.myTasks
+                          ? (_isBoardView ? l10n.boardView : l10n.myTasks)
                           : _currentIndex == 1
                           ? l10n.calendar
                           : l10n.settings,
@@ -300,6 +328,16 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
               actions: [
                 if (_currentIndex == 0) ...[
+                  IconButton(
+                    icon: Icon(_isBoardView ? Icons.view_list_rounded : Icons.view_kanban_outlined),
+                    tooltip: _isBoardView ? l10n.listView : l10n.boardView,
+                    onPressed: () {
+                      HapticFeedback.lightImpact();
+                      setState(() {
+                        _isBoardView = !_isBoardView;
+                      });
+                    },
+                  ),
                   IconButton(
                     icon: Icon(_isSearching ? Icons.close : Icons.search),
                     onPressed: () {
@@ -406,10 +444,10 @@ class _HomeScreenState extends State<HomeScreen> {
               controller: _pageController,
               onPageChanged: _onPageChanged,
               physics: const BouncingScrollPhysics(),
-              children: const [
-                TaskListView(),
-                CalendarScreen(),
-                SettingsScreen(),
+              children: [
+                _isBoardView ? const KanbanBoardView() : const TaskListView(),
+                const CalendarScreen(),
+                const SettingsScreen(),
               ],
             ),
           ),
@@ -464,37 +502,40 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             )
           : null,
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.only(left: 16, right: 16, bottom: 12),
-        child: GlassContainer(
-          borderRadius: BorderRadius.circular(24),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _buildNavItem(
-                  0,
-                  Icons.task_alt_outlined,
-                  Icons.task_alt,
-                  l10n.tasks,
-                  theme,
-                ),
-                _buildNavItem(
-                  1,
-                  Icons.calendar_month_outlined,
-                  Icons.calendar_month,
-                  l10n.calendar,
-                  theme,
-                ),
-                _buildNavItem(
-                  2,
-                  Icons.settings_outlined,
-                  Icons.settings,
-                  l10n.settings,
-                  theme,
-                ),
-              ],
+      bottomNavigationBar: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.only(left: 16, right: 16, bottom: 12),
+          child: GlassContainer(
+            borderRadius: BorderRadius.circular(24),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _buildNavItem(
+                    0,
+                    Icons.task_alt_outlined,
+                    Icons.task_alt,
+                    l10n.tasks,
+                    theme,
+                  ),
+                  _buildNavItem(
+                    1,
+                    Icons.calendar_month_outlined,
+                    Icons.calendar_month,
+                    l10n.calendar,
+                    theme,
+                  ),
+                  _buildNavItem(
+                    2,
+                    Icons.settings_outlined,
+                    Icons.settings,
+                    l10n.settings,
+                    theme,
+                  ),
+                ],
+              ),
             ),
           ),
         ),

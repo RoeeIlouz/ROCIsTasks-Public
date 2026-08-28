@@ -1,7 +1,1281 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/widget_full_calendar_row_container"
+    android:id="@+id/widget_full_calendar_row_root"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:gravity="center_vertical" />
+    android:gravity="center_vertical"
+    android:paddingTop="1dp"
+    android:paddingBottom="1dp">
+
+    <!-- Week Number Column -->
+    <FrameLayout
+        android:id="@+id/widget_full_week_num_root"
+        android:layout_width="0dp"
+        android:layout_height="52dp"
+        android:layout_weight="0.6"
+        android:gravity="center">
+        <TextView
+            android:id="@+id/widget_full_week_num_text"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="34"
+            android:textSize="10sp"
+            android:textColor="@color/widget_secondary_text"
+            android:textStyle="italic" />
+    </FrameLayout>
+
+    <!-- Day 0 (Col 0) -->
+    <FrameLayout
+        android:id="@+id/widget_full_day_0"
+        android:layout_width="0dp"
+        android:layout_height="52dp"
+        android:layout_weight="1"
+        android:layout_marginStart="1dp"
+        android:layout_marginEnd="1dp"
+        android:padding="1dp"
+        android:clickable="true"
+        android:focusable="true">
+
+        <ImageView
+            android:id="@+id/widget_full_day_fill_0"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/widget_day_fill"
+            android:scaleType="fitXY"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/widget_full_day_stroke_0"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/widget_day_stroke"
+            android:scaleType="fitXY"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:paddingTop="1.5dp"
+            android:paddingBottom="1.5dp"
+            android:paddingStart="1dp"
+            android:paddingEnd="1dp">
+
+            <TextView
+                android:id="@+id/widget_full_day_text_0"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="1"
+                android:textSize="11sp"
+                android:fontFamily="sans-serif"
+                android:textColor="@color/widget_title_text" />
+
+            <!-- Event 1 Box with soft tint background + colored border + title text -->
+            <FrameLayout
+                android:id="@+id/widget_full_event_box_0_1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="1dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/widget_full_event_fill_0_1"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/widget_event_badge_fill"
+                    android:scaleType="fitXY" />
+
+                <ImageView
+                    android:id="@+id/widget_full_event_stroke_0_1"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/widget_event_badge_stroke"
+                    android:scaleType="fitXY" />
+
+                <TextView
+                    android:id="@+id/widget_full_event_text_0_1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:ellipsize="end"
+                    android:textSize="7.5sp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:paddingStart="2dp"
+                    android:paddingEnd="2dp"
+                    android:paddingTop="0.5dp"
+                    android:paddingBottom="0.5dp" />
+            </FrameLayout>
+
+            <!-- Event 2 Box with soft tint background + colored border + title text -->
+            <FrameLayout
+                android:id="@+id/widget_full_event_box_0_2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="1dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/widget_full_event_fill_0_2"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/widget_event_badge_fill"
+                    android:scaleType="fitXY" />
+
+                <ImageView
+                    android:id="@+id/widget_full_event_stroke_0_2"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/widget_event_badge_stroke"
+                    android:scaleType="fitXY" />
+
+                <TextView
+                    android:id="@+id/widget_full_event_text_0_2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:ellipsize="end"
+                    android:textSize="7.5sp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:paddingStart="2dp"
+                    android:paddingEnd="2dp"
+                    android:paddingTop="0.5dp"
+                    android:paddingBottom="0.5dp" />
+            </FrameLayout>
+
+            <!-- Spacer for dots -->
+            <FrameLayout
+                android:layout_width="1dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <!-- Micro-dots row (When > 2 events) -->
+            <LinearLayout
+                android:id="@+id/widget_full_dots_0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_gravity="center_horizontal"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/widget_full_dot_0_1"
+                    android:layout_width="4dp"
+                    android:layout_height="4dp"
+                    android:layout_marginStart="1dp"
+                    android:layout_marginEnd="1dp"
+                    android:src="@drawable/widget_event_dot"
+                    android:visibility="gone" />
+
+                <ImageView
+                    android:id="@+id/widget_full_dot_0_2"
+                    android:layout_width="4dp"
+                    android:layout_height="4dp"
+                    android:layout_marginStart="1dp"
+                    android:layout_marginEnd="1dp"
+                    android:src="@drawable/widget_event_dot"
+                    android:visibility="gone" />
+
+                <ImageView
+                    android:id="@+id/widget_full_dot_0_3"
+                    android:layout_width="4dp"
+                    android:layout_height="4dp"
+                    android:layout_marginStart="1dp"
+                    android:layout_marginEnd="1dp"
+                    android:src="@drawable/widget_event_dot"
+                    android:visibility="gone" />
+
+                <ImageView
+                    android:id="@+id/widget_full_dot_0_4"
+                    android:layout_width="4dp"
+                    android:layout_height="4dp"
+                    android:layout_marginStart="1dp"
+                    android:layout_marginEnd="1dp"
+                    android:src="@drawable/widget_event_dot"
+                    android:visibility="gone" />
+            </LinearLayout>
+        </LinearLayout>
+    </FrameLayout>
+
+    <!-- Day 1 (Col 1) -->
+    <FrameLayout
+        android:id="@+id/widget_full_day_1"
+        android:layout_width="0dp"
+        android:layout_height="52dp"
+        android:layout_weight="1"
+        android:layout_marginStart="1dp"
+        android:layout_marginEnd="1dp"
+        android:padding="1dp"
+        android:clickable="true"
+        android:focusable="true">
+
+        <ImageView
+            android:id="@+id/widget_full_day_fill_1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/widget_day_fill"
+            android:scaleType="fitXY"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/widget_full_day_stroke_1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/widget_day_stroke"
+            android:scaleType="fitXY"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:paddingTop="1.5dp"
+            android:paddingBottom="1.5dp"
+            android:paddingStart="1dp"
+            android:paddingEnd="1dp">
+
+            <TextView
+                android:id="@+id/widget_full_day_text_1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="2"
+                android:textSize="11sp"
+                android:fontFamily="sans-serif"
+                android:textColor="@color/widget_title_text" />
+
+            <!-- Event 1 Box with soft tint background + colored border + title text -->
+            <FrameLayout
+                android:id="@+id/widget_full_event_box_1_1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="1dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/widget_full_event_fill_1_1"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/widget_event_badge_fill"
+                    android:scaleType="fitXY" />
+
+                <ImageView
+                    android:id="@+id/widget_full_event_stroke_1_1"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/widget_event_badge_stroke"
+                    android:scaleType="fitXY" />
+
+                <TextView
+                    android:id="@+id/widget_full_event_text_1_1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:ellipsize="end"
+                    android:textSize="7.5sp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:paddingStart="2dp"
+                    android:paddingEnd="2dp"
+                    android:paddingTop="0.5dp"
+                    android:paddingBottom="0.5dp" />
+            </FrameLayout>
+
+            <!-- Event 2 Box with soft tint background + colored border + title text -->
+            <FrameLayout
+                android:id="@+id/widget_full_event_box_1_2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="1dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/widget_full_event_fill_1_2"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/widget_event_badge_fill"
+                    android:scaleType="fitXY" />
+
+                <ImageView
+                    android:id="@+id/widget_full_event_stroke_1_2"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/widget_event_badge_stroke"
+                    android:scaleType="fitXY" />
+
+                <TextView
+                    android:id="@+id/widget_full_event_text_1_2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:ellipsize="end"
+                    android:textSize="7.5sp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:paddingStart="2dp"
+                    android:paddingEnd="2dp"
+                    android:paddingTop="0.5dp"
+                    android:paddingBottom="0.5dp" />
+            </FrameLayout>
+
+            <!-- Spacer for dots -->
+            <FrameLayout
+                android:layout_width="1dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <!-- Micro-dots row (When > 2 events) -->
+            <LinearLayout
+                android:id="@+id/widget_full_dots_1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_gravity="center_horizontal"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/widget_full_dot_1_1"
+                    android:layout_width="4dp"
+                    android:layout_height="4dp"
+                    android:layout_marginStart="1dp"
+                    android:layout_marginEnd="1dp"
+                    android:src="@drawable/widget_event_dot"
+                    android:visibility="gone" />
+
+                <ImageView
+                    android:id="@+id/widget_full_dot_1_2"
+                    android:layout_width="4dp"
+                    android:layout_height="4dp"
+                    android:layout_marginStart="1dp"
+                    android:layout_marginEnd="1dp"
+                    android:src="@drawable/widget_event_dot"
+                    android:visibility="gone" />
+
+                <ImageView
+                    android:id="@+id/widget_full_dot_1_3"
+                    android:layout_width="4dp"
+                    android:layout_height="4dp"
+                    android:layout_marginStart="1dp"
+                    android:layout_marginEnd="1dp"
+                    android:src="@drawable/widget_event_dot"
+                    android:visibility="gone" />
+
+                <ImageView
+                    android:id="@+id/widget_full_dot_1_4"
+                    android:layout_width="4dp"
+                    android:layout_height="4dp"
+                    android:layout_marginStart="1dp"
+                    android:layout_marginEnd="1dp"
+                    android:src="@drawable/widget_event_dot"
+                    android:visibility="gone" />
+            </LinearLayout>
+        </LinearLayout>
+    </FrameLayout>
+
+    <!-- Day 2 (Col 2) -->
+    <FrameLayout
+        android:id="@+id/widget_full_day_2"
+        android:layout_width="0dp"
+        android:layout_height="52dp"
+        android:layout_weight="1"
+        android:layout_marginStart="1dp"
+        android:layout_marginEnd="1dp"
+        android:padding="1dp"
+        android:clickable="true"
+        android:focusable="true">
+
+        <ImageView
+            android:id="@+id/widget_full_day_fill_2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/widget_day_fill"
+            android:scaleType="fitXY"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/widget_full_day_stroke_2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/widget_day_stroke"
+            android:scaleType="fitXY"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:paddingTop="1.5dp"
+            android:paddingBottom="1.5dp"
+            android:paddingStart="1dp"
+            android:paddingEnd="1dp">
+
+            <TextView
+                android:id="@+id/widget_full_day_text_2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="3"
+                android:textSize="11sp"
+                android:fontFamily="sans-serif"
+                android:textColor="@color/widget_title_text" />
+
+            <!-- Event 1 Box with soft tint background + colored border + title text -->
+            <FrameLayout
+                android:id="@+id/widget_full_event_box_2_1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="1dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/widget_full_event_fill_2_1"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/widget_event_badge_fill"
+                    android:scaleType="fitXY" />
+
+                <ImageView
+                    android:id="@+id/widget_full_event_stroke_2_1"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/widget_event_badge_stroke"
+                    android:scaleType="fitXY" />
+
+                <TextView
+                    android:id="@+id/widget_full_event_text_2_1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:ellipsize="end"
+                    android:textSize="7.5sp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:paddingStart="2dp"
+                    android:paddingEnd="2dp"
+                    android:paddingTop="0.5dp"
+                    android:paddingBottom="0.5dp" />
+            </FrameLayout>
+
+            <!-- Event 2 Box with soft tint background + colored border + title text -->
+            <FrameLayout
+                android:id="@+id/widget_full_event_box_2_2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="1dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/widget_full_event_fill_2_2"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/widget_event_badge_fill"
+                    android:scaleType="fitXY" />
+
+                <ImageView
+                    android:id="@+id/widget_full_event_stroke_2_2"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/widget_event_badge_stroke"
+                    android:scaleType="fitXY" />
+
+                <TextView
+                    android:id="@+id/widget_full_event_text_2_2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:ellipsize="end"
+                    android:textSize="7.5sp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:paddingStart="2dp"
+                    android:paddingEnd="2dp"
+                    android:paddingTop="0.5dp"
+                    android:paddingBottom="0.5dp" />
+            </FrameLayout>
+
+            <!-- Spacer for dots -->
+            <FrameLayout
+                android:layout_width="1dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <!-- Micro-dots row (When > 2 events) -->
+            <LinearLayout
+                android:id="@+id/widget_full_dots_2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_gravity="center_horizontal"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/widget_full_dot_2_1"
+                    android:layout_width="4dp"
+                    android:layout_height="4dp"
+                    android:layout_marginStart="1dp"
+                    android:layout_marginEnd="1dp"
+                    android:src="@drawable/widget_event_dot"
+                    android:visibility="gone" />
+
+                <ImageView
+                    android:id="@+id/widget_full_dot_2_2"
+                    android:layout_width="4dp"
+                    android:layout_height="4dp"
+                    android:layout_marginStart="1dp"
+                    android:layout_marginEnd="1dp"
+                    android:src="@drawable/widget_event_dot"
+                    android:visibility="gone" />
+
+                <ImageView
+                    android:id="@+id/widget_full_dot_2_3"
+                    android:layout_width="4dp"
+                    android:layout_height="4dp"
+                    android:layout_marginStart="1dp"
+                    android:layout_marginEnd="1dp"
+                    android:src="@drawable/widget_event_dot"
+                    android:visibility="gone" />
+
+                <ImageView
+                    android:id="@+id/widget_full_dot_2_4"
+                    android:layout_width="4dp"
+                    android:layout_height="4dp"
+                    android:layout_marginStart="1dp"
+                    android:layout_marginEnd="1dp"
+                    android:src="@drawable/widget_event_dot"
+                    android:visibility="gone" />
+            </LinearLayout>
+        </LinearLayout>
+    </FrameLayout>
+
+    <!-- Day 3 (Col 3) -->
+    <FrameLayout
+        android:id="@+id/widget_full_day_3"
+        android:layout_width="0dp"
+        android:layout_height="52dp"
+        android:layout_weight="1"
+        android:layout_marginStart="1dp"
+        android:layout_marginEnd="1dp"
+        android:padding="1dp"
+        android:clickable="true"
+        android:focusable="true">
+
+        <ImageView
+            android:id="@+id/widget_full_day_fill_3"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/widget_day_fill"
+            android:scaleType="fitXY"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/widget_full_day_stroke_3"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/widget_day_stroke"
+            android:scaleType="fitXY"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:paddingTop="1.5dp"
+            android:paddingBottom="1.5dp"
+            android:paddingStart="1dp"
+            android:paddingEnd="1dp">
+
+            <TextView
+                android:id="@+id/widget_full_day_text_3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="4"
+                android:textSize="11sp"
+                android:fontFamily="sans-serif"
+                android:textColor="@color/widget_title_text" />
+
+            <!-- Event 1 Box with soft tint background + colored border + title text -->
+            <FrameLayout
+                android:id="@+id/widget_full_event_box_3_1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="1dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/widget_full_event_fill_3_1"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/widget_event_badge_fill"
+                    android:scaleType="fitXY" />
+
+                <ImageView
+                    android:id="@+id/widget_full_event_stroke_3_1"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/widget_event_badge_stroke"
+                    android:scaleType="fitXY" />
+
+                <TextView
+                    android:id="@+id/widget_full_event_text_3_1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:ellipsize="end"
+                    android:textSize="7.5sp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:paddingStart="2dp"
+                    android:paddingEnd="2dp"
+                    android:paddingTop="0.5dp"
+                    android:paddingBottom="0.5dp" />
+            </FrameLayout>
+
+            <!-- Event 2 Box with soft tint background + colored border + title text -->
+            <FrameLayout
+                android:id="@+id/widget_full_event_box_3_2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="1dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/widget_full_event_fill_3_2"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/widget_event_badge_fill"
+                    android:scaleType="fitXY" />
+
+                <ImageView
+                    android:id="@+id/widget_full_event_stroke_3_2"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/widget_event_badge_stroke"
+                    android:scaleType="fitXY" />
+
+                <TextView
+                    android:id="@+id/widget_full_event_text_3_2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:ellipsize="end"
+                    android:textSize="7.5sp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:paddingStart="2dp"
+                    android:paddingEnd="2dp"
+                    android:paddingTop="0.5dp"
+                    android:paddingBottom="0.5dp" />
+            </FrameLayout>
+
+            <!-- Spacer for dots -->
+            <FrameLayout
+                android:layout_width="1dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <!-- Micro-dots row (When > 2 events) -->
+            <LinearLayout
+                android:id="@+id/widget_full_dots_3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_gravity="center_horizontal"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/widget_full_dot_3_1"
+                    android:layout_width="4dp"
+                    android:layout_height="4dp"
+                    android:layout_marginStart="1dp"
+                    android:layout_marginEnd="1dp"
+                    android:src="@drawable/widget_event_dot"
+                    android:visibility="gone" />
+
+                <ImageView
+                    android:id="@+id/widget_full_dot_3_2"
+                    android:layout_width="4dp"
+                    android:layout_height="4dp"
+                    android:layout_marginStart="1dp"
+                    android:layout_marginEnd="1dp"
+                    android:src="@drawable/widget_event_dot"
+                    android:visibility="gone" />
+
+                <ImageView
+                    android:id="@+id/widget_full_dot_3_3"
+                    android:layout_width="4dp"
+                    android:layout_height="4dp"
+                    android:layout_marginStart="1dp"
+                    android:layout_marginEnd="1dp"
+                    android:src="@drawable/widget_event_dot"
+                    android:visibility="gone" />
+
+                <ImageView
+                    android:id="@+id/widget_full_dot_3_4"
+                    android:layout_width="4dp"
+                    android:layout_height="4dp"
+                    android:layout_marginStart="1dp"
+                    android:layout_marginEnd="1dp"
+                    android:src="@drawable/widget_event_dot"
+                    android:visibility="gone" />
+            </LinearLayout>
+        </LinearLayout>
+    </FrameLayout>
+
+    <!-- Day 4 (Col 4) -->
+    <FrameLayout
+        android:id="@+id/widget_full_day_4"
+        android:layout_width="0dp"
+        android:layout_height="52dp"
+        android:layout_weight="1"
+        android:layout_marginStart="1dp"
+        android:layout_marginEnd="1dp"
+        android:padding="1dp"
+        android:clickable="true"
+        android:focusable="true">
+
+        <ImageView
+            android:id="@+id/widget_full_day_fill_4"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/widget_day_fill"
+            android:scaleType="fitXY"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/widget_full_day_stroke_4"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/widget_day_stroke"
+            android:scaleType="fitXY"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:paddingTop="1.5dp"
+            android:paddingBottom="1.5dp"
+            android:paddingStart="1dp"
+            android:paddingEnd="1dp">
+
+            <TextView
+                android:id="@+id/widget_full_day_text_4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="5"
+                android:textSize="11sp"
+                android:fontFamily="sans-serif"
+                android:textColor="@color/widget_title_text" />
+
+            <!-- Event 1 Box with soft tint background + colored border + title text -->
+            <FrameLayout
+                android:id="@+id/widget_full_event_box_4_1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="1dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/widget_full_event_fill_4_1"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/widget_event_badge_fill"
+                    android:scaleType="fitXY" />
+
+                <ImageView
+                    android:id="@+id/widget_full_event_stroke_4_1"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/widget_event_badge_stroke"
+                    android:scaleType="fitXY" />
+
+                <TextView
+                    android:id="@+id/widget_full_event_text_4_1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:ellipsize="end"
+                    android:textSize="7.5sp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:paddingStart="2dp"
+                    android:paddingEnd="2dp"
+                    android:paddingTop="0.5dp"
+                    android:paddingBottom="0.5dp" />
+            </FrameLayout>
+
+            <!-- Event 2 Box with soft tint background + colored border + title text -->
+            <FrameLayout
+                android:id="@+id/widget_full_event_box_4_2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="1dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/widget_full_event_fill_4_2"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/widget_event_badge_fill"
+                    android:scaleType="fitXY" />
+
+                <ImageView
+                    android:id="@+id/widget_full_event_stroke_4_2"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/widget_event_badge_stroke"
+                    android:scaleType="fitXY" />
+
+                <TextView
+                    android:id="@+id/widget_full_event_text_4_2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:ellipsize="end"
+                    android:textSize="7.5sp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:paddingStart="2dp"
+                    android:paddingEnd="2dp"
+                    android:paddingTop="0.5dp"
+                    android:paddingBottom="0.5dp" />
+            </FrameLayout>
+
+            <!-- Spacer for dots -->
+            <FrameLayout
+                android:layout_width="1dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <!-- Micro-dots row (When > 2 events) -->
+            <LinearLayout
+                android:id="@+id/widget_full_dots_4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_gravity="center_horizontal"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/widget_full_dot_4_1"
+                    android:layout_width="4dp"
+                    android:layout_height="4dp"
+                    android:layout_marginStart="1dp"
+                    android:layout_marginEnd="1dp"
+                    android:src="@drawable/widget_event_dot"
+                    android:visibility="gone" />
+
+                <ImageView
+                    android:id="@+id/widget_full_dot_4_2"
+                    android:layout_width="4dp"
+                    android:layout_height="4dp"
+                    android:layout_marginStart="1dp"
+                    android:layout_marginEnd="1dp"
+                    android:src="@drawable/widget_event_dot"
+                    android:visibility="gone" />
+
+                <ImageView
+                    android:id="@+id/widget_full_dot_4_3"
+                    android:layout_width="4dp"
+                    android:layout_height="4dp"
+                    android:layout_marginStart="1dp"
+                    android:layout_marginEnd="1dp"
+                    android:src="@drawable/widget_event_dot"
+                    android:visibility="gone" />
+
+                <ImageView
+                    android:id="@+id/widget_full_dot_4_4"
+                    android:layout_width="4dp"
+                    android:layout_height="4dp"
+                    android:layout_marginStart="1dp"
+                    android:layout_marginEnd="1dp"
+                    android:src="@drawable/widget_event_dot"
+                    android:visibility="gone" />
+            </LinearLayout>
+        </LinearLayout>
+    </FrameLayout>
+
+    <!-- Day 5 (Col 5) -->
+    <FrameLayout
+        android:id="@+id/widget_full_day_5"
+        android:layout_width="0dp"
+        android:layout_height="52dp"
+        android:layout_weight="1"
+        android:layout_marginStart="1dp"
+        android:layout_marginEnd="1dp"
+        android:padding="1dp"
+        android:clickable="true"
+        android:focusable="true">
+
+        <ImageView
+            android:id="@+id/widget_full_day_fill_5"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/widget_day_fill"
+            android:scaleType="fitXY"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/widget_full_day_stroke_5"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/widget_day_stroke"
+            android:scaleType="fitXY"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:paddingTop="1.5dp"
+            android:paddingBottom="1.5dp"
+            android:paddingStart="1dp"
+            android:paddingEnd="1dp">
+
+            <TextView
+                android:id="@+id/widget_full_day_text_5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="6"
+                android:textSize="11sp"
+                android:fontFamily="sans-serif"
+                android:textColor="@color/widget_title_text" />
+
+            <!-- Event 1 Box with soft tint background + colored border + title text -->
+            <FrameLayout
+                android:id="@+id/widget_full_event_box_5_1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="1dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/widget_full_event_fill_5_1"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/widget_event_badge_fill"
+                    android:scaleType="fitXY" />
+
+                <ImageView
+                    android:id="@+id/widget_full_event_stroke_5_1"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/widget_event_badge_stroke"
+                    android:scaleType="fitXY" />
+
+                <TextView
+                    android:id="@+id/widget_full_event_text_5_1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:ellipsize="end"
+                    android:textSize="7.5sp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:paddingStart="2dp"
+                    android:paddingEnd="2dp"
+                    android:paddingTop="0.5dp"
+                    android:paddingBottom="0.5dp" />
+            </FrameLayout>
+
+            <!-- Event 2 Box with soft tint background + colored border + title text -->
+            <FrameLayout
+                android:id="@+id/widget_full_event_box_5_2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="1dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/widget_full_event_fill_5_2"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/widget_event_badge_fill"
+                    android:scaleType="fitXY" />
+
+                <ImageView
+                    android:id="@+id/widget_full_event_stroke_5_2"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/widget_event_badge_stroke"
+                    android:scaleType="fitXY" />
+
+                <TextView
+                    android:id="@+id/widget_full_event_text_5_2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:ellipsize="end"
+                    android:textSize="7.5sp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:paddingStart="2dp"
+                    android:paddingEnd="2dp"
+                    android:paddingTop="0.5dp"
+                    android:paddingBottom="0.5dp" />
+            </FrameLayout>
+
+            <!-- Spacer for dots -->
+            <FrameLayout
+                android:layout_width="1dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <!-- Micro-dots row (When > 2 events) -->
+            <LinearLayout
+                android:id="@+id/widget_full_dots_5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_gravity="center_horizontal"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/widget_full_dot_5_1"
+                    android:layout_width="4dp"
+                    android:layout_height="4dp"
+                    android:layout_marginStart="1dp"
+                    android:layout_marginEnd="1dp"
+                    android:src="@drawable/widget_event_dot"
+                    android:visibility="gone" />
+
+                <ImageView
+                    android:id="@+id/widget_full_dot_5_2"
+                    android:layout_width="4dp"
+                    android:layout_height="4dp"
+                    android:layout_marginStart="1dp"
+                    android:layout_marginEnd="1dp"
+                    android:src="@drawable/widget_event_dot"
+                    android:visibility="gone" />
+
+                <ImageView
+                    android:id="@+id/widget_full_dot_5_3"
+                    android:layout_width="4dp"
+                    android:layout_height="4dp"
+                    android:layout_marginStart="1dp"
+                    android:layout_marginEnd="1dp"
+                    android:src="@drawable/widget_event_dot"
+                    android:visibility="gone" />
+
+                <ImageView
+                    android:id="@+id/widget_full_dot_5_4"
+                    android:layout_width="4dp"
+                    android:layout_height="4dp"
+                    android:layout_marginStart="1dp"
+                    android:layout_marginEnd="1dp"
+                    android:src="@drawable/widget_event_dot"
+                    android:visibility="gone" />
+            </LinearLayout>
+        </LinearLayout>
+    </FrameLayout>
+
+    <!-- Day 6 (Col 6) -->
+    <FrameLayout
+        android:id="@+id/widget_full_day_6"
+        android:layout_width="0dp"
+        android:layout_height="52dp"
+        android:layout_weight="1"
+        android:layout_marginStart="1dp"
+        android:layout_marginEnd="1dp"
+        android:padding="1dp"
+        android:clickable="true"
+        android:focusable="true">
+
+        <ImageView
+            android:id="@+id/widget_full_day_fill_6"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/widget_day_fill"
+            android:scaleType="fitXY"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/widget_full_day_stroke_6"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/widget_day_stroke"
+            android:scaleType="fitXY"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:paddingTop="1.5dp"
+            android:paddingBottom="1.5dp"
+            android:paddingStart="1dp"
+            android:paddingEnd="1dp">
+
+            <TextView
+                android:id="@+id/widget_full_day_text_6"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="7"
+                android:textSize="11sp"
+                android:fontFamily="sans-serif"
+                android:textColor="@color/widget_title_text" />
+
+            <!-- Event 1 Box with soft tint background + colored border + title text -->
+            <FrameLayout
+                android:id="@+id/widget_full_event_box_6_1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="1dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/widget_full_event_fill_6_1"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/widget_event_badge_fill"
+                    android:scaleType="fitXY" />
+
+                <ImageView
+                    android:id="@+id/widget_full_event_stroke_6_1"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/widget_event_badge_stroke"
+                    android:scaleType="fitXY" />
+
+                <TextView
+                    android:id="@+id/widget_full_event_text_6_1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:ellipsize="end"
+                    android:textSize="7.5sp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:paddingStart="2dp"
+                    android:paddingEnd="2dp"
+                    android:paddingTop="0.5dp"
+                    android:paddingBottom="0.5dp" />
+            </FrameLayout>
+
+            <!-- Event 2 Box with soft tint background + colored border + title text -->
+            <FrameLayout
+                android:id="@+id/widget_full_event_box_6_2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="1dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/widget_full_event_fill_6_2"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/widget_event_badge_fill"
+                    android:scaleType="fitXY" />
+
+                <ImageView
+                    android:id="@+id/widget_full_event_stroke_6_2"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/widget_event_badge_stroke"
+                    android:scaleType="fitXY" />
+
+                <TextView
+                    android:id="@+id/widget_full_event_text_6_2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:ellipsize="end"
+                    android:textSize="7.5sp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:paddingStart="2dp"
+                    android:paddingEnd="2dp"
+                    android:paddingTop="0.5dp"
+                    android:paddingBottom="0.5dp" />
+            </FrameLayout>
+
+            <!-- Spacer for dots -->
+            <FrameLayout
+                android:layout_width="1dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <!-- Micro-dots row (When > 2 events) -->
+            <LinearLayout
+                android:id="@+id/widget_full_dots_6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_gravity="center_horizontal"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/widget_full_dot_6_1"
+                    android:layout_width="4dp"
+                    android:layout_height="4dp"
+                    android:layout_marginStart="1dp"
+                    android:layout_marginEnd="1dp"
+                    android:src="@drawable/widget_event_dot"
+                    android:visibility="gone" />
+
+                <ImageView
+                    android:id="@+id/widget_full_dot_6_2"
+                    android:layout_width="4dp"
+                    android:layout_height="4dp"
+                    android:layout_marginStart="1dp"
+                    android:layout_marginEnd="1dp"
+                    android:src="@drawable/widget_event_dot"
+                    android:visibility="gone" />
+
+                <ImageView
+                    android:id="@+id/widget_full_dot_6_3"
+                    android:layout_width="4dp"
+                    android:layout_height="4dp"
+                    android:layout_marginStart="1dp"
+                    android:layout_marginEnd="1dp"
+                    android:src="@drawable/widget_event_dot"
+                    android:visibility="gone" />
+
+                <ImageView
+                    android:id="@+id/widget_full_dot_6_4"
+                    android:layout_width="4dp"
+                    android:layout_height="4dp"
+                    android:layout_marginStart="1dp"
+                    android:layout_marginEnd="1dp"
+                    android:src="@drawable/widget_event_dot"
+                    android:visibility="gone" />
+            </LinearLayout>
+        </LinearLayout>
+    </FrameLayout>
+</LinearLayout>

@@ -285,12 +285,12 @@ class FullCalendarWidgetService {
           final dayEvents = eventsByDate[dateKey] ?? [];
           final dayTasks = tasksByDate[dateKey] ?? [];
 
-          // Create summaries (up to 3 items)
+          // Create summaries (up to 4 items)
           final summaries = <Map<String, dynamic>>[];
 
           // 1. Prioritize tasks
           for (final t in dayTasks) {
-            if (summaries.length >= 3) break;
+            if (summaries.length >= 4) break;
             int? colorVal;
             try {
               final cat = categories.firstWhere(
@@ -316,7 +316,7 @@ class FullCalendarWidgetService {
           }
 
           for (final e in dayEvents) {
-            if (summaries.length >= 3) break;
+            if (summaries.length >= 4) break;
             final timeStr = e.start != null
                 ? _formatEventTime(e.start, e.end, l10n)
                 : '';

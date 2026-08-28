@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -37,6 +39,9 @@ class AppInitializer {
     try {
       // 1. Core Binding (Required first)
       WidgetsFlutterBinding.ensureInitialized();
+
+      // Enforce local asset-based font loading for 100% offline instant rendering
+      GoogleFonts.config.allowRuntimeFetching = false;
 
       // 2. Load Environment Variables First
       await _initEnvironment();
@@ -294,8 +299,15 @@ class AppInitializer {
         'free_category_limit': AppConfig.freeCategoryLimit,
         'enable_premium_ui': true,
       });
-      await remoteConfig.fetchAndActivate();
-      AppLogger.info('Firebase Remote Config initialized');
+      // Fetch in the background non-blockingly to keep startup instant
+      unawaited(
+        remoteConfig.fetchAndActivate().then((_) {
+          AppLogger.info('Firebase Remote Config fetched and activated');
+        }).catchError((e) {
+          AppLogger.warning('Remote Config fetch failed (non-critical)', error: e);
+        }),
+      );
+      AppLogger.info('Firebase Remote Config initialized with local defaults');
     } catch (e) {
       AppLogger.warning('Remote Config initialization failed', error: e);
     }

@@ -101,10 +101,8 @@ class AuthService extends ChangeNotifier {
         AppLogger.info('Google user restored on startup.', tag: 'Auth');
         if (!isTokenValid) {
           final clientAuth = await restored.authorizationClient
-                  .authorizationForScopes(GoogleOAuthManager.googleTasksScopes) ??
-              await restored.authorizationClient
-                  .authorizeScopes(GoogleOAuthManager.googleTasksScopes);
-          if (clientAuth.accessToken.isNotEmpty) {
+              .authorizationForScopes(GoogleOAuthManager.googleTasksScopes);
+          if (clientAuth != null && clientAuth.accessToken.isNotEmpty) {
             await _oauthManager.cacheGoogleAccessToken(clientAuth.accessToken);
             setGoogleTasksTokenExpired(false);
           }

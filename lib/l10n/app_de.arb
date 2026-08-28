@@ -493,5 +493,21 @@
   "plusOneDay": "+1 Tag",
   "plusOneWeek": "+1 Woche",
   "moveToToday": "Auf heute verschieben",
-  "activeTasks": "Aktive Aufgaben"
+  "activeTasks": "Aktive Aufgaben",
+  "boardView": "Board",
+  "listView": "Liste",
+  "groupBy": "Gruppieren nach",
+  "groupByStatus": "Status",
+  "groupByPriority": "Priorität",
+  "groupByCategory": "Kategorie",
+  "columnToDo": "Zu erledigen",
+  "columnInFocus": "Im Fokus",
+  "columnDone": "Erledigt",
+  "emptyColumn": "Keine Aufgaben in dieser Spalte",
+  "uncategorized": "Ohne Kategorie",
+  "highPriority": "Hohe Priorität",
+  "mediumPriority": "Mittlere Priorität",
+  "lowPriority": "Niedrige Priorität",
+  "kanbanWidget": "Kanban-Board",
+  "kanbanWidgetDesc": "Interaktives Kanban-Board mit Spalten Zu erledigen, Im Fokus und Erledigt"
 }

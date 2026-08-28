@@ -493,5 +493,21 @@
   "plusOneDay": "+1 Dag",
   "plusOneWeek": "+1 Vecka",
   "moveToToday": "Flytta till idag",
-  "activeTasks": "Aktiva uppgifter"
+  "activeTasks": "Aktiva uppgifter",
+  "boardView": "Tavla",
+  "listView": "Lista",
+  "groupBy": "Gruppera efter",
+  "groupByStatus": "Status",
+  "groupByPriority": "Prioritet",
+  "groupByCategory": "Kategori",
+  "columnToDo": "Att göra",
+  "columnInFocus": "I fokus",
+  "columnDone": "Klart",
+  "emptyColumn": "Inga uppgifter i denna kolumn",
+  "uncategorized": "Okategoriserad",
+  "highPriority": "Hög prioritet",
+  "mediumPriority": "Medel prioritet",
+  "lowPriority": "Låg prioritet",
+  "kanbanWidget": "Kanban-tavla",
+  "kanbanWidgetDesc": "Interaktiv Kanban-tavla med kolumner för Att göra, I fokus och Klart"
 }

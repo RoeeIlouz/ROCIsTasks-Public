@@ -18,6 +18,7 @@ import 'package:rocis_tasks/features/tasks/domain/models/custom_field.dart';
 import 'package:rocis_tasks/features/tasks/domain/services/custom_field_action_service.dart';
 import 'package:rocis_tasks/features/tasks/presentation/widgets/task_custom_fields_section.dart';
 import 'package:rocis_tasks/features/auth/presentation/screens/login_screen.dart';
+import 'package:rocis_tasks/features/tasks/presentation/widgets/kanban/kanban_board_view.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -297,6 +298,12 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
               setState(() { _activeTab = 'tasks'; _selectTask(null); });
               Provider.of<TaskProvider>(context, listen: false).syncGoogleTasksToLocal();
             },
+          ),
+          _buildSidebarTab(
+            icon: Icons.view_kanban_outlined,
+            label: l10n.boardView,
+            isActive: _activeTab == 'board',
+            onTap: () => setState(() { _activeTab = 'board'; _selectTask(null); }),
           ),
           _buildSidebarTab(
             icon: Icons.calendar_month_rounded,
@@ -656,6 +663,8 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
     final user = Provider.of<AuthService>(context, listen: false).currentUser;
 
     switch (_activeTab) {
+      case 'board':
+        return const KanbanBoardView();
       case 'calendar':
         return const CalendarScreen();
       case 'settings':

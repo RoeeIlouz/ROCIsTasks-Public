@@ -2,7 +2,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
-import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:rocis_tasks/core/services/logger_service.dart';
 export 'package:flutter_local_notifications/flutter_local_notifications.dart'
@@ -59,9 +59,25 @@ class NotificationService {
       return;
     }
     tz.initializeTimeZones();
-    final timezoneInfo = await FlutterTimezone.getLocalTimezone();
-    final timeZoneName = timezoneInfo.identifier;
-    tz.setLocalLocation(tz.getLocation(timeZoneName));
+    String timeZoneName = 'UTC';
+    try {
+      final timezoneInfo = await FlutterTimezone.getLocalTimezone();
+      timeZoneName = timezoneInfo.identifier;
+    } catch (e) {
+      AppLogger.warning('Failed to get local timezone in NotificationService: $e', tag: 'Notifications');
+    }
+
+    if (tz.timeZoneDatabase.locations.containsKey(timeZoneName)) {
+      tz.setLocalLocation(tz.getLocation(timeZoneName));
+    } else if (timeZoneName == 'GMT' || timeZoneName == 'UTC') {
+      tz.setLocalLocation(tz.getLocation('UTC'));
+    } else {
+      try {
+        tz.setLocalLocation(tz.getLocation('Etc/$timeZoneName'));
+      } catch (_) {
+        tz.setLocalLocation(tz.getLocation('UTC'));
+      }
+    }
     AppLogger.info(
       'NotificationService initialized with timezone: $timeZoneName',
       tag: 'Notifications',

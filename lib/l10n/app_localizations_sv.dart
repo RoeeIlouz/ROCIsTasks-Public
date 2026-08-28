@@ -1394,4 +1394,53 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get activeTasks => 'Aktiva uppgifter';
+
+  @override
+  String get boardView => 'Tavla';
+
+  @override
+  String get listView => 'Lista';
+
+  @override
+  String get groupBy => 'Gruppera efter';
+
+  @override
+  String get groupByStatus => 'Status';
+
+  @override
+  String get groupByPriority => 'Prioritet';
+
+  @override
+  String get groupByCategory => 'Kategori';
+
+  @override
+  String get columnToDo => 'Att göra';
+
+  @override
+  String get columnInFocus => 'I fokus';
+
+  @override
+  String get columnDone => 'Klart';
+
+  @override
+  String get emptyColumn => 'Inga uppgifter i denna kolumn';
+
+  @override
+  String get uncategorized => 'Okategoriserad';
+
+  @override
+  String get highPriority => 'Hög prioritet';
+
+  @override
+  String get mediumPriority => 'Medel prioritet';
+
+  @override
+  String get lowPriority => 'Låg prioritet';
+
+  @override
+  String get kanbanWidget => 'Kanban-tavla';
+
+  @override
+  String get kanbanWidgetDesc =>
+      'Interaktiv Kanban-tavla med kolumner för Att göra, I fokus och Klart';
 }

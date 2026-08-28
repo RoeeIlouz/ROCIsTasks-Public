@@ -492,5 +492,21 @@
   "plusOneDay": "+יום אחד",
   "plusOneWeek": "+שבוע אחד",
   "moveToToday": "העבר להיום",
-  "activeTasks": "משימות פעילות"
+  "activeTasks": "משימות פעילות",
+  "boardView": "לוח",
+  "listView": "רשימה",
+  "groupBy": "קבץ לפי",
+  "groupByStatus": "סטטוס",
+  "groupByPriority": "עדיפות",
+  "groupByCategory": "קטגוריה",
+  "columnToDo": "לביצוע",
+  "columnInFocus": "במיקוד",
+  "columnDone": "הושלם",
+  "emptyColumn": "אין משימות בעמודה זו",
+  "uncategorized": "ללא קטגוריה",
+  "highPriority": "עדיפות גבוהה",
+  "mediumPriority": "עדיפות בינונית",
+  "lowPriority": "עדיפות נמוכה",
+  "kanbanWidget": "לוח קנבן",
+  "kanbanWidgetDesc": "לוח קנבן אינטראקטיבי עם עמודות משימות, במיקוד והושלם"
 }

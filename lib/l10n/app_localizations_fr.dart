@@ -1406,4 +1406,53 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get activeTasks => 'Tâches actives';
+
+  @override
+  String get boardView => 'Tableau';
+
+  @override
+  String get listView => 'Liste';
+
+  @override
+  String get groupBy => 'Grouper par';
+
+  @override
+  String get groupByStatus => 'Statut';
+
+  @override
+  String get groupByPriority => 'Priorité';
+
+  @override
+  String get groupByCategory => 'Catégorie';
+
+  @override
+  String get columnToDo => 'À faire';
+
+  @override
+  String get columnInFocus => 'En cours';
+
+  @override
+  String get columnDone => 'Terminé';
+
+  @override
+  String get emptyColumn => 'Aucune tâche dans cette colonne';
+
+  @override
+  String get uncategorized => 'Sans catégorie';
+
+  @override
+  String get highPriority => 'Priorité haute';
+
+  @override
+  String get mediumPriority => 'Priorité moyenne';
+
+  @override
+  String get lowPriority => 'Priorité basse';
+
+  @override
+  String get kanbanWidget => 'Tableau Kanban';
+
+  @override
+  String get kanbanWidgetDesc =>
+      'Tableau Kanban interactif avec les colonnes À faire, En cours et Terminé';
 }

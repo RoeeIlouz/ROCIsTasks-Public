@@ -192,8 +192,11 @@ class _AppRootState extends State<AppRoot> {
         unawaited(_subscriptionService.syncWithAuthUserId(user?.uid));
       });
 
-      await _subscriptionService.syncWithAuthUserId(
-        _authService.currentUser?.uid,
+      // Synchronize subscription non-blockingly in the background
+      unawaited(
+        _subscriptionService.syncWithAuthUserId(
+          _authService.currentUser?.uid,
+        ),
       );
       debugPrint('AppRoot: _initServices finished successfully');
     } catch (e, stackTrace) {

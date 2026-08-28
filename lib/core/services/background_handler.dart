@@ -61,8 +61,40 @@ class BackgroundHandler {
       await _handleFullCalendarFilterToggle('google');
     } else if (host == 'full_calendar_filter_rocis') {
       await _handleFullCalendarFilterToggle('rocis');
+    } else if (host == 'kanban_sync') {
+      await _handleKanbanSync();
     } else {
       AppLogger.warning('Unknown host: $host', tag: 'Background');
+    }
+  }
+
+  static Future<void> _handleKanbanSync() async {
+    try {
+      await AppInitializer.initialize(isBackground: true);
+      final calendarService = CalendarService();
+      await calendarService.init();
+
+      final taskSource = LocalTaskSource();
+      await taskSource.init();
+
+      final categories = taskSource.getCategories();
+      Category? getCategoryById(String? id) {
+        if (id == null || id.isEmpty) return null;
+        try {
+          return categories.firstWhere((c) => c.id == id);
+        } catch (_) {
+          return null;
+        }
+      }
+
+      final widgetDataService = WidgetDataService(calendarService);
+      await widgetDataService.updateKanbanWidget(
+        taskSource.getTasks(),
+        getCategoryById,
+        userId: FirebaseAuth.instance.currentUser?.uid,
+      );
+    } catch (e, s) {
+      AppLogger.error('Error handling kanban widget sync', error: e, stack: s, tag: 'Background');
     }
   }
 

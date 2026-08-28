@@ -29,7 +29,7 @@ class FirebaseConfig {
   static bool _isEnvironmentConfigComplete() {
     try {
       // Check if dotenv is loaded at all
-      if (dotenv.env.isEmpty) {
+      if (!dotenv.isInitialized || dotenv.env.isEmpty) {
         debugPrint('FirebaseConfig: Environment variables not loaded');
         return false;
       }

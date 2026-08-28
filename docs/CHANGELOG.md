@@ -5,6 +5,39 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.10+90] - 2026-08-28
+
+### Added
+
+- In-cell event pills with colored category borders and subtle tint backdrops on FullCalendar widget.
+- Circular glass navigation controls and brand Crimson Red styling for home screen widgets.
+- Local Outfit font bundling for 100% offline instant typography.
+
+### Performance
+
+- Non-blocking startup lifecycle and background RemoteConfig/subscription sync.
+- Optimized Android R8 ProGuard keep rules for reduced app binary size.
+
+### Fixed
+
+- Resolved Android RemoteViews XML inflation error on home screen widgets.
+- Fixed startup timezone GMT parsing and dotenv initialization guards.
+
+## [0.2.10+89] - 2026-08-27
+
+### Added
+
+- Interactive Kanban Board view across Mobile & Web with drag-and-drop workflow grouping.
+- Android Home Screen Kanban Board Widget with native column navigation and quick actions.
+- Redesigned FullCalendar Home Screen Widget to match in-app calendar aesthetics.
+
+## [0.2.10+88] - 2026-08-27
+
+### Fixed
+
+- Fixed repeated Google Sign-In authorization prompts on mobile startup and sync.
+- Fixed Android 3-button navigation bar overlapping the bottom navigation bar.
+
 ## [0.2.10+83] - 2026-08-22
 
 ### Fixed

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_kanban_item_root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingStart="4dp"
+    android:paddingEnd="8dp"
+    android:paddingTop="6dp"
+    android:paddingBottom="6dp"
+    android:background="@drawable/widget_card_bg">
+
+    <!-- Category Accent Strip -->
+    <FrameLayout
+        android:id="@+id/widget_kanban_color_strip"
+        android:layout_width="4dp"
+        android:layout_height="32dp"
+        android:background="@color/widget_primary"
+        android:layout_marginEnd="8dp" />
+
+    <!-- Action Checkbox -->
+    <ImageView
+        android:id="@+id/widget_kanban_check"
+        android:layout_width="26dp"
+        android:layout_height="26dp"
+        android:src="@drawable/ic_circle_outline"
+        android:layout_marginEnd="8dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:contentDescription="Toggle Task Status" />
+
+    <!-- Content Details -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/widget_kanban_item_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Task Title"
+                android:textColor="@color/widget_title_text"
+                android:textSize="13sp"
+                android:fontFamily="sans-serif"
+                android:textStyle="bold"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+            <TextView
+                android:id="@+id/widget_kanban_item_priority"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="HIGH"
+                android:textSize="9sp"
+                android:textStyle="bold"
+                android:textColor="@color/widget_primary"
+                android:paddingStart="4dp"
+                android:paddingEnd="4dp"
+                android:paddingTop="1dp"
+                android:paddingBottom="1dp"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="2dp">
+
+            <TextView
+                android:id="@+id/widget_kanban_item_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Today"
+                android:textColor="@color/widget_secondary_text"
+                android:textSize="11sp"
+                android:layout_marginEnd="6dp" />
+
+            <TextView
+                android:id="@+id/widget_kanban_item_category"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Work"
+                android:textColor="@color/widget_secondary_text"
+                android:textSize="11sp"
+                android:maxLines="1"
+                android:ellipsize="end" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>
