@@ -5,12 +5,12 @@ This file summarizes errors encountered and changes made to the codebase, ensuri
 ## 4 Core Productivity Features & Codebase Cleanup - 2026-08-29
 
 #### Enhancements & Fixes
-* **Resolved 48 Syntax / Semantic Errors**: Cleaned up duplicated blocks in [`AppInitializer`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/services/app_initializer.dart) and [`WebHomeScreen`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/home/presentation/screens/web_home_screen.dart), fixed missing `FocusNode` declarations and lifecycle disposals, and corrected test mock imports.
+* **Resolved 48 Syntax / Semantic Errors**: Cleaned up duplicated blocks in [`AppInitializer`](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/lib/core/services/app_initializer.dart) and [`WebHomeScreen`](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/lib/features/home/presentation/screens/web_home_screen.dart), fixed missing `FocusNode` declarations and lifecycle disposals, and corrected test mock imports.
 * **4 Features Implemented & Verified**:
-  1. Smart Syntax & NLP Task Parsing (`!high`, `#tag`, `tonight`, `in N days`) in [`NlpService`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/tasks/services/nlp_service.dart) and [`AddTaskScreen`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/tasks/presentation/screens/add_task_screen.dart).
-  2. Non-blocking 7-day Hive DB Compaction in [`AppInitializer`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/services/app_initializer.dart) and [`LocalTaskSource`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/tasks/data/datasources/local_task_source.dart).
-  3. Desktop Web Keyboard Shortcuts (`Ctrl+N`, `/`, `1`-`5`, `Esc`) in [`WebHomeScreen`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/home/presentation/screens/web_home_screen.dart).
-  4. Granular Category Filtering for Android Widgets in [`WidgetDataService`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/services/widget_data_service.dart) and [`WidgetCustomizationScreen`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/home/presentation/screens/widget_customization_screen.dart).
+  1. Smart Syntax & NLP Task Parsing (`!high`, `#tag`, `tonight`, `in N days`) in [`NlpService`](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/lib/features/tasks/services/nlp_service.dart) and [`AddTaskScreen`](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/lib/features/tasks/presentation/screens/add_task_screen.dart).
+  2. Non-blocking 7-day Hive DB Compaction in [`AppInitializer`](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/lib/core/services/app_initializer.dart) and [`LocalTaskSource`](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/lib/features/tasks/data/datasources/local_task_source.dart).
+  3. Desktop Web Keyboard Shortcuts (`Ctrl+N`, `/`, `1`-`5`, `Esc`) in [`WebHomeScreen`](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/lib/features/home/presentation/screens/web_home_screen.dart).
+  4. Granular Category Filtering for Android Widgets in [`WidgetDataService`](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/lib/core/services/widget_data_service.dart) and [`WidgetCustomizationScreen`](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/lib/features/home/presentation/screens/widget_customization_screen.dart).
 * **Verification**:
   * `flutter analyze`: **0 issues found**.
   * `flutter test`: **284 / 284 tests passed (100%)**.
@@ -24,10 +24,10 @@ This file summarizes errors encountered and changes made to the codebase, ensuri
 * Root cause 2: In `GoogleOAuthManager._performSilentTokenRefresh()`, `attemptLightweightAuthentication()` was called during task sync when `_googleUser` was `null`, prompting the user during background synchronization.
 
 #### Solutions & Verification
-* **Restricted Lightweight Authentication to Web**: In [`lib/core/services/auth_service.dart`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/services/auth_service.dart) and [`lib/core/services/auth/google_oauth_manager.dart`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/services/auth/google_oauth_manager.dart), restricted `attemptLightweightAuthentication()` strictly to Web (`kIsWeb`) where it operates silently via browser cookies.
+* **Restricted Lightweight Authentication to Web**: In [`lib/core/services/auth_service.dart`](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/lib/core/services/auth_service.dart) and [`lib/core/services/auth/google_oauth_manager.dart`](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/lib/core/services/auth/google_oauth_manager.dart), restricted `attemptLightweightAuthentication()` strictly to Web (`kIsWeb`) where it operates silently via browser cookies.
 * **Non-Intrusive Mobile Startup & Expiration State**: On Mobile (`!kIsWeb`), the app relies on Firebase Auth's persistent session across restarts and never invokes interactive Credential Manager dialogs on launch or during background sync. Expired tokens cleanly set `isGoogleTasksTokenExpired = true`, displaying the in-app "Reconnect" banner only when relevant.
 * **Verification**:
-  * Added unit test in [`test/core/services/auth/google_oauth_manager_test.dart`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/test/core/services/auth/google_oauth_manager_test.dart).
+  * Added unit test in [`test/core/services/auth/google_oauth_manager_test.dart`](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/test/core/services/auth/google_oauth_manager_test.dart).
   * `flutter analyze`: 0 issues found.
   * `flutter test`: 278/278 tests passed (100%).
 
@@ -35,13 +35,13 @@ This file summarizes errors encountered and changes made to the codebase, ensuri
 
 #### Improvements & Fixes
 * **Google OAuth Scopes Alignment**:
-  * In [`lib/core/services/auth/google_oauth_manager.dart`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/services/auth/google_oauth_manager.dart), removed `https://www.googleapis.com/auth/calendar` (broad root scope) to strictly adhere to the scopes configured in Google Cloud Console: `https://www.googleapis.com/auth/calendar.readonly`, `https://www.googleapis.com/auth/calendar.events`, `https://www.googleapis.com/auth/tasks`, and `email`.
-  * Added unit test assertions in [`test/core/services/auth/google_oauth_manager_test.dart`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/test/core/services/auth/google_oauth_manager_test.dart) ensuring the broad `calendar` scope is excluded.
+  * In [`lib/core/services/auth/google_oauth_manager.dart`](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/lib/core/services/auth/google_oauth_manager.dart), removed `https://www.googleapis.com/auth/calendar` (broad root scope) to strictly adhere to the scopes configured in Google Cloud Console: `https://www.googleapis.com/auth/calendar.readonly`, `https://www.googleapis.com/auth/calendar.events`, `https://www.googleapis.com/auth/tasks`, and `email`.
+  * Added unit test assertions in [`test/core/services/auth/google_oauth_manager_test.dart`](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/test/core/services/auth/google_oauth_manager_test.dart) ensuring the broad `calendar` scope is excluded.
 * **Android Homescreen Calendar Widget Row Height & Density Enhancement**:
-  * In [`widget_full_calendar_row.xml`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/layout/widget_full_calendar_row.xml), increased day cell heights and week number root height from `52dp` to `62dp`.
+  * In [`widget_full_calendar_row.xml`](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/layout/widget_full_calendar_row.xml), increased day cell heights and week number root height from `52dp` to `62dp`.
   * Increased row padding to `paddingTop="2dp"`, `paddingBottom="2dp"`, refined day number font size (`11.5sp`), and enhanced event badge box top margin (`1.5dp`) and typography (`8sp`).
-  * In [`widget_full_calendar_layout.xml`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/layout/widget_full_calendar_layout.xml), adjusted weekday header vertical padding (`4dp`) for balanced visual hierarchy.
-  * In [`widget_month_agenda_row.xml`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/layout/widget_month_agenda_row.xml), increased day cell height from `32dp` to `36dp` with `1dp` top/bottom padding.
+  * In [`widget_full_calendar_layout.xml`](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/layout/widget_full_calendar_layout.xml), adjusted weekday header vertical padding (`4dp`) for balanced visual hierarchy.
+  * In [`widget_month_agenda_row.xml`](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/layout/widget_month_agenda_row.xml), increased day cell height from `32dp` to `36dp` with `1dp` top/bottom padding.
 * **Verification**:
   * `flutter analyze` completed with 0 issues.
   * `flutter test` passed 277/277 tests (100%).
@@ -67,17 +67,17 @@ This file summarizes errors encountered and changes made to the codebase, ensuri
 
 #### Improvements & Fixes
 * **In-Cell Event Badges with Colored Border & Tint Fill**:
-  * Created [`widget_event_badge_fill.xml`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/drawable/widget_event_badge_fill.xml) and [`widget_event_badge_stroke.xml`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/drawable/widget_event_badge_stroke.xml).
-  * In [`widget_full_calendar_row.xml`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/layout/widget_full_calendar_row.xml) and [`FullCalendarWidgetService.kt`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/kotlin/com/rocisapps/tasks/FullCalendarWidgetService.kt), configured dynamic color-filtering on each event badge: 15% opacity tint fill + 50% opacity colored border + event color text matching the in-app `BoxDecoration` calendar styling.
+  * Created [`widget_event_badge_fill.xml`](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/drawable/widget_event_badge_fill.xml) and [`widget_event_badge_stroke.xml`](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/drawable/widget_event_badge_stroke.xml).
+  * In [`widget_full_calendar_row.xml`](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/layout/widget_full_calendar_row.xml) and [`FullCalendarWidgetService.kt`](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/kotlin/com/rocisapps/tasks/FullCalendarWidgetService.kt), configured dynamic color-filtering on each event badge: 15% opacity tint fill + 50% opacity colored border + event color text matching the in-app `BoxDecoration` calendar styling.
 * **Refined Header Controls to Match App Design**:
-  * Added [`widget_nav_icon_bg.xml`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/drawable/widget_nav_icon_bg.xml) circular glass backdrops for previous (`‹`), next (`›`), today (`⦿`), and add (`+`) buttons.
+  * Added [`widget_nav_icon_bg.xml`](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/drawable/widget_nav_icon_bg.xml) circular glass backdrops for previous (`‹`), next (`›`), today (`⦿`), and add (`+`) buttons.
   * Synchronized month/year title, chevrons, and today action colors with the theme and brand scheme.
 * **Homescreen Widgets AI Skill (`flutter-homescreen-widgets`) Updated**:
   * Added Section 7 detailing critical rules: RemoteViews XML tag whitelisting (never `<View>`), static XML row templates for ListView adapters, self-healing native calendar generation, smart in-cell information density (snippets vs. dots), transparent sub-headers, and brand color alignment.
 * **Eliminated Glaring Weekdays White Background**:
-  * Removed `@drawable/widget_item_background` from the weekdays strip in [`widget_full_calendar_layout.xml`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/layout/widget_full_calendar_layout.xml), providing seamless transparent blending with dark and glass themes.
+  * Removed `@drawable/widget_item_background` from the weekdays strip in [`widget_full_calendar_layout.xml`](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/layout/widget_full_calendar_layout.xml), providing seamless transparent blending with dark and glass themes.
 * **Eliminated Purple/Indigo from All Widget Drawables**:
-  * Updated [`widget_filter_button_active_bg.xml`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/drawable/widget_filter_button_active_bg.xml), [`widget_pill_bg.xml`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/drawable/widget_pill_bg.xml), [`widget_selected_today_background.xml`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/drawable/widget_selected_today_background.xml), [`widget_today_background.xml`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/drawable/widget_today_background.xml), [`values/colors.xml`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/values/colors.xml), and [`values-night/colors.xml`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/values-night/colors.xml) to use ROCIs brand Crimson Red (`#EF3842`).
+  * Updated [`widget_filter_button_active_bg.xml`](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/drawable/widget_filter_button_active_bg.xml), [`widget_pill_bg.xml`](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/drawable/widget_pill_bg.xml), [`widget_selected_today_background.xml`](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/drawable/widget_selected_today_background.xml), [`widget_today_background.xml`](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/drawable/widget_today_background.xml), [`values/colors.xml`](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/values/colors.xml), and [`values-night/colors.xml`](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/values-night/colors.xml) to use ROCIs brand Crimson Red (`#EF3842`).
 * **Verification**: `flutter analyze` passed with 0 issues; `flutter test` passed 277/277 tests (100%).
 
 ## Application Startup Exceptions & Android Widget Fixes - 2026-08-28
@@ -90,14 +90,14 @@ This file summarizes errors encountered and changes made to the codebase, ensuri
 
 #### Solutions & Verification
 * **Eliminated Forbidden `<View>` Tags in RemoteViews Layouts**:
-  * Replaced all `<View>` spacer tags with whitelisted `<FrameLayout>` tags in [`widget_full_calendar_row.xml`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/layout/widget_full_calendar_row.xml) and [`widget_full_calendar_day_item.xml`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/layout/widget_full_calendar_day_item.xml). Verified zero `<View>` tags remain across all layout XML files.
-* **DotEnv Safe Access**: Added `dotenv.isInitialized` checks before accessing `dotenv.env` in [`SubscriptionService.dart`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/services/subscription_service.dart) and [`FirebaseConfig.dart`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/config/firebase_config.dart).
-* **Timezone GMT/Alias Fallback**: In [`NotificationService.dart`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/services/notification_service.dart), checked `tz.timeZoneDatabase.locations.containsKey(timeZoneName)` with safe fallback to `UTC`.
-* **GlassContainer Material Hierarchy**: Wrapped `child` with `Material(type: MaterialType.transparency, borderRadius: radius, clipBehavior: Clip.antiAlias)` inside [`GlassContainer.dart`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/shared/ui/widgets/glass_container.dart).
+  * Replaced all `<View>` spacer tags with whitelisted `<FrameLayout>` tags in [`widget_full_calendar_row.xml`](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/layout/widget_full_calendar_row.xml) and [`widget_full_calendar_day_item.xml`](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/layout/widget_full_calendar_day_item.xml). Verified zero `<View>` tags remain across all layout XML files.
+* **DotEnv Safe Access**: Added `dotenv.isInitialized` checks before accessing `dotenv.env` in [`SubscriptionService.dart`](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/lib/core/services/subscription_service.dart) and [`FirebaseConfig.dart`](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/lib/core/config/firebase_config.dart).
+* **Timezone GMT/Alias Fallback**: In [`NotificationService.dart`](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/lib/core/services/notification_service.dart), checked `tz.timeZoneDatabase.locations.containsKey(timeZoneName)` with safe fallback to `UTC`.
+* **GlassContainer Material Hierarchy**: Wrapped `child` with `Material(type: MaterialType.transparency, borderRadius: radius, clipBehavior: Clip.antiAlias)` inside [`GlassContainer.dart`](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/lib/shared/ui/widgets/glass_container.dart).
 * **Native Android Calendar Self-Healing & Startup Update**:
-  * Implemented `generateFallbackCalendar()` in [`FullCalendarWidgetService.kt`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/kotlin/com/rocisapps/tasks/FullCalendarWidgetService.kt) to compute and render calendar grid even before Dart writes data.
-  * Added fallback month title formatting in [`FullCalendarWidgetProvider.kt`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/kotlin/com/rocisapps/tasks/FullCalendarWidgetProvider.kt).
-  * Triggered initial home screen widget sync in [`TaskProvider.init()`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/tasks/presentation/providers/task_provider.dart).
+  * Implemented `generateFallbackCalendar()` in [`FullCalendarWidgetService.kt`](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/kotlin/com/rocisapps/tasks/FullCalendarWidgetService.kt) to compute and render calendar grid even before Dart writes data.
+  * Added fallback month title formatting in [`FullCalendarWidgetProvider.kt`](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/kotlin/com/rocisapps/tasks/FullCalendarWidgetProvider.kt).
+  * Triggered initial home screen widget sync in [`TaskProvider.init()`](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/lib/features/tasks/presentation/providers/task_provider.dart).
 * **Verification**: `flutter analyze` 0 issues, `flutter test` 277/277 passed (100%).
 
 ## ROCIs Brand Identity System & `/brand` Workflow - 2026-08-28
@@ -189,9 +189,9 @@ This file summarizes errors encountered and changes made to the codebase, ensuri
 * Root cause 3: In `home_screen.dart`, `bottomNavigationBar` was wrapped in a fixed `EdgeInsets.only(bottom: 12)` without respecting `SafeArea` or system window bottom insets.
 
 #### Solutions & Verification
-* **Platform-Aware OAuth Scopes**: In [GoogleOAuthManager.dart](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/services/auth/google_oauth_manager.dart), configured `googleTasksScopes` to only request `email` and `https://www.googleapis.com/auth/tasks` on mobile, while keeping full REST API calendar scopes on Web (`kIsWeb`).
-* **Non-Interactive Silent Token Refresh**: In [GoogleOAuthManager.dart](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/services/auth/google_oauth_manager.dart) and [AuthService.dart](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/services/auth_service.dart), removed `authorizeScopes(...)` fallbacks from background token refresh and startup restoration routines. Background token fetching now strictly queries non-interactive `authorizationForScopes(...)`.
-* **System Window Insets Safe Navigation**: In [home_screen.dart](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/home/presentation/screens/home_screen.dart), wrapped `bottomNavigationBar` in `SafeArea(top: false, ...)` so that the floating glass navigation bar and Floating Action Button (FAB) are dynamically offset above both 3-button system navigation bars and gesture navigation bars.
+* **Platform-Aware OAuth Scopes**: In [GoogleOAuthManager.dart](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/lib/core/services/auth/google_oauth_manager.dart), configured `googleTasksScopes` to only request `email` and `https://www.googleapis.com/auth/tasks` on mobile, while keeping full REST API calendar scopes on Web (`kIsWeb`).
+* **Non-Interactive Silent Token Refresh**: In [GoogleOAuthManager.dart](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/lib/core/services/auth/google_oauth_manager.dart) and [AuthService.dart](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/lib/core/services/auth_service.dart), removed `authorizeScopes(...)` fallbacks from background token refresh and startup restoration routines. Background token fetching now strictly queries non-interactive `authorizationForScopes(...)`.
+* **System Window Insets Safe Navigation**: In [home_screen.dart](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/lib/features/home/presentation/screens/home_screen.dart), wrapped `bottomNavigationBar` in `SafeArea(top: false, ...)` so that the floating glass navigation bar and Floating Action Button (FAB) are dynamically offset above both 3-button system navigation bars and gesture navigation bars.
 * **Testing & Verification**:
   * Added `test/features/home/home_screen_navigation_test.dart` verifying `HomeScreen` bottom navigation bar `SafeArea` protection under Android 3-button navigation insets.
   * Updated `test/core/services/auth/google_oauth_manager_test.dart` verifying platform-specific mobile scopes.
@@ -207,9 +207,9 @@ This file summarizes errors encountered and changes made to the codebase, ensuri
 * Root cause 3: In `AuthService._restoreGoogleUser()`, restoring `_googleUser` was skipped on Web (`kIsWeb`), preventing silent token renewal after the initial 55-minute OAuth token expired.
 
 #### Solutions & Verification
-* **REST URL Safety with `Uri.https`**: In [CalendarService.dart](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/services/calendar_service.dart), migrated all REST API endpoints (`calendarList`, `events`, `createOrUpdateTaskEvent`, `deleteEvent`) to `Uri.https` with query parameter maps, preventing URI fragment truncation.
+* **REST URL Safety with `Uri.https`**: In [CalendarService.dart](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/lib/core/services/calendar_service.dart), migrated all REST API endpoints (`calendarList`, `events`, `createOrUpdateTaskEvent`, `deleteEvent`) to `Uri.https` with query parameter maps, preventing URI fragment truncation.
 * **Resilient Multi-Calendar Error Isolation**: In `CalendarService.getEvents()`, isolated secondary calendar `403`/`404` errors to log warnings and skip individual secondary calendars without aborting the loop or discarding primary calendar events. Only actual `401` responses (or complete primary failures) throw `GoogleTokenExpiredException`.
-* **Web OAuth Session Hydration & Silent Refresh**: In [AuthService.dart](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/services/auth_service.dart) and [GoogleOAuthManager.dart](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/services/auth/google_oauth_manager.dart), enabled silent lightweight authentication on Web startup and in `_performSilentTokenRefresh()` so `_googleUser` is restored and access tokens renew automatically.
+* **Web OAuth Session Hydration & Silent Refresh**: In [AuthService.dart](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/lib/core/services/auth_service.dart) and [GoogleOAuthManager.dart](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/lib/core/services/auth/google_oauth_manager.dart), enabled silent lightweight authentication on Web startup and in `_performSilentTokenRefresh()` so `_googleUser` is restored and access tokens renew automatically.
 * **Verification**: `flutter analyze` completed with 0 issues; all 271/271 unit, widget, and service tests passed.
 
 ## R8 / ProGuard Keep Rules Optimization - 2026-08-22
@@ -226,7 +226,7 @@ This file summarizes errors encountered and changes made to the codebase, ensuri
 * Retained `-assumenosideeffects class android.util.Log` (log stripping in release) and `-dontwarn com.google.android.play.core.**`.
 
 #### Solutions & Verification
-* **Optimized Rules**: Updated [android/app/proguard-rules.pro](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/proguard-rules.pro) with minimal, surgical rules.
+* **Optimized Rules**: Updated [android/app/proguard-rules.pro](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/android/app/proguard-rules.pro) with minimal, surgical rules.
 * **Verification**: Ran `flutter analyze` (0 issues), `flutter test` (271/271 passed, 100%), and `flutter build appbundle --release` (successfully built `app-release.aab` with R8 Full Mode optimization).
 
 ## App Launch Crash Resolution: SecureStorage Keystore Resilience & QuickActions Drawables - 2026-08-22
@@ -238,9 +238,9 @@ This file summarizes errors encountered and changes made to the codebase, ensuri
 * Root cause 3: Unhandled errors or timeout in secondary services inside `AppInitializer.initialize()` rethrew to `main()`, aborting Flutter execution before the root widget tree could mount.
 
 #### Solutions & Verification
-* **Keystore Resilience**: Updated [EncryptionService.dart](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/services/encryption_service.dart) to use `AndroidOptions(resetOnError: true)` and catch Keystore read failures, automatically resetting corrupted storage and falling back to a securely generated key rather than crashing the app.
-* **Shortcut Drawables & Safe Init**: Added vector drawables [ic_add.xml](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/drawable/ic_add.xml), [ic_delete.xml](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/drawable/ic_delete.xml), and [ic_sync.xml](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/drawable/ic_sync.xml) to `res/drawable/` and wrapped [QuickActionsService.dart](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/services/quick_actions_service.dart) initialization in a try-catch block.
-* **Guaranteed Startup**: In [AppInitializer.dart](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/services/app_initializer.dart) and [main.dart](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/main.dart), made secondary service timeouts non-fatal and wrapped `AppInitializer.initialize()` in `main()` to ensure `runApp(const AppRoot())` is always called.
+* **Keystore Resilience**: Updated [EncryptionService.dart](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/lib/core/services/encryption_service.dart) to use `AndroidOptions(resetOnError: true)` and catch Keystore read failures, automatically resetting corrupted storage and falling back to a securely generated key rather than crashing the app.
+* **Shortcut Drawables & Safe Init**: Added vector drawables [ic_add.xml](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/drawable/ic_add.xml), [ic_delete.xml](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/drawable/ic_delete.xml), and [ic_sync.xml](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/drawable/ic_sync.xml) to `res/drawable/` and wrapped [QuickActionsService.dart](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/lib/core/services/quick_actions_service.dart) initialization in a try-catch block.
+* **Guaranteed Startup**: In [AppInitializer.dart](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/lib/core/services/app_initializer.dart) and [main.dart](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/lib/main.dart), made secondary service timeouts non-fatal and wrapped `AppInitializer.initialize()` in `main()` to ensure `runApp(const AppRoot())` is always called.
 * **Verification**: Ran `flutter analyze` (0 issues), `flutter test` (271/271 passed), and verified successful Gradle compile and Shorebird release build.
 
 
@@ -252,9 +252,9 @@ This file summarizes errors encountered and changes made to the codebase, ensuri
 * Configured `android.newDsl=false` and `android.builtInKotlin=false` in `android/gradle.properties` to ensure binary compatibility with third-party Flutter plugin Gradle hooks (`dev.flutter.flutter-gradle-plugin`, `cloud_firestore`, etc.) that currently reference legacy extension types.
 
 #### Solutions & Verification
-* **Gradle Wrapper**: Updated [android/gradle/wrapper/gradle-wrapper.properties](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/gradle/wrapper/gradle-wrapper.properties) to `gradle-9.1.0-all.zip`.
-* **Plugin Versions**: Updated [android/settings.gradle.kts](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/settings.gradle.kts) to `id("com.android.application") version "9.0.1"` with `id("org.jetbrains.kotlin.android") version "2.3.20"`.
-* **DSL & Kotlin Compile**: Updated [android/build.gradle.kts](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/build.gradle.kts) to use `CommonExtension` with `compileSdk = 36` and direct `KotlinCompile` task configuration.
+* **Gradle Wrapper**: Updated [android/gradle/wrapper/gradle-wrapper.properties](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/android/gradle/wrapper/gradle-wrapper.properties) to `gradle-9.1.0-all.zip`.
+* **Plugin Versions**: Updated [android/settings.gradle.kts](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/android/settings.gradle.kts) to `id("com.android.application") version "9.0.1"` with `id("org.jetbrains.kotlin.android") version "2.3.20"`.
+* **DSL & Kotlin Compile**: Updated [android/build.gradle.kts](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/android/build.gradle.kts) to use `CommonExtension` with `compileSdk = 36` and direct `KotlinCompile` task configuration.
 * **Verification**: Verified `./gradlew help` (`BUILD SUCCESSFUL`), `./gradlew build --dry-run` (`BUILD SUCCESSFUL`), `flutter analyze` (0 issues), and `flutter test` (271/271 tests passing).
 
 ## Side-by-Side Calendar Month Navigation, Date Selection & Dynamic Accent Colors - 2026-08-22
@@ -266,9 +266,9 @@ This file summarizes errors encountered and changes made to the codebase, ensuri
 * Widget highlight colors still showed purple references instead of reading and applying the user's chosen accent color from Widget Customization settings.
 
 #### Solutions & Verification
-* **Native Month Grid Generation**: In [MonthAgendaWidgetService.kt](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/kotlin/com/rocisapps/tasks/MonthAgendaWidgetService.kt), `MonthAgendaGridFactory` now natively computes the 42-day month grid using `Calendar` + `PREF_MONTH_OFFSET`, instantly updating the grid on next/prev month clicks and cross-referencing event dots from agenda data.
-* **Unique Day Cell View IDs**: In [widget_month_agenda_row.xml](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/layout/widget_month_agenda_row.xml), defined 7 static child cells with unique IDs (`widget_month_day_0` .. `widget_month_day_6`, `widget_month_bg_0` .. `widget_month_bg_6`, `widget_month_text_0` .. `widget_month_text_6`, `widget_month_dot_0` .. `widget_month_dot_6`), enabling 100% accurate per-day selection via fill-in intents.
-* **In-App Navigation Stability**: In [home_screen.dart](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/home/presentation/screens/home_screen.dart), removed `LazyInitializationWidget` and mounted `CalendarScreen` directly in `PageView`. In [settings_screen.dart](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/home/presentation/screens/settings_screen.dart) and [web_home_screen.dart](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/home/presentation/screens/web_home_screen.dart), added `displayName.isNotEmpty` checks before accessing `[0]`. In [calendar_screen.dart](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/calendar/presentation/screens/calendar_screen.dart), made calendar lookups safe and bounded TableCalendar dates.
+* **Native Month Grid Generation**: In [MonthAgendaWidgetService.kt](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/kotlin/com/rocisapps/tasks/MonthAgendaWidgetService.kt), `MonthAgendaGridFactory` now natively computes the 42-day month grid using `Calendar` + `PREF_MONTH_OFFSET`, instantly updating the grid on next/prev month clicks and cross-referencing event dots from agenda data.
+* **Unique Day Cell View IDs**: In [widget_month_agenda_row.xml](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/layout/widget_month_agenda_row.xml), defined 7 static child cells with unique IDs (`widget_month_day_0` .. `widget_month_day_6`, `widget_month_bg_0` .. `widget_month_bg_6`, `widget_month_text_0` .. `widget_month_text_6`, `widget_month_dot_0` .. `widget_month_dot_6`), enabling 100% accurate per-day selection via fill-in intents.
+* **In-App Navigation Stability**: In [home_screen.dart](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/lib/features/home/presentation/screens/home_screen.dart), removed `LazyInitializationWidget` and mounted `CalendarScreen` directly in `PageView`. In [settings_screen.dart](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/lib/features/home/presentation/screens/settings_screen.dart) and [web_home_screen.dart](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/lib/features/home/presentation/screens/web_home_screen.dart), added `displayName.isNotEmpty` checks before accessing `[0]`. In [calendar_screen.dart](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/lib/features/calendar/presentation/screens/calendar_screen.dart), made calendar lookups safe and bounded TableCalendar dates.
 * **Dynamic Widget Accent Color**: In `MonthAgendaWidgetService.kt`, `TodayAgendaWidgetService.kt`, `TimelineAgendaWidgetService.kt`, `UpNextWidgetProvider.kt`, `QuickActionWidgetProvider.kt`, and `widget_customization_screen.dart`, all widgets read `full_calendar_highlight_color` (defaulting to Modern Indigo `#6366F1`) and dynamically apply it to highlights, indicators, priority badges, and button tints. Replaced default purple in `CalendarColorService` with Sky Blue (`#0284C7`).
 * **Verification**: Ran `flutter analyze` (0 issues), `flutter test` (271/271 passed), and `gradlew compileDebugKotlin` (BUILD SUCCESSFUL).
 
@@ -283,7 +283,7 @@ This file summarizes errors encountered and changes made to the codebase, ensuri
 * Side-by-side calendar was missing event dates because `updateTodayAgendaWidget` range was restricted to 30 days and had invisible dark text.
 
 #### Solutions & Verification
-* **Task Filtering**: In [lib/core/services/widget_data_service.dart](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/services/widget_data_service.dart), filtered out all completed (`!t.isCompleted`) and deleted tasks across all widget update methods. Bound undated tasks specifically to today (`dateDisplay: yyyy-MM-dd`) and expanded the sync window to [-60, +120] days.
+* **Task Filtering**: In [lib/core/services/widget_data_service.dart](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/lib/core/services/widget_data_service.dart), filtered out all completed (`!t.isCompleted`) and deleted tasks across all widget update methods. Bound undated tasks specifically to today (`dateDisplay: yyyy-MM-dd`) and expanded the sync window to [-60, +120] days.
 * **Contrast & Purple Ban**: Updated `values/colors.xml`, `values-night/colors.xml`, and all widget drawables (`widget_pill_bg.xml`, `widget_selected_background.xml`, `widget_selected_today_background.xml`, `widget_today_background.xml`, `ic_check_circle_filled.xml`) with Modern Indigo (`#6366F1`) and pure white text (`#FFFFFF`) with `#94A3B8` secondary contrast.
 * **Kotlin Services Text Color**: In `MonthAgendaWidgetService.kt`, `TodayAgendaWidgetService.kt`, `TimelineAgendaWidgetService.kt`, `UpNextWidgetProvider.kt`, and `QuickActionWidgetProvider.kt`, default/dark themes resolve text to `#FFFFFF` for guaranteed contrast on dark glass backgrounds.
 * **Quick Actions Overlap**: In `QuickActionWidgetProvider.kt` and `widget_quick_action_layout.xml`, conditionally hide the stat text container when the circular chart bitmap is rendered.
@@ -297,10 +297,10 @@ This file summarizes errors encountered and changes made to the codebase, ensuri
 * Root cause: `android/app/google-services.json` was ignored in `.gitignore` without a template file, and Crashlytics attempted network uploads of obfuscation maps synchronously during Gradle packaging.
 
 #### Solutions & Verification
-* Created [android/app/google-services.json.example](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/google-services.json.example) containing valid schema placeholders for package `com.rocisapps.tasks`.
-* Configured `mappingFileUploadEnabled = false` inside `buildTypes.release` in [android/app/build.gradle.kts](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/build.gradle.kts) to prevent offline release packaging failures.
+* Created [android/app/google-services.json.example](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/android/app/google-services.json.example) containing valid schema placeholders for package `com.rocisapps.tasks`.
+* Configured `mappingFileUploadEnabled = false` inside `buildTypes.release` in [android/app/build.gradle.kts](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/android/app/build.gradle.kts) to prevent offline release packaging failures.
 * Created `scripts/setup_ci_configs.py` with multi-format validation (Base64 vs raw string, JSON syntax check, and automatic example fallback) to eliminate CI `MalformedJsonException` errors.
-* Updated [.github/workflows/flutter-ci.yml](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/.github/workflows/flutter-ci.yml) to run `python scripts/setup_ci_configs.py` and build installable release APKs (`app-release.apk`).
+* Updated [.github/workflows/flutter-ci.yml](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/.github/workflows/flutter-ci.yml) to run `python scripts/setup_ci_configs.py` and build installable release APKs (`app-release.apk`).
 * Verified with `flutter build appbundle --release` (successfully compiled in 181.7s) and `flutter test` (271/271 passing).
 
 ## Android Free 1-Widget Limit & Side-by-Side Calendar Integration - 2026-08-22
@@ -323,9 +323,9 @@ This file summarizes errors encountered and changes made to the codebase, ensuri
 
 #### Goals / Requirements
 * **Production Lemon Squeezy URLs**:
-  * Updated [lib/core/config/app_config.dart](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/config/app_config.dart) with live Lemon Squeezy checkout URLs for Monthly (`5833ecbc-c8c9-4044-974c-782c1fd47e4b`), Yearly (`9afcddf6-d31c-4031-8d49-38e4afdbcee4`), and Lifetime (`40f6b2af-ab2f-4bef-ab3f-32da7f417930`) plans.
+  * Updated [lib/core/config/app_config.dart](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/lib/core/config/app_config.dart) with live Lemon Squeezy checkout URLs for Monthly (`5833ecbc-c8c9-4044-974c-782c1fd47e4b`), Yearly (`9afcddf6-d31c-4031-8d49-38e4afdbcee4`), and Lifetime (`40f6b2af-ab2f-4bef-ab3f-32da7f417930`) plans.
 * **3-Tier Web Paywall UI**:
-  * Integrated **Lifetime Pro** option (`_buildPlanCard` index 2) alongside Monthly and Yearly in [lib/features/premium/presentation/screens/paywall_screen.dart](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/premium/presentation/screens/paywall_screen.dart).
+  * Integrated **Lifetime Pro** option (`_buildPlanCard` index 2) alongside Monthly and Yearly in [lib/features/premium/presentation/screens/paywall_screen.dart](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/lib/features/premium/presentation/screens/paywall_screen.dart).
   * Added responsive `FittedBox` text scaling, compact padding, and "Best Value" badge.
   * Added full localization for Lifetime plan title, price, and badge across all 8 supported languages (`en`, `he`, `es`, `fr`, `de`, `ar`, `sv`, `hi`).
 * **Verification**:
@@ -336,9 +336,9 @@ This file summarizes errors encountered and changes made to the codebase, ensuri
 
 #### Goals / Requirements
 * **Version Alignment**:
-  * Synchronized app version across [pubspec.yaml](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/pubspec.yaml) (`0.2.10+81`), [lib/core/config/app_config.dart](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/config/app_config.dart) (`0.2.10`), and [docs/CHANGELOG.md](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/docs/CHANGELOG.md) (`## [0.2.10+81] - 2026-08-21`).
+  * Synchronized app version across [pubspec.yaml](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/pubspec.yaml) (`0.2.10+81`), [lib/core/config/app_config.dart](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/lib/core/config/app_config.dart) (`0.2.10`), and [docs/CHANGELOG.md](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/docs/CHANGELOG.md) (`## [0.2.10+81] - 2026-08-21`).
 * **Android Build Fix**:
-  * Upgraded Kotlin Gradle Plugin (`org.jetbrains.kotlin.android`) in [android/settings.gradle.kts](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/settings.gradle.kts) from `2.1.10` to `2.2.20` to fulfill Flutter's minimum supported version requirement for Android Gradle builds.
+  * Upgraded Kotlin Gradle Plugin (`org.jetbrains.kotlin.android`) in [android/settings.gradle.kts](file:///c:/Users/<username>/Documents/rocis_apps/ROCIs-tasks/android/settings.gradle.kts) from `2.1.10` to `2.2.20` to fulfill Flutter's minimum supported version requirement for Android Gradle builds.
 
 ## UI/UX Pro Max: 5-Pillar App-Wide Interaction & Aesthetics Enhancement Suite - 2026-08-21
 
@@ -386,7 +386,7 @@ This file summarizes errors encountered and changes made to the codebase, ensuri
 ## ROCIs-Schedule: Full Auth Suite & Guest Mode Parity - 2026-08-20
 
 #### Goals / Requirements
-* **Release Keystore Error Resolution**: Fixed trailing whitespace in `ROCIs-Schedule/android/key.properties` (`storePassword=roee14il `) and verified keystore fingerprints via `keytool` (SHA-1: `90:98:BD:98:55:EB:EB:4E:E7:3C:1A:40:4E:DA:55:D1:06:CC:5E:E8`).
+* **Release Keystore Error Resolution**: Fixed trailing whitespace in `ROCIs-Schedule/android/key.properties` (`storePassword=<password> `) and verified keystore fingerprints via `keytool` (SHA-1: `90:98:BD:98:55:EB:EB:4E:E7:3C:1A:40:4E:DA:55:D1:06:CC:5E:E8`).
 * **Complete Auth Feature Parity with ROCIs-tasks**:
   * Added Email & Password authentication (`signInWithEmailAndPassword`, `signUpWithEmailAndPassword`, and `sendPasswordResetEmail`) in `AuthService`.
   * Implemented seamless **Guest Mode** (`continueAsGuest`, `isGuest`, `effectiveUserId = 'guest'`) allowing offline local use of the app without mandatory login.
@@ -428,7 +428,7 @@ This file summarizes errors encountered and changes made to the codebase, ensuri
 ## ROCIsApps Ecosystem Expansion: ROCIs Schedule Phase 1 (Sync & Auth Reliability) - 2026-08-20
 
 #### Goals / Requirements
-* Cloned and configured `ROCIs-Schedule` (`https://github.com/RoeeIlouz/ROCIs-Schedule`) in parent directory `c:\Users\roeei\Documents\rocis_apps\ROCIs-Schedule` as part of the unified ROCIsApps ecosystem.
+* Cloned and configured `ROCIs-Schedule` (`https://github.com/<username>/ROCIs-Schedule`) in parent directory `c:\Users\<username>\Documents\rocis_apps\ROCIs-Schedule` as part of the unified ROCIsApps ecosystem.
 * Resolved `material_color_utilities: ^0.13.0` dependency conflict with Flutter SDK.
 * Implemented Phase 1: bidirectional Firestore download & merge for Courses, Events, and Assignments, offline SQLite database isolation per user (`rocis_schedule_<uid>.db`), safe sign-out cache clearance in `LocalDbService.clearCache()`, sync-safe provider methods without re-triggering remote loops, and unit tests (7/7 passing).
 * Established alignment with `ROCIs-Tasks`'s existing `ScheduleFirestoreService` for cross-app timetable and assignment synchronization.
