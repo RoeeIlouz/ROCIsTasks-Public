@@ -7,14 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.2.10+91] - 2026-08-29
 
-### Fixed
-
-- Eliminated startup Credential Manager account re-prompt dialogs on mobile launches.
-- Aligned Google OAuth scopes to task and calendar endpoints configured in Google Cloud Console.
-
 ### Added
 
-- Enhanced Android FullCalendar widget row height, day density, and badge spacing.
+- Smart syntax NLP parsing for priorities (`!high`), categories (`#tag`), and relative dates.
+- Desktop Web power-user keyboard shortcuts (`Ctrl+N`, `/`, `1-5`, `Esc`).
+- Granular category filtering for Android home screen widgets.
+- Periodic non-blocking Hive database storage compaction.
+
+### Fixed
+
+- Eliminated startup Credential Manager popups on mobile launches.
+- Aligned OAuth scopes with Google Cloud Console.
 
 ## [0.2.10+90] - 2026-08-28
 
