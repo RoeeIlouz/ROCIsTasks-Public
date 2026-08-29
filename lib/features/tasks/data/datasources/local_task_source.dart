@@ -35,8 +35,12 @@ class LocalTaskSource {
 
   Future<void> _openBoxes() async {
     try {
-      await Hive.openBox<Task>(_tasksBoxName);
-      await Hive.openBox<Category>(_categoriesBoxName);
+      if (!Hive.isBoxOpen(_tasksBoxName)) {
+        await Hive.openBox<Task>(_tasksBoxName);
+      }
+      if (!Hive.isBoxOpen(_categoriesBoxName)) {
+        await Hive.openBox<Category>(_categoriesBoxName);
+      }
     } catch (e) {
       AppLogger.warning(
         'Failed to open Hive boxes, attempting recovery...',
@@ -44,8 +48,12 @@ class LocalTaskSource {
       );
       _tasksBoxName = '${boxName}_recovered';
       _categoriesBoxName = '${categoriesBoxName}_recovered';
-      await Hive.openBox<Task>(_tasksBoxName);
-      await Hive.openBox<Category>(_categoriesBoxName);
+      if (!Hive.isBoxOpen(_tasksBoxName)) {
+        await Hive.openBox<Task>(_tasksBoxName);
+      }
+      if (!Hive.isBoxOpen(_categoriesBoxName)) {
+        await Hive.openBox<Category>(_categoriesBoxName);
+      }
     }
   }
 

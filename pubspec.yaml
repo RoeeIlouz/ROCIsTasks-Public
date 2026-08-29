@@ -2,7 +2,7 @@ name: rocis_tasks
 description: "ROCI's Tasks — A premium task management app with Google Tasks sync, calendar integration, and glassmorphism UI."
 publish_to: "none"
 
-version: 0.2.10+91
+version: 0.2.10+92
 
 environment:
   sdk: ^3.10.0
@@ -103,7 +103,6 @@ flutter:
   assets:
     - assets/images/logo.png
     - assets/icons/
-    - assets/fonts/
     - google_fonts/
     - shorebird.yaml
 

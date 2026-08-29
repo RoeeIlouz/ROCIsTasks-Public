@@ -141,7 +141,11 @@ class AppInitializer {
   static Future<void> _initHive() async {
     await Hive.initFlutter();
     _registerHiveAdapters();
-    await Hive.openBox('settings');
+    await Future.wait([
+      Hive.openBox('settings'),
+      Hive.openBox<Task>('tasksBox'),
+      Hive.openBox<Category>('categoriesBox'),
+    ]);
   }
 
   static void _registerHiveAdapters() {

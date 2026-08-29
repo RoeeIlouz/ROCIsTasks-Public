@@ -38,7 +38,9 @@ Future<void> main() async {
   try {
     await AppInitializer.initialize();
   } catch (e, stack) {
-    debugPrint('main(): AppInitializer.initialize critical exception: $e\n$stack');
+    debugPrint(
+      'main(): AppInitializer.initialize critical exception: $e\n$stack',
+    );
   }
 
   // Register callback for home widget interactivity
@@ -151,13 +153,6 @@ class _AppRootState extends State<AppRoot> {
             stack: stack,
           ),
         ),
-        _scheduleService.initialize().catchError(
-          (e, stack) => AppLogger.error(
-            'Failed to init schedule service',
-            error: e,
-            stack: stack,
-          ),
-        ),
         _subscriptionService.init().catchError(
           (e, stack) => AppLogger.error(
             'Failed to init subscription service',
@@ -182,6 +177,17 @@ class _AppRootState extends State<AppRoot> {
         _authService.initialized,
       ]);
 
+      // Initialize secondary schedule service non-blockingly
+      unawaited(
+        _scheduleService.initialize().catchError(
+          (e, stack) => AppLogger.error(
+            'Failed to init schedule service in background',
+            error: e,
+            stack: stack,
+          ),
+        ),
+      );
+
       // Log session start
       AnalyticsService().logSessionStart();
 
@@ -194,9 +200,7 @@ class _AppRootState extends State<AppRoot> {
 
       // Synchronize subscription non-blockingly in the background
       unawaited(
-        _subscriptionService.syncWithAuthUserId(
-          _authService.currentUser?.uid,
-        ),
+        _subscriptionService.syncWithAuthUserId(_authService.currentUser?.uid),
       );
       debugPrint('AppRoot: _initServices finished successfully');
     } catch (e, stackTrace) {

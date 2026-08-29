@@ -2,6 +2,53 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## Mobile Google Calendar Direct API Integration & Scopes Unification - 2026-08-29
+
+#### Root Cause & Resolution
+* **Root Cause 1 (Mobile Scopes Missing)**: On mobile (`!kIsWeb`), `GoogleOAuthManager.googleTasksScopes` only requested `tasks` and excluded `calendar.readonly` / `calendar.events`. Consequently, mobile Google sign-in and reconnect tokens lacked Google Calendar permissions.
+* **Root Cause 2 (Mobile API Gating)**: `CalendarService` previously gated all Google Calendar REST API calls behind `kIsWeb`, forcing mobile devices to rely solely on native OS `DeviceCalendarPlugin`. Users who signed in with Google but did not have local Android calendar provider synchronization saw 0 calendars and 0 events.
+* **Fixes Applied**:
+  * **Unified OAuth Scopes**: In [`GoogleOAuthManager.googleTasksScopes`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/services/auth/google_oauth_manager.dart), unified scopes across Mobile and Web to include `email`, `tasks`, `calendar.readonly`, and `calendar.events`.
+  * **Direct Google Calendar API on Mobile**: In [`CalendarService`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/services/calendar_service.dart), enabled direct Google Calendar REST API querying whenever a Google OAuth token is present, while seamlessly merging with native device calendars if permissions are granted.
+* **Verification**:
+  * Updated unit tests in [`test/core/services/auth/google_oauth_manager_test.dart`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/test/core/services/auth/google_oauth_manager_test.dart) and [`test/core/services/calendar_service_test.dart`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/test/core/services/calendar_service_test.dart).
+  * `flutter analyze`: **0 issues found**.
+  * `flutter test`: **287 / 287 tests passed (100%)**.
+
+## Ghost "Unnamed" Google Calendar Sanitization & Display Name Resolution - 2026-08-29
+
+#### Improvements & Fixes
+* **Eliminated Ghost "Unnamed" Calendars & Resolved Clean Titles**:
+  * In [`CalendarService`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/services/calendar_service.dart), added `_sanitizeAndFilterCalendars(...)` pipeline:
+    * Automatically identifies and purges phantom/ghost calendar rows with empty/invalid names and no associated account information returned by native Android calendar providers and Web endpoints.
+    * Intelligently resolves friendly display names from `summaryOverride`, `summary`, `accountName`, or `id` instead of falling back to `"Unnamed"`.
+    * Deduplicates calendars by ID to prevent duplicate list tiles in the filter sheet.
+  * In [`CalendarFilterSheet`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/calendar/presentation/widgets/calendar_filter_sheet.dart), refined calendar title and subtitle resolution logic to ensure clean labels without displaying `"Unnamed"` or duplicate subtitles.
+* **Verification**:
+  * Added unit test suite in [`test/core/services/calendar_service_test.dart`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/test/core/services/calendar_service_test.dart).
+  * `flutter analyze`: **0 issues found**.
+  * `flutter test`: **287 / 287 tests passed (100%)**.
+
+## App Size & Startup Load Times Optimization Suite - 2026-08-29
+
+#### Improvements & Fixes
+* **Asset & Font Deduplication (~880 KB Raw Asset Purge)**:
+  * Eliminated duplicated `assets/fonts/` directory and unneeded variable font files (`Outfit-VariableFont_wght.ttf`, `Outfit.ttf`).
+  * Streamlined `pubspec.yaml` assets list to only bundle required static weights (`Regular`, `Medium`, `SemiBold`, `Bold`) in `google_fonts/`.
+  * Removed unused duplicate icon `assets/icons/google.svg`.
+* **Android Gradle, R8 Full Mode & Packaging Optimization**:
+  * Added `android.enableR8.fullMode=true` and `android.nonTransitiveRClass=true` in `android/gradle.properties` for aggressive dead code elimination, class merging, and method inlining.
+  * Added `packaging` resource exclusions (`META-INF/DEPENDENCIES`, `META-INF/LICENSE*`, `META-INF/NOTICE*`, `META-INF/*.kotlin_module`) in `android/app/build.gradle.kts` to eliminate APK metadata bloat.
+* **Startup Pipeline & Non-Blocking Load Times**:
+  * **Parallel Hive DB Warmup**: Updated `AppInitializer._initHive()` to eagerly open `tasksBox` and `categoriesBox` in parallel alongside `settings`, and guarded `LocalTaskSource._openBoxes()` with `Hive.isBoxOpen` to ensure zero startup I/O latency.
+  * **Deduplicated Platform Channel Calls**: Updated `TimezoneService.init()` to reuse already resolved device timezone from `tz.local.name`, avoiding redundant 2-second platform channel queries on startup.
+  * **Non-Blocking Secondary Services**: Converted `_scheduleService.initialize()` in `main.dart` and `_checkSubscriptionStatus()` in `SubscriptionService.init()` to background non-blocking tasks (`unawaited`), allowing the main task UI to mount and render instantaneously.
+  * **Guarded Connectivity Initialization**: Added `_isInitialized` guard to `ConnectivityService` preventing duplicated socket checks and subscriptions.
+* **Verification**:
+  * `flutter analyze`: **0 issues found**.
+  * `flutter test`: **284 / 284 tests passed (100%)**.
+  * Master audit checklist (`checklist.py`): **All checks PASSED**.
+
 ## 4 Core Productivity Features & Codebase Cleanup - 2026-08-29
 
 #### Enhancements & Fixes

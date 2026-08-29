@@ -24,17 +24,12 @@ class GoogleTokenExpiredException implements Exception {
 }
 
 class GoogleOAuthManager {
-  static List<String> get googleTasksScopes => kIsWeb
-      ? const [
-          'email',
-          'https://www.googleapis.com/auth/tasks',
-          'https://www.googleapis.com/auth/calendar.readonly',
-          'https://www.googleapis.com/auth/calendar.events',
-        ]
-      : const [
-          'email',
-          'https://www.googleapis.com/auth/tasks',
-        ];
+  static List<String> get googleTasksScopes => const [
+    'email',
+    'https://www.googleapis.com/auth/tasks',
+    'https://www.googleapis.com/auth/calendar.readonly',
+    'https://www.googleapis.com/auth/calendar.events',
+  ];
 
   final ErrorHandlingService _errorHandlingService;
   final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
@@ -49,7 +44,10 @@ class GoogleOAuthManager {
   GoogleSignInAccount? get googleUser => _googleUser;
   GoogleSignIn get googleSignIn => _googleSignIn;
 
-  void setGoogleTasksTokenExpired(bool expired, {void Function()? onStateChanged}) {
+  void setGoogleTasksTokenExpired(
+    bool expired, {
+    void Function()? onStateChanged,
+  }) {
     if (_isGoogleTasksTokenExpired != expired) {
       _isGoogleTasksTokenExpired = expired;
       onStateChanged?.call();
@@ -69,7 +67,11 @@ class GoogleOAuthManager {
         }
         _googleSignInInitialized = true;
       } catch (e) {
-        AppLogger.error('Failed to initialize GoogleSignIn', error: e, tag: 'Auth');
+        AppLogger.error(
+          'Failed to initialize GoogleSignIn',
+          error: e,
+          tag: 'Auth',
+        );
       }
     }
   }
@@ -83,11 +85,21 @@ class GoogleOAuthManager {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('google_access_token', token);
       final expiresAt = DateTime.now().add(const Duration(minutes: 55));
-      await prefs.setString('google_access_token_expires_at', expiresAt.toIso8601String());
+      await prefs.setString(
+        'google_access_token_expires_at',
+        expiresAt.toIso8601String(),
+      );
       _isGoogleTasksTokenExpired = false;
-      AppLogger.info('Google Tasks access token cached successfully.', tag: 'Auth');
+      AppLogger.info(
+        'Google Tasks access token cached successfully.',
+        tag: 'Auth',
+      );
     } catch (e) {
-      AppLogger.error('Failed to cache Google access token', error: e, tag: 'Auth');
+      AppLogger.error(
+        'Failed to cache Google access token',
+        error: e,
+        tag: 'Auth',
+      );
     }
   }
 
@@ -120,7 +132,8 @@ class GoogleOAuthManager {
           freshToken = await _performSilentTokenRefresh();
         }
 
-        final bool isTokenUnexpired = token != null &&
+        final bool isTokenUnexpired =
+            token != null &&
             expiresAtStr != null &&
             DateTime.tryParse(expiresAtStr) != null &&
             DateTime.now().isBefore(DateTime.parse(expiresAtStr));
@@ -129,8 +142,13 @@ class GoogleOAuthManager {
         return freshToken ?? (isTokenUnexpired ? token : null);
       } catch (e, s) {
         _tokenRefreshCompleter!.completeError(e, s);
-        _errorHandlingService.logError(e, s, reason: 'getGoogleAccessToken refresh');
-        final bool isTokenUnexpired = token != null &&
+        _errorHandlingService.logError(
+          e,
+          s,
+          reason: 'getGoogleAccessToken refresh',
+        );
+        final bool isTokenUnexpired =
+            token != null &&
             expiresAtStr != null &&
             DateTime.tryParse(expiresAtStr) != null &&
             DateTime.now().isBefore(DateTime.parse(expiresAtStr));
@@ -150,18 +168,28 @@ class GoogleOAuthManager {
         await ensureGoogleSignInInitialized();
         if (_googleSignIn.supportsAuthenticate()) {
           try {
-            _googleUser = await _googleSignIn.attemptLightweightAuthentication();
+            _googleUser = await _googleSignIn
+                .attemptLightweightAuthentication();
             if (_googleUser != null) {
-              AppLogger.info('Silent refresh: restored Google user via lightweight auth.', tag: 'Auth');
+              AppLogger.info(
+                'Silent refresh: restored Google user via lightweight auth.',
+                tag: 'Auth',
+              );
             }
           } catch (e) {
-            AppLogger.info('Silent refresh: lightweight auth attempt failed: $e', tag: 'Auth');
+            AppLogger.info(
+              'Silent refresh: lightweight auth attempt failed: $e',
+              tag: 'Auth',
+            );
           }
         }
       }
 
       if (_googleUser == null) {
-        AppLogger.info('Silent refresh: no Google user available.', tag: 'Auth');
+        AppLogger.info(
+          'Silent refresh: no Google user available.',
+          tag: 'Auth',
+        );
         _isGoogleTasksTokenExpired = true;
         return null;
       }

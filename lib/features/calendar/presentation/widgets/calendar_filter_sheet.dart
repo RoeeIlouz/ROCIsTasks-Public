@@ -97,9 +97,27 @@ class CalendarFilterSheet extends StatelessWidget {
                               ...provider.availableCalendars.map((calendar) {
                                 final isSelected = provider.selectedCalendarIds
                                     .contains(calendar.id);
+                                final calendarName =
+                                    (calendar.name != null &&
+                                        calendar.name!.trim().isNotEmpty &&
+                                        calendar.name!.toLowerCase() !=
+                                            'unnamed' &&
+                                        calendar.name!.toLowerCase() !=
+                                            'unnamed calendar')
+                                    ? calendar.name!
+                                    : (calendar.accountName
+                                                  ?.trim()
+                                                  .isNotEmpty ==
+                                              true
+                                          ? calendar.accountName!
+                                          : l10n.calendar);
+                                final hasSubtitle =
+                                    calendar.accountName != null &&
+                                    calendar.accountName!.trim().isNotEmpty &&
+                                    calendar.accountName != calendarName;
                                 return CheckboxListTile(
-                                  title: Text(calendar.name ?? 'Unnamed'),
-                                  subtitle: calendar.accountName != null
+                                  title: Text(calendarName),
+                                  subtitle: hasSubtitle
                                       ? Text(calendar.accountName!)
                                       : null,
                                   value: isSelected,

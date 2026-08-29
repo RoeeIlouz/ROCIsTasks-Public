@@ -57,7 +57,9 @@ class SubscriptionService extends ChangeNotifier {
         );
         apiKey = fromDefine.isNotEmpty ? fromDefine : null;
       } else if (Platform.isIOS) {
-        final fromDefine = const String.fromEnvironment('REVENUECAT_API_KEY_IOS');
+        final fromDefine = const String.fromEnvironment(
+          'REVENUECAT_API_KEY_IOS',
+        );
         apiKey = fromDefine.isNotEmpty ? fromDefine : null;
       }
 
@@ -86,7 +88,8 @@ class SubscriptionService extends ChangeNotifier {
       await Purchases.configure(configuration);
       _isConfigured = true;
 
-      await _checkSubscriptionStatus();
+      // Check subscription status non-blockingly so startup is instant
+      unawaited(_checkSubscriptionStatus());
 
       Purchases.addCustomerInfoUpdateListener(_updateCustomerStatus);
 
@@ -146,17 +149,17 @@ class SubscriptionService extends ChangeNotifier {
         .doc(normalized)
         .snapshots()
         .listen((snapshot) async {
-      final data = snapshot.data();
-      final cloudPremium = data?['is_premium'] == true;
-      if (_firestorePremium != cloudPremium) {
-        _firestorePremium = cloudPremium;
-        if (kIsWeb) {
-          final prefs = await SharedPreferences.getInstance();
-          await prefs.setBool('web_is_premium', cloudPremium);
-        }
-        _updatePremiumState();
-      }
-    });
+          final data = snapshot.data();
+          final cloudPremium = data?['is_premium'] == true;
+          if (_firestorePremium != cloudPremium) {
+            _firestorePremium = cloudPremium;
+            if (kIsWeb) {
+              final prefs = await SharedPreferences.getInstance();
+              await prefs.setBool('web_is_premium', cloudPremium);
+            }
+            _updatePremiumState();
+          }
+        });
 
     if (!kIsWeb && _isConfigured) {
       try {
@@ -225,10 +228,7 @@ class SubscriptionService extends ChangeNotifier {
   Future<void> _backSyncToFirestore(String userId) async {
     try {
       if (!_firestorePremium) {
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(userId)
-            .set({
+        await FirebaseFirestore.instance.collection('users').doc(userId).set({
           'is_premium': true,
           'subscription_status': 'active',
           'last_synced_from_mobile': FieldValue.serverTimestamp(),

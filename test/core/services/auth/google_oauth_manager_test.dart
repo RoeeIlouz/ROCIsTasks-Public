@@ -22,34 +22,48 @@ void main() {
 
     test('setGoogleTasksTokenExpired updates state and fires callback', () {
       bool callbackFired = false;
-      oauthManager.setGoogleTasksTokenExpired(true, onStateChanged: () {
-        callbackFired = true;
-      });
+      oauthManager.setGoogleTasksTokenExpired(
+        true,
+        onStateChanged: () {
+          callbackFired = true;
+        },
+      );
 
       expect(oauthManager.isGoogleTasksTokenExpired, isTrue);
       expect(callbackFired, isTrue);
     });
 
-    test('googleTasksScopes includes email and tasks scopes on mobile', () {
-      expect(
-        GoogleOAuthManager.googleTasksScopes,
-        contains('email'),
-      );
-      expect(
-        GoogleOAuthManager.googleTasksScopes,
-        contains('https://www.googleapis.com/auth/tasks'),
-      );
-      expect(
-        GoogleOAuthManager.googleTasksScopes,
-        isNot(contains('https://www.googleapis.com/auth/calendar')),
-      );
-    });
+    test(
+      'googleTasksScopes includes email, tasks, and granular calendar scopes',
+      () {
+        expect(GoogleOAuthManager.googleTasksScopes, contains('email'));
+        expect(
+          GoogleOAuthManager.googleTasksScopes,
+          contains('https://www.googleapis.com/auth/tasks'),
+        );
+        expect(
+          GoogleOAuthManager.googleTasksScopes,
+          contains('https://www.googleapis.com/auth/calendar.readonly'),
+        );
+        expect(
+          GoogleOAuthManager.googleTasksScopes,
+          contains('https://www.googleapis.com/auth/calendar.events'),
+        );
+        expect(
+          GoogleOAuthManager.googleTasksScopes,
+          isNot(contains('https://www.googleapis.com/auth/calendar')),
+        );
+      },
+    );
 
-    test('getGoogleAccessToken returns null and marks expired on mobile when no token or user exists', () async {
-      expect(oauthManager.isGoogleTasksTokenExpired, isFalse);
-      final token = await oauthManager.getGoogleAccessToken();
-      expect(token, isNull);
-      expect(oauthManager.isGoogleTasksTokenExpired, isTrue);
-    });
+    test(
+      'getGoogleAccessToken returns null and marks expired on mobile when no token or user exists',
+      () async {
+        expect(oauthManager.isGoogleTasksTokenExpired, isFalse);
+        final token = await oauthManager.getGoogleAccessToken();
+        expect(token, isNull);
+        expect(oauthManager.isGoogleTasksTokenExpired, isTrue);
+      },
+    );
   });
 }
