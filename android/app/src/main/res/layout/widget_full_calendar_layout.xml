@@ -156,8 +156,8 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_below="@id/widget_full_calendar_filters"
-        android:paddingTop="3dp"
-        android:paddingBottom="3dp">
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp">
 
         <TextView android:id="@+id/widget_weekday_num_header" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="0.6" android:gravity="center" android:text="#" android:textSize="11sp" android:textColor="@color/widget_secondary_text" android:textStyle="italic"/>
         <TextView android:id="@+id/widget_weekday_sun_header" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="S" android:textSize="11sp" android:textColor="#EF4444" android:textStyle="bold" />

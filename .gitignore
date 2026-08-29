@@ -83,6 +83,8 @@ firebase_options.dart.backup
 **/firebase_options_backup.dart
 .firebaserc
 .firebase/
+dataconnect/
+/lib/dataconnect_generated/
 # Sensitive Configuration
 secrets/
 config/secrets/

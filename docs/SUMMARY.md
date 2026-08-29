@@ -2,6 +2,50 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## 4 Core Productivity Features & Codebase Cleanup - 2026-08-29
+
+#### Enhancements & Fixes
+* **Resolved 48 Syntax / Semantic Errors**: Cleaned up duplicated blocks in [`AppInitializer`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/services/app_initializer.dart) and [`WebHomeScreen`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/home/presentation/screens/web_home_screen.dart), fixed missing `FocusNode` declarations and lifecycle disposals, and corrected test mock imports.
+* **4 Features Implemented & Verified**:
+  1. Smart Syntax & NLP Task Parsing (`!high`, `#tag`, `tonight`, `in N days`) in [`NlpService`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/tasks/services/nlp_service.dart) and [`AddTaskScreen`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/tasks/presentation/screens/add_task_screen.dart).
+  2. Non-blocking 7-day Hive DB Compaction in [`AppInitializer`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/services/app_initializer.dart) and [`LocalTaskSource`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/tasks/data/datasources/local_task_source.dart).
+  3. Desktop Web Keyboard Shortcuts (`Ctrl+N`, `/`, `1`-`5`, `Esc`) in [`WebHomeScreen`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/home/presentation/screens/web_home_screen.dart).
+  4. Granular Category Filtering for Android Widgets in [`WidgetDataService`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/services/widget_data_service.dart) and [`WidgetCustomizationScreen`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/home/presentation/screens/widget_customization_screen.dart).
+* **Verification**:
+  * `flutter analyze`: **0 issues found**.
+  * `flutter test`: **284 / 284 tests passed (100%)**.
+  * Master audit checklist (`checklist.py`): **All checks PASSED**.
+
+## Mobile App Launch Sign-In Reprompt Elimination - 2026-08-29
+
+#### Issue / Enhancement
+* The mobile version of the app was reprompting the user to sign in / choose a Google account via Credential Manager on every app launch.
+* Root cause 1: In `AuthService._restoreGoogleUser()`, when the 55-minute cached Google access token expired, `_oauthManager.googleSignIn.attemptLightweightAuthentication()` was called on startup. Under `google_sign_in: ^7.2.0` on Android, Credential Manager popped up the system account selection bottom sheet on every cold start.
+* Root cause 2: In `GoogleOAuthManager._performSilentTokenRefresh()`, `attemptLightweightAuthentication()` was called during task sync when `_googleUser` was `null`, prompting the user during background synchronization.
+
+#### Solutions & Verification
+* **Restricted Lightweight Authentication to Web**: In [`lib/core/services/auth_service.dart`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/services/auth_service.dart) and [`lib/core/services/auth/google_oauth_manager.dart`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/services/auth/google_oauth_manager.dart), restricted `attemptLightweightAuthentication()` strictly to Web (`kIsWeb`) where it operates silently via browser cookies.
+* **Non-Intrusive Mobile Startup & Expiration State**: On Mobile (`!kIsWeb`), the app relies on Firebase Auth's persistent session across restarts and never invokes interactive Credential Manager dialogs on launch or during background sync. Expired tokens cleanly set `isGoogleTasksTokenExpired = true`, displaying the in-app "Reconnect" banner only when relevant.
+* **Verification**:
+  * Added unit test in [`test/core/services/auth/google_oauth_manager_test.dart`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/test/core/services/auth/google_oauth_manager_test.dart).
+  * `flutter analyze`: 0 issues found.
+  * `flutter test`: 278/278 tests passed (100%).
+
+## Google Cloud Console OAuth Scopes Alignment & Android Homescreen Calendar Widget Spacing - 2026-08-29
+
+#### Improvements & Fixes
+* **Google OAuth Scopes Alignment**:
+  * In [`lib/core/services/auth/google_oauth_manager.dart`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/services/auth/google_oauth_manager.dart), removed `https://www.googleapis.com/auth/calendar` (broad root scope) to strictly adhere to the scopes configured in Google Cloud Console: `https://www.googleapis.com/auth/calendar.readonly`, `https://www.googleapis.com/auth/calendar.events`, `https://www.googleapis.com/auth/tasks`, and `email`.
+  * Added unit test assertions in [`test/core/services/auth/google_oauth_manager_test.dart`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/test/core/services/auth/google_oauth_manager_test.dart) ensuring the broad `calendar` scope is excluded.
+* **Android Homescreen Calendar Widget Row Height & Density Enhancement**:
+  * In [`widget_full_calendar_row.xml`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/layout/widget_full_calendar_row.xml), increased day cell heights and week number root height from `52dp` to `62dp`.
+  * Increased row padding to `paddingTop="2dp"`, `paddingBottom="2dp"`, refined day number font size (`11.5sp`), and enhanced event badge box top margin (`1.5dp`) and typography (`8sp`).
+  * In [`widget_full_calendar_layout.xml`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/layout/widget_full_calendar_layout.xml), adjusted weekday header vertical padding (`4dp`) for balanced visual hierarchy.
+  * In [`widget_month_agenda_row.xml`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/layout/widget_month_agenda_row.xml), increased day cell height from `32dp` to `36dp` with `1dp` top/bottom padding.
+* **Verification**:
+  * `flutter analyze` completed with 0 issues.
+  * `flutter test` passed 277/277 tests (100%).
+
 ## Startup Load Times & App Size Optimization - 2026-08-28
 
 #### Improvements & Fixes

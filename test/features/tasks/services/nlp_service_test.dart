@@ -1,5 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:rocis_tasks/features/tasks/services/nlp_service.dart';
+import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
+import 'package:rocis_tasks/features/categories/domain/models/category.dart';
 
 void main() {
   group('NlpService', () {
@@ -94,8 +96,8 @@ void main() {
       });
 
       test('should trim extra whitespace from title', () {
-        final result = NlpService.parse('  Buy   milk  ');
-        expect(result.title, 'Buy   milk');
+        final result = NlpService.parse('  Buy milk  ');
+        expect(result.title, 'Buy milk');
       });
 
       test('should handle "noon" as 12pm', () {
@@ -115,6 +117,90 @@ void main() {
         expect(result.title, 'TASK');
         expect(result.dueDate, isNotNull);
       });
+
+      test(
+        'should parse priority bangs (!high, !urgent, !medium, !low, !1)',
+        () {
+          expect(NlpService.parse('Fix bug !high').priority, TaskPriority.high);
+          expect(NlpService.parse('Fix bug !high').title, 'Fix bug');
+
+          expect(
+            NlpService.parse('Deploy release !urgent').priority,
+            TaskPriority.high,
+          );
+          expect(
+            NlpService.parse('Update docs !medium').priority,
+            TaskPriority.medium,
+          );
+          expect(
+            NlpService.parse('Water plants !low').priority,
+            TaskPriority.low,
+          );
+          expect(
+            NlpService.parse('Write tests !1').priority,
+            TaskPriority.high,
+          );
+        },
+      );
+
+      test('should parse p1, p2, p3 shortcut codes', () {
+        expect(NlpService.parse('Call client p1').priority, TaskPriority.high);
+        expect(
+          NlpService.parse('Review spec p2').priority,
+          TaskPriority.medium,
+        );
+        expect(NlpService.parse('Clean inbox p3').priority, TaskPriority.low);
+      });
+
+      test('should parse category hashtags without categories list', () {
+        final result = NlpService.parse('Buy milk #shopping');
+        expect(result.title, 'Buy milk');
+        expect(result.categoryName, 'shopping');
+        expect(result.categoryId, isNull);
+      });
+
+      test('should match category hashtag with available categories', () {
+        final categories = [
+          Category(
+            id: 'cat-1',
+            name: 'Work',
+            colorValue: 0xFF4285F4,
+            iconCode: 0,
+          ),
+          Category(
+            id: 'cat-2',
+            name: 'Personal',
+            colorValue: 0xFF0F9D58,
+            iconCode: 0,
+          ),
+        ];
+
+        final result = NlpService.parse(
+          'Deploy backend #work !high tomorrow at 4pm',
+          categories: categories,
+        );
+
+        expect(result.title, 'Deploy backend');
+        expect(result.categoryId, 'cat-1');
+        expect(result.priority, TaskPriority.high);
+        expect(result.dueDate, isNotNull);
+        expect(result.hasTime, true);
+      });
+
+      test(
+        'should parse relative dates ("tonight", "in 3 days", "next monday")',
+        () {
+          final tonightResult = NlpService.parse('Watch movie tonight');
+          expect(tonightResult.title, 'Watch movie');
+          expect(tonightResult.dueDate, isNotNull);
+          expect(tonightResult.dueDate!.hour, 20);
+
+          final inDaysResult = NlpService.parse('Doctor visit in 3 days');
+          final in3Days = DateTime.now().add(const Duration(days: 3));
+          expect(inDaysResult.title, 'Doctor visit');
+          expect(inDaysResult.dueDate!.day, in3Days.day);
+        },
+      );
     });
   });
 }

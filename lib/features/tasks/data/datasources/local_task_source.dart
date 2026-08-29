@@ -92,4 +92,25 @@ class LocalTaskSource {
   Future<void> deleteCategory(String id) async {
     await _categoriesBox.delete(id);
   }
+
+  /// Safely compacts Hive boxes to reduce disk usage and eliminate fragmented tombstones.
+  Future<void> compactBoxes() async {
+    try {
+      if (Hive.isBoxOpen(_tasksBoxName)) {
+        await _box.compact();
+      }
+      if (Hive.isBoxOpen(_categoriesBoxName)) {
+        await _categoriesBox.compact();
+      }
+      AppLogger.info(
+        'Hive boxes compacted successfully.',
+        tag: 'LocalTaskSource',
+      );
+    } catch (e) {
+      AppLogger.warning(
+        'Failed to compact Hive boxes: $e',
+        tag: 'LocalTaskSource',
+      );
+    }
+  }
 }

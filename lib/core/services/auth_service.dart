@@ -57,10 +57,13 @@ class AuthService extends ChangeNotifier {
     });
   }
 
-  /// Proactively restores [_googleUser] on app startup so that
+  /// Proactively restores [_googleUser] on Web startup so that
   /// [_performSilentTokenRefresh] can call [authorizationForScopes] without
-  /// requiring the user to tap "Sign in with Google" again.
+  /// requiring the user to open a popup.
+  /// On Mobile, Firebase Auth handles session persistence; calling lightweight auth
+  /// on mobile triggers Android Credential Manager UI popups on app launch.
   Future<void> _restoreGoogleUser() async {
+    if (!kIsWeb) return;
     if (_oauthManager.googleUser != null) return;
     try {
       final user = currentUser;
@@ -83,22 +86,12 @@ class AuthService extends ChangeNotifier {
         return;
       }
 
-      // On Mobile/Android, avoid Credential Manager bottom sheet popup if token is already valid.
-      // On Web, lightweight authentication is silent (checks browser cookie/session), so we restore _googleUser.
-      if (!kIsWeb && isTokenValid) {
-        AppLogger.info(
-          'Mobile Google access token cached and valid. Skipping startup lightweight authentication.',
-          tag: 'Auth',
-        );
-        return;
-      }
-
       await _oauthManager.ensureGoogleSignInInitialized();
       final restored = await _oauthManager.googleSignIn
           .attemptLightweightAuthentication();
       if (restored != null) {
         _oauthManager.setGoogleUser(restored);
-        AppLogger.info('Google user restored on startup.', tag: 'Auth');
+        AppLogger.info('Google user restored on startup on Web.', tag: 'Auth');
         if (!isTokenValid) {
           final clientAuth = await restored.authorizationClient
               .authorizationForScopes(GoogleOAuthManager.googleTasksScopes);

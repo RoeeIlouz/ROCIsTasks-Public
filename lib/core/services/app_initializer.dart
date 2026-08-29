@@ -71,11 +71,13 @@ class AppInitializer {
             _initSecondaryFirebase(),
             _initPerformance(),
             _initRemoteConfig(),
-          ]
+          ],
         ]).timeout(
           Duration(seconds: AppConfig.syncTimeoutSeconds),
           onTimeout: () {
-            AppLogger.warning('Initialization services timed out, continuing startup.');
+            AppLogger.warning(
+              'Initialization services timed out, continuing startup.',
+            );
             return [];
           },
         );
@@ -86,7 +88,11 @@ class AppInitializer {
           AnalyticsService();
         }
       } catch (e, stack) {
-        AppLogger.warning('Non-critical service initialization warning: $e', error: e, stack: stack);
+        AppLogger.warning(
+          'Non-critical service initialization warning: $e',
+          error: e,
+          stack: stack,
+        );
       }
 
       // 4. Dependent services (NotificationService might need Context or other things, but usually safe here)
@@ -164,9 +170,7 @@ class AppInitializer {
       AppLogger.info('Initializing Firebase with configuration...');
 
       // Use FirebaseConfig (reads from .env if present, fallback to default_options)
-      await Firebase.initializeApp(
-        options: FirebaseConfig.currentPlatform,
-      );
+      await Firebase.initializeApp(options: FirebaseConfig.currentPlatform);
 
       AppLogger.info('Firebase initialized successfully');
 
@@ -255,9 +259,12 @@ class AppInitializer {
             tz.timeZoneDatabase.locations.containsKey(saved)) {
           timeZoneName = saved;
         } else if (!isBackground) {
-          final timezoneInfo = await FlutterTimezone.getLocalTimezone()
-              .timeout(const Duration(seconds: 2));
-          if (tz.timeZoneDatabase.locations.containsKey(timezoneInfo.identifier)) {
+          final timezoneInfo = await FlutterTimezone.getLocalTimezone().timeout(
+            const Duration(seconds: 2),
+          );
+          if (tz.timeZoneDatabase.locations.containsKey(
+            timezoneInfo.identifier,
+          )) {
             timeZoneName = timezoneInfo.identifier;
           }
         }
@@ -272,7 +279,9 @@ class AppInitializer {
   }
 
   static Future<void> _initPerformance() async {
-    if (kIsWeb) return; // Disable Firebase Performance entirely on Web to prevent adblocker-induced crashes
+    if (kIsWeb) {
+      return; // Disable Firebase Performance entirely on Web to prevent adblocker-induced crashes
+    }
     if (!AppConfig.enablePerformanceMonitoring) return;
     try {
       FirebasePerformance.instance.setPerformanceCollectionEnabled(true);
@@ -301,11 +310,17 @@ class AppInitializer {
       });
       // Fetch in the background non-blockingly to keep startup instant
       unawaited(
-        remoteConfig.fetchAndActivate().then((_) {
-          AppLogger.info('Firebase Remote Config fetched and activated');
-        }).catchError((e) {
-          AppLogger.warning('Remote Config fetch failed (non-critical)', error: e);
-        }),
+        remoteConfig
+            .fetchAndActivate()
+            .then((_) {
+              AppLogger.info('Firebase Remote Config fetched and activated');
+            })
+            .catchError((e) {
+              AppLogger.warning(
+                'Remote Config fetch failed (non-critical)',
+                error: e,
+              );
+            }),
       );
       AppLogger.info('Firebase Remote Config initialized with local defaults');
     } catch (e) {

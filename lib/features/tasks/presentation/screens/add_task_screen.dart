@@ -73,11 +73,13 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
       text: widget.task?.description ?? '',
     );
     _selectedDate = widget.task?.dueDate ?? widget.initialDueDate;
-    _priority = widget.task?.priority ?? widget.initialPriority ?? TaskPriority.medium;
+    _priority =
+        widget.task?.priority ?? widget.initialPriority ?? TaskPriority.medium;
     _selectedCategoryIds = widget.task?.categoryIds.toList() ?? [];
     if (_selectedCategoryIds.isEmpty && widget.task?.categoryId != null) {
       _selectedCategoryIds.add(widget.task!.categoryId!);
-    } else if (_selectedCategoryIds.isEmpty && widget.initialCategoryId != null) {
+    } else if (_selectedCategoryIds.isEmpty &&
+        widget.initialCategoryId != null) {
       _selectedCategoryIds.add(widget.initialCategoryId!);
     }
     _titleDirection = _getTextDirection(_titleController.text);
@@ -92,7 +94,9 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     _syncWithGoogleTasks = widget.task?.syncWithGoogleTasks ?? false;
     _skipReminders = widget.task?.skipReminders ?? false;
     _isGroceryList = widget.task?.isGroceryList ?? false;
-    _attachmentPaths = List<String>.from(widget.task?.attachmentPaths ?? const []);
+    _attachmentPaths = List<String>.from(
+      widget.task?.attachmentPaths ?? const [],
+    );
     _customFields =
         widget.task?.customFields?.map((cf) => cf.copyWith()).toList() ?? [];
     _recurrenceRule = widget.task?.recurrenceRule;
@@ -185,7 +189,9 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
         );
 
         final validCustomFields = _customFields
-            .where((cf) => cf.label.trim().isNotEmpty || cf.value.trim().isNotEmpty)
+            .where(
+              (cf) => cf.label.trim().isNotEmpty || cf.value.trim().isNotEmpty,
+            )
             .toList();
 
         if (widget.task != null) {
@@ -196,7 +202,9 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
             dueDate: _selectedDate,
             clearDueDate: _dateCleared,
             priority: _priority,
-            categoryId: _selectedCategoryIds.isNotEmpty ? _selectedCategoryIds.first : null,
+            categoryId: _selectedCategoryIds.isNotEmpty
+                ? _selectedCategoryIds.first
+                : null,
             categoryIds: _selectedCategoryIds,
             subTasks: _subTasks,
             requireSubTasksBeforeReminders: _requireSubTasksBeforeReminders,
@@ -230,11 +238,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
         Navigator.pop(context);
       } catch (e) {
         final l10n = AppLocalizations.of(context)!;
-        ErrorService.handleUserError(
-          context,
-          l10n.failedToSaveTask,
-          error: e,
-        );
+        ErrorService.handleUserError(context, l10n.failedToSaveTask, error: e);
       }
     }
   }
@@ -283,7 +287,9 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     );
     if (!mounted || result == null) return;
 
-    final pickedPaths = result.paths.whereType<String>().where((p) => p.isNotEmpty);
+    final pickedPaths = result.paths.whereType<String>().where(
+      (p) => p.isNotEmpty,
+    );
     if (pickedPaths.isEmpty) return;
 
     setState(() {
@@ -364,7 +370,11 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     });
   }
 
-  Widget _buildQuickDateChips(BuildContext context, AppLocalizations l10n, ThemeData theme) {
+  Widget _buildQuickDateChips(
+    BuildContext context,
+    AppLocalizations l10n,
+    ThemeData theme,
+  ) {
     final today = _getQuickDateToday();
     final tomorrow = _getQuickDateTomorrow();
     final weekend = _getQuickDateThisWeekend();
@@ -446,7 +456,9 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
             Icon(
               isSelected ? Icons.check_circle_rounded : icon,
               size: 16,
-              color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurfaceVariant,
+              color: isSelected
+                  ? theme.colorScheme.primary
+                  : theme.colorScheme.onSurfaceVariant,
             ),
             const SizedBox(width: 6),
             Text(
@@ -454,7 +466,9 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
               style: GoogleFonts.outfit(
                 fontSize: 12,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurface,
+                color: isSelected
+                    ? theme.colorScheme.primary
+                    : theme.colorScheme.onSurface,
               ),
             ),
           ],
@@ -470,19 +484,45 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   }
 
   void _applyNlpSuggestion() {
-    if (_nlpSuggestion == null || _nlpSuggestion!.dueDate == null) return;
-    
+    if (_nlpSuggestion == null) return;
+
     final themeService = Provider.of<ThemeService>(context, listen: false);
-    
+
     setState(() {
-      _selectedDate = _nlpSuggestion!.dueDate;
+      if (_nlpSuggestion!.dueDate != null) {
+        _selectedDate = _nlpSuggestion!.dueDate;
+        _dateCleared = false;
+      }
+      if (_nlpSuggestion!.priority != null) {
+        _priority = _nlpSuggestion!.priority!;
+      }
+      if (_nlpSuggestion!.categoryId != null) {
+        _selectedCategoryIds = [_nlpSuggestion!.categoryId!];
+      }
       if (themeService.autoRemoveNlpDates) {
         _titleController.text = _nlpSuggestion!.title;
-        // Reset suggestion after applying and removing from title
         _nlpSuggestion = null;
       }
     });
     HapticFeedback.lightImpact();
+  }
+
+  String _getNlpSuggestionSummary(NlpResult nlp, AppLocalizations l10n) {
+    final parts = <String>[];
+    if (nlp.dueDate != null) {
+      if (nlp.hasTime) {
+        parts.add(DateFormat.yMMMd().add_jm().format(nlp.dueDate!));
+      } else {
+        parts.add(DateFormat.yMMMd().format(nlp.dueDate!));
+      }
+    }
+    if (nlp.priority != null) {
+      parts.add(_getPriorityLabel(nlp.priority!, l10n));
+    }
+    if (nlp.categoryName != null) {
+      parts.add('#${nlp.categoryName}');
+    }
+    return parts.join(' • ');
   }
 
   String _getPriorityLabel(TaskPriority priority, AppLocalizations l10n) {
@@ -543,13 +583,17 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   return null;
                 },
                 onChanged: (value) {
+                  final taskProvider = Provider.of<TaskProvider>(
+                    context,
+                    listen: false,
+                  );
+                  final parsed = NlpService.parse(
+                    value,
+                    categories: taskProvider.categories,
+                  );
                   setState(() {
                     _titleDirection = _getTextDirection(value);
-                    _nlpSuggestion = NlpService.parse(value);
-                    // Clear suggestion if it doesn't have a date or matches current
-                    if (_nlpSuggestion?.dueDate == null || _nlpSuggestion?.dueDate == _selectedDate) {
-                      _nlpSuggestion = null;
-                    }
+                    _nlpSuggestion = parsed.hasAnySuggestion ? parsed : null;
                   });
                 },
               ),
@@ -560,11 +604,15 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   child: ActionChip(
                     avatar: const Icon(Icons.auto_awesome, size: 16),
                     label: Text(
-                      'Suggest: ${DateFormat.yMMMd().add_jm().format(_nlpSuggestion!.dueDate!)}',
-                      style: GoogleFonts.outfit(fontSize: 12),
+                      'Suggest: ${_getNlpSuggestionSummary(_nlpSuggestion!, l10n)}',
+                      style: GoogleFonts.outfit(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                     onPressed: _applyNlpSuggestion,
-                    backgroundColor: theme.colorScheme.primaryContainer.withValues(alpha: 0.5),
+                    backgroundColor: theme.colorScheme.primaryContainer
+                        .withValues(alpha: 0.5),
                   ),
                 ),
               ],
@@ -818,7 +866,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                     context,
                     listen: false,
                   );
-                  
+
                   final token = await authService.getGoogleAccessToken();
                   if (!context.mounted) return;
 
@@ -891,14 +939,18 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   if (categories.isEmpty) {
                     return Text(
                       l10n.noCategory,
-                      style: GoogleFonts.outfit(color: theme.colorScheme.onSurfaceVariant),
+                      style: GoogleFonts.outfit(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
                     );
                   }
                   return Wrap(
                     spacing: 8,
                     runSpacing: 8,
                     children: categories.map((category) {
-                      final isSelected = _selectedCategoryIds.contains(category.id);
+                      final isSelected = _selectedCategoryIds.contains(
+                        category.id,
+                      );
                       return FilterChip(
                         selected: isSelected,
                         label: Row(
@@ -946,8 +998,8 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   final Color color = priority == TaskPriority.high
                       ? Colors.redAccent
                       : (priority == TaskPriority.medium
-                          ? Colors.orangeAccent
-                          : Colors.greenAccent);
+                            ? Colors.orangeAccent
+                            : Colors.greenAccent);
 
                   return Expanded(
                     child: Padding(

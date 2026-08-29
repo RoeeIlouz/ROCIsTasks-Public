@@ -28,7 +28,6 @@ class GoogleOAuthManager {
       ? const [
           'email',
           'https://www.googleapis.com/auth/tasks',
-          'https://www.googleapis.com/auth/calendar',
           'https://www.googleapis.com/auth/calendar.readonly',
           'https://www.googleapis.com/auth/calendar.events',
         ]
@@ -114,9 +113,9 @@ class GoogleOAuthManager {
       try {
         var freshToken = await _performSilentTokenRefresh();
 
-        // If refresh returned null and _googleUser was null (startup race),
+        // On Web, if refresh returned null and _googleUser was null (startup race),
         // wait briefly for _restoreGoogleUser() to complete, then retry once.
-        if (freshToken == null && _googleUser == null) {
+        if (kIsWeb && freshToken == null && _googleUser == null) {
           await Future<void>.delayed(const Duration(milliseconds: 1500));
           freshToken = await _performSilentTokenRefresh();
         }
@@ -147,7 +146,7 @@ class GoogleOAuthManager {
 
   Future<String?> _performSilentTokenRefresh() async {
     try {
-      if (_googleUser == null) {
+      if (_googleUser == null && kIsWeb) {
         await ensureGoogleSignInInitialized();
         if (_googleSignIn.supportsAuthenticate()) {
           try {
@@ -163,6 +162,7 @@ class GoogleOAuthManager {
 
       if (_googleUser == null) {
         AppLogger.info('Silent refresh: no Google user available.', tag: 'Auth');
+        _isGoogleTasksTokenExpired = true;
         return null;
       }
 
@@ -177,9 +177,11 @@ class GoogleOAuthManager {
         'Silent refresh: authorizationClient returned null or empty token.',
         tag: 'Auth',
       );
+      _isGoogleTasksTokenExpired = true;
       return null;
     } catch (e) {
       AppLogger.warning('Silent Google token refresh failed: $e', tag: 'Auth');
+      _isGoogleTasksTokenExpired = true;
       return null;
     }
   }
