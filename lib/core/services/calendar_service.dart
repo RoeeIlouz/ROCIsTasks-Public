@@ -2,7 +2,6 @@ import 'package:device_calendar/device_calendar.dart';
 import 'package:rocis_tasks/core/services/logger_service.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:flutter/foundation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:rocis_tasks/core/services/auth_service.dart';
@@ -46,12 +45,12 @@ class CalendarService {
   /// Centralized token resolution that returns null if no token is cached.
   Future<String?> _getAccessToken() async {
     if (_authService != null) {
+      final isGoogleUser = _authService!.currentUser?.providerData.any((p) => p.providerId == 'google.com') ?? false;
+      if (!isGoogleUser) return null;
       final token = await _authService!.getGoogleAccessToken();
       if (token != null && token.isNotEmpty) return token;
     }
-
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('google_access_token');
+    return null;
   }
 
   Future<bool> requestPermissions() async {
@@ -183,10 +182,13 @@ class CalendarService {
           );
         }
       } else if (kIsWeb) {
-        throw GoogleTokenExpiredException(
-          'No Web Google access token available.',
-          true,
-        );
+        final isGoogle = _authService?.currentUser?.providerData.any((p) => p.providerId == 'google.com') ?? false;
+        if (isGoogle) {
+          throw GoogleTokenExpiredException(
+            'No Web Google access token available.',
+            true,
+          );
+        }
       }
     }
 
@@ -314,8 +316,8 @@ class CalendarService {
       }
     }
 
-    // 2. On Web, or if Mobile found 0 device events and token is present, query Google REST API
-    if (kIsWeb || (allEvents.isEmpty && token != null && token.isNotEmpty)) {
+    // 2. On Web, or if Mobile found 0 device events, query Google REST API if token is present
+    if (token != null && token.isNotEmpty) {
       final googleIds = targetCalendarIds
           .where(
             (id) =>

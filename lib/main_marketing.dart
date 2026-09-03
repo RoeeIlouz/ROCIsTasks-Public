@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart' hide Category;
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:rocis_tasks/main.dart';
 import 'package:rocis_tasks/core/services/app_initializer.dart';
@@ -30,8 +31,24 @@ Future<void> main() async {
     await prefs.setBool('use_material_theme', false);
     await prefs.setString('language_code', lang);
     await prefs.setBool('onboarding_complete', true);
+    await prefs.setBool('web_is_premium', true);
+    await prefs.setBool('disable_cloud_sync', true);
+    await prefs.remove('google_access_token');
   } catch (e) {
     debugPrint('Error setting SharedPreferences: $e');
+  }
+
+  // Authenticate QA Pro user
+  try {
+    final auth = FirebaseAuth.instance;
+    if (auth.currentUser == null) {
+      await auth.signInWithEmailAndPassword(
+        email: 'qa@rocisapps.com',
+        password: 'Qa123456123456',
+      );
+    }
+  } catch (e) {
+    debugPrint('QA sign-in error in main_marketing: $e');
   }
 
   // Seed Hive
