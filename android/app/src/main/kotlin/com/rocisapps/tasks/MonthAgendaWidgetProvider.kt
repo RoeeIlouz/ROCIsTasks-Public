@@ -79,8 +79,24 @@ class MonthAgendaWidgetProvider : HomeWidgetProvider() {
                 if (offset != 0) {
                     cal.add(Calendar.MONTH, offset)
                 }
-                val monthTitleStr = SimpleDateFormat("MMMM yyyy", widgetLocale).format(cal.time)
+                val monthTitleStr = WidgetLocaleHelper.getMonthYearTitle(cal, widgetLocale)
                 views.setTextViewText(R.id.widget_month_agenda_month_title, monthTitleStr)
+
+                // Dynamic Weekday header letters for the mini month grid
+                val startOfWeek = widgetData.getInt("full_calendar_start_of_week", 7)
+                val daysOfWeekLetters = WidgetLocaleHelper.getWeekdayLetters(startOfWeek, widgetLocale)
+                val weekdayViewIds = listOf(
+                    R.id.widget_day_h0,
+                    R.id.widget_day_h1,
+                    R.id.widget_day_h2,
+                    R.id.widget_day_h3,
+                    R.id.widget_day_h4,
+                    R.id.widget_day_h5,
+                    R.id.widget_day_h6
+                )
+                for (col in 0..6) {
+                    views.setTextViewText(weekdayViewIds[col], daysOfWeekLetters[col])
+                }
 
                 // Selected Date Display
                 var selectedDate = widgetData.getString(PREF_SELECTED_DATE, "") ?: ""
@@ -89,7 +105,8 @@ class MonthAgendaWidgetProvider : HomeWidgetProvider() {
                 }
                 val selectedDateDisplay = try {
                     val parsed = SimpleDateFormat("yyyy-MM-dd", Locale.US).parse(selectedDate)
-                    SimpleDateFormat("EEE, MMM d", widgetLocale).format(parsed!!)
+                    val calSel = Calendar.getInstance().apply { time = parsed!! }
+                    WidgetLocaleHelper.getDateTitle(calSel, widgetLocale, false)
                 } catch (_: Exception) {
                     WidgetLocaleHelper.getTodayText(widgetLocale)
                 }
@@ -171,6 +188,7 @@ class MonthAgendaWidgetProvider : HomeWidgetProvider() {
                     data = Uri.parse("widget://rocis/month_agenda_list/$appWidgetId/$selectedDate")
                 }
                 views.setRemoteAdapter(R.id.widget_month_agenda_list, agendaServiceIntent)
+                views.setTextViewText(R.id.widget_month_agenda_empty, WidgetLocaleHelper.getNoEventsOrTasksText(widgetLocale))
                 views.setEmptyView(R.id.widget_month_agenda_list, R.id.widget_month_agenda_empty)
 
                 // Day Agenda Item Click Template (direct completion or view)

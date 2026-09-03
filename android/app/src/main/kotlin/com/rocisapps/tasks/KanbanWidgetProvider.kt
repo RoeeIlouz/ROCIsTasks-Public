@@ -96,11 +96,8 @@ class KanbanWidgetProvider : HomeWidgetProvider() {
 
                 val columnIndex = (widgetData.getInt(PREF_KANBAN_COLUMN, 0) % 3 + 3) % 3
 
-                val columnTitle = when (columnIndex) {
-                    1 -> "In Focus"
-                    2 -> "Done"
-                    else -> "To Do"
-                }
+                val widgetLocale = WidgetLocaleHelper.getWidgetLocale(widgetData)
+                val columnTitle = WidgetLocaleHelper.getKanbanColumnTitle(columnIndex, widgetLocale)
 
                 val currentCount = when (columnIndex) {
                     1 -> focusCount
@@ -109,12 +106,12 @@ class KanbanWidgetProvider : HomeWidgetProvider() {
                 }
 
                 views.setTextViewText(R.id.widget_kanban_title, columnTitle)
-                views.setTextViewText(R.id.widget_kanban_subtitle, "Kanban Board • $currentCount tasks")
+                views.setTextViewText(R.id.widget_kanban_subtitle, WidgetLocaleHelper.getKanbanSubtitle(currentCount, widgetLocale))
 
                 // Update Segment Tab Titles with counts
-                views.setTextViewText(R.id.widget_kanban_tab_todo, "To Do ($todoCount)")
-                views.setTextViewText(R.id.widget_kanban_tab_focus, "In Focus ($focusCount)")
-                views.setTextViewText(R.id.widget_kanban_tab_done, "Done ($doneCount)")
+                views.setTextViewText(R.id.widget_kanban_tab_todo, "${WidgetLocaleHelper.getKanbanTodoTitle(widgetLocale)} ($todoCount)")
+                views.setTextViewText(R.id.widget_kanban_tab_focus, "${WidgetLocaleHelper.getKanbanFocusTitle(widgetLocale)} ($focusCount)")
+                views.setTextViewText(R.id.widget_kanban_tab_done, "${WidgetLocaleHelper.getKanbanDoneTitle(widgetLocale)} ($doneCount)")
 
                 // Active tab pill highlighting
                 when (columnIndex) {
@@ -236,6 +233,7 @@ class KanbanWidgetProvider : HomeWidgetProvider() {
                     data = Uri.parse("widget://rocis/kanban/$appWidgetId/$columnIndex")
                 }
                 views.setRemoteAdapter(R.id.widget_kanban_list, serviceIntent)
+                views.setTextViewText(R.id.widget_kanban_empty, WidgetLocaleHelper.getNoTasksInColumnText(widgetLocale))
                 views.setEmptyView(R.id.widget_kanban_list, R.id.widget_kanban_empty)
 
                 // 6. Template PendingIntent for list item actions

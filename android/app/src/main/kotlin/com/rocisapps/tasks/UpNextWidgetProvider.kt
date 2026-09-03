@@ -55,12 +55,25 @@ class UpNextWidgetProvider : HomeWidgetProvider() {
                 views.setTextColor(R.id.widget_up_next_subtitle, secondaryColor)
                 views.setTextColor(R.id.widget_up_next_time_badge, highlightColor)
 
+                val widgetLocale = WidgetLocaleHelper.getWidgetLocale(widgetData)
                 val type = widgetData.getString("up_next_type", "task") ?: "task"
                 val id = widgetData.getString("up_next_id", "") ?: ""
-                val title = widgetData.getString("up_next_title", "No upcoming tasks") ?: "No upcoming tasks"
+                val rawTitle = widgetData.getString("up_next_title", "") ?: ""
                 val subtitle = widgetData.getString("up_next_subtitle", "") ?: ""
-                val timeDisplay = widgetData.getString("up_next_time_display", "All caught up") ?: "All caught up"
+                val rawTimeDisplay = widgetData.getString("up_next_time_display", "") ?: ""
                 val colorHex = widgetData.getString("up_next_color", "") ?: ""
+
+                val title = if (id.isEmpty() || type == "none" || rawTitle.isEmpty() || rawTitle == "All tasks completed" || rawTitle == "No upcoming tasks") {
+                    WidgetLocaleHelper.getAllCaughtUpText(widgetLocale)
+                } else {
+                    rawTitle
+                }
+
+                val timeDisplay = if (id.isEmpty() || type == "none" || rawTimeDisplay.isEmpty() || rawTimeDisplay == "Clear" || rawTimeDisplay == "All caught up") {
+                    WidgetLocaleHelper.getClearText(widgetLocale)
+                } else {
+                    rawTimeDisplay
+                }
 
                 views.setTextViewText(R.id.widget_up_next_title, title)
                 views.setTextViewText(R.id.widget_up_next_subtitle, subtitle)

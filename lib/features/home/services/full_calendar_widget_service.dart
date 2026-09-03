@@ -60,23 +60,21 @@ class FullCalendarWidgetService {
   final CalendarService _calendarService;
   final LocalTaskSource _taskSource;
 
-  FullCalendarWidgetService(this._calendarService, this._taskSource)
-    ;
+  FullCalendarWidgetService(this._calendarService, this._taskSource);
 
   /// Initialize the schedule service
-  Future<void> initScheduleService() async {
-  }
+  Future<void> initScheduleService() async {}
 
   /// Set the user email for ROCIs-Schedule lookup
-  void setUserEmail(String? email) {
-  }
+  void setUserEmail(String? email) {}
 
   /// Get current filter settings
   Future<FullCalendarFilters> getFilters() async {
     final prefs = await SharedPreferences.getInstance();
     final showTasks = prefs.getBool('full_calendar_show_tasks') ?? true;
     final showGoogle = prefs.getBool('full_calendar_show_google') ?? true;
-    final selectedCalendarIds = prefs.getStringList('full_calendar_selected_ids') ?? [];
+    final selectedCalendarIds =
+        prefs.getStringList('full_calendar_selected_ids') ?? [];
 
     return FullCalendarFilters(
       showTasks: showTasks,
@@ -110,10 +108,7 @@ class FullCalendarWidgetService {
       'full_calendar_show_google',
       filters.showGoogleCalendar,
     );
-    await HomeWidget.saveWidgetData<bool>(
-      'full_calendar_show_rocis',
-      false,
-    );
+    await HomeWidget.saveWidgetData<bool>('full_calendar_show_rocis', false);
     await HomeWidget.saveWidgetData<String>(
       'full_calendar_selected_ids',
       jsonEncode(filters.selectedCalendarIds),
@@ -174,9 +169,12 @@ class FullCalendarWidgetService {
       final googleColorHex =
           '#${googleColorInt.toRadixString(16).padLeft(8, '0')}';
 
+      final localeCode =
+          prefs.getString('language_code') ??
+          PlatformDispatcher.instance.locale.languageCode;
       final now = DateTime.now();
       final targetMonth = DateTime(now.year, now.month + offset, 1);
-      final monthName = DateFormat('MMMM yyyy').format(targetMonth);
+      final monthName = DateFormat('MMMM yyyy', localeCode).format(targetMonth);
 
       // Calculate calendar grid (6 weeks) based on startOfWeek preference (7=Sunday, 1=Monday, 6=Saturday)
       final startOfWeek = prefs.getInt('full_calendar_start_of_week') ?? 7;
@@ -198,8 +196,11 @@ class FullCalendarWidgetService {
           calendarColors = await _calendarService.getCalendarColors();
         }
       } catch (e, stack) {
-        AppLogger.error('Failed to fetch Google Calendar events for widget',
-            error: e, stack: stack);
+        AppLogger.error(
+          'Failed to fetch Google Calendar events for widget',
+          error: e,
+          stack: stack,
+        );
       }
 
       // Pre-index events by date for O(1) lookup instead of O(n) per day
@@ -248,8 +249,11 @@ class FullCalendarWidgetService {
               .toList();
         }
       } catch (e, stack) {
-        AppLogger.error('Failed to fetch tasks for widget',
-            error: e, stack: stack);
+        AppLogger.error(
+          'Failed to fetch tasks for widget',
+          error: e,
+          stack: stack,
+        );
       }
 
       for (final t in filteredTasks) {
@@ -294,9 +298,9 @@ class FullCalendarWidgetService {
             int? colorVal;
             try {
               final cat = categories.firstWhere(
-                (c) => t.categoryIds.isNotEmpty 
-                       ? t.categoryIds.contains(c.id) 
-                       : c.id == t.categoryId,
+                (c) => t.categoryIds.isNotEmpty
+                    ? t.categoryIds.contains(c.id)
+                    : c.id == t.categoryId,
               );
               colorVal = cat.colorValue;
             } catch (_) {}
@@ -384,10 +388,7 @@ class FullCalendarWidgetService {
           'full_calendar_show_google',
           filters.showGoogleCalendar,
         ),
-        HomeWidget.saveWidgetData<bool>(
-          'full_calendar_show_rocis',
-          false,
-        ),
+        HomeWidget.saveWidgetData<bool>('full_calendar_show_rocis', false),
       ]);
 
       // Small delay to ensure SharedPreferences are flushed to disk
@@ -401,9 +402,10 @@ class FullCalendarWidgetService {
       );
     } catch (e, stack) {
       AppLogger.error(
-          'Error in FullCalendarWidgetService.updateFullCalendarWidget',
-          error: e,
-          stack: stack);
+        'Error in FullCalendarWidgetService.updateFullCalendarWidget',
+        error: e,
+        stack: stack,
+      );
       await _generateFallbackGrid(monthOffset, userId);
     }
   }
@@ -412,10 +414,17 @@ class FullCalendarWidgetService {
   Future<void> updateSelectedDate(DateTime date, String? userId) async {
     try {
       final dateStr = DateFormat('yyyy-MM-dd').format(date);
-      await HomeWidget.saveWidgetData<String>('full_calendar_selected_date', dateStr);
+      await HomeWidget.saveWidgetData<String>(
+        'full_calendar_selected_date',
+        dateStr,
+      );
       await updateFullCalendarWidget(userId: userId);
     } catch (e, stack) {
-      AppLogger.error('Failed to update selected date on widget', error: e, stack: stack);
+      AppLogger.error(
+        'Failed to update selected date on widget',
+        error: e,
+        stack: stack,
+      );
     }
   }
 
@@ -426,11 +435,13 @@ class FullCalendarWidgetService {
           monthOffset ??
           (await HomeWidget.getWidgetData<int>('full_calendar_offset') ?? 0);
 
+      final prefs = await SharedPreferences.getInstance();
+      final localeCode =
+          prefs.getString('language_code') ??
+          PlatformDispatcher.instance.locale.languageCode;
       final now = DateTime.now();
       final targetMonth = DateTime(now.year, now.month + offset, 1);
-      final monthName = DateFormat('MMMM yyyy').format(targetMonth);
-
-      final prefs = await SharedPreferences.getInstance();
+      final monthName = DateFormat('MMMM yyyy', localeCode).format(targetMonth);
       // Calculate calendar grid (6 weeks) based on startOfWeek preference (7=Sunday, 1=Monday, 6=Saturday)
       final startOfWeek = prefs.getInt('full_calendar_start_of_week') ?? 7;
       final firstDayOfMonth = targetMonth;
@@ -478,11 +489,19 @@ class FullCalendarWidgetService {
         iOSName: 'FullCalendarWidget',
       );
     } catch (e, stack) {
-      AppLogger.error('Critical failure in widget fallback', error: e, stack: stack);
+      AppLogger.error(
+        'Critical failure in widget fallback',
+        error: e,
+        stack: stack,
+      );
     }
   }
 
-  String _formatEventTime(DateTime? start, DateTime? end, AppLocalizations? l10n) {
+  String _formatEventTime(
+    DateTime? start,
+    DateTime? end,
+    AppLocalizations? l10n,
+  ) {
     if (start == null) return '';
 
     // Handle all-day events (when end is null or same day start/end with no time difference)

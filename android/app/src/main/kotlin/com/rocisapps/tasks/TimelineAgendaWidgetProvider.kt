@@ -39,7 +39,9 @@ class TimelineAgendaWidgetProvider : HomeWidgetProvider() {
                     "dark", "glassmorphic" -> android.graphics.Color.parseColor("#FFFFFF")
                     else -> context.getColor(R.color.widget_title_text)
                 }
+                val widgetLocale = WidgetLocaleHelper.getWidgetLocale(widgetData)
                 views.setTextColor(R.id.widget_timeline_title, textColor)
+                views.setTextViewText(R.id.widget_timeline_title, WidgetLocaleHelper.getScheduleTimelineText(widgetLocale))
 
                 // Add Task Button
                 val addIntent = HomeWidgetLaunchIntent.getActivity(
@@ -63,6 +65,8 @@ class TimelineAgendaWidgetProvider : HomeWidgetProvider() {
                     data = Uri.parse("widget://rocis/timeline_agenda/$appWidgetId")
                 }
                 views.setRemoteAdapter(R.id.widget_timeline_list, serviceIntent)
+                views.setTextViewText(R.id.widget_timeline_empty_title, WidgetLocaleHelper.getNoTasksOrEventsText(widgetLocale))
+                views.setTextViewText(R.id.widget_timeline_empty_subtitle, WidgetLocaleHelper.getTapPlusToAddText(widgetLocale))
                 views.setEmptyView(R.id.widget_timeline_list, R.id.widget_timeline_empty)
 
                 // Item Click Template

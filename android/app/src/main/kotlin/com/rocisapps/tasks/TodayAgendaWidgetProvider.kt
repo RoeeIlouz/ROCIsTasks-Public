@@ -85,35 +85,13 @@ class TodayAgendaWidgetProvider : HomeWidgetProvider() {
                     cal.add(Calendar.DAY_OF_YEAR, offset)
                 }
 
-                val titleFormat = SimpleDateFormat("EEEE, MMM d", widgetLocale)
-                val titleStr = titleFormat.format(cal.time)
+                val titleStr = WidgetLocaleHelper.getDateTitle(cal, widgetLocale, true)
 
                 val subtitleStr = when (offset) {
                     0 -> WidgetLocaleHelper.getTodayText(widgetLocale)
-                    1 -> when (widgetLocale.language.lowercase()) {
-                        "he" -> "מחר"
-                        "es" -> "Mañana"
-                        "de" -> "Morgen"
-                        "fr" -> "Demain"
-                        "ar" -> "غداً"
-                        "sv" -> "Imorgon"
-                        "hi" -> "कल"
-                        else -> "Tomorrow"
-                    }
-                    -1 -> when (widgetLocale.language.lowercase()) {
-                        "he" -> "אתמול"
-                        "es" -> "Ayer"
-                        "de" -> "Gestern"
-                        "fr" -> "Hier"
-                        "ar" -> "أمس"
-                        "sv" -> "Igår"
-                        "hi" -> "कल"
-                        else -> "Yesterday"
-                    }
-                    else -> {
-                        val diffFormat = SimpleDateFormat("yyyy-MM-dd", widgetLocale)
-                        diffFormat.format(cal.time)
-                    }
+                    1 -> WidgetLocaleHelper.getTomorrowText(widgetLocale)
+                    -1 -> WidgetLocaleHelper.getYesterdayText(widgetLocale)
+                    else -> WidgetLocaleHelper.getDateTitle(cal, widgetLocale, false)
                 }
 
                 views.setTextViewText(R.id.widget_today_date_title, titleStr)
@@ -176,6 +154,8 @@ class TodayAgendaWidgetProvider : HomeWidgetProvider() {
                     data = Uri.parse("widget://rocis/today_agenda/$appWidgetId/$offset")
                 }
                 views.setRemoteAdapter(R.id.widget_today_list, serviceIntent)
+                views.setTextViewText(R.id.widget_today_empty_title, WidgetLocaleHelper.getNoTasksOrEventsText(widgetLocale))
+                views.setTextViewText(R.id.widget_today_empty_subtitle, WidgetLocaleHelper.getTapPlusToAddText(widgetLocale))
                 views.setEmptyView(R.id.widget_today_list, R.id.widget_today_empty)
 
                 // 6. Template PendingIntent for list items

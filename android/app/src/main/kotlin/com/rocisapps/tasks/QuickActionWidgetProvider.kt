@@ -52,6 +52,10 @@ class QuickActionWidgetProvider : HomeWidgetProvider() {
                     else -> Color.parseColor("#94A3B8")
                 }
 
+                val widgetLocale = WidgetLocaleHelper.getWidgetLocale(widgetData)
+                views.setTextViewText(R.id.widget_quick_stat_label, WidgetLocaleHelper.getPendingLeftText(widgetLocale))
+                views.setTextViewText(R.id.widget_quick_btn_add_text, WidgetLocaleHelper.getNewTaskText(widgetLocale))
+                views.setTextViewText(R.id.widget_quick_btn_cal_text, WidgetLocaleHelper.getCalendarText(widgetLocale))
                 views.setTextColor(R.id.widget_quick_stat_number, textColor)
                 views.setTextColor(R.id.widget_quick_stat_label, secondaryColor)
                 views.setTextColor(R.id.widget_quick_btn_add_icon, highlightColor)

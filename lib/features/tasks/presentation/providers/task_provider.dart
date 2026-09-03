@@ -229,8 +229,8 @@ class TaskProvider extends ChangeNotifier {
     _subscriptionService.addListener(notifyListeners);
     _privateModeService.addListener(_onPrivateModeChanged);
 
-    // Populate all home screen widgets with initial data
-    unawaited(_updateWidgets(showNotification: false));
+    // Populate all home screen widgets with initial data and restore task counter notification
+    unawaited(_updateWidgets(showNotification: true));
 
     Future.delayed(const Duration(seconds: 2), () async {
       final allTasks = _source.getTasks();

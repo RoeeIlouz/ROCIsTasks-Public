@@ -49,6 +49,9 @@ class TaskWidgetProvider : HomeWidgetProvider() {
                 putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
                 data = Uri.parse("widget://rocis/task/$appWidgetId")
             }
+            val widgetLocale = WidgetLocaleHelper.getWidgetLocale(widgetData)
+            views.setTextViewText(R.id.widget_title, WidgetLocaleHelper.getPendingTasksText(widgetLocale))
+            views.setTextViewText(R.id.empty_view, WidgetLocaleHelper.getNoPendingTasksText(widgetLocale))
             views.setRemoteAdapter(R.id.widget_list_view, intent)
             views.setEmptyView(R.id.widget_list_view, R.id.empty_view)
 
@@ -78,16 +81,10 @@ class TaskWidgetProvider : HomeWidgetProvider() {
         val sortMode = prefs.getInt(PREF_SORT_KEY, 0)
         val filterMode = prefs.getInt(PREF_FILTER_KEY, 0)
         val isPremium = prefs.getBoolean("is_premium", false)
+        val widgetLocale = WidgetLocaleHelper.getWidgetLocale(prefs)
 
-        val sortText = if (sortMode == 0) "Sort: Date" else "Sort: Priority"
-        val filterText = when (filterMode) {
-            0 -> "Filter: All"
-            1 -> "Filter: Today"
-            2 -> "Filter: High Prio"
-            3 -> if (isPremium) "Filter: Overdue" else "Filter: PRO"
-            4 -> if (isPremium) "Filter: Pinned" else "Filter: PRO"
-            else -> "Filter: All"
-        }
+        val sortText = WidgetLocaleHelper.getSortButtonText(sortMode, widgetLocale)
+        val filterText = WidgetLocaleHelper.getFilterButtonText(filterMode, isPremium, widgetLocale)
 
         views.setTextViewText(R.id.widget_btn_sort, sortText)
         views.setTextViewText(R.id.widget_btn_filter, filterText)

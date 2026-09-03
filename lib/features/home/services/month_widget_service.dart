@@ -88,7 +88,8 @@ class MonthWidgetService {
             final currentDate = date;
 
             // Standard inclusive-start, exclusive-end check
-            if (currentDate.isBefore(eventStart) || currentDate.isAfter(endDay)) {
+            if (currentDate.isBefore(eventStart) ||
+                currentDate.isAfter(endDay)) {
               return false;
             }
 
@@ -130,13 +131,15 @@ class MonthWidgetService {
             int? colorVal;
             try {
               final cat = _taskSource.getCategories().firstWhere(
-                (c) => t.categoryIds.isNotEmpty 
-                       ? t.categoryIds.contains(c.id) 
-                       : c.id == t.categoryId,
+                (c) => t.categoryIds.isNotEmpty
+                    ? t.categoryIds.contains(c.id)
+                    : c.id == t.categoryId,
               );
               colorVal = cat.colorValue;
             } catch (e) {
-              AppLogger.debug('Category not found for task in widget: ${t.title}');
+              AppLogger.debug(
+                'Category not found for task in widget: ${t.title}',
+              );
             }
 
             summaries.add({
@@ -172,9 +175,12 @@ class MonthWidgetService {
       );
 
       // Save Month Name
+      final localeCode =
+          prefs.getString('language_code') ??
+          PlatformDispatcher.instance.locale.languageCode;
       await HomeWidget.saveWidgetData<String>(
         'month_name',
-        DateFormat('MMMM yyyy').format(targetMonth),
+        DateFormat('MMMM yyyy', localeCode).format(targetMonth),
       );
 
       try {

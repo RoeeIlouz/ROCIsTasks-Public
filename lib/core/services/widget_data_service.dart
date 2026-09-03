@@ -59,9 +59,10 @@ class WidgetDataService {
   Future<String> _getAppLanguage() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      return prefs.getString('language_code') ?? 'en';
+      return prefs.getString('language_code') ??
+          PlatformDispatcher.instance.locale.languageCode;
     } catch (_) {
-      return 'en';
+      return PlatformDispatcher.instance.locale.languageCode;
     }
   }
 
@@ -150,6 +151,72 @@ class WidgetDataService {
         return 'बिना शीर्षक';
       default:
         return 'No Title';
+    }
+  }
+
+  Future<String> _getOverdueLabel() async {
+    final lang = await _getAppLanguage();
+    switch (lang.toLowerCase()) {
+      case 'he':
+        return 'באיחור';
+      case 'es':
+        return 'Vencida';
+      case 'de':
+        return 'Überfällig';
+      case 'fr':
+        return 'En retard';
+      case 'ar':
+        return 'متأخرة';
+      case 'sv':
+        return 'Försenad';
+      case 'hi':
+        return 'अतिदेय';
+      default:
+        return 'Overdue';
+    }
+  }
+
+  Future<String> _getAllTasksCompletedLabel() async {
+    final lang = await _getAppLanguage();
+    switch (lang.toLowerCase()) {
+      case 'he':
+        return 'כל המשימות הושלמו';
+      case 'es':
+        return 'Todas las tareas completadas';
+      case 'de':
+        return 'Alle Aufgaben erledigt';
+      case 'fr':
+        return 'Toutes les tâches terminées';
+      case 'ar':
+        return 'اكتملت جميع المهام';
+      case 'sv':
+        return 'Alla uppgifter slutförda';
+      case 'hi':
+        return 'सभी कार्य पूरे हो गए';
+      default:
+        return 'All tasks completed';
+    }
+  }
+
+  Future<String> _getClearLabel() async {
+    final lang = await _getAppLanguage();
+    switch (lang.toLowerCase()) {
+      case 'he':
+        return 'נקי';
+      case 'es':
+        return 'Limpio';
+      case 'de':
+        return 'Frei';
+      case 'fr':
+        return 'Libre';
+      case 'ar':
+        return 'منجز';
+      case 'sv':
+        return 'Klart';
+      case 'hi':
+        return 'साफ़';
+      default:
+        return 'Clear';
     }
   }
 
@@ -758,18 +825,14 @@ class WidgetDataService {
         ),
       ]);
     } else {
+      final completedTitle = await _getAllTasksCompletedLabel();
+      final clearBadge = await _getClearLabel();
       await Future.wait([
         HomeWidget.saveWidgetData<String>('up_next_type', 'none'),
         HomeWidget.saveWidgetData<String>('up_next_id', ''),
-        HomeWidget.saveWidgetData<String>(
-          'up_next_title',
-          'All tasks completed',
-        ),
-        HomeWidget.saveWidgetData<String>(
-          'up_next_subtitle',
-          'No upcoming items',
-        ),
-        HomeWidget.saveWidgetData<String>('up_next_time_display', 'Clear'),
+        HomeWidget.saveWidgetData<String>('up_next_title', completedTitle),
+        HomeWidget.saveWidgetData<String>('up_next_subtitle', ''),
+        HomeWidget.saveWidgetData<String>('up_next_time_display', clearBadge),
         HomeWidget.saveWidgetData<String>('up_next_color', '#10B981'),
       ]);
     }
@@ -1041,6 +1104,11 @@ class WidgetDataService {
     final today = DateTime(now.year, now.month, now.day);
     final tomorrow = today.add(const Duration(days: 1));
 
+    final lang = await _getAppLanguage();
+    final todayLabel = await _getTodayLabel();
+    final tomorrowLabel = await _getTomorrowLabel();
+    final overdueLabel = await _getOverdueLabel();
+
     final todoTasks = <Map<String, dynamic>>[];
     final inFocusTasks = <Map<String, dynamic>>[];
     final doneTasks = <Map<String, dynamic>>[];
@@ -1060,14 +1128,15 @@ class WidgetDataService {
 
       String dateDisplay = '';
       if (t.dueDate != null) {
+        final formattedDate = _formatDatePattern('MMM d', t.dueDate!, lang);
         if (isToday) {
-          dateDisplay = 'Today';
+          dateDisplay = todayLabel;
         } else if (isTomorrow) {
-          dateDisplay = 'Tomorrow';
+          dateDisplay = tomorrowLabel;
         } else if (isOverdue) {
-          dateDisplay = 'Overdue (${DateFormat('MMM d').format(t.dueDate!)})';
+          dateDisplay = '$overdueLabel ($formattedDate)';
         } else {
-          dateDisplay = DateFormat('MMM d').format(t.dueDate!);
+          dateDisplay = formattedDate;
         }
       }
 

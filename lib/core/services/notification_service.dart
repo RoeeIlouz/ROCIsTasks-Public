@@ -55,7 +55,10 @@ class NotificationService {
     if (_isInitialized) return;
     if (kIsWeb) {
       _isInitialized = true;
-      AppLogger.info('NotificationService initialization skipped on web', tag: 'Notifications');
+      AppLogger.info(
+        'NotificationService initialization skipped on web',
+        tag: 'Notifications',
+      );
       return;
     }
     tz.initializeTimeZones();
@@ -64,7 +67,10 @@ class NotificationService {
       final timezoneInfo = await FlutterTimezone.getLocalTimezone();
       timeZoneName = timezoneInfo.identifier;
     } catch (e) {
-      AppLogger.warning('Failed to get local timezone in NotificationService: $e', tag: 'Notifications');
+      AppLogger.warning(
+        'Failed to get local timezone in NotificationService: $e',
+        tag: 'Notifications',
+      );
     }
 
     if (tz.timeZoneDatabase.locations.containsKey(timeZoneName)) {
@@ -199,8 +205,6 @@ class NotificationService {
         });
   }
 
-
-
   Future<void> cancelNotification(int id) async {
     if (kIsWeb) return;
     await flutterLocalNotificationsPlugin.cancel(id: id);
@@ -241,14 +245,17 @@ class NotificationService {
         'isDarkText': isDarkText,
       });
     } catch (e) {
-      // Error updating task count icon (falling back)
+      AppLogger.warning(
+        'Error updating task count icon via native channel (falling back): $e',
+        tag: 'Notifications',
+      );
 
       final String body = titles.isEmpty
           ? (uncompletedTasksLabel ?? '$count Uncompleted Tasks')
           : titles.join('\n');
 
       final androidDetails = AndroidNotificationDetails(
-        'rocis_tasks_persistent',
+        'rocis_tasks_persistent_v6',
         'Task Counter',
         channelDescription: 'Persistent notification for uncompleted tasks',
         importance: Importance.low,

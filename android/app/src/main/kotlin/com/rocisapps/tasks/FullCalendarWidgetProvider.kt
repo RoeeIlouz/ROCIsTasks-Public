@@ -126,15 +126,12 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
                 views.setViewVisibility(R.id.widget_weekday_num_header, if (showWeekNumbers) android.view.View.VISIBLE else android.view.View.GONE)
 
                 // 3. Title Update
-                val savedMonthName = widgetData.getString("full_calendar_month_name", null)
-                val monthName = if (!savedMonthName.isNullOrEmpty()) {
-                    savedMonthName
-                } else {
-                    val cal = java.util.Calendar.getInstance()
-                    val offset = widgetData.getInt(PREF_OFFSET, 0)
+                val cal = java.util.Calendar.getInstance()
+                val offset = widgetData.getInt(PREF_OFFSET, 0)
+                if (offset != 0) {
                     cal.add(java.util.Calendar.MONTH, offset)
-                    java.text.SimpleDateFormat("MMMM yyyy", widgetLocale).format(cal.time)
                 }
+                val monthName = WidgetLocaleHelper.getMonthYearTitle(cal, widgetLocale)
                 views.setTextViewText(R.id.widget_full_calendar_title, monthName)
 
                 // 4. Header Navigation Buttons
@@ -200,7 +197,11 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
                     if (showGoogle) R.drawable.widget_filter_button_active_bg else R.drawable.widget_filter_button_bg
                 )
 
-                // Text colors
+                // Text colors and localized labels
+                views.setTextViewText(R.id.widget_filter_tasks, WidgetLocaleHelper.getTasksFilterText(widgetLocale))
+                views.setTextViewText(R.id.widget_filter_google, WidgetLocaleHelper.getGoogleFilterText(widgetLocale))
+                views.setTextViewText(R.id.widget_filter_rocis, WidgetLocaleHelper.getScheduleFilterText(widgetLocale))
+                views.setTextViewText(R.id.empty_full_calendar_view, WidgetLocaleHelper.getNoDataAvailableText(widgetLocale))
                 views.setTextColor(R.id.widget_filter_tasks, if (showTasks) primaryColor else weekdaySecondaryColor)
                 views.setTextColor(R.id.widget_filter_google, if (showGoogle) primaryColor else weekdaySecondaryColor)
 

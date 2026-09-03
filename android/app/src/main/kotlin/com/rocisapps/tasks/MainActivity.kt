@@ -26,8 +26,12 @@ class MainActivity : FlutterFragmentActivity() {
                 val titles = call.argument<List<String>>("titles") ?: emptyList()
                 val largeIconPath = call.argument<String>("largeIconPath")
                 val isDarkText = call.argument<Boolean>("isDarkText") ?: false
-                notificationHelper.showTaskCountNotification(count, titles, largeIconPath, isDarkText)
-                result.success(null)
+                val success = notificationHelper.showTaskCountNotification(count, titles, largeIconPath, isDarkText)
+                if (success) {
+                    result.success(null)
+                } else {
+                    result.error("NOTIFICATION_FAILED", "Failed to post task count notification", null)
+                }
             } else {
                 result.notImplemented()
             }

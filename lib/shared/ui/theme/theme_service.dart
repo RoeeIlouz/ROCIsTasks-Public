@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kIsWeb, PlatformDispatcher;
 import 'package:home_widget/home_widget.dart';
 import 'package:rocis_tasks/l10n/l10n_helper.dart';
 
@@ -67,6 +67,15 @@ class ThemeService extends ChangeNotifier {
           await HomeWidget.saveWidgetData<String>(
             'app_language',
             _locale!.languageCode,
+          );
+        } catch (_) {}
+      }
+    } else {
+      if (!kIsWeb) {
+        try {
+          await HomeWidget.saveWidgetData<String>(
+            'app_language',
+            PlatformDispatcher.instance.locale.languageCode,
           );
         } catch (_) {}
       }
