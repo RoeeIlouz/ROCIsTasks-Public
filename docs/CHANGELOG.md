@@ -5,6 +5,51 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.12+94] - 2026-08-29
+
+### Added
+- Date & Time exact chronological sorting option for intraday task scheduling.
+- Interactive category badge filtering directly from task tiles.
+
+### Improved
+- Streamlined New Task screen with collapsible More Options section for fast logging.
+- Redesigned Guest Account card in Settings to prevent text squishing on narrow screens.
+
+### Fixed
+- Fixed Quick Actions Android widget launcher RemoteViews crash.
+
+## [0.2.11+93] - 2026-08-29
+
+### Fixed
+
+- Synchronized in-app language switching with Android home screen widgets.
+- Fixed background Google OAuth token refresh on mobile to prevent Google Calendar from disappearing.
+
+## [0.2.10+92] - 2026-08-29
+
+### Fixed
+
+- Purged phantom "Unnamed" Google Calendar entries on Android and Web.
+- Improved calendar display name resolution and deduplication in filter sheet.
+
+## [0.2.10+91] - 2026-08-29
+
+### Added
+
+- Smart syntax NLP parsing for priorities (`!high`), categories (`#tag`), and relative dates.
+- Desktop Web power-user keyboard shortcuts (`Ctrl+N`, `/`, `1-5`, `Esc`).
+- Granular category filtering for Android home screen widgets.
+- Periodic non-blocking Hive database storage compaction.
+
+### Performance
+
+- Asset font deduplication, R8 Full Mode, and parallel Hive warmup for faster startup.
+
+### Fixed
+
+- Eliminated startup Credential Manager popups on mobile launches.
+- Aligned OAuth scopes with Google Cloud Console.
+
 ## [0.2.10+90] - 2026-08-28
 
 ### Added

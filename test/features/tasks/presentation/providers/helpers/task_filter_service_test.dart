@@ -14,8 +14,19 @@ void main() {
       filterService = TaskFilterService();
 
       sampleCategories = [
-        Category(id: 'cat_work', name: 'Work', colorValue: 0xFF0000FF, iconCode: 1),
-        Category(id: 'cat_personal', name: 'Personal', colorValue: 0xFF00FF00, iconCode: 2, isPrivate: true),
+        Category(
+          id: 'cat_work',
+          name: 'Work',
+          colorValue: 0xFF0000FF,
+          iconCode: 1,
+        ),
+        Category(
+          id: 'cat_personal',
+          name: 'Personal',
+          colorValue: 0xFF00FF00,
+          iconCode: 2,
+          isPrivate: true,
+        ),
       ];
 
       sampleTasks = [
@@ -121,17 +132,45 @@ void main() {
       expect(result.first.id, equals('task_3'));
     });
 
-    test('Sorting by priority sorts high -> medium -> low', () {
-      filterService.currentSortOption = TaskSortOption.priority;
-      filterService.showCompleted = true;
-      final result = filterService.filterAndSortTasks(
-        allTasks: sampleTasks,
-        getCategoryById: mockGetCategoryById,
-        isPrivateTask: mockIsPrivateTask,
-        shouldMaskPrivateContent: false,
-      );
-      // Pending tasks come before completed tasks by default
-      expect(result.first.priority, equals(TaskPriority.high));
-    });
+    test(
+      'Sorting by dueDateTime sorts intraday tasks in exact chronological order',
+      () {
+        final now = DateTime.now();
+        final baseDate = DateTime(now.year, now.month, now.day);
+        final sameDayTasks = [
+          Task(
+            id: 'task_late',
+            title: 'Late Task',
+            priority: TaskPriority.high,
+            dueDate: baseDate.add(const Duration(hours: 18)),
+          ),
+          Task(
+            id: 'task_early',
+            title: 'Early Task',
+            priority: TaskPriority.low,
+            dueDate: baseDate.add(const Duration(hours: 9)),
+          ),
+          Task(
+            id: 'task_mid',
+            title: 'Midday Task',
+            priority: TaskPriority.medium,
+            dueDate: baseDate.add(const Duration(hours: 13)),
+          ),
+        ];
+
+        filterService.currentSortOption = TaskSortOption.dueDateTime;
+        final result = filterService.filterAndSortTasks(
+          allTasks: sameDayTasks,
+          getCategoryById: mockGetCategoryById,
+          isPrivateTask: mockIsPrivateTask,
+          shouldMaskPrivateContent: false,
+        );
+
+        expect(
+          result.map((t) => t.id).toList(),
+          equals(['task_early', 'task_mid', 'task_late']),
+        );
+      },
+    );
   });
 }

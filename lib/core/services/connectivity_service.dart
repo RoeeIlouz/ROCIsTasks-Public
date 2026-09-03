@@ -9,6 +9,7 @@ class ConnectivityService extends ChangeNotifier {
   final Connectivity _connectivity = Connectivity();
   StreamSubscription<List<ConnectivityResult>>? _subscription;
   Timer? _periodicCheckTimer;
+  bool _isInitialized = false;
   bool _isOnline = true;
 
   bool get isOnline => _isOnline;
@@ -21,11 +22,16 @@ class ConnectivityService extends ChangeNotifier {
 
   /// Initialize connectivity monitoring
   Future<void> init() async {
+    if (_isInitialized) return;
+    _isInitialized = true;
+
     // Check initial connectivity
     await _checkConnectivity();
 
     // Listen to connectivity changes
-    _subscription = _connectivity.onConnectivityChanged.listen(_handleConnectivityChanged);
+    _subscription = _connectivity.onConnectivityChanged.listen(
+      _handleConnectivityChanged,
+    );
 
     // Periodic check to self-heal from false-negative offline states
     _periodicCheckTimer?.cancel();
@@ -41,17 +47,25 @@ class ConnectivityService extends ChangeNotifier {
       final results = await _connectivity.checkConnectivity();
       await _processConnectivityResults(results);
     } catch (e) {
-      AppLogger.warning('Error checking connectivity via plugin, attempting fallback lookup: $e', tag: 'Connectivity');
+      AppLogger.warning(
+        'Error checking connectivity via plugin, attempting fallback lookup: $e',
+        tag: 'Connectivity',
+      );
       await _verifyRealInternet();
     }
   }
 
-  Future<void> _handleConnectivityChanged(List<ConnectivityResult> results) async {
+  Future<void> _handleConnectivityChanged(
+    List<ConnectivityResult> results,
+  ) async {
     await _processConnectivityResults(results);
   }
 
-  Future<void> _processConnectivityResults(List<ConnectivityResult> results) async {
-    final hasActiveInterface = results.isNotEmpty &&
+  Future<void> _processConnectivityResults(
+    List<ConnectivityResult> results,
+  ) async {
+    final hasActiveInterface =
+        results.isNotEmpty &&
         !results.every((result) => result == ConnectivityResult.none);
 
     bool actualOnline = hasActiveInterface;
@@ -75,13 +89,15 @@ class ConnectivityService extends ChangeNotifier {
 
   Future<bool> _isInternetReachable() async {
     try {
-      final lookup = await InternetAddress.lookup('8.8.8.8')
-          .timeout(const Duration(milliseconds: 2000));
+      final lookup = await InternetAddress.lookup(
+        '8.8.8.8',
+      ).timeout(const Duration(milliseconds: 2000));
       return lookup.isNotEmpty && lookup[0].rawAddress.isNotEmpty;
     } catch (_) {
       try {
-        final lookupHost = await InternetAddress.lookup('google.com')
-            .timeout(const Duration(milliseconds: 2000));
+        final lookupHost = await InternetAddress.lookup(
+          'google.com',
+        ).timeout(const Duration(milliseconds: 2000));
         return lookupHost.isNotEmpty && lookupHost[0].rawAddress.isNotEmpty;
       } catch (_) {
         return false;
@@ -95,7 +111,10 @@ class ConnectivityService extends ChangeNotifier {
     final stateChanged = wasOnline != _isOnline;
 
     if (stateChanged) {
-      AppLogger.info('Connectivity changed: ${_isOnline ? "ONLINE" : "OFFLINE"}', tag: 'Connectivity');
+      AppLogger.info(
+        'Connectivity changed: ${_isOnline ? "ONLINE" : "OFFLINE"}',
+        tag: 'Connectivity',
+      );
       notifyListeners();
     }
   }
@@ -110,6 +129,7 @@ class ConnectivityService extends ChangeNotifier {
   void dispose() {
     _subscription?.cancel();
     _periodicCheckTimer?.cancel();
+    _isInitialized = false;
     super.dispose();
   }
 }

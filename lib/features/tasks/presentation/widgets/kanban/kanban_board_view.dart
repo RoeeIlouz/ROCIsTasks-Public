@@ -225,6 +225,9 @@ class _KanbanBoardViewState extends State<KanbanBoardView> {
           if (task.isCompleted) {
             await taskProvider.toggleTaskCompletion(task);
           }
+          if (_isTodayOrOverdue(task.dueDate)) {
+            await taskProvider.updateTask(task, clearDueDate: true);
+          }
         },
       ),
       KanbanColumn(
@@ -239,8 +242,8 @@ class _KanbanBoardViewState extends State<KanbanBoardView> {
             await taskProvider.toggleTaskCompletion(task);
           }
           final now = DateTime.now();
-          task.dueDate = DateTime(now.year, now.month, now.day, 12, 0);
-          await taskProvider.updateTask(task);
+          final todayNoon = DateTime(now.year, now.month, now.day, 12, 0);
+          await taskProvider.updateTask(task, dueDate: todayNoon);
         },
       ),
       KanbanColumn(

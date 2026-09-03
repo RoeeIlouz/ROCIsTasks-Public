@@ -88,9 +88,10 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
 
                 views.setTextColor(R.id.widget_weekday_num_header, weekdaySecondaryColor)
 
-                // Dynamic Weekday headers text and colors based on startOfWeek
+                // Dynamic Weekday headers text and colors based on startOfWeek and app locale
+                val widgetLocale = WidgetLocaleHelper.getWidgetLocale(widgetData)
                 val startOfWeek = widgetData.getInt("full_calendar_start_of_week", 7) // 7 = Sunday, 1 = Monday, 6 = Saturday
-                val daysOfWeekLetters = listOf("M", "T", "W", "T", "F", "S", "S") // 1-indexed days of week: 1=Mon, ..., 7=Sun
+                val daysOfWeekLetters = WidgetLocaleHelper.getWeekdayLetters(startOfWeek, widgetLocale)
                 val weekdayViewIds = listOf(
                     R.id.widget_weekday_sun_header,
                     R.id.widget_weekday_mon_header,
@@ -103,7 +104,7 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
 
                 for (col in 0..6) {
                     val dayOfWeek = (startOfWeek + col - 1) % 7 + 1
-                    val letter = daysOfWeekLetters[dayOfWeek - 1]
+                    val letter = daysOfWeekLetters[col]
                     val viewId = weekdayViewIds[col]
                     views.setTextViewText(viewId, letter)
 
@@ -132,7 +133,7 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
                     val cal = java.util.Calendar.getInstance()
                     val offset = widgetData.getInt(PREF_OFFSET, 0)
                     cal.add(java.util.Calendar.MONTH, offset)
-                    java.text.SimpleDateFormat("MMMM yyyy", java.util.Locale.getDefault()).format(cal.time)
+                    java.text.SimpleDateFormat("MMMM yyyy", widgetLocale).format(cal.time)
                 }
                 views.setTextViewText(R.id.widget_full_calendar_title, monthName)
 

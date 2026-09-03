@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:rocis_tasks/core/services/auth_service.dart';
 import 'package:rocis_tasks/features/calendar/presentation/providers/calendar_provider.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:rocis_tasks/shared/ui/widgets/glass_container.dart';
@@ -65,6 +66,48 @@ class CalendarFilterSheet extends StatelessWidget {
                           },
                           secondary: const Icon(Icons.event_note_rounded),
                         ),
+                        if (provider.isGoogleCalendarTokenExpired) ...[
+                          const Divider(height: 1),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16.0,
+                              vertical: 10.0,
+                            ),
+                            color: Colors.amber.withValues(alpha: 0.1),
+                            child: Row(
+                              children: [
+                                const Icon(
+                                  Icons.warning_amber_rounded,
+                                  color: Colors.amber,
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    l10n.googleTasksDisconnected,
+                                    style: const TextStyle(fontSize: 13),
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: () async {
+                                    final authService =
+                                        Provider.of<AuthService>(
+                                          context,
+                                          listen: false,
+                                        );
+                                    final success = await authService
+                                        .linkGoogleTasks();
+                                    if (success) {
+                                      provider.resetTokenExpiredState();
+                                      await provider.loadEvents();
+                                    }
+                                  },
+                                  child: Text(l10n.reconnect),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                         if (provider.showGoogleCalendar &&
                             provider.availableCalendars.isNotEmpty) ...[
                           const Divider(height: 1),
@@ -97,9 +140,27 @@ class CalendarFilterSheet extends StatelessWidget {
                               ...provider.availableCalendars.map((calendar) {
                                 final isSelected = provider.selectedCalendarIds
                                     .contains(calendar.id);
+                                final calendarName =
+                                    (calendar.name != null &&
+                                        calendar.name!.trim().isNotEmpty &&
+                                        calendar.name!.toLowerCase() !=
+                                            'unnamed' &&
+                                        calendar.name!.toLowerCase() !=
+                                            'unnamed calendar')
+                                    ? calendar.name!
+                                    : (calendar.accountName
+                                                  ?.trim()
+                                                  .isNotEmpty ==
+                                              true
+                                          ? calendar.accountName!
+                                          : l10n.calendar);
+                                final hasSubtitle =
+                                    calendar.accountName != null &&
+                                    calendar.accountName!.trim().isNotEmpty &&
+                                    calendar.accountName != calendarName;
                                 return CheckboxListTile(
-                                  title: Text(calendar.name ?? 'Unnamed'),
-                                  subtitle: calendar.accountName != null
+                                  title: Text(calendarName),
+                                  subtitle: hasSubtitle
                                       ? Text(calendar.accountName!)
                                       : null,
                                   value: isSelected,
@@ -123,6 +184,37 @@ class CalendarFilterSheet extends StatelessWidget {
                                 );
                               }),
                             ],
+                          ),
+                        ],
+                        if (provider.showGoogleCalendar &&
+                            provider.availableCalendars.isEmpty) ...[
+                          const Divider(height: 1),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16.0,
+                              vertical: 8.0,
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(
+                                  Icons.calendar_today_outlined,
+                                  size: 18,
+                                ),
+                                const SizedBox(width: 12),
+                                const Expanded(
+                                  child: Text(
+                                    'No calendars loaded',
+                                    style: TextStyle(fontSize: 13),
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    provider.requestPermissionsAndReload();
+                                  },
+                                  child: const Text('Sync Calendars'),
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       ],

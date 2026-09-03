@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:device_calendar/device_calendar.dart';
 import 'package:rocis_tasks/core/services/auth_service.dart';
@@ -30,6 +29,7 @@ class CalendarProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+
   List<Event> get events => _events;
   bool get showTasks => _showTasks;
   bool get showGoogleCalendar => _showGoogleCalendar;
@@ -74,13 +74,19 @@ class CalendarProvider extends ChangeNotifier {
 
     _showTasks = nextShowTasks;
     _showGoogleCalendar = nextShowGoogleCalendar;
-    if (savedCalendarIds != null) {
+    if (savedCalendarIds != null && savedCalendarIds.isNotEmpty) {
       _selectedCalendarIds = savedCalendarIds.toSet();
     }
 
     if (hasChanges) {
       notifyListeners();
     }
+  }
+
+  Future<bool> requestPermissionsAndReload() async {
+    final granted = await _calendarService.requestPermissions();
+    await loadEvents();
+    return granted;
   }
 
   Future<void> updateFilters({
@@ -173,8 +179,13 @@ class CalendarProvider extends ChangeNotifier {
         );
         if (validSelectedIds.isEmpty) {
           // If no selected calendars are valid in the current platform's available calendars,
-          // default to selecting all available calendars.
+          // default to selecting all available calendars and persist to SharedPreferences.
           _selectedCalendarIds = availableIds;
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setStringList(
+            'full_calendar_selected_ids',
+            _selectedCalendarIds.toList(),
+          );
         } else {
           _selectedCalendarIds = validSelectedIds;
         }
@@ -189,14 +200,16 @@ class CalendarProvider extends ChangeNotifier {
 
       _processEventsToMap();
     } on GoogleTokenExpiredException catch (e) {
-      if (e.isServerRejection || kIsWeb) {
+      if (e.isServerRejection) {
         _isGoogleCalendarTokenExpired = true;
       }
       _events = [];
       _eventsMap = {};
-      AppLogger.warning('Google Calendar token expired on Web (serverRejection: ${e.isServerRejection}).');
+      AppLogger.warning(
+        'Google Calendar token expired (serverRejection: ${e.isServerRejection}).',
+      );
     } catch (e, s) {
-      if (e is GoogleTokenExpiredException && (e.isServerRejection || kIsWeb)) {
+      if (e is GoogleTokenExpiredException && e.isServerRejection) {
         _isGoogleCalendarTokenExpired = true;
         _events = [];
         _eventsMap = {};

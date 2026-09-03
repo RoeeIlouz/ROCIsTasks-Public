@@ -33,18 +33,29 @@ class _PaywallScreenState extends State<PaywallScreen> {
   }
 
   Future<void> _loadOfferings() async {
-    final subscriptionService =
-        Provider.of<SubscriptionService>(context, listen: false);
+    final subscriptionService = Provider.of<SubscriptionService>(
+      context,
+      listen: false,
+    );
     final offerings = await subscriptionService.getOfferings();
     if (mounted && offerings != null && offerings.current != null) {
       setState(() {
         final current = offerings.current!;
-        _monthlyPackage = current.monthly ??
-            current.availablePackages.where((p) => p.packageType == PackageType.monthly).firstOrNull;
-        _yearlyPackage = current.annual ??
-            current.availablePackages.where((p) => p.packageType == PackageType.annual).firstOrNull;
-        _lifetimePackage = current.lifetime ??
-            current.availablePackages.where((p) => p.packageType == PackageType.lifetime).firstOrNull;
+        _monthlyPackage =
+            current.monthly ??
+            current.availablePackages
+                .where((p) => p.packageType == PackageType.monthly)
+                .firstOrNull;
+        _yearlyPackage =
+            current.annual ??
+            current.availablePackages
+                .where((p) => p.packageType == PackageType.annual)
+                .firstOrNull;
+        _lifetimePackage =
+            current.lifetime ??
+            current.availablePackages
+                .where((p) => p.packageType == PackageType.lifetime)
+                .firstOrNull;
       });
     }
   }
@@ -55,9 +66,12 @@ class _PaywallScreenState extends State<PaywallScreen> {
     final l10n = AppLocalizations.of(context)!;
     final isDark = theme.brightness == Brightness.dark;
 
-    final monthlyPrice = _monthlyPackage?.storeProduct.priceString ?? l10n.monthlyPlanPrice;
-    final yearlyPrice = _yearlyPackage?.storeProduct.priceString ?? l10n.yearlyPlanPrice;
-    final lifetimePrice = _lifetimePackage?.storeProduct.priceString ?? l10n.lifetimePlanPrice;
+    final monthlyPrice =
+        _monthlyPackage?.storeProduct.priceString ?? l10n.monthlyPlanPrice;
+    final yearlyPrice =
+        _yearlyPackage?.storeProduct.priceString ?? l10n.yearlyPlanPrice;
+    final lifetimePrice =
+        _lifetimePackage?.storeProduct.priceString ?? l10n.lifetimePlanPrice;
 
     return Container(
       decoration: BoxDecoration(
@@ -94,7 +108,9 @@ class _PaywallScreenState extends State<PaywallScreen> {
                     child: Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: theme.colorScheme.primary.withValues(alpha: 0.12),
+                        color: theme.colorScheme.primary.withValues(
+                          alpha: 0.12,
+                        ),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
@@ -122,7 +138,9 @@ class _PaywallScreenState extends State<PaywallScreen> {
                     textAlign: TextAlign.center,
                     style: GoogleFonts.outfit(
                       fontSize: 14,
-                      color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+                      color: theme.textTheme.bodyMedium?.color?.withValues(
+                        alpha: 0.7,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 24),
@@ -227,7 +245,9 @@ class _PaywallScreenState extends State<PaywallScreen> {
                     textAlign: TextAlign.center,
                     style: GoogleFonts.outfit(
                       fontSize: 12,
-                      color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.6),
+                      color: theme.textTheme.bodySmall?.color?.withValues(
+                        alpha: 0.6,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -250,7 +270,9 @@ class _PaywallScreenState extends State<PaywallScreen> {
                             width: 20,
                             child: CircularProgressIndicator(
                               strokeWidth: 2.5,
-                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Colors.white,
+                              ),
                             ),
                           )
                         : Text(
@@ -281,11 +303,14 @@ class _PaywallScreenState extends State<PaywallScreen> {
                         Text(
                           ' • ',
                           style: TextStyle(
-                            color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.4),
+                            color: theme.textTheme.bodySmall?.color?.withValues(
+                              alpha: 0.4,
+                            ),
                           ),
                         ),
                         TextButton(
-                          onPressed: () => _launchURL(AppConfig.termsOfServiceUrl),
+                          onPressed: () =>
+                              _launchURL(AppConfig.termsOfServiceUrl),
                           child: Text(
                             l10n.termsOfService,
                             style: GoogleFonts.outfit(
@@ -297,11 +322,14 @@ class _PaywallScreenState extends State<PaywallScreen> {
                         Text(
                           ' • ',
                           style: TextStyle(
-                            color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.4),
+                            color: theme.textTheme.bodySmall?.color?.withValues(
+                              alpha: 0.4,
+                            ),
                           ),
                         ),
                         TextButton(
-                          onPressed: () => _launchURL(AppConfig.privacyPolicyUrl),
+                          onPressed: () =>
+                              _launchURL(AppConfig.privacyPolicyUrl),
                           child: Text(
                             l10n.privacyPolicy,
                             style: GoogleFonts.outfit(
@@ -341,7 +369,8 @@ class _PaywallScreenState extends State<PaywallScreen> {
     setState(() => _isLoading = true);
 
     try {
-      if (kIsWeb) {
+      final shouldUseWebCheckout = kIsWeb || AppConfig.isGitHubDistribution;
+      if (shouldUseWebCheckout) {
         final authService = Provider.of<AuthService>(context, listen: false);
         final userId = authService.currentUser?.uid;
 
@@ -363,9 +392,18 @@ class _PaywallScreenState extends State<PaywallScreen> {
         };
 
         final separator = baseUrl.contains('?') ? '&' : '?';
-        final checkoutUrl = '$baseUrl${separator}checkout[custom][user_id]=$userId';
+        final checkoutUrl =
+            '$baseUrl${separator}checkout[custom][user_id]=$userId';
 
-        openLemonSqueezyCheckout(checkoutUrl);
+        if (kIsWeb) {
+          openLemonSqueezyCheckout(checkoutUrl);
+        } else {
+          final uri = Uri.parse(checkoutUrl);
+          if (await canLaunchUrl(uri)) {
+            await launchUrl(uri, mode: LaunchMode.externalApplication);
+          }
+        }
+
         if (mounted) {
           Navigator.pop(context, false);
           ScaffoldMessenger.of(context).showSnackBar(
@@ -379,8 +417,10 @@ class _PaywallScreenState extends State<PaywallScreen> {
       }
 
       // Mobile In-App Purchase via RevenueCat
-      final subscriptionService =
-          Provider.of<SubscriptionService>(context, listen: false);
+      final subscriptionService = Provider.of<SubscriptionService>(
+        context,
+        listen: false,
+      );
 
       final selectedPackage = switch (_selectedPlanIndex) {
         0 => _monthlyPackage,
@@ -390,13 +430,15 @@ class _PaywallScreenState extends State<PaywallScreen> {
       };
 
       if (selectedPackage != null) {
-        final isSuccess = await subscriptionService.purchasePackage(selectedPackage);
+        final isSuccess = await subscriptionService.purchasePackage(
+          selectedPackage,
+        );
         if (mounted) {
           if (isSuccess) {
             Navigator.pop(context, true);
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(l10n.welcomeToPro)),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(l10n.welcomeToPro)));
           }
         }
       } else {
@@ -404,9 +446,9 @@ class _PaywallScreenState extends State<PaywallScreen> {
         await subscriptionService.showPaywall();
         if (mounted && subscriptionService.isPremium) {
           Navigator.pop(context, true);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(l10n.welcomeToPro)),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(l10n.welcomeToPro)));
         }
       }
     } catch (e) {
@@ -430,26 +472,28 @@ class _PaywallScreenState extends State<PaywallScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final subscriptionService =
-          Provider.of<SubscriptionService>(context, listen: false);
+      final subscriptionService = Provider.of<SubscriptionService>(
+        context,
+        listen: false,
+      );
       await subscriptionService.restorePurchases();
       if (mounted) {
         if (subscriptionService.isPremium) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(l10n.purchasesRestored)),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(l10n.purchasesRestored)));
           Navigator.pop(context, true);
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(l10n.noActiveSubscription)),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(l10n.noActiveSubscription)));
         }
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.failedToRestore)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.failedToRestore)));
       }
     } finally {
       if (mounted) {
@@ -468,11 +512,7 @@ class _PaywallScreenState extends State<PaywallScreen> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(
-          icon,
-          color: theme.colorScheme.primary,
-          size: 20,
-        ),
+        Icon(icon, color: theme.colorScheme.primary, size: 20),
         const SizedBox(width: 12),
         Expanded(
           child: Column(
@@ -490,7 +530,9 @@ class _PaywallScreenState extends State<PaywallScreen> {
                 description,
                 style: GoogleFonts.outfit(
                   fontSize: 12,
-                  color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+                  color: theme.textTheme.bodyMedium?.color?.withValues(
+                    alpha: 0.7,
+                  ),
                 ),
               ),
             ],
@@ -521,7 +563,9 @@ class _PaywallScreenState extends State<PaywallScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
         decoration: BoxDecoration(
           color: isSelected
-              ? theme.colorScheme.primary.withValues(alpha: isDark ? 0.15 : 0.08)
+              ? theme.colorScheme.primary.withValues(
+                  alpha: isDark ? 0.15 : 0.08,
+                )
               : theme.colorScheme.surfaceContainerHigh,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
@@ -545,8 +589,9 @@ class _PaywallScreenState extends State<PaywallScreen> {
                     title,
                     style: GoogleFonts.outfit(
                       fontSize: 13,
-                      fontWeight:
-                          isSelected ? FontWeight.bold : FontWeight.normal,
+                      fontWeight: isSelected
+                          ? FontWeight.bold
+                          : FontWeight.normal,
                       color: isSelected ? theme.colorScheme.primary : null,
                     ),
                   ),
@@ -570,8 +615,10 @@ class _PaywallScreenState extends State<PaywallScreen> {
                 top: -26,
                 right: -6,
                 child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 3,
+                  ),
                   decoration: BoxDecoration(
                     color: theme.colorScheme.tertiary,
                     borderRadius: BorderRadius.circular(6),

@@ -78,6 +78,15 @@ class AppLocalizationsFr extends AppLocalizations {
   String get createdDate => 'Date de création';
 
   @override
+  String get dueDateTime => 'Date et heure';
+
+  @override
+  String get moreOptions => 'Plus d\'options';
+
+  @override
+  String get fewerOptions => 'Moins d\'options';
+
+  @override
   String get filterByCategory => 'Filtrer par catégorie';
 
   @override

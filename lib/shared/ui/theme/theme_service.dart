@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:home_widget/home_widget.dart';
 import 'package:rocis_tasks/l10n/l10n_helper.dart';
 
 class ThemeService extends ChangeNotifier {
@@ -61,6 +62,14 @@ class ThemeService extends ChangeNotifier {
     }
     if (_locale != null) {
       await ensureLocaleLoaded(_locale!);
+      if (!kIsWeb) {
+        try {
+          await HomeWidget.saveWidgetData<String>(
+            'app_language',
+            _locale!.languageCode,
+          );
+        } catch (_) {}
+      }
     }
     _useCustomSeedColor = prefs.getBool('use_custom_seed_color') ?? false;
     _customSeedColorValue = prefs.getInt('custom_seed_color_value');
@@ -145,8 +154,21 @@ class ThemeService extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     if (locale != null) {
       await prefs.setString('language_code', locale.languageCode);
+      if (!kIsWeb) {
+        try {
+          await HomeWidget.saveWidgetData<String>(
+            'app_language',
+            locale.languageCode,
+          );
+        } catch (_) {}
+      }
     } else {
       await prefs.remove('language_code');
+      if (!kIsWeb) {
+        try {
+          await HomeWidget.saveWidgetData<String>('app_language', 'system');
+        } catch (_) {}
+      }
     }
   }
 

@@ -17,7 +17,8 @@ class TaskSortFilterSheet extends StatelessWidget {
         final l10n = AppLocalizations.of(context)!;
         final theme = Theme.of(context);
 
-        final hasActiveFilters = provider.selectedCategoryIds.isNotEmpty ||
+        final hasActiveFilters =
+            provider.selectedCategoryIds.isNotEmpty ||
             provider.currentDateFilter != DateTimeFilterOption.all ||
             provider.currentSortOption != TaskSortOption.dueDate ||
             !provider.showCompleted;
@@ -105,6 +106,13 @@ class TaskSortFilterSheet extends StatelessWidget {
                       ),
                       _buildSortPill(
                         context,
+                        label: l10n.dueDateTime,
+                        icon: Icons.schedule_rounded,
+                        option: TaskSortOption.dueDateTime,
+                        provider: provider,
+                      ),
+                      _buildSortPill(
+                        context,
                         label: l10n.priority,
                         icon: Icons.flag_rounded,
                         option: TaskSortOption.priority,
@@ -128,7 +136,7 @@ class TaskSortFilterSheet extends StatelessWidget {
                   ),
 
                   const SizedBox(height: 24),
-                  
+
                   // Date Filtering Section
                   Text(
                     l10n.dateRange,
@@ -143,11 +151,36 @@ class TaskSortFilterSheet extends StatelessWidget {
                     spacing: 8,
                     runSpacing: 8,
                     children: [
-                      _buildDateFilterChip(context, l10n.all, DateTimeFilterOption.all, provider),
-                      _buildDateFilterChip(context, l10n.filterToday, DateTimeFilterOption.today, provider),
-                      _buildDateFilterChip(context, l10n.filterThisWeek, DateTimeFilterOption.thisWeek, provider),
-                      _buildDateFilterChip(context, l10n.filterOverdue, DateTimeFilterOption.overdue, provider),
-                      _buildDateFilterChip(context, l10n.filterNoDate, DateTimeFilterOption.noDate, provider),
+                      _buildDateFilterChip(
+                        context,
+                        l10n.all,
+                        DateTimeFilterOption.all,
+                        provider,
+                      ),
+                      _buildDateFilterChip(
+                        context,
+                        l10n.filterToday,
+                        DateTimeFilterOption.today,
+                        provider,
+                      ),
+                      _buildDateFilterChip(
+                        context,
+                        l10n.filterThisWeek,
+                        DateTimeFilterOption.thisWeek,
+                        provider,
+                      ),
+                      _buildDateFilterChip(
+                        context,
+                        l10n.filterOverdue,
+                        DateTimeFilterOption.overdue,
+                        provider,
+                      ),
+                      _buildDateFilterChip(
+                        context,
+                        l10n.filterNoDate,
+                        DateTimeFilterOption.noDate,
+                        provider,
+                      ),
                     ],
                   ),
 
@@ -178,7 +211,8 @@ class TaskSortFilterSheet extends StatelessWidget {
                         },
                       ),
                       ...categories.map((category) {
-                        final isSelected = provider.selectedCategoryIds.contains(category.id);
+                        final isSelected = provider.selectedCategoryIds
+                            .contains(category.id);
                         return FilterChip(
                           avatar: Container(
                             width: 10,
@@ -188,7 +222,10 @@ class TaskSortFilterSheet extends StatelessWidget {
                               shape: BoxShape.circle,
                             ),
                           ),
-                          label: Text(category.name, style: GoogleFonts.outfit()),
+                          label: Text(
+                            category.name,
+                            style: GoogleFonts.outfit(),
+                          ),
                           selected: isSelected,
                           onSelected: (selected) {
                             HapticFeedback.lightImpact();

@@ -57,9 +57,9 @@ class AuthService extends ChangeNotifier {
     });
   }
 
-  /// Proactively restores [_googleUser] on app startup so that
-  /// [_performSilentTokenRefresh] can call [authorizationForScopes] without
-  /// requiring the user to tap "Sign in with Google" again.
+  /// Proactively restores Google auth state on startup so that
+  /// [_performSilentTokenRefresh] can refresh tokens in the background without
+  /// requiring user intervention.
   Future<void> _restoreGoogleUser() async {
     if (_oauthManager.googleUser != null) return;
     try {
@@ -70,41 +70,82 @@ class AuthService extends ChangeNotifier {
         (p) => p.providerId == 'google.com',
       );
       final prefs = await SharedPreferences.getInstance();
-      final hasCachedToken = prefs.containsKey('google_access_token');
-      final token = prefs.getString('google_access_token');
-      final expiresAtStr = prefs.getString('google_access_token_expires_at');
-      final isTokenValid = token != null &&
+      final hasCachedToken = prefs.containsKey(
+        GoogleOAuthManager.keyAccessToken,
+      );
+      final hasSavedEmail = prefs.containsKey(GoogleOAuthManager.keyUserEmail);
+      final token = prefs.getString(GoogleOAuthManager.keyAccessToken);
+      final expiresAtStr = prefs.getString(
+        GoogleOAuthManager.keyAccessTokenExpiresAt,
+      );
+      final isTokenValid =
+          token != null &&
           expiresAtStr != null &&
           DateTime.tryParse(expiresAtStr)?.isAfter(DateTime.now()) == true;
 
-      // Only attempt startup lightweight authentication if user signed in via Google
-      // or has linked Google Tasks, avoiding unwanted prompts for Email/Password users.
-      if (!isGoogleUser && !hasCachedToken) {
+      // Only attempt startup restoration if user signed in via Google
+      // or has linked Google Tasks/Calendar, avoiding unwanted attempts for Email/Password users.
+      if (!isGoogleUser && !hasCachedToken && !hasSavedEmail) {
         return;
       }
 
-      // On Mobile/Android, avoid Credential Manager bottom sheet popup if token is already valid.
-      // On Web, lightweight authentication is silent (checks browser cookie/session), so we restore _googleUser.
-      if (!kIsWeb && isTokenValid) {
-        AppLogger.info(
-          'Mobile Google access token cached and valid. Skipping startup lightweight authentication.',
-          tag: 'Auth',
+      // If email is not yet saved but Firebase user is a Google user, persist it
+      if (!hasSavedEmail && isGoogleUser && user.email != null) {
+        await _oauthManager.saveGoogleUserIdentity(
+          email: user.email!,
+          id: user.uid,
         );
-        return;
       }
 
       await _oauthManager.ensureGoogleSignInInitialized();
-      final restored = await _oauthManager.googleSignIn
-          .attemptLightweightAuthentication();
-      if (restored != null) {
-        _oauthManager.setGoogleUser(restored);
-        AppLogger.info('Google user restored on startup.', tag: 'Auth');
-        if (!isTokenValid) {
-          final clientAuth = await restored.authorizationClient
-              .authorizationForScopes(GoogleOAuthManager.googleTasksScopes);
-          if (clientAuth != null && clientAuth.accessToken.isNotEmpty) {
-            await _oauthManager.cacheGoogleAccessToken(clientAuth.accessToken);
+
+      if (kIsWeb) {
+        // On Web, attempt non-intrusive lightweight authentication via browser cookies
+        final restored = await _oauthManager.googleSignIn
+            .attemptLightweightAuthentication();
+        if (restored != null) {
+          _oauthManager.setGoogleUser(restored);
+          await _oauthManager.saveGoogleUserIdentity(
+            email: restored.email,
+            id: restored.id,
+          );
+          AppLogger.info('Google user restored on web startup.', tag: 'Auth');
+          if (!isTokenValid) {
+            final clientAuth = await restored.authorizationClient
+                .authorizationForScopes(GoogleOAuthManager.googleTasksScopes);
+            if (clientAuth != null && clientAuth.accessToken.isNotEmpty) {
+              await _oauthManager.cacheGoogleAccessToken(
+                clientAuth.accessToken,
+              );
+              setGoogleTasksTokenExpired(false);
+            }
+          }
+        }
+      } else {
+        // On Mobile, NEVER call attemptLightweightAuthentication() on cold start,
+        // because Credential Manager pops up an interactive account-selection bottom sheet.
+        // If the token is already valid, mark unexpired and proceed silently.
+        if (isTokenValid) {
+          setGoogleTasksTokenExpired(false);
+          AppLogger.info(
+            'Valid cached Google token present on startup.',
+            tag: 'Auth',
+          );
+        } else {
+          // If token is missing or expired, quietly refresh in background via getGoogleAccessToken()
+          final freshToken = await _oauthManager.getGoogleAccessToken();
+          if (freshToken != null && freshToken.isNotEmpty) {
             setGoogleTasksTokenExpired(false);
+            AppLogger.info(
+              'Silently restored and refreshed Google token on startup.',
+              tag: 'Auth',
+            );
+          } else {
+            setGoogleTasksTokenExpired(true);
+            AppLogger.info(
+              'Google token expired on startup; reconnect banner active.',
+              tag: 'Auth',
+            );
           }
         }
       }
@@ -140,9 +181,8 @@ class AuthService extends ChangeNotifier {
     if (_oauthManager.googleUser != null) {
       try {
         final clientAuth =
-            await _oauthManager.googleUser!.authorizationClient.authorizationForScopes(
-              GoogleOAuthManager.googleTasksScopes,
-            ) ??
+            await _oauthManager.googleUser!.authorizationClient
+                .authorizationForScopes(GoogleOAuthManager.googleTasksScopes) ??
             await _oauthManager.googleUser!.authorizationClient.authorizeScopes(
               GoogleOAuthManager.googleTasksScopes,
             );
@@ -223,6 +263,10 @@ class AuthService extends ChangeNotifier {
         );
         _oauthManager.setGoogleUser(googleUser);
       }
+      await _oauthManager.saveGoogleUserIdentity(
+        email: googleUser.email,
+        id: googleUser.id,
+      );
 
       final GoogleSignInAuthentication googleAuth = googleUser.authentication;
 
@@ -532,31 +576,35 @@ class AuthService extends ChangeNotifier {
       try {
         await _oauthManager.ensureGoogleSignInInitialized();
 
-        GoogleSignInAccount? googleUser =
-            _oauthManager.googleUser ??
-            await _oauthManager.googleSignIn.attemptLightweightAuthentication();
+        GoogleSignInAccount? googleUser = _oauthManager.googleUser;
         googleUser ??= await _oauthManager.googleSignIn.authenticate(
           scopeHint: GoogleOAuthManager.googleTasksScopes,
         );
         _oauthManager.setGoogleUser(googleUser);
 
-        final clientAuth =
-            await googleUser.authorizationClient.authorizationForScopes(
-              GoogleOAuthManager.googleTasksScopes,
-            ) ??
-            await googleUser.authorizationClient.authorizeScopes(
-              GoogleOAuthManager.googleTasksScopes,
-            );
+        var clientAuth = await googleUser.authorizationClient
+            .authorizationForScopes(GoogleOAuthManager.googleTasksScopes);
+        if (clientAuth == null || clientAuth.accessToken.isEmpty) {
+          clientAuth = await googleUser.authorizationClient.authorizeScopes(
+            GoogleOAuthManager.googleTasksScopes,
+          );
+        }
 
-        await _oauthManager.cacheGoogleAccessToken(clientAuth.accessToken);
+        if (clientAuth.accessToken.isNotEmpty) {
+          await _oauthManager.cacheGoogleAccessToken(clientAuth.accessToken);
+          await _oauthManager.saveGoogleUserIdentity(
+            email: googleUser.email,
+            id: googleUser.id,
+          );
 
-        AppLogger.info(
-          'Mobile Google Tasks & Calendar authorized. Token cached.',
-          tag: 'Auth',
-        );
-        setGoogleTasksTokenExpired(false);
-        notifyListeners();
-        return true;
+          AppLogger.info(
+            'Mobile Google Tasks & Calendar authorized. Token cached.',
+            tag: 'Auth',
+          );
+          setGoogleTasksTokenExpired(false);
+          notifyListeners();
+          return true;
+        }
       } catch (e, s) {
         AppLogger.error(
           'Error authorizing Google Tasks access token on Mobile',

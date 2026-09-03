@@ -1,4 +1,6 @@
+import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 
 /// Application configuration class
 /// This should be used to manage environment-specific settings
@@ -7,9 +9,54 @@ class AppConfig {
   static const bool isProduction = kReleaseMode;
   static const bool isDevelopment = kDebugMode;
 
+  // Optional compile-time override via --dart-define=CHANNEL=playstore|github
+  static const String _channelOverride = String.fromEnvironment('CHANNEL');
+
+  // Runtime detected installer source (e.g., 'com.android.vending' for Google Play Store)
+  static String? _installerPackageName;
+  static bool _installerInitialized = false;
+
+  /// Detects the installer package name on Android at runtime with a strict 2s timeout.
+  static Future<void> initDistributionChannel() async {
+    if (_installerInitialized) return;
+    if (_channelOverride.isNotEmpty) {
+      _installerInitialized = true;
+      return;
+    }
+    if (!kIsWeb && Platform.isAndroid) {
+      try {
+        const channel = MethodChannel('com.rocisapps.tasks/app_info');
+        _installerPackageName = await channel
+            .invokeMethod<String>('getInstallerPackageName')
+            .timeout(const Duration(seconds: 2));
+      } catch (_) {
+        _installerPackageName = null;
+      }
+    }
+    _installerInitialized = true;
+  }
+
+  /// Whether the app was installed from the Google Play Store.
+  static bool get isPlayStoreDistribution {
+    if (_channelOverride == 'playstore') return true;
+    if (_channelOverride == 'github') return false;
+    // On Android, Google Play Store installer ID is 'com.android.vending'
+    return _installerPackageName == 'com.android.vending';
+  }
+
+  /// Whether the app is a standalone/sideloaded APK distribution (e.g. GitHub Releases).
+  static bool get isGitHubDistribution => !isPlayStoreDistribution;
+
+  /// The active distribution channel string ('playstore', 'github', or 'web')
+  static String get distributionChannel {
+    if (kIsWeb) return 'web';
+    if (_channelOverride.isNotEmpty) return _channelOverride;
+    return isPlayStoreDistribution ? 'playstore' : 'github';
+  }
+
   // App information
   static const String appName = 'ROCI\'s Tasks';
-  static const String appVersion = '0.2.10';
+  static const String appVersion = '0.2.12';
   static const String supportEmail = 'support@rocisapps.com';
   static const String privacyPolicyUrl = 'https://rocisapps.com/privacy.html';
   static const String termsOfServiceUrl = 'https://rocisapps.com/terms.html';

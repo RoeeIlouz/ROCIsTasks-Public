@@ -49,8 +49,6 @@ class _HomeScreenState extends State<HomeScreen> {
   String? _lastHandledUri;
   DateTime? _lastHandledTime;
 
-
-
   @override
   void initState() {
     super.initState();
@@ -121,7 +119,9 @@ class _HomeScreenState extends State<HomeScreen> {
       return;
     }
 
-    if (uri.host == 'open_kanban' || uri.path.contains('open_kanban') || uri.host == 'kanban') {
+    if (uri.host == 'open_kanban' ||
+        uri.path.contains('open_kanban') ||
+        uri.host == 'kanban') {
       _onItemTapped(0);
       setState(() {
         _isBoardView = true;
@@ -190,7 +190,10 @@ class _HomeScreenState extends State<HomeScreen> {
       });
     }
     if (index == 0) {
-      Provider.of<TaskProvider>(context, listen: false).syncGoogleTasksToLocal();
+      Provider.of<TaskProvider>(
+        context,
+        listen: false,
+      ).syncGoogleTasksToLocal();
     }
   }
 
@@ -326,18 +329,24 @@ class _HomeScreenState extends State<HomeScreen> {
                           : l10n.settings,
                       style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
                     ),
+              leading: _currentIndex == 0
+                  ? IconButton(
+                      icon: Icon(
+                        _isBoardView
+                            ? Icons.view_list_rounded
+                            : Icons.view_kanban_outlined,
+                      ),
+                      tooltip: _isBoardView ? l10n.listView : l10n.boardView,
+                      onPressed: () {
+                        HapticFeedback.lightImpact();
+                        setState(() {
+                          _isBoardView = !_isBoardView;
+                        });
+                      },
+                    )
+                  : null,
               actions: [
                 if (_currentIndex == 0) ...[
-                  IconButton(
-                    icon: Icon(_isBoardView ? Icons.view_list_rounded : Icons.view_kanban_outlined),
-                    tooltip: _isBoardView ? l10n.listView : l10n.boardView,
-                    onPressed: () {
-                      HapticFeedback.lightImpact();
-                      setState(() {
-                        _isBoardView = !_isBoardView;
-                      });
-                    },
-                  ),
                   IconButton(
                     icon: Icon(_isSearching ? Icons.close : Icons.search),
                     onPressed: () {
@@ -421,7 +430,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         Text(
                           l10n.offlineMode,
                           style: TextStyle(
-                            color: Theme.of(context).colorScheme.onErrorContainer,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onErrorContainer,
                             fontWeight: FontWeight.w500,
                             fontSize: 12,
                           ),
@@ -430,7 +441,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         Icon(
                           Icons.refresh_rounded,
                           size: 14,
-                          color: Theme.of(context).colorScheme.onErrorContainer.withValues(alpha: 0.7),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onErrorContainer.withValues(alpha: 0.7),
                         ),
                       ],
                     ),
@@ -712,4 +725,3 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
-

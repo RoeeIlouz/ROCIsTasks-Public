@@ -14,7 +14,8 @@ class WidgetCustomizationScreen extends StatefulWidget {
   const WidgetCustomizationScreen({super.key});
 
   @override
-  State<WidgetCustomizationScreen> createState() => _WidgetCustomizationScreenState();
+  State<WidgetCustomizationScreen> createState() =>
+      _WidgetCustomizationScreenState();
 }
 
 class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
@@ -25,6 +26,7 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
   bool _showGoogle = true;
   int _startOfWeek = 7;
   String _highlightColor = '#6366F1';
+  String _selectedCategoryFilter = 'all';
   bool _isLoading = true;
   int _selectedPreviewIndex = 0;
 
@@ -38,13 +40,18 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
     try {
       final prefs = await SharedPreferences.getInstance();
       setState(() {
-        _showWeekNumbers = prefs.getBool('full_calendar_show_week_numbers') ?? true;
-        _weekendHighlight = prefs.getBool('full_calendar_weekend_highlight') ?? true;
+        _showWeekNumbers =
+            prefs.getBool('full_calendar_show_week_numbers') ?? true;
+        _weekendHighlight =
+            prefs.getBool('full_calendar_weekend_highlight') ?? true;
         _widgetTheme = prefs.getString('full_calendar_theme') ?? 'system';
         _showTasks = prefs.getBool('full_calendar_show_tasks') ?? true;
         _showGoogle = prefs.getBool('full_calendar_show_google') ?? true;
         _startOfWeek = prefs.getInt('full_calendar_start_of_week') ?? 7;
-        _highlightColor = prefs.getString('full_calendar_highlight_color') ?? '#6366F1';
+        _highlightColor =
+            prefs.getString('full_calendar_highlight_color') ?? '#6366F1';
+        _selectedCategoryFilter =
+            prefs.getString('widget_filter_category_id') ?? 'all';
         _isLoading = false;
       });
     } catch (_) {
@@ -70,12 +77,20 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
 
       // Update widgets dynamically
       if (mounted) {
-        final fullCalendarService = Provider.of<FullCalendarWidgetService>(context, listen: false);
-        final widgetDataService = Provider.of<WidgetDataService>(context, listen: false);
+        final fullCalendarService = Provider.of<FullCalendarWidgetService>(
+          context,
+          listen: false,
+        );
+        final widgetDataService = Provider.of<WidgetDataService>(
+          context,
+          listen: false,
+        );
         final taskProvider = Provider.of<TaskProvider>(context, listen: false);
         final authService = Provider.of<AuthService>(context, listen: false);
 
-        await fullCalendarService.updateFullCalendarWidget(userId: authService.currentUser?.uid);
+        await fullCalendarService.updateFullCalendarWidget(
+          userId: authService.currentUser?.uid,
+        );
         await widgetDataService.updateAllWidgets(
           taskProvider.tasks,
           taskProvider.getCategoryById,
@@ -99,7 +114,8 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
     }
 
     // Determine current theme settings for the live preview
-    final isDark = _widgetTheme == 'dark' || 
+    final isDark =
+        _widgetTheme == 'dark' ||
         (_widgetTheme == 'system' && theme.brightness == Brightness.dark);
     final isGlass = _widgetTheme == 'glassmorphic';
 
@@ -118,7 +134,9 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
             children: [
               Text(
                 'Live Widget Preview',
-                style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -146,7 +164,9 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
           // 2. Theme Selection
           Text(
             l10n.widgetTheme,
-            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
           ),
           const SizedBox(height: 12),
           _buildThemeSelector(theme, themeService),
@@ -155,7 +175,9 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
           // 3. Accent Color Selection
           Text(
             l10n.widgetAccentColor,
-            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
           ),
           const SizedBox(height: 12),
           _buildColorPicker(theme),
@@ -164,7 +186,9 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
           // 4. Toggles & Behavior (Active for Calendar widgets)
           Text(
             'Calendar Widget Behavior',
-            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
           ),
           const SizedBox(height: 12),
           _buildTogglesCard(theme, l10n),
@@ -173,12 +197,16 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
           // 5. Available Home Widgets Gallery
           Text(
             l10n.widgetSuiteTitle,
-            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
           ),
           const SizedBox(height: 4),
           Text(
             l10n.widgetSuiteSubtitle,
-            style: theme.textTheme.bodySmall?.copyWith(color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.7)),
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.7),
+            ),
           ),
           const SizedBox(height: 12),
           _buildWidgetSuiteSection(theme, l10n),
@@ -235,7 +263,10 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
               borderRadius: BorderRadius.circular(12),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: isSelected
                       ? theme.colorScheme.primary
@@ -262,10 +293,14 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
                       item['name'] as String,
                       style: TextStyle(
                         fontSize: 12,
-                        fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                        fontWeight: isSelected
+                            ? FontWeight.bold
+                            : FontWeight.w500,
                         color: isSelected
                             ? Colors.white
-                            : theme.colorScheme.onSurface.withValues(alpha: 0.8),
+                            : theme.colorScheme.onSurface.withValues(
+                                alpha: 0.8,
+                              ),
                       ),
                     ),
                   ],
@@ -288,7 +323,9 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
     if (isGlass) {
       previewBg = isDark ? const Color(0xB31A1A1A) : const Color(0xB3FFFFFF);
       textColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
-      secondaryTextColor = isDark ? const Color(0xFFAEAEB2) : const Color(0xFF8E8E93);
+      secondaryTextColor = isDark
+          ? const Color(0xFFAEAEB2)
+          : const Color(0xFF8E8E93);
       border = Border.all(color: Colors.white24, width: 1);
     } else if (isDark) {
       previewBg = const Color(0xFF121212);
@@ -299,10 +336,15 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
       previewBg = const Color(0xFFFFFFFF);
       textColor = const Color(0xFF1C1C1E);
       secondaryTextColor = const Color(0xFF8E8E93);
-      border = Border.all(color: Colors.black.withValues(alpha: 0.08), width: 1);
+      border = Border.all(
+        color: Colors.black.withValues(alpha: 0.08),
+        width: 1,
+      );
     }
 
-    final accentColor = Color(int.parse(_highlightColor.replaceAll('#', '0xff')));
+    final accentColor = Color(
+      int.parse(_highlightColor.replaceAll('#', '0xff')),
+    );
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 250),
@@ -311,58 +353,133 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
         color: previewBg,
         borderRadius: BorderRadius.circular(18),
         border: border,
-        boxShadow: isGlass 
-            ? [] 
+        boxShadow: isGlass
+            ? []
             : [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.06),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
-                )
+                ),
               ],
       ),
-      child: _buildSelectedWidgetMock(theme, textColor, secondaryTextColor, accentColor),
+      child: _buildSelectedWidgetMock(
+        theme,
+        textColor,
+        secondaryTextColor,
+        accentColor,
+      ),
     );
   }
 
-  Widget _buildSelectedWidgetMock(ThemeData theme, Color textColor, Color secondaryTextColor, Color accentColor) {
+  Widget _buildSelectedWidgetMock(
+    ThemeData theme,
+    Color textColor,
+    Color secondaryTextColor,
+    Color accentColor,
+  ) {
     switch (_selectedPreviewIndex) {
       case 0:
-        return _buildFullCalendarMock(theme, textColor, secondaryTextColor, accentColor);
+        return _buildFullCalendarMock(
+          theme,
+          textColor,
+          secondaryTextColor,
+          accentColor,
+        );
       case 1:
-        return _buildDayAgendaMock(theme, textColor, secondaryTextColor, accentColor);
+        return _buildDayAgendaMock(
+          theme,
+          textColor,
+          secondaryTextColor,
+          accentColor,
+        );
       case 2:
-        return _buildMonthAgendaMock(theme, textColor, secondaryTextColor, accentColor);
+        return _buildMonthAgendaMock(
+          theme,
+          textColor,
+          secondaryTextColor,
+          accentColor,
+        );
       case 3:
-        return _buildTimelineMock(theme, textColor, secondaryTextColor, accentColor);
+        return _buildTimelineMock(
+          theme,
+          textColor,
+          secondaryTextColor,
+          accentColor,
+        );
       case 4:
-        return _buildQuickActionsMock(theme, textColor, secondaryTextColor, accentColor);
+        return _buildQuickActionsMock(
+          theme,
+          textColor,
+          secondaryTextColor,
+          accentColor,
+        );
       case 5:
-        return _buildUpNextMock(theme, textColor, secondaryTextColor, accentColor);
+        return _buildUpNextMock(
+          theme,
+          textColor,
+          secondaryTextColor,
+          accentColor,
+        );
       default:
-        return _buildFullCalendarMock(theme, textColor, secondaryTextColor, accentColor);
+        return _buildFullCalendarMock(
+          theme,
+          textColor,
+          secondaryTextColor,
+          accentColor,
+        );
     }
   }
 
-  Widget _buildFullCalendarMock(ThemeData theme, Color textColor, Color secondaryTextColor, Color accentColor) {
+  Widget _buildFullCalendarMock(
+    ThemeData theme,
+    Color textColor,
+    Color secondaryTextColor,
+    Color accentColor,
+  ) {
     return Column(
       children: [
         // Header Mock
         Row(
           children: [
-            Text('❮', style: TextStyle(color: textColor, fontWeight: FontWeight.bold, fontSize: 13)),
+            Text(
+              '❮',
+              style: TextStyle(
+                color: textColor,
+                fontWeight: FontWeight.bold,
+                fontSize: 13,
+              ),
+            ),
             Expanded(
               child: Text(
                 'August 2026',
                 textAlign: TextAlign.center,
-                style: TextStyle(color: textColor, fontWeight: FontWeight.bold, fontSize: 15),
+                style: TextStyle(
+                  color: textColor,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15,
+                ),
               ),
             ),
-            Text('❯', style: TextStyle(color: textColor, fontWeight: FontWeight.bold, fontSize: 13)),
+            Text(
+              '❯',
+              style: TextStyle(
+                color: textColor,
+                fontWeight: FontWeight.bold,
+                fontSize: 13,
+              ),
+            ),
             const SizedBox(width: 10),
             Text('⦿', style: TextStyle(color: accentColor, fontSize: 15)),
             const SizedBox(width: 10),
-            Text('+', style: TextStyle(color: accentColor, fontSize: 20, fontWeight: FontWeight.bold)),
+            Text(
+              '+',
+              style: TextStyle(
+                color: accentColor,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ],
         ),
         const SizedBox(height: 10),
@@ -384,12 +501,27 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
             if (_showWeekNumbers)
               Expanded(
                 child: Center(
-                  child: Text('#', style: TextStyle(color: secondaryTextColor, fontSize: 11, fontStyle: FontStyle.italic)),
+                  child: Text(
+                    '#',
+                    style: TextStyle(
+                      color: secondaryTextColor,
+                      fontSize: 11,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
                 ),
               ),
             ...List.generate(7, (index) {
               final dayOfWeek = (_startOfWeek + index - 1) % 7 + 1;
-              final dayLetter = ['M', 'T', 'W', 'T', 'F', 'S', 'S'][dayOfWeek - 1];
+              final dayLetter = [
+                'M',
+                'T',
+                'W',
+                'T',
+                'F',
+                'S',
+                'S',
+              ][dayOfWeek - 1];
               final Color dayColor;
               if (_weekendHighlight) {
                 if (dayOfWeek == 7) {
@@ -407,7 +539,11 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
                 child: Center(
                   child: Text(
                     dayLetter,
-                    style: TextStyle(color: dayColor, fontWeight: FontWeight.bold, fontSize: 11),
+                    style: TextStyle(
+                      color: dayColor,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 11,
+                    ),
                   ),
                 ),
               );
@@ -422,7 +558,14 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
             if (_showWeekNumbers)
               Expanded(
                 child: Center(
-                  child: Text('34', style: TextStyle(color: secondaryTextColor, fontSize: 11, fontStyle: FontStyle.italic)),
+                  child: Text(
+                    '34',
+                    style: TextStyle(
+                      color: secondaryTextColor,
+                      fontSize: 11,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
                 ),
               ),
             ...List.generate(7, (index) {
@@ -462,7 +605,11 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
                     child: Center(
                       child: Text(
                         '$dayNum',
-                        style: TextStyle(color: dayTextColor, fontWeight: FontWeight.bold, fontSize: 11),
+                        style: TextStyle(
+                          color: dayTextColor,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 11,
+                        ),
                       ),
                     ),
                   ),
@@ -475,13 +622,24 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
     );
   }
 
-  Widget _buildDayAgendaMock(ThemeData theme, Color textColor, Color secondaryTextColor, Color accentColor) {
+  Widget _buildDayAgendaMock(
+    ThemeData theme,
+    Color textColor,
+    Color secondaryTextColor,
+    Color accentColor,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
-            Text('❮', style: TextStyle(color: secondaryTextColor, fontWeight: FontWeight.bold)),
+            Text(
+              '❮',
+              style: TextStyle(
+                color: secondaryTextColor,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             const SizedBox(width: 8),
             Expanded(
               child: Column(
@@ -489,16 +647,30 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
                 children: [
                   Text(
                     'Friday, Aug 21',
-                    style: TextStyle(color: textColor, fontWeight: FontWeight.bold, fontSize: 14),
+                    style: TextStyle(
+                      color: textColor,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
                   ),
                   Text(
                     'Today · 3 tasks remaining',
-                    style: TextStyle(color: accentColor, fontSize: 11, fontWeight: FontWeight.w600),
+                    style: TextStyle(
+                      color: accentColor,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ],
               ),
             ),
-            Text('❯', style: TextStyle(color: secondaryTextColor, fontWeight: FontWeight.bold)),
+            Text(
+              '❯',
+              style: TextStyle(
+                color: secondaryTextColor,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             const SizedBox(width: 8),
             Container(
               padding: const EdgeInsets.all(6),
@@ -511,14 +683,33 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
           ],
         ),
         const SizedBox(height: 10),
-        _buildAgendaRowMock('Design Review & Handoff', '10:00 AM', accentColor, textColor, secondaryTextColor, isDone: false),
+        _buildAgendaRowMock(
+          'Design Review & Handoff',
+          '10:00 AM',
+          accentColor,
+          textColor,
+          secondaryTextColor,
+          isDone: false,
+        ),
         const SizedBox(height: 6),
-        _buildAgendaRowMock('Update Flutter Dependencies', '02:30 PM', const Color(0xFF10B981), textColor, secondaryTextColor, isDone: true),
+        _buildAgendaRowMock(
+          'Update Flutter Dependencies',
+          '02:30 PM',
+          const Color(0xFF10B981),
+          textColor,
+          secondaryTextColor,
+          isDone: true,
+        ),
       ],
     );
   }
 
-  Widget _buildMonthAgendaMock(ThemeData theme, Color textColor, Color secondaryTextColor, Color accentColor) {
+  Widget _buildMonthAgendaMock(
+    ThemeData theme,
+    Color textColor,
+    Color secondaryTextColor,
+    Color accentColor,
+  ) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -527,11 +718,29 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
           flex: 4,
           child: Column(
             children: [
-              Text('August 2026', style: TextStyle(color: textColor, fontWeight: FontWeight.bold, fontSize: 12)),
+              Text(
+                'August 2026',
+                style: TextStyle(
+                  color: textColor,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12,
+                ),
+              ),
               const SizedBox(height: 4),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: ['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d) => Text(d, style: TextStyle(fontSize: 9, color: secondaryTextColor, fontWeight: FontWeight.bold))).toList(),
+                children: ['M', 'T', 'W', 'T', 'F', 'S', 'S']
+                    .map(
+                      (d) => Text(
+                        d,
+                        style: TextStyle(
+                          fontSize: 9,
+                          color: secondaryTextColor,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    )
+                    .toList(),
               ),
               const SizedBox(height: 4),
               Row(
@@ -540,8 +749,20 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
                   final isToday = d == 21;
                   return Container(
                     padding: const EdgeInsets.all(2),
-                    decoration: isToday ? BoxDecoration(color: accentColor, shape: BoxShape.circle) : null,
-                    child: Text('$d', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: isToday ? Colors.white : textColor)),
+                    decoration: isToday
+                        ? BoxDecoration(
+                            color: accentColor,
+                            shape: BoxShape.circle,
+                          )
+                        : null,
+                    child: Text(
+                      '$d',
+                      style: TextStyle(
+                        fontSize: 9,
+                        fontWeight: FontWeight.bold,
+                        color: isToday ? Colors.white : textColor,
+                      ),
+                    ),
                   );
                 }).toList(),
               ),
@@ -549,7 +770,11 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
           ),
         ),
         const SizedBox(width: 10),
-        Container(width: 1, height: 60, color: secondaryTextColor.withValues(alpha: 0.2)),
+        Container(
+          width: 1,
+          height: 60,
+          color: secondaryTextColor.withValues(alpha: 0.2),
+        ),
         const SizedBox(width: 10),
         // Right side agenda
         Expanded(
@@ -557,11 +782,34 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Agenda (21st)', style: TextStyle(color: accentColor, fontWeight: FontWeight.bold, fontSize: 11)),
+              Text(
+                'Agenda (21st)',
+                style: TextStyle(
+                  color: accentColor,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 11,
+                ),
+              ),
               const SizedBox(height: 4),
-              _buildAgendaRowMock('Sprint Planning', '09:00 AM', accentColor, textColor, secondaryTextColor, isDone: false, compact: true),
+              _buildAgendaRowMock(
+                'Sprint Planning',
+                '09:00 AM',
+                accentColor,
+                textColor,
+                secondaryTextColor,
+                isDone: false,
+                compact: true,
+              ),
               const SizedBox(height: 4),
-              _buildAgendaRowMock('Grocery Shopping', '06:00 PM', const Color(0xFFF59E0B), textColor, secondaryTextColor, isDone: false, compact: true),
+              _buildAgendaRowMock(
+                'Grocery Shopping',
+                '06:00 PM',
+                const Color(0xFFF59E0B),
+                textColor,
+                secondaryTextColor,
+                isDone: false,
+                compact: true,
+              ),
             ],
           ),
         ),
@@ -569,7 +817,12 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
     );
   }
 
-  Widget _buildTimelineMock(ThemeData theme, Color textColor, Color secondaryTextColor, Color accentColor) {
+  Widget _buildTimelineMock(
+    ThemeData theme,
+    Color textColor,
+    Color secondaryTextColor,
+    Color accentColor,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -583,25 +836,64 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
               ),
               child: Text(
                 'TODAY · Fri, Aug 21',
-                style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: accentColor),
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                  color: accentColor,
+                ),
               ),
             ),
           ],
         ),
         const SizedBox(height: 8),
-        _buildTimelineRowMock('09:00 AM', 'Daily Standup Call', 'Google Meet · Team', accentColor, textColor, secondaryTextColor),
+        _buildTimelineRowMock(
+          '09:00 AM',
+          'Daily Standup Call',
+          'Google Meet · Team',
+          accentColor,
+          textColor,
+          secondaryTextColor,
+        ),
         const SizedBox(height: 6),
-        _buildTimelineRowMock('11:30 AM', 'Prepare Release v0.2.9', 'Product Tasks', const Color(0xFF10B981), textColor, secondaryTextColor),
+        _buildTimelineRowMock(
+          '11:30 AM',
+          'Prepare Release v0.2.9',
+          'Product Tasks',
+          const Color(0xFF10B981),
+          textColor,
+          secondaryTextColor,
+        ),
       ],
     );
   }
 
-  Widget _buildQuickActionsMock(ThemeData theme, Color textColor, Color secondaryTextColor, Color accentColor) {
+  Widget _buildQuickActionsMock(
+    ThemeData theme,
+    Color textColor,
+    Color secondaryTextColor,
+    Color accentColor,
+  ) {
     final actions = [
-      {'icon': Icons.add_task_rounded, 'label': 'New Task', 'color': accentColor},
-      {'icon': Icons.shopping_basket_rounded, 'label': 'Grocery', 'color': const Color(0xFF10B981)},
-      {'icon': Icons.calendar_month_rounded, 'label': 'Calendar', 'color': const Color(0xFFF59E0B)},
-      {'icon': Icons.lock_outline_rounded, 'label': 'Private', 'color': const Color(0xFFEF4444)},
+      {
+        'icon': Icons.add_task_rounded,
+        'label': 'New Task',
+        'color': accentColor,
+      },
+      {
+        'icon': Icons.shopping_basket_rounded,
+        'label': 'Grocery',
+        'color': const Color(0xFF10B981),
+      },
+      {
+        'icon': Icons.calendar_month_rounded,
+        'label': 'Calendar',
+        'color': const Color(0xFFF59E0B),
+      },
+      {
+        'icon': Icons.lock_outline_rounded,
+        'label': 'Private',
+        'color': const Color(0xFFEF4444),
+      },
     ];
 
     return Column(
@@ -609,8 +901,22 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('Quick Launch', style: TextStyle(color: textColor, fontWeight: FontWeight.bold, fontSize: 13)),
-            Text('09:41 AM', style: TextStyle(color: secondaryTextColor, fontSize: 11, fontWeight: FontWeight.w600)),
+            Text(
+              'Quick Launch',
+              style: TextStyle(
+                color: textColor,
+                fontWeight: FontWeight.bold,
+                fontSize: 13,
+              ),
+            ),
+            Text(
+              '09:41 AM',
+              style: TextStyle(
+                color: secondaryTextColor,
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ],
         ),
         const SizedBox(height: 10),
@@ -632,7 +938,11 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
                     const SizedBox(height: 3),
                     Text(
                       a['label'] as String,
-                      style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: textColor),
+                      style: TextStyle(
+                        fontSize: 9,
+                        fontWeight: FontWeight.bold,
+                        color: textColor,
+                      ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -646,7 +956,12 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
     );
   }
 
-  Widget _buildUpNextMock(ThemeData theme, Color textColor, Color secondaryTextColor, Color accentColor) {
+  Widget _buildUpNextMock(
+    ThemeData theme,
+    Color textColor,
+    Color secondaryTextColor,
+    Color accentColor,
+  ) {
     return Row(
       children: [
         Container(
@@ -666,7 +981,11 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
             children: [
               Text(
                 'Next: Product Launch Review',
-                style: TextStyle(color: textColor, fontWeight: FontWeight.bold, fontSize: 13),
+                style: TextStyle(
+                  color: textColor,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 13,
+                ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -685,18 +1004,32 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
           ),
           child: Text(
             'Up Next',
-            style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: accentColor),
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+              color: accentColor,
+            ),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildAgendaRowMock(String title, String time, Color tagColor, Color textColor, Color secondaryTextColor, {required bool isDone, bool compact = false}) {
+  Widget _buildAgendaRowMock(
+    String title,
+    String time,
+    Color tagColor,
+    Color textColor,
+    Color secondaryTextColor, {
+    required bool isDone,
+    bool compact = false,
+  }) {
     return Row(
       children: [
         Icon(
-          isDone ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded,
+          isDone
+              ? Icons.check_circle_rounded
+              : Icons.radio_button_unchecked_rounded,
           size: compact ? 14 : 18,
           color: isDone ? tagColor : secondaryTextColor,
         ),
@@ -717,34 +1050,63 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
         const SizedBox(width: 4),
         Text(
           time,
-          style: TextStyle(color: secondaryTextColor, fontSize: compact ? 9 : 10),
+          style: TextStyle(
+            color: secondaryTextColor,
+            fontSize: compact ? 9 : 10,
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildTimelineRowMock(String time, String title, String subtitle, Color tagColor, Color textColor, Color secondaryTextColor) {
+  Widget _buildTimelineRowMock(
+    String time,
+    String title,
+    String subtitle,
+    Color tagColor,
+    Color textColor,
+    Color secondaryTextColor,
+  ) {
     return Row(
       children: [
         SizedBox(
           width: 58,
           child: Text(
             time,
-            style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: secondaryTextColor),
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+              color: secondaryTextColor,
+            ),
           ),
         ),
         Container(
           width: 3,
           height: 28,
-          decoration: BoxDecoration(color: tagColor, borderRadius: BorderRadius.circular(2)),
+          decoration: BoxDecoration(
+            color: tagColor,
+            borderRadius: BorderRadius.circular(2),
+          ),
         ),
         const SizedBox(width: 8),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title, style: TextStyle(color: textColor, fontWeight: FontWeight.bold, fontSize: 11), maxLines: 1),
-              Text(subtitle, style: TextStyle(color: secondaryTextColor, fontSize: 9), maxLines: 1),
+              Text(
+                title,
+                style: TextStyle(
+                  color: textColor,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 11,
+                ),
+                maxLines: 1,
+              ),
+              Text(
+                subtitle,
+                style: TextStyle(color: secondaryTextColor, fontSize: 9),
+                maxLines: 1,
+              ),
             ],
           ),
         ),
@@ -752,18 +1114,31 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
     );
   }
 
-  Widget _buildMockFilter(String text, bool active, Color textColor, ThemeData theme) {
+  Widget _buildMockFilter(
+    String text,
+    bool active,
+    Color textColor,
+    ThemeData theme,
+  ) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: active ? theme.colorScheme.primary.withValues(alpha: 0.15) : Colors.transparent,
-        border: Border.all(color: active ? theme.colorScheme.primary : textColor.withValues(alpha: 0.2)),
+        color: active
+            ? theme.colorScheme.primary.withValues(alpha: 0.15)
+            : Colors.transparent,
+        border: Border.all(
+          color: active
+              ? theme.colorScheme.primary
+              : textColor.withValues(alpha: 0.2),
+        ),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
         text,
         style: TextStyle(
-          color: active ? theme.colorScheme.primary : textColor.withValues(alpha: 0.6),
+          color: active
+              ? theme.colorScheme.primary
+              : textColor.withValues(alpha: 0.6),
           fontSize: 10,
           fontWeight: FontWeight.bold,
         ),
@@ -774,10 +1149,18 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
   Widget _buildThemeSelector(ThemeData theme, ThemeService themeService) {
     final l10n = AppLocalizations.of(context)!;
     final themes = [
-      {'id': 'system', 'label': l10n.widgetThemeSystem, 'icon': Icons.brightness_auto},
+      {
+        'id': 'system',
+        'label': l10n.widgetThemeSystem,
+        'icon': Icons.brightness_auto,
+      },
       {'id': 'light', 'label': l10n.widgetThemeLight, 'icon': Icons.light_mode},
       {'id': 'dark', 'label': l10n.widgetThemeDark, 'icon': Icons.dark_mode},
-      {'id': 'glassmorphic', 'label': l10n.widgetThemeGlassmorphic, 'icon': Icons.blur_on},
+      {
+        'id': 'glassmorphic',
+        'label': l10n.widgetThemeGlassmorphic,
+        'icon': Icons.blur_on,
+      },
     ];
 
     return GlassContainer(
@@ -800,11 +1183,18 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
                 },
                 child: Container(
                   width: itemWidth,
-                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 12,
+                    horizontal: 8,
+                  ),
                   decoration: BoxDecoration(
-                    color: isSel ? theme.colorScheme.primary.withValues(alpha: 0.15) : Colors.transparent,
+                    color: isSel
+                        ? theme.colorScheme.primary.withValues(alpha: 0.15)
+                        : Colors.transparent,
                     border: Border.all(
-                      color: isSel ? theme.colorScheme.primary : theme.dividerColor.withValues(alpha: 0.1),
+                      color: isSel
+                          ? theme.colorScheme.primary
+                          : theme.dividerColor.withValues(alpha: 0.1),
                       width: 1.5,
                     ),
                     borderRadius: BorderRadius.circular(12),
@@ -813,7 +1203,9 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
                     children: [
                       Icon(
                         t['icon'] as IconData,
-                        color: isSel ? theme.colorScheme.primary : theme.iconTheme.color?.withValues(alpha: 0.7),
+                        color: isSel
+                            ? theme.colorScheme.primary
+                            : theme.iconTheme.color?.withValues(alpha: 0.7),
                         size: 20,
                       ),
                       const SizedBox(width: 8),
@@ -821,8 +1213,12 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
                         child: Text(
                           t['label'] as String,
                           style: TextStyle(
-                            color: isSel ? theme.colorScheme.primary : theme.textTheme.bodyMedium?.color,
-                            fontWeight: isSel ? FontWeight.bold : FontWeight.normal,
+                            color: isSel
+                                ? theme.colorScheme.primary
+                                : theme.textTheme.bodyMedium?.color,
+                            fontWeight: isSel
+                                ? FontWeight.bold
+                                : FontWeight.normal,
                             fontSize: 12,
                           ),
                           overflow: TextOverflow.ellipsis,
@@ -854,7 +1250,9 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: colors.map((c) {
-          final isSelected = _highlightColor.toLowerCase() == (c['hex'] as String).toLowerCase();
+          final isSelected =
+              _highlightColor.toLowerCase() ==
+              (c['hex'] as String).toLowerCase();
           final itemColor = c['color'] as Color;
 
           return GestureDetector(
@@ -901,7 +1299,10 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
         children: [
           // Show Week Numbers
           SwitchListTile(
-            secondary: Icon(Icons.format_list_numbered, color: theme.colorScheme.primary),
+            secondary: Icon(
+              Icons.format_list_numbered,
+              color: theme.colorScheme.primary,
+            ),
             title: Text(l10n.showWeekNumbers),
             value: _showWeekNumbers,
             onChanged: (val) {
@@ -931,7 +1332,10 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
 
           // Show Tasks
           SwitchListTile(
-            secondary: Icon(Icons.check_box_outlined, color: theme.colorScheme.primary),
+            secondary: Icon(
+              Icons.check_box_outlined,
+              color: theme.colorScheme.primary,
+            ),
             title: Text(l10n.showCalendarTasks),
             value: _showTasks,
             onChanged: (val) {
@@ -946,7 +1350,10 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
 
           // Show Google Calendar
           SwitchListTile(
-            secondary: Icon(Icons.calendar_month, color: theme.colorScheme.primary),
+            secondary: Icon(
+              Icons.calendar_month,
+              color: theme.colorScheme.primary,
+            ),
             title: Text(l10n.showGoogleCalendar),
             value: _showGoogle,
             onChanged: (val) {
@@ -961,13 +1368,19 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
 
           // Start of Week Dropdown
           ListTile(
-            leading: Icon(Icons.first_page_rounded, color: theme.colorScheme.primary),
+            leading: Icon(
+              Icons.first_page_rounded,
+              color: theme.colorScheme.primary,
+            ),
             title: Text(l10n.startOfWeek),
             trailing: DropdownButton<int>(
               value: _startOfWeek,
               dropdownColor: theme.colorScheme.surfaceContainerLow,
               underline: const SizedBox(),
-              icon: Icon(Icons.keyboard_arrow_down_rounded, color: theme.iconTheme.color?.withValues(alpha: 0.7)),
+              icon: Icon(
+                Icons.keyboard_arrow_down_rounded,
+                color: theme.iconTheme.color?.withValues(alpha: 0.7),
+              ),
               items: [
                 DropdownMenuItem(value: 7, child: Text(l10n.sunday)),
                 DropdownMenuItem(value: 1, child: Text(l10n.monday)),
@@ -983,6 +1396,74 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
                 }
               },
             ),
+          ),
+          const Divider(height: 1),
+
+          // Task Category Filter Dropdown
+          Builder(
+            builder: (context) {
+              final taskProvider = Provider.of<TaskProvider>(context);
+              final categories = taskProvider.categories;
+
+              return ListTile(
+                leading: Icon(
+                  Icons.label_outline_rounded,
+                  color: theme.colorScheme.primary,
+                ),
+                title: Text(l10n.categories),
+                subtitle: const Text(
+                  'Filter widget tasks',
+                  style: TextStyle(fontSize: 12),
+                ),
+                trailing: DropdownButton<String>(
+                  value: _selectedCategoryFilter,
+                  dropdownColor: theme.colorScheme.surfaceContainerLow,
+                  underline: const SizedBox(),
+                  icon: Icon(
+                    Icons.keyboard_arrow_down_rounded,
+                    color: theme.iconTheme.color?.withValues(alpha: 0.7),
+                  ),
+                  items: [
+                    DropdownMenuItem(value: 'all', child: Text(l10n.all)),
+                    ...categories.map((c) {
+                      return DropdownMenuItem(
+                        value: c.id,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              width: 10,
+                              height: 10,
+                              margin: const EdgeInsets.only(right: 6),
+                              decoration: BoxDecoration(
+                                color: Color(c.colorValue),
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            ConstrainedBox(
+                              constraints: const BoxConstraints(maxWidth: 110),
+                              child: Text(
+                                c.name,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
+                  ],
+                  onChanged: (val) {
+                    if (val != null) {
+                      HapticFeedback.selectionClick();
+                      setState(() {
+                        _selectedCategoryFilter = val;
+                      });
+                      _saveSetting('widget_filter_category_id', val);
+                    }
+                  },
+                ),
+              );
+            },
           ),
         ],
       ),
@@ -1082,13 +1563,20 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
                             Expanded(
                               child: Text(
                                 w['title'] as String,
-                                style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+                                style: theme.textTheme.titleSmall?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 2,
+                              ),
                               decoration: BoxDecoration(
-                                color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                                color: theme.colorScheme.primary.withValues(
+                                  alpha: 0.1,
+                                ),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text(
@@ -1106,7 +1594,9 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
                         Text(
                           w['subtitle'] as String,
                           style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.75),
+                            color: theme.textTheme.bodySmall?.color?.withValues(
+                              alpha: 0.75,
+                            ),
                           ),
                         ),
                       ],

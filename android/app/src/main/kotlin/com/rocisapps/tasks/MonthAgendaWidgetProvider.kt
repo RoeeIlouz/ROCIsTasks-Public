@@ -73,12 +73,13 @@ class MonthAgendaWidgetProvider : HomeWidgetProvider() {
                 views.setTextColor(R.id.widget_month_agenda_today_btn, highlightColor)
                 views.setTextColor(R.id.widget_month_agenda_add_btn, highlightColor)
 
+                val widgetLocale = WidgetLocaleHelper.getWidgetLocale(widgetData)
                 val offset = widgetData.getInt(PREF_MONTH_OFFSET, 0)
                 val cal = Calendar.getInstance()
                 if (offset != 0) {
                     cal.add(Calendar.MONTH, offset)
                 }
-                val monthTitleStr = SimpleDateFormat("MMMM yyyy", Locale.getDefault()).format(cal.time)
+                val monthTitleStr = SimpleDateFormat("MMMM yyyy", widgetLocale).format(cal.time)
                 views.setTextViewText(R.id.widget_month_agenda_month_title, monthTitleStr)
 
                 // Selected Date Display
@@ -88,9 +89,9 @@ class MonthAgendaWidgetProvider : HomeWidgetProvider() {
                 }
                 val selectedDateDisplay = try {
                     val parsed = SimpleDateFormat("yyyy-MM-dd", Locale.US).parse(selectedDate)
-                    SimpleDateFormat("EEE, MMM d", Locale.getDefault()).format(parsed!!)
+                    SimpleDateFormat("EEE, MMM d", widgetLocale).format(parsed!!)
                 } catch (_: Exception) {
-                    "Today"
+                    WidgetLocaleHelper.getTodayText(widgetLocale)
                 }
                 views.setTextViewText(R.id.widget_month_agenda_selected_title, selectedDateDisplay)
 

@@ -26,7 +26,7 @@ void main() {
       final appRouter = AppRouter(mockAuthService, mockOnboardingService);
       final router = appRouter.router;
 
-      expect(router.configuration.routes.length, 3);
+      expect(router.configuration.routes.length, 8);
     });
 
     test('Allows guest user to access "/" when onboarding is complete', () {

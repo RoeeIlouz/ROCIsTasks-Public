@@ -78,6 +78,15 @@ class AppLocalizationsHe extends AppLocalizations {
   String get createdDate => 'תאריך יצירה';
 
   @override
+  String get dueDateTime => 'תאריך ושעה';
+
+  @override
+  String get moreOptions => 'אפשרויות נוספות';
+
+  @override
+  String get fewerOptions => 'פחות אפשרויות';
+
+  @override
   String get filterByCategory => 'סנן לפי קטגוריה';
 
   @override

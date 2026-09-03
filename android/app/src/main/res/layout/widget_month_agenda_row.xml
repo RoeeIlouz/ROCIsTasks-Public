@@ -4,13 +4,15 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:gravity="center_vertical">
+    android:gravity="center_vertical"
+    android:paddingTop="1dp"
+    android:paddingBottom="1dp">
 
     <!-- Day 0 (Sunday/Day 1) -->
     <FrameLayout
         android:id="@+id/widget_month_day_0"
         android:layout_width="0dp"
-        android:layout_height="32dp"
+        android:layout_height="36dp"
         android:layout_weight="1"
         android:padding="1dp"
         android:clickable="true"
@@ -45,7 +47,7 @@
     <FrameLayout
         android:id="@+id/widget_month_day_1"
         android:layout_width="0dp"
-        android:layout_height="32dp"
+        android:layout_height="36dp"
         android:layout_weight="1"
         android:padding="1dp"
         android:clickable="true"
@@ -80,7 +82,7 @@
     <FrameLayout
         android:id="@+id/widget_month_day_2"
         android:layout_width="0dp"
-        android:layout_height="32dp"
+        android:layout_height="36dp"
         android:layout_weight="1"
         android:padding="1dp"
         android:clickable="true"
@@ -115,7 +117,7 @@
     <FrameLayout
         android:id="@+id/widget_month_day_3"
         android:layout_width="0dp"
-        android:layout_height="32dp"
+        android:layout_height="36dp"
         android:layout_weight="1"
         android:padding="1dp"
         android:clickable="true"
@@ -150,7 +152,7 @@
     <FrameLayout
         android:id="@+id/widget_month_day_4"
         android:layout_width="0dp"
-        android:layout_height="32dp"
+        android:layout_height="36dp"
         android:layout_weight="1"
         android:padding="1dp"
         android:clickable="true"
@@ -185,7 +187,7 @@
     <FrameLayout
         android:id="@+id/widget_month_day_5"
         android:layout_width="0dp"
-        android:layout_height="32dp"
+        android:layout_height="36dp"
         android:layout_weight="1"
         android:padding="1dp"
         android:clickable="true"
@@ -220,7 +222,7 @@
     <FrameLayout
         android:id="@+id/widget_month_day_6"
         android:layout_width="0dp"
-        android:layout_height="32dp"
+        android:layout_height="36dp"
         android:layout_weight="1"
         android:padding="1dp"
         android:clickable="true"

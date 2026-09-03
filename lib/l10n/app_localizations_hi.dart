@@ -78,6 +78,15 @@ class AppLocalizationsHi extends AppLocalizations {
   String get createdDate => 'बनाने की तिथि';
 
   @override
+  String get dueDateTime => 'तिथि और समय';
+
+  @override
+  String get moreOptions => 'और विकल्प';
+
+  @override
+  String get fewerOptions => 'कम विकल्प';
+
+  @override
   String get filterByCategory => 'श्रेणी के अनुसार फ़िल्टर करें';
 
   @override

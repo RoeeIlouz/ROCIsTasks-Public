@@ -12,6 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart' show showModalBottomSheet;
 import 'package:rocis_tasks/core/config/app_config.dart';
+import 'package:rocis_tasks/core/config/app_secrets.dart';
 import 'package:rocis_tasks/core/config/router.dart';
 import 'package:rocis_tasks/core/services/error_handling_service.dart';
 import 'package:rocis_tasks/core/services/logger_service.dart' hide LogLevel;
@@ -55,10 +56,20 @@ class SubscriptionService extends ChangeNotifier {
         final fromDefine = const String.fromEnvironment(
           'REVENUECAT_API_KEY_ANDROID',
         );
-        apiKey = fromDefine.isNotEmpty ? fromDefine : null;
+        if (fromDefine.isNotEmpty) {
+          apiKey = fromDefine;
+        } else if (AppSecrets.revenueCatApiKeyAndroid.isNotEmpty) {
+          apiKey = AppSecrets.revenueCatApiKeyAndroid;
+        }
       } else if (Platform.isIOS) {
-        final fromDefine = const String.fromEnvironment('REVENUECAT_API_KEY_IOS');
-        apiKey = fromDefine.isNotEmpty ? fromDefine : null;
+        final fromDefine = const String.fromEnvironment(
+          'REVENUECAT_API_KEY_IOS',
+        );
+        if (fromDefine.isNotEmpty) {
+          apiKey = fromDefine;
+        } else if (AppSecrets.revenueCatApiKeyIos.isNotEmpty) {
+          apiKey = AppSecrets.revenueCatApiKeyIos;
+        }
       }
 
       if (apiKey == null && dotenv.isInitialized) {
@@ -86,7 +97,8 @@ class SubscriptionService extends ChangeNotifier {
       await Purchases.configure(configuration);
       _isConfigured = true;
 
-      await _checkSubscriptionStatus();
+      // Check subscription status non-blockingly so startup is instant
+      unawaited(_checkSubscriptionStatus());
 
       Purchases.addCustomerInfoUpdateListener(_updateCustomerStatus);
 
@@ -146,17 +158,17 @@ class SubscriptionService extends ChangeNotifier {
         .doc(normalized)
         .snapshots()
         .listen((snapshot) async {
-      final data = snapshot.data();
-      final cloudPremium = data?['is_premium'] == true;
-      if (_firestorePremium != cloudPremium) {
-        _firestorePremium = cloudPremium;
-        if (kIsWeb) {
-          final prefs = await SharedPreferences.getInstance();
-          await prefs.setBool('web_is_premium', cloudPremium);
-        }
-        _updatePremiumState();
-      }
-    });
+          final data = snapshot.data();
+          final cloudPremium = data?['is_premium'] == true;
+          if (_firestorePremium != cloudPremium) {
+            _firestorePremium = cloudPremium;
+            if (kIsWeb) {
+              final prefs = await SharedPreferences.getInstance();
+              await prefs.setBool('web_is_premium', cloudPremium);
+            }
+            _updatePremiumState();
+          }
+        });
 
     if (!kIsWeb && _isConfigured) {
       try {
@@ -225,10 +237,7 @@ class SubscriptionService extends ChangeNotifier {
   Future<void> _backSyncToFirestore(String userId) async {
     try {
       if (!_firestorePremium) {
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(userId)
-            .set({
+        await FirebaseFirestore.instance.collection('users').doc(userId).set({
           'is_premium': true,
           'subscription_status': 'active',
           'last_synced_from_mobile': FieldValue.serverTimestamp(),
