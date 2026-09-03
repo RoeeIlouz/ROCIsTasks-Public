@@ -22,6 +22,8 @@ migrate_working_dir/
 .github/copilot-instructions.md
 .agents/
 .agent/
+docs/SUMMARY.md
+SUMMARY.md
 # IntelliJ related
 *.iml
 *.ipr

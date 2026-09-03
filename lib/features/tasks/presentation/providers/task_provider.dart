@@ -408,10 +408,14 @@ class TaskProvider extends ChangeNotifier {
   }
 
   Future<void> uploadLocalDataToCloud() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (prefs.getBool('disable_cloud_sync') == true) return;
     await _syncManager.uploadLocalDataToCloud();
   }
 
   Future<void> _prefetchCompletedTasksIfNeeded() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (prefs.getBool('disable_cloud_sync') == true) return;
     await _syncManager.prefetchCompletedTasksIfNeeded(
       showCompleted: _filterService.showCompleted,
       onDataChanged: () {
@@ -422,6 +426,8 @@ class TaskProvider extends ChangeNotifier {
   }
 
   Future<void> syncWithCloud() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (prefs.getBool('disable_cloud_sync') == true) return;
     await _syncManager.startCloudSync(
       getTaskById: getTaskById,
       scheduleTaskNotifications: _scheduleTaskNotifications,
