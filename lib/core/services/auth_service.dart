@@ -21,7 +21,12 @@ class AuthService extends ChangeNotifier {
   FirebaseAuth get _auth => FirebaseAuth.instance;
   final Completer<void> _initCompleter = Completer<void>();
 
-  bool get isGoogleTasksTokenExpired => _oauthManager.isGoogleTasksTokenExpired;
+  bool get isGoogleTasksTokenExpired {
+    final isGoogleUser =
+        currentUser?.providerData.any((p) => p.providerId == 'google.com') ??
+        false;
+    return isGoogleUser && _oauthManager.isGoogleTasksTokenExpired;
+  }
 
   void setGoogleTasksTokenExpired(bool expired) {
     _oauthManager.setGoogleTasksTokenExpired(
