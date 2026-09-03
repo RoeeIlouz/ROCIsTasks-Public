@@ -16,7 +16,7 @@
 
   <br />
 
-  <img src="docs/marketing/playstore/en-US/feature_graphic.png" alt="ROCIs Tasks Feature Graphic" width="100%" style="border-radius: 16px;" />
+  <img src="assets/images/play_store/feature_graphic.png" alt="ROCIs Tasks Feature Graphic" width="100%" style="border-radius: 16px;" />
 
 </div>
 
@@ -70,9 +70,9 @@
 <div align="center">
   <table>
     <tr>
-      <td width="33%"><img src="docs/marketing/playstore/en-US/screenshot_01.png" alt="Daily Focus Agenda" /></td>
-      <td width="33%"><img src="docs/marketing/playstore/en-US/screenshot_02.png" alt="Natural Language Input" /></td>
-      <td width="33%"><img src="docs/marketing/playstore/en-US/screenshot_03.png" alt="Home Screen Widgets" /></td>
+      <td width="33%"><img src="assets/images/play_store/screenshot_01.png" alt="Daily Focus Agenda" /></td>
+      <td width="33%"><img src="assets/images/play_store/screenshot_02.png" alt="Natural Language Input" /></td>
+      <td width="33%"><img src="assets/images/play_store/screenshot_03.png" alt="Home Screen Widgets" /></td>
     </tr>
     <tr>
       <td align="center"><b>Daily Focus Agenda</b></td>
@@ -80,9 +80,9 @@
       <td align="center"><b>Android Home Widgets</b></td>
     </tr>
     <tr>
-      <td width="33%"><img src="docs/marketing/playstore/en-US/screenshot_04.png" alt="Unified Calendar Sync" /></td>
-      <td width="33%"><img src="docs/marketing/playstore/en-US/screenshot_05.png" alt="Subtasks & Attachments" /></td>
-      <td width="33%"><img src="docs/marketing/playstore/en-US/screenshot_06.png" alt="Productivity Analytics" /></td>
+      <td width="33%"><img src="assets/images/play_store/screenshot_04.png" alt="Unified Calendar Sync" /></td>
+      <td width="33%"><img src="assets/images/play_store/screenshot_05.png" alt="Subtasks & Attachments" /></td>
+      <td width="33%"><img src="assets/images/play_store/screenshot_06.png" alt="Productivity Analytics" /></td>
     </tr>
     <tr>
       <td align="center"><b>Unified Calendar Sync</b></td>
