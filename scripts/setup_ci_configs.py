@@ -114,6 +114,26 @@ def main():
     setup_file("KEYSTORE_BASE64", "android/app/upload-keystore.jks", None, is_binary=True)
     setup_file("KEY_PROPERTIES_BASE64", "android/key.properties", None)
 
+    # 6. app_secrets.dart
+    app_secrets_path = "lib/core/config/app_secrets.dart"
+    example_secrets_path = "lib/core/config/app_secrets.dart.example"
+    rc_android = read_env_secret("REVENUECAT_API_KEY_ANDROID")
+    rc_ios = read_env_secret("REVENUECAT_API_KEY_IOS")
+
+    if not os.path.exists(app_secrets_path):
+        if rc_android or rc_ios:
+            os.makedirs(os.path.dirname(app_secrets_path), exist_ok=True)
+            with open(app_secrets_path, "w", encoding="utf-8") as f:
+                f.write(f"""// Generated in CI
+class AppSecrets {{
+  static const String revenueCatApiKeyAndroid = '{rc_android}';
+  static const String revenueCatApiKeyIos = '{rc_ios}';
+}}
+""")
+            print(f"[REVENUECAT_API_KEY] Generated {app_secrets_path} from environment secrets")
+        else:
+            setup_file("APP_SECRETS_BASE64", app_secrets_path, example_secrets_path)
+
     # Final sanity check on google-services.json
     gs_path = "android/app/google-services.json"
     if os.path.exists(gs_path):

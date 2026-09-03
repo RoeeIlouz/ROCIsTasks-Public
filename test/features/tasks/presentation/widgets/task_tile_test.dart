@@ -17,14 +17,16 @@ import 'package:rocis_tasks/core/services/security_service.dart';
 import 'package:flutter/foundation.dart' hide Category;
 import 'package:rocis_tasks/l10n/app_localizations_en.dart';
 
-class SynchronousAppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
+class SynchronousAppLocalizationsDelegate
+    extends LocalizationsDelegate<AppLocalizations> {
   const SynchronousAppLocalizationsDelegate();
 
   @override
   bool isSupported(Locale locale) => true;
 
   @override
-  Future<AppLocalizations> load(Locale locale) => SynchronousFuture(AppLocalizationsEn());
+  Future<AppLocalizations> load(Locale locale) =>
+      SynchronousFuture(AppLocalizationsEn());
 
   @override
   bool shouldReload(SynchronousAppLocalizationsDelegate old) => false;
@@ -56,8 +58,9 @@ void main() {
     when(() => mockThemeService.taskCompletionFeedback).thenReturn(false);
     when(() => mockThemeService.useMaterialTheme).thenReturn(true);
     when(() => mockSubscriptionService.isPremium).thenReturn(true);
-    when(() => mockPrivateModeService.shouldHidePrivateContent)
-        .thenReturn(false);
+    when(
+      () => mockPrivateModeService.shouldHidePrivateContent,
+    ).thenReturn(false);
     when(() => mockPrivateModeService.hasPin).thenReturn(false);
   });
 
@@ -161,11 +164,7 @@ void main() {
 
   group('TaskTile - Category', () {
     testWidgets('shows category chip when category provided', (tester) async {
-      final task = Task(
-        id: '1',
-        title: 'With Category',
-        categoryId: 'cat-1',
-      );
+      final task = Task(id: '1', title: 'With Category', categoryId: 'cat-1');
       final category = Category(
         id: 'cat-1',
         name: 'Work',
@@ -220,11 +219,7 @@ void main() {
     testWidgets('shows selection highlight when selected', (tester) async {
       final task = Task(id: '1', title: 'Selected');
       await tester.pumpWidget(
-        createWidgetUnderTest(
-          task,
-          isSelectionMode: true,
-          isSelected: true,
-        ),
+        createWidgetUnderTest(task, isSelectionMode: true, isSelected: true),
       );
       expect(find.text('Selected'), findsOneWidget);
     });
@@ -232,11 +227,7 @@ void main() {
     testWidgets('shows unselected state when not selected', (tester) async {
       final task = Task(id: '1', title: 'Unselected');
       await tester.pumpWidget(
-        createWidgetUnderTest(
-          task,
-          isSelectionMode: true,
-          isSelected: false,
-        ),
+        createWidgetUnderTest(task, isSelectionMode: true, isSelected: false),
       );
       expect(find.text('Unselected'), findsOneWidget);
     });
@@ -287,8 +278,9 @@ void main() {
   group('TaskTile - Private Masked', () {
     testWidgets('shows masked title for private task', (tester) async {
       when(() => mockSubscriptionService.isPremium).thenReturn(true);
-      when(() => mockPrivateModeService.shouldHidePrivateContent)
-          .thenReturn(true);
+      when(
+        () => mockPrivateModeService.shouldHidePrivateContent,
+      ).thenReturn(true);
       when(() => mockPrivateModeService.hasPin).thenReturn(true);
 
       final task = Task(id: '1', title: 'Secret Task');
@@ -332,9 +324,7 @@ void main() {
   });
 
   group('TaskTile - Completed Task Styling', () {
-    testWidgets('shows strikethrough on completed task title', (
-      tester,
-    ) async {
+    testWidgets('shows strikethrough on completed task title', (tester) async {
       final task = Task(id: '1', title: 'Done Task', isCompleted: true);
       await tester.pumpWidget(createWidgetUnderTest(task));
       final textWidget = tester.widget<Text>(find.text('Done Task'));
@@ -361,7 +351,9 @@ void main() {
   });
 
   group('TaskTile - Recurrence Chip', () {
-    testWidgets('shows recurrence chip when recurrenceRule is set', (tester) async {
+    testWidgets('shows recurrence chip when recurrenceRule is set', (
+      tester,
+    ) async {
       final task = Task(
         id: '1',
         title: 'Recurring Task',
@@ -372,14 +364,48 @@ void main() {
       expect(find.byIcon(Icons.repeat_rounded), findsOneWidget);
     });
 
-    testWidgets('does not show recurrence chip when recurrenceRule is null', (tester) async {
-      final task = Task(
-        id: '2',
-        title: 'Normal Task',
-        recurrenceRule: null,
-      );
+    testWidgets('does not show recurrence chip when recurrenceRule is null', (
+      tester,
+    ) async {
+      final task = Task(id: '2', title: 'Normal Task', recurrenceRule: null);
       await tester.pumpWidget(createWidgetUnderTest(task));
       expect(find.byIcon(Icons.repeat_rounded), findsNothing);
+    });
+  });
+
+  group('TaskTile - Category Interactivity', () {
+    testWidgets('tapping category chip calls selectSingleCategoryFilter', (
+      tester,
+    ) async {
+      final category = Category(
+        id: 'cat_work',
+        name: 'Work',
+        colorValue: 0xFF2196F3,
+        iconCode: 1,
+      );
+      final task = Task(
+        id: 'task_work',
+        title: 'Work Task',
+        categoryId: 'cat_work',
+      );
+
+      when(
+        () => mockTaskProvider.selectSingleCategoryFilter('cat_work'),
+      ).thenReturn(null);
+
+      await tester.pumpWidget(
+        createWidgetUnderTest(task, categories: [category]),
+      );
+
+      final chipFinder = find.text('Work');
+      expect(chipFinder, findsOneWidget);
+
+      await tester.tap(chipFinder);
+      await tester.pump();
+
+      verify(
+        () => mockTaskProvider.selectSingleCategoryFilter('cat_work'),
+      ).called(1);
     });
   });
 }

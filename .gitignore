@@ -21,6 +21,7 @@ migrate_working_dir/
 .mimocode/
 .github/copilot-instructions.md
 .agents/
+.agent/
 # IntelliJ related
 *.iml
 *.ipr
@@ -49,9 +50,16 @@ android/build/
 repomix-output.xml
 # Symbolication related
 app.*.symbols
+# Ruthless agent outputs
+docs/CLAIMED_VS_OBSERVED.md
+docs/MORNING_CLEANUP_PLAN.md
+docs/OVERNIGHT_QA_FINDINGS.md
 
 # Obfuscation related
 app.*.map.json
+docs/.tmp.driveupload/
+docs/.tmp.drivedownload/
+docs/marketing/
 
 # Android Studio will place build artifacts here
 /android/app/debug
@@ -61,7 +69,12 @@ app.*.map.json
 .kotlin/
 /lib/firebase_options.dart
 /lib/firebase_schedule_options.dart
+/lib/core/config/app_secrets.dart
 /docs/SUMMARY.md
+docs/SUMMARY.md
+docs/marketing/
+docs/MARKETING_SCHEDULE.md
+1.1.0
 graphify-out/
 .serena/
 functions/
@@ -83,6 +96,8 @@ firebase_options.dart.backup
 **/firebase_options_backup.dart
 .firebaserc
 .firebase/
+dataconnect/
+/lib/dataconnect_generated/
 # Sensitive Configuration
 secrets/
 config/secrets/

@@ -76,11 +76,10 @@
                 android:paddingEnd="10dp"
                 android:paddingTop="6dp"
                 android:paddingBottom="6dp"
-                android:layout_marginBottom="6dp"
-                android:clickable="true"
-                android:focusable="true">
+                android:layout_marginBottom="6dp">
 
                 <TextView
+                    android:id="@+id/widget_quick_btn_add_icon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="+"
@@ -90,6 +89,7 @@
                     android:layout_marginEnd="6dp" />
 
                 <TextView
+                    android:id="@+id/widget_quick_btn_add_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="New Task"
@@ -110,9 +110,7 @@
                 android:paddingStart="10dp"
                 android:paddingEnd="10dp"
                 android:paddingTop="6dp"
-                android:paddingBottom="6dp"
-                android:clickable="true"
-                android:focusable="true">
+                android:paddingBottom="6dp">
 
                 <ImageView
                     android:id="@+id/widget_quick_calendar_icon"
@@ -122,6 +120,7 @@
                     android:layout_marginEnd="6dp" />
 
                 <TextView
+                    android:id="@+id/widget_quick_btn_cal_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Calendar"

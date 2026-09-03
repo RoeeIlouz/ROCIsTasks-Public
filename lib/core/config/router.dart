@@ -7,8 +7,15 @@ import 'package:rocis_tasks/features/onboarding/data/services/onboarding_service
 import 'package:rocis_tasks/features/onboarding/presentation/screens/onboarding_screen.dart';
 import 'package:rocis_tasks/shared/ui/widgets/global_error_boundary.dart';
 
+import 'package:rocis_tasks/features/tasks/presentation/screens/add_task_screen.dart';
+import 'package:rocis_tasks/features/categories/presentation/screens/categories_screen.dart';
+import 'package:rocis_tasks/features/home/presentation/screens/settings_screen.dart';
+import 'package:rocis_tasks/features/calendar/presentation/screens/calendar_screen.dart';
+import 'package:rocis_tasks/features/tasks/presentation/widgets/kanban/kanban_board_view.dart';
+
 class AppRouter {
-  static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+  static final GlobalKey<NavigatorState> navigatorKey =
+      GlobalKey<NavigatorState>();
 
   final AuthService authService;
   final OnboardingService onboardingService;
@@ -26,6 +33,26 @@ class AppRouter {
       GoRoute(
         path: '/onboarding',
         builder: (context, state) => const OnboardingScreen(),
+      ),
+      GoRoute(
+        path: '/add-task',
+        builder: (context, state) => const AddTaskScreen(),
+      ),
+      GoRoute(
+        path: '/categories',
+        builder: (context, state) => const CategoriesScreen(),
+      ),
+      GoRoute(
+        path: '/settings',
+        builder: (context, state) => const Scaffold(body: SettingsScreen()),
+      ),
+      GoRoute(
+        path: '/calendar',
+        builder: (context, state) => const Scaffold(body: CalendarScreen()),
+      ),
+      GoRoute(
+        path: '/kanban',
+        builder: (context, state) => const Scaffold(body: KanbanBoardView()),
       ),
     ],
     redirect: (context, state) {

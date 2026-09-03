@@ -35,8 +35,12 @@ class LocalTaskSource {
 
   Future<void> _openBoxes() async {
     try {
-      await Hive.openBox<Task>(_tasksBoxName);
-      await Hive.openBox<Category>(_categoriesBoxName);
+      if (!Hive.isBoxOpen(_tasksBoxName)) {
+        await Hive.openBox<Task>(_tasksBoxName);
+      }
+      if (!Hive.isBoxOpen(_categoriesBoxName)) {
+        await Hive.openBox<Category>(_categoriesBoxName);
+      }
     } catch (e) {
       AppLogger.warning(
         'Failed to open Hive boxes, attempting recovery...',
@@ -44,8 +48,12 @@ class LocalTaskSource {
       );
       _tasksBoxName = '${boxName}_recovered';
       _categoriesBoxName = '${categoriesBoxName}_recovered';
-      await Hive.openBox<Task>(_tasksBoxName);
-      await Hive.openBox<Category>(_categoriesBoxName);
+      if (!Hive.isBoxOpen(_tasksBoxName)) {
+        await Hive.openBox<Task>(_tasksBoxName);
+      }
+      if (!Hive.isBoxOpen(_categoriesBoxName)) {
+        await Hive.openBox<Category>(_categoriesBoxName);
+      }
     }
   }
 
@@ -91,5 +99,26 @@ class LocalTaskSource {
 
   Future<void> deleteCategory(String id) async {
     await _categoriesBox.delete(id);
+  }
+
+  /// Safely compacts Hive boxes to reduce disk usage and eliminate fragmented tombstones.
+  Future<void> compactBoxes() async {
+    try {
+      if (Hive.isBoxOpen(_tasksBoxName)) {
+        await _box.compact();
+      }
+      if (Hive.isBoxOpen(_categoriesBoxName)) {
+        await _categoriesBox.compact();
+      }
+      AppLogger.info(
+        'Hive boxes compacted successfully.',
+        tag: 'LocalTaskSource',
+      );
+    } catch (e) {
+      AppLogger.warning(
+        'Failed to compact Hive boxes: $e',
+        tag: 'LocalTaskSource',
+      );
+    }
   }
 }

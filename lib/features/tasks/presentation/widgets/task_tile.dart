@@ -114,327 +114,391 @@ class TaskTile extends StatelessWidget {
               isSelectionMode: isSelectionMode,
             )
           : GlassContainer(
-        margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-        isSelected: isSelected,
-        selectedBorderColor: categories.isNotEmpty ? Color(categories.first.colorValue) : theme.colorScheme.primary,
-        color: isSelected 
-            ? (categories.isNotEmpty ? Color(categories.first.colorValue) : theme.colorScheme.primary)
-            : null,
-        child: Padding(
-          padding: const EdgeInsets.only(
-            left: 6,
-            right: 16,
-            top: 10,
-            bottom: 10,
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (!isSelectionMode && task.isGroceryList)
-                Padding(
-                  padding: const EdgeInsets.only(
-                    left: 10,
-                    right: 10,
-                    top: 2,
-                    bottom: 18,
-                  ),
-                  child: Icon(
-                    task.isCompleted ? Icons.check_circle_rounded : Icons.checklist_rounded,
-                    color: task.isCompleted
-                        ? theme.colorScheme.primary
-                        : (categories.isNotEmpty
-                            ? Color(categories.first.colorValue)
-                            : theme.colorScheme.primary).withValues(alpha: 0.7),
-                    size: 26,
-                  ),
-                )
-              else
-                GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onTap: isSelectionMode
-                    ? () => onLongPress?.call()
-                    : () {
-                        if (themeService.taskCompletionFeedback) {
-                          // Stronger impact when completing, lighter when un-completing
-                          if (!task.isCompleted) {
-                            HapticFeedback.mediumImpact();
-                          } else {
-                            HapticFeedback.lightImpact();
-                          }
-                        }
-                        onToggle();
-                      },
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                    left: 10,
-                    right: 10,
-                    top: 2,
-                    bottom: 18,
-                  ),
-                  child: Semantics(
-                    label: isSelectionMode
-                        ? (isSelected ? 'Selected' : 'Not selected')
-                        : (task.isCompleted
-                            ? l10n.markAsIncomplete
-                            : l10n.markAsComplete),
-                    checked: isSelectionMode ? isSelected : task.isCompleted,
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      width: 28,
-                      height: 28,
-                      decoration: BoxDecoration(
-                        color: (isSelectionMode ? isSelected : task.isCompleted)
-                            ? (categories.isNotEmpty
-                                ? Color(categories.first.colorValue)
-                                : theme.colorScheme.primary)
-                            : Colors.transparent,
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: (isSelectionMode ? isSelected : task.isCompleted)
-                              ? Colors.transparent
-                              : (categories.isNotEmpty
-                                      ? Color(categories.first.colorValue)
-                                      : theme.colorScheme.primary)
-                                  .withValues(alpha: 0.5),
-                          width: 2,
-                        ),
-                      ),
-                      child: (isSelectionMode ? isSelected : task.isCompleted)
-                          ? const Icon(
-                              Icons.check,
-                              color: Colors.white,
-                              size: 18,
-                            )
-                          : null,
-                    ),
-                  ),
+              margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+              isSelected: isSelected,
+              selectedBorderColor: categories.isNotEmpty
+                  ? Color(categories.first.colorValue)
+                  : theme.colorScheme.primary,
+              color: isSelected
+                  ? (categories.isNotEmpty
+                        ? Color(categories.first.colorValue)
+                        : theme.colorScheme.primary)
+                  : null,
+              child: Padding(
+                padding: const EdgeInsets.only(
+                  left: 6,
+                  right: 16,
+                  top: 10,
+                  bottom: 10,
                 ),
-              ),
-              const SizedBox(width: 6),
-              Expanded(
-                child: InkWell(
-                  onTap: isSelectionMode ? onLongPress : onTap,
-                  onLongPress: onLongPress,
-                  borderRadius: BorderRadius.circular(12),
-                  child: Semantics(
-                    label: '${l10n.tasks}: ${task.title}',
-                    hint: l10n.editTaskDetailsHint,
-                    container: true,
-                    child: Padding(
-                      padding: const EdgeInsets.all(4.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Flexible(
-                                child: Text(
-                                  task.title,
-                                  style: theme.textTheme.titleMedium
-                                      ?.copyWith(
-                                        fontWeight: FontWeight.bold,
-                                        color: task.isCompleted
-                                            ? theme.disabledColor
-                                            : theme.colorScheme.onSurface,
-                                        decoration: task.isCompleted
-                                            ? TextDecoration.lineThrough
-                                            : null,
-                                      ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (!isSelectionMode && task.isGroceryList)
+                      Padding(
+                        padding: const EdgeInsets.only(
+                          left: 10,
+                          right: 10,
+                          top: 2,
+                          bottom: 18,
+                        ),
+                        child: Icon(
+                          task.isCompleted
+                              ? Icons.check_circle_rounded
+                              : Icons.checklist_rounded,
+                          color: task.isCompleted
+                              ? theme.colorScheme.primary
+                              : (categories.isNotEmpty
+                                        ? Color(categories.first.colorValue)
+                                        : theme.colorScheme.primary)
+                                    .withValues(alpha: 0.7),
+                          size: 26,
+                        ),
+                      )
+                    else
+                      GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: isSelectionMode
+                            ? () => onLongPress?.call()
+                            : () {
+                                if (themeService.taskCompletionFeedback) {
+                                  // Stronger impact when completing, lighter when un-completing
+                                  if (!task.isCompleted) {
+                                    HapticFeedback.mediumImpact();
+                                  } else {
+                                    HapticFeedback.lightImpact();
+                                  }
+                                }
+                                onToggle();
+                              },
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                            left: 10,
+                            right: 10,
+                            top: 2,
+                            bottom: 18,
+                          ),
+                          child: Semantics(
+                            label: isSelectionMode
+                                ? (isSelected ? 'Selected' : 'Not selected')
+                                : (task.isCompleted
+                                      ? l10n.markAsIncomplete
+                                      : l10n.markAsComplete),
+                            checked: isSelectionMode
+                                ? isSelected
+                                : task.isCompleted,
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 300),
+                              width: 28,
+                              height: 28,
+                              decoration: BoxDecoration(
+                                color:
+                                    (isSelectionMode
+                                        ? isSelected
+                                        : task.isCompleted)
+                                    ? (categories.isNotEmpty
+                                          ? Color(categories.first.colorValue)
+                                          : theme.colorScheme.primary)
+                                    : Colors.transparent,
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color:
+                                      (isSelectionMode
+                                          ? isSelected
+                                          : task.isCompleted)
+                                      ? Colors.transparent
+                                      : (categories.isNotEmpty
+                                                ? Color(
+                                                    categories.first.colorValue,
+                                                  )
+                                                : theme.colorScheme.primary)
+                                            .withValues(alpha: 0.5),
+                                  width: 2,
                                 ),
                               ),
-                              if (task.syncWithGoogleTasks) ...[
-                                const SizedBox(width: 6),
-                                const _GTasksBadge(),
-                              ],
-                            ],
-                          ),
-                          if (task.description.isNotEmpty) ...[
-                            const SizedBox(height: 8),
-                            Text(
-                              task.description,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: theme.textTheme.bodySmall
-                                  ?.copyWith(
-                                    color: theme.colorScheme.onSurface
-                                        .withValues(alpha: 0.6),
-                                    height: 1.4,
-                                  ),
+                              child:
+                                  (isSelectionMode
+                                      ? isSelected
+                                      : task.isCompleted)
+                                  ? const Icon(
+                                      Icons.check,
+                                      color: Colors.white,
+                                      size: 18,
+                                    )
+                                  : null,
                             ),
-                          ],
-                          if (task.subTasks != null &&
-                              task.subTasks!.isNotEmpty) ...[
-                            const SizedBox(height: 8),
-                            _buildSubTasksList(context),
-                          ],
-                          const SizedBox(height: 12),
-                          Wrap(
-                            spacing: 6,
-                            runSpacing: 4,
-                            children: [
-                              ...categories.map((c) => _buildChip(
-                                context,
-                                icon: IconUtils.getIconData(c.iconCode),
-                                label: c.name,
-                                color: Color(c.colorValue),
-                              )),
-                              if (task.isGroceryList)
-                                _buildChip(
-                                  context,
-                                  icon: Icons.checklist_rounded,
-                                  label: '${task.subTasks?.where((st) => st.isCompleted).length ?? 0}/${task.subTasks?.length ?? 0}',
-                                  color: theme.colorScheme.primary,
+                          ),
+                        ),
+                      ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: InkWell(
+                        onTap: isSelectionMode ? onLongPress : onTap,
+                        onLongPress: onLongPress,
+                        borderRadius: BorderRadius.circular(12),
+                        child: Semantics(
+                          label: '${l10n.tasks}: ${task.title}',
+                          hint: l10n.editTaskDetailsHint,
+                          container: true,
+                          child: Padding(
+                            padding: const EdgeInsets.all(4.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Flexible(
+                                      child: Text(
+                                        task.title,
+                                        style: theme.textTheme.titleMedium
+                                            ?.copyWith(
+                                              fontWeight: FontWeight.bold,
+                                              color: task.isCompleted
+                                                  ? theme.disabledColor
+                                                  : theme.colorScheme.onSurface,
+                                              decoration: task.isCompleted
+                                                  ? TextDecoration.lineThrough
+                                                  : null,
+                                            ),
+                                      ),
+                                    ),
+                                    if (task.syncWithGoogleTasks) ...[
+                                      const SizedBox(width: 6),
+                                      const _GTasksBadge(),
+                                    ],
+                                  ],
                                 ),
-                               if (task.dueDate != null)
-                                _buildChip(
-                                  context,
-                                  icon: Icons.access_time_rounded,
-                                  label: themeService.use24HourFormat
-                                      ? _timeFormat24.format(
-                                          task.dueDate!,
-                                        )
-                                      : _timeFormat12.format(
-                                          task.dueDate!,
-                                        ),
-                                  color: (!task.isCompleted &&
-                                          task.dueDate!.isBefore(
-                                            DateTime.now(),
-                                          ))
-                                      ? theme.colorScheme.error
-                                      : theme.colorScheme.primary,
-                                  onTap: isSelectionMode || task.isCompleted
-                                      ? null
-                                      : () => _showRescheduleSheet(context, task, l10n, theme),
+                                if (task.description.isNotEmpty) ...[
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    task.description,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      color: theme.colorScheme.onSurface
+                                          .withValues(alpha: 0.6),
+                                      height: 1.4,
+                                    ),
+                                  ),
+                                ],
+                                if (task.subTasks != null &&
+                                    task.subTasks!.isNotEmpty) ...[
+                                  const SizedBox(height: 8),
+                                  _buildSubTasksList(context),
+                                ],
+                                const SizedBox(height: 12),
+                                Wrap(
+                                  spacing: 6,
+                                  runSpacing: 4,
+                                  children: [
+                                    ...categories.map(
+                                      (c) => _buildChip(
+                                        context,
+                                        icon: IconUtils.getIconData(c.iconCode),
+                                        label: c.name,
+                                        color: Color(c.colorValue),
+                                        onTap: isSelectionMode
+                                            ? null
+                                            : () {
+                                                HapticFeedback.lightImpact();
+                                                Provider.of<TaskProvider>(
+                                                  context,
+                                                  listen: false,
+                                                ).selectSingleCategoryFilter(
+                                                  c.id,
+                                                );
+                                              },
+                                      ),
+                                    ),
+                                    if (task.isGroceryList)
+                                      _buildChip(
+                                        context,
+                                        icon: Icons.checklist_rounded,
+                                        label:
+                                            '${task.subTasks?.where((st) => st.isCompleted).length ?? 0}/${task.subTasks?.length ?? 0}',
+                                        color: theme.colorScheme.primary,
+                                      ),
+                                    if (task.dueDate != null)
+                                      _buildChip(
+                                        context,
+                                        icon: Icons.access_time_rounded,
+                                        label: themeService.use24HourFormat
+                                            ? _timeFormat24.format(
+                                                task.dueDate!,
+                                              )
+                                            : _timeFormat12.format(
+                                                task.dueDate!,
+                                              ),
+                                        color:
+                                            (!task.isCompleted &&
+                                                task.dueDate!.isBefore(
+                                                  DateTime.now(),
+                                                ))
+                                            ? theme.colorScheme.error
+                                            : theme.colorScheme.primary,
+                                        onTap:
+                                            isSelectionMode || task.isCompleted
+                                            ? null
+                                            : () => _showRescheduleSheet(
+                                                context,
+                                                task,
+                                                l10n,
+                                                theme,
+                                              ),
+                                      ),
+                                    if (task.recurrenceRule != null &&
+                                        task.recurrenceRule!.trim().isNotEmpty)
+                                      _buildChip(
+                                        context,
+                                        icon: Icons.repeat_rounded,
+                                        label:
+                                            TaskRecurrenceService.getRecurrenceLabel(
+                                              task.recurrenceRule,
+                                              l10n,
+                                            ),
+                                        color: theme.colorScheme.primary,
+                                      ),
+                                    if (task.customFields != null &&
+                                        task.customFields!.isNotEmpty)
+                                      ...task.customFields!
+                                          .where(
+                                            (cf) =>
+                                                cf.value.isNotEmpty ||
+                                                cf.label.isNotEmpty,
+                                          )
+                                          .map((cf) {
+                                            final icon =
+                                                CustomFieldActionService.getIcon(
+                                                  cf.type,
+                                                  cf.value,
+                                                );
+                                            final displayLabel =
+                                                cf.value.isNotEmpty
+                                                ? cf.value
+                                                : cf.label;
+                                            return _buildChip(
+                                              context,
+                                              icon: icon,
+                                              label: displayLabel,
+                                              color: theme.colorScheme.primary,
+                                            );
+                                          }),
+                                  ],
                                 ),
-                               if (task.recurrenceRule != null &&
-                                   task.recurrenceRule!.trim().isNotEmpty)
-                                 _buildChip(
-                                   context,
-                                   icon: Icons.repeat_rounded,
-                                   label: TaskRecurrenceService.getRecurrenceLabel(
-                                     task.recurrenceRule,
-                                     l10n,
-                                   ),
-                                   color: theme.colorScheme.primary,
-                                 ),
-                               if (task.customFields != null &&
-                                   task.customFields!.isNotEmpty)
-                                 ...task.customFields!
-                                     .where((cf) =>
-                                         cf.value.isNotEmpty ||
-                                         cf.label.isNotEmpty)
-                                     .map((cf) {
-                                   final icon =
-                                       CustomFieldActionService.getIcon(
-                                     cf.type,
-                                     cf.value,
-                                   );
-                                   final displayLabel =
-                                       cf.value.isNotEmpty
-                                           ? cf.value
-                                           : cf.label;
-                                   return _buildChip(
-                                     context,
-                                     icon: icon,
-                                     label: displayLabel,
-                                     color: theme.colorScheme.primary,
-                                   );
-                                 }),
-                             ],
-                           ),
-                        ],
+                              ],
+                            ),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
+                    const SizedBox(width: 16),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (enablePin)
+                          Semantics(
+                            label: (task.isPinned ?? false)
+                                ? l10n.unpinTask
+                                : l10n.pinTask,
+                            button: true,
+                            child: IconButton(
+                              icon: Icon(
+                                (task.isPinned ?? false)
+                                    ? Icons.push_pin
+                                    : Icons.push_pin_outlined,
+                                size: 20,
+                                color: (task.isPinned ?? false)
+                                    ? theme.colorScheme.primary
+                                    : theme.disabledColor,
+                              ),
+                              onPressed: () {
+                                HapticFeedback.lightImpact();
+                                Provider.of<TaskProvider>(
+                                  context,
+                                  listen: false,
+                                ).toggleTaskPin(task);
+                              },
+                              constraints: const BoxConstraints(
+                                minWidth: 44,
+                                minHeight: 44,
+                              ),
+                              padding: const EdgeInsets.all(8),
+                            ),
+                          )
+                        else
+                          const SizedBox(height: 40),
+                        const SizedBox(height: 8),
+                        Semantics(
+                          label: '${l10n.priority}: ${task.priority.name}',
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 3,
+                            ),
+                            decoration: BoxDecoration(
+                              color: _getPriorityColor(
+                                context,
+                                task.priority,
+                              ).withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(6),
+                              border: Border.all(
+                                color: _getPriorityColor(
+                                  context,
+                                  task.priority,
+                                ).withValues(alpha: 0.3),
+                                width: 1,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Container(
+                                  width: 6,
+                                  height: 6,
+                                  decoration: BoxDecoration(
+                                    color: _getPriorityColor(
+                                      context,
+                                      task.priority,
+                                    ),
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: _getPriorityColor(
+                                          context,
+                                          task.priority,
+                                        ).withValues(alpha: 0.6),
+                                        blurRadius: 4,
+                                        spreadRadius: 1,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  task.priority.name.toUpperCase(),
+                                  style: GoogleFonts.outfit(
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.bold,
+                                    color: _getPriorityColor(
+                                      context,
+                                      task.priority,
+                                    ),
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(width: 16),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (enablePin)
-                    Semantics(
-                      label: (task.isPinned ?? false)
-                          ? l10n.unpinTask
-                          : l10n.pinTask,
-                      button: true,
-                      child: IconButton(
-                        icon: Icon(
-                          (task.isPinned ?? false)
-                              ? Icons.push_pin
-                              : Icons.push_pin_outlined,
-                          size: 20,
-                          color: (task.isPinned ?? false)
-                              ? theme.colorScheme.primary
-                              : theme.disabledColor,
-                        ),
-                        onPressed: () {
-                          HapticFeedback.lightImpact();
-                          Provider.of<TaskProvider>(
-                            context,
-                            listen: false,
-                          ).toggleTaskPin(task);
-                        },
-                        constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
-                        padding: const EdgeInsets.all(8),
-                      ),
-                    )
-                  else
-                    const SizedBox(height: 40),
-                  const SizedBox(height: 8),
-                  Semantics(
-                    label: '${l10n.priority}: ${task.priority.name}',
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: _getPriorityColor(context, task.priority).withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(6),
-                        border: Border.all(
-                          color: _getPriorityColor(context, task.priority).withValues(alpha: 0.3),
-                          width: 1,
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            width: 6,
-                            height: 6,
-                            decoration: BoxDecoration(
-                              color: _getPriorityColor(context, task.priority),
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: _getPriorityColor(context, task.priority).withValues(alpha: 0.6),
-                                  blurRadius: 4,
-                                  spreadRadius: 1,
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            task.priority.name.toUpperCase(),
-                            style: GoogleFonts.outfit(
-                              fontSize: 9,
-                              fontWeight: FontWeight.bold,
-                              color: _getPriorityColor(context, task.priority),
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
+            ),
     );
   }
 
@@ -508,7 +572,9 @@ class TaskTile extends StatelessWidget {
                   ),
                   subtitle: Text(
                     DateFormat.yMMMd().format(
-                      (task.dueDate ?? DateTime.now()).add(const Duration(days: 1)),
+                      (task.dueDate ?? DateTime.now()).add(
+                        const Duration(days: 1),
+                      ),
                     ),
                     style: GoogleFonts.outfit(fontSize: 12),
                   ),
@@ -542,7 +608,9 @@ class TaskTile extends StatelessWidget {
                   ),
                   subtitle: Text(
                     DateFormat.yMMMd().format(
-                      (task.dueDate ?? DateTime.now()).add(const Duration(days: 7)),
+                      (task.dueDate ?? DateTime.now()).add(
+                        const Duration(days: 7),
+                      ),
                     ),
                     style: GoogleFonts.outfit(fontSize: 12),
                   ),
@@ -555,7 +623,8 @@ class TaskTile extends StatelessWidget {
                   },
                 ),
               ),
-              if (task.dueDate != null && task.dueDate!.isBefore(DateTime.now()))
+              if (task.dueDate != null &&
+                  task.dueDate!.isBefore(DateTime.now()))
                 Material(
                   type: MaterialType.transparency,
                   child: ListTile(
@@ -581,7 +650,13 @@ class TaskTile extends StatelessWidget {
                     ),
                     onTap: () {
                       final now = DateTime.now();
-                      final newDate = DateTime(now.year, now.month, now.day, 18, 0);
+                      final newDate = DateTime(
+                        now.year,
+                        now.month,
+                        now.day,
+                        18,
+                        0,
+                      );
                       provider.updateTask(task, dueDate: newDate);
                       HapticFeedback.lightImpact();
                       Navigator.pop(ctx);
@@ -776,36 +851,52 @@ class _MaskedPrivateTaskTile extends StatelessWidget {
                     const SizedBox(height: 10),
                     Row(
                       children: [
-                        ...categories.map((c) => Container(
-                          margin: const EdgeInsets.only(right: 8),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Color(c.colorValue).withValues(alpha: 0.10),
+                        ...categories.map(
+                          (c) => InkWell(
+                            onTap: isSelectionMode
+                                ? null
+                                : () {
+                                    HapticFeedback.lightImpact();
+                                    Provider.of<TaskProvider>(
+                                      context,
+                                      listen: false,
+                                    ).selectSingleCategoryFilter(c.id);
+                                  },
                             borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                IconUtils.getIconData(c.iconCode),
-                                size: 12,
-                                color: Color(c.colorValue),
+                            child: Container(
+                              margin: const EdgeInsets.only(right: 8),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
                               ),
-                              const SizedBox(width: 4),
-                              Text(
-                                c.name,
-                                style: GoogleFonts.outfit(
-                                  color: Color(c.colorValue),
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                              decoration: BoxDecoration(
+                                color: Color(
+                                  c.colorValue,
+                                ).withValues(alpha: 0.10),
+                                borderRadius: BorderRadius.circular(8),
                               ),
-                            ],
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    IconUtils.getIconData(c.iconCode),
+                                    size: 12,
+                                    color: Color(c.colorValue),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    c.name,
+                                    style: GoogleFonts.outfit(
+                                      color: Color(c.colorValue),
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
-                        )),
+                        ),
                         if (dueDate != null)
                           Container(
                             padding: const EdgeInsets.symmetric(
@@ -813,7 +904,9 @@ class _MaskedPrivateTaskTile extends StatelessWidget {
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: theme.colorScheme.primary.withValues(alpha: 0.10),
+                              color: theme.colorScheme.primary.withValues(
+                                alpha: 0.10,
+                              ),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Row(
@@ -882,9 +975,7 @@ class _GTasksBadge extends StatelessWidget {
         height: 20,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: isDark
-              ? Colors.white.withValues(alpha: 0.10)
-              : Colors.white,
+          color: isDark ? Colors.white.withValues(alpha: 0.10) : Colors.white,
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.08),

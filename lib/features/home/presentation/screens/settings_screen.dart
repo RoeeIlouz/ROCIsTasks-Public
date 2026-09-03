@@ -79,11 +79,12 @@ class SettingsScreen extends StatelessWidget {
                     : null,
                 child: user.photoURL == null
                     ? Text(
-                        (user.displayName != null && user.displayName!.isNotEmpty)
+                        (user.displayName != null &&
+                                user.displayName!.isNotEmpty)
                             ? user.displayName![0].toUpperCase()
                             : (user.email != null && user.email!.isNotEmpty
-                                ? user.email![0].toUpperCase()
-                                : 'U'),
+                                  ? user.email![0].toUpperCase()
+                                  : 'U'),
                       )
                     : null,
               ),
@@ -92,7 +93,49 @@ class SettingsScreen extends StatelessWidget {
                     ? user.displayName!
                     : 'User',
               ),
-              subtitle: Text(user.email ?? ''),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (user.email != null && user.email!.isNotEmpty)
+                    Text(user.email!),
+                  const SizedBox(height: 4),
+                  InkWell(
+                    borderRadius: BorderRadius.circular(6),
+                    onTap: () {
+                      Clipboard.setData(ClipboardData(text: user.uid));
+                      HapticFeedback.lightImpact();
+                      showSuccessSnackBar(context, l10n.copiedToClipboard);
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 2),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Flexible(
+                            child: Text(
+                              'UID: ${user.uid}',
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant
+                                    .withValues(alpha: 0.8),
+                                fontSize: 11,
+                                fontFamily: 'monospace',
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          Icon(
+                            Icons.copy_rounded,
+                            size: 13,
+                            color: theme.colorScheme.primary,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
             ListTile(
               leading: _buildLeadingIcon(
@@ -104,24 +147,59 @@ class SettingsScreen extends StatelessWidget {
               subtitle: Text(l10n.cloudSyncActive),
             ),
           ] else ...[
-            ListTile(
-              leading: _buildLeadingIcon(
-                context,
-                Icons.person_outline_rounded,
-                Colors.orangeAccent,
-              ),
-              title: Text(l10n.guestAccount),
-              subtitle: Text(l10n.guestModeSubtitle),
-              trailing: FilledButton.tonal(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const LoginScreen(),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildLeadingIcon(
+                        context,
+                        Icons.person_outline_rounded,
+                        Colors.orangeAccent,
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              l10n.guestAccount,
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              l10n.guestModeSubtitle,
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton.tonalIcon(
+                      icon: const Icon(Icons.login_rounded, size: 18),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const LoginScreen(),
+                          ),
+                        );
+                      },
+                      label: Text(l10n.signInOrRegister),
                     ),
-                  );
-                },
-                child: Text(l10n.signInOrRegister),
+                  ),
+                ],
               ),
             ),
           ],
@@ -531,10 +609,11 @@ class SettingsScreen extends StatelessWidget {
                             flag: '🇺🇸',
                             name: l10n.english,
                             isSelected: isEnSelected,
-                            onTap: () {
-                              themeService.setLocale(const Locale('en'));
+                            onTap: () async {
+                              await themeService.setLocale(const Locale('en'));
                               analyticsService.logLanguageChanged(locale: 'en');
-                              Navigator.pop(context);
+                              taskProvider.updateAllWidgets();
+                              if (context.mounted) Navigator.pop(context);
                             },
                           ),
                           const SizedBox(height: 8),
@@ -542,10 +621,11 @@ class SettingsScreen extends StatelessWidget {
                             flag: '🇮🇳',
                             name: l10n.hindi,
                             isSelected: isHiSelected,
-                            onTap: () {
-                              themeService.setLocale(const Locale('hi'));
+                            onTap: () async {
+                              await themeService.setLocale(const Locale('hi'));
                               analyticsService.logLanguageChanged(locale: 'hi');
-                              Navigator.pop(context);
+                              taskProvider.updateAllWidgets();
+                              if (context.mounted) Navigator.pop(context);
                             },
                           ),
                           const SizedBox(height: 8),
@@ -553,10 +633,11 @@ class SettingsScreen extends StatelessWidget {
                             flag: '🇮🇱',
                             name: l10n.hebrew,
                             isSelected: isHeSelected,
-                            onTap: () {
-                              themeService.setLocale(const Locale('he'));
+                            onTap: () async {
+                              await themeService.setLocale(const Locale('he'));
                               analyticsService.logLanguageChanged(locale: 'he');
-                              Navigator.pop(context);
+                              taskProvider.updateAllWidgets();
+                              if (context.mounted) Navigator.pop(context);
                             },
                           ),
                           const SizedBox(height: 8),
@@ -564,10 +645,11 @@ class SettingsScreen extends StatelessWidget {
                             flag: '🇪🇸',
                             name: l10n.spanish,
                             isSelected: isEsSelected,
-                            onTap: () {
-                              themeService.setLocale(const Locale('es'));
+                            onTap: () async {
+                              await themeService.setLocale(const Locale('es'));
                               analyticsService.logLanguageChanged(locale: 'es');
-                              Navigator.pop(context);
+                              taskProvider.updateAllWidgets();
+                              if (context.mounted) Navigator.pop(context);
                             },
                           ),
                           const SizedBox(height: 8),
@@ -575,10 +657,11 @@ class SettingsScreen extends StatelessWidget {
                             flag: '🇸🇦',
                             name: l10n.arabic,
                             isSelected: isArSelected,
-                            onTap: () {
-                              themeService.setLocale(const Locale('ar'));
+                            onTap: () async {
+                              await themeService.setLocale(const Locale('ar'));
                               analyticsService.logLanguageChanged(locale: 'ar');
-                              Navigator.pop(context);
+                              taskProvider.updateAllWidgets();
+                              if (context.mounted) Navigator.pop(context);
                             },
                           ),
                           const SizedBox(height: 8),
@@ -586,10 +669,11 @@ class SettingsScreen extends StatelessWidget {
                             flag: '🇸🇪',
                             name: l10n.swedish,
                             isSelected: isSvSelected,
-                            onTap: () {
-                              themeService.setLocale(const Locale('sv'));
+                            onTap: () async {
+                              await themeService.setLocale(const Locale('sv'));
                               analyticsService.logLanguageChanged(locale: 'sv');
-                              Navigator.pop(context);
+                              taskProvider.updateAllWidgets();
+                              if (context.mounted) Navigator.pop(context);
                             },
                           ),
                           const SizedBox(height: 8),
@@ -597,10 +681,11 @@ class SettingsScreen extends StatelessWidget {
                             flag: '🇩🇪',
                             name: l10n.german,
                             isSelected: isDeSelected,
-                            onTap: () {
-                              themeService.setLocale(const Locale('de'));
+                            onTap: () async {
+                              await themeService.setLocale(const Locale('de'));
                               analyticsService.logLanguageChanged(locale: 'de');
-                              Navigator.pop(context);
+                              taskProvider.updateAllWidgets();
+                              if (context.mounted) Navigator.pop(context);
                             },
                           ),
                           const SizedBox(height: 8),
@@ -608,10 +693,11 @@ class SettingsScreen extends StatelessWidget {
                             flag: '🇫🇷',
                             name: l10n.french,
                             isSelected: isFrSelected,
-                            onTap: () {
-                              themeService.setLocale(const Locale('fr'));
+                            onTap: () async {
+                              await themeService.setLocale(const Locale('fr'));
                               analyticsService.logLanguageChanged(locale: 'fr');
-                              Navigator.pop(context);
+                              taskProvider.updateAllWidgets();
+                              if (context.mounted) Navigator.pop(context);
                             },
                           ),
                         ],

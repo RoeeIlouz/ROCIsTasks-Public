@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -35,7 +36,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
     super.initState();
     final provider = Provider.of<CalendarProvider>(context, listen: false);
     final selected = provider.selectedDate;
-    if (selected.isBefore(DateTime(2020, 1, 1)) || selected.isAfter(DateTime(2035, 12, 31))) {
+    if (selected.isBefore(DateTime(2020, 1, 1)) ||
+        selected.isAfter(DateTime(2035, 12, 31))) {
       _focusedDay = DateTime.now();
     } else {
       _focusedDay = selected;
@@ -218,7 +220,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
             child: Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.only(left: 12.0, right: 4.0, bottom: 8.0, top: 4.0),
+                  padding: const EdgeInsets.only(
+                    left: 12.0,
+                    right: 4.0,
+                    bottom: 8.0,
+                    top: 4.0,
+                  ),
                   child: Row(
                     children: [
                       Text(
@@ -235,7 +242,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         visualDensity: VisualDensity.compact,
                         onPressed: () {
                           setState(() {
-                            _focusedDay = DateTime(_focusedDay.year, _focusedDay.month - 1);
+                            _focusedDay = DateTime(
+                              _focusedDay.year,
+                              _focusedDay.month - 1,
+                            );
                           });
                         },
                       ),
@@ -244,7 +254,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         visualDensity: VisualDensity.compact,
                         onPressed: () {
                           setState(() {
-                            _focusedDay = DateTime(_focusedDay.year, _focusedDay.month + 1);
+                            _focusedDay = DateTime(
+                              _focusedDay.year,
+                              _focusedDay.month + 1,
+                            );
                           });
                         },
                       ),
@@ -291,7 +304,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     return isSameDay(selectedDay, day);
                   },
                   onDaySelected: (selectedDay, focusedDay) {
-                    if (!isSameDay(calendarProvider.selectedDate, selectedDay)) {
+                    if (!isSameDay(
+                      calendarProvider.selectedDate,
+                      selectedDay,
+                    )) {
                       calendarProvider.setSelectedDate(selectedDay);
                       setState(() {
                         _focusedDay = focusedDay;
@@ -347,7 +363,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       if (events.length == 1) {
                         final event = events.first;
                         String title = '';
-                        final c = _getEventColor(event, taskProvider, calendarProvider, colorService);
+                        final c = _getEventColor(
+                          event,
+                          taskProvider,
+                          calendarProvider,
+                          colorService,
+                        );
                         if (event is Task) {
                           title = event.title;
                         } else if (event is Event) {
@@ -390,7 +411,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       final dotWidgets = <Widget>[];
                       final visibleEvents = events.take(3).toList();
                       for (final event in visibleEvents) {
-                        final c = _getEventColor(event, taskProvider, calendarProvider, colorService);
+                        final c = _getEventColor(
+                          event,
+                          taskProvider,
+                          calendarProvider,
+                          colorService,
+                        );
                         dotWidgets.add(
                           Container(
                             width: 6,
@@ -419,7 +445,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
                               '+${events.length - 3}',
                               style: TextStyle(
                                 fontSize: 8,
-                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurface.withValues(alpha: 0.7),
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -456,80 +484,109 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   child: TaskListSkeleton(),
                 )
               : selectedItems.isEmpty
-                  ? SingleChildScrollView(
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 16.0, bottom: 16.0),
-                        child: GlassContainer(
-                          margin: const EdgeInsets.symmetric(horizontal: 16),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 24,
-                            vertical: 24,
+              ? SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 16.0, bottom: 16.0),
+                    child: GlassContainer(
+                      margin: const EdgeInsets.symmetric(horizontal: 16),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 24,
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(14),
+                            decoration: BoxDecoration(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.primary.withValues(alpha: 0.12),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.event_available_rounded,
+                              size: 44,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
                           ),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(14),
-                                decoration: BoxDecoration(
-                                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
-                                  shape: BoxShape.circle,
+                          const SizedBox(height: 14),
+                          Text(
+                            l10n.noEventsForThisDay,
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.outfit(
+                              fontSize: 17,
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            'Your schedule is clear for this date.',
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(
+                                  color: Theme.of(context).colorScheme.onSurface
+                                      .withValues(alpha: 0.65),
                                 ),
-                                child: Icon(
-                                  Icons.event_available_rounded,
-                                  size: 44,
-                                  color: Theme.of(context).colorScheme.primary,
+                          ),
+                          const SizedBox(height: 16),
+                          OutlinedButton.icon(
+                            onPressed: () {
+                              HapticFeedback.lightImpact();
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => AddTaskScreen(
+                                    initialDueDate:
+                                        calendarProvider.selectedDate,
+                                  ),
+                                  fullscreenDialog: true,
                                 ),
+                              );
+                            },
+                            style: OutlinedButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
                               ),
-                              const SizedBox(height: 14),
-                              Text(
-                                l10n.noEventsForThisDay,
-                                textAlign: TextAlign.center,
-                                style: GoogleFonts.outfit(
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.bold,
-                                  color: Theme.of(context).colorScheme.onSurface,
-                                ),
+                              side: BorderSide(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.primary.withValues(alpha: 0.4),
                               ),
-                              const SizedBox(height: 6),
-                              Text(
-                                'Your schedule is clear for this date.',
-                                textAlign: TextAlign.center,
-                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.65),
-                                ),
-                              ),
-                              const SizedBox(height: 16),
-                              OutlinedButton.icon(
-                                onPressed: () {
-                                  HapticFeedback.lightImpact();
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => AddTaskScreen(
-                                        initialDueDate: calendarProvider.selectedDate,
+                            ),
+                            icon: const Icon(Icons.add_rounded, size: 18),
+                            label: Text(l10n.newTask),
+                          ),
+                          if (!kIsWeb &&
+                              calendarProvider.availableCalendars.isEmpty) ...[
+                            const SizedBox(height: 8),
+                            TextButton.icon(
+                              onPressed: () async {
+                                HapticFeedback.lightImpact();
+                                final granted = await calendarProvider
+                                    .requestPermissionsAndReload();
+                                if (context.mounted && !granted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        'Calendar permission is required to display events.',
                                       ),
-                                      fullscreenDialog: true,
                                     ),
                                   );
-                                },
-                                style: OutlinedButton.styleFrom(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(14),
-                                  ),
-                                  side: BorderSide(
-                                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.4),
-                                  ),
-                                ),
-                                icon: const Icon(Icons.add_rounded, size: 18),
-                                label: Text(l10n.newTask),
-                              ),
-                            ],
-                          ),
-                        ),
+                                }
+                              },
+                              icon: const Icon(Icons.sync_rounded, size: 16),
+                              label: const Text('Sync Device Calendar'),
+                            ),
+                          ],
+                        ],
                       ),
-                    )
+                    ),
+                  ),
+                )
               : ListView.builder(
                   itemCount: selectedItems.length,
                   padding: const EdgeInsets.only(bottom: 100),

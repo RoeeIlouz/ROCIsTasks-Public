@@ -2,7 +2,7 @@ import 'package:intl/intl.dart';
 import 'package:rocis_tasks/features/categories/domain/models/category.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 
-enum TaskSortOption { dueDate, priority, title, dateCreated }
+enum TaskSortOption { dueDate, priority, title, dateCreated, dueDateTime }
 
 enum DateTimeFilterOption { all, today, thisWeek, overdue, noDate }
 
@@ -103,14 +103,16 @@ class TaskFilterService {
           bool matched = false;
           if (t.categoryId != null) {
             final cat = getCategoryById(t.categoryId);
-            if (cat != null && cat.name.toLowerCase().contains(categoryFilter)) {
+            if (cat != null &&
+                cat.name.toLowerCase().contains(categoryFilter)) {
               matched = true;
             }
           }
           if (!matched && t.categoryIds.isNotEmpty) {
             for (final id in t.categoryIds) {
               final cat = getCategoryById(id);
-              if (cat != null && cat.name.toLowerCase().contains(categoryFilter)) {
+              if (cat != null &&
+                  cat.name.toLowerCase().contains(categoryFilter)) {
                 matched = true;
                 break;
               }
@@ -137,9 +139,11 @@ class TaskFilterService {
 
         if (subtaskFilter != null && subtaskFilter.isNotEmpty) {
           final filter = subtaskFilter;
-          final hasMatchingSubtask = t.subTasks?.any(
-            (st) => st.title.toLowerCase().contains(filter),
-          ) ?? false;
+          final hasMatchingSubtask =
+              t.subTasks?.any(
+                (st) => st.title.toLowerCase().contains(filter),
+              ) ??
+              false;
           if (!hasMatchingSubtask) return false;
         }
 
@@ -168,9 +172,11 @@ class TaskFilterService {
 
     if (selectedCategoryIds.isNotEmpty) {
       tasks = tasks
-          .where((t) =>
-              selectedCategoryIds.contains(t.categoryId) ||
-              t.categoryIds.any((id) => selectedCategoryIds.contains(id)))
+          .where(
+            (t) =>
+                selectedCategoryIds.contains(t.categoryId) ||
+                t.categoryIds.any((id) => selectedCategoryIds.contains(id)),
+          )
           .toList();
     }
 
@@ -191,14 +197,18 @@ class TaskFilterService {
           if (shouldMaskPrivateContent && isPrivateTask(t)) return true;
           if (t.dueDate == null) return false;
           final d = t.dueDate!;
-          return d.year == today.year && d.month == today.month && d.day == today.day;
+          return d.year == today.year &&
+              d.month == today.month &&
+              d.day == today.day;
         }).toList();
         break;
       case DateTimeFilterOption.thisWeek:
         tasks = tasks.where((t) {
           if (shouldMaskPrivateContent && isPrivateTask(t)) return true;
           if (t.dueDate == null) return false;
-          return t.dueDate!.isAfter(today.subtract(const Duration(seconds: 1))) &&
+          return t.dueDate!.isAfter(
+                today.subtract(const Duration(seconds: 1)),
+              ) &&
               t.dueDate!.isBefore(weekEnd);
         }).toList();
         break;
@@ -237,7 +247,30 @@ class TaskFilterService {
           if (a.dueDate == null && b.dueDate == null) return 0;
           if (a.dueDate == null) return 1;
           if (b.dueDate == null) return -1;
+          final aDate = DateTime(
+            a.dueDate!.year,
+            a.dueDate!.month,
+            a.dueDate!.day,
+          );
+          final bDate = DateTime(
+            b.dueDate!.year,
+            b.dueDate!.month,
+            b.dueDate!.day,
+          );
+          final dayCmp = aDate.compareTo(bDate);
+          if (dayCmp != 0) return dayCmp;
+          final prioCmp = b.priority.index.compareTo(a.priority.index);
+          if (prioCmp != 0) return prioCmp;
           return a.dueDate!.compareTo(b.dueDate!);
+        case TaskSortOption.dueDateTime:
+          if (a.dueDate == null && b.dueDate == null) return 0;
+          if (a.dueDate == null) return 1;
+          if (b.dueDate == null) return -1;
+          final dateCmp = a.dueDate!.compareTo(b.dueDate!);
+          if (dateCmp != 0) return dateCmp;
+          final prioCmp = b.priority.index.compareTo(a.priority.index);
+          if (prioCmp != 0) return prioCmp;
+          return a.createdAt.compareTo(b.createdAt);
         case TaskSortOption.priority:
           return b.priority.index.compareTo(a.priority.index);
         case TaskSortOption.title:

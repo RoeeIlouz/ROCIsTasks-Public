@@ -50,12 +50,24 @@ class TimezoneService extends ChangeNotifier {
         }
       }
 
-      // Auto mode
+      // Auto mode: If tz.local was already resolved by AppInitializer, reuse it immediately
       _isAuto = true;
       _selectedTimezone = null;
-      await _detectAndApplyDeviceTimezone();
+      if (tz.timeZoneDatabase.locations.containsKey(tz.local.name) &&
+          tz.local.name != 'UTC') {
+        _currentTimezone = tz.local.name;
+        AppLogger.info(
+          'Reusing initialized device timezone: $_currentTimezone',
+          tag: 'Timezone',
+        );
+      } else {
+        await _detectAndApplyDeviceTimezone();
+      }
     } catch (e) {
-      AppLogger.warning('Failed to initialize TimezoneService: $e', tag: 'Timezone');
+      AppLogger.warning(
+        'Failed to initialize TimezoneService: $e',
+        tag: 'Timezone',
+      );
     }
   }
 
@@ -67,7 +79,10 @@ class TimezoneService extends ChangeNotifier {
       );
       detectedTz = tzInfo.identifier;
     } catch (e) {
-      AppLogger.warning('Could not get local device timezone: $e', tag: 'Timezone');
+      AppLogger.warning(
+        'Could not get local device timezone: $e',
+        tag: 'Timezone',
+      );
     }
 
     if (tz.timeZoneDatabase.locations.containsKey(detectedTz)) {
@@ -77,7 +92,10 @@ class TimezoneService extends ChangeNotifier {
       _currentTimezone = 'UTC';
       tz.setLocalLocation(tz.getLocation('UTC'));
     }
-    AppLogger.info('Applied device timezone: $_currentTimezone', tag: 'Timezone');
+    AppLogger.info(
+      'Applied device timezone: $_currentTimezone',
+      tag: 'Timezone',
+    );
   }
 
   Future<void> setTimezone(String? timezone) async {

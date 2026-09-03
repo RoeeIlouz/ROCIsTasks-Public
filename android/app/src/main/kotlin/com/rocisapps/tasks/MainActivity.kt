@@ -1,5 +1,6 @@
 package com.rocisapps.tasks
 
+import android.os.Build
 import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
@@ -7,6 +8,7 @@ import io.flutter.plugin.common.MethodChannel
 class MainActivity : FlutterFragmentActivity() {
     private val CHANNEL = "com.rocisapps.tasks/notifications"
     private val WIDGET_CHANNEL = "com.rocisapps.tasks/widget"
+    private val APP_INFO_CHANNEL = "com.rocisapps.tasks/app_info"
     private lateinit var notificationHelper: NotificationHelper
     private var widgetChannel: MethodChannel? = null
 
@@ -26,6 +28,25 @@ class MainActivity : FlutterFragmentActivity() {
                 val isDarkText = call.argument<Boolean>("isDarkText") ?: false
                 notificationHelper.showTaskCountNotification(count, titles, largeIconPath, isDarkText)
                 result.success(null)
+            } else {
+                result.notImplemented()
+            }
+        }
+
+        val appInfoChannel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, APP_INFO_CHANNEL)
+        appInfoChannel.setMethodCallHandler { call, result ->
+            if (call.method == "getInstallerPackageName") {
+                try {
+                    val installer = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                        packageManager.getInstallSourceInfo(packageName).installingPackageName
+                    } else {
+                        @Suppress("DEPRECATION")
+                        packageManager.getInstallerPackageName(packageName)
+                    }
+                    result.success(installer)
+                } catch (e: Exception) {
+                    result.success(null)
+                }
             } else {
                 result.notImplemented()
             }
