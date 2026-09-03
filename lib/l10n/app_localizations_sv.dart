@@ -78,6 +78,15 @@ class AppLocalizationsSv extends AppLocalizations {
   String get createdDate => 'Skapat datum';
 
   @override
+  String get dueDateTime => 'Datum & tid';
+
+  @override
+  String get moreOptions => 'Fler alternativ';
+
+  @override
+  String get fewerOptions => 'Färre alternativ';
+
+  @override
   String get filterByCategory => 'Filtrera efter kategori';
 
   @override

@@ -54,8 +54,10 @@ class QuickActionWidgetProvider : HomeWidgetProvider() {
 
                 views.setTextColor(R.id.widget_quick_stat_number, textColor)
                 views.setTextColor(R.id.widget_quick_stat_label, secondaryColor)
-                views.setTextColor(R.id.widget_quick_btn_add_task, highlightColor)
-                views.setTextColor(R.id.widget_quick_btn_calendar, highlightColor)
+                views.setTextColor(R.id.widget_quick_btn_add_icon, highlightColor)
+                views.setTextColor(R.id.widget_quick_btn_add_text, textColor)
+                views.setTextColor(R.id.widget_quick_btn_cal_text, textColor)
+                views.setInt(R.id.widget_quick_calendar_icon, "setColorFilter", highlightColor)
 
                 // Load Circular Chart if available, otherwise show number fallback
                 val chartPath = widgetData.getString("chart_image_path", null)

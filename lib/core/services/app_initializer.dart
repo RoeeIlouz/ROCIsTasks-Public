@@ -40,6 +40,11 @@ class AppInitializer {
       // 1. Core Binding (Required first)
       WidgetsFlutterBinding.ensureInitialized();
 
+      // Detect distribution channel early for UI & payment routing (bypassed in background isolates)
+      if (!isBackground) {
+        await AppConfig.initDistributionChannel();
+      }
+
       // Enforce local asset-based font loading for 100% offline instant rendering
       GoogleFonts.config.allowRuntimeFetching = false;
 

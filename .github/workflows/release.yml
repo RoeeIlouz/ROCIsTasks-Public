@@ -1,0 +1,105 @@
+name: ROCIs Tasks Release (Dual Channel)
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Release tag (e.g. v0.2.13)'
+        required: true
+        default: 'v0.2.13'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build & Release Dual Artifacts
+    runs-on: ubuntu-latest
+    env:
+      REVENUECAT_API_KEY_ANDROID: ${{ secrets.REVENUECAT_API_KEY_ANDROID }}
+
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Set up Java
+        uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@f2c4f6686ca8e8d6e6d0f28410eeef506ed66aff # v2.18.0
+        with:
+          flutter-version: '3.44.2'
+          channel: 'stable'
+          cache: true
+
+      - name: Cache Gradle
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # v4.2.2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/gradle-wrapper.properties', '**/*.gradle*', '**/gradle.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Setup configuration templates & secrets
+        env:
+          GOOGLE_SERVICES_JSON_BASE64: ${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}
+          ENV_FILE_BASE64: ${{ secrets.ENV_FILE_BASE64 }}
+          FIREBASE_OPTIONS_BASE64: ${{ secrets.FIREBASE_OPTIONS_BASE64 }}
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEY_PROPERTIES_BASE64: ${{ secrets.KEY_PROPERTIES_BASE64 }}
+          REVENUECAT_API_KEY_ANDROID: ${{ secrets.REVENUECAT_API_KEY_ANDROID }}
+        run: python scripts/setup_ci_configs.py
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Run code generation
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Analyze project
+        run: flutter analyze
+
+      - name: Run tests
+        run: flutter test
+
+      - name: Build Standalone APK (Unified Runtime Detection)
+        shell: bash
+        run: |
+          set -euo pipefail
+          ( while true; do echo "Building APK..."; sleep 120; done ) &
+          KEEPALIVE_PID=$!
+          trap 'kill $KEEPALIVE_PID' EXIT
+          flutter build apk --release
+
+      - name: Build Google Play App Bundle (Unified Runtime Detection)
+        shell: bash
+        run: |
+          set -euo pipefail
+          ( while true; do echo "Building AAB..."; sleep 120; done ) &
+          KEEPALIVE_PID=$!
+          trap 'kill $KEEPALIVE_PID' EXIT
+          flutter build appbundle --release
+
+      - name: Upload Google Play AAB Artifact
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
+        with:
+          name: rocis-tasks-google-play-bundle
+          path: build/app/outputs/bundle/release/app-release.aab
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@c062e08bd532815e2082a85e87e3ef29c3e6d191 # v2.0.8
+        with:
+          tag_name: ${{ github.event.inputs.release_tag || github.ref_name }}
+          files: |
+            build/app/outputs/flutter-apk/app-release.apk
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+

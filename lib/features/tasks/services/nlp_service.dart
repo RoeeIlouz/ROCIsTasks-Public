@@ -226,19 +226,31 @@ class NlpService {
           : 0;
       String? amPm = timeMatch.group(3)?.toLowerCase();
 
-      if (amPm == 'pm' && hour < 12) hour += 12;
-      if (amPm == 'am' && hour == 12) hour = 0;
+      bool isValidTime = false;
+      if (amPm != null) {
+        if (hour >= 1 && hour <= 12 && minute >= 0 && minute <= 59) {
+          if (amPm == 'pm' && hour < 12) hour += 12;
+          if (amPm == 'am' && hour == 12) hour = 0;
+          isValidTime = true;
+        }
+      } else {
+        if (hour >= 0 && hour <= 23 && minute >= 0 && minute <= 59) {
+          isValidTime = true;
+        }
+      }
 
-      final baseDate = dueDate ?? DateTime(now.year, now.month, now.day);
-      dueDate = DateTime(
-        baseDate.year,
-        baseDate.month,
-        baseDate.day,
-        hour,
-        minute,
-      );
-      hasTime = true;
-      cleanTitle = _removeMatch(cleanTitle, timeRegex);
+      if (isValidTime) {
+        final baseDate = dueDate ?? DateTime(now.year, now.month, now.day);
+        dueDate = DateTime(
+          baseDate.year,
+          baseDate.month,
+          baseDate.day,
+          hour,
+          minute,
+        );
+        hasTime = true;
+        cleanTitle = _removeMatch(cleanTitle, timeRegex);
+      }
     }
 
     // 7. Clean up prepositions left at edges and multiple spaces

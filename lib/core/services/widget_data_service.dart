@@ -55,6 +55,119 @@ class WidgetDataService {
     _scheduleService.setUserEmail(email);
   }
 
+  /// Helper to get active app language
+  Future<String> _getAppLanguage() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      return prefs.getString('language_code') ?? 'en';
+    } catch (_) {
+      return 'en';
+    }
+  }
+
+  Future<String> _getAllDayLabel() async {
+    final lang = await _getAppLanguage();
+    switch (lang.toLowerCase()) {
+      case 'he':
+        return 'כל היום';
+      case 'es':
+        return 'Todo el día';
+      case 'de':
+        return 'Ganztägig';
+      case 'fr':
+        return 'Toute la journée';
+      case 'ar':
+        return 'طوال اليوم';
+      case 'sv':
+        return 'Hela dagen';
+      case 'hi':
+        return 'पूरा दिन';
+      default:
+        return 'All Day';
+    }
+  }
+
+  Future<String> _getTodayLabel() async {
+    final lang = await _getAppLanguage();
+    switch (lang.toLowerCase()) {
+      case 'he':
+        return 'היום';
+      case 'es':
+        return 'HOY';
+      case 'de':
+        return 'HEUTE';
+      case 'fr':
+        return "AUJOURD'HUI";
+      case 'ar':
+        return 'اليوم';
+      case 'sv':
+        return 'IDAG';
+      case 'hi':
+        return 'आज';
+      default:
+        return 'TODAY';
+    }
+  }
+
+  Future<String> _getTomorrowLabel() async {
+    final lang = await _getAppLanguage();
+    switch (lang.toLowerCase()) {
+      case 'he':
+        return 'מחר';
+      case 'es':
+        return 'MAÑANA';
+      case 'de':
+        return 'MORGEN';
+      case 'fr':
+        return 'DEMAIN';
+      case 'ar':
+        return 'غداً';
+      case 'sv':
+        return 'IMORGON';
+      case 'hi':
+        return 'कल';
+      default:
+        return 'TOMORROW';
+    }
+  }
+
+  Future<String> _getNoTitleLabel() async {
+    final lang = await _getAppLanguage();
+    switch (lang.toLowerCase()) {
+      case 'he':
+        return 'ללא כותרת';
+      case 'es':
+        return 'Sin título';
+      case 'de':
+        return 'Kein Titel';
+      case 'fr':
+        return 'Sans titre';
+      case 'ar':
+        return 'بلا عنوان';
+      case 'sv':
+        return 'Ingen rubrik';
+      case 'hi':
+        return 'बिना शीर्षक';
+      default:
+        return 'No Title';
+    }
+  }
+
+  String _formatDatePattern(String pattern, DateTime date, [String? locale]) {
+    if (locale != null && locale.isNotEmpty) {
+      try {
+        return DateFormat(pattern, locale).format(date);
+      } catch (_) {
+        try {
+          return DateFormat(pattern).format(date);
+        } catch (_) {
+          return date.toIso8601String();
+        }
+      }
+    }
+    return DateFormat(pattern).format(date);
+  }
+
   /// Helper to filter tasks by the user's chosen widget category filter
   Future<List<Task>> _filterTasksByCategory(List<Task> tasks) async {
     try {
@@ -106,6 +219,8 @@ class WidgetDataService {
     final rangeStart = today.subtract(const Duration(days: 60));
     final rangeEnd = today.add(const Duration(days: 120));
     final agendaItems = <Map<String, dynamic>>[];
+    final allDayLabel = await _getAllDayLabel();
+    final noTitleLabel = await _getNoTitleLabel();
 
     // 1. Filter tasks by category setting & pending only
     final categoryTasks = await _filterTasksByCategory(allTasks);
@@ -133,7 +248,7 @@ class WidgetDataService {
         'date': taskDate.toIso8601String(),
         'dateDisplay': dateOnlyFormatted,
         'timeDisplay': isAllDay
-            ? 'All Day'
+            ? allDayLabel
             : DateFormat('HH:mm').format(taskDate),
         'isAllDay': isAllDay,
         'isCompleted': false,
@@ -156,7 +271,7 @@ class WidgetDataService {
         if (event.start != null) {
           final isAllDay = event.allDay ?? false;
           final timeDisplay = isAllDay
-              ? 'All Day'
+              ? allDayLabel
               : (event.end != null
                     ? '${DateFormat('HH:mm').format(event.start!)}-${DateFormat('HH:mm').format(event.end!)}'
                     : DateFormat('HH:mm').format(event.start!));
@@ -183,9 +298,9 @@ class WidgetDataService {
             agendaItems.add({
               'type': 'event',
               'id': event.eventId ?? '',
-              'title': event.title ?? 'No Title',
+              'title': event.title ?? noTitleLabel,
               'subtitle':
-                  event.location ?? (isAllDay ? 'All day' : timeDisplay),
+                  event.location ?? (isAllDay ? allDayLabel : timeDisplay),
               'date': day.toIso8601String(),
               'dateDisplay': dayFormatted,
               'timeDisplay': timeDisplay,
@@ -311,6 +426,7 @@ class WidgetDataService {
         }
       }
 
+      final appLang = await _getAppLanguage();
       await Future.wait([
         HomeWidget.saveWidgetData<String>(
           'month_agenda_grid_data',
@@ -318,7 +434,7 @@ class WidgetDataService {
         ),
         HomeWidget.saveWidgetData<String>(
           'month_agenda_month_title',
-          DateFormat('MMMM yyyy').format(targetMonth),
+          _formatDatePattern('MMMM yyyy', targetMonth, appLang),
         ),
       ]);
 
@@ -350,6 +466,11 @@ class WidgetDataService {
     final today = DateTime(now.year, now.month, now.day);
     final rangeStart = today.subtract(const Duration(days: 1));
     final rangeEnd = today.add(const Duration(days: 30));
+    final allDayLabel = await _getAllDayLabel();
+    final todayLabel = await _getTodayLabel();
+    final tomorrowLabel = await _getTomorrowLabel();
+    final noTitleLabel = await _getNoTitleLabel();
+    final appLang = await _getAppLanguage();
 
     final rawItems = <Map<String, dynamic>>[];
 
@@ -373,7 +494,7 @@ class WidgetDataService {
           'dateOnly': DateFormat('yyyy-MM-dd').format(taskDate),
           'timeDisplay': t.dueDate != null
               ? DateFormat('HH:mm').format(t.dueDate!)
-              : 'All Day',
+              : allDayLabel,
           'isCompleted': false,
           'priority': t.priority.name,
         });
@@ -395,7 +516,7 @@ class WidgetDataService {
         if (event.start != null) {
           final isAllDay = event.allDay ?? false;
           final timeDisplay = isAllDay
-              ? 'All Day'
+              ? allDayLabel
               : (event.end != null
                     ? '${DateFormat('HH:mm').format(event.start!)}-${DateFormat('HH:mm').format(event.end!)}'
                     : DateFormat('HH:mm').format(event.start!));
@@ -421,9 +542,9 @@ class WidgetDataService {
             rawItems.add({
               'type': 'event',
               'id': event.eventId ?? '',
-              'title': event.title ?? 'No Title',
+              'title': event.title ?? noTitleLabel,
               'subtitle':
-                  event.location ?? (isAllDay ? 'All day' : timeDisplay),
+                  event.location ?? (isAllDay ? allDayLabel : timeDisplay),
               'date': day.toIso8601String(),
               'dateOnly': DateFormat('yyyy-MM-dd').format(day),
               'timeDisplay': timeDisplay,
@@ -460,11 +581,15 @@ class WidgetDataService {
             parsedDate.day == now.day + 1;
 
         final dayLabel = isToday
-            ? 'TODAY'
+            ? todayLabel
             : (isTomorrow
-                  ? 'TOMORROW'
-                  : DateFormat('EEEE').format(parsedDate).toUpperCase());
-        final dateDisplay = DateFormat('MMM d').format(parsedDate);
+                  ? tomorrowLabel
+                  : _formatDatePattern(
+                      'EEEE',
+                      parsedDate,
+                      appLang,
+                    ).toUpperCase());
+        final dateDisplay = _formatDatePattern('MMM d', parsedDate, appLang);
 
         timelineData.add({
           'isHeader': true,

@@ -201,6 +201,16 @@ void main() {
           expect(inDaysResult.dueDate!.day, in3Days.day);
         },
       );
+
+      test('should reject out-of-bounds time strings without day rollover', () {
+        final result = NlpService.parse('Meeting at 25:00');
+        expect(result.dueDate, isNull);
+        expect(result.hasTime, false);
+
+        final result2 = NlpService.parse('Party at 14:99');
+        expect(result2.dueDate, isNull);
+        expect(result2.hasTime, false);
+      });
     });
   });
 }

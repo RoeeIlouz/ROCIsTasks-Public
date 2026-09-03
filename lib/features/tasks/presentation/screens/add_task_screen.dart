@@ -64,6 +64,8 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   bool _isGroceryList = false;
   List<String> _attachmentPaths = [];
   List<TaskCustomField> _customFields = [];
+  bool _showMoreOptions = false;
+  bool _isSaving = false;
 
   @override
   void initState() {
@@ -100,6 +102,29 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     _customFields =
         widget.task?.customFields?.map((cf) => cf.copyWith()).toList() ?? [];
     _recurrenceRule = widget.task?.recurrenceRule;
+
+    _showMoreOptions =
+        _attachmentPaths.isNotEmpty ||
+        _customFields.isNotEmpty ||
+        (_recurrenceRule != null && _recurrenceRule!.trim().isNotEmpty) ||
+        _syncWithGoogleTasks ||
+        _skipReminders ||
+        _isGroceryList ||
+        _subTasks.isNotEmpty ||
+        _requireSubTasksBeforeReminders;
+  }
+
+  int _getActiveAdvancedOptionsCount() {
+    int count = 0;
+    if (_attachmentPaths.isNotEmpty) count++;
+    if (_customFields.isNotEmpty) count++;
+    if (_recurrenceRule != null && _recurrenceRule!.trim().isNotEmpty) count++;
+    if (_syncWithGoogleTasks) count++;
+    if (_skipReminders) count++;
+    if (_isGroceryList) count++;
+    if (_subTasks.isNotEmpty) count++;
+    if (_requireSubTasksBeforeReminders) count++;
+    return count;
   }
 
   @override
@@ -169,11 +194,14 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   }
 
   void _saveTask() {
+    if (_isSaving) return;
     if (_formKey.currentState!.validate()) {
+      setState(() => _isSaving = true);
       try {
         // Validate due date
         final dateError = ValidationService.validateDueDate(_selectedDate);
         if (dateError != null) {
+          setState(() => _isSaving = false);
           ErrorService.handleUserError(context, dateError);
           return;
         }
@@ -237,6 +265,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
         HapticFeedback.mediumImpact();
         Navigator.pop(context);
       } catch (e) {
+        setState(() => _isSaving = false);
         final l10n = AppLocalizations.of(context)!;
         ErrorService.handleUserError(context, l10n.failedToSaveTask, error: e);
       }
@@ -647,20 +676,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   });
                 },
               ),
-              const SizedBox(height: 24),
-              TaskAttachmentsSection(
-                attachmentPaths: _attachmentPaths,
-                onAddAttachment: _pickAttachments,
-                onRemoveAttachment: _removeAttachmentAt,
-              ),
-              const SizedBox(height: 24),
-              TaskCustomFieldsSection(
-                customFields: _customFields,
-                onAddField: _addCustomField,
-                onRemoveField: _removeCustomFieldAt,
-                onUpdateField: _updateCustomFieldAt,
-              ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
               Text(
                 l10n.dueDateAndTime,
                 style: GoogleFonts.outfit(
@@ -731,258 +747,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    l10n.recurrence,
-                    style: GoogleFonts.outfit(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                      color: theme.colorScheme.primary,
-                    ),
-                  ),
-                  if (!subscriptionService.isPremium)
-                    Container(
-                      margin: const EdgeInsets.only(left: 8),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.amber.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        'PRO',
-                        style: GoogleFonts.outfit(
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.amber[800],
-                        ),
-                      ),
-                    ),
-                  const Spacer(),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Semantics(
-                label: l10n.recurrence,
-                hint: 'Double tap to configure recurrence',
-                button: true,
-                child: InkWell(
-                  onTap: () async {
-                    if (!subscriptionService.isPremium) {
-                      subscriptionService.showPaywall();
-                      return;
-                    }
-                    HapticFeedback.lightImpact();
-                    final selectedRule = await RecurrencePickerSheet.show(
-                      context,
-                      currentRule: _recurrenceRule,
-                    );
-                    if (selectedRule != _recurrenceRule) {
-                      setState(() {
-                        _recurrenceRule = selectedRule;
-                        _recurrenceCleared = selectedRule == null;
-                      });
-                    }
-                  },
-                  borderRadius: BorderRadius.circular(16),
-                  child: GlassContainer(
-                    borderRadius: BorderRadius.circular(16),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 14,
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.repeat_rounded,
-                          size: 20,
-                          color: _recurrenceRule != null
-                              ? theme.colorScheme.primary
-                              : theme.disabledColor,
-                        ),
-                        const SizedBox(width: 12),
-                        Text(
-                          TaskRecurrenceService.getRecurrenceLabel(
-                            _recurrenceRule,
-                            l10n,
-                          ),
-                          style: GoogleFonts.outfit(
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const Spacer(),
-                        if (_recurrenceRule != null)
-                          Semantics(
-                            label: 'Clear recurrence',
-                            button: true,
-                            child: GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  _recurrenceRule = null;
-                                  _recurrenceCleared = true;
-                                });
-                              },
-                              child: Icon(
-                                Icons.cancel_rounded,
-                                size: 20,
-                                color: theme.disabledColor,
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 24),
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                secondary: Icon(
-                  _syncWithGoogleTasks
-                      ? Icons.playlist_add_check_rounded
-                      : Icons.playlist_add_rounded,
-                ),
-                title: Text(
-                  l10n.syncWithGoogleTasks,
-                  style: GoogleFonts.outfit(fontWeight: FontWeight.w600),
-                ),
-                subtitle: Text(
-                  l10n.syncWithGoogleTasksSubtitle,
-                  style: GoogleFonts.outfit(fontSize: 13),
-                ),
-                value: _syncWithGoogleTasks,
-                onChanged: (value) async {
-                  if (!value) {
-                    setState(() => _syncWithGoogleTasks = false);
-                    return;
-                  }
-
-                  final authService = Provider.of<AuthService>(
-                    context,
-                    listen: false,
-                  );
-
-                  final token = await authService.getGoogleAccessToken();
-                  if (!context.mounted) return;
-
-                  if (token == null) {
-                    final success = await authService.linkGoogleTasks();
-                    if (!context.mounted) return;
-                    if (!success) {
-                      setState(() => _syncWithGoogleTasks = false);
-                      return;
-                    }
-                  }
-
-                  setState(() => _syncWithGoogleTasks = true);
-                },
-              ),
-              const SizedBox(height: 24),
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                secondary: Icon(
-                  _skipReminders
-                      ? Icons.notifications_off_rounded
-                      : Icons.notifications_rounded,
-                ),
-                title: Text(
-                  l10n.doNotRemind,
-                  style: GoogleFonts.outfit(fontWeight: FontWeight.w600),
-                ),
-                subtitle: Text(
-                  l10n.doNotRemindSubtitle,
-                  style: GoogleFonts.outfit(fontSize: 13),
-                ),
-                value: _skipReminders,
-                onChanged: (value) {
-                  setState(() => _skipReminders = value);
-                },
-              ),
-              const SizedBox(height: 12),
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                secondary: Icon(
-                  Icons.checklist_rounded,
-                  color: _isGroceryList ? theme.colorScheme.primary : null,
-                ),
-                title: Text(
-                  l10n.groceryListMode,
-                  style: GoogleFonts.outfit(fontWeight: FontWeight.w600),
-                ),
-                subtitle: Text(
-                  l10n.groceryListModeSubtitle,
-                  style: GoogleFonts.outfit(fontSize: 13),
-                ),
-                value: _isGroceryList,
-                onChanged: (value) {
-                  setState(() => _isGroceryList = value);
-                },
-              ),
-              const SizedBox(height: 24),
-              Text(
-                l10n.category,
-                style: GoogleFonts.outfit(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                  color: theme.colorScheme.primary,
-                ),
-              ),
-              const SizedBox(height: 12),
-              Consumer<TaskProvider>(
-                builder: (context, provider, child) {
-                  final categories = provider.categories;
-                  if (categories.isEmpty) {
-                    return Text(
-                      l10n.noCategory,
-                      style: GoogleFonts.outfit(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    );
-                  }
-                  return Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: categories.map((category) {
-                      final isSelected = _selectedCategoryIds.contains(
-                        category.id,
-                      );
-                      return FilterChip(
-                        selected: isSelected,
-                        label: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Container(
-                              width: 12,
-                              height: 12,
-                              decoration: BoxDecoration(
-                                color: Color(category.colorValue),
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Text(category.name, style: GoogleFonts.outfit()),
-                          ],
-                        ),
-                        onSelected: (selected) {
-                          setState(() {
-                            if (selected) {
-                              _selectedCategoryIds.add(category.id);
-                            } else {
-                              _selectedCategoryIds.remove(category.id);
-                            }
-                          });
-                        },
-                      );
-                    }).toList(),
-                  );
-                },
-              ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
               Text(
                 l10n.priorityLabel,
                 style: GoogleFonts.outfit(
@@ -991,7 +756,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   color: theme.colorScheme.primary,
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 10),
               Row(
                 children: TaskPriority.values.map((priority) {
                   final isSelected = _priority == priority;
@@ -1066,14 +831,345 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   );
                 }).toList(),
               ),
-              const SizedBox(height: 24),
-              _buildSubTasksSection(context, l10n),
+              const SizedBox(height: 20),
+              Text(
+                l10n.category,
+                style: GoogleFonts.outfit(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                  color: theme.colorScheme.primary,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Consumer<TaskProvider>(
+                builder: (context, provider, child) {
+                  final categories = provider.categories;
+                  if (categories.isEmpty) {
+                    return Text(
+                      l10n.noCategory,
+                      style: GoogleFonts.outfit(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    );
+                  }
+                  return Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: categories.map((category) {
+                      final isSelected = _selectedCategoryIds.contains(
+                        category.id,
+                      );
+                      return FilterChip(
+                        selected: isSelected,
+                        label: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              width: 12,
+                              height: 12,
+                              decoration: BoxDecoration(
+                                color: Color(category.colorValue),
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(category.name, style: GoogleFonts.outfit()),
+                          ],
+                        ),
+                        onSelected: (selected) {
+                          setState(() {
+                            if (selected) {
+                              _selectedCategoryIds.add(category.id);
+                            } else {
+                              _selectedCategoryIds.remove(category.id);
+                            }
+                          });
+                        },
+                      );
+                    }).toList(),
+                  );
+                },
+              ),
+              const SizedBox(height: 20),
+
+              // Expandable More Options Section
+              InkWell(
+                onTap: () {
+                  HapticFeedback.lightImpact();
+                  setState(() => _showMoreOptions = !_showMoreOptions);
+                },
+                borderRadius: BorderRadius.circular(16),
+                child: GlassContainer(
+                  borderRadius: BorderRadius.circular(16),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 14,
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.tune_rounded,
+                        size: 20,
+                        color: theme.colorScheme.primary,
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        _showMoreOptions ? l10n.fewerOptions : l10n.moreOptions,
+                        style: GoogleFonts.outfit(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                        ),
+                      ),
+                      if (_getActiveAdvancedOptionsCount() > 0) ...[
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.primary.withValues(
+                              alpha: 0.15,
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            '${_getActiveAdvancedOptionsCount()}',
+                            style: GoogleFonts.outfit(
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                              color: theme.colorScheme.primary,
+                            ),
+                          ),
+                        ),
+                      ],
+                      const Spacer(),
+                      Icon(
+                        _showMoreOptions
+                            ? Icons.keyboard_arrow_up_rounded
+                            : Icons.keyboard_arrow_down_rounded,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              if (_showMoreOptions) ...[
+                const SizedBox(height: 20),
+                TaskAttachmentsSection(
+                  attachmentPaths: _attachmentPaths,
+                  onAddAttachment: _pickAttachments,
+                  onRemoveAttachment: _removeAttachmentAt,
+                ),
+                const SizedBox(height: 20),
+                TaskCustomFieldsSection(
+                  customFields: _customFields,
+                  onAddField: _addCustomField,
+                  onRemoveField: _removeCustomFieldAt,
+                  onUpdateField: _updateCustomFieldAt,
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      l10n.recurrence,
+                      style: GoogleFonts.outfit(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                    if (!subscriptionService.isPremium)
+                      Container(
+                        margin: const EdgeInsets.only(left: 8),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.amber.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          'PRO',
+                          style: GoogleFonts.outfit(
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.amber[800],
+                          ),
+                        ),
+                      ),
+                    const Spacer(),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Semantics(
+                  label: l10n.recurrence,
+                  hint: 'Double tap to configure recurrence',
+                  button: true,
+                  child: InkWell(
+                    onTap: () async {
+                      if (!subscriptionService.isPremium) {
+                        subscriptionService.showPaywall();
+                        return;
+                      }
+                      HapticFeedback.lightImpact();
+                      final selectedRule = await RecurrencePickerSheet.show(
+                        context,
+                        currentRule: _recurrenceRule,
+                      );
+                      if (selectedRule != _recurrenceRule) {
+                        setState(() {
+                          _recurrenceRule = selectedRule;
+                          _recurrenceCleared = selectedRule == null;
+                        });
+                      }
+                    },
+                    borderRadius: BorderRadius.circular(16),
+                    child: GlassContainer(
+                      borderRadius: BorderRadius.circular(16),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 14,
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.repeat_rounded,
+                            size: 20,
+                            color: _recurrenceRule != null
+                                ? theme.colorScheme.primary
+                                : theme.disabledColor,
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            TaskRecurrenceService.getRecurrenceLabel(
+                              _recurrenceRule,
+                              l10n,
+                            ),
+                            style: GoogleFonts.outfit(
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const Spacer(),
+                          if (_recurrenceRule != null)
+                            Semantics(
+                              label: 'Clear recurrence',
+                              button: true,
+                              child: GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    _recurrenceRule = null;
+                                    _recurrenceCleared = true;
+                                  });
+                                },
+                                child: Icon(
+                                  Icons.cancel_rounded,
+                                  size: 20,
+                                  color: theme.disabledColor,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  secondary: Icon(
+                    _syncWithGoogleTasks
+                        ? Icons.playlist_add_check_rounded
+                        : Icons.playlist_add_rounded,
+                  ),
+                  title: Text(
+                    l10n.syncWithGoogleTasks,
+                    style: GoogleFonts.outfit(fontWeight: FontWeight.w600),
+                  ),
+                  subtitle: Text(
+                    l10n.syncWithGoogleTasksSubtitle,
+                    style: GoogleFonts.outfit(fontSize: 13),
+                  ),
+                  value: _syncWithGoogleTasks,
+                  onChanged: (value) async {
+                    if (!value) {
+                      setState(() => _syncWithGoogleTasks = false);
+                      return;
+                    }
+
+                    final authService = Provider.of<AuthService>(
+                      context,
+                      listen: false,
+                    );
+
+                    final token = await authService.getGoogleAccessToken();
+                    if (!context.mounted) return;
+
+                    if (token == null) {
+                      final success = await authService.linkGoogleTasks();
+                      if (!context.mounted) return;
+                      if (!success) {
+                        setState(() => _syncWithGoogleTasks = false);
+                        return;
+                      }
+                    }
+
+                    setState(() => _syncWithGoogleTasks = true);
+                  },
+                ),
+                const SizedBox(height: 12),
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  secondary: Icon(
+                    _skipReminders
+                        ? Icons.notifications_off_rounded
+                        : Icons.notifications_rounded,
+                  ),
+                  title: Text(
+                    l10n.doNotRemind,
+                    style: GoogleFonts.outfit(fontWeight: FontWeight.w600),
+                  ),
+                  subtitle: Text(
+                    l10n.doNotRemindSubtitle,
+                    style: GoogleFonts.outfit(fontSize: 13),
+                  ),
+                  value: _skipReminders,
+                  onChanged: (value) {
+                    setState(() => _skipReminders = value);
+                  },
+                ),
+                const SizedBox(height: 12),
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  secondary: Icon(
+                    Icons.checklist_rounded,
+                    color: _isGroceryList ? theme.colorScheme.primary : null,
+                  ),
+                  title: Text(
+                    l10n.groceryListMode,
+                    style: GoogleFonts.outfit(fontWeight: FontWeight.w600),
+                  ),
+                  subtitle: Text(
+                    l10n.groceryListModeSubtitle,
+                    style: GoogleFonts.outfit(fontSize: 13),
+                  ),
+                  value: _isGroceryList,
+                  onChanged: (value) {
+                    setState(() => _isGroceryList = value);
+                  },
+                ),
+                const SizedBox(height: 20),
+                _buildSubTasksSection(context, l10n),
+              ],
               const SizedBox(height: 40),
               Semantics(
                 label: isEditing ? l10n.updateTask : l10n.saveTask,
                 button: true,
                 child: FilledButton(
-                  onPressed: _saveTask,
+                  onPressed: _isSaving ? null : _saveTask,
                   style: FilledButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 18),
                     shape: RoundedRectangleBorder(
@@ -1081,20 +1177,29 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                     ),
                     elevation: 2,
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(isEditing ? Icons.check_rounded : Icons.add_rounded),
-                      const SizedBox(width: 8),
-                      Text(
-                        isEditing ? l10n.updateTask : l10n.saveTask,
-                        style: GoogleFonts.outfit(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                  child: _isSaving
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.5,
+                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        )
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(isEditing ? Icons.check_rounded : Icons.add_rounded),
+                            const SizedBox(width: 8),
+                            Text(
+                              isEditing ? l10n.updateTask : l10n.saveTask,
+                              style: GoogleFonts.outfit(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
-                  ),
                 ),
               ),
             ],

@@ -11,7 +11,9 @@ import 'package:rocis_tasks/shared/ui/theme/theme_service.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
 
 class MockTaskProvider extends Mock implements TaskProvider {}
+
 class MockThemeService extends Mock implements ThemeService {}
+
 class MockSubscriptionService extends Mock implements SubscriptionService {}
 
 void main() {
@@ -27,10 +29,19 @@ void main() {
     mockSubscriptionService = MockSubscriptionService();
 
     when(() => mockTaskProvider.categories).thenReturn([
-      Category(id: 'cat-1', name: 'Work', colorValue: 0xFF2196F3, iconCode: 58835),
+      Category(
+        id: 'cat-1',
+        name: 'Work',
+        colorValue: 0xFF2196F3,
+        iconCode: 58835,
+      ),
     ]);
-    when(() => mockTaskProvider.currentSortOption).thenReturn(TaskSortOption.dueDate);
-    when(() => mockTaskProvider.currentDateFilter).thenReturn(DateTimeFilterOption.all);
+    when(
+      () => mockTaskProvider.currentSortOption,
+    ).thenReturn(TaskSortOption.dueDate);
+    when(
+      () => mockTaskProvider.currentDateFilter,
+    ).thenReturn(DateTimeFilterOption.all);
     when(() => mockTaskProvider.selectedCategoryIds).thenReturn([]);
     when(() => mockTaskProvider.showCompleted).thenReturn(true);
     when(() => mockThemeService.useGlassmorphism).thenReturn(false);
@@ -44,30 +55,45 @@ void main() {
       providers: [
         ChangeNotifierProvider<TaskProvider>.value(value: mockTaskProvider),
         ChangeNotifierProvider<ThemeService>.value(value: mockThemeService),
-        ChangeNotifierProvider<SubscriptionService>.value(value: mockSubscriptionService),
+        ChangeNotifierProvider<SubscriptionService>.value(
+          value: mockSubscriptionService,
+        ),
       ],
       child: MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        home: const Scaffold(
-          body: Stack(
-            children: [
-              TaskSortFilterSheet(),
-            ],
-          ),
-        ),
+        home: const Scaffold(body: Stack(children: [TaskSortFilterSheet()])),
       ),
     );
   }
 
-  testWidgets('renders sort pills (Date, Priority, Title, Created Date)', (tester) async {
+  testWidgets(
+    'renders sort pills (Date, Date & Time, Priority, Title, Created Date)',
+    (tester) async {
+      await tester.pumpWidget(buildTestWidget());
+      await tester.pumpAndSettle();
+
+      expect(find.text('Date'), findsWidgets);
+      expect(find.text('Date & Time'), findsOneWidget);
+      expect(find.text('Priority'), findsOneWidget);
+      expect(find.text('Title'), findsOneWidget);
+      expect(find.text('Created Date'), findsOneWidget);
+    },
+  );
+
+  testWidgets('tapping Date & Time sort pill calls setSortOption', (
+    tester,
+  ) async {
     await tester.pumpWidget(buildTestWidget());
     await tester.pumpAndSettle();
 
-    expect(find.text('Date'), findsWidgets);
-    expect(find.text('Priority'), findsOneWidget);
-    expect(find.text('Title'), findsOneWidget);
-    expect(find.text('Created Date'), findsOneWidget);
+    final dateTimePill = find.text('Date & Time');
+    await tester.tap(dateTimePill);
+    await tester.pumpAndSettle();
+
+    verify(
+      () => mockTaskProvider.setSortOption(TaskSortOption.dueDateTime),
+    ).called(1);
   });
 
   testWidgets('tapping priority sort pill calls setSortOption', (tester) async {
@@ -78,21 +104,26 @@ void main() {
     await tester.tap(priorityPill);
     await tester.pumpAndSettle();
 
-    verify(() => mockTaskProvider.setSortOption(TaskSortOption.priority)).called(1);
+    verify(
+      () => mockTaskProvider.setSortOption(TaskSortOption.priority),
+    ).called(1);
   });
 
-  testWidgets('shows Reset All button when active filters exist and calls resetAllFilters', (tester) async {
-    when(() => mockTaskProvider.selectedCategoryIds).thenReturn(['cat-1']);
+  testWidgets(
+    'shows Reset All button when active filters exist and calls resetAllFilters',
+    (tester) async {
+      when(() => mockTaskProvider.selectedCategoryIds).thenReturn(['cat-1']);
 
-    await tester.pumpWidget(buildTestWidget());
-    await tester.pumpAndSettle();
+      await tester.pumpWidget(buildTestWidget());
+      await tester.pumpAndSettle();
 
-    final resetButton = find.text('Reset All');
-    expect(resetButton, findsOneWidget);
+      final resetButton = find.text('Reset All');
+      expect(resetButton, findsOneWidget);
 
-    await tester.tap(resetButton);
-    await tester.pumpAndSettle();
+      await tester.tap(resetButton);
+      await tester.pumpAndSettle();
 
-    verify(() => mockTaskProvider.resetAllFilters()).called(1);
-  });
+      verify(() => mockTaskProvider.resetAllFilters()).called(1);
+    },
+  );
 }

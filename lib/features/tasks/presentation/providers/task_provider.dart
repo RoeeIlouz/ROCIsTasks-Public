@@ -43,7 +43,8 @@ export 'package:rocis_tasks/features/tasks/presentation/providers/helpers/task_f
 /// and coordination between various services (notifications, widgets, etc.).
 class TaskProvider extends ChangeNotifier {
   AppLocalizations get _l10n {
-    final currentLocale = _themeService.locale ?? PlatformDispatcher.instance.locale;
+    final currentLocale =
+        _themeService.locale ?? PlatformDispatcher.instance.locale;
     return getSafeAppLocalizations(currentLocale);
   }
 
@@ -106,12 +107,12 @@ class TaskProvider extends ChangeNotifier {
     FirestoreService? firestoreService,
     ConnectivityService? connectivityService,
     AnalyticsService? analyticsService,
-  })  : _privateModeService = privateModeService ?? PrivateModeService(),
-        _source = source ?? LocalTaskSource(),
-        _notificationService = notificationService ?? NotificationService(),
-        _firestoreService = firestoreService ?? FirestoreService(),
-        _connectivityService = connectivityService ?? ConnectivityService(),
-        _analyticsService = analyticsService ?? AnalyticsService() {
+  }) : _privateModeService = privateModeService ?? PrivateModeService(),
+       _source = source ?? LocalTaskSource(),
+       _notificationService = notificationService ?? NotificationService(),
+       _firestoreService = firestoreService ?? FirestoreService(),
+       _connectivityService = connectivityService ?? ConnectivityService(),
+       _analyticsService = analyticsService ?? AnalyticsService() {
     _filterService = TaskFilterService();
     _notificationManager = TaskNotificationManager(
       notificationService: _notificationService,
@@ -213,9 +214,11 @@ class TaskProvider extends ChangeNotifier {
       _taskPagination.initialize();
       // Ensure notification service is initialized without blocking UI on permission prompt
       await _notificationService.init();
-      unawaited(_notificationService.requestPermissions().catchError((e) {
-        AppLogger.warning('Permission request warning: $e');
-      }));
+      unawaited(
+        _notificationService.requestPermissions().catchError((e) {
+          AppLogger.warning('Permission request warning: $e');
+        }),
+      );
     } catch (e, s) {
       _errorHandlingService.logError(e, s, reason: 'Initialization failed');
       _setError(_l10n.initializationFailedError);
@@ -246,12 +249,14 @@ class TaskProvider extends ChangeNotifier {
 
     await _connectivityService.init();
 
-    _connectivitySubscription = _connectivityService.addListener(() {
-      if (_connectivityService.isOnline &&
-          _authService.currentUser != null) {
-        syncWithCloud();
-      }
-    }) as StreamSubscription?;
+    _connectivitySubscription =
+        _connectivityService.addListener(() {
+              if (_connectivityService.isOnline &&
+                  _authService.currentUser != null) {
+                syncWithCloud();
+              }
+            })
+            as StreamSubscription?;
 
     _lastUserId = _authService.currentUser?.uid;
     _authSubscription = _authService.authStateChanges.listen((
@@ -266,7 +271,10 @@ class TaskProvider extends ChangeNotifier {
         unawaited(_prefetchCompletedTasksIfNeeded());
       } else {
         if (_lastUserId != null) {
-          AppLogger.info('User signed out, clearing local data...', tag: 'Tasks');
+          AppLogger.info(
+            'User signed out, clearing local data...',
+            tag: 'Tasks',
+          );
           _firestoreService.setUserId(null);
           await _syncManager.cancelSubscriptions();
           await _source.clearAll();
@@ -288,7 +296,7 @@ class TaskProvider extends ChangeNotifier {
     if (_authService.currentUser != null) {
       _firestoreService.setUserId(_authService.currentUser!.uid);
       _refreshPagination();
-      
+
       uploadLocalDataToCloud()
           .then((_) => syncWithCloud())
           .then((_) => updateHomeWidget())
@@ -331,7 +339,10 @@ class TaskProvider extends ChangeNotifier {
     try {
       final task = _source.getTasks().firstWhere((t) => t.id == taskId);
       if (task.dueDate != null) {
-        final newDate = _notificationManager.getSnoozedDate(task.dueDate!, actionId);
+        final newDate = _notificationManager.getSnoozedDate(
+          task.dueDate!,
+          actionId,
+        );
         await updateTask(task, dueDate: newDate);
       }
     } catch (e, s) {
@@ -451,15 +462,19 @@ class TaskProvider extends ChangeNotifier {
   }
 
   TaskSortOption get currentSortOption => _filterService.currentSortOption;
-  DateTimeFilterOption get currentDateFilter => _filterService.currentDateFilter;
+  DateTimeFilterOption get currentDateFilter =>
+      _filterService.currentDateFilter;
   List<String> get selectedCategoryIds => _filterService.selectedCategoryIds;
   bool get showCompleted => _filterService.showCompleted;
   bool get advancedRemindersEnabled =>
       _subscriptionService.isPremium && _advancedRemindersEnabled;
-  bool get nagRemindersEnabled => _subscriptionService.isPremium && _nagRemindersEnabled;
-  int get nagIntervalMinutes => _subscriptionService.isPremium ? _nagIntervalMinutes : 15;
+  bool get nagRemindersEnabled =>
+      _subscriptionService.isPremium && _nagRemindersEnabled;
+  int get nagIntervalMinutes =>
+      _subscriptionService.isPremium ? _nagIntervalMinutes : 15;
   int get nagCount => _subscriptionService.isPremium ? _nagCount : 0;
-  bool get quietHoursEnabled => _subscriptionService.isPremium && _quietHoursEnabled;
+  bool get quietHoursEnabled =>
+      _subscriptionService.isPremium && _quietHoursEnabled;
   int get quietStartMinutes => _quietStartMinutes;
   int get quietEndMinutes => _quietEndMinutes;
   bool get showMyTasksGuideShortcut => _showMyTasksGuideShortcut;
@@ -560,6 +575,18 @@ class TaskProvider extends ChangeNotifier {
     _saveCategoryFilters();
   }
 
+  void selectSingleCategoryFilter(String categoryId) {
+    if (_filterService.selectedCategoryIds.length == 1 &&
+        _filterService.selectedCategoryIds.contains(categoryId)) {
+      _filterService.selectedCategoryIds.clear();
+    } else {
+      _filterService.selectedCategoryIds = [categoryId];
+    }
+    _refreshPagination();
+    notifyListeners();
+    _saveCategoryFilters();
+  }
+
   void clearCategoryFilters() {
     _filterService.clearCategoryFilters();
     _refreshPagination();
@@ -575,19 +602,24 @@ class TaskProvider extends ChangeNotifier {
     _refreshPagination();
     notifyListeners();
     _saveCategoryFilters();
-    SharedPreferences.getInstance().then((prefs) {
-      prefs.setInt('sort_option', TaskSortOption.dueDate.index);
-      prefs.setInt('date_filter', DateTimeFilterOption.all.index);
-      prefs.setBool('show_completed', true);
-    }).catchError((e, s) {
-      _errorHandlingService.logError(e, s, reason: 'Resetting filters');
-    });
+    SharedPreferences.getInstance()
+        .then((prefs) {
+          prefs.setInt('sort_option', TaskSortOption.dueDate.index);
+          prefs.setInt('date_filter', DateTimeFilterOption.all.index);
+          prefs.setBool('show_completed', true);
+        })
+        .catchError((e, s) {
+          _errorHandlingService.logError(e, s, reason: 'Resetting filters');
+        });
   }
 
   void _saveCategoryFilters() {
     SharedPreferences.getInstance()
         .then((prefs) {
-          prefs.setStringList('category_filters', _filterService.selectedCategoryIds);
+          prefs.setStringList(
+            'category_filters',
+            _filterService.selectedCategoryIds,
+          );
         })
         .catchError((e, s) {
           _errorHandlingService.logError(
@@ -633,7 +665,10 @@ class TaskProvider extends ChangeNotifier {
 
   List<Task> get allTasks {
     if (_isLoading) return [];
-    var tasks = _source.getTasks().where((t) => !(t.isDeleted ?? false)).toList();
+    var tasks = _source
+        .getTasks()
+        .where((t) => !(t.isDeleted ?? false))
+        .toList();
     if (_shouldMaskPrivateContent()) {
       tasks = tasks.where((t) => !_isPrivateTask(t)).toList();
     }
@@ -667,11 +702,10 @@ class TaskProvider extends ChangeNotifier {
 
   Future<void> loadMoreTasks() async {
     await _taskPagination.loadNextPage();
-    
-    if (!_taskPagination.hasMoreItems && 
-        _filterService.showCompleted && 
+
+    if (!_taskPagination.hasMoreItems &&
+        _filterService.showCompleted &&
         _authService.currentUser != null) {
-      
       final moreTasks = await _firestoreService.getNextCompletedTasksBatch();
       if (moreTasks.isNotEmpty) {
         for (final task in moreTasks) {
@@ -680,7 +714,7 @@ class TaskProvider extends ChangeNotifier {
         _refreshPagination();
       }
     }
-    
+
     notifyListeners();
   }
 
@@ -695,13 +729,23 @@ class TaskProvider extends ChangeNotifier {
   List<Task> _getTasksForPublicSurfaces() {
     final all = _source.getTasks();
     if (!_shouldMaskPrivateContent()) return all;
-    final privateCategoryIds =
-        _source.getCategories().where((c) => c.isPrivate).map((c) => c.id).toSet();
-    return all.where((t) => !privateCategoryIds.contains(t.categoryId) && !t.categoryIds.any(privateCategoryIds.contains)).toList();
+    final privateCategoryIds = _source
+        .getCategories()
+        .where((c) => c.isPrivate)
+        .map((c) => c.id)
+        .toSet();
+    return all
+        .where(
+          (t) =>
+              !privateCategoryIds.contains(t.categoryId) &&
+              !t.categoryIds.any(privateCategoryIds.contains),
+        )
+        .toList();
   }
 
   bool _shouldMaskPrivateContent() {
-    return _subscriptionService.isPremium && _privateModeService.shouldHidePrivateContent;
+    return _subscriptionService.isPremium &&
+        _privateModeService.shouldHidePrivateContent;
   }
 
   List<Task> _getTasksForTaskWidgetAndCounter() {
@@ -721,8 +765,11 @@ class TaskProvider extends ChangeNotifier {
 
   String _formatTaskTitleForCounter(Task task) {
     final priority = _priorityLabel(task.priority);
-    final categoryName = task.categoryIds.isNotEmpty 
-        ? task.categoryIds.map((id) => getCategoryById(id)?.name).where((n) => n != null).join(', ')
+    final categoryName = task.categoryIds.isNotEmpty
+        ? task.categoryIds
+              .map((id) => getCategoryById(id)?.name)
+              .where((n) => n != null)
+              .join(', ')
         : getCategoryById(task.categoryId)?.name;
     final parts = <String>[
       if (categoryName != null && categoryName.isNotEmpty) categoryName,
@@ -768,11 +815,12 @@ class TaskProvider extends ChangeNotifier {
           _pendingWidgetUpdate = true;
           return;
         }
-        
+
         _widgetUpdateInProgress = true;
         try {
           final tasksForPublicSurfaces = _getTasksForPublicSurfaces();
-          final tasksForTaskWidgetAndCounter = _getTasksForTaskWidgetAndCounter();
+          final tasksForTaskWidgetAndCounter =
+              _getTasksForTaskWidgetAndCounter();
           final chartPath = await TaskWidgetService.updateTaskWidget(
             tasksForTaskWidgetAndCounter,
             getCategoryById,
@@ -789,7 +837,9 @@ class TaskProvider extends ChangeNotifier {
               isDarkMode: _themeService.isDarkMode,
               l10n: _l10n,
               largeIconPath: chartPath,
-              formattedTitles: uncompletedTasks.map(_formatTaskTitleForCounter).toList(),
+              formattedTitles: uncompletedTasks
+                  .map(_formatTaskTitleForCounter)
+                  .toList(),
             );
           }
 
@@ -865,7 +915,11 @@ class TaskProvider extends ChangeNotifier {
     await _source.addTask(task);
 
     _firestoreService.addTask(task).catchError((e, s) {
-      _errorHandlingService.logError(e, s, reason: 'Background cloud addTask failed');
+      _errorHandlingService.logError(
+        e,
+        s,
+        reason: 'Background cloud addTask failed',
+      );
     });
 
     if (dueDate != null && dueDate.isAfter(DateTime.now())) {
@@ -888,13 +942,16 @@ class TaskProvider extends ChangeNotifier {
     _updateTaskCounterNotification();
 
     await _analyticsService.logTaskCreated(
-      categoryId: categoryIds?.isNotEmpty == true ? categoryIds!.join(',') : (category ?? 'none'),
+      categoryId: categoryIds?.isNotEmpty == true
+          ? categoryIds!.join(',')
+          : (category ?? 'none'),
       hasDueDate: dueDate != null,
     );
 
     if (category != null) {
       final cat = getCategoryById(category);
-      if (cat?.isPrivate == true && !_privateModeService.shouldHidePrivateContent) {
+      if (cat?.isPrivate == true &&
+          !_privateModeService.shouldHidePrivateContent) {
         _showSecurityPrompt = true;
         notifyListeners();
       }
@@ -909,11 +966,21 @@ class TaskProvider extends ChangeNotifier {
 
     notifyListeners();
     await _source.addTask(task);
-    _firestoreService.updateTask(task).catchError((e, s) {
-      _errorHandlingService.logError(e, s, reason: 'Background cloud updateTask failed');
-    }).whenComplete(() {
-      _syncManager.schedulePendingWriteCleanup(task.id, delay: const Duration(seconds: 15));
-    });
+    _firestoreService
+        .updateTask(task)
+        .catchError((e, s) {
+          _errorHandlingService.logError(
+            e,
+            s,
+            reason: 'Background cloud updateTask failed',
+          );
+        })
+        .whenComplete(() {
+          _syncManager.schedulePendingWriteCleanup(
+            task.id,
+            delay: const Duration(seconds: 15),
+          );
+        });
 
     await _syncTaskGoogleTasksState(task);
 
@@ -940,11 +1007,13 @@ class TaskProvider extends ChangeNotifier {
             _errorHandlingService.logError(
               e,
               s,
-              reason: 'Background cloud addTask for recurring next instance failed',
+              reason:
+                  'Background cloud addTask for recurring next instance failed',
             );
           });
 
-          if (nextTask.dueDate != null && nextTask.dueDate!.isAfter(DateTime.now())) {
+          if (nextTask.dueDate != null &&
+              nextTask.dueDate!.isAfter(DateTime.now())) {
             try {
               await _scheduleTaskNotifications(nextTask);
             } catch (e, s) {
@@ -1034,7 +1103,9 @@ class TaskProvider extends ChangeNotifier {
       task.recurrenceRule = recurrenceRule;
     }
 
-    if (task.isGroceryList && task.subTasks != null && task.subTasks!.isNotEmpty) {
+    if (task.isGroceryList &&
+        task.subTasks != null &&
+        task.subTasks!.isNotEmpty) {
       final allCompleted = task.subTasks!.every((st) => st.isCompleted);
       if (allCompleted && !task.isCompleted) {
         task.isCompleted = true;
@@ -1049,11 +1120,21 @@ class TaskProvider extends ChangeNotifier {
 
     await _source.addTask(task);
     final taskId = task.id;
-    _firestoreService.updateTask(task).catchError((e, s) {
-      _errorHandlingService.logError(e, s, reason: 'Background cloud updateTask failed');
-    }).whenComplete(() {
-      _syncManager.schedulePendingWriteCleanup(taskId, delay: const Duration(seconds: 15));
-    });
+    _firestoreService
+        .updateTask(task)
+        .catchError((e, s) {
+          _errorHandlingService.logError(
+            e,
+            s,
+            reason: 'Background cloud updateTask failed',
+          );
+        })
+        .whenComplete(() {
+          _syncManager.schedulePendingWriteCleanup(
+            taskId,
+            delay: const Duration(seconds: 15),
+          );
+        });
 
     await _cancelTaskNotifications(task);
     if (!task.isCompleted &&
@@ -1082,7 +1163,9 @@ class TaskProvider extends ChangeNotifier {
     if (task.subTasks == null || task.subTasks!.isEmpty) return;
 
     int index = -1;
-    if (identifier is int && identifier >= 0 && identifier < task.subTasks!.length) {
+    if (identifier is int &&
+        identifier >= 0 &&
+        identifier < task.subTasks!.length) {
       index = identifier;
     } else if (identifier is String) {
       index = task.subTasks!.indexWhere((st) => st.id == identifier);
@@ -1091,7 +1174,9 @@ class TaskProvider extends ChangeNotifier {
     if (index != -1) {
       task.subTasks![index].isCompleted = !task.subTasks![index].isCompleted;
 
-      if (task.isGroceryList && task.subTasks != null && task.subTasks!.isNotEmpty) {
+      if (task.isGroceryList &&
+          task.subTasks != null &&
+          task.subTasks!.isNotEmpty) {
         final allCompleted = task.subTasks!.every((st) => st.isCompleted);
         if (allCompleted && !task.isCompleted) {
           task.isCompleted = true;
@@ -1125,11 +1210,21 @@ class TaskProvider extends ChangeNotifier {
       notifyListeners();
 
       final taskId = task.id;
-      _firestoreService.addTask(task).catchError((e, s) {
-        _errorHandlingService.logError(e, s, reason: 'Cloud addTask failed');
-      }).whenComplete(() {
-        _syncManager.schedulePendingWriteCleanup(taskId, delay: const Duration(seconds: 15));
-      });
+      _firestoreService
+          .addTask(task)
+          .catchError((e, s) {
+            _errorHandlingService.logError(
+              e,
+              s,
+              reason: 'Cloud addTask failed',
+            );
+          })
+          .whenComplete(() {
+            _syncManager.schedulePendingWriteCleanup(
+              taskId,
+              delay: const Duration(seconds: 15),
+            );
+          });
 
       unawaited(_updateTaskCounterNotification());
       updateHomeWidgetWithNotification();
@@ -1141,7 +1236,11 @@ class TaskProvider extends ChangeNotifier {
     notifyListeners();
     await _source.addTask(task);
     _firestoreService.updateTask(task).catchError((e, s) {
-      _errorHandlingService.logError(e, s, reason: 'Background cloud updateTask failed');
+      _errorHandlingService.logError(
+        e,
+        s,
+        reason: 'Background cloud updateTask failed',
+      );
     });
     _refreshPagination();
     notifyListeners();
@@ -1154,7 +1253,11 @@ class TaskProvider extends ChangeNotifier {
       task.isDeleted = true;
       await _source.addTask(task);
       _firestoreService.updateTask(task).catchError((e, s) {
-        _errorHandlingService.logError(e, s, reason: 'Background cloud updateTask failed');
+        _errorHandlingService.logError(
+          e,
+          s,
+          reason: 'Background cloud updateTask failed',
+        );
       });
       await _cancelTaskNotifications(task);
       await _removeGoogleTask(task);
@@ -1174,7 +1277,11 @@ class TaskProvider extends ChangeNotifier {
     await _source.addTask(task);
     await _syncTaskGoogleTasksState(task);
     _firestoreService.updateTask(task).catchError((e, s) {
-      _errorHandlingService.logError(e, s, reason: 'Background cloud updateTask failed');
+      _errorHandlingService.logError(
+        e,
+        s,
+        reason: 'Background cloud updateTask failed',
+      );
     });
     if (!task.isCompleted &&
         task.dueDate != null &&
@@ -1202,7 +1309,11 @@ class TaskProvider extends ChangeNotifier {
     }
     await _source.deleteTask(id);
     _firestoreService.deleteTask(id).catchError((e, s) {
-      _errorHandlingService.logError(e, s, reason: 'Background cloud deleteTask failed');
+      _errorHandlingService.logError(
+        e,
+        s,
+        reason: 'Background cloud deleteTask failed',
+      );
     });
     await _cancelTaskNotificationsById(id);
     _refreshPagination();
@@ -1217,7 +1328,11 @@ class TaskProvider extends ChangeNotifier {
     for (final task in tasksToDelete) {
       await _source.deleteTask(task.id);
       _firestoreService.deleteTask(task.id).catchError((e, s) {
-        _errorHandlingService.logError(e, s, reason: 'Background cloud bulk deleteTask failed');
+        _errorHandlingService.logError(
+          e,
+          s,
+          reason: 'Background cloud bulk deleteTask failed',
+        );
       });
       await _cancelTaskNotifications(task);
     }
@@ -1261,7 +1376,7 @@ class TaskProvider extends ChangeNotifier {
   Future<void> deleteSelectedTasks() async {
     final idsToDelete = List<String>.from(_selectedTaskIds);
     clearSelection();
-    
+
     for (final id in idsToDelete) {
       await deleteTask(id);
     }
@@ -1269,7 +1384,10 @@ class TaskProvider extends ChangeNotifier {
 
   Future<void> toggleSelectedTasksPin() async {
     final idsToToggle = List<String>.from(_selectedTaskIds);
-    final tasksToToggle = _source.getTasks().where((t) => idsToToggle.contains(t.id)).toList();
+    final tasksToToggle = _source
+        .getTasks()
+        .where((t) => idsToToggle.contains(t.id))
+        .toList();
 
     final pinnedCount = tasksToToggle.where((t) => t.isPinned ?? false).length;
     final targetPin = pinnedCount < (tasksToToggle.length / 2);
@@ -1284,7 +1402,10 @@ class TaskProvider extends ChangeNotifier {
 
   Future<void> moveSelectedTasksToCategory(String? categoryId) async {
     final idsToMove = List<String>.from(_selectedTaskIds);
-    final tasksToMove = _source.getTasks().where((t) => idsToMove.contains(t.id)).toList();
+    final tasksToMove = _source
+        .getTasks()
+        .where((t) => idsToMove.contains(t.id))
+        .toList();
 
     for (final task in tasksToMove) {
       await updateTask(task, categoryId: categoryId);
@@ -1369,7 +1490,9 @@ class TaskProvider extends ChangeNotifier {
 
   bool _isPrivateTask(Task task) {
     if (task.categoryIds.isNotEmpty) {
-      if (task.categoryIds.any((id) => getCategoryById(id)?.isPrivate == true)) {
+      if (task.categoryIds.any(
+        (id) => getCategoryById(id)?.isPrivate == true,
+      )) {
         return true;
       }
     }
@@ -1400,7 +1523,10 @@ class TaskProvider extends ChangeNotifier {
   }
 
   Future<void> _syncTaskGoogleTasksState(Task task) async {
-    await _syncManager.syncTaskGoogleTasksState(task, getCategoryById: getCategoryById);
+    await _syncManager.syncTaskGoogleTasksState(
+      task,
+      getCategoryById: getCategoryById,
+    );
   }
 
   Task? getTaskById(String id) {
@@ -1423,7 +1549,11 @@ class TaskProvider extends ChangeNotifier {
     );
   }
 
-  Future<void> addGroceryItem(Task task, String itemTitle, {String? quantity}) async {
+  Future<void> addGroceryItem(
+    Task task,
+    String itemTitle, {
+    String? quantity,
+  }) async {
     if (itemTitle.trim().isEmpty) return;
     final subTasks = List<SubTask>.from(task.subTasks ?? []);
     subTasks.add(SubTask(title: itemTitle.trim(), quantity: quantity?.trim()));
@@ -1447,4 +1577,7 @@ class TaskProvider extends ChangeNotifier {
     final remaining = subTasks.where((st) => !st.isCompleted).toList();
     await updateTask(task, subTasks: remaining);
   }
+
+  /// Alias for widget refresh
+  void updateAllWidgets() => updateHomeWidget();
 }

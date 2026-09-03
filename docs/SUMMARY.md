@@ -2,6 +2,217 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## Google Sign-In Silent Background Token Refresh & Identity Persistence Architecture - 2026-09-03
+
+#### Problem & Root Causes
+* **Issue 1 (Cold Start Reprompt via Credential Manager)**:
+  * On mobile app startup, `AuthService._restoreGoogleUser()` called `_oauthManager.googleSignIn.attemptLightweightAuthentication()`. Under `google_sign_in: ^7.2.0` on Android, Credential Manager raised an interactive account-picker bottom sheet on every launch if multiple accounts existed or auto-selection was ambiguous.
+* **Issue 2 (Interactive Dialogs during Background Token Refresh)**:
+  * In `GoogleOAuthManager._performSilentTokenRefresh()`, if `authorizationForScopes` returned null, `authorizeScopes(googleTasksScopes)` was invoked (`promptIfUnauthorized: true`), popping up an interactive Google OAuth authorization intent over the user's active session during background sync.
+* **Issue 3 (Missing Google Account Identity Persistence)**:
+  * In-memory `_googleUser` was lost on app kill/restart. Only the raw token string and a timestamp were stored in `SharedPreferences`, omitting the user's Google account email and ID. Without an account email, native Android Google Play Services Identity API could not determine which account to authorize silently and reported `hasResolution() == true`, preventing true silent background token generation and triggering false expiration states.
+
+#### Solutions & Architecture Applied
+1. **Persistent Google Account Identity**:
+   * In [`GoogleOAuthManager`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/services/auth/google_oauth_manager.dart), added `saveGoogleUserIdentity({required String email, String? id})` persisting `google_user_email` and `google_user_id` in `SharedPreferences`.
+   * Stored upon Google Sign-In (`signInWithGoogle`) and explicit linking (`linkGoogleTasks`) in [`AuthService`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/services/auth_service.dart).
+2. **Proactive Refresh Window (50-Minute Mark)**:
+   * Updated `GoogleOAuthManager.cacheGoogleAccessToken()` to set cached expiration to 50 minutes (5 minutes ahead of the 55-minute Google token expiry), proactively refreshing tokens during active requests to prevent transient 401 errors.
+3. **True Silent Background Token Refresh**:
+   * In `GoogleOAuthManager._performSilentTokenRefresh()`, completely eliminated `authorizeScopes()` and mobile `attemptLightweightAuthentication()`.
+   * Directly queries `GoogleSignInPlatform.instance.clientAuthorizationTokensForScopes` with `email: savedEmail` and `promptIfUnauthorized: false`. If authorization is cached in Google Play Services, it returns a fresh access token without ANY UI prompt.
+   * If refresh fails (due to offline state, connection loss, or revoked permissions), marks `isGoogleTasksTokenExpired = true` and returns `null`, strictly surfacing the quiet in-app banner ("Google Tasks Disconnected — Reconnect") without modal interruptions.
+4. **Clean Token Clearance on Sign Out**:
+   * Updated `signOut()` to call `GoogleSignInPlatform.instance.clearAuthorizationToken()` to flush cached tokens from OS-level Google Play Services, clearing `google_access_token`, `google_access_token_expires_at`, `google_user_email`, and `google_user_id` to prevent stale token reuse.
+5. **Non-Intrusive Cold Start**:
+   * In `AuthService._restoreGoogleUser()`, bypassed `attemptLightweightAuthentication()` on mobile. If an existing token is valid, it proceeds silently; if missing or expired, it initiates background silent resolution via `getGoogleAccessToken()`.
+6. **Testing & Verification**:
+   * Added unit tests in [`test/core/services/auth/google_oauth_manager_test.dart`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/test/core/services/auth/google_oauth_manager_test.dart) covering identity persistence, proactive refresh window, and `signOut()` token cleanup.
+   * `flutter analyze`: **No issues found!**
+   * `flutter test`: **296 / 296 tests passed (100%)**.
+
+## Google Play Store Listing Experiments (Variant B - Widget-First Hook & Midnight Emerald) - 2026-09-03
+
+#### Problem & Requirements
+* **Objective**: Create an alternate set of visual assets for Google Play Store Listing Experiments (A/B testing) to test conversion lift against the baseline production listing.
+* **Hypothesis**: A "Widget-First" lead hook (putting Android Home Screen Widgets on Slide 1) captures high-intent utility searchers looking specifically for homescreen productivity and widget-centric workflows.
+* **Palette Shift**: Transitioned from the baseline crimson red theme to a high-contrast "Midnight Emerald & Deep Indigo" aesthetic (`#050E12`, `#10B981`, `#06B6D4`, `#14B8A6`) adhering strictly to the Purple Ban while delivering a distinct visual identity for testing.
+* **Preservation**: Saved all experiment assets into dedicated directory `docs/marketing/playstore_experiments/variant_b_widgets/`, keeping the baseline production assets in `docs/marketing/playstore/` completely untouched.
+
+#### Architectural Deliverables & Implementation
+1. **Experiment Copy Matrix (`locales_experiment_b.json`)**:
+   * Authored full 8-slide narratives and matching feature graphic metadata for English (`en-US`) and Hebrew (`iw-IL` RTL).
+   * Reordered sequence: Slide 1 = Android Native Widgets, Slide 2 = Smart NLP Input, Slide 3 = Dark Task Focus Agenda, Slide 4 = Kanban, Slide 5 = Calendar, Slide 6 = Categories, Slide 7 = 100% Offline, Slide 8 = AMOLED Dual Theme.
+2. **Dedicated Generator HTML (`screenshots_experiment_b.html`)**:
+   * Built from `build_experiment_b_html.py` with custom ambient mesh gradients (`bg-mesh-emerald-dark`, `bg-mesh-cyan-dark`, `bg-mesh-teal-dark`).
+   * Slide 1 features an Android home screen widget layout with Quick Action bar, Today's Focus Agenda with live checkboxes and colored priority bars, full month calendar, and weekly focus score (92%).
+   * Refined layout spacing (`top: 252px` pills, `top: 335px` phone wrapper) to ensure zero subtitle occlusion across both LTR and RTL.
+   * Full bidirectional layout support with dynamic `dir="rtl"` and flipped border indicators (`border-right: 5px solid ...`).
+3. **Dedicated Batch Automation (`render_experiment_b_assets.py`)**:
+   * Automated headless Playwright rendering generating 8x 9:16 screenshots (1080 × 1920) + 1x Feature Graphic (1024 × 500) per language (18 total files rendered in < 40 seconds).
+4. **Verification**:
+   * Visually inspected all screenshots and feature graphics in `en-US/` and `iw-IL/`.
+   * Verified typography, contrast, RTL mirroring, and absence of text overlaps.
+
+## Dual Distribution Architecture (Google Play + GitHub Releases) & Zero-Flag Secret Management - 2026-09-03
+
+#### Problem & Requirements
+* **Objective**: Enable simultaneous publishing to both the Google Play Store (App Bundle) and GitHub Releases (standalone APK), ensuring monetization and core app features work seamlessly across both.
+* **Secret Management Constraint**: Eliminate the requirement to manually pass `--dart-define=REVENUECAT_API_KEY_ANDROID=...` during local and CI builds, and guarantee zero secret leakage into the public repository.
+
+#### Architectural Decisions & Solutions Applied
+1. **Zero-Flag Secret Architecture (`AppSecrets`)**:
+   * Created [`lib/core/config/app_secrets.dart.example`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/config/app_secrets.dart.example) as the public git-tracked template.
+   * Registered `/lib/core/config/app_secrets.dart` in [`.gitignore`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/.gitignore) to strictly prevent staging or committing real credentials.
+   * Created local [`lib/core/config/app_secrets.dart`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/config/app_secrets.dart) populated with the active RevenueCat Android key.
+   * Updated [`lib/core/services/subscription_service.dart`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/services/subscription_service.dart) to resolve `AppSecrets.revenueCatApiKeyAndroid` automatically when no `--dart-define` override is provided.
+   * Updated [`scripts/setup_ci_configs.py`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/scripts/setup_ci_configs.py) to dynamically generate `app_secrets.dart` in CI using the GitHub repository secret `REVENUECAT_API_KEY_ANDROID`.
+2. **Dual-Channel Monetization with Runtime Installer Detection (Shorebird Compatible)**:
+   * In [`android/app/src/main/kotlin/com/rocisapps/tasks/MainActivity.kt`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/kotlin/com/rocisapps/tasks/MainActivity.kt), added `getInstallerPackageName` via `getInstallSourceInfo` (SDK 30+) with deprecation fallback.
+   * In [`lib/core/config/app_config.dart`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/config/app_config.dart), added `initDistributionChannel()` with a strict 2s timeout. Automatically resolves `isPlayStoreDistribution` (`installer == 'com.android.vending'`) vs `isGitHubDistribution` (`!isPlayStoreDistribution`).
+   * In [`lib/core/services/app_initializer.dart`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/services/app_initializer.dart), triggers channel detection during foreground startup.
+   * In [`lib/features/premium/presentation/screens/paywall_screen.dart`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/premium/presentation/screens/paywall_screen.dart), routes sideloaded/GitHub users to Lemon Squeezy with user ID binding and Firestore sync, while Google Play Store installs strictly use native Google Play In-App Billing (RevenueCat).
+   * **Shorebird Advantage**: Eliminates the need for separate compile-time builds. The compiled Dart AOT bytecode across `.aab` and `.apk` is 100% identical, meaning **a single `shorebird patch android` updates both Google Play and GitHub APK users simultaneously**.
+3. **Automated Dual-Channel Release Pipeline**:
+   * Created [`.github/workflows/release.yml`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/.github/workflows/release.yml) triggered on version tags (`v*`) or manual `workflow_dispatch`.
+   * Builds standalone APK (`app-release.apk`) and publishes it directly to GitHub Releases.
+   * Builds Google Play App Bundle (`app-release.aab`) and uploads it as a workflow artifact.
+4. **Testing & Verification**:
+   * Verified git ignores `lib/core/config/app_secrets.dart` via `git check-ignore`.
+   * `flutter analyze`: **0 issues found**.
+   * `flutter test`: **295 / 295 tests passed (100%)**.
+
+## Autonomous Overnight Chaos QA Audit & Vulnerability Fix Suite - 2026-09-03
+
+#### Problem & Requirements
+* **Objective**: Execute autonomous overnight QA testing of `ROCIs-Tasks` with chaos user flows, boundary values, aspect ratio shifts, and concurrency checks under isolated test account `qa@rocisapps.com`, then patch all discovered bugs.
+* **Deliverables**: Severity-ranked findings with reproduction evidence, claimed-vs-observed capability matrix, deferred morning cleanup script, and direct bug fixes.
+
+#### Solutions & Audit Fixes Applied
+1. **Double-Tap Submit Race Condition (`BUG-01`)**:
+   * In [`lib/features/tasks/presentation/screens/add_task_screen.dart`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/tasks/presentation/screens/add_task_screen.dart), added `_isSaving` submit lock and disabled Save button with CircularProgressIndicator during task submission to prevent duplicate records on rapid pointer clicks.
+2. **Kanban Status Drop Snap-Back (`BUG-02`)**:
+   * In [`lib/features/tasks/presentation/widgets/kanban/kanban_board_view.dart`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/tasks/presentation/widgets/kanban/kanban_board_view.dart), properly handled dropping tasks from "In Focus" to "To Do" by setting `clearDueDate: true`, and assigning `dueDate = todayNoon` on drops into "In Focus".
+3. **Web Responsive Workspace Overflow (`BUG-03`)**:
+   * In [`lib/features/home/presentation/screens/web_home_screen.dart`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/home/presentation/screens/web_home_screen.dart), wrapped layout in `LayoutBuilder`. Added dynamic compact rail sidebar (`72px`) for viewports `< 800px`, dynamic clamp sizing for right inspector, and ultra-compact full-screen modal mode with back navigation for `< 600px` screens.
+4. **NLP Hour/Minute Out-of-Bounds Day Rollover (`BUG-04`)**:
+   * In [`lib/features/tasks/services/nlp_service.dart`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/tasks/services/nlp_service.dart), validated hour (`0-23` or `1-12` with am/pm) and minute (`0-59`) bounds before constructing suggestion dates.
+5. **Ruthless QA Skill, Specialist Agent & Automation Suite Provisioned**:
+   * Created [`.agent/skills/ruthless-qa-tester/SKILL.md`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/.agent/skills/ruthless-qa-tester/SKILL.md) and [`.agent/agents/ruthless-qa-tester.md`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/.agent/agents/ruthless-qa-tester.md).
+   * Added [`.agent/skills/ruthless-qa-tester/scripts/chaos_runner.py`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/.agent/skills/ruthless-qa-tester/scripts/chaos_runner.py) (automated CLI runner supporting fuzzing, concurrency stress, network flapping, and telemetry collection).
+   * Added [`.agent/skills/ruthless-qa-tester/scripts/visual_snapper.py`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/.agent/skills/ruthless-qa-tester/scripts/visual_snapper.py) (multi-viewport layout glitch & overflow snapper).
+   * Added [`.agent/skills/ruthless-qa-tester/resources/payloads.json`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/.agent/skills/ruthless-qa-tester/resources/payloads.json) (100+ hostile test payloads: polyglots, RTL, emojis, ZWJ, time boundary bombs).
+   * Added [`.agent/reports/morning_review.html`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/.agent/reports/morning_review.html) (interactive single-file HTML morning triage portal with 1-click copy fix buttons).
+6. **Testing & Verification**:
+   * `flutter analyze`: **0 issues found**.
+   * `flutter test`: **295 / 295 tests passed (100%)**.
+   * Python scripts: Both `chaos_runner.py` and `visual_snapper.py` executed cleanly with exit code 0.
+
+## Google Play Store Visual Assets & Video Production with Live Flutter Web Integration - 2026-09-02
+#### Problem & Requirements
+* **Requirement**: Deliver a Google Play Store marketing suite, including 8x 9:16 (1080 × 1920) screenshots, 1x (1024 × 500) Feature Graphic, and promo videos (16:9 Google Play Trailer & 9:16 Vertical Shorts).
+* **Feedback & Polish Directives**:
+  * The task creation / NLP typing animation in promo videos appeared mechanical/unnatural.
+  * In both [`video_trailer_16_9.html`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/docs/marketing/assets_generator/video_trailer_16_9.html) and [`video_shorts_9_16.html`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/docs/marketing/assets_generator/video_shorts_9_16.html), redesigned Scene 2 with authentic character-by-character typing (`"Sprint review tomorrow 10am !high #work"`) in JetBrains Mono monospace font with a blinking cursor.
+  * Added auto-sliding NLP suggestion pill, priority/tag/date chips popping in dynamically, and instant transition to `"✓ Saved in 0.5s!"` state.
+  * Encoded production video MP4s via FFmpeg H.264:
+    * [`docs/marketing/videos/rocis_tasks_playstore_trailer_16x9.mp4`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/docs/marketing/videos/rocis_tasks_playstore_trailer_16x9.mp4) (1920 × 1080, 30.0s @ 30fps, 955 KB)
+    * [`docs/marketing/videos/rocis_tasks_shorts_9x16.mp4`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/docs/marketing/videos/rocis_tasks_shorts_9x16.mp4) (1080 × 1920, 15.0s @ 30fps, 651 KB)
+* **Play Store Screenshots Vertical Density & Spacing Stabilization**:
+  * **Frame & Flex Resolution**: Added `box-sizing: border-box;` and explicit `height: 1542px;` to `.device-screen-box` across Slides 3, 5, 6, 7, and 8, resolving Chromium flex container height collapse and ensuring `justify-content: space-between` distributes space cleanly.
+  * **Slide 1 (Hero NLP & Task List)**: 8 rich task cards with live subtask progress bars, priority badges, and floating speed pill (`⚡ Instant 0.5s NLP`).
+  * **Slide 2 (Smart NLP Task Creation Modal)**: Full modal with smart auto-detection, priority pills, category selectors, 4-item checklist, reminder toggle, recurrence toggle, and bottom action button.
+  * **Slide 3 (Native Home Screen Widgets)**: 12 app shortcuts (3 rows of 4 apps), 4x1 Quick Action Bar, 4x4 Focus Agenda with 5 tasks, 4x3 Month Calendar, 4x2 Focus Score (92%), Quick Filter Bar, Google Search pill, and Android Home Dock.
+  * **Slide 4 (Drag & Drop Kanban Board)**: Fully populated In Focus & Done columns with 6 rich cards each, subtask progress bars, and bottom navigation bar.
+  * **Slide 5 (Full Timeline View & Calendar Sync)**: Interactive August 2026 month calendar card + 9 hourly timeline events from 07:00 AM to 10:15 PM with category badges and 2-way Google Calendar sync pill.
+  * **Slide 6 (Categories & Customization)**: 8 custom category rows, embedded category creator modal with 24-icon picker and color palette, Accent selector, Smart Auto-Tagging banner, and Schema export.
+  * **Slide 7 (100% Offline & Privacy First)**: 100% Local Hive Engine shield card, 3 KPI stats (<2ms, 0 KB, 100% Offline), Local Architecture card, Storage & Memory Engine stats (1.2 MB, 42 tasks, 18 backups), 11 settings rows, Privacy Audit Certificate, and Zero Cloud Dependency Guarantee banner.
+  * **Slide 8 (Dual Theme Elegance)**: Side-by-side Dark Slate and Crisp Light phones with 12 rich task cards each (24 cards total) with live progress bars, Quick Add bar, and bottom navigation.
+  * Re-rendered all 8 screenshots (`screenshot_01.png` - `screenshot_08.png`) and `feature_graphic.png` in [`docs/marketing/playstore/`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/docs/marketing/playstore/).
+  * In [`widget_quick_action_layout.xml`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/layout/widget_quick_action_layout.xml), assigned dedicated IDs to the inner `TextView`s (`widget_quick_btn_add_text`, `widget_quick_btn_cal_text`, `widget_quick_btn_add_icon`).
+  * In [`QuickActionWidgetProvider.kt`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/kotlin/com/rocisapps/tasks/QuickActionWidgetProvider.kt), set text colors on `TextView`s and applied `setColorFilter` to the calendar `ImageView`.
+  * Included `KanbanWidgetProvider::class.java` in [`WidgetLimitHelper.ALL_PROVIDERS`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/kotlin/com/rocisapps/tasks/WidgetLimitHelper.kt).
+* **Settings Screen Responsive Card Layout**:
+  * In [`settings_screen.dart`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/home/presentation/screens/settings_screen.dart), replaced the squished `ListTile` with a full-width column card containing unconstrained typography and a prominent `FilledButton.tonalIcon` below the description.
+* **Streamlined Fast-Logging `AddTaskScreen`**:
+  * Reordered primary fields upfront: Title (with NLP parsing), Due Date quick chips & Date/Time picker, Priority pills, Category selector, and Description.
+  * Encapsulated secondary options (Attachments, Custom Lines, Recurrence, Switches, Subtasks) into a collapsible "More Options" card with active count badge (auto-expanded when editing tasks containing advanced data).
+* **Tappable Category Badges on Task Tiles**:
+  * Added `selectSingleCategoryFilter(String categoryId)` to [`TaskProvider`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/tasks/presentation/providers/task_provider.dart) with toggle capability.
+  * Wrapped category chips in [`TaskTile`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/tasks/presentation/widgets/task_tile.dart) with `InkWell` and haptic feedback.
+* **Due Date & Time Intraday Chronological Sorting**:
+  * Added `TaskSortOption.dueDateTime` to [`TaskFilterService`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/tasks/presentation/providers/helpers/task_filter_service.dart).
+  * Added `Date & Time` sort pill in [`TaskSortFilterSheet`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/tasks/presentation/widgets/task_sort_filter_sheet.dart).
+  * Localized strings across all 8 ARB language files (`app_en.arb`, `app_he.arb`, `app_es.arb`, `app_de.arb`, `app_fr.arb`, `app_ar.arb`, `app_sv.arb`, `app_hi.arb`).
+* **Verification & Testing**:
+  * `flutter analyze`: **0 issues found**.
+  * `flutter test`: **294 / 294 tests passed (100%)**.
+  * Bumped version to `0.2.12+94`.
+
+## Homescreen Widgets Language Synchronization & Mobile Google OAuth Token Refresh - 2026-08-29
+
+#### Problem & Root Causes
+* **Issue 1 (Homescreen Widget Language Synchronization)**:
+  * Switching language inside the app did not update Android home screen widgets (`FullCalendar`, `MonthAgenda`, `TodayAgenda`, `TimelineAgenda`).
+  * *Root Cause*: Kotlin widget providers hardcoded `Locale.getDefault()` (OS system locale) and static English weekday abbreviation strings (`M, T, W, T, F, S, S`), ignoring the user's selected in-app language. In Dart, `ThemeService.setLocale()` was not writing the language code to `HomeWidget` or requesting a widget update.
+* **Issue 2 (Google Calendar Token Expiry on Mobile)**:
+  * Google Calendar events and Google Tasks disappeared after ~55 minutes on mobile devices.
+  * *Root Cause*: `AuthService._restoreGoogleUser()` had an early return `if (!kIsWeb) return;`, leaving `_googleUser = null` upon mobile app restart. When the 55-minute access token expired, `GoogleOAuthManager._performSilentTokenRefresh()` failed to restore the Google user in the background, causing `_isGoogleTasksTokenExpired` to become true.
+
+#### Solutions & Architecture
+* **Android Kotlin Widget Localization**:
+  * Created [`WidgetLocaleHelper.kt`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/kotlin/com/rocisapps/tasks/WidgetLocaleHelper.kt) to resolve active `Locale` from widget `SharedPreferences` (`app_language`), format localized month titles, selected dates, and compute single-letter weekday headers using `DateFormatSymbols`.
+  * Updated [`FullCalendarWidgetProvider.kt`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/kotlin/com/rocisapps/tasks/FullCalendarWidgetProvider.kt), [`MonthAgendaWidgetProvider.kt`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/kotlin/com/rocisapps/tasks/MonthAgendaWidgetProvider.kt), and [`TodayAgendaWidgetProvider.kt`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/kotlin/com/rocisapps/tasks/TodayAgendaWidgetProvider.kt).
+* **Flutter Dart Language Sync**:
+  * Updated [`ThemeService`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/shared/ui/theme/theme_service.dart) to persist `app_language` to `HomeWidget.saveWidgetData` during `init()` and `setLocale()`.
+  * In [`SettingsScreen`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/home/presentation/screens/settings_screen.dart), trigger `taskProvider.updateAllWidgets()` when the user selects a language.
+  * In [`WidgetDataService`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/services/widget_data_service.dart), localized "All Day", "Today", "Tomorrow", "No Title", and date formatters with fallback safety.
+* **Proactive Silent Token Refresh**:
+  * In [`GoogleOAuthManager._performSilentTokenRefresh()`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/services/auth/google_oauth_manager.dart) and [`AuthService._restoreGoogleUser()`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/services/auth_service.dart), enabled silent Google user restoration and background OAuth token refresh across all platforms.
+* **Verification & Testing**:
+  * `flutter analyze`: **0 issues found**.
+  * `flutter test`: **289 / 289 tests passed (100%)**.
+  * Bumped version to `0.2.11+93`.
+
+## Automated Marketing Growth Engine & Social Distribution Agent - 2026-08-29
+
+#### Architecture & Capabilities Added
+* **Automated Growth Engine CLI tool ([`.agent/scripts/growth_engine.py`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/.agent/scripts/growth_engine.py))**:
+  * Implemented an automated growth and social distribution suite supporting content generation, community opportunity scanning, anti-spam cooldown tracking, and Playwright browser automation.
+  * **Draft Generation (`--generate`)**: Automatically reads current features, version numbers, and changelogs to produce targeted channel-specific posts for `r/SideProject`, `r/androidapps`, `r/productivity`, `r/androidthemes`, X/Twitter threads, and TikTok/Shorts 15s video scripts in `docs/marketing/drafts/`.
+  * **Playwright Browser Bot (`--post`, `--login`)**: Handles authenticated browser sessions via persistent Chromium context, pre-filling Reddit title, body markdown, and handling automated submission without requiring API developer tokens.
+  * **Reddit Opportunity Scanner (`--scan-reddit`)**: Queries Reddit's search endpoints to detect users actively asking for to-do widgets, minimal task managers, or calendar sync apps.
+  * **Safety & Schedule Engine (`--schedule`)**: Enforces the 9:1 community ratio and per-subreddit cooldowns (7–14 days) in [`docs/MARKETING_SCHEDULE.md`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/docs/MARKETING_SCHEDULE.md).
+* **Specialist Agent & Workflow**:
+  * Registered `growth-marketer` specialist in [`.agent/agents/growth-marketer.md`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/.agent/agents/growth-marketer.md) and [`.agent/ARCHITECTURE.md`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/.agent/ARCHITECTURE.md).
+  * Added `/market` workflow in [`.agent/workflows/market.md`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/.agent/workflows/market.md).
+
+## Settings Page Copyable Firebase User ID Integration - 2026-08-29
+
+#### Feature & Enhancements
+* **Copyable Firebase User ID under Email in Settings**:
+  * In [`lib/features/home/presentation/screens/settings_screen.dart`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/home/presentation/screens/settings_screen.dart), enhanced the user account profile `ListTile` subtitle to display a clean, monospace `UID: <user.uid>` row directly below the user's email address.
+  * Tapping the UID row copies the Firebase User ID to the system clipboard via `Clipboard.setData`, triggers light haptic feedback (`HapticFeedback.lightImpact`), and presents a localized floating success snackbar (`l10n.copiedToClipboard`).
+  * Features a copy icon (`Icons.copy_rounded`) matching the primary theme accent.
+* **Testing & Verification**:
+  * Added unit & widget test suite in [`test/features/home/settings_screen_test.dart`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/test/features/home/settings_screen_test.dart) covering user profile rendering, UID tap-to-copy clipboard handling, and guest mode fallback.
+  * `flutter analyze`: **0 issues found**.
+  * `flutter test`: **289 / 289 tests passed (100%)**.
+
+## Mobile Calendar Direct Google REST API + Device Calendar Merged Architecture - 2026-08-29
+
+#### Root Cause & Comprehensive Resolution
+* **Root Cause 1 (Mobile Silent Token Refresh Blocking)**: `_performSilentTokenRefresh()` previously contained a `kIsWeb` gate preventing mobile devices from attempting lightweight authentication to refresh expired Google OAuth tokens silently when fetching Google Calendar or Tasks.
+  * **Fix**: In [`GoogleOAuthManager._performSilentTokenRefresh()`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/services/auth/google_oauth_manager.dart), enabled lightweight authentication on mobile during active token refresh requests, while preserving the cold-startup suppression in `_restoreGoogleUser()` so Android Credential Manager account pickers do not appear on app launch.
+* **Root Cause 2 (Empty Stored Calendar IDs Blocking Events)**: In [`CalendarProvider.loadFilters()`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/calendar/presentation/providers/calendar_provider.dart), if `full_calendar_selected_ids` was saved as an empty list `[]` in a past session when 0 calendars were loaded, `_selectedCalendarIds` was set to an empty set and never auto-selected available calendars.
+  * **Fix**: Updated `loadFilters()` to only assign non-empty saved calendar ID lists. If no calendars are selected or none match the available list, `CalendarProvider.loadEvents()` automatically defaults to selecting **all** available calendars and persisting them.
+* **Root Cause 3 (Mobile Calendar Dual Support & UI Sync Controls)**:
+  * In [`CalendarService`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/services/calendar_service.dart), mobile now queries both Google Calendar REST API (via OAuth token) and native OS `DeviceCalendarPlugin`, merging and deduplicating both seamlessly.
+  * Added one-tap "Sync Device Calendar" action in [`CalendarScreen`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/calendar/presentation/screens/calendar_screen.dart) and [`CalendarFilterSheet`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/calendar/presentation/widgets/calendar_filter_sheet.dart) allowing instant OS permission prompts and reload.
+* **Verification**:
+  * `flutter analyze`: **0 issues found**.
+  * `flutter test`: **287 / 287 tests passed (100%)**.
+
 ## Mobile Google Calendar Direct API Integration & Scopes Unification - 2026-08-29
 
 #### Root Cause & Resolution

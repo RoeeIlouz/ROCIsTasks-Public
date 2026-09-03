@@ -247,6 +247,24 @@ abstract class AppLocalizations {
   /// **'Created Date'**
   String get createdDate;
 
+  /// No description provided for @dueDateTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Date & Time'**
+  String get dueDateTime;
+
+  /// No description provided for @moreOptions.
+  ///
+  /// In en, this message translates to:
+  /// **'More Options'**
+  String get moreOptions;
+
+  /// No description provided for @fewerOptions.
+  ///
+  /// In en, this message translates to:
+  /// **'Fewer Options'**
+  String get fewerOptions;
+
   /// No description provided for @filterByCategory.
   ///
   /// In en, this message translates to:

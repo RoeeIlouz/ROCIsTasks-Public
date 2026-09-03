@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.12+94] - 2026-08-29
+
+### Added
+- Date & Time exact chronological sorting option for intraday task scheduling.
+- Interactive category badge filtering directly from task tiles.
+
+### Improved
+- Streamlined New Task screen with collapsible More Options section for fast logging.
+- Redesigned Guest Account card in Settings to prevent text squishing on narrow screens.
+
+### Fixed
+- Fixed Quick Actions Android widget launcher RemoteViews crash.
+
+## [0.2.11+93] - 2026-08-29
+
+### Fixed
+
+- Synchronized in-app language switching with Android home screen widgets.
+- Fixed background Google OAuth token refresh on mobile to prevent Google Calendar from disappearing.
+
 ## [0.2.10+92] - 2026-08-29
 
 ### Fixed

@@ -315,51 +315,101 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
         autofocus: true,
         child: Scaffold(
           backgroundColor: theme.scaffoldBackgroundColor,
-          body: Row(
-            children: [
-              // 1. Sidebar Panel (Left)
-              _buildSidebar(
-                context,
-                user,
-                calendarProvider,
-                authService,
-                taskProvider,
-                l10n,
-              ),
+          body: LayoutBuilder(
+            builder: (context, constraints) {
+              final isCompact = constraints.maxWidth < 800;
+              final isUltraCompact = constraints.maxWidth < 600;
+              final showInspector = _selectedTask != null || _isCreatingTask;
+              final double inspectorWidth = constraints.maxWidth < 950
+                  ? (constraints.maxWidth * 0.45).clamp(280.0, 380.0)
+                  : 380.0;
 
-              // Divider
-              VerticalDivider(
-                width: 1,
-                color: isDark ? Colors.white12 : Colors.black12,
-              ),
-
-              // 2. Middle Content Workspace
-              Expanded(
-                child: _buildMainWorkspace(
-                  context,
-                  taskProvider,
-                  calendarProvider,
-                  l10n,
-                ),
-              ),
-
-              if (_selectedTask != null || _isCreatingTask) ...[
-                // Divider
-                VerticalDivider(
-                  width: 1,
-                  color: isDark ? Colors.white12 : Colors.black12,
-                ),
-
-                // 3. Right Task Inspector
-                Container(
-                  width: 380,
+              if (isUltraCompact && showInspector) {
+                return Container(
                   color: isDark
                       ? theme.colorScheme.surface.withValues(alpha: 0.5)
                       : Colors.grey[50],
-                  child: _buildInspector(context, taskProvider, l10n),
-                ),
-              ],
-            ],
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
+                        child: Row(
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.arrow_back_rounded),
+                              onPressed: () => _selectTask(null),
+                              tooltip: 'Back to tasks',
+                            ),
+                            Text(
+                              _isCreatingTask ? l10n.newTask : l10n.editTask,
+                              style: GoogleFonts.outfit(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Divider(height: 1),
+                      Expanded(
+                        child: _buildInspector(context, taskProvider, l10n),
+                      ),
+                    ],
+                  ),
+                );
+              }
+
+              return Row(
+                children: [
+                  // 1. Sidebar Panel (Left)
+                  _buildSidebar(
+                    context,
+                    user,
+                    calendarProvider,
+                    authService,
+                    taskProvider,
+                    l10n,
+                    isCompact: isCompact,
+                  ),
+
+                  // Divider
+                  VerticalDivider(
+                    width: 1,
+                    color: isDark ? Colors.white12 : Colors.black12,
+                  ),
+
+                  // 2. Middle Content Workspace
+                  Expanded(
+                    child: _buildMainWorkspace(
+                      context,
+                      taskProvider,
+                      calendarProvider,
+                      l10n,
+                    ),
+                  ),
+
+                  if (showInspector) ...[
+                    // Divider
+                    VerticalDivider(
+                      width: 1,
+                      color: isDark ? Colors.white12 : Colors.black12,
+                    ),
+
+                    // 3. Right Task Inspector
+                    Container(
+                      width: inspectorWidth,
+                      color: isDark
+                          ? theme.colorScheme.surface.withValues(alpha: 0.5)
+                          : Colors.grey[50],
+                      child: _buildInspector(context, taskProvider, l10n),
+                    ),
+                  ],
+                ],
+              );
+            },
           ),
         ),
       ),
@@ -373,39 +423,51 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
     CalendarProvider calendarProvider,
     AuthService authService,
     TaskProvider taskProvider,
-    AppLocalizations l10n,
-  ) {
+    AppLocalizations l10n, {
+    bool isCompact = false,
+  }) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
     return Container(
-      width: 260,
+      width: isCompact ? 72 : 260,
       color: isDark ? Colors.black.withValues(alpha: 0.3) : Colors.grey[100],
-      padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+      padding: EdgeInsets.symmetric(
+        vertical: 24,
+        horizontal: isCompact ? 8 : 16,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // App Logo / Branding
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.check_circle_rounded,
-                  size: 28,
-                  color: theme.colorScheme.primary,
-                ),
-                const SizedBox(width: 12),
-                Text(
-                  'ROCIs Tasks',
-                  style: GoogleFonts.outfit(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: -0.5,
+            padding: const EdgeInsets.symmetric(horizontal: 4.0),
+            child: isCompact
+                ? Center(
+                    child: Icon(
+                      Icons.check_circle_rounded,
+                      size: 28,
+                      color: theme.colorScheme.primary,
+                    ),
+                  )
+                : Row(
+                    children: [
+                      Icon(
+                        Icons.check_circle_rounded,
+                        size: 28,
+                        color: theme.colorScheme.primary,
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        'ROCIs Tasks',
+                        style: GoogleFonts.outfit(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: -0.5,
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
           ),
           const SizedBox(height: 32),
 
@@ -414,6 +476,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
             icon: Icons.task_alt_rounded,
             label: l10n.tasks,
             isActive: _activeTab == 'tasks',
+            isCompact: isCompact,
             onTap: () {
               setState(() {
                 _activeTab = 'tasks';
@@ -429,6 +492,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
             icon: Icons.view_kanban_outlined,
             label: l10n.boardView,
             isActive: _activeTab == 'board',
+            isCompact: isCompact,
             onTap: () => setState(() {
               _activeTab = 'board';
               _selectTask(null);
@@ -438,6 +502,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
             icon: Icons.calendar_month_rounded,
             label: l10n.calendar,
             isActive: _activeTab == 'calendar',
+            isCompact: isCompact,
             onTap: () => setState(() {
               _activeTab = 'calendar';
               _selectTask(null);
@@ -447,6 +512,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
             icon: Icons.dashboard_customize_outlined,
             label: l10n.categories,
             isActive: _activeTab == 'categories',
+            isCompact: isCompact,
             onTap: () => setState(() {
               _activeTab = 'categories';
               _selectTask(null);
@@ -456,6 +522,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
             icon: Icons.settings_rounded,
             label: l10n.settings,
             isActive: _activeTab == 'settings',
+            isCompact: isCompact,
             onTap: () => setState(() {
               _activeTab = 'settings';
               _selectTask(null);
@@ -466,349 +533,433 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
 
           // Google Calendar Connection Status banner
           if (calendarProvider.isGoogleCalendarTokenExpired)
-            Container(
-              margin: const EdgeInsets.only(bottom: 16),
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.errorContainer.withValues(alpha: 0.4),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: theme.colorScheme.error.withValues(alpha: 0.3),
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.warning_amber_rounded,
-                        color: theme.colorScheme.error,
-                        size: 18,
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          'Calendar Disconnected',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: theme.colorScheme.onErrorContainer,
-                          ),
+            isCompact
+                ? Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: Tooltip(
+                      message: 'Calendar Disconnected - Tap to Reconnect',
+                      child: IconButton(
+                        icon: Icon(
+                          Icons.warning_amber_rounded,
+                          color: theme.colorScheme.error,
+                          size: 22,
                         ),
+                        onPressed: () async {
+                          calendarProvider.resetTokenExpiredState();
+                          final success = await authService.linkGoogleTasks();
+                          if (success) {
+                            calendarProvider.loadEvents();
+                            taskProvider.syncGoogleTasksToLocal();
+                          }
+                        },
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  ElevatedButton(
-                    onPressed: () async {
-                      calendarProvider.resetTokenExpiredState();
-                      final success = await authService.linkGoogleTasks();
-                      if (success) {
-                        calendarProvider.loadEvents();
-                        taskProvider.syncGoogleTasksToLocal();
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 4),
-                      visualDensity: VisualDensity.compact,
-                      backgroundColor: theme.colorScheme.error,
-                      foregroundColor: theme.colorScheme.onError,
-                      elevation: 0,
                     ),
-                    child: const Text(
-                      'Reconnect',
-                      style: TextStyle(fontSize: 11),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-          // Google Tasks Connection Status banner
-          if (authService.isGoogleTasksTokenExpired)
-            Container(
-              margin: const EdgeInsets.only(bottom: 16),
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.errorContainer.withValues(alpha: 0.4),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: theme.colorScheme.error.withValues(alpha: 0.3),
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.warning_amber_rounded,
-                        color: theme.colorScheme.error,
-                        size: 18,
+                  )
+                : Container(
+                    margin: const EdgeInsets.only(bottom: 16),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.errorContainer.withValues(alpha: 0.4),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: theme.colorScheme.error.withValues(alpha: 0.3),
                       ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          l10n.googleTasksDisconnected,
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: theme.colorScheme.onErrorContainer,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  ElevatedButton(
-                    onPressed: () async {
-                      final success = await authService.linkGoogleTasks();
-                      if (success) {
-                        calendarProvider.resetTokenExpiredState();
-                        calendarProvider.loadEvents();
-                        taskProvider.syncGoogleTasksToLocal();
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 4),
-                      visualDensity: VisualDensity.compact,
-                      backgroundColor: theme.colorScheme.error,
-                      foregroundColor: theme.colorScheme.onError,
-                      elevation: 0,
                     ),
-                    child: Text(
-                      l10n.reconnect,
-                      style: const TextStyle(fontSize: 11),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-          // Google Play Shortcut
-          Container(
-            margin: const EdgeInsets.only(bottom: 12),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: () async {
-                  final url = Uri.parse(
-                    'https://play.google.com/store/apps/details?id=com.rocisapps.tasks&pcampaignid=web_share',
-                  );
-                  if (await canLaunchUrl(url)) {
-                    await launchUrl(url, mode: LaunchMode.externalApplication);
-                  }
-                },
-                borderRadius: BorderRadius.circular(16),
-                child: Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: isDark
-                        ? Colors.white.withValues(alpha: 0.05)
-                        : Colors.white.withValues(alpha: 0.6),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: isDark ? Colors.white10 : Colors.black12,
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Image.asset(
-                          'assets/images/logo.png',
-                          width: 32,
-                          height: 32,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) => Icon(
-                            Icons.play_arrow_rounded,
-                            color: theme.colorScheme.primary,
-                            size: 24,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Row(
                           children: [
-                            Text(
-                              'Get Android App',
-                              style: GoogleFonts.outfit(
-                                fontSize: 13,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: -0.2,
-                              ),
+                            Icon(
+                              Icons.warning_amber_rounded,
+                              color: theme.colorScheme.error,
+                              size: 18,
                             ),
-                            Text(
-                              'On Google Play',
-                              style: TextStyle(
-                                fontSize: 10,
-                                color: theme.disabledColor,
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                'Calendar Disconnected',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: theme.colorScheme.onErrorContainer,
+                                ),
                               ),
                             ),
                           ],
                         ),
+                        const SizedBox(height: 8),
+                        ElevatedButton(
+                          onPressed: () async {
+                            calendarProvider.resetTokenExpiredState();
+                            final success = await authService.linkGoogleTasks();
+                            if (success) {
+                              calendarProvider.loadEvents();
+                              taskProvider.syncGoogleTasksToLocal();
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 4),
+                            visualDensity: VisualDensity.compact,
+                            backgroundColor: theme.colorScheme.error,
+                            foregroundColor: theme.colorScheme.onError,
+                            elevation: 0,
+                          ),
+                          child: const Text(
+                            'Reconnect',
+                            style: TextStyle(fontSize: 11),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+          // Google Tasks Connection Status banner
+          if (authService.isGoogleTasksTokenExpired)
+            isCompact
+                ? Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: Tooltip(
+                      message: '${l10n.googleTasksDisconnected} - ${l10n.reconnect}',
+                      child: IconButton(
+                        icon: Icon(
+                          Icons.warning_amber_rounded,
+                          color: theme.colorScheme.error,
+                          size: 22,
+                        ),
+                        onPressed: () async {
+                          final success = await authService.linkGoogleTasks();
+                          if (success) {
+                            calendarProvider.resetTokenExpiredState();
+                            calendarProvider.loadEvents();
+                            taskProvider.syncGoogleTasksToLocal();
+                          }
+                        },
                       ),
-                      Icon(
-                        Icons.arrow_forward_ios_rounded,
-                        size: 10,
-                        color: theme.disabledColor,
+                    ),
+                  )
+                : Container(
+                    margin: const EdgeInsets.only(bottom: 16),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.errorContainer.withValues(alpha: 0.4),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: theme.colorScheme.error.withValues(alpha: 0.3),
                       ),
-                    ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.warning_amber_rounded,
+                              color: theme.colorScheme.error,
+                              size: 18,
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                l10n.googleTasksDisconnected,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: theme.colorScheme.onErrorContainer,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        ElevatedButton(
+                          onPressed: () async {
+                            final success = await authService.linkGoogleTasks();
+                            if (success) {
+                              calendarProvider.resetTokenExpiredState();
+                              calendarProvider.loadEvents();
+                              taskProvider.syncGoogleTasksToLocal();
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 4),
+                            visualDensity: VisualDensity.compact,
+                            backgroundColor: theme.colorScheme.error,
+                            foregroundColor: theme.colorScheme.onError,
+                            elevation: 0,
+                          ),
+                          child: Text(
+                            l10n.reconnect,
+                            style: const TextStyle(fontSize: 11),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+          // Google Play Shortcut
+          if (!isCompact)
+            Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () async {
+                    final url = Uri.parse(
+                      'https://play.google.com/store/apps/details?id=com.rocisapps.tasks&pcampaignid=web_share',
+                    );
+                    if (await canLaunchUrl(url)) {
+                      await launchUrl(url, mode: LaunchMode.externalApplication);
+                    }
+                  },
+                  borderRadius: BorderRadius.circular(16),
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? Colors.white.withValues(alpha: 0.05)
+                          : Colors.white.withValues(alpha: 0.6),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: isDark ? Colors.white10 : Colors.black12,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image.asset(
+                            'assets/images/logo.png',
+                            width: 32,
+                            height: 32,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) => Icon(
+                              Icons.play_arrow_rounded,
+                              color: theme.colorScheme.primary,
+                              size: 24,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Get Android App',
+                                style: GoogleFonts.outfit(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: -0.2,
+                                ),
+                              ),
+                              Text(
+                                'On Google Play',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  color: theme.disabledColor,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Icon(
+                          Icons.arrow_forward_ios_rounded,
+                          size: 10,
+                          color: theme.disabledColor,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
 
           // User Profile Card
           if (user != null)
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: isDark
-                    ? Colors.white.withValues(alpha: 0.05)
-                    : Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: isDark ? Colors.white10 : Colors.black12,
-                ),
-              ),
-              child: Row(
-                children: [
-                  CircleAvatar(
-                    radius: 18,
-                    backgroundColor: theme.colorScheme.primary.withValues(
-                      alpha: 0.1,
-                    ),
-                    child: Text(
-                      (user.displayName != null && user.displayName!.isNotEmpty)
-                          ? user.displayName![0].toUpperCase()
-                          : (user.email != null && user.email!.isNotEmpty
-                                ? user.email![0].toUpperCase()
-                                : 'U'),
-                      style: TextStyle(
-                        color: theme.colorScheme.primary,
-                        fontWeight: FontWeight.bold,
+            isCompact
+                ? Tooltip(
+                    message: user.email ?? 'User Profile',
+                    child: CircleAvatar(
+                      radius: 18,
+                      backgroundColor: theme.colorScheme.primary.withValues(
+                        alpha: 0.15,
+                      ),
+                      child: Text(
+                        (user.displayName != null && user.displayName!.isNotEmpty)
+                            ? user.displayName![0].toUpperCase()
+                            : (user.email != null && user.email!.isNotEmpty
+                                  ? user.email![0].toUpperCase()
+                                  : 'U'),
+                        style: TextStyle(
+                          color: theme.colorScheme.primary,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                  )
+                : Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? Colors.white.withValues(alpha: 0.05)
+                          : Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: isDark ? Colors.white10 : Colors.black12,
+                      ),
+                    ),
+                    child: Row(
                       children: [
-                        Text(
-                          (user.displayName != null &&
-                                  user.displayName!.isNotEmpty)
-                              ? user.displayName!
-                              : 'User',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 13,
+                        CircleAvatar(
+                          radius: 18,
+                          backgroundColor: theme.colorScheme.primary.withValues(
+                            alpha: 0.1,
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                          child: Text(
+                            (user.displayName != null && user.displayName!.isNotEmpty)
+                                ? user.displayName![0].toUpperCase()
+                                : (user.email != null && user.email!.isNotEmpty
+                                      ? user.email![0].toUpperCase()
+                                      : 'U'),
+                            style: TextStyle(
+                              color: theme.colorScheme.primary,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
-                        Text(
-                          user.email ?? '',
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: theme.disabledColor,
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                (user.displayName != null &&
+                                        user.displayName!.isNotEmpty)
+                                    ? user.displayName!
+                                    : 'User',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 13,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              Text(
+                                user.email ?? '',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: theme.disabledColor,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                        ),
+                        IconButton(
+                          icon: const Icon(
+                            Icons.logout,
+                            size: 18,
+                            color: Colors.redAccent,
+                          ),
+                          onPressed: () => authService.signOut(),
+                          tooltip: l10n.signOut,
                         ),
                       ],
                     ),
-                  ),
-                  IconButton(
-                    icon: const Icon(
-                      Icons.logout,
-                      size: 18,
-                      color: Colors.redAccent,
-                    ),
-                    onPressed: () => authService.signOut(),
-                    tooltip: l10n.signOut,
-                  ),
-                ],
-              ),
-            )
+                  )
           else
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: isDark
-                    ? Colors.white.withValues(alpha: 0.05)
-                    : Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: isDark ? Colors.white10 : Colors.black12,
-                ),
-              ),
-              child: Row(
-                children: [
-                  CircleAvatar(
-                    radius: 18,
-                    backgroundColor: Colors.orangeAccent.withValues(alpha: 0.1),
-                    child: const Icon(
-                      Icons.person_outline_rounded,
-                      size: 20,
-                      color: Colors.orangeAccent,
+            isCompact
+                ? Tooltip(
+                    message: l10n.signIn,
+                    child: IconButton(
+                      icon: const Icon(
+                        Icons.login_rounded,
+                        color: Colors.orangeAccent,
+                      ),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const LoginScreen(),
+                          ),
+                        );
+                      },
                     ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                  )
+                : Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? Colors.white.withValues(alpha: 0.05)
+                          : Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: isDark ? Colors.white10 : Colors.black12,
+                      ),
+                    ),
+                    child: Row(
                       children: [
-                        Text(
-                          l10n.guestAccount,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 13,
+                        CircleAvatar(
+                          radius: 18,
+                          backgroundColor: Colors.orangeAccent.withValues(alpha: 0.1),
+                          child: const Icon(
+                            Icons.person_outline_rounded,
+                            size: 20,
+                            color: Colors.orangeAccent,
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
                         ),
-                        Text(
-                          l10n.guestMode,
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: theme.disabledColor,
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                l10n.guestAccount,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 13,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              Text(
+                                l10n.guestMode,
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: theme.disabledColor,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                        ),
+                        FilledButton.tonal(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const LoginScreen(),
+                              ),
+                            );
+                          },
+                          style: FilledButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
+                            textStyle: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          child: Text(l10n.signIn),
                         ),
                       ],
                     ),
                   ),
-                  FilledButton.tonal(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const LoginScreen(),
-                        ),
-                      );
-                    },
-                    style: FilledButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                      textStyle: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    child: Text(l10n.signIn),
-                  ),
-                ],
-              ),
-            ),
         ],
       ),
     );
@@ -820,9 +971,41 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
     String? shortcut,
     required bool isActive,
     required VoidCallback onTap,
+    bool isCompact = false,
   }) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+
+    if (isCompact) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4.0),
+        child: Tooltip(
+          message: label,
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: isActive
+                    ? theme.colorScheme.primary.withValues(alpha: 0.15)
+                    : Colors.transparent,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                icon,
+                color: isActive
+                    ? theme.colorScheme.primary
+                    : theme.disabledColor,
+                size: 22,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: InkWell(

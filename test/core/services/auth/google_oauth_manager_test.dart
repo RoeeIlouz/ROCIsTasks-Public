@@ -65,5 +65,59 @@ void main() {
         expect(oauthManager.isGoogleTasksTokenExpired, isTrue);
       },
     );
+
+    test(
+      'cacheGoogleAccessToken saves token and resets expired flag with 50-minute expiry',
+      () async {
+        oauthManager.setGoogleTasksTokenExpired(true);
+        expect(oauthManager.isGoogleTasksTokenExpired, isTrue);
+
+        await oauthManager.cacheGoogleAccessToken('mock_token_123');
+
+        expect(oauthManager.isGoogleTasksTokenExpired, isFalse);
+        final retrieved = await oauthManager.getGoogleAccessToken();
+        expect(retrieved, 'mock_token_123');
+
+        final prefs = await SharedPreferences.getInstance();
+        final expiresAtStr = prefs.getString(
+          GoogleOAuthManager.keyAccessTokenExpiresAt,
+        );
+        expect(expiresAtStr, isNotNull);
+        final expiresAt = DateTime.parse(expiresAtStr!);
+        // Expiry should be ~50 minutes from now (between 48 and 51 minutes)
+        final diff = expiresAt.difference(DateTime.now()).inMinutes;
+        expect(diff, inInclusiveRange(48, 51));
+      },
+    );
+
+    test(
+      'saveGoogleUserIdentity persists email and id and clears on signOut',
+      () async {
+        await oauthManager.saveGoogleUserIdentity(
+          email: 'test@rocisapps.com',
+          id: 'google-user-12345',
+        );
+
+        expect(
+          await oauthManager.getSavedGoogleUserEmail(),
+          'test@rocisapps.com',
+        );
+        expect(await oauthManager.getSavedGoogleUserId(), 'google-user-12345');
+
+        await oauthManager.cacheGoogleAccessToken('token_to_clear');
+        expect(await oauthManager.getGoogleAccessToken(), 'token_to_clear');
+
+        await oauthManager.signOut();
+
+        expect(await oauthManager.getSavedGoogleUserEmail(), isNull);
+        expect(await oauthManager.getSavedGoogleUserId(), isNull);
+        final prefs = await SharedPreferences.getInstance();
+        expect(prefs.getString(GoogleOAuthManager.keyAccessToken), isNull);
+        expect(
+          prefs.getString(GoogleOAuthManager.keyAccessTokenExpiresAt),
+          isNull,
+        );
+      },
+    );
   });
 }

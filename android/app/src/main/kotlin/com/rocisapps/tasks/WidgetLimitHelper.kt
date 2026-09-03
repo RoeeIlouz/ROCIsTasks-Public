@@ -18,7 +18,8 @@ object WidgetLimitHelper {
         MonthAgendaWidgetProvider::class.java,
         TimelineAgendaWidgetProvider::class.java,
         QuickActionWidgetProvider::class.java,
-        UpNextWidgetProvider::class.java
+        UpNextWidgetProvider::class.java,
+        KanbanWidgetProvider::class.java
     )
 
     /**

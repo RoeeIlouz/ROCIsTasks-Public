@@ -78,6 +78,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get createdDate => 'تاريخ الإنشاء';
 
   @override
+  String get dueDateTime => 'التاريخ والوقت';
+
+  @override
+  String get moreOptions => 'خيارات إضافية';
+
+  @override
+  String get fewerOptions => 'خيارات أقل';
+
+  @override
   String get filterByCategory => 'تصفية حسب الفئة';
 
   @override

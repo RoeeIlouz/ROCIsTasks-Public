@@ -12,6 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart' show showModalBottomSheet;
 import 'package:rocis_tasks/core/config/app_config.dart';
+import 'package:rocis_tasks/core/config/app_secrets.dart';
 import 'package:rocis_tasks/core/config/router.dart';
 import 'package:rocis_tasks/core/services/error_handling_service.dart';
 import 'package:rocis_tasks/core/services/logger_service.dart' hide LogLevel;
@@ -55,12 +56,20 @@ class SubscriptionService extends ChangeNotifier {
         final fromDefine = const String.fromEnvironment(
           'REVENUECAT_API_KEY_ANDROID',
         );
-        apiKey = fromDefine.isNotEmpty ? fromDefine : null;
+        if (fromDefine.isNotEmpty) {
+          apiKey = fromDefine;
+        } else if (AppSecrets.revenueCatApiKeyAndroid.isNotEmpty) {
+          apiKey = AppSecrets.revenueCatApiKeyAndroid;
+        }
       } else if (Platform.isIOS) {
         final fromDefine = const String.fromEnvironment(
           'REVENUECAT_API_KEY_IOS',
         );
-        apiKey = fromDefine.isNotEmpty ? fromDefine : null;
+        if (fromDefine.isNotEmpty) {
+          apiKey = fromDefine;
+        } else if (AppSecrets.revenueCatApiKeyIos.isNotEmpty) {
+          apiKey = AppSecrets.revenueCatApiKeyIos;
+        }
       }
 
       if (apiKey == null && dotenv.isInitialized) {

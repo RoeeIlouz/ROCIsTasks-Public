@@ -78,21 +78,40 @@ class TodayAgendaWidgetProvider : HomeWidgetProvider() {
                 views.setTextColor(R.id.widget_today_add_btn, highlightColor)
 
                 // 2. Calculate and Render Date Headers
+                val widgetLocale = WidgetLocaleHelper.getWidgetLocale(widgetData)
                 val offset = widgetData.getInt(PREF_TODAY_OFFSET, 0)
                 val cal = Calendar.getInstance()
                 if (offset != 0) {
                     cal.add(Calendar.DAY_OF_YEAR, offset)
                 }
 
-                val titleFormat = SimpleDateFormat("EEEE, MMM d", Locale.getDefault())
+                val titleFormat = SimpleDateFormat("EEEE, MMM d", widgetLocale)
                 val titleStr = titleFormat.format(cal.time)
 
                 val subtitleStr = when (offset) {
-                    0 -> "Today"
-                    1 -> "Tomorrow"
-                    -1 -> "Yesterday"
+                    0 -> WidgetLocaleHelper.getTodayText(widgetLocale)
+                    1 -> when (widgetLocale.language.lowercase()) {
+                        "he" -> "מחר"
+                        "es" -> "Mañana"
+                        "de" -> "Morgen"
+                        "fr" -> "Demain"
+                        "ar" -> "غداً"
+                        "sv" -> "Imorgon"
+                        "hi" -> "कल"
+                        else -> "Tomorrow"
+                    }
+                    -1 -> when (widgetLocale.language.lowercase()) {
+                        "he" -> "אתמול"
+                        "es" -> "Ayer"
+                        "de" -> "Gestern"
+                        "fr" -> "Hier"
+                        "ar" -> "أمس"
+                        "sv" -> "Igår"
+                        "hi" -> "कल"
+                        else -> "Yesterday"
+                    }
                     else -> {
-                        val diffFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                        val diffFormat = SimpleDateFormat("yyyy-MM-dd", widgetLocale)
                         diffFormat.format(cal.time)
                     }
                 }
