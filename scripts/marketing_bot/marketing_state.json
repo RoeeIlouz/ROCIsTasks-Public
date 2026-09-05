@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-05T19:15:51.286101+00:00",
+  "last_run_timestamp": "2026-09-05T19:59:15.481801+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -644,6 +644,42 @@
       "title": "Building a Fully Offline-First Flutter App for ERPNext: The RedLine Architecture and Sync Engine",
       "url": "https://dev.to/m7amedenho/building-a-fully-offline-first-flutter-app-for-erpnext-the-redline-architecture-and-sync-engine-23a6",
       "inspected_at": "2026-09-05T19:15:41.864911+00:00"
+    },
+    "reddit_1w8araa": {
+      "platform": "reddit",
+      "title": "Built a Dropbox alternative",
+      "url": "https://reddit.com/r/SideProject/comments/1w8araa/built_a_dropbox_alternative/",
+      "inspected_at": "2026-09-05T19:59:01.533856+00:00"
+    },
+    "reddit_1w8al7w": {
+      "platform": "reddit",
+      "title": "SEKTR FUEL - Fuel gauges for your Claude plan windows",
+      "url": "https://reddit.com/r/SideProject/comments/1w8al7w/sektr_fuel_fuel_gauges_for_your_claude_plan/",
+      "inspected_at": "2026-09-05T19:59:02.762598+00:00"
+    },
+    "reddit_1w8ajgn": {
+      "platform": "reddit",
+      "title": "POV: Design Custom Shirts, watch the store go live.",
+      "url": "https://reddit.com/r/SideProject/comments/1w8ajgn/pov_design_custom_shirts_watch_the_store_go_live/",
+      "inspected_at": "2026-09-05T19:59:03.491665+00:00"
+    },
+    "reddit_1w8a8c2": {
+      "platform": "reddit",
+      "title": "Roast my startup: I hand-reviewed 500 design tools and wrote down why each one sucks",
+      "url": "https://reddit.com/r/roastmystartup/comments/1w8a8c2/roast_my_startup_i_handreviewed_500_design_tools/",
+      "inspected_at": "2026-09-05T19:59:04.154353+00:00"
+    },
+    "reddit_1w8a6h4": {
+      "platform": "reddit",
+      "title": "[iOS] I built a calorie tracker designed to be deleted. Roast it.",
+      "url": "https://reddit.com/r/roastmystartup/comments/1w8a6h4/ios_i_built_a_calorie_tracker_designed_to_be/",
+      "inspected_at": "2026-09-05T19:59:04.967014+00:00"
+    },
+    "reddit_1w8aazs": {
+      "platform": "reddit",
+      "title": "How I architected an enterprise fitness platform using Flutter BLoC, .NET 10 Minimal APIs, and PostgreSQL",
+      "url": "https://reddit.com/r/FlutterDev/comments/1w8aazs/how_i_architected_an_enterprise_fitness_platform/",
+      "inspected_at": "2026-09-05T19:59:05.836593+00:00"
     }
   },
   "pending_drafts": {
@@ -872,6 +908,18 @@
       "created_at": "2026-09-05T18:43:42.975481+00:00",
       "status": "rejected",
       "updated_at": "2026-09-05T19:15:17.901810+00:00"
+    },
+    "reddit_post_sideproject_7860b233": {
+      "id": "reddit_post_sideproject_7860b233",
+      "type": "reddit_post",
+      "platform": "reddit",
+      "subreddit": "SideProject",
+      "title": "I got tired of subscription task apps that lag offline, so I spent months building my own: ROCIs Tasks",
+      "body": "Hey r/SideProject! 👋\n\nLike many of you, I hit subscription fatigue a while back. Every task manager I tried either forced me into a monthly fee, required an internet connection just to check off a grocery item, or lacked decent home screen widgets on Android.\n\nSo, as any reasonable developer with too much free time would do, I decided to build my own alternative. Meet **ROCIs Tasks**—an offline-first task and calendar workspace for Android.\n\n### Why I built it (The Pain Points)\nI wanted something fast, local-first, but still modern. Too many productivity apps feel bloated, slow, or aggressively push cloud sync for things that should just live on your device. I also hate clicking through endless dropdown menus just to set a due date.\n\n### Key Engineering Choices & Technical Challenges\nBuilding this solo gave me the freedom to experiment with the stack, but came with plenty of headaches:\n\n* **Flutter + Local-First (Hive):** The core app is built with Flutter. For storage, I went with Hive for lightning-fast, offline-first reads and writes. Data lives locally on your device first, and syncs seamlessly with Firebase Firestore in the background whenever an internet connection is available.\n* **Native Kotlin Widgets:** Flutter is great for the main app UI, but Android widgets demand deep native integration for performance and battery efficiency. I ended up writing native Kotlin widgets for the Daily Focus Agenda, Monthly Calendar, and Kanban views. Getting the platform channel bridge to update these widgets instantly with zero sync lag was easily the hardest part of the project.\n* **Natural Language Parser:** Instead of manual pickers, I built a lightweight parser so you can type things like *“Submit report tomorrow at 5pm #urgent @work”* and have it automatically extract dates, times, priorities, and tags.\n* **Aesthetics:** I'm a huge fan of true AMOLED pitch-black modes (#000000) paired with subtle glassmorphism (frosted cards with fine borders) and crisp micro-haptics. It just makes checking off tasks feel satisfying.\n\n### Lessons Learned\n1. **Widgets are hard:** Bridging Flutter state with native Android widget providers is not for the faint of heart, but the UX payoff is massive.\n2. **Scope creep is real:** What started as a simple to-do list evolved into a calendar workspace because I kept saying, \"Just one more feature...\"\n\nIf you want to check it out, I'd love to hear your thoughts, bug reports, or feature ideas:\n- **Google Play:** [https://play.google.com/store/apps/details?id=com.rocisapps.tasks](https://play.google.com/store/apps/details?id=com.rocisapps.tasks)\n- **Web Version:** [https://tasks.rocisapps.com](https://tasks.rocisapps.com)\n\nI'm curious—for those of you building productivity tools or managing complex side projects, how do you handle local data persistence vs. cloud sync? And how do you deal with platform-specific native UI components in cross-platform frameworks?",
+      "topic": "indie_journey",
+      "created_at": "2026-09-05T19:59:10.330271+00:00",
+      "status": "pending",
+      "telegram_message_id": 53
     }
   },
   "posted_threads": {
