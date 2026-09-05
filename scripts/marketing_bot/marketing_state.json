@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-05T17:01:53.853635+00:00",
+  "last_run_timestamp": "2026-09-05T17:03:44.817443+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -499,31 +499,31 @@
       "platform": "reddit",
       "title": "I built a Chrome extension to help you actually learn what you read",
       "url": "https://reddit.com/r/SideProject/comments/1w86645/i_built_a_chrome_extension_to_help_you_actually/",
-      "inspected_at": "2026-09-05T17:01:40.392036+00:00"
+      "inspected_at": "2026-09-05T17:02:23.021550+00:00"
     },
     "reddit_1w864q2": {
       "platform": "reddit",
       "title": "Building striking analytics for combat sports (mt/mma/boxing/kb)",
       "url": "https://reddit.com/r/SideProject/comments/1w864q2/building_striking_analytics_for_combat_sports/",
-      "inspected_at": "2026-09-05T17:01:41.658791+00:00"
+      "inspected_at": "2026-09-05T17:02:24.499916+00:00"
     },
     "reddit_1w864q1": {
       "platform": "reddit",
       "title": "Is VideoBro a bad name for our app?",
       "url": "https://reddit.com/r/SideProject/comments/1w864q1/is_videobro_a_bad_name_for_our_app/",
-      "inspected_at": "2026-09-05T17:01:42.411024+00:00"
+      "inspected_at": "2026-09-05T17:02:25.468060+00:00"
     },
     "reddit_1w860r1": {
       "platform": "reddit",
       "title": "Prompt caching behaves differently on OpenAI and Anthropic, and it quietly wrecks your cost math",
       "url": "https://reddit.com/r/SideProject/comments/1w860r1/prompt_caching_behaves_differently_on_openai_and/",
-      "inspected_at": "2026-09-05T17:01:43.222909+00:00"
+      "inspected_at": "2026-09-05T17:02:29.847586+00:00"
     },
     "reddit_1w861r5": {
       "platform": "reddit",
       "title": "A startup to resolve “schizophrenia”",
       "url": "https://reddit.com/r/roastmystartup/comments/1w861r5/a_startup_to_resolve_schizophrenia/",
-      "inspected_at": "2026-09-05T17:01:44.018770+00:00"
+      "inspected_at": "2026-09-05T17:02:46.860842+00:00"
     }
   },
   "pending_drafts": {
@@ -677,8 +677,9 @@
       "x_text": "Ever tried accessing WidgetsBinding.instance inside a Flutter background isolate? Spoiler: It crashes. 💥 Fixed this in ROCIs Tasks v0.2.2 by switching to PlatformDispatcher.instance, plus added robust two-way Google Tasks sync! Try it: https://play.google.com/store/apps/details?id=com.rocisapps.tasks",
       "bsky_text": "Background isolates in Flutter are great until you accidentally touch UI bindings. 😅 Just shipped ROCIs Tasks v0.2.2, replacing WidgetsBinding with PlatformDispatcher for rock-solid background handling and full two-way Google Tasks sync! https://tasks.rocisapps.com",
       "created_at": "2026-09-05T16:52:23.686309+00:00",
-      "status": "pending",
-      "telegram_message_id": 37
+      "status": "approved",
+      "telegram_message_id": 37,
+      "updated_at": "2026-09-05T17:02:02.780718+00:00"
     },
     "reddit_post_sideproject_565ff0ca": {
       "id": "reddit_post_sideproject_565ff0ca",
@@ -691,6 +692,38 @@
       "created_at": "2026-09-05T17:01:48.767244+00:00",
       "status": "pending",
       "telegram_message_id": 39
+    },
+    "devlog_devlog_0_2_2_64_2026_07_18_a40bb4fdd5": {
+      "id": "devlog_devlog_0_2_2_64_2026_07_18_a40bb4fdd5",
+      "type": "devlog",
+      "milestone_title": "[0.2.2+64] - 2026-07-18",
+      "milestone_date": "2026-07-18",
+      "milestone_slug": "devlog_0_2_2_64_2026_07_18_a40bb4fdd5",
+      "devto_title": "How I Fixed Web Paywall Crashes and Wired Up Lemon Squeezy in a Flutter App",
+      "devto_body": "# The Hook\nBuilding an offline-first Android task and calendar app (ROCIs Tasks) using Flutter while supporting a web version sounds great on paper. Until you realize that mobile-centric billing SDKs crash the web canvas, and you're left scrambling to build a cross-platform monetization strategy before launch day.\n\n# The Mystery / The Bug\nWhen users opened the web version of ROCIs Tasks and tried to check out premium features, the app immediately threw fatal runtime errors. Why? Because I was attempting to render native RevenueCat UI widgets (`purchases_ui_flutter`) on a Flutter Web target where the underlying native iOS/Android bridge simply didn't exist.\n\nTo make matters worse, my Gradle build pipelines for the native Android app were choking on subproject namespace mismatches, and AGP 8.12.1 updates were throwing R8 shrinking errors regarding missing Play Core packages. It was a classic indie dev nightmare: half my build targets wouldn't compile, and the other half crashed the moment a web user touched the paywall.\n\n# The Root Cause\n1. **Platform Mismatch:** Mobile billing SDKs rely entirely on platform channels connected to Google Play Billing and Apple App StoreKit. Running them on Flutter Web without a conditional abstraction layer results in immediate unhandled exceptions.\n2. **Aggressive R8 Shrinking:** Modern AGP versions combined with legacy library references can strip essential metadata if rules aren't explicitly declared, causing silent runtime failures during AAB bundle generation.\n3. **Monolithic Startup Costs:** Initializing heavy localization bundles and eagerly building heavy calendar views right at cold start caused annoying empty-state flickers and bloated startup memory.\n\n# The Solution & Code Architecture\nTo fix the web paywall without breaking mobile, I separated the billing flow conditionally and integrated **Lemon Squeezy** for web users, synchronized securely via Firebase Cloud Functions.\n\nFirst, I redirected web pricing cards directly to Lemon Squeezy checkout URLs while appending the user's Firebase UID as custom metadata:\n\n```dart\n// Safe cross-platform checkout redirection\nFuture<void> handleWebCheckout(String planId, String firebaseUid) async {\n  final checkoutUrl = Uri.parse('https://my-store.lemonsqueezy.com/buy/$planId?checkout[custom][uid]=$firebaseUid');\n  if (kIsWeb) {\n    await launchUrl(checkoutUrl, mode: LaunchMode.externalApplication);\n  } else {\n    // Fallback to RevenueCat for Native Android/iOS\n    await Purchases.purchaseProduct(planId);\n  }\n}\n```\n\nNext, I set up a secure Firebase Cloud Function to handle Lemon Squeezy webhooks, validating the HMAC signature before updating the user's document in Firestore:\n\n```javascript\n// Firebase Cloud Function for Lemon Squeezy Webhooks\nconst functions = require('firebase-functions');\nconst crypto = require('crypto');\nconst admin = require('firebase-admin');\nadmin.initializeApp();\n\nexports.lemonSqueezyWebhook = functions.https.onRequest(async (req, res) => {\n  const hmac = crypto.createHmac('sha256', functions.config().lemonsqueezy.secret);\n  const digest = hmac.update(req.rawBody).digest('hex');\n  \n  if (digest !== req.headers['x-signature']) {\n    return res.status(403.send('Invalid signature'));\n  }\n\n  const event = req.body;\n  if (event.meta.event_name === 'subscription_created') {\n    const uid = event.data.attributes.custom.uid;\n    await admin.firestore().collection('users').doc(uid).set({ is_premium: true }, { merge: true });\n  }\n  \n  res.status(200).send('Webhook processed');\n});\n```\n\nFinally, on the Flutter client side, a real-time Firestore stream listener syncs the entitlement state instantly and caches it locally via `SharedPreferences` for offline resilience.\n\nTo banish UI flickering, I introduced pulsing skeleton loaders (`TaskListSkeleton` and `TaskTileSkeleton`) across task lists and delayed the construction of the heavy `CalendarScreen` until the user actively navigated to it.\n\n# Key Lessons for Other Devs\n- **Never trust mobile SDKs on the web:** Always isolate platform-specific billing or native UI packages behind abstract interfaces or conditional checks (`kIsWeb`).\n- **Secure your webhooks:** Always verify HMAC cryptographic signatures on backend webhook handlers to prevent spoofed payment requests.\n- **Lazy-load heavy screens:** Deferring secondary screen initialization drastically improves cold start metrics and eliminates empty-state flickering.\n\n# Outro & ROCIs Tasks\nBuilding cross-platform apps solo means constantly juggling native Android widgets, web paywalls, and build optimization. If you want to check out the final result—an offline-first task and calendar app with native Kotlin home screen widgets—take a look at ROCIs Tasks!\n\n🌐 [Try ROCIs Tasks on the Web](https://tasks.rocisapps.com)\n📱 [Download on Google Play](https://play.google.com/store/apps/details?id=com.rocisapps.tasks)",
+      "tags": [
+        "flutter",
+        "android",
+        "firebase",
+        "indiedev"
+      ],
+      "x_text": "Fixed web paywall crashes by swapping mobile billing for Lemon Squeezy webhooks, cleaned up AGP 8.12 compiler errors, and added skeleton loaders to stop UI flickering in ROCIs Tasks. Building cross-platform apps is wild! 🚀 Check it out: https://tasks.rocisapps.com",
+      "bsky_text": "Web paywalls crashing because mobile billing SDKs don't run on the web canvas? Solved it by integrating Lemon Squeezy with secure Firebase webhook verification. Plus Gradle 8.12 stabilization & lazy-loaded screens in ROCIs Tasks! 🛠️✨ https://tasks.rocisapps.com",
+      "created_at": "2026-09-05T17:02:56.621303+00:00",
+      "status": "pending",
+      "telegram_message_id": 41
+    },
+    "reddit_post_sideproject_dbc4b3c0": {
+      "id": "reddit_post_sideproject_dbc4b3c0",
+      "type": "reddit_post",
+      "platform": "reddit",
+      "subreddit": "SideProject",
+      "title": "I got tired of subscription-heavy task apps, so I built an offline-first Android planner with native widgets",
+      "body": "Hey r/SideProject! Like a lot of you, I've gone down the endless rabbit hole of productivity apps. Todoist, TickTick, Notion—they're all great, but they either lock basic features behind a monthly subscription, require constant internet connection, or have clunky widgets that lag when you try to check off a task.\n\nSo, over the last several months, I decided to build what I actually wanted to use: **ROCIs Tasks**.\n\n### Why build another task app?\nI had three non-negotiable rules for myself:\n1. **Offline-First:** It has to work instantly in a subway tunnel or deep in the woods. Zero loading spinners. \n2. **No Subscription Fatigue:** A clean, fast experience without nagging pop-ups asking for $5/month for basic reminders.\n3. **Native Android Integration:** Widgets that actually look and feel native, updating instantly without a clunky web wrapper feel.\n\n### Under the Hood (The Tech Stack)\nBuilding this as a solo indie dev came with some fun architectural hurdles:\n- **Frontend:** Built with **Flutter**. Getting 60fps animations and buttery-smooth scrolling on Android took some tuning, especially with heavy lists.\n- **Local Database:** Powered by **Hive**. Because it's purely local-first, read/write speeds are practically instantaneous. It syncs up quietly in the background with Firebase Firestore whenever an internet connection is detected.\n- **Widgets:** This was the hardest part. Flutter's default widget rendering wasn't cutting it for home screen widgets, so I wrote custom **native Kotlin code** to power the interactive home screen widgets (Daily Focus, Kanban boards, Quick Actions). Bridging Flutter state with native Android AppWidgets without draining the battery was a puzzle, but the zero-lag result was worth it.\n- **UI/UX:** I'm a sucker for true OLED pitch-black modes (`#000000`) paired with subtle glassmorphism and micro-haptics. It just *feels* satisfying to use.\n\n### Key Features I'm Proud Of\n- **Natural Language Parsing:** Typing *\"Submit quarterly report tomorrow at 5pm #urgent @work\"* automatically extracts the dates, priorities, and tags so you aren't tapping through ten different dropdown menus.\n- **Unified Calendar:** Bringing Google Calendar, local device calendars, and to-do tasks into one side-by-side agenda view.\n- **Nested Subtasks & Streaks:** Keeping it simple enough for quick lists, but deep enough for complex project breakdowns.\n\n### What I'd love from you:\nBuilding in a vacuum is tough. I'd love for some fellow makers to take it for a spin, test the widget performance on your specific devices, and rip my UI/UX apart. What are your biggest annoyances with existing task apps?\n\nIf you want to check it out:\n- **Google Play:** [https://play.google.com/store/apps/details?id=com.rocisapps.tasks](https://play.google.com/store/apps/details?id=com.rocisapps.tasks)\n- **Web App:** [https://tasks.rocisapps.com](https://tasks.rocisapps.com)\n\nThanks for reading, and happy building!",
+      "topic": "indie_journey",
+      "created_at": "2026-09-05T17:03:39.631118+00:00",
+      "status": "pending",
+      "telegram_message_id": 42
     }
   },
   "posted_threads": {
@@ -767,6 +800,13 @@
       "x_url": null,
       "bsky_url": null,
       "published_at": "2026-09-05T16:51:52.201136+00:00"
+    },
+    "devlog_0_2_2_63_2026_07_17_de92843d11": {
+      "title": "Why Your Flutter Background Isolates Crash on Android (And How I Fixed It)",
+      "devto_url": "https://dev.to/rocisapps/why-your-flutter-background-isolates-crash-on-android-and-how-i-fixed-it-5cka",
+      "x_url": null,
+      "bsky_url": null,
+      "published_at": "2026-09-05T17:02:02.778815+00:00"
     }
   }
 }
