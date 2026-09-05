@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-05T16:52:27.904098+00:00",
+  "last_run_timestamp": "2026-09-05T17:01:53.853635+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -494,6 +494,36 @@
       "title": "Flutter Platform Channels",
       "url": "https://dev.to/godofgeeks/flutter-platform-channels-13hg",
       "inspected_at": "2026-09-05T16:52:16.706822+00:00"
+    },
+    "reddit_1w86645": {
+      "platform": "reddit",
+      "title": "I built a Chrome extension to help you actually learn what you read",
+      "url": "https://reddit.com/r/SideProject/comments/1w86645/i_built_a_chrome_extension_to_help_you_actually/",
+      "inspected_at": "2026-09-05T17:01:40.392036+00:00"
+    },
+    "reddit_1w864q2": {
+      "platform": "reddit",
+      "title": "Building striking analytics for combat sports (mt/mma/boxing/kb)",
+      "url": "https://reddit.com/r/SideProject/comments/1w864q2/building_striking_analytics_for_combat_sports/",
+      "inspected_at": "2026-09-05T17:01:41.658791+00:00"
+    },
+    "reddit_1w864q1": {
+      "platform": "reddit",
+      "title": "Is VideoBro a bad name for our app?",
+      "url": "https://reddit.com/r/SideProject/comments/1w864q1/is_videobro_a_bad_name_for_our_app/",
+      "inspected_at": "2026-09-05T17:01:42.411024+00:00"
+    },
+    "reddit_1w860r1": {
+      "platform": "reddit",
+      "title": "Prompt caching behaves differently on OpenAI and Anthropic, and it quietly wrecks your cost math",
+      "url": "https://reddit.com/r/SideProject/comments/1w860r1/prompt_caching_behaves_differently_on_openai_and/",
+      "inspected_at": "2026-09-05T17:01:43.222909+00:00"
+    },
+    "reddit_1w861r5": {
+      "platform": "reddit",
+      "title": "A startup to resolve “schizophrenia”",
+      "url": "https://reddit.com/r/roastmystartup/comments/1w861r5/a_startup_to_resolve_schizophrenia/",
+      "inspected_at": "2026-09-05T17:01:44.018770+00:00"
     }
   },
   "pending_drafts": {
@@ -649,6 +679,18 @@
       "created_at": "2026-09-05T16:52:23.686309+00:00",
       "status": "pending",
       "telegram_message_id": 37
+    },
+    "reddit_post_sideproject_565ff0ca": {
+      "id": "reddit_post_sideproject_565ff0ca",
+      "type": "reddit_post",
+      "platform": "reddit",
+      "subreddit": "SideProject",
+      "title": "I got tired of $10/month task apps with subscription fatigue, so I built my own offline-first Android app",
+      "body": "Hey r/SideProject! \n\nLike many of you, I hit a breaking point with productivity tools. Every app I wanted to use for simple daily tasks and calendar management either locked basic features behind a monthly subscription, forced an account creation just to take notes, or lagged terribly because everything was routed through a clunky cloud backend.\n\nSo, as any reasonable developer with too much free time would do, I spent months building my own: **ROCIs Tasks**.\n\n### The Vision\nI wanted a lightning-fast, offline-first workspace for Android that combines tasks, calendar events, and home screen widgets without the bloat—and without subscription fatigue.\n\n### Key Engineering Choices & Challenges\nBuilding this as a solo indie dev came with some fun architectural hurdles:\n\n*   **The Tech Stack:** I chose **Flutter** for the cross-platform UI and web version, but I quickly realized standard Flutter plugins weren't going to cut it for deep Android integration.\n*   **Offline-First Local DB:** I went with **Hive** for local storage. Read/write operations are practically instantaneous, meaning the app works entirely offline without stuttering. It syncs up quietly with Firebase Firestore in the background whenever a connection is available.\n*   **Native Kotlin Home Screen Widgets:** This was the hardest part. Flutter's rendering engine doesn't play natively with Android home screen widgets. I had to write custom native Kotlin bridging to power interactive widgets (Daily Focus Agenda, Monthly Calendar, Kanban views) directly on the launcher with zero sync lag.\n*   **Natural Language Parser:** I built a local parser so you can type things like *\"Submit report tomorrow at 5pm #urgent @work\"* and it automatically extracts dates, priorities, and tags without making you tap through endless dropdown menus.\n*   **UI & Design:** As an OLED screen lover, I built a true pitch-black mode (`#000000`) paired with subtle glassmorphism cards and micro-haptics to make task management feel tactile and satisfying.\n\n### What I Learned\nBuilding a productivity app is deceptively complex. Edge cases with local timezone shifts, calendar permissions across different Android manufacturer skins (looking at you, Samsung and Xiaomi battery managers), and keeping widget states synchronized with the local database tested my patience more than once.\n\n### Check It Out\nIf you want to test it out, I’d love your brutal, honest feedback—especially on the UI/UX or if you spot any weird widget quirks on your specific device.\n\n*   **Android App (Google Play):** [https://play.google.com/store/apps/details?id=com.rocisapps.tasks](https://play.google.com/store/apps/details?id=com.rocisapps.tasks)\n*   **Web Version:** [https://tasks.rocisapps.com](https://tasks.rocisapps.com)\n\nI’m around in the comments—how do you guys usually handle local storage vs. cloud sync in your side projects? Ever dipped your toes into native widget development using Flutter?",
+      "topic": "indie_journey",
+      "created_at": "2026-09-05T17:01:48.767244+00:00",
+      "status": "pending",
+      "telegram_message_id": 39
     }
   },
   "posted_threads": {
