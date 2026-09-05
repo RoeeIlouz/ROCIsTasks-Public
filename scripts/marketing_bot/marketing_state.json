@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-05T17:20:20.658700+00:00",
+  "last_run_timestamp": "2026-09-05T18:35:56.315692+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -536,6 +536,42 @@
       "title": "Apply before it hits LinkedIn",
       "url": "https://reddit.com/r/SideProject/comments/1w86ayk/apply_before_it_hits_linkedin/",
       "inspected_at": "2026-09-05T17:20:14.845555+00:00"
+    },
+    "reddit_1w88n8c": {
+      "platform": "reddit",
+      "title": "I built a local SRT/VTT-to-text tool; is crypto checkout the wrong part?",
+      "url": "https://reddit.com/r/SideProject/comments/1w88n8c/i_built_a_local_srtvtttotext_tool_is_crypto/",
+      "inspected_at": "2026-09-05T18:35:41.345448+00:00"
+    },
+    "reddit_1w88hlo": {
+      "platform": "reddit",
+      "title": "I built Watchy it keeps watching your purchases after checkout",
+      "url": "https://reddit.com/r/SideProject/comments/1w88hlo/i_built_watchy_it_keeps_watching_your_purchases/",
+      "inspected_at": "2026-09-05T18:35:43.126621+00:00"
+    },
+    "reddit_1w88clj": {
+      "platform": "reddit",
+      "title": "I built an interactive 10,000-plot cyber world where indie hackers and devs can claim their spot to showcase what they're building",
+      "url": "https://reddit.com/r/SideProject/comments/1w88clj/i_built_an_interactive_10000plot_cyber_world/",
+      "inspected_at": "2026-09-05T18:35:44.204213+00:00"
+    },
+    "reddit_1w88c58": {
+      "platform": "reddit",
+      "title": "Vibe coders whose project became \"real\" — what's actually blocking you right now?",
+      "url": "https://reddit.com/r/SideProject/comments/1w88c58/vibe_coders_whose_project_became_real_whats/",
+      "inspected_at": "2026-09-05T18:35:44.945775+00:00"
+    },
+    "reddit_1w889o0": {
+      "platform": "reddit",
+      "title": "[OS] I built a free, on-device alternative to Wispr Flow for Mac",
+      "url": "https://reddit.com/r/roastmystartup/comments/1w889o0/os_i_built_a_free_ondevice_alternative_to_wispr/",
+      "inspected_at": "2026-09-05T18:35:45.804886+00:00"
+    },
+    "reddit_1w87tns": {
+      "platform": "reddit",
+      "title": "I built a tool that automates the annoying parts of dropshipping. About to launch, ISO beta testers",
+      "url": "https://reddit.com/r/roastmystartup/comments/1w87tns/i_built_a_tool_that_automates_the_annoying_parts/",
+      "inspected_at": "2026-09-05T18:35:46.585048+00:00"
     }
   },
   "pending_drafts": {
@@ -702,8 +738,9 @@
       "body": "Hey r/SideProject! \n\nLike many of you, I hit a breaking point with productivity tools. Every app I wanted to use for simple daily tasks and calendar management either locked basic features behind a monthly subscription, forced an account creation just to take notes, or lagged terribly because everything was routed through a clunky cloud backend.\n\nSo, as any reasonable developer with too much free time would do, I spent months building my own: **ROCIs Tasks**.\n\n### The Vision\nI wanted a lightning-fast, offline-first workspace for Android that combines tasks, calendar events, and home screen widgets without the bloat—and without subscription fatigue.\n\n### Key Engineering Choices & Challenges\nBuilding this as a solo indie dev came with some fun architectural hurdles:\n\n*   **The Tech Stack:** I chose **Flutter** for the cross-platform UI and web version, but I quickly realized standard Flutter plugins weren't going to cut it for deep Android integration.\n*   **Offline-First Local DB:** I went with **Hive** for local storage. Read/write operations are practically instantaneous, meaning the app works entirely offline without stuttering. It syncs up quietly with Firebase Firestore in the background whenever a connection is available.\n*   **Native Kotlin Home Screen Widgets:** This was the hardest part. Flutter's rendering engine doesn't play natively with Android home screen widgets. I had to write custom native Kotlin bridging to power interactive widgets (Daily Focus Agenda, Monthly Calendar, Kanban views) directly on the launcher with zero sync lag.\n*   **Natural Language Parser:** I built a local parser so you can type things like *\"Submit report tomorrow at 5pm #urgent @work\"* and it automatically extracts dates, priorities, and tags without making you tap through endless dropdown menus.\n*   **UI & Design:** As an OLED screen lover, I built a true pitch-black mode (`#000000`) paired with subtle glassmorphism cards and micro-haptics to make task management feel tactile and satisfying.\n\n### What I Learned\nBuilding a productivity app is deceptively complex. Edge cases with local timezone shifts, calendar permissions across different Android manufacturer skins (looking at you, Samsung and Xiaomi battery managers), and keeping widget states synchronized with the local database tested my patience more than once.\n\n### Check It Out\nIf you want to test it out, I’d love your brutal, honest feedback—especially on the UI/UX or if you spot any weird widget quirks on your specific device.\n\n*   **Android App (Google Play):** [https://play.google.com/store/apps/details?id=com.rocisapps.tasks](https://play.google.com/store/apps/details?id=com.rocisapps.tasks)\n*   **Web Version:** [https://tasks.rocisapps.com](https://tasks.rocisapps.com)\n\nI’m around in the comments—how do you guys usually handle local storage vs. cloud sync in your side projects? Ever dipped your toes into native widget development using Flutter?",
       "topic": "indie_journey",
       "created_at": "2026-09-05T17:01:48.767244+00:00",
-      "status": "pending",
-      "telegram_message_id": 39
+      "status": "approved",
+      "telegram_message_id": 39,
+      "updated_at": "2026-09-05T18:35:23.671321+00:00"
     },
     "devlog_devlog_0_2_2_64_2026_07_18_a40bb4fdd5": {
       "id": "devlog_devlog_0_2_2_64_2026_07_18_a40bb4fdd5",
@@ -737,6 +774,18 @@
       "status": "approved",
       "telegram_message_id": 42,
       "updated_at": "2026-09-05T17:19:55.852767+00:00"
+    },
+    "reddit_post_sideproject_356cc2a1": {
+      "id": "reddit_post_sideproject_356cc2a1",
+      "type": "reddit_post",
+      "platform": "reddit",
+      "subreddit": "SideProject",
+      "title": "I got tired of task apps locking basic features behind $10/mo subscriptions, so I built my own (Flutter + Kotlin widgets)",
+      "body": "Hey r/SideProject,\n\nLike many of you, I hit peak subscription fatigue a while back. Every task manager I tried either forced me into a monthly fee just to get basic calendar sync, or bloated the UI with AI features I didn't want. Worse, most of them were sluggish web wrappers masquerading as native apps.\n\nSo, as any reasonable developer with too much free time would do, I spent the last several months building **ROCIs Tasks**—an offline-first Android task and calendar app designed to be fast, private, and free of subscription traps.\n\n### The Tech Stack & Why I Chose It\n* **Flutter:** Cross-platform UI framework. While I built the core app in Flutter, the real challenge was getting Android home screen widgets to feel truly native.\n* **Native Kotlin Widgets:** Flutter's built-in widget rendering for home screens can feel laggy or battery-heavy. I ended up writing native Kotlin/Glance implementations for the widgets (Daily Focus Agenda, Monthly Calendar, Kanban columns) that communicate directly with the local database.\n* **Hive (Local Database):** True offline-first. Read and writes happen instantly with zero loading spinners. It syncs up quietly with Firebase Firestore in the background whenever an internet connection is available.\n\n### Core Features I Wanted for Myself\n* **Natural Language Parsing:** Typing out \"Submit quarterly report tomorrow at 5pm #urgent @work\" automatically extracts the due date, time, priority, and category without clicking through ten dropdown menus.\n* **Unified Calendar:** Bringing Google Calendar events, local device calendars, and task deadlines side-by-side into a single agenda view.\n* **True AMOLED Pitch-Black Mode:** Because battery life matters, the UI uses deep `#000000` blacks paired with subtle frosted glassmorphism borders and micro-haptics.\n\n### Biggest Lesson Learned\nBridging Flutter state with native Android home screen widgets cleanly was a massive headache. If you're building something similar, don't try to force Flutter's engine to render your home screen widgets—write them natively and pass data via platform channels or a shared local database abstraction.\n\nI'd love for some fellow builders to check it out, break it, and let me know what you think of the UX or performance.\n\n* **Google Play:** [https://play.google.com/store/apps/details?id=com.rocisapps.tasks](https://play.google.com/store/apps/details?id=com.rocisapps.tasks)\n* **Web Version:** [https://tasks.rocisapps.com](https://tasks.rocisapps.com)\n\nCurious—how do you guys handle task management for your own side projects? Do you use existing tools, or did you build your own workflows too?",
+      "topic": "indie_journey",
+      "created_at": "2026-09-05T18:35:51.210803+00:00",
+      "status": "pending",
+      "telegram_message_id": 47
     }
   },
   "posted_threads": {
