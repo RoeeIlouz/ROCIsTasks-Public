@@ -62,7 +62,8 @@ class DevtoClient:
         body_markdown: str,
         tags: Optional[List[str]] = None,
         published: bool = True,
-        series: Optional[str] = None
+        series: Optional[str] = None,
+        main_image: Optional[str] = None
     ) -> Optional[Dict[str, Any]]:
         """
         Publishes a new article or devlog on Dev.to.
@@ -85,6 +86,8 @@ class DevtoClient:
         }
         if series:
             payload["article"]["series"] = series
+        if main_image:
+            payload["article"]["main_image"] = main_image
 
         try:
             res = requests.post(url, headers=self._headers(), json=payload, timeout=20)
@@ -104,4 +107,30 @@ class DevtoClient:
                 return None
         except Exception as e:
             logger.error(f"Network error publishing Dev.to article: {e}")
+            return None
+
+    def get_analytics(self) -> Optional[List[Dict[str, Any]]]:
+        """Fetches all published and draft articles with view and reaction stats."""
+        if not self.is_configured():
+            return None
+
+        url = f"{self.base_url}/articles/me/all"
+        try:
+            res = requests.get(url, headers=self._headers(), timeout=20)
+            res.raise_for_status()
+            articles = res.json()
+            results = []
+            for art in articles:
+                results.append({
+                    "id": art.get("id"),
+                    "title": art.get("title"),
+                    "url": art.get("url"),
+                    "page_views_count": art.get("page_views_count", 0),
+                    "positive_reactions_count": art.get("positive_reactions_count", 0),
+                    "comments_count": art.get("comments_count", 0),
+                    "published": art.get("published", False)
+                })
+            return results
+        except Exception as e:
+            logger.error(f"Failed to fetch Dev.to analytics: {e}")
             return None

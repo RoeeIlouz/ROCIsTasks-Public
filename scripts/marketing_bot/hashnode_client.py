@@ -81,7 +81,8 @@ class HashnodeClient:
         body_markdown: str,
         tags: Optional[List[str]] = None,
         canonical_url: Optional[str] = None,
-        subtitle: Optional[str] = None
+        subtitle: Optional[str] = None,
+        cover_image_url: Optional[str] = None
     ) -> Optional[Dict[str, Any]]:
         """
         Publishes an engineering article to Hashnode.
@@ -125,6 +126,11 @@ class HashnodeClient:
         if subtitle:
             post_input["subtitle"] = subtitle
 
+        if cover_image_url:
+            post_input["coverImageOptions"] = {
+                "coverImageURL": cover_image_url
+            }
+
         headers = {
             "Authorization": self.access_token.strip(),
             "Content-Type": "application/json",
@@ -156,4 +162,76 @@ class HashnodeClient:
 
         except Exception as e:
             logger.error(f"Failed to publish to Hashnode: {e}")
+            return None
+
+    def get_publication_stats(self) -> Optional[Dict[str, Any]]:
+        """Fetches publication posts and read/view stats."""
+        if not self.is_configured():
+            return None
+
+        pub_id = self._get_publication_id()
+        if not pub_id:
+            return None
+
+        query = """
+        query GetPubStats($id: ObjectId!) {
+          publication(id: $id) {
+            title
+            totalPosts
+            posts(first: 10) {
+              edges {
+                node {
+                  id
+                  title
+                  views
+                  reactionCount
+                }
+              }
+            }
+          }
+        }
+        """
+        headers = {
+            "Authorization": self.access_token.strip(),
+            "Content-Type": "application/json",
+            "User-Agent": "ROCIsTasksMarketing/1.0"
+        }
+        try:
+            res = requests.post(
+                HASHNODE_GQL_URL,
+                headers=headers,
+                json={"query": query, "variables": {"id": pub_id}},
+                timeout=20
+            )
+            res.raise_for_status()
+            data = res.json()
+            pub_data = data.get("data", {}).get("publication", {})
+            if not pub_data:
+                return None
+
+            posts = []
+            total_views = 0
+            total_reactions = 0
+            for edge in pub_data.get("posts", {}).get("edges", []):
+                node = edge.get("node", {})
+                v = node.get("views", 0)
+                r = node.get("reactionCount", 0)
+                total_views += v
+                total_reactions += r
+                posts.append({
+                    "id": node.get("id"),
+                    "title": node.get("title"),
+                    "views": v,
+                    "reactionCount": r
+                })
+
+            return {
+                "title": pub_data.get("title"),
+                "total_posts": pub_data.get("totalPosts", len(posts)),
+                "total_views": total_views,
+                "total_reactions": total_reactions,
+                "posts": posts
+            }
+        except Exception as e:
+            logger.error(f"Failed to fetch Hashnode publication stats: {e}")
             return None

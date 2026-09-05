@@ -16,12 +16,14 @@ from .config import (
 )
 from .state_manager import StateManager
 from .bluesky_client import BlueskyClient
+from .query_tuner import QueryTuner
 
 logger = logging.getLogger(__name__)
 
 class DiscoveryEngine:
     def __init__(self, state_manager: StateManager):
         self.state_manager = state_manager
+        self.query_tuner = QueryTuner(state_manager)
         self.now_ts = time.time()
         self.min_created_ts = self.now_ts - (MAX_POST_AGE_HOURS * 3600)
         self.bsky = BlueskyClient()
@@ -48,12 +50,13 @@ class DiscoveryEngine:
         Discovers active, fresh, and relevant threads across Reddit, Bluesky, Hacker News, and Dev.to.
         """
         candidates: List[Dict[str, Any]] = []
+        active_queries = self.query_tuner.get_active_queries()
 
         # 1. Search Reddit (via PRAW if configured, otherwise headless Playwright)
         praw_reddit = self._get_praw_reddit()
         if praw_reddit:
             for sub_name in REDDIT_SUBREDDITS[:4]:
-                for query in DISCOVERY_SEARCH_QUERIES[:2]:
+                for query in active_queries[:3]:
                     if len(candidates) >= max_results * 2:
                         break
                     try:
@@ -81,7 +84,7 @@ class DiscoveryEngine:
 
         # 2. Search Bluesky (if configured)
         if self.bsky.is_configured():
-            for query in DISCOVERY_SEARCH_QUERIES[:2]:
+            for query in active_queries[:3]:
                 try:
                     bsky_posts = self.bsky.search_posts(query, limit=5)
                     candidates.extend(bsky_posts)

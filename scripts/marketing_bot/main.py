@@ -27,6 +27,9 @@ from .poster import Poster
 from .feedback_monitor import FeedbackMonitor
 from .devlog_engine import DevlogEngine
 from .reddit_post_generator import RedditPostGenerator
+from .analytics import AnalyticsTracker
+from .launch_kit import LaunchKitGenerator
+from .query_tuner import QueryTuner
 
 logging.basicConfig(
     level=logging.INFO,
@@ -417,7 +420,35 @@ def run_pipeline(dry_run: bool = False):
 def main():
     parser = argparse.ArgumentParser(description="ROCIs Tasks Marketing & Feedback Bot")
     parser.add_argument("--dry-run", action="store_true", help="Run without sending real messages or posting.")
+    parser.add_argument("--analytics", action="store_true", help="Generate and send weekly analytics traction digest to Telegram.")
+    parser.add_argument("--launch-kit", action="store_true", help="Generate Show HN and Product Hunt launch packages to Telegram.")
+    parser.add_argument("--version-tag", type=str, default="1.0", help="Version string for launch kit (default: 1.0).")
+    parser.add_argument("--refresh-queries", action="store_true", help="Force regenerate dynamic community search queries via Gemini.")
     args = parser.parse_args()
+
+    state_mgr = StateManager(STATE_FILE_PATH)
+    telegram = TelegramBot()
+
+    if args.analytics:
+        logger.info("Executing Weekly Analytics Digest...")
+        tracker = AnalyticsTracker(state_mgr, telegram)
+        success = tracker.generate_and_send_digest()
+        logger.info(f"Analytics digest dispatch result: {success}")
+        return
+
+    if args.launch_kit:
+        logger.info(f"Generating Launch Kit for v{args.version_tag}...")
+        generator = LaunchKitGenerator(state_mgr, telegram)
+        success = generator.dispatch_to_telegram(version=args.version_tag)
+        logger.info(f"Launch kit dispatch result: {success}")
+        return
+
+    if args.refresh_queries:
+        logger.info("Force refreshing dynamic discovery queries...")
+        tuner = QueryTuner(state_mgr)
+        queries = tuner.get_active_queries(force_refresh=True)
+        logger.info(f"Active search queries: {queries}")
+        return
 
     is_dry = args.dry_run or DRY_RUN
     run_pipeline(dry_run=is_dry)

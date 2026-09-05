@@ -24,9 +24,10 @@ class ThreadsClient:
             self.access_token and len(self.access_token.strip()) > 10
         )
 
-    def post_thread(self, text: str) -> Optional[str]:
+    def post_thread(self, text: str, image_url: Optional[str] = None) -> Optional[str]:
         """
         Publishes a post on Meta Threads using the 2-step container creation & publishing workflow.
+        Supports both text posts and image attachments via public image URLs.
         Returns the thread URL or ID if successful, or None on failure.
         """
         if not self.is_configured():
@@ -42,10 +43,15 @@ class ThreadsClient:
             # Step 1: Create the media container
             create_url = f"{THREADS_API_BASE}/{self.user_id}/threads"
             payload = {
-                "media_type": "TEXT",
-                "text": clean_text,
-                "access_token": self.access_token
+                "access_token": self.access_token,
+                "text": clean_text
             }
+            if image_url:
+                payload["media_type"] = "IMAGE"
+                payload["image_url"] = image_url
+            else:
+                payload["media_type"] = "TEXT"
+
             res = requests.post(create_url, data=payload, timeout=20)
             if res.status_code not in (200, 201):
                 logger.error(f"Threads container creation failed ({res.status_code}): {res.text}")

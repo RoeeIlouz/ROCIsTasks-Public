@@ -24,6 +24,7 @@ from .mastodon_client import MastodonClient
 from .threads_client import ThreadsClient
 from .hashnode_client import HashnodeClient
 from .medium_client import MediumClient
+from .media_manager import MediaManager
 
 logger = logging.getLogger(__name__)
 
@@ -39,6 +40,7 @@ class Poster:
         self.threads = ThreadsClient()
         self.hashnode = HashnodeClient()
         self.medium = MediumClient()
+        self.media_manager = MediaManager()
         self._reddit = None
 
     def _get_reddit_client(self):
@@ -243,6 +245,8 @@ class Poster:
         msg_id = draft.get("telegram_message_id")
 
         published_links = {}
+        banner_url = self.media_manager.get_default_banner_url()
+        banner_data = self.media_manager.get_default_banner_data()
 
         # 1. Publish to Dev.to (Primary canonical publication)
         devto_url = None
@@ -252,7 +256,8 @@ class Poster:
                     title=devto_title,
                     body_markdown=devto_body,
                     tags=tags,
-                    published=True
+                    published=True,
+                    main_image=banner_url
                 )
                 if res and res.get("url"):
                     devto_url = res["url"]
@@ -263,7 +268,7 @@ class Poster:
         else:
             logger.warning("Dev.to is not configured. Skipping Dev.to publication.")
 
-        # 2. Publish to Hashnode (with canonical URL)
+        # 2. Publish to Hashnode (with canonical URL & cover image)
         hashnode_url = None
         if self.hashnode.is_configured():
             try:
@@ -271,7 +276,8 @@ class Poster:
                     title=devto_title,
                     body_markdown=devto_body,
                     tags=tags,
-                    canonical_url=devto_url
+                    canonical_url=devto_url,
+                    cover_image_url=banner_url
                 )
                 if res_h and res_h.get("url"):
                     hashnode_url = res_h["url"]
@@ -315,7 +321,7 @@ class Poster:
             except Exception as e:
                 logger.error(f"Failed to post DevLog to X: {e}")
 
-        # 5. Publish to Bluesky
+        # 5. Publish to Bluesky (with image attachment)
         bsky_url = None
         if self.bluesky.is_configured():
             try:
@@ -326,14 +332,18 @@ class Poster:
                     clean_bsky = clean_bsky[:max_bsky_body - 1].rstrip() + "…"
                 post_text = f"{clean_bsky}{link_part}"
 
-                res_bsky = self.bluesky.post_reply(post_text)
+                image_blob = None
+                if banner_data:
+                    image_blob = self.bluesky.upload_blob(banner_data[0], mime_type=banner_data[1])
+
+                res_bsky = self.bluesky.post_reply(post_text, image_blob=image_blob)
                 if res_bsky:
                     bsky_url = res_bsky
                     published_links["Bluesky"] = bsky_url
             except Exception as e:
                 logger.error(f"Failed to post DevLog to Bluesky: {e}")
 
-        # 6. Publish to Mastodon / Fediverse
+        # 6. Publish to Mastodon / Fediverse (with media attachment)
         mastodon_url = None
         if self.mastodon.is_configured():
             try:
@@ -343,14 +353,25 @@ class Poster:
                 max_m_body = 495 - len(link_footer)
                 if len(m_text) > max_m_body:
                     m_text = m_text[:max_m_body - 1].rstrip() + "…"
-                res_m = self.mastodon.post_status(f"{m_text}{link_footer}")
+
+                media_ids = None
+                if banner_data:
+                    m_id = self.mastodon.upload_media(
+                        banner_data[0],
+                        mime_type=banner_data[1],
+                        description="ROCIs Tasks Offline App"
+                    )
+                    if m_id:
+                        media_ids = [m_id]
+
+                res_m = self.mastodon.post_status(f"{m_text}{link_footer}", media_ids=media_ids)
                 if res_m:
                     mastodon_url = res_m
                     published_links["Mastodon"] = mastodon_url
             except Exception as e:
                 logger.error(f"Failed to post DevLog to Mastodon: {e}")
 
-        # 7. Publish to Meta Threads
+        # 7. Publish to Meta Threads (with image attachment)
         threads_url = None
         if self.threads.is_configured():
             try:
@@ -360,7 +381,7 @@ class Poster:
                 max_t_body = 495 - len(link_footer)
                 if len(t_text) > max_t_body:
                     t_text = t_text[:max_t_body - 1].rstrip() + "…"
-                res_t = self.threads.post_thread(f"{t_text}{link_footer}")
+                res_t = self.threads.post_thread(f"{t_text}{link_footer}", image_url=banner_url)
                 if res_t:
                     threads_url = res_t
                     published_links["Threads"] = threads_url

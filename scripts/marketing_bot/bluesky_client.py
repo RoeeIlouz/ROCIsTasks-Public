@@ -118,8 +118,35 @@ class BlueskyClient:
             })
         return facets
 
-    def post_reply(self, text: str, reply_to_uri: Optional[str] = None, reply_to_cid: Optional[str] = None) -> Optional[str]:
-        """Publishes a post or reply on Bluesky with strict length safety and link facets."""
+    def upload_blob(self, image_bytes: bytes, mime_type: str = "image/png") -> Optional[Dict[str, Any]]:
+        """Uploads an image blob to ATProto repo."""
+        if not self._login():
+            return None
+
+        url = "https://bsky.social/xrpc/com.atproto.repo.uploadBlob"
+        headers = {
+            "Authorization": f"Bearer {self.access_jwt}",
+            "Content-Type": mime_type
+        }
+        try:
+            res = requests.post(url, headers=headers, data=image_bytes, timeout=30)
+            res.raise_for_status()
+            blob_data = res.json().get("blob")
+            logger.info("Successfully uploaded image blob to Bluesky")
+            return blob_data
+        except Exception as e:
+            logger.error(f"Failed to upload blob to Bluesky: {e}")
+            return None
+
+    def post_reply(
+        self,
+        text: str,
+        reply_to_uri: Optional[str] = None,
+        reply_to_cid: Optional[str] = None,
+        image_blob: Optional[Dict[str, Any]] = None,
+        alt_text: str = "ROCIs Tasks Visual"
+    ) -> Optional[str]:
+        """Publishes a post or reply on Bluesky with strict length safety, link facets, and optional image."""
         if not self._login():
             return None
 
@@ -147,6 +174,15 @@ class BlueskyClient:
         if facets:
             record["facets"] = facets
 
+        if image_blob:
+            record["embed"] = {
+                "$type": "app.bsky.embed.images",
+                "images": [{
+                    "alt": alt_text,
+                    "image": image_blob
+                }]
+            }
+
         if reply_to_uri and reply_to_cid:
             record["reply"] = {
                 "root": {"uri": reply_to_uri, "cid": reply_to_cid},
@@ -172,4 +208,25 @@ class BlueskyClient:
             return web_link
         except Exception as e:
             logger.error(f"Failed to post record to Bluesky: {e}")
+            return None
+
+    def get_profile_stats(self) -> Optional[Dict[str, Any]]:
+        """Fetches account follower, following, and post counts."""
+        if not self._login():
+            return None
+
+        url = "https://bsky.social/xrpc/app.bsky.actor.getProfile"
+        headers = {"Authorization": f"Bearer {self.access_jwt}"}
+        params = {"actor": self.handle}
+        try:
+            res = requests.get(url, headers=headers, params=params, timeout=15)
+            res.raise_for_status()
+            data = res.json()
+            return {
+                "followers_count": data.get("followersCount", 0),
+                "follows_count": data.get("followsCount", 0),
+                "posts_count": data.get("postsCount", 0)
+            }
+        except Exception as e:
+            logger.error(f"Failed to fetch Bluesky profile stats: {e}")
             return None
