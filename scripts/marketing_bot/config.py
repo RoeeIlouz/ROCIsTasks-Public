@@ -41,6 +41,13 @@ MAX_POST_AGE_HOURS = int(os.getenv("MAX_POST_AGE_HOURS", "72"))
 AUTO_POST_ORGANIC = os.getenv("AUTO_POST_ORGANIC", "true").lower() in ("true", "1", "yes")
 ORGANIC_POST_MIN_INTERVAL_HOURS = int(os.getenv("ORGANIC_POST_MIN_INTERVAL_HOURS", "12"))
 
+# ZERO-COST FREE TIER SAFETY GUARDS (Prevent any paid charges)
+# X / Twitter Free Tier allows 500 posts / month. We cap at 100 / month (well below 500) and max 5 / day.
+X_MAX_MONTHLY_POSTS = int(os.getenv("X_MAX_MONTHLY_POSTS", "100"))
+X_MAX_DAILY_POSTS = int(os.getenv("X_MAX_DAILY_POSTS", "5"))
+
+# Gemini API Free Tier safeguards: maximum calls per run to remain well under 15 RPM
+GEMINI_MAX_CALLS_PER_RUN = int(os.getenv("GEMINI_MAX_CALLS_PER_RUN", "10"))
 
 # State Storage Path
 STATE_FILE_PATH = base_dir / "marketing_state.json"

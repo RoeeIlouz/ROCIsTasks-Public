@@ -15,7 +15,8 @@ DEFAULT_STATE = {
     "pending_drafts": {},
     "posted_threads": {},
     "recorded_feedback": [],
-    "organic_posts": []
+    "organic_posts": [],
+    "x_posts_timestamps": []
 }
 
 class StateManager:
@@ -124,3 +125,45 @@ class StateManager:
         })
         # Keep recent 30 posts to avoid unbound growth
         self.data["organic_posts"] = self.data["organic_posts"][-30:]
+
+    def can_post_to_x(self, max_monthly: int = 100, max_daily: int = 5) -> bool:
+        """
+        Guarantees that X posting NEVER exceeds the free tier quota.
+        Counts tweets within the last 30 days and last 24 hours.
+        """
+        now = datetime.now(timezone.utc)
+        timestamps = self.data.get("x_posts_timestamps", [])
+
+        # Filter valid timestamps within 30 days
+        valid_30d = []
+        count_24h = 0
+        for ts_str in timestamps:
+            try:
+                dt = datetime.fromisoformat(ts_str)
+                age_hours = (now - dt).total_seconds() / 3600.0
+                if age_hours <= 24 * 30:
+                    valid_30d.append(ts_str)
+                if age_hours <= 24:
+                    count_24h += 1
+            except Exception:
+                continue
+
+        # Keep state clean
+        self.data["x_posts_timestamps"] = valid_30d
+
+        if len(valid_30d) >= max_monthly:
+            logger.warning(f"SAFETY GUARD: X monthly free limit reached ({len(valid_30d)}/{max_monthly} in 30d). Blocking post to prevent charges.")
+            return False
+
+        if count_24h >= max_daily:
+            logger.warning(f"SAFETY GUARD: X daily limit reached ({count_24h}/{max_daily} in 24h). Blocking post to prevent charges.")
+            return False
+
+        return True
+
+    def record_x_post(self) -> None:
+        """Records a successful post to X to decrement available free quota."""
+        now_iso = datetime.now(timezone.utc).isoformat()
+        if "x_posts_timestamps" not in self.data:
+            self.data["x_posts_timestamps"] = []
+        self.data["x_posts_timestamps"].append(now_iso)

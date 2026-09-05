@@ -8,7 +8,9 @@ from .config import (
     REDDIT_USERNAME,
     REDDIT_PASSWORD,
     REDDIT_USER_AGENT,
-    DEVTO_API_KEY
+    DEVTO_API_KEY,
+    X_MAX_MONTHLY_POSTS,
+    X_MAX_DAILY_POSTS
 )
 from .state_manager import StateManager
 from .telegram_bot import TelegramBot
@@ -136,12 +138,16 @@ class Poster:
                 logger.error(f"Failed to post to Bluesky: {e}")
 
         # ---------------------------------------------------------------------
-        # 3. Twitter / X Auto-Posting
+        # 3. Twitter / X Auto-Posting (Guarded by ZERO-COST free quota limits)
         # ---------------------------------------------------------------------
         elif platform == "x" and self.x_client.is_configured():
+            if not self.state_manager.can_post_to_x(max_monthly=X_MAX_MONTHLY_POSTS, max_daily=X_MAX_DAILY_POSTS):
+                logger.warning("SAFETY GUARD: X post blocked because free tier limit would be exceeded. Preventing charges.")
+                return False
             try:
                 tweet_url = self.x_client.post_tweet(draft_text)
                 if tweet_url:
+                    self.state_manager.record_x_post()
                     self.state_manager.record_posted_thread(thread_id, {
                         "platform": "x",
                         "thread_url": tweet_url,

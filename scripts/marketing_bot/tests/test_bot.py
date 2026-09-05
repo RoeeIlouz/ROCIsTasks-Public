@@ -148,6 +148,24 @@ class TestMarketingBot(unittest.TestCase):
         # 4. Immediate cooldown (0h) should be True
         self.assertTrue(self.state_mgr.can_post_organic(min_interval_hours=0))
 
+    def test_x_zero_cost_quota_guards(self):
+        # 1. Fresh state should allow posting
+        self.assertTrue(self.state_mgr.can_post_to_x(max_monthly=3, max_daily=2))
+
+        # 2. Record 2 posts (hitting daily limit of 2)
+        self.state_mgr.record_x_post()
+        self.state_mgr.record_x_post()
+
+        # 3. Should now be blocked by daily limit (2/2)
+        self.assertFalse(self.state_mgr.can_post_to_x(max_monthly=10, max_daily=2))
+
+        # 4. Should be allowed if daily limit were 5
+        self.assertTrue(self.state_mgr.can_post_to_x(max_monthly=10, max_daily=5))
+
+        # 5. Record 1 more post to hit monthly limit of 3
+        self.state_mgr.record_x_post()
+        self.assertFalse(self.state_mgr.can_post_to_x(max_monthly=3, max_daily=5))
+
 if __name__ == "__main__":
     unittest.main()
 

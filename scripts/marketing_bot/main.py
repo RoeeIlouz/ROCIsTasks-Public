@@ -11,7 +11,10 @@ from .config import (
     DRY_RUN,
     DEVTO_API_KEY,
     AUTO_POST_ORGANIC,
-    ORGANIC_POST_MIN_INTERVAL_HOURS
+    ORGANIC_POST_MIN_INTERVAL_HOURS,
+    X_MAX_MONTHLY_POSTS,
+    X_MAX_DAILY_POSTS,
+    GEMINI_MAX_CALLS_PER_RUN
 )
 from .state_manager import StateManager
 from .gemini_engine import GeminiEngine
@@ -204,11 +207,15 @@ def run_pipeline(dry_run: bool = False):
 
             published_platforms = []
             if not dry_run:
-                # 1. Post to Twitter/X
+                # 1. Post to Twitter/X (Guarded by ZERO-COST free quota limits)
                 if poster.x_client.is_configured():
-                    tweet_url = poster.x_client.post_tweet(thought_text)
-                    if tweet_url:
-                        published_platforms.append("Twitter/X")
+                    if state_mgr.can_post_to_x(max_monthly=X_MAX_MONTHLY_POSTS, max_daily=X_MAX_DAILY_POSTS):
+                        tweet_url = poster.x_client.post_tweet(thought_text)
+                        if tweet_url:
+                            state_mgr.record_x_post()
+                            published_platforms.append("Twitter/X")
+                    else:
+                        logger.info("Skipping X post: free tier quota ceiling reached (protecting against charges).")
 
                 # 2. Post to Bluesky
                 if poster.bluesky.is_configured():
