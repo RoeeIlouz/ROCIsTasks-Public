@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-05T16:35:56.416625+00:00",
+  "last_run_timestamp": "2026-09-05T16:42:26.352606+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -319,37 +319,37 @@
       "platform": "reddit",
       "title": "I built DitherEYE—a 100% free, offline Android tool for processing retro dither effects and textures for images & videos (No Subscriptions)",
       "url": "https://reddit.com/r/SideProject/comments/1w85f8l/i_built_dithereyea_100_free_offline_android_tool/",
-      "inspected_at": "2026-09-05T16:35:39.623419+00:00"
+      "inspected_at": "2026-09-05T16:36:17.822149+00:00"
     },
     "reddit_1w85gf6": {
       "platform": "reddit",
       "title": "How I architected an enterprise fitness platform using Flutter BLoC, .NET 10 Minimal APIs, and PostgreSQL",
       "url": "https://reddit.com/r/FlutterDev/comments/1w85gf6/how_i_architected_an_enterprise_fitness_platform/",
-      "inspected_at": "2026-09-05T16:35:41.406498+00:00"
+      "inspected_at": "2026-09-05T16:36:50.903071+00:00"
     },
     "bsky_bafyreidu6vk": {
       "platform": "bluesky",
       "title": "Demos played:\n\nBloodstone Rising\nstore.steampowered.com/app/3338020/...\n--\nUltim...",
       "url": "https://bsky.app/profile/charmaemengming.bsky.social/post/3muiitfrgi22v",
-      "inspected_at": "2026-09-05T16:35:45.627673+00:00"
+      "inspected_at": "2026-09-05T16:39:57.305997+00:00"
     },
     "bsky_bafyreicurrf": {
       "platform": "bluesky",
       "title": "whoa! you built a custom todo app that maps to your own mental processes to mana...",
       "url": "https://bsky.app/profile/whatthefuck.computer/post/3mukr6zpq6k2s",
-      "inspected_at": "2026-09-05T16:35:46.423240+00:00"
+      "inspected_at": "2026-09-05T16:40:24.747543+00:00"
     },
     "bsky_bafyreihaww2": {
       "platform": "bluesky",
       "title": "Esta app tiene todo lo que necesitas en tu Mac gratis y open source:\n\n- Dock Pre...",
       "url": "https://bsky.app/profile/ikenshu.bsky.social/post/3mudseqmyxv25",
-      "inspected_at": "2026-09-05T16:35:48.484533+00:00"
+      "inspected_at": "2026-09-05T16:40:29.970832+00:00"
     },
     "bsky_bafyreigyjty": {
       "platform": "bluesky",
       "title": "Built a todo app in under 5 minutes:\nyoutube.com/watch?v=2ZKR...\n\nPlayground: ol...",
       "url": "https://bsky.app/profile/eissapk.bsky.social/post/3mtltnynft22a",
-      "inspected_at": "2026-09-05T16:35:49.299615+00:00"
+      "inspected_at": "2026-09-05T16:40:39.558684+00:00"
     }
   },
   "pending_drafts": {
@@ -389,6 +389,30 @@
       "draft_text": "That workflow sounds fascinating—orchestrating agent teams locally on a Mac Mini while needing a system that actually maps to how your brain works is the ultimate productivity puzzle.\n\nIt actually mirrors why I built ROCIs Tasks. I got so frustrated with bloated corporate apps and rigid monthly subscriptions that I coded my own offline-first workspace using Flutter and Hive. It features a natural language parser so you can just type out thoughts like 'Review agent logs tomorrow at 3pm #urgent @dev' without messing around with dropdowns, plus deep AMOLED dark mode and instant local performance.\n\nIf you ever want to check out a fast, no-nonsense web and Android workspace that stays out of your way, you can try it here: https://tasks.rocisapps.com or grab the Android app on Google Play: https://play.google.com/store/apps/details?id=com.rocisapps.tasks.",
       "telegram_message_id": 18,
       "created_at": "2026-09-05T16:35:48.484515+00:00",
+      "status": "pending"
+    },
+    "draft_38c4c4ae": {
+      "thread_id": "bsky_bafyreicurrf",
+      "platform": "bluesky",
+      "thread_title": "whoa! you built a custom todo app that maps to your own mental processes to mana...",
+      "thread_url": "https://bsky.app/profile/whatthefuck.computer/post/3mukr6zpq6k2s",
+      "relevance_score": 85,
+      "reasoning": "The user is expressing enthusiasm for a custom, personalized productivity workflow mapped to their mental processes, opening the door to discuss alternative task and workflow management tools.",
+      "draft_text": "That workflow sounds fascinating—orchestrating agent teams locally on a Mac Mini while needing a system that actually maps to how your brain works is the ultimate productivity puzzle.\n\nIt actually mirrors why I built ROCIs Tasks. I got so frustrated with bloated corporate apps and rigid monthly subscriptions that I coded my own offline-first workspace using Flutter and Hive. It features a natural language parser so you can just type out thoughts like 'Review agent logs tomorrow at 3pm #urgent @dev' without messing around with dropdowns, plus deep AMOLED dark mode and instant local performance.\n\nIf you ever want to check out a fast, no-nonsense web and Android workspace that stays out of your way, you can try it here: https://tasks.rocisapps.com or grab the Android app on Google Play: https://play.google.com/store/apps/details?id=com.rocisapps.tasks.",
+      "telegram_message_id": 18,
+      "created_at": "2026-09-05T16:35:48.484515+00:00",
+      "status": "pending"
+    },
+    "draft_6494d625": {
+      "thread_id": "bsky_bafyreicurrf",
+      "platform": "bluesky",
+      "thread_title": "whoa! you built a custom todo app that maps to your own mental processes to mana...",
+      "thread_url": "https://bsky.app/profile/whatthefuck.computer/post/3mukr6zpq6k2s",
+      "relevance_score": 85,
+      "reasoning": "The user is expressing deep interest in a custom productivity workflow that maps to personal mental processes and orchestrating tasks, which aligns well with ROCIs Tasks' philosophy of custom workflow design, fast execution, and natural language parsing.",
+      "draft_text": "It's funny you mention that—that exact frustration with bloated corporate tools is why I ended up building my own as a solo indie dev. I wanted something that actually maps to how we think instead of making you click through endless dropdowns.\n\nI built ROCIs Tasks using Flutter and local-first storage (Hive) precisely for this kind of workflow. It features a natural language parser so you can just type out what you need ('Deploy staging server tomorrow at 3pm #urgent @dev'), and it handles the rest instantly offline. Plus, it has native Android widgets if you like keeping your focus right on your home screen.\n\nIf you want to check out how it handles fast, local-first task orchestration, you can grab it on Google Play (https://play.google.com/store/apps/details?id=com.rocisapps.tasks) or try the web version (https://tasks.rocisapps.com). Would love to hear your thoughts if you give it a spin!",
+      "telegram_message_id": 20,
+      "created_at": "2026-09-05T16:40:29.970814+00:00",
       "status": "pending"
     }
   },
