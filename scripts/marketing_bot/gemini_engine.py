@@ -8,9 +8,13 @@ from .config import GEMINI_API_KEY, APP_INFO
 
 logger = logging.getLogger(__name__)
 
+# Candidate models to try in priority order (including future 3.x, 2.5, 2.0, 1.5)
 GEMINI_MODELS = [
-    "gemini-2.0-flash",
+    "gemini-3.0-flash",
+    "gemini-3-flash",
     "gemini-2.5-flash",
+    "gemini-2.0-flash",
+    "gemini-2.0-flash-exp",
     "gemini-1.5-flash-latest",
     "gemini-1.5-flash",
     "gemini-pro"
@@ -28,9 +32,37 @@ class GeminiEngine:
     def __init__(self, api_key: Optional[str] = None):
         self.api_key = api_key or GEMINI_API_KEY
         self.working_model: Optional[str] = None
+        self._discovered_models: Optional[list] = None
 
     def is_available(self) -> bool:
         return bool(self.api_key and len(self.api_key.strip()) > 5)
+
+    def _discover_available_models(self) -> list:
+        """Dynamically queries the Gemini API to find which models are actually available for this key."""
+        if self._discovered_models is not None:
+            return self._discovered_models
+
+        try:
+            url = f"https://generativelanguage.googleapis.com/v1beta/models?key={self.api_key}"
+            resp = requests.get(url, timeout=10)
+            if resp.status_code == 200:
+                data = resp.json()
+                raw_models = [
+                    m.get("name", "").replace("models/", "")
+                    for m in data.get("models", [])
+                    if "generateContent" in m.get("supportedGenerationMethods", [])
+                ]
+                # Filter models: prefer flash models first, sorted by version descending
+                flash_models = [m for m in raw_models if "flash" in m]
+                other_models = [m for m in raw_models if "flash" not in m]
+                self._discovered_models = flash_models + other_models
+                logger.info(f"Discovered {len(self._discovered_models)} Gemini models via API. Top models: {self._discovered_models[:5]}")
+                return self._discovered_models
+        except Exception as e:
+            logger.warning(f"Could not dynamically query models endpoint: {e}")
+
+        self._discovered_models = list(GEMINI_MODELS)
+        return self._discovered_models
 
     def _call_gemini(self, prompt: str, temperature: float = 0.7) -> Optional[str]:
         if not self.is_available():
@@ -52,8 +84,17 @@ class GeminiEngine:
             }
         }
 
-        # If we already found a working model, try that first
-        models_to_try = [self.working_model] if self.working_model else list(GEMINI_MODELS)
+        # Build candidate list: working_model first, then discovered from API, then fallback list
+        models_to_try = []
+        if self.working_model:
+            models_to_try.append(self.working_model)
+
+        # Discover dynamic models from Google
+        api_models = self._discover_available_models()
+        for m in api_models:
+            if m not in models_to_try:
+                models_to_try.append(m)
+
         for m in GEMINI_MODELS:
             if m not in models_to_try:
                 models_to_try.append(m)
