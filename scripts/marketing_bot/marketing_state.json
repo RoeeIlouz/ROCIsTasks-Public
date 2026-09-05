@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-05T14:26:30.360071+00:00",
+  "last_run_timestamp": "2026-09-05T14:59:40.692819+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -134,9 +134,58 @@
       "title": "640 visits, 4 signups, 0 payments. Roast it",
       "url": "https://reddit.com/r/roastmystartup/comments/1w81tds/640_visits_4_signups_0_payments_roast_it/",
       "inspected_at": "2026-09-05T14:26:26.972727+00:00"
+    },
+    "reddit_1w82wm9": {
+      "platform": "reddit",
+      "title": "My passion Side Project: a drinking tracker and journal that never tells you to drink less. Shipped in Japan where I live, now available in the US.",
+      "url": "https://reddit.com/r/SideProject/comments/1w82wm9/my_passion_side_project_a_drinking_tracker_and/",
+      "inspected_at": "2026-09-05T14:59:33.296147+00:00"
+    },
+    "reddit_1w82t12": {
+      "platform": "reddit",
+      "title": "Cramblr - Thai lesson photos to flashcards you can review and study",
+      "url": "https://reddit.com/r/SideProject/comments/1w82t12/cramblr_thai_lesson_photos_to_flashcards_you_can/",
+      "inspected_at": "2026-09-05T14:59:35.655639+00:00"
+    },
+    "reddit_1w82qy1": {
+      "platform": "reddit",
+      "title": "made a free tool for linear/square/board feet conversions + cost estimates, feedback welcome",
+      "url": "https://reddit.com/r/SideProject/comments/1w82qy1/made_a_free_tool_for_linearsquareboard_feet/",
+      "inspected_at": "2026-09-05T14:59:36.370225+00:00"
+    },
+    "reddit_1w82mcf": {
+      "platform": "reddit",
+      "title": "I got tired of keeping track of random deadlines, so I built this",
+      "url": "https://reddit.com/r/SideProject/comments/1w82mcf/i_got_tired_of_keeping_track_of_random_deadlines/",
+      "inspected_at": "2026-09-05T14:59:37.091288+00:00"
+    },
+    "reddit_1w7jcwn": {
+      "platform": "reddit",
+      "title": "Roast my App.. Built for me ready to share with others. Chronic and acute health issues.. Insurance fight back claims.. trackers.. the works..",
+      "url": "https://reddit.com/r/roastmystartup/comments/1w7jcwn/roast_my_app_built_for_me_ready_to_share_with/",
+      "inspected_at": "2026-09-05T14:59:39.120031+00:00"
+    },
+    "reddit_1w7g73v": {
+      "platform": "reddit",
+      "title": "[Dev] I made BLINDER — a lightweight mobile 3D editor built entirely with HTML/CSS/JS for smartphones",
+      "url": "https://reddit.com/r/roastmystartup/comments/1w7g73v/dev_i_made_blinder_a_lightweight_mobile_3d_editor/",
+      "inspected_at": "2026-09-05T14:59:39.923394+00:00"
     }
   },
-  "pending_drafts": {},
+  "pending_drafts": {
+    "draft_96d56cd5": {
+      "thread_id": "reddit_1w82mcf",
+      "platform": "reddit",
+      "thread_title": "I got tired of keeping track of random deadlines, so I built this",
+      "thread_url": "https://reddit.com/r/SideProject/comments/1w82mcf/i_got_tired_of_keeping_track_of_random_deadlines/",
+      "relevance_score": 90,
+      "reasoning": "The user is sharing a custom-built solution for tracking random deadlines, indicating they care about task management and developer-built productivity tools. This is a prime opportunity to share ROCIs Tasks, which was built out of similar indie developer frustration.",
+      "draft_text": "I totally feel your pain—that exact frustration is what drove me to build my own app, ROCIs Tasks. I got so tired of bloated corporate task apps with predatory subscriptions and clunky interfaces.\n\nSince you're on Android, you might appreciate that I built native Kotlin home screen widgets for it (like a daily focus agenda and quick actions) so you can track random deadlines right from your home screen without lag. It also has a natural language parser, so you can just type 'Finish project Friday at 3pm #urgent' and it parses everything automatically.\n\nIt's offline-first using Hive, runs super fast, and has a true AMOLED pitch-black mode if you're into that. \n\nIf you want to check it out, it's on Google Play here: https://play.google.com/store/apps/details?id=com.rocisapps.tasks or you can check the web version at https://tasks.rocisapps.com. Would love to hear what you think of it since you built your own tool too!",
+      "telegram_message_id": 8,
+      "created_at": "2026-09-05T14:59:39.120010+00:00",
+      "status": "pending"
+    }
+  },
   "posted_threads": {},
   "recorded_feedback": [],
   "last_organic_post_timestamp": "2026-09-05T14:26:29.792124+00:00",
@@ -149,5 +198,6 @@
       ],
       "posted_at": "2026-09-05T14:26:29.792124+00:00"
     }
-  ]
+  ],
+  "x_posts_timestamps": []
 }
