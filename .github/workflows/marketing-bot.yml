@@ -16,6 +16,8 @@ on:
         required: false
         default: false
         type: boolean
+  repository_dispatch:
+    types: [telegram-approval]
 
 jobs:
   run-marketing-pipeline:
