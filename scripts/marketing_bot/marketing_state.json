@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-05T16:47:19.068030+00:00",
+  "last_run_timestamp": "2026-09-05T16:48:38.202732+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -421,7 +421,43 @@
       "platform": "devto",
       "title": "Scroll depth couldn't tell my users from my bounces",
       "url": "https://dev.to/hblai_filmlook/scroll-depth-couldnt-tell-my-users-from-my-bounces-3b89",
-      "inspected_at": "2026-09-05T16:47:16.220250+00:00"
+      "inspected_at": "2026-09-05T16:47:03.093742+00:00"
+    },
+    "devto_4581280": {
+      "platform": "devto",
+      "title": "Five things I noticed this week: inference cadence, reach, and who files bug reports",
+      "url": "https://dev.to/morinaga/five-things-i-noticed-this-week-inference-cadence-reach-and-who-files-bug-reports-hck",
+      "inspected_at": "2026-09-05T16:48:29.452978+00:00"
+    },
+    "devto_4573188": {
+      "platform": "devto",
+      "title": "Three things I encoded when Dev.to comments started feeding my autonomous article pipeline",
+      "url": "https://dev.to/morinaga/three-things-i-encoded-when-devto-comments-started-feeding-my-autonomous-article-pipeline-2nge",
+      "inspected_at": "2026-09-05T16:48:30.878098+00:00"
+    },
+    "devto_4568024": {
+      "platform": "devto",
+      "title": "I Built My First Product as a Solo Developer — With Breaking Bad on My Second Monitor",
+      "url": "https://dev.to/aimadaitelhoussecrypto/i-built-my-first-product-as-a-solo-developer-with-breaking-bad-on-my-second-monitor-1m4h",
+      "inspected_at": "2026-09-05T16:48:31.681236+00:00"
+    },
+    "devto_4565756": {
+      "platform": "devto",
+      "title": "I built an iOS alarm that makes you scan a QR code across the room to turn it off",
+      "url": "https://dev.to/praveen_kumar_517b7294c47/i-built-an-ios-alarm-that-makes-you-scan-a-qr-code-across-the-room-to-turn-it-off-36ml",
+      "inspected_at": "2026-09-05T16:48:32.480015+00:00"
+    },
+    "devto_4565941": {
+      "platform": "devto",
+      "title": "Staying Organized as a Solo Dev: A Lesson from the Road",
+      "url": "https://dev.to/scot_gardner_7fd0617670bb/staying-organized-as-a-solo-dev-a-lesson-from-the-road-6nm",
+      "inspected_at": "2026-09-05T16:48:33.274544+00:00"
+    },
+    "devto_4565867": {
+      "platform": "devto",
+      "title": "Taming Flutter Infinite Scroll: Why 3 Lines of async* Missed the Point, and How BlocSignal Fixes It",
+      "url": "https://dev.to/gde/taming-flutter-infinite-scroll-why-3-lines-of-async-missed-the-point-and-how-blocsignal-fixes-it-3n48",
+      "inspected_at": "2026-09-05T16:48:34.164729+00:00"
     }
   },
   "pending_drafts": {
@@ -487,7 +523,8 @@
       "draft_text": "There is honestly nothing quite like that accidental feeling when a side project suddenly turns into the exact tool you reach for every single day. Speed and snappy interactions completely change how a productivity app feels.\n\nThat obsession with speed is actually why I built ROCIs Tasks. I got tired of bloated corporate apps with slow sync loops, so I built an offline-first Flutter & Hive workspace that loads instantly, complete with natural language parsing (type 'meeting tomorrow at 3pm #work') and native Android widgets. \n\nIf you ever check out the Android side of things or want to compare notes on local-first speed, you can check it out here: https://play.google.com/store/apps/details?id=com.rocisapps.tasks or on the web at https://tasks.rocisapps.com. Love seeing fellow devs scratch their own itch!",
       "telegram_message_id": 22,
       "created_at": "2026-09-05T16:45:11.514918+00:00",
-      "status": "pending"
+      "status": "approved",
+      "updated_at": "2026-09-05T16:48:06.679185+00:00"
     },
     "draft_2c6ad630": {
       "thread_id": "bsky_bafyreifni2y",
@@ -539,6 +576,15 @@
       "thread_title": "I built Strive — a lightweight task & focus app for students to fix my own procrastination (Looking for feedback!)",
       "method": "manual_drop",
       "posted_at": "2026-09-05T16:35:20.208277+00:00",
+      "tracked_comments": []
+    },
+    "bsky_bafyreibafw6": {
+      "platform": "bluesky",
+      "thread_url": "https://bsky.app/profile/codestirring.bsky.social/post/3mtjlghtj2e2t",
+      "posted_text": "There is honestly nothing quite like that accidental feeling when a side project suddenly turns into the exact tool you reach for every single day. Speed and snappy interactions completely change how a productivity app feels.\n\nThat obsession with speed is actually why I built ROCIs Tasks. I got tired of bloated corporate apps with slow sync loops, so I built an offline-first Flutter & Hive workspace that loads instantly, complete with natural language parsing (type 'meeting tomorrow at 3pm #work') and native Android widgets. \n\nIf you ever check out the Android side of things or want to compare notes on local-first speed, you can check it out here: https://play.google.com/store/apps/details?id=com.rocisapps.tasks or on the web at https://tasks.rocisapps.com. Love seeing fellow devs scratch their own itch!",
+      "thread_title": "I accidentally built the fastest todo app I’ve ever used.\n\nIt started out as a b...",
+      "method": "manual_drop",
+      "posted_at": "2026-09-05T16:48:08.430804+00:00",
       "tracked_comments": []
     }
   },
