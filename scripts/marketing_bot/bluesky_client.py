@@ -22,6 +22,10 @@ class BlueskyClient:
     def is_configured(self) -> bool:
         return bool(self.handle and self.app_password and len(self.app_password.strip()) > 5)
 
+    def create_session(self) -> bool:
+        """Public alias for authenticating a session."""
+        return self._login()
+
     def _login(self) -> bool:
         if not self.is_configured():
             return False

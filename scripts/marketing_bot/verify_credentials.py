@@ -21,7 +21,9 @@ from .config import (
     X_ACCESS_SECRET,
     BSKY_HANDLE,
     BSKY_APP_PASSWORD,
-    DEVTO_API_KEY
+    DEVTO_API_KEY,
+    HASHNODE_ACCESS_TOKEN,
+    MASTODON_ACCESS_TOKEN
 )
 
 def check_telegram():
@@ -130,20 +132,24 @@ def check_twitter():
 
 def check_bluesky():
     if not (BSKY_HANDLE and BSKY_APP_PASSWORD):
-        return True
+        return None
     print("\n--- 4. Testing Bluesky ---")
-    from .bluesky_client import BlueskyClient
-    client = BlueskyClient()
-    if client.create_session():
-        print(f"✅ Bluesky session authenticated for @{BSKY_HANDLE}!")
-        return True
-    else:
-        print(f"❌ Failed to authenticate Bluesky for @{BSKY_HANDLE}.")
+    try:
+        from .bluesky_client import BlueskyClient
+        client = BlueskyClient()
+        if client.create_session():
+            print(f"✅ Bluesky session authenticated for @{BSKY_HANDLE}!")
+            return True
+        else:
+            print(f"❌ Failed to authenticate Bluesky for @{BSKY_HANDLE}.")
+            return False
+    except Exception as e:
+        print(f"❌ Bluesky error: {e}")
         return False
 
 def check_devto():
     if not DEVTO_API_KEY:
-        return True
+        return None
     print("\n--- 5. Testing Dev.to ---")
     url = "https://dev.to/api/users/me"
     try:
@@ -159,23 +165,74 @@ def check_devto():
         print(f"❌ Error checking Dev.to: {e}")
         return False
 
+def check_hashnode():
+    if not HASHNODE_ACCESS_TOKEN:
+        return None
+    print("\n--- 6. Testing Hashnode ---")
+    try:
+        from .hashnode_client import HashnodeClient
+        client = HashnodeClient()
+        pub_id = client._get_publication_id()
+        if pub_id:
+            print(f"✅ Hashnode Token Valid! Resolved Publication ID: {pub_id}")
+            return True
+        else:
+            print("❌ Could not resolve Hashnode publication ID with the provided token.")
+            return False
+    except Exception as e:
+        print(f"❌ Error checking Hashnode: {e}")
+        return False
+
+def check_mastodon():
+    if not MASTODON_ACCESS_TOKEN:
+        return None
+    print("\n--- 7. Testing Mastodon ---")
+    try:
+        from .mastodon_client import MastodonClient
+        client = MastodonClient()
+        stats = client.get_profile_stats()
+        if stats is not None:
+            print(f"✅ Mastodon Token Valid! Followers: {stats.get('followers_count', 0)}, Statuses: {stats.get('statuses_count', 0)}")
+            return True
+        else:
+            print("❌ Failed to verify Mastodon credentials.")
+            return False
+    except Exception as e:
+        print(f"❌ Error checking Mastodon: {e}")
+        return False
+
 def main():
     print("=" * 60)
     print("ROCIs Tasks Marketing Engine - Credential Verification")
     print("=" * 60)
 
-    t_ok = check_telegram()
-    g_ok = check_gemini()
-    x_ok = check_twitter()
-    b_ok = check_bluesky()
-    d_ok = check_devto()
+    results = {
+        "Telegram": check_telegram(),
+        "Gemini": check_gemini(),
+        "Twitter/X": check_twitter(),
+        "Bluesky": check_bluesky(),
+        "Dev.to": check_devto(),
+        "Hashnode": check_hashnode(),
+        "Mastodon": check_mastodon()
+    }
 
     print("\n" + "=" * 60)
     print("Verification Summary:")
-    print(f"  • Telegram:   {'✅ PASSED' if t_ok else '❌ FAILED'}")
-    print(f"  • Gemini:     {'✅ PASSED' if g_ok else '❌ FAILED'}")
-    print(f"  • Twitter/X:  {'✅ PASSED' if x_ok else '❌ FAILED'}")
+    has_failure = False
+    for platform, status in results.items():
+        if status is True:
+            tag = "✅ PASSED"
+        elif status is False:
+            tag = "❌ FAILED"
+            has_failure = True
+        else:
+            tag = "⚪ SKIPPED (Not Configured)"
+        print(f"  • {platform.ljust(12)}: {tag}")
     print("=" * 60)
 
-if __name__ == "__main__":
-    main()
+    if has_failure:
+        print("\n⚠️ One or more configured credentials failed verification.")
+        sys.exit(1)
+    else:
+        print("\n🎉 All configured services verified successfully!")
+        sys.exit(0)
