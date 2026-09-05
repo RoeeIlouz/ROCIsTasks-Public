@@ -52,9 +52,10 @@ class GeminiEngine:
                     for m in data.get("models", [])
                     if "generateContent" in m.get("supportedGenerationMethods", [])
                 ]
-                # Filter models: prefer flash models first, sorted by version descending
-                flash_models = [m for m in raw_models if "flash" in m]
-                other_models = [m for m in raw_models if "flash" not in m]
+                # Filter models: exclude TTS/audio-only preview models
+                text_models = [m for m in raw_models if "tts" not in m and "audio" not in m]
+                flash_models = [m for m in text_models if "flash" in m]
+                other_models = [m for m in text_models if "flash" not in m]
                 self._discovered_models = flash_models + other_models
                 logger.info(f"Discovered {len(self._discovered_models)} Gemini models via API. Top models: {self._discovered_models[:5]}")
                 return self._discovered_models
