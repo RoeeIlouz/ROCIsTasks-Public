@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-05T16:48:38.202732+00:00",
+  "last_run_timestamp": "2026-09-05T16:49:10.780003+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -421,43 +421,43 @@
       "platform": "devto",
       "title": "Scroll depth couldn't tell my users from my bounces",
       "url": "https://dev.to/hblai_filmlook/scroll-depth-couldnt-tell-my-users-from-my-bounces-3b89",
-      "inspected_at": "2026-09-05T16:47:03.093742+00:00"
+      "inspected_at": "2026-09-05T16:47:16.220250+00:00"
     },
     "devto_4581280": {
       "platform": "devto",
       "title": "Five things I noticed this week: inference cadence, reach, and who files bug reports",
       "url": "https://dev.to/morinaga/five-things-i-noticed-this-week-inference-cadence-reach-and-who-files-bug-reports-hck",
-      "inspected_at": "2026-09-05T16:48:29.452978+00:00"
+      "inspected_at": "2026-09-05T16:48:55.959370+00:00"
     },
     "devto_4573188": {
       "platform": "devto",
       "title": "Three things I encoded when Dev.to comments started feeding my autonomous article pipeline",
       "url": "https://dev.to/morinaga/three-things-i-encoded-when-devto-comments-started-feeding-my-autonomous-article-pipeline-2nge",
-      "inspected_at": "2026-09-05T16:48:30.878098+00:00"
+      "inspected_at": "2026-09-05T16:48:57.157576+00:00"
     },
     "devto_4568024": {
       "platform": "devto",
       "title": "I Built My First Product as a Solo Developer — With Breaking Bad on My Second Monitor",
       "url": "https://dev.to/aimadaitelhoussecrypto/i-built-my-first-product-as-a-solo-developer-with-breaking-bad-on-my-second-monitor-1m4h",
-      "inspected_at": "2026-09-05T16:48:31.681236+00:00"
+      "inspected_at": "2026-09-05T16:48:57.826959+00:00"
     },
     "devto_4565756": {
       "platform": "devto",
       "title": "I built an iOS alarm that makes you scan a QR code across the room to turn it off",
       "url": "https://dev.to/praveen_kumar_517b7294c47/i-built-an-ios-alarm-that-makes-you-scan-a-qr-code-across-the-room-to-turn-it-off-36ml",
-      "inspected_at": "2026-09-05T16:48:32.480015+00:00"
+      "inspected_at": "2026-09-05T16:48:59.743962+00:00"
     },
     "devto_4565941": {
       "platform": "devto",
       "title": "Staying Organized as a Solo Dev: A Lesson from the Road",
       "url": "https://dev.to/scot_gardner_7fd0617670bb/staying-organized-as-a-solo-dev-a-lesson-from-the-road-6nm",
-      "inspected_at": "2026-09-05T16:48:33.274544+00:00"
+      "inspected_at": "2026-09-05T16:49:00.600537+00:00"
     },
     "devto_4565867": {
       "platform": "devto",
       "title": "Taming Flutter Infinite Scroll: Why 3 Lines of async* Missed the Point, and How BlocSignal Fixes It",
       "url": "https://dev.to/gde/taming-flutter-infinite-scroll-why-3-lines-of-async-missed-the-point-and-how-blocsignal-fixes-it-3n48",
-      "inspected_at": "2026-09-05T16:48:34.164729+00:00"
+      "inspected_at": "2026-09-05T16:49:01.489752+00:00"
     }
   },
   "pending_drafts": {
@@ -536,7 +536,8 @@
       "draft_text": "Spot on. Treating high-energy days and low-energy recovery days the exact same way is a recipe for chronic burnout and task avoidance. To-do apps usually act like rigid task wardens instead of flexible workspaces.\n\nThat exact frustration is why I built ROCIs Tasks as an independent solo developer. It's an offline-first Flutter app designed with speed and flexibility in mind—allowing you to quickly brain-dump via natural language parsing ('Submit report tomorrow at 5pm #urgent @work') so you aren't wasting mental energy fighting dropdown menus when you're already low on fuel.\n\nIf you're on Android or want a clean web workspace to manage your tasks alongside your calendar without bloated corporate features or predatory subscriptions, you can check it out here:\nPlay Store: https://play.google.com/store/apps/details?id=com.rocisapps.tasks\nWeb: https://tasks.rocisapps.com",
       "telegram_message_id": 23,
       "created_at": "2026-09-05T16:45:14.726919+00:00",
-      "status": "pending"
+      "status": "approved",
+      "updated_at": "2026-09-05T16:48:30.704413+00:00"
     },
     "devlog_devlog_0_2_2_60_2026_07_17_190f9f3082": {
       "id": "devlog_devlog_0_2_2_60_2026_07_17_190f9f3082",
@@ -557,6 +558,18 @@
       "created_at": "2026-09-05T16:45:20.561415+00:00",
       "status": "pending",
       "telegram_message_id": 24
+    },
+    "draft_3b6ec69b": {
+      "thread_id": "devto_4568024",
+      "platform": "devto",
+      "thread_title": "I Built My First Product as a Solo Developer — With Breaking Bad on My Second Monitor",
+      "thread_url": "https://dev.to/aimadaitelhoussecrypto/i-built-my-first-product-as-a-solo-developer-with-breaking-bad-on-my-second-monitor-1m4h",
+      "relevance_score": 85,
+      "reasoning": "The user is a solo developer discussing the journey of building and shipping their first product. As a solo dev behind ROCIs Tasks, this is a great opportunity to connect over the indie development trenches while organically sharing a tool built out of similar frustrations with bloated software.",
+      "draft_text": "Congrats on shipping your first product! Building solo while keeping Breaking Bad on loop is basically the official indie hacker rite of passage.\n\nYour post really resonates. I got so frustrated by bloated, subscription-trap productivity apps that I ended up building my own Android task and calendar workspace called ROCIs Tasks (using Flutter and Hive for instant offline speed).\n\nIf you ever need a distraction-free, zero-lag workspace to manage your next feature backlog (complete with a pitch-black AMOLED mode for late-night coding sessions), check it out:\n- Web: https://tasks.rocisapps.com\n- Play Store: https://play.google.com/store/apps/details?id=com.rocisapps.tasks\n\nKeep up the momentum—shipping that first product is the hardest part!",
+      "telegram_message_id": 31,
+      "created_at": "2026-09-05T16:48:59.743920+00:00",
+      "status": "pending"
     }
   },
   "posted_threads": {
@@ -585,6 +598,15 @@
       "thread_title": "I accidentally built the fastest todo app I’ve ever used.\n\nIt started out as a b...",
       "method": "manual_drop",
       "posted_at": "2026-09-05T16:48:08.430804+00:00",
+      "tracked_comments": []
+    },
+    "bsky_bafyreifni2y": {
+      "platform": "bluesky",
+      "thread_url": "https://bsky.app/profile/minigoal.bsky.social/post/3msupvalpb22r",
+      "posted_text": "Spot on. Treating high-energy days and low-energy recovery days the exact same way is a recipe for chronic burnout and task avoidance. To-do apps usually act like rigid task wardens instead of flexible workspaces.\n\nThat exact frustration is why I built ROCIs Tasks as an independent solo developer. It's an offline-first Flutter app designed with speed and flexibility in mind—allowing you to quickly brain-dump via natural language parsing ('Submit report tomorrow at 5pm #urgent @work') so you aren't wasting mental energy fighting dropdown menus when you're already low on fuel.\n\nIf you're on Android or want a clean web workspace to manage your tasks alongside your calendar without bloated corporate features or predatory subscriptions, you can check it out here:\nPlay Store: https://play.google.com/store/apps/details?id=com.rocisapps.tasks\nWeb: https://tasks.rocisapps.com",
+      "thread_title": "We kept failing at todo lists — not from lack of discipline, but because every d...",
+      "method": "manual_drop",
+      "posted_at": "2026-09-05T16:48:32.251856+00:00",
       "tracked_comments": []
     }
   },
