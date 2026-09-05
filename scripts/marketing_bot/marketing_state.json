@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-05T13:56:19.463866+00:00",
+  "last_run_timestamp": "2026-09-05T14:26:30.360071+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -98,9 +98,56 @@
       "title": "Most startup directories are useless for traffic. Here's what I built to fix it",
       "url": "https://reddit.com/r/indiehackers/comments/1w6cy1h/most_startup_directories_are_useless_for_traffic/",
       "inspected_at": "2026-09-05T13:56:19.324675+00:00"
+    },
+    "reddit_1w8215r": {
+      "platform": "reddit",
+      "title": "I made a site that helps with the AI Training job search.",
+      "url": "https://reddit.com/r/SideProject/comments/1w8215r/i_made_a_site_that_helps_with_the_ai_training_job/",
+      "inspected_at": "2026-09-05T14:26:14.220956+00:00"
+    },
+    "reddit_1w81vuj": {
+      "platform": "reddit",
+      "title": "I just launched Rimfold — a national park road-trip planner 🏕️",
+      "url": "https://reddit.com/r/SideProject/comments/1w81vuj/i_just_launched_rimfold_a_national_park_roadtrip/",
+      "inspected_at": "2026-09-05T14:26:20.469129+00:00"
+    },
+    "reddit_1w81u5a": {
+      "platform": "reddit",
+      "title": "Made a brain games app as a side project and 100+ users so far with zero marketing. Would love your honest feedback",
+      "url": "https://reddit.com/r/SideProject/comments/1w81u5a/made_a_brain_games_app_as_a_side_project_and_100/",
+      "inspected_at": "2026-09-05T14:26:24.588029+00:00"
+    },
+    "reddit_1w5k4oy": {
+      "platform": "reddit",
+      "title": "4 months in: 43 paying users, $1,247 MRR. Here's what actually worked.",
+      "url": "https://reddit.com/r/indiehackers/comments/1w5k4oy/4_months_in_43_paying_users_1247_mrr_heres_what/",
+      "inspected_at": "2026-09-05T14:26:25.442297+00:00"
+    },
+    "reddit_1w5jfra": {
+      "platform": "reddit",
+      "title": "Marketing with creators shouldn’t be this annoying",
+      "url": "https://reddit.com/r/indiehackers/comments/1w5jfra/marketing_with_creators_shouldnt_be_this_annoying/",
+      "inspected_at": "2026-09-05T14:26:26.224882+00:00"
+    },
+    "reddit_1w81tds": {
+      "platform": "reddit",
+      "title": "640 visits, 4 signups, 0 payments. Roast it",
+      "url": "https://reddit.com/r/roastmystartup/comments/1w81tds/640_visits_4_signups_0_payments_roast_it/",
+      "inspected_at": "2026-09-05T14:26:26.972727+00:00"
     }
   },
   "pending_drafts": {},
   "posted_threads": {},
-  "recorded_feedback": []
+  "recorded_feedback": [],
+  "last_organic_post_timestamp": "2026-09-05T14:26:29.792124+00:00",
+  "organic_posts": [
+    {
+      "text": "you either die a young enthusiastic builder or live long enough to realize that 90% of tech problems are solved by restarting the router.",
+      "topic": "mobile_and_code_quirks",
+      "platforms": [
+        "Bluesky"
+      ],
+      "posted_at": "2026-09-05T14:26:29.792124+00:00"
+    }
+  ]
 }
