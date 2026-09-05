@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-05T16:26:09.635956+00:00",
+  "last_run_timestamp": "2026-09-05T16:33:09.160580+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -278,6 +278,42 @@
       "title": "Another dev callout: I've had so many submissions for my monthly Indie Apps Show...",
       "url": "https://bsky.app/profile/rolfebox.bsky.social/post/3muk43rmoq22v",
       "inspected_at": "2026-09-05T16:26:08.622128+00:00"
+    },
+    "reddit_1w85bq6": {
+      "platform": "reddit",
+      "title": "Covey Finance : offline finance tracking",
+      "url": "https://reddit.com/r/SideProject/comments/1w85bq6/covey_finance_offline_finance_tracking/",
+      "inspected_at": "2026-09-05T16:32:54.003030+00:00"
+    },
+    "reddit_1w85bmc": {
+      "platform": "reddit",
+      "title": "Built a small Android app to stop pet-care records living across five different places",
+      "url": "https://reddit.com/r/SideProject/comments/1w85bmc/built_a_small_android_app_to_stop_petcare_records/",
+      "inspected_at": "2026-09-05T16:32:58.597461+00:00"
+    },
+    "reddit_1w85b90": {
+      "platform": "reddit",
+      "title": "I built a free, 100% client-side F1 telemetry dashboard — no backend, no login, no ads",
+      "url": "https://reddit.com/r/SideProject/comments/1w85b90/i_built_a_free_100_clientside_f1_telemetry/",
+      "inspected_at": "2026-09-05T16:32:59.274925+00:00"
+    },
+    "reddit_1w858fh": {
+      "platform": "reddit",
+      "title": "[Feedback] Appeak Pro: ASO recommendations you can ship, plus getting the app recommended by ChatGPT",
+      "url": "https://reddit.com/r/SideProject/comments/1w858fh/feedback_appeak_pro_aso_recommendations_you_can/",
+      "inspected_at": "2026-09-05T16:33:00.090650+00:00"
+    },
+    "reddit_1w85902": {
+      "platform": "reddit",
+      "title": "I built Strive — a lightweight task & focus app for students to fix my own procrastination (Looking for feedback!)",
+      "url": "https://reddit.com/r/roastmystartup/comments/1w85902/i_built_strive_a_lightweight_task_focus_app_for/",
+      "inspected_at": "2026-09-05T16:33:00.862073+00:00"
+    },
+    "bsky_bafyreiexfut": {
+      "platform": "bluesky",
+      "title": "Indie games lovers assemble: let's showcase our most awaited human-made titles f...",
+      "url": "https://bsky.app/profile/fromthevoid.net/post/3mujm5aysjs2v",
+      "inspected_at": "2026-09-05T16:33:03.300512+00:00"
     }
   },
   "pending_drafts": {
@@ -293,6 +329,18 @@
       "created_at": "2026-09-05T14:59:39.120010+00:00",
       "status": "approved",
       "updated_at": "2026-09-05T15:58:55.407187+00:00"
+    },
+    "draft_5c86ecf4": {
+      "thread_id": "reddit_1w85902",
+      "platform": "reddit",
+      "thread_title": "I built Strive — a lightweight task & focus app for students to fix my own procrastination (Looking for feedback!)",
+      "thread_url": "https://reddit.com/r/roastmystartup/comments/1w85902/i_built_strive_a_lightweight_task_focus_app_for/",
+      "relevance_score": 85,
+      "reasoning": "The user built a lightweight task and focus app for students to fix procrastination and is explicitly looking for feedback on indie productivity tools, making it a great fit to share an indie perspective and solution.",
+      "draft_text": "Hey! First off, massive props for building your own tool to tackle procrastination—that's literally why I started building my own app too. As a fellow solo developer who got fed up with bloated corporate apps and crazy monthly subscriptions, I totally get the struggle of trying to find or build something that's actually fast and frictionless.\n\nSince you built Strive to be lightweight, you might appreciate how I tackled a similar problem with ROCIs Tasks. I built it using Flutter and local-first storage (Hive) so it opens instantly with zero lag, alongside a natural language parser so you can just type 'Finish assignment tomorrow at 3pm #school' without messing with endless dropdown menus. It also has a true AMOLED pitch-black mode if you're burning the midnight oil studying.\n\nIf you want to check it out for some indie design inspiration or just see how another solo dev handled local-first data, you can check it out on the web at https://tasks.rocisapps.com or grab it on Google Play at https://play.google.com/store/apps/details?id=com.rocisapps.tasks.\n\nWould love to hear how you handled state management or offline sync in Strive—keep up the great work!",
+      "telegram_message_id": 14,
+      "created_at": "2026-09-05T16:33:03.300495+00:00",
+      "status": "pending"
     }
   },
   "posted_threads": {
