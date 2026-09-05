@@ -85,8 +85,63 @@ class TestNewPlatforms(unittest.TestCase):
         self.assertFalse(client_empty.is_configured())
         self.assertIsNone(client_empty.publish_article("title", "body"))
 
+        # Configured with token only (auto-discovery mode)
+        client_token_only = HashnodeClient(access_token="hashnode_token_12345", publication_id="")
+        self.assertTrue(client_token_only.is_configured())
+
+        # Configured with both token and publication ID
         client_configured = HashnodeClient(access_token="hashnode_token_12345", publication_id="pub_12345")
         self.assertTrue(client_configured.is_configured())
+
+    @patch("requests.post")
+    def test_hashnode_auto_discover_publication_id_success(self, mock_post):
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.json.return_value = {
+            "data": {
+                "me": {
+                    "publications": {
+                        "edges": [
+                            {
+                                "node": {
+                                    "id": "auto_discovered_pub_999",
+                                    "title": "ROCIs Engineering",
+                                    "url": "https://engineering.rocisapps.com"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+        mock_post.return_value = mock_resp
+
+        client = HashnodeClient(access_token="valid_hashnode_token_123", publication_id=None)
+        pub_id = client._get_publication_id()
+
+        self.assertEqual(pub_id, "auto_discovered_pub_999")
+        self.assertEqual(client.publication_id, "auto_discovered_pub_999")
+        mock_post.assert_called_once()
+
+    @patch("requests.post")
+    def test_hashnode_auto_discover_publication_id_failure(self, mock_post):
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.json.return_value = {
+            "data": {
+                "me": {
+                    "publications": {
+                        "edges": []
+                    }
+                }
+            }
+        }
+        mock_post.return_value = mock_resp
+
+        client = HashnodeClient(access_token="valid_hashnode_token_123", publication_id=None)
+        pub_id = client._get_publication_id()
+
+        self.assertIsNone(pub_id)
 
     @patch("requests.post")
     def test_hashnode_publish_article_success(self, mock_post):
@@ -116,6 +171,58 @@ class TestNewPlatforms(unittest.TestCase):
         self.assertEqual(res["url"], "https://blog.rocisapps.com/flutter-background-isolates")
         call_json = mock_post.call_args[1]["json"]
         self.assertEqual(call_json["variables"]["input"]["originalArticleURL"], "https://dev.to/rocisapps/article-123")
+        self.assertEqual(call_json["variables"]["input"]["publicationId"], "pub_123")
+
+    @patch("requests.post")
+    def test_hashnode_publish_article_with_auto_discovery(self, mock_post):
+        # First call: _get_publication_id, second call: publishPost mutation
+        resp_discover = MagicMock()
+        resp_discover.status_code = 200
+        resp_discover.json.return_value = {
+            "data": {
+                "me": {
+                    "publications": {
+                        "edges": [
+                            {
+                                "node": {
+                                    "id": "discovered_pub_456",
+                                    "title": "ROCIs Engineering Blog"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+
+        resp_publish = MagicMock()
+        resp_publish.status_code = 200
+        resp_publish.json.return_value = {
+            "data": {
+                "publishPost": {
+                    "post": {
+                        "id": "post_xyz",
+                        "slug": "auto-discovered-post",
+                        "url": "https://blog.rocisapps.com/auto-discovered-post"
+                    }
+                }
+            }
+        }
+
+        mock_post.side_effect = [resp_discover, resp_publish]
+
+        client = HashnodeClient(access_token="valid_hashnode_token_123", publication_id="")
+        res = client.publish_article(
+            title="Auto Discovery Test",
+            body_markdown="Testing auto-discovery in publish_article...",
+            canonical_url="https://dev.to/rocisapps/article-456"
+        )
+
+        self.assertIsNotNone(res)
+        self.assertEqual(res["url"], "https://blog.rocisapps.com/auto-discovered-post")
+        self.assertEqual(mock_post.call_count, 2)
+        publish_call_json = mock_post.call_args_list[1][1]["json"]
+        self.assertEqual(publish_call_json["variables"]["input"]["publicationId"], "discovered_pub_456")
 
     # -------------------------------------------------------------------------
     # 4. Medium Tests

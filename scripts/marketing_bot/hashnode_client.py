@@ -22,10 +22,58 @@ class HashnodeClient:
         self.publication_id = publication_id or HASHNODE_PUBLICATION_ID
 
     def is_configured(self) -> bool:
-        return bool(
-            self.access_token and len(self.access_token.strip()) > 10 and
-            self.publication_id and len(self.publication_id.strip()) > 5
-        )
+        return bool(self.access_token and len(self.access_token.strip()) > 10)
+
+    def _get_publication_id(self) -> Optional[str]:
+        """
+        Auto-discovers the user's primary Hashnode publication ID via GraphQL
+        if HASHNODE_PUBLICATION_ID was not explicitly provided.
+        """
+        if self.publication_id and len(self.publication_id.strip()) > 5:
+            return self.publication_id.strip()
+
+        if not self.access_token:
+            return None
+
+        query = """
+        query {
+          me {
+            publications(first: 1) {
+              edges {
+                node {
+                  id
+                  title
+                  url
+                }
+              }
+            }
+          }
+        }
+        """
+        headers = {
+            "Authorization": self.access_token.strip(),
+            "Content-Type": "application/json",
+            "User-Agent": "ROCIsTasksMarketing/1.0"
+        }
+
+        try:
+            res = requests.post(HASHNODE_GQL_URL, headers=headers, json={"query": query}, timeout=15)
+            res.raise_for_status()
+            data = res.json()
+            edges = data.get("data", {}).get("me", {}).get("publications", {}).get("edges", [])
+            if edges:
+                node = edges[0].get("node", {})
+                pub_id = node.get("id")
+                pub_title = node.get("title", "")
+                if pub_id:
+                    logger.info(f"Auto-discovered Hashnode publication ID: {pub_id} ('{pub_title}')")
+                    self.publication_id = pub_id
+                    return pub_id
+            logger.warning("No Hashnode publications found for this access token.")
+            return None
+        except Exception as e:
+            logger.error(f"Failed to auto-discover Hashnode publication ID: {e}")
+            return None
 
     def publish_article(
         self,
@@ -41,6 +89,11 @@ class HashnodeClient:
         """
         if not self.is_configured():
             logger.warning("HashnodeClient not configured. Skipping publication.")
+            return None
+
+        pub_id = self._get_publication_id()
+        if not pub_id:
+            logger.error("Could not determine Hashnode publication ID. Skipping publication.")
             return None
 
         clean_tags = tags or ["flutter", "android", "indiedev", "productivity"]
@@ -62,7 +115,7 @@ class HashnodeClient:
         post_input: Dict[str, Any] = {
             "title": title,
             "contentMarkdown": body_markdown,
-            "publicationId": self.publication_id,
+            "publicationId": pub_id,
             "tags": tag_inputs
         }
 
