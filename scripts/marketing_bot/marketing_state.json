@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-05T14:59:40.692819+00:00",
+  "last_run_timestamp": "2026-09-05T15:54:12.409353+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -170,6 +170,42 @@
       "title": "[Dev] I made BLINDER — a lightweight mobile 3D editor built entirely with HTML/CSS/JS for smartphones",
       "url": "https://reddit.com/r/roastmystartup/comments/1w7g73v/dev_i_made_blinder_a_lightweight_mobile_3d_editor/",
       "inspected_at": "2026-09-05T14:59:39.923394+00:00"
+    },
+    "reddit_1w84e52": {
+      "platform": "reddit",
+      "title": "I built a meter that shows what a meeting costs, per second, while you sit in it",
+      "url": "https://reddit.com/r/SideProject/comments/1w84e52/i_built_a_meter_that_shows_what_a_meeting_costs/",
+      "inspected_at": "2026-09-05T15:54:04.935980+00:00"
+    },
+    "reddit_1w84046": {
+      "platform": "reddit",
+      "title": "I built an open-source app that turns Excel/CSV into a local, queryable database — feedback welcome",
+      "url": "https://reddit.com/r/SideProject/comments/1w84046/i_built_an_opensource_app_that_turns_excelcsv/",
+      "inspected_at": "2026-09-05T15:54:08.523690+00:00"
+    },
+    "reddit_1w83yyg": {
+      "platform": "reddit",
+      "title": "Built a text-first, 12-stage roadmap for DevOps, Cloud & MLOps (Books + official docs only)",
+      "url": "https://reddit.com/r/SideProject/comments/1w83yyg/built_a_textfirst_12stage_roadmap_for_devops/",
+      "inspected_at": "2026-09-05T15:54:09.285972+00:00"
+    },
+    "reddit_1w7e4i8": {
+      "platform": "reddit",
+      "title": "I built an AI tool that makes an audit of Etsy shop. Then fixes them",
+      "url": "https://reddit.com/r/roastmystartup/comments/1w7e4i8/i_built_an_ai_tool_that_makes_an_audit_of_etsy/",
+      "inspected_at": "2026-09-05T15:54:10.055666+00:00"
+    },
+    "reddit_1w7djgv": {
+      "platform": "reddit",
+      "title": "Guys... It's time to roast my French flight comparator (yes, another one)",
+      "url": "https://reddit.com/r/roastmystartup/comments/1w7djgv/guys_its_time_to_roast_my_french_flight/",
+      "inspected_at": "2026-09-05T15:54:10.814592+00:00"
+    },
+    "reddit_1w83ywo": {
+      "platform": "reddit",
+      "title": "How can I detect if iPhone Rotation Lock is ON when using CoreMotion?",
+      "url": "https://reddit.com/r/FlutterDev/comments/1w83ywo/how_can_i_detect_if_iphone_rotation_lock_is_on/",
+      "inspected_at": "2026-09-05T15:54:11.620146+00:00"
     }
   },
   "pending_drafts": {
