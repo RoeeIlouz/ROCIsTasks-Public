@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-05T20:45:23.059105+00:00",
+  "last_run_timestamp": "2026-09-05T20:59:10.326883+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -710,6 +710,18 @@
       "title": "Indie App Spotlight: ‘KeyAlarm’ turns your most important calendar events into a...",
       "url": "https://bsky.app/profile/9to5mac.com/post/3muscz6lavi2j",
       "inspected_at": "2026-09-05T20:45:12.478188+00:00"
+    },
+    "reddit_1w8cbsz": {
+      "platform": "reddit",
+      "title": "rungs - catch stale backlogs and broken docs in repos used by coding agents",
+      "url": "https://reddit.com/r/SideProject/comments/1w8cbsz/rungs_catch_stale_backlogs_and_broken_docs_in/",
+      "inspected_at": "2026-09-05T20:58:41.398804+00:00"
+    },
+    "reddit_1w8c41f": {
+      "platform": "reddit",
+      "title": "I couldn't remember what I'd built in three weeks with Claude Code, so I drew it",
+      "url": "https://reddit.com/r/SideProject/comments/1w8c41f/i_couldnt_remember_what_id_built_in_three_weeks/",
+      "inspected_at": "2026-09-05T20:58:58.259097+00:00"
     }
   },
   "pending_drafts": {
@@ -961,8 +973,21 @@
       "body": "Hey r/SideProject,\n\nLike a lot of you, I hit a wall with productivity apps a few months ago. Everything on the Play Store either required a recurring $8/month subscription just to unlock basic reminders, felt bloated with AI bloatware I didn't care about, or lagged terribly when I was offline.\n\nSo, I decided to build **ROCIs Tasks** — an offline-first task and calendar workspace for Android focused on speed, privacy, and zero subscription fatigue.\n\n### Why I built it (The Pain Point)\nI wanted something lightning-fast that worked seamlessly in the subway with zero signal. I also hated digging through endless dropdown menus just to set a due date.\n\n### Key Tech Stack & Engineering Choices\nAs a solo dev, choosing the right stack was crucial for shipping efficiently without sacrificing native performance:\n\n*   **Frontend (Flutter):** Allowed me to build a polished, fluid UI that runs smoothly at 120Hz, while sharing code logic with the web version.\n*   **Local-First Architecture (Hive):** Read and write operations happen instantly on-device using Hive. There's zero waiting for spinners. If you're online, it quietly syncs in the background with Firebase Firestore.\n*   **Native Android Widgets (Kotlin):** Flutter is great, but Android home screen widgets demand buttery-native performance. I wrote the widgets entirely in native Kotlin to ensure zero sync lag, supporting interactive daily agendas, Kanban columns, and quick-add actions right from the home screen.\n*   **Natural Language Parser:** Instead of tapping five times to schedule something, you can type: *\"Submit quarterly report tomorrow at 5pm #urgent @work\"* and it automatically extracts the date, priority, and category.\n\n### Design Details\nI'm a huge fan of battery-saving aesthetics, so I built a true AMOLED pitch-black mode (`#000000`) paired with frosted glassmorphism and crisp micro-haptics. It also features a unified calendar sync that merges Google Calendar, local device calendars, and your tasks into a single agenda view.\n\n### What's Next & Feedback\nBuilding this solo while balancing a day job has been an exhausting but incredible indie journey. I'd love for fellow builders to check it out, stress-test it, and let me know what you think of the widget responsiveness or the overall offline experience.\n\nYou can grab it on the Google Play Store:\n👉 [https://play.google.com/store/apps/details?id=com.rocisapps.tasks](https://play.google.com/store/apps/details?id=com.rocisapps.tasks)\n\nOr try the web version here:\n👉 [https://tasks.rocisapps.com](https://tasks.rocisapps.com)\n\nI'm happy to answer any technical questions about bridging Flutter with native Kotlin widgets or local-first database patterns in the comments!",
       "topic": "indie_journey",
       "created_at": "2026-09-05T20:45:16.899577+00:00",
+      "status": "approved",
+      "telegram_message_id": 55,
+      "updated_at": "2026-09-05T20:58:24.995478+00:00"
+    },
+    "reddit_post_sideproject_27da2208": {
+      "id": "reddit_post_sideproject_27da2208",
+      "type": "reddit_post",
+      "platform": "reddit",
+      "subreddit": "SideProject",
+      "title": "I got tired of subscription fatigue and over-engineered todo apps, so I built my own offline-first Android workspace (Flutter + Native Kotlin widgets)",
+      "body": "Hey r/SideProject,\n\nLike many of you, I hit a breaking point with productivity apps. Every task manager I tried either locked basic features behind an $8/month subscription, required a constant internet connection, or felt bloated with AI gimmicks I didn't ask for. I just wanted something fast, private, battery-friendly, and dead simple to use.\n\nSo, I spent my nights and weekends building **ROCIs Tasks**—an offline-first task and calendar workspace for Android.\n\n### Why Build Another Task App?\nI wanted a tool that respects your device, your data, and your wallet. No forced cloud sign-ups just to add a grocery item, no paywalls for recurring tasks, and an aesthetic that actually looks good on OLED screens.\n\n### The Tech Stack & Engineering Challenges\nBuilding this solo was a fun architectural puzzle, especially balancing cross-platform convenience with native performance:\n\n*   **Flutter for UI:** Allowed me to craft a fluid interface with true AMOLED pitch-black modes (`#000000`), frosted glassmorphism accents, and crisp micro-haptics.\n*   **Hive for Offline-First Speed:** Because data is stored locally first using Hive, read/write speeds are instant with zero loading spinners. It syncs seamlessly with Firestore in the background only when an internet connection is actually available.\n*   **Native Kotlin Home Screen Widgets:** This was the hardest hurdle. Flutter doesn't natively handle interactive home screen widgets well. I had to write native Kotlin code to build responsive widgets (Daily Focus Agenda, Kanban columns, Quick Actions) that talk directly to the local database, ensuring zero sync lag when ticking off tasks right from the home screen.\n*   **Natural Language Parser:** Instead of digging through endless dropdown menus, you can type things like *\"Submit quarterly report tomorrow at 5pm #urgent @work\"* and it automatically parses the dates, times, priorities, and tags.\n*   **Calendar Sync:** Pulls in Google Calendar and local device calendars right alongside your to-do tasks in a unified agenda view.\n\n### What I Learned\nBuilding native Kotlin widgets while managing a Flutter state tree taught me a lot about platform channels and background isolate handling. More than that, it reinforced how important it is to scratch your own itch. I use this app every single day now, which makes fixing bugs much less of a chore.\n\nIf you want to check it out, I have a web version and a free Android release up on Google Play (no hidden subscription paywalls to test it out):\n\n- **Android App:** [Google Play Store](https://play.google.com/store/apps/details?id=com.rocisapps.tasks)\n- **Web App:** [tasks.rocisapps.com](https://tasks.rocisapps.com)\n\nI’d love to hear how other indie devs handle home screen widgets in cross-platform apps, or what your current daily driver task setup looks like. Roasts, feedback, and technical questions are more than welcome!",
+      "topic": "indie_journey",
+      "created_at": "2026-09-05T20:59:02.799000+00:00",
       "status": "pending",
-      "telegram_message_id": 55
+      "telegram_message_id": 57
     }
   },
   "posted_threads": {
@@ -1019,6 +1044,16 @@
       "subreddit": "SideProject",
       "method": "auto",
       "posted_at": "2026-09-05T20:44:51.521242+00:00",
+      "tracked_comments": []
+    },
+    "reddit_post_reddit_post_sideproject_6272a790": {
+      "platform": "reddit",
+      "thread_url": "https://www.reddit.com/r/SideProject/submit/",
+      "posted_text": "Hey r/SideProject,\n\nLike a lot of you, I hit a wall with productivity apps a few months ago. Everything on the Play Store either required a recurring $8/month subscription just to unlock basic reminders, felt bloated with AI bloatware I didn't care about, or lagged terribly when I was offline.\n\nSo, I decided to build **ROCIs Tasks** — an offline-first task and calendar workspace for Android focused on speed, privacy, and zero subscription fatigue.\n\n### Why I built it (The Pain Point)\nI wanted something lightning-fast that worked seamlessly in the subway with zero signal. I also hated digging through endless dropdown menus just to set a due date.\n\n### Key Tech Stack & Engineering Choices\nAs a solo dev, choosing the right stack was crucial for shipping efficiently without sacrificing native performance:\n\n*   **Frontend (Flutter):** Allowed me to build a polished, fluid UI that runs smoothly at 120Hz, while sharing code logic with the web version.\n*   **Local-First Architecture (Hive):** Read and write operations happen instantly on-device using Hive. There's zero waiting for spinners. If you're online, it quietly syncs in the background with Firebase Firestore.\n*   **Native Android Widgets (Kotlin):** Flutter is great, but Android home screen widgets demand buttery-native performance. I wrote the widgets entirely in native Kotlin to ensure zero sync lag, supporting interactive daily agendas, Kanban columns, and quick-add actions right from the home screen.\n*   **Natural Language Parser:** Instead of tapping five times to schedule something, you can type: *\"Submit quarterly report tomorrow at 5pm #urgent @work\"* and it automatically extracts the date, priority, and category.\n\n### Design Details\nI'm a huge fan of battery-saving aesthetics, so I built a true AMOLED pitch-black mode (`#000000`) paired with frosted glassmorphism and crisp micro-haptics. It also features a unified calendar sync that merges Google Calendar, local device calendars, and your tasks into a single agenda view.\n\n### What's Next & Feedback\nBuilding this solo while balancing a day job has been an exhausting but incredible indie journey. I'd love for fellow builders to check it out, stress-test it, and let me know what you think of the widget responsiveness or the overall offline experience.\n\nYou can grab it on the Google Play Store:\n👉 [https://play.google.com/store/apps/details?id=com.rocisapps.tasks](https://play.google.com/store/apps/details?id=com.rocisapps.tasks)\n\nOr try the web version here:\n👉 [https://tasks.rocisapps.com](https://tasks.rocisapps.com)\n\nI'm happy to answer any technical questions about bridging Flutter with native Kotlin widgets or local-first database patterns in the comments!",
+      "thread_title": "I got tired of subscription fatigue and slow to-do apps, so I built my own offline-first Android task app",
+      "subreddit": "SideProject",
+      "method": "auto",
+      "posted_at": "2026-09-05T20:58:24.995456+00:00",
       "tracked_comments": []
     }
   },
