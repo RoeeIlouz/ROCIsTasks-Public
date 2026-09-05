@@ -81,8 +81,8 @@ class TelegramBot:
             logger.error(f"Failed to edit Telegram message {message_id}: {e}")
             return False
 
-    def answer_callback_query(self, callback_query_id: str, text: str) -> None:
-        if not self.is_configured():
+    def answer_callback_query(self, callback_query_id: Optional[str], text: str) -> None:
+        if not self.is_configured() or not callback_query_id:
             return
         url = f"{self.base_url}/answerCallbackQuery"
         try:
@@ -199,6 +199,9 @@ class TelegramBot:
 
         try:
             res = requests.get(url, params=params, timeout=15)
+            if res.status_code == 409:
+                logger.info("Telegram webhook is active; skipping getUpdates polling.")
+                return [], last_update_id
             res.raise_for_status()
             updates = res.json().get("result", [])
 

@@ -1,5 +1,6 @@
 import argparse
 import logging
+import os
 import sys
 import uuid
 from typing import Dict, Any
@@ -57,10 +58,27 @@ def run_pipeline(dry_run: bool = False):
     logger.info("=" * 60)
 
     # =========================================================================
-    # Step 1: Process User Approvals / Rejections from Telegram
+    # Step 1: Process User Approvals / Rejections
     # =========================================================================
+    actions = []
+
+    # 1a. Check for direct dispatch action from Cloudflare Worker / GitHub Actions payload
+    dispatch_action = os.getenv("DISPATCH_ACTION")
+    dispatch_draft_id = os.getenv("DISPATCH_DRAFT_ID")
+    dispatch_msg_id = os.getenv("DISPATCH_MESSAGE_ID")
+    if dispatch_action and dispatch_draft_id:
+        logger.info(f"Received webhook dispatch: action='{dispatch_action}', draft_id='{dispatch_draft_id}'")
+        actions.append({
+            "action": dispatch_action,
+            "draft_id": dispatch_draft_id,
+            "callback_id": None,
+            "message_id": int(dispatch_msg_id) if (dispatch_msg_id and dispatch_msg_id.isdigit()) else None
+        })
+
+    # 1b. Check Telegram updates (for polling fallback)
     logger.info("Checking Telegram for pending approvals/rejections...")
-    actions, max_update_id = telegram.get_pending_user_actions(state_mgr.telegram_last_update_id)
+    polled_actions, max_update_id = telegram.get_pending_user_actions(state_mgr.telegram_last_update_id)
+    actions.extend(polled_actions)
     if actions:
         logger.info(f"Found {len(actions)} user actions from Telegram.")
         for act in actions:
@@ -73,6 +91,9 @@ def run_pipeline(dry_run: bool = False):
             if not draft:
                 telegram.answer_callback_query(callback_id, "Draft not found.")
                 continue
+
+            if not msg_id:
+                msg_id = draft.get("telegram_message_id")
 
             if draft.get("status") != "pending":
                 telegram.answer_callback_query(callback_id, f"Already {draft.get('status')}.")
