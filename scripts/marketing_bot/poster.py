@@ -282,7 +282,7 @@ class Poster:
                 else:
                     post_text = f"{bsky_text}\n\n📲 https://tasks.rocisapps.com"
 
-                res_bsky = self.bluesky.post_update(post_text)
+                res_bsky = self.bluesky.post_reply(post_text)
                 if res_bsky:
                     bsky_url = res_bsky
                     published_links["Bluesky"] = bsky_url

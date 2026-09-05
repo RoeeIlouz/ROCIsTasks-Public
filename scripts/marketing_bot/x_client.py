@@ -41,6 +41,8 @@ class XClient:
 
         try:
             res = requests.post(url, auth=auth, json=payload, timeout=15)
+            if res.status_code != 201:
+                logger.error(f"X API returned status {res.status_code}: {res.text}")
             res.raise_for_status()
             data = res.json().get("data", {})
             tweet_id = data.get("id")
