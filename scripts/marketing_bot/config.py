@@ -37,6 +37,11 @@ MAX_DISCOVERIES_PER_RUN = int(os.getenv("MAX_DISCOVERIES_PER_RUN", "6"))
 MIN_RELEVANCE_SCORE = int(os.getenv("MIN_RELEVANCE_SCORE", "70"))
 MAX_POST_AGE_HOURS = int(os.getenv("MAX_POST_AGE_HOURS", "72"))
 
+# Organic Anti-Bot Persona Settings
+AUTO_POST_ORGANIC = os.getenv("AUTO_POST_ORGANIC", "true").lower() in ("true", "1", "yes")
+ORGANIC_POST_MIN_INTERVAL_HOURS = int(os.getenv("ORGANIC_POST_MIN_INTERVAL_HOURS", "12"))
+
+
 # State Storage Path
 STATE_FILE_PATH = base_dir / "marketing_state.json"
 

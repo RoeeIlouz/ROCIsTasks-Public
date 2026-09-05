@@ -9,11 +9,13 @@ logger = logging.getLogger(__name__)
 DEFAULT_STATE = {
     "version": 1,
     "last_run_timestamp": None,
+    "last_organic_post_timestamp": None,
     "telegram_last_update_id": 0,
     "inspected_threads": {},
     "pending_drafts": {},
     "posted_threads": {},
-    "recorded_feedback": []
+    "recorded_feedback": [],
+    "organic_posts": []
 }
 
 class StateManager:
@@ -87,3 +89,38 @@ class StateManager:
     def add_feedback(self, feedback_item: Dict[str, Any]) -> None:
         feedback_item["recorded_at"] = datetime.now(timezone.utc).isoformat()
         self.data["recorded_feedback"].append(feedback_item)
+
+    def can_post_organic(self, min_interval_hours: int = 12) -> bool:
+        """
+        Determines if enough time has passed to publish a fresh organic persona post.
+        """
+        last_ts_str = self.data.get("last_organic_post_timestamp")
+        if not last_ts_str:
+            return True
+
+        try:
+            last_dt = datetime.fromisoformat(last_ts_str)
+            now_dt = datetime.now(timezone.utc)
+            elapsed_hours = (now_dt - last_dt).total_seconds() / 3600.0
+            return elapsed_hours >= min_interval_hours
+        except Exception as e:
+            logger.warning(f"Error parsing last_organic_post_timestamp: {e}")
+            return True
+
+    def record_organic_post(self, text: str, platforms: list, topic: str = "general") -> None:
+        """
+        Records an executed organic post to maintain history and pace.
+        """
+        now_iso = datetime.now(timezone.utc).isoformat()
+        self.data["last_organic_post_timestamp"] = now_iso
+        if "organic_posts" not in self.data:
+            self.data["organic_posts"] = []
+
+        self.data["organic_posts"].append({
+            "text": text,
+            "topic": topic,
+            "platforms": platforms,
+            "posted_at": now_iso
+        })
+        # Keep recent 30 posts to avoid unbound growth
+        self.data["organic_posts"] = self.data["organic_posts"][-30:]

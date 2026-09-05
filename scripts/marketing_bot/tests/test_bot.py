@@ -120,6 +120,35 @@ class TestMarketingBot(unittest.TestCase):
         self.assertEqual(len(self.state_mgr.data["recorded_feedback"]), 1)
         self.assertEqual(self.state_mgr.data["recorded_feedback"][0]["author"], "john_doe")
 
+    def test_persona_engine_generation(self):
+        from scripts.marketing_bot.persona_engine import PersonaEngine
+        engine = PersonaEngine(api_key="")  # uses curated fallback
+        thought = engine.generate_organic_thought()
+        self.assertIn("text", thought)
+        self.assertIn("topic", thought)
+        self.assertGreater(len(thought["text"]), 10)
+        self.assertLessEqual(len(thought["text"]), 280)
+        # Verify zero self-promotion in organic thoughts
+        self.assertNotIn("http://", thought["text"])
+        self.assertNotIn("https://", thought["text"])
+        self.assertNotIn("ROCIs Tasks", thought["text"])
+
+    def test_state_manager_organic_cadence(self):
+        # 1. Fresh state should allow organic post
+        self.assertTrue(self.state_mgr.can_post_organic(min_interval_hours=12))
+
+        # 2. Record organic post
+        self.state_mgr.record_organic_post("Debugging Flutter layouts", ["Twitter/X", "Bluesky"], "mobile_engineering")
+        self.assertEqual(len(self.state_mgr.data["organic_posts"]), 1)
+        self.assertEqual(self.state_mgr.data["organic_posts"][0]["topic"], "mobile_engineering")
+
+        # 3. Subsequent check with 12h cooldown should be False
+        self.assertFalse(self.state_mgr.can_post_organic(min_interval_hours=12))
+
+        # 4. Immediate cooldown (0h) should be True
+        self.assertTrue(self.state_mgr.can_post_organic(min_interval_hours=0))
+
 if __name__ == "__main__":
     unittest.main()
+
 

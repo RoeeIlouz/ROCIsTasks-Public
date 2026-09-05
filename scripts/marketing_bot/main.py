@@ -9,10 +9,13 @@ from .config import (
     MAX_DISCOVERIES_PER_RUN,
     MIN_RELEVANCE_SCORE,
     DRY_RUN,
-    DEVTO_API_KEY
+    DEVTO_API_KEY,
+    AUTO_POST_ORGANIC,
+    ORGANIC_POST_MIN_INTERVAL_HOURS
 )
 from .state_manager import StateManager
 from .gemini_engine import GeminiEngine
+from .persona_engine import PersonaEngine
 from .telegram_bot import TelegramBot
 from .discovery import DiscoveryEngine
 from .poster import Poster
@@ -32,6 +35,7 @@ def run_pipeline(dry_run: bool = False):
 
     state_mgr = StateManager(STATE_FILE_PATH)
     gemini = GeminiEngine()
+    persona = PersonaEngine()
     telegram = TelegramBot()
     discovery = DiscoveryEngine(state_mgr)
     poster = Poster(state_mgr, telegram)
@@ -45,6 +49,7 @@ def run_pipeline(dry_run: bool = False):
     logger.info(f"  • Bluesky API: {'AVAILABLE' if poster.bluesky.is_configured() else 'NOT CONFIGURED'}")
     logger.info(f"  • Dev.to API: {'AVAILABLE' if DEVTO_API_KEY else 'NOT CONFIGURED'}")
     logger.info(f"  • X/Twitter API: {'AVAILABLE' if poster.x_client.is_configured() else 'NOT CONFIGURED'}")
+    logger.info(f"  • Auto-Post Organic Persona: {'ENABLED' if AUTO_POST_ORGANIC else 'DISABLED'} (Cooldown: {ORGANIC_POST_MIN_INTERVAL_HOURS}h)")
     logger.info(f"  • Dry-Run Mode: {dry_run}")
     logger.info("=" * 60)
 
@@ -185,23 +190,75 @@ def run_pipeline(dry_run: bool = False):
         logger.info("Skipping comment monitoring in dry-run mode or when Gemini unavailable.")
 
     # =========================================================================
-    # Step 4: Final State Persistence & Notification Summary
+    # Step 4: Autonomous Organic Persona Posting (Anti-Bot Account Warming)
+    # =========================================================================
+    organic_summary = None
+    if AUTO_POST_ORGANIC:
+        logger.info("Evaluating eligibility for organic persona post...")
+        if state_mgr.can_post_organic(min_interval_hours=ORGANIC_POST_MIN_INTERVAL_HOURS):
+            logger.info("Cooldown elapsed. Generating authentic developer thought...")
+            recent_texts = [p.get("text", "") for p in state_mgr.data.get("organic_posts", [])]
+            thought = persona.generate_organic_thought(previous_posts=recent_texts)
+            thought_text = thought["text"]
+            thought_topic = thought["topic"]
+
+            published_platforms = []
+            if not dry_run:
+                # 1. Post to Twitter/X
+                if poster.x_client.is_configured():
+                    tweet_url = poster.x_client.post_tweet(thought_text)
+                    if tweet_url:
+                        published_platforms.append("Twitter/X")
+
+                # 2. Post to Bluesky
+                if poster.bluesky.is_configured():
+                    bsky_url = poster.bluesky.post_reply(thought_text)
+                    if bsky_url:
+                        published_platforms.append("Bluesky")
+
+                if published_platforms:
+                    state_mgr.record_organic_post(
+                        text=thought_text,
+                        platforms=published_platforms,
+                        topic=thought_topic
+                    )
+                    organic_summary = f"🌱 Organic post published to {', '.join(published_platforms)}"
+                    logger.info(f"Published organic thought to: {', '.join(published_platforms)}")
+
+                    if telegram.is_configured():
+                        telegram.send_message(
+                            f"🌱 <b>Autonomous Organic Persona Post</b>\n\n"
+                            f"<blockquote>{thought_text}</blockquote>\n\n"
+                            f"📌 <b>Platforms:</b> {', '.join(published_platforms)}\n"
+                            f"🏷️ <b>Topic:</b> #{thought_topic} <i>(Account warming / zero promo)</i>"
+                        )
+                else:
+                    logger.info("Organic thought generated, but social platforms not connected or post failed.")
+            else:
+                logger.info(f"[DRY RUN] Would publish organic thought to X & Bluesky:\n{thought_text}")
+                organic_summary = f"[DRY RUN] Organic thought generated: \"{thought_text[:60]}...\""
+        else:
+            logger.info(f"Organic posting cooldown active (minimum {ORGANIC_POST_MIN_INTERVAL_HOURS}h between posts).")
+
+    # =========================================================================
+    # Step 5: Final State Persistence & Notification Summary
     # =========================================================================
     state_mgr.save()
 
     if telegram.is_configured() and not dry_run:
+        org_extra = f"\n• {organic_summary}" if organic_summary else ""
         if dispatched_count > 0:
             telegram.send_message(
                 f"🎯 <b>ROCIs Marketing Engine Run Finished</b>\n\n"
                 f"• Scanned candidate discussions across Reddit, Bluesky, Dev.to & HN.\n"
                 f"• Sent <b>{dispatched_count}</b> new high-relevance draft cards above for your approval!\n"
-                f"• Tap <b>[Approve & Post]</b> or <b>[Skip]</b> to process them."
+                f"• Tap <b>[Approve & Post]</b> or <b>[Skip]</b> to process them.{org_extra}"
             )
         else:
             telegram.send_message(
                 f"🤖 <b>ROCIs Marketing Engine Scan Report</b>\n\n"
                 f"• Scanned <b>{total_candidates}</b> active candidate discussions.\n"
-                f"• 0 discussions met the <b>>={MIN_RELEVANCE_SCORE}%</b> relevance threshold for an authentic indie plug this run.\n"
+                f"• 0 discussions met the <b>>={MIN_RELEVANCE_SCORE}%</b> relevance threshold for an authentic indie plug this run.{org_extra}\n"
                 f"• Next automated scan will run in 6 hours (or upon manual trigger)."
             )
 
