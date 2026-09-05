@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-05T16:49:10.780003+00:00",
+  "last_run_timestamp": "2026-09-05T16:50:49.562857+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -427,37 +427,37 @@
       "platform": "devto",
       "title": "Five things I noticed this week: inference cadence, reach, and who files bug reports",
       "url": "https://dev.to/morinaga/five-things-i-noticed-this-week-inference-cadence-reach-and-who-files-bug-reports-hck",
-      "inspected_at": "2026-09-05T16:48:55.959370+00:00"
+      "inspected_at": "2026-09-05T16:48:44.367145+00:00"
     },
     "devto_4573188": {
       "platform": "devto",
       "title": "Three things I encoded when Dev.to comments started feeding my autonomous article pipeline",
       "url": "https://dev.to/morinaga/three-things-i-encoded-when-devto-comments-started-feeding-my-autonomous-article-pipeline-2nge",
-      "inspected_at": "2026-09-05T16:48:57.157576+00:00"
+      "inspected_at": "2026-09-05T16:48:46.887716+00:00"
     },
     "devto_4568024": {
       "platform": "devto",
       "title": "I Built My First Product as a Solo Developer — With Breaking Bad on My Second Monitor",
       "url": "https://dev.to/aimadaitelhoussecrypto/i-built-my-first-product-as-a-solo-developer-with-breaking-bad-on-my-second-monitor-1m4h",
-      "inspected_at": "2026-09-05T16:48:57.826959+00:00"
+      "inspected_at": "2026-09-05T16:48:47.629511+00:00"
     },
     "devto_4565756": {
       "platform": "devto",
       "title": "I built an iOS alarm that makes you scan a QR code across the room to turn it off",
       "url": "https://dev.to/praveen_kumar_517b7294c47/i-built-an-ios-alarm-that-makes-you-scan-a-qr-code-across-the-room-to-turn-it-off-36ml",
-      "inspected_at": "2026-09-05T16:48:59.743962+00:00"
+      "inspected_at": "2026-09-05T16:49:39.191371+00:00"
     },
     "devto_4565941": {
       "platform": "devto",
       "title": "Staying Organized as a Solo Dev: A Lesson from the Road",
       "url": "https://dev.to/scot_gardner_7fd0617670bb/staying-organized-as-a-solo-dev-a-lesson-from-the-road-6nm",
-      "inspected_at": "2026-09-05T16:49:00.600537+00:00"
+      "inspected_at": "2026-09-05T16:49:44.924827+00:00"
     },
     "devto_4565867": {
       "platform": "devto",
       "title": "Taming Flutter Infinite Scroll: Why 3 Lines of async* Missed the Point, and How BlocSignal Fixes It",
       "url": "https://dev.to/gde/taming-flutter-infinite-scroll-why-3-lines-of-async-missed-the-point-and-how-blocsignal-fixes-it-3n48",
-      "inspected_at": "2026-09-05T16:49:01.489752+00:00"
+      "inspected_at": "2026-09-05T16:49:50.951838+00:00"
     }
   },
   "pending_drafts": {
@@ -556,8 +556,9 @@
       "x_text": "Ever had your Flutter app spam users with Google Sign-In prompts? 😅 Fixed a nasty multi-prompt regression in ROCIs Tasks by fixing in-memory session caching, splitting mobile/web OAuth scopes, and stopping silent auth from triggering UI. Details: https://tasks.rocisapps.com",
       "bsky_text": "Debugging Auth loops in Flutter: Why Google Sign-In v7 was triggering multiple Credential Manager overlays on Android, and how I fixed it with proper in-memory session caching and platform-specific OAuth scopes in ROCIs Tasks. 🛠️✨ https://tasks.rocisapps.com",
       "created_at": "2026-09-05T16:45:20.561415+00:00",
-      "status": "pending",
-      "telegram_message_id": 24
+      "status": "approved",
+      "telegram_message_id": 24,
+      "updated_at": "2026-09-05T16:48:27.201704+00:00"
     },
     "draft_3b6ec69b": {
       "thread_id": "devto_4568024",
@@ -570,6 +571,26 @@
       "telegram_message_id": 31,
       "created_at": "2026-09-05T16:48:59.743920+00:00",
       "status": "pending"
+    },
+    "devlog_devlog_0_2_2_62_2026_07_17_1ff5655b91": {
+      "id": "devlog_devlog_0_2_2_62_2026_07_17_1ff5655b91",
+      "type": "devlog",
+      "milestone_title": "[0.2.2+62] - 2026-07-17",
+      "milestone_date": "2026-07-17",
+      "milestone_slug": "devlog_0_2_2_62_2026_07_17_1ff5655b91",
+      "devto_title": "Why Google Tasks Sync Was Silently Failing Every Hour (And How I Fixed It)",
+      "devto_body": "Building an offline-first task app sounds peaceful until you introduce cloud synchronization. Suddenly, you're knee-deep in OAuth scopes, token expirations, and mysterious silent failures that only happen when you step away from your desk for an hour.\n\nIn ROCIs Tasks—my offline-first Android task and calendar app built with Flutter and native Kotlin home screen widgets—I recently ran into a multi-layered Google Tasks sync puzzle. Users were experiencing sudden sync dropouts, and worse, the app wasn't telling them why. Let's break down what went wrong and how I built a robust, self-healing auth recovery flow.\n\n### The Mystery: The 60-Minute Disappearing Act\nEverything worked great during initial testing. You log in, tasks sync beautifully between local SQLite databases and Google Tasks, and native widgets update seamlessly. But after an hour of idle time, background sync would quietly die.\n\nWhen looking at the logs, three distinct culprits emerged:\n1. **The Cloud Console Blindspot**: The Google Tasks API simply wasn't enabled in the Google Cloud Console for the project. Classic rookie configuration error.\n2. **The 60-Minute Token Wall**: OAuth access tokens expire after 60 minutes. When the API threw a `GoogleTokenExpiredException`, my `TaskProvider` was catching it, silently ignoring it, and failing indefinitely.\n3. **The Web Silent Refresh Gap**: While mobile had some token handling, the web platform lacked proper silent scope authorization requests, forcing users to completely re-authenticate manually.\n\nThe result? A broken user experience where data simply stopped syncing without any visual feedback.\n\n### The Solution & Architecture\nTo fix this permanently, I needed a multi-pronged approach: fixing the backend configuration, upgrading token handling, and adding graceful UI recovery.\n\nFirst, I enabled the API in Google Cloud. Next, I tackled the token lifecycle inside our authentication service. I implemented platform-agnostic silent scope authorization requests to ensure tokens could refresh seamlessly without throwing hard errors.\n\nTo bridge the gap between the auth layer and the UI, I exposed a reactive state flag in our `AuthService`:\n\n```dart\nclass AuthService extends ChangeNotifier {\n  bool _isGoogleTasksTokenExpired = false;\n  \n  bool get isGoogleTasksTokenExpired => _isGoogleTasksTokenExpired;\n\n  void setTokenExpired(bool expired) {\n    if (_isGoogleTasksTokenExpired != expired) {\n      _isGoogleTasksTokenExpired = expired;\n      notifyListeners();\n    }\n  }\n\n  Future<void> refreshAccessToken() async {\n    try {\n      // Platform-agnostic silent token request logic\n      await _silentAuthClient.requestAccess();\n      setTokenExpired(false);\n    } catch (e) {\n      setTokenExpired(true);\n    }\n  }\n}\n```\n\nFinally, instead of hiding the failure, I brought it to the user's attention gracefully. Using our Glassmorphism design system rules, I added contextual warning banners at the top of the Tasks tab on Mobile and inside the sidebar on Web. With a single tap on 'Reconnect', users trigger a self-healing re-authorization flow right where they are.\n\n### Key Lessons for Other Devs\n* **Never silently swallow auth exceptions**: If an API call fails due to an expired token, surface that state immediately to your state management layer.\n* **Design for expiration**: OAuth tokens *will* expire. Always build your UI assuming connectivity and auth states can drop at any moment.\n* **Self-healing UI wins**: Instead of locking users out or showing generic error toasts, give them a prominent, one-tap path to re-authenticate.\n\n### Try ROCIs Tasks\nBuilding ROCIs Tasks as an indie developer has been an incredible journey into bridging Flutter cross-platform power with native Android widgets. If you want to check out an offline-first productivity app with deep calendar integration, take a look at [ROCIs Tasks on Google Play](https://play.google.com/store/apps/details?id=com.rocisapps.tasks) or try the web version at [tasks.rocisapps.com](https://tasks.rocisapps.com). Feedback is always welcome!",
+      "tags": [
+        "flutter",
+        "android",
+        "indiedev",
+        "programming"
+      ],
+      "x_text": "Ever wonder why your Google Tasks sync dies after exactly 60 minutes? Turns out silent OAuth exceptions + missing web silent refresh = invisible sync failures. Fixed it with reactive auth states and glassmorphism reconnect banners! #indiedev #flutter",
+      "bsky_text": "Spent the week debugging a classic 60-minute OAuth token expiration issue in my offline-first Flutter app. Swallowing token exceptions silently is a trap! Added a reactive token-expired flag and gorgeous tap-to-reconnect glass banners instead. #flutter #indiedev",
+      "created_at": "2026-09-05T16:50:47.258000+00:00",
+      "status": "pending",
+      "telegram_message_id": 33
     }
   },
   "posted_threads": {
@@ -623,5 +644,13 @@
     }
   ],
   "x_posts_timestamps": [],
-  "posted_devlogs": {}
+  "posted_devlogs": {
+    "devlog_0_2_2_60_2026_07_17_190f9f3082": {
+      "title": "Why My Flutter App Was Spamming Google Sign-In Prompts (And How I Fixed It)",
+      "devto_url": "https://dev.to/rocisapps/why-my-flutter-app-was-spamming-google-sign-in-prompts-and-how-i-fixed-it-496h",
+      "x_url": null,
+      "bsky_url": null,
+      "published_at": "2026-09-05T16:48:27.200369+00:00"
+    }
+  }
 }
