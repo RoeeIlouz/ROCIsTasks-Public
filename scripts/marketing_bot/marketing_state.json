@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-05T18:43:55.674150+00:00",
+  "last_run_timestamp": "2026-09-05T19:15:51.286101+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -608,6 +608,42 @@
       "title": "Why Your Flutter Background Isolates Crash on Android (And How I Fixed It)",
       "url": "https://dev.to/rocisapps/why-your-flutter-background-isolates-crash-on-android-and-how-i-fixed-it-5cka",
       "inspected_at": "2026-09-05T18:43:41.455686+00:00"
+    },
+    "reddit_1w89nax": {
+      "platform": "reddit",
+      "title": "Simple invoice generating tool that I made almost two years ago",
+      "url": "https://reddit.com/r/SideProject/comments/1w89nax/simple_invoice_generating_tool_that_i_made_almost/",
+      "inspected_at": "2026-09-05T19:15:37.231722+00:00"
+    },
+    "reddit_1w89kk4": {
+      "platform": "reddit",
+      "title": "I built the study app I wanted in college — notes that quiz you back. Looking for\nstudents to break it",
+      "url": "https://reddit.com/r/SideProject/comments/1w89kk4/i_built_the_study_app_i_wanted_in_college_notes/",
+      "inspected_at": "2026-09-05T19:15:38.763598+00:00"
+    },
+    "reddit_1w89gem": {
+      "platform": "reddit",
+      "title": "I built a lightweight tool to track recurring building maintenance and compliance (now with an iOS app)",
+      "url": "https://reddit.com/r/SideProject/comments/1w89gem/i_built_a_lightweight_tool_to_track_recurring/",
+      "inspected_at": "2026-09-05T19:15:39.528422+00:00"
+    },
+    "reddit_1w8969b": {
+      "platform": "reddit",
+      "title": "I’ve been working on this new clock design for quite a while — what do you think?",
+      "url": "https://reddit.com/r/SideProject/comments/1w8969b/ive_been_working_on_this_new_clock_design_for/",
+      "inspected_at": "2026-09-05T19:15:40.269647+00:00"
+    },
+    "devto_4583420": {
+      "platform": "devto",
+      "title": "Why My Flutter App Was Spamming Google Sign-In Prompts (And How I Fixed It)",
+      "url": "https://dev.to/rocisapps/why-my-flutter-app-was-spamming-google-sign-in-prompts-and-how-i-fixed-it-496h",
+      "inspected_at": "2026-09-05T19:15:41.045455+00:00"
+    },
+    "devto_4583185": {
+      "platform": "devto",
+      "title": "Building a Fully Offline-First Flutter App for ERPNext: The RedLine Architecture and Sync Engine",
+      "url": "https://dev.to/m7amedenho/building-a-fully-offline-first-flutter-app-for-erpnext-the-redline-architecture-and-sync-engine-23a6",
+      "inspected_at": "2026-09-05T19:15:41.864911+00:00"
     }
   },
   "pending_drafts": {
@@ -834,7 +870,8 @@
       "draft_text": "Spot on. Dealing with method channels and background isolates for native Android widgets in Flutter can be a real headache. Passing the right callback handles via `PluginUtilities` saved my sanity when building widget updates for ROCIs Tasks.",
       "telegram_message_id": 50,
       "created_at": "2026-09-05T18:43:42.975481+00:00",
-      "status": "pending"
+      "status": "rejected",
+      "updated_at": "2026-09-05T19:15:17.901810+00:00"
     }
   },
   "posted_threads": {
