@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-05T15:54:12.409353+00:00",
+  "last_run_timestamp": "2026-09-05T16:00:43.420823+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -206,6 +206,42 @@
       "title": "How can I detect if iPhone Rotation Lock is ON when using CoreMotion?",
       "url": "https://reddit.com/r/FlutterDev/comments/1w83ywo/how_can_i_detect_if_iphone_rotation_lock_is_on/",
       "inspected_at": "2026-09-05T15:54:11.620146+00:00"
+    },
+    "reddit_1w83yg6": {
+      "platform": "reddit",
+      "title": "Need guidence",
+      "url": "https://reddit.com/r/SideProject/comments/1w83yg6/need_guidence/",
+      "inspected_at": "2026-09-05T15:59:20.865881+00:00"
+    },
+    "reddit_1w7yx7x": {
+      "platform": "reddit",
+      "title": "I shipped a Flutter desktop app to macOS, Windows and Linux — including both arm64 targets. Here's what broke.",
+      "url": "https://reddit.com/r/FlutterDev/comments/1w7yx7x/i_shipped_a_flutter_desktop_app_to_macos_windows/",
+      "inspected_at": "2026-09-05T15:59:32.183329+00:00"
+    },
+    "reddit_1w7pl6a": {
+      "platform": "reddit",
+      "title": "I was tired of rigid UI packages with bloated dependencies, so I built an open-source copy-paste component system for Flutter inspired by shadcn/ui",
+      "url": "https://reddit.com/r/FlutterDev/comments/1w7pl6a/i_was_tired_of_rigid_ui_packages_with_bloated/",
+      "inspected_at": "2026-09-05T15:59:32.964405+00:00"
+    },
+    "reddit_1w7nykz": {
+      "platform": "reddit",
+      "title": "Built a Flutter gallery package with infinite masonry + animated carousels",
+      "url": "https://reddit.com/r/FlutterDev/comments/1w7nykz/built_a_flutter_gallery_package_with_infinite/",
+      "inspected_at": "2026-09-05T15:59:37.091649+00:00"
+    },
+    "bsky_bafyreiclwe7": {
+      "platform": "bluesky",
+      "title": "Introducing “Send in the Clown”!\n\nCheck out this indie comedy RPG that I co-wrot...",
+      "url": "https://bsky.app/profile/connermccabe.bsky.social/post/3mupjavg5q22d",
+      "inspected_at": "2026-09-05T15:59:38.019888+00:00"
+    },
+    "bsky_bafyreibjs7c": {
+      "platform": "bluesky",
+      "title": "FACTOMANCER - Gameplay Trailer\n\n🎮  Try the demo and wishlist the game during the...",
+      "url": "https://bsky.app/profile/voltigegames.bsky.social/post/3mupdxsbpuk2e",
+      "inspected_at": "2026-09-05T16:00:41.453891+00:00"
     }
   },
   "pending_drafts": {
@@ -219,10 +255,21 @@
       "draft_text": "I totally feel your pain—that exact frustration is what drove me to build my own app, ROCIs Tasks. I got so tired of bloated corporate task apps with predatory subscriptions and clunky interfaces.\n\nSince you're on Android, you might appreciate that I built native Kotlin home screen widgets for it (like a daily focus agenda and quick actions) so you can track random deadlines right from your home screen without lag. It also has a natural language parser, so you can just type 'Finish project Friday at 3pm #urgent' and it parses everything automatically.\n\nIt's offline-first using Hive, runs super fast, and has a true AMOLED pitch-black mode if you're into that. \n\nIf you want to check it out, it's on Google Play here: https://play.google.com/store/apps/details?id=com.rocisapps.tasks or you can check the web version at https://tasks.rocisapps.com. Would love to hear what you think of it since you built your own tool too!",
       "telegram_message_id": 8,
       "created_at": "2026-09-05T14:59:39.120010+00:00",
-      "status": "pending"
+      "status": "approved",
+      "updated_at": "2026-09-05T15:58:55.407187+00:00"
     }
   },
-  "posted_threads": {},
+  "posted_threads": {
+    "reddit_1w82mcf": {
+      "platform": "reddit",
+      "thread_url": "https://reddit.com/r/SideProject/comments/1w82mcf/i_got_tired_of_keeping_track_of_random_deadlines/",
+      "posted_text": "I totally feel your pain—that exact frustration is what drove me to build my own app, ROCIs Tasks. I got so tired of bloated corporate task apps with predatory subscriptions and clunky interfaces.\n\nSince you're on Android, you might appreciate that I built native Kotlin home screen widgets for it (like a daily focus agenda and quick actions) so you can track random deadlines right from your home screen without lag. It also has a natural language parser, so you can just type 'Finish project Friday at 3pm #urgent' and it parses everything automatically.\n\nIt's offline-first using Hive, runs super fast, and has a true AMOLED pitch-black mode if you're into that. \n\nIf you want to check it out, it's on Google Play here: https://play.google.com/store/apps/details?id=com.rocisapps.tasks or you can check the web version at https://tasks.rocisapps.com. Would love to hear what you think of it since you built your own tool too!",
+      "thread_title": "I got tired of keeping track of random deadlines, so I built this",
+      "method": "manual_drop",
+      "posted_at": "2026-09-05T15:59:01.176367+00:00",
+      "tracked_comments": []
+    }
+  },
   "recorded_feedback": [],
   "last_organic_post_timestamp": "2026-09-05T14:26:29.792124+00:00",
   "organic_posts": [
