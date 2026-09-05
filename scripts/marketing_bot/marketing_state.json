@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-05T16:50:49.562857+00:00",
+  "last_run_timestamp": "2026-09-05T16:52:19.478589+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -458,6 +458,42 @@
       "title": "Taming Flutter Infinite Scroll: Why 3 Lines of async* Missed the Point, and How BlocSignal Fixes It",
       "url": "https://dev.to/gde/taming-flutter-infinite-scroll-why-3-lines-of-async-missed-the-point-and-how-blocsignal-fixes-it-3n48",
       "inspected_at": "2026-09-05T16:49:50.951838+00:00"
+    },
+    "reddit_1w85vay": {
+      "platform": "reddit",
+      "title": "Made a translation keyboard for people living in a second language.",
+      "url": "https://reddit.com/r/SideProject/comments/1w85vay/made_a_translation_keyboard_for_people_living_in/",
+      "inspected_at": "2026-09-05T16:51:59.513488+00:00"
+    },
+    "devto_4578989": {
+      "platform": "devto",
+      "title": "Beyond Clean Architecture: The Iceberg Pattern for Real-Time Flutter Apps with BlocSignal",
+      "url": "https://dev.to/gde/beyond-clean-architecture-the-iceberg-pattern-for-real-time-flutter-apps-with-blocsignal-3l84",
+      "inspected_at": "2026-09-05T16:52:00.783500+00:00"
+    },
+    "devto_4567479": {
+      "platform": "devto",
+      "title": "Taming Flutter Infinite Scroll (Part 2): Turning ScrollController into a Reactive State Machine with CubitSignalMixin",
+      "url": "https://dev.to/gde/taming-flutter-infinite-scroll-part-2-turning-scrollcontroller-into-a-reactive-state-machine-cgh",
+      "inspected_at": "2026-09-05T16:52:01.912779+00:00"
+    },
+    "devto_4558637": {
+      "platform": "devto",
+      "title": "Flutter Web SEO: Crawlable Content, JSON-LD, and Share Cards for a Canvas App",
+      "url": "https://dev.to/devshakib/flutter-web-seo-crawlable-content-json-ld-and-share-cards-for-a-canvas-app-4a83",
+      "inspected_at": "2026-09-05T16:52:02.799422+00:00"
+    },
+    "devto_4582374": {
+      "platform": "devto",
+      "title": "How I Built a Tech Interview Prep App with 35,000+ Questions in Flutter 🚀",
+      "url": "https://dev.to/savankumar_sanghani_949c7/how-i-built-a-tech-interview-prep-app-in-flutter-28gd",
+      "inspected_at": "2026-09-05T16:52:11.828713+00:00"
+    },
+    "devto_4581729": {
+      "platform": "devto",
+      "title": "Flutter Platform Channels",
+      "url": "https://dev.to/godofgeeks/flutter-platform-channels-13hg",
+      "inspected_at": "2026-09-05T16:52:12.527408+00:00"
     }
   },
   "pending_drafts": {
@@ -570,7 +606,8 @@
       "draft_text": "Congrats on shipping your first product! Building solo while keeping Breaking Bad on loop is basically the official indie hacker rite of passage.\n\nYour post really resonates. I got so frustrated by bloated, subscription-trap productivity apps that I ended up building my own Android task and calendar workspace called ROCIs Tasks (using Flutter and Hive for instant offline speed).\n\nIf you ever need a distraction-free, zero-lag workspace to manage your next feature backlog (complete with a pitch-black AMOLED mode for late-night coding sessions), check it out:\n- Web: https://tasks.rocisapps.com\n- Play Store: https://play.google.com/store/apps/details?id=com.rocisapps.tasks\n\nKeep up the momentum—shipping that first product is the hardest part!",
       "telegram_message_id": 31,
       "created_at": "2026-09-05T16:48:59.743920+00:00",
-      "status": "pending"
+      "status": "approved",
+      "updated_at": "2026-09-05T16:51:39.547512+00:00"
     },
     "devlog_devlog_0_2_2_62_2026_07_17_1ff5655b91": {
       "id": "devlog_devlog_0_2_2_62_2026_07_17_1ff5655b91",
@@ -628,6 +665,15 @@
       "thread_title": "We kept failing at todo lists — not from lack of discipline, but because every d...",
       "method": "manual_drop",
       "posted_at": "2026-09-05T16:48:32.251856+00:00",
+      "tracked_comments": []
+    },
+    "devto_4568024": {
+      "platform": "devto",
+      "thread_url": "https://dev.to/aimadaitelhoussecrypto/i-built-my-first-product-as-a-solo-developer-with-breaking-bad-on-my-second-monitor-1m4h",
+      "posted_text": "Congrats on shipping your first product! Building solo while keeping Breaking Bad on loop is basically the official indie hacker rite of passage.\n\nYour post really resonates. I got so frustrated by bloated, subscription-trap productivity apps that I ended up building my own Android task and calendar workspace called ROCIs Tasks (using Flutter and Hive for instant offline speed).\n\nIf you ever need a distraction-free, zero-lag workspace to manage your next feature backlog (complete with a pitch-black AMOLED mode for late-night coding sessions), check it out:\n- Web: https://tasks.rocisapps.com\n- Play Store: https://play.google.com/store/apps/details?id=com.rocisapps.tasks\n\nKeep up the momentum—shipping that first product is the hardest part!",
+      "thread_title": "I Built My First Product as a Solo Developer — With Breaking Bad on My Second Monitor",
+      "method": "manual_drop",
+      "posted_at": "2026-09-05T16:51:40.652088+00:00",
       "tracked_comments": []
     }
   },
