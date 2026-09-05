@@ -21,11 +21,23 @@ GEMINI_MODELS = [
 ]
 
 def _clean_json_markdown(text: str) -> str:
-    """Removes ```json ... ``` markdown wrappers if present."""
+    """Removes ```json ... ``` markdown wrappers if present and extracts the outermost JSON object."""
     text = text.strip()
-    match = re.search(r"```(?:json)?\s*([\s\S]*?)\s*```", text)
-    if match:
-        return match.group(1).strip()
+    # If the response starts with ```json or ```, strip that outer fence
+    if text.startswith("```"):
+        first_newline = text.find("\n")
+        if first_newline != -1:
+            text = text[first_newline + 1:]
+        if text.endswith("```"):
+            text = text[:-3]
+        text = text.strip()
+
+    # Find the first '{' and the last '}'
+    start_idx = text.find("{")
+    end_idx = text.rfind("}")
+    if start_idx != -1 and end_idx != -1 and end_idx > start_idx:
+        return text[start_idx:end_idx + 1]
+
     return text
 
 class GeminiEngine:
@@ -103,7 +115,7 @@ class GeminiEngine:
         for model_name in models_to_try:
             url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={self.api_key}"
             try:
-                response = requests.post(url, headers=headers, json=payload, timeout=25)
+                response = requests.post(url, headers=headers, json=payload, timeout=45)
                 if response.status_code == 404:
                     logger.warning(f"Model '{model_name}' returned 404. Trying next model...")
                     continue
