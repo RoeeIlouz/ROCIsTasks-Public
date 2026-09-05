@@ -214,3 +214,42 @@ Analyze this comment and return ONLY valid JSON with this structure:
             logger.error(f"Failed to parse feedback classification JSON: {e}")
             return None
 
+    def generate_devto_article(self, topic: Optional[str] = None) -> Optional[Dict[str, Any]]:
+        """
+        Generates an authentic, in-depth technical article or devlog for Dev.to
+        sharing architecture insights, lessons learned building ROCIs Tasks with Flutter & Kotlin,
+        or solving offline-first synchronization challenges.
+        """
+        prompt = f"""You are a passionate indie mobile developer writing a high-quality technical article on Dev.to.
+Context: You built an offline-first Android task & calendar app called "{APP_INFO['name']}" using Flutter, Kotlin home widgets, and Hive/Firestore.
+
+Topic Focus: {topic or "Architecture & Lessons from building an offline-first mobile app with Flutter & Kotlin"}
+
+REQUIREMENTS:
+1. VALUE-FIRST: Provide real technical value (code concepts, architecture patterns, tradeoffs between local Hive storage vs remote Firestore sync, battery life with home widgets).
+2. TONE: Honest, humble developer journey (what went wrong, how you solved it, clean code principles). Not a sales pitch.
+3. FORMAT:
+   - Catchy, authentic developer title (e.g. "How I Built Real-Time Offline-First Sync in Flutter Without State Headaches")
+   - Markdown formatted article with headings, code snippets, and key takeaways.
+   - 4 relevant tags (e.g. ["flutter", "android", "architecture", "showdev"]).
+4. OUTPUT FORMAT:
+   Return ONLY valid JSON matching this exact structure:
+   {{
+     "title": "<article title>",
+     "tags": ["flutter", "android", "productivity", "showdev"],
+     "body_markdown": "<full markdown body of the article>",
+     "summary": "<1-2 sentence summary for Telegram notification>"
+   }}
+"""
+        raw_text = self._call_gemini(prompt, temperature=0.7)
+        if not raw_text:
+            return None
+
+        cleaned = _clean_json_markdown(raw_text)
+        try:
+            return json.loads(cleaned)
+        except Exception as e:
+            logger.error(f"Failed to parse Dev.to article JSON: {e}")
+            return None
+
+

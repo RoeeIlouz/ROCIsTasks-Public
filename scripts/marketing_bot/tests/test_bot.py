@@ -166,6 +166,16 @@ class TestMarketingBot(unittest.TestCase):
         self.state_mgr.record_x_post()
         self.assertFalse(self.state_mgr.can_post_to_x(max_monthly=3, max_daily=5))
 
+    def test_devto_client_configuration(self):
+        from scripts.marketing_bot.devto_client import DevtoClient
+        client_empty = DevtoClient(api_key="")
+        self.assertFalse(client_empty.is_configured())
+        self.assertIsNone(client_empty.publish_article("test", "body"))
+        self.assertIsNone(client_empty.post_comment("123", "comment"))
+
+        client_configured = DevtoClient(api_key="valid_devto_key_123")
+        self.assertTrue(client_configured.is_configured())
+
 if __name__ == "__main__":
     unittest.main()
 

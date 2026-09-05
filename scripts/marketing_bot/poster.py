@@ -17,6 +17,7 @@ from .telegram_bot import TelegramBot
 from .reddit_playwright import RedditPlaywrightPoster
 from .bluesky_client import BlueskyClient
 from .x_client import XClient
+from .devto_client import DevtoClient
 
 logger = logging.getLogger(__name__)
 
@@ -27,6 +28,7 @@ class Poster:
         self.playwright_poster = RedditPlaywrightPoster()
         self.bluesky = BlueskyClient()
         self.x_client = XClient()
+        self.devto = DevtoClient()
         self._reddit = None
 
     def _get_reddit_client(self):
@@ -164,18 +166,13 @@ class Poster:
                 logger.error(f"Failed to post to X: {e}")
 
         # ---------------------------------------------------------------------
-        # 4. Dev.to Auto-Posting
+        # 4. Dev.to Auto-Posting (Comments & Discussions)
         # ---------------------------------------------------------------------
-        elif platform == "devto" and DEVTO_API_KEY:
+        elif platform == "devto" and self.devto.is_configured():
             try:
                 art_id = thread_id.replace("devto_", "")
-                res = requests.post(
-                    "https://dev.to/api/comments",
-                    headers={"api-key": DEVTO_API_KEY},
-                    json={"comment_id": None, "commentable_id": art_id, "commentable_type": "Article", "body_markdown": draft_text},
-                    timeout=15
-                )
-                if res.status_code in (200, 201):
+                comment_url = self.devto.post_comment(art_id, draft_text)
+                if comment_url:
                     self.state_manager.record_posted_thread(thread_id, {
                         "platform": "devto",
                         "thread_url": thread_url,
