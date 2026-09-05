@@ -22,8 +22,6 @@ migrate_working_dir/
 .github/copilot-instructions.md
 .agents/
 .agent/
-docs/SUMMARY.md
-SUMMARY.md
 # IntelliJ related
 *.iml
 *.ipr
@@ -72,8 +70,6 @@ docs/marketing/
 /lib/firebase_options.dart
 /lib/firebase_schedule_options.dart
 /lib/core/config/app_secrets.dart
-/docs/SUMMARY.md
-docs/SUMMARY.md
 docs/marketing/
 docs/MARKETING_SCHEDULE.md
 1.1.0
