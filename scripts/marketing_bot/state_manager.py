@@ -1,0 +1,89 @@
+import json
+import logging
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Dict, Any, Optional
+
+logger = logging.getLogger(__name__)
+
+DEFAULT_STATE = {
+    "version": 1,
+    "last_run_timestamp": None,
+    "telegram_last_update_id": 0,
+    "inspected_threads": {},
+    "pending_drafts": {},
+    "posted_threads": {},
+    "recorded_feedback": []
+}
+
+class StateManager:
+    def __init__(self, state_file_path: Path):
+        self.state_file_path = Path(state_file_path)
+        self.data: Dict[str, Any] = self._load()
+
+    def _load(self) -> Dict[str, Any]:
+        if self.state_file_path.exists():
+            try:
+                with open(self.state_file_path, "r", encoding="utf-8") as f:
+                    state = json.load(f)
+                    # Backfill any missing top-level keys
+                    for key, val in DEFAULT_STATE.items():
+                        if key not in state:
+                            state[key] = val
+                    return state
+            except Exception as e:
+                logger.error(f"Failed to read state file {self.state_file_path}: {e}. Initializing fresh state.")
+        return json.loads(json.dumps(DEFAULT_STATE))
+
+    def save(self) -> None:
+        try:
+            self.data["last_run_timestamp"] = datetime.now(timezone.utc).isoformat()
+            self.state_file_path.parent.mkdir(parents=True, exist_ok=True)
+            with open(self.state_file_path, "w", encoding="utf-8") as f:
+                json.dump(self.data, f, indent=2, ensure_ascii=False)
+            logger.info("State successfully persisted.")
+        except Exception as e:
+            logger.error(f"Failed to save state to {self.state_file_path}: {e}")
+
+    @property
+    def telegram_last_update_id(self) -> int:
+        return self.data.get("telegram_last_update_id", 0)
+
+    @telegram_last_update_id.setter
+    def telegram_last_update_id(self, val: int) -> None:
+        self.data["telegram_last_update_id"] = val
+
+    def is_thread_inspected(self, thread_id: str) -> bool:
+        return thread_id in self.data["inspected_threads"]
+
+    def record_inspected_thread(self, thread_id: str, info: Dict[str, Any]) -> None:
+        info["inspected_at"] = datetime.now(timezone.utc).isoformat()
+        self.data["inspected_threads"][thread_id] = info
+
+    def add_pending_draft(self, draft_id: str, draft_info: Dict[str, Any]) -> None:
+        draft_info["created_at"] = datetime.now(timezone.utc).isoformat()
+        draft_info["status"] = "pending"
+        self.data["pending_drafts"][draft_id] = draft_info
+
+    def get_pending_draft(self, draft_id: str) -> Optional[Dict[str, Any]]:
+        return self.data["pending_drafts"].get(draft_id)
+
+    def mark_draft_status(self, draft_id: str, status: str) -> Optional[Dict[str, Any]]:
+        draft = self.data["pending_drafts"].get(draft_id)
+        if draft:
+            draft["status"] = status
+            draft["updated_at"] = datetime.now(timezone.utc).isoformat()
+        return draft
+
+    def record_posted_thread(self, thread_id: str, post_info: Dict[str, Any]) -> None:
+        post_info["posted_at"] = datetime.now(timezone.utc).isoformat()
+        if "tracked_comments" not in post_info:
+            post_info["tracked_comments"] = []
+        self.data["posted_threads"][thread_id] = post_info
+
+    def get_posted_threads(self) -> Dict[str, Dict[str, Any]]:
+        return self.data.get("posted_threads", {})
+
+    def add_feedback(self, feedback_item: Dict[str, Any]) -> None:
+        feedback_item["recorded_at"] = datetime.now(timezone.utc).isoformat()
+        self.data["recorded_feedback"].append(feedback_item)

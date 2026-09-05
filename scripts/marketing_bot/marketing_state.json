@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "last_run_timestamp": "2026-09-05T11:42:00.731738+00:00",
+  "telegram_last_update_id": 0,
+  "inspected_threads": {
+    "hn_49574041": {
+      "platform": "hackernews",
+      "title": "Show HN: ForgeGuardian – Open-source software supply-chain security scanner",
+      "url": "https://news.ycombinator.com/item?id=49574041",
+      "inspected_at": "2026-09-05T11:42:00.728804+00:00"
+    },
+    "hn_49564832": {
+      "platform": "hackernews",
+      "title": "Show HN: Votito helps you decide what to build next with confidence",
+      "url": "https://news.ycombinator.com/item?id=49564832",
+      "inspected_at": "2026-09-05T11:42:00.728916+00:00"
+    },
+    "hn_49552616": {
+      "platform": "hackernews",
+      "title": "Launch HN: Mireye (YC S26) – Infrastructure for Physical World AI Agents",
+      "url": "https://news.ycombinator.com/item?id=49552616",
+      "inspected_at": "2026-09-05T11:42:00.728968+00:00"
+    },
+    "devto_4557766": {
+      "platform": "devto",
+      "title": "What do you build when you can build anything?",
+      "url": "https://dev.to/ale3oula/what-do-you-build-when-you-can-build-anything-4eg0",
+      "inspected_at": "2026-09-05T11:42:00.729013+00:00"
+    },
+    "devto_4581392": {
+      "platform": "devto",
+      "title": "Your Scroll Animations Look Amateur. Here's the GSAP + Lenis Setup That Fixes It",
+      "url": "https://dev.to/thebitforge/your-scroll-animations-look-amateur-heres-the-gsap-lenis-setup-that-fixes-it-48ni",
+      "inspected_at": "2026-09-05T11:42:00.729055+00:00"
+    }
+  },
+  "pending_drafts": {},
+  "posted_threads": {},
+  "recorded_feedback": []
+}

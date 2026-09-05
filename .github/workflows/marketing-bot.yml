@@ -1,0 +1,56 @@
+name: ROCIs Tasks Marketing & Feedback Bot
+
+on:
+  schedule:
+    # Runs every 6 hours (00:00, 06:00, 12:00, 18:00 UTC)
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Run in dry-run mode (no external posting)'
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  run-marketing-pipeline:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+          cache-dependency-path: 'scripts/marketing_bot/requirements.txt'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r scripts/marketing_bot/requirements.txt
+
+      - name: Run Marketing & Feedback Engine
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          REDDIT_CLIENT_ID: ${{ secrets.REDDIT_CLIENT_ID }}
+          REDDIT_CLIENT_SECRET: ${{ secrets.REDDIT_CLIENT_SECRET }}
+          REDDIT_USERNAME: ${{ secrets.REDDIT_USERNAME }}
+          REDDIT_PASSWORD: ${{ secrets.REDDIT_PASSWORD }}
+          DRY_RUN: ${{ inputs.dry_run || false }}
+        run: |
+          python -m scripts.marketing_bot.main
+
+      - name: Commit & Push Updated State
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action [Marketing Bot]"
+          git add scripts/marketing_bot/marketing_state.json
+          git diff --staged --quiet || (git commit -m "chore(marketing): update marketing state [skip ci]" && git push)
+

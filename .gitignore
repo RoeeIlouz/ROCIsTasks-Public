@@ -87,8 +87,9 @@ docs/notebooklm/
 .env.local
 .env.production
 .env.staging
-scripts/marketing_bot/
-.github/workflows/marketing-bot.yml
+scripts/marketing_bot/.env
+scripts/marketing_bot/__pycache__/
+scripts/marketing_bot/**/__pycache__/
 android/key.properties
 android/app/upload-keystore.jks
 android/app/release-keystore.jks
