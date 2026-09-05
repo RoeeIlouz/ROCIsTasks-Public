@@ -34,15 +34,21 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r scripts/marketing_bot/requirements.txt
 
+      - name: Install Playwright Browsers
+        run: |
+          python -m playwright install --with-deps chromium
+
       - name: Run Marketing & Feedback Engine
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          REDDIT_SESSION_COOKIE: ${{ secrets.REDDIT_SESSION_COOKIE }}
           REDDIT_CLIENT_ID: ${{ secrets.REDDIT_CLIENT_ID }}
           REDDIT_CLIENT_SECRET: ${{ secrets.REDDIT_CLIENT_SECRET }}
           REDDIT_USERNAME: ${{ secrets.REDDIT_USERNAME }}
           REDDIT_PASSWORD: ${{ secrets.REDDIT_PASSWORD }}
+          DEVTO_API_KEY: ${{ secrets.DEVTO_API_KEY }}
           DRY_RUN: ${{ inputs.dry_run || false }}
         run: |
           python -m scripts.marketing_bot.main
@@ -53,4 +59,3 @@ jobs:
           git config --local user.name "GitHub Action [Marketing Bot]"
           git add scripts/marketing_bot/marketing_state.json
           git diff --staged --quiet || (git commit -m "chore(marketing): update marketing state [skip ci]" && git push)
-

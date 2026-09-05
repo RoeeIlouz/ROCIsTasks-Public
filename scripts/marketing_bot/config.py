@@ -12,11 +12,20 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "")
 
+# Reddit Configuration
+REDDIT_SESSION_COOKIE = os.getenv("REDDIT_SESSION_COOKIE", "")
 REDDIT_CLIENT_ID = os.getenv("REDDIT_CLIENT_ID", "")
 REDDIT_CLIENT_SECRET = os.getenv("REDDIT_CLIENT_SECRET", "")
 REDDIT_USERNAME = os.getenv("REDDIT_USERNAME", "")
 REDDIT_PASSWORD = os.getenv("REDDIT_PASSWORD", "")
 REDDIT_USER_AGENT = os.getenv("REDDIT_USER_AGENT", "python:com.rocisapps.tasks.marketing:v1.0 (by /u/rocis_apps)")
+
+# Additional Platform API Keys
+DEVTO_API_KEY = os.getenv("DEVTO_API_KEY", "")
+X_API_KEY = os.getenv("X_API_KEY", "")
+X_API_SECRET = os.getenv("X_API_SECRET", "")
+X_ACCESS_TOKEN = os.getenv("X_ACCESS_TOKEN", "")
+X_ACCESS_SECRET = os.getenv("X_ACCESS_SECRET", "")
 
 # Operational Settings
 DRY_RUN = os.getenv("DRY_RUN", "false").lower() in ("true", "1", "yes")

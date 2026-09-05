@@ -2,3 +2,4 @@ requests>=2.31.0
 google-genai>=0.1.1
 python-dotenv>=1.0.0
 praw>=7.7.1
+playwright>=1.40.0

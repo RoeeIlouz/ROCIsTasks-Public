@@ -83,7 +83,14 @@ class TestMarketingBot(unittest.TestCase):
         self.assertTrue(res)
         posted = self.state_mgr.get_posted_threads()
         self.assertIn("reddit_abc", posted)
-        self.assertEqual(posted["reddit_abc"]["type"], "manual_drop")
+        self.assertEqual(posted["reddit_abc"]["method"], "manual_drop")
+
+    def test_reddit_playwright_availability(self):
+        from scripts.marketing_bot.reddit_playwright import RedditPlaywrightPoster
+        poster_none = RedditPlaywrightPoster(session_cookie="")
+        self.assertFalse(poster_none.is_available())
+        poster_with_cookie = RedditPlaywrightPoster(session_cookie="dummy_reddit_session_cookie_value_12345")
+        self.assertTrue(poster_with_cookie.is_available())
 
     def test_feedback_storage(self):
         self.state_mgr.add_feedback({
