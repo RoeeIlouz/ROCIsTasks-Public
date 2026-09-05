@@ -9,7 +9,8 @@ from .config import (
     MAX_POST_AGE_HOURS,
     REDDIT_CLIENT_ID,
     REDDIT_CLIENT_SECRET,
-    REDDIT_USER_AGENT
+    REDDIT_USER_AGENT,
+    REDDIT_SESSION_COOKIE
 )
 from .state_manager import StateManager
 from .bluesky_client import BlueskyClient
@@ -46,7 +47,7 @@ class DiscoveryEngine:
         """
         candidates: List[Dict[str, Any]] = []
 
-        # 1. Search Reddit (via PRAW if configured)
+        # 1. Search Reddit (via PRAW if configured, otherwise headless Playwright)
         praw_reddit = self._get_praw_reddit()
         if praw_reddit:
             for sub_name in REDDIT_SUBREDDITS[:4]:
@@ -71,6 +72,10 @@ class DiscoveryEngine:
                         time.sleep(0.5)
                     except Exception as e:
                         logger.error(f"Error searching Reddit r/{sub_name} for '{query}': {e}")
+        else:
+            logger.info("PRAW OAuth not configured. Discovering Reddit threads via Playwright browser...")
+            reddit_posts = self._discover_reddit_playwright(REDDIT_SUBREDDITS[:4], max_per_sub=4)
+            candidates.extend(reddit_posts)
 
         # 2. Search Bluesky (if configured)
         if self.bsky.is_configured():
@@ -173,3 +178,81 @@ class DiscoveryEngine:
                 "created_utc": self.now_ts
             })
         return results
+
+    def _discover_reddit_playwright(self, subreddits: List[str], max_per_sub: int = 4) -> List[Dict[str, Any]]:
+        """
+        Discovers recent posts from target subreddits using headless Playwright.
+        Bypasses Reddit API restrictions without requiring OAuth application credentials.
+        """
+        results: List[Dict[str, Any]] = []
+        try:
+            from playwright.sync_api import sync_playwright
+            with sync_playwright() as p:
+                browser = p.chromium.launch(
+                    headless=True,
+                    args=[
+                        "--no-sandbox",
+                        "--disable-setuid-sandbox",
+                        "--disable-dev-shm-usage",
+                        "--disable-blink-features=AutomationControlled"
+                    ]
+                )
+                context = browser.new_context(
+                    user_agent=(
+                        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                        "AppleWebKit/537.36 (KHTML, like Gecko) "
+                        "Chrome/124.0.0.0 Safari/537.36"
+                    ),
+                    viewport={"width": 1280, "height": 800}
+                )
+
+                if REDDIT_SESSION_COOKIE and len(REDDIT_SESSION_COOKIE.strip()) > 10:
+                    clean_cookie = REDDIT_SESSION_COOKIE.strip()
+                    if clean_cookie.startswith("reddit_session="):
+                        clean_cookie = clean_cookie.replace("reddit_session=", "", 1).strip()
+                    if ";" in clean_cookie:
+                        clean_cookie = clean_cookie.split(";", 1)[0].strip()
+                    context.add_cookies([{
+                        "name": "reddit_session",
+                        "value": clean_cookie,
+                        "domain": ".reddit.com",
+                        "path": "/",
+                        "httpOnly": True,
+                        "secure": True
+                    }])
+
+                page = context.new_page()
+                for sub in subreddits:
+                    try:
+                        url = f"https://www.reddit.com/r/{sub}/new/"
+                        page.goto(url, timeout=25000, wait_until="domcontentloaded")
+                        time.sleep(2.5)
+                        posts = page.query_selector_all("shreddit-post")
+                        for post in posts[:max_per_sub]:
+                            post_id = post.get_attribute("id") or ""
+                            title = post.get_attribute("post-title") or ""
+                            permalink = post.get_attribute("permalink") or ""
+                            author = post.get_attribute("author") or ""
+                            clean_id = post_id.replace("t3_", "")
+
+                            if clean_id and title and permalink:
+                                full_url = f"https://reddit.com{permalink}" if not permalink.startswith("http") else permalink
+                                results.append({
+                                    "id": f"reddit_{clean_id}",
+                                    "platform": "reddit",
+                                    "subreddit": sub,
+                                    "title": title,
+                                    "body": "",
+                                    "author": author,
+                                    "url": full_url,
+                                    "created_utc": self.now_ts
+                                })
+                    except Exception as sub_err:
+                        logger.warning(f"Playwright error scanning r/{sub}: {sub_err}")
+                browser.close()
+        except Exception as e:
+            logger.error(f"Playwright Reddit discovery failed: {e}")
+
+        logger.info(f"Playwright Reddit discovery found {len(results)} posts.")
+        return results
+

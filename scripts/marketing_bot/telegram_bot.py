@@ -37,6 +37,16 @@ class TelegramBot:
 
         try:
             res = requests.post(url, json=payload, timeout=20)
+            if res.status_code != 200:
+                logger.error(f"Telegram API Error ({res.status_code}): {res.text}")
+                if "chat not found" in res.text or "blocked by the user" in res.text:
+                    logger.error("=" * 60)
+                    logger.error("⚠️ CRITICAL TELEGRAM SETUP REQUIREMENT:")
+                    logger.error("Telegram bots CANNOT initiate contact with a user.")
+                    logger.error("You MUST open Telegram on your phone/desktop, search for your bot,")
+                    logger.error("and tap 'START' (or send /start). Once you do this once, the bot")
+                    logger.error("will be authorized to send you messages!")
+                    logger.error("=" * 60)
             res.raise_for_status()
             return res.json().get("result")
         except Exception as e:

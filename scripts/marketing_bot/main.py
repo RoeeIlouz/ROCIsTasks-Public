@@ -8,7 +8,8 @@ from .config import (
     STATE_FILE_PATH,
     MAX_DISCOVERIES_PER_RUN,
     MIN_RELEVANCE_SCORE,
-    DRY_RUN
+    DRY_RUN,
+    DEVTO_API_KEY
 )
 from .state_manager import StateManager
 from .gemini_engine import GeminiEngine
@@ -25,7 +26,9 @@ logging.basicConfig(
 logger = logging.getLogger("MarketingBot")
 
 def run_pipeline(dry_run: bool = False):
+    logger.info("=" * 60)
     logger.info("Starting ROCIs Tasks Marketing & Feedback Pipeline...")
+    logger.info("=" * 60)
 
     state_mgr = StateManager(STATE_FILE_PATH)
     gemini = GeminiEngine()
@@ -33,6 +36,17 @@ def run_pipeline(dry_run: bool = False):
     discovery = DiscoveryEngine(state_mgr)
     poster = Poster(state_mgr, telegram)
     monitor = FeedbackMonitor(state_mgr, gemini, telegram)
+
+    # Diagnostic visibility
+    logger.info("Environment Diagnostics:")
+    logger.info(f"  • Gemini API: {'AVAILABLE' if gemini.is_available() else 'NOT CONFIGURED'}")
+    logger.info(f"  • Telegram Bot: {'CONFIGURED' if telegram.is_configured() else 'NOT CONFIGURED'}")
+    logger.info(f"  • Reddit Cookie Poster: {'AVAILABLE' if poster.playwright_poster.is_available() else 'NOT CONFIGURED'}")
+    logger.info(f"  • Bluesky API: {'AVAILABLE' if poster.bluesky.is_configured() else 'NOT CONFIGURED'}")
+    logger.info(f"  • Dev.to API: {'AVAILABLE' if DEVTO_API_KEY else 'NOT CONFIGURED'}")
+    logger.info(f"  • X/Twitter API: {'AVAILABLE' if poster.x_client.is_configured() else 'NOT CONFIGURED'}")
+    logger.info(f"  • Dry-Run Mode: {dry_run}")
+    logger.info("=" * 60)
 
     # =========================================================================
     # Step 1: Process User Approvals / Rejections from Telegram
@@ -90,6 +104,8 @@ def run_pipeline(dry_run: bool = False):
     # =========================================================================
     logger.info("Scanning communities for fresh promotion opportunities...")
     candidates = discovery.discover_opportunities(max_results=MAX_DISCOVERIES_PER_RUN)
+    total_candidates = len(candidates)
+    dispatched_count = 0
 
     for thread in candidates:
         thread_id = thread["id"]
@@ -140,6 +156,8 @@ def run_pipeline(dry_run: bool = False):
                     reasoning=reasoning,
                     draft_reply=draft_reply
                 )
+                if msg_id:
+                    dispatched_count += 1
             else:
                 logger.info(f"[DRY RUN / NO TELEGRAM] Draft preview for {draft_id}:\n{draft_reply}")
                 msg_id = None
@@ -167,9 +185,26 @@ def run_pipeline(dry_run: bool = False):
         logger.info("Skipping comment monitoring in dry-run mode or when Gemini unavailable.")
 
     # =========================================================================
-    # Step 4: Final State Persistence
+    # Step 4: Final State Persistence & Notification Summary
     # =========================================================================
     state_mgr.save()
+
+    if telegram.is_configured() and not dry_run:
+        if dispatched_count > 0:
+            telegram.send_message(
+                f"🎯 <b>ROCIs Marketing Engine Run Finished</b>\n\n"
+                f"• Scanned candidate discussions across Reddit, Bluesky, Dev.to & HN.\n"
+                f"• Sent <b>{dispatched_count}</b> new high-relevance draft cards above for your approval!\n"
+                f"• Tap <b>[Approve & Post]</b> or <b>[Skip]</b> to process them."
+            )
+        else:
+            telegram.send_message(
+                f"🤖 <b>ROCIs Marketing Engine Scan Report</b>\n\n"
+                f"• Scanned <b>{total_candidates}</b> active candidate discussions.\n"
+                f"• 0 discussions met the <b>>={MIN_RELEVANCE_SCORE}%</b> relevance threshold for an authentic indie plug this run.\n"
+                f"• Next automated scan will run in 6 hours (or upon manual trigger)."
+            )
+
     logger.info("Pipeline run completed successfully.")
 
 def main():
