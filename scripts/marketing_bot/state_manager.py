@@ -174,8 +174,13 @@ class StateManager:
         return slug in self.data.get("posted_devlogs", {})
 
     def record_posted_devlog(self, slug: str, devlog_data: Dict[str, Any]) -> None:
-        """Records a successfully published DevLog."""
+        """Records a successfully published DevLog and blacklists it from discovery."""
         if "posted_devlogs" not in self.data:
             self.data["posted_devlogs"] = {}
         self.data["posted_devlogs"][slug] = devlog_data
+
+        devto_url = devlog_data.get("devto_url")
+        if devto_url:
+            self.record_inspected_thread(f"devlog_{slug}", {"url": devto_url, "title": devlog_data.get("title", "")})
+            self.record_inspected_thread(f"devto_{slug}", {"url": devto_url})
         self.save()

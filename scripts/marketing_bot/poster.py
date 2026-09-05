@@ -1,3 +1,4 @@
+import html
 import logging
 from datetime import datetime, timezone
 from typing import Dict, Any, Optional
@@ -276,11 +277,12 @@ class Poster:
         bsky_url = None
         if self.bluesky.is_configured():
             try:
-                post_text = bsky_text
-                if devto_url:
-                    post_text = f"{bsky_text}\n\nRead on Dev.to: {devto_url}\n📲 https://tasks.rocisapps.com"
-                else:
-                    post_text = f"{bsky_text}\n\n📲 https://tasks.rocisapps.com"
+                link_part = f"\n\nRead on Dev.to: {devto_url}\n📲 https://tasks.rocisapps.com" if devto_url else "\n\n📲 https://tasks.rocisapps.com"
+                max_bsky_body = 295 - len(link_part)
+                clean_bsky = (bsky_text or "").strip()
+                if len(clean_bsky) > max_bsky_body:
+                    clean_bsky = clean_bsky[:max_bsky_body - 1].rstrip() + "…"
+                post_text = f"{clean_bsky}{link_part}"
 
                 res_bsky = self.bluesky.post_reply(post_text)
                 if res_bsky:
@@ -357,10 +359,14 @@ class Poster:
         # 3. If both automated methods fail or unconfigured, send 1-tap clipboard drop
         if not post_url:
             submit_direct_link = f"https://www.reddit.com/r/{subreddit}/submit"
+            safe_title = html.escape(title)
+            safe_body = html.escape(body[:3000])
+            if len(body) > 3000:
+                safe_body += "\n...[truncated for Telegram]"
             drop_card = (
                 f"📋 <b>Reddit 1-Tap Submission Ready (r/{subreddit})</b>\n\n"
-                f"📌 <b>Title:</b>\n<code>{title}</code>\n\n"
-                f"📝 <b>Body:</b>\n<code>{body}</code>\n\n"
+                f"📌 <b>Title:</b>\n<code>{safe_title}</code>\n\n"
+                f"📝 <b>Body:</b>\n<code>{safe_body}</code>\n\n"
                 f"👉 <a href=\"{submit_direct_link}\">Open r/{subreddit} Submit Page</a>"
             )
             self.telegram.send_message(drop_card)

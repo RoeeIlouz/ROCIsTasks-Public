@@ -10,7 +10,9 @@ from .config import (
     REDDIT_CLIENT_ID,
     REDDIT_CLIENT_SECRET,
     REDDIT_USER_AGENT,
-    REDDIT_SESSION_COOKIE
+    REDDIT_SESSION_COOKIE,
+    REDDIT_USERNAME,
+    BSKY_HANDLE
 )
 from .state_manager import StateManager
 from .bluesky_client import BlueskyClient
@@ -97,18 +99,16 @@ class DiscoveryEngine:
             except Exception as e:
                 logger.error(f"Error searching Hacker News for '{query}': {e}")
 
-        # 4. Search Dev.to Articles & Discussions (Tags: showdev, indiehackers, flutter)
-        for tag in ["showdev", "indiehackers", "flutter"]:
-            try:
-                devto_threads = self._search_devto(tag)
-                candidates.extend(devto_threads)
-            except Exception as e:
-                logger.error(f"Error searching Dev.to for #{tag}: {e}")
+        # Note: Dev.to is exclusively for publishing our own long-form DevLogs.
+        # We do NOT search Dev.to for commenting opportunities to prevent piggybacking loops.
 
-        # Deduplicate and filter out inspected / stale items
+        # Deduplicate and filter out inspected, stale, or self-authored items
         fresh_unseen = []
         for item in candidates:
             item_id = item["id"]
+            if self._is_own_content(item):
+                logger.info(f"Skipping own content: {item.get('title', item_id)} ({item.get('url')})")
+                continue
             if self.state_manager.is_thread_inspected(item_id):
                 continue
             if item.get("created_utc", 0) < self.min_created_ts:
@@ -119,6 +119,27 @@ class DiscoveryEngine:
 
         logger.info(f"Discovered {len(fresh_unseen)} fresh unseen candidate threads.")
         return fresh_unseen
+
+    def _is_own_content(self, item: Dict[str, Any]) -> bool:
+        """Checks if a candidate post is authored by ourselves to prevent self-promotional feedback loops."""
+        author = (item.get("author") or "").lower().strip()
+        url = (item.get("url") or "").lower().strip()
+        title = (item.get("title") or "").lower().strip()
+
+        own_handles = {
+            "rocisapps", "rocis_apps", "roeeilouz", "roee_ilouz",
+            (BSKY_HANDLE or "").lower().strip(),
+            (REDDIT_USERNAME or "").lower().strip()
+        }
+        own_handles.discard("")
+
+        if author in own_handles:
+            return True
+        if any(h in url for h in ["rocisapps", "roeeilouz", "rocis_apps"]):
+            return True
+        if "rocis tasks" in title or "rocis_tasks" in title:
+            return True
+        return False
 
     def _search_hackernews(self, query: str) -> List[Dict[str, Any]]:
         url = "https://hn.algolia.com/api/v1/search_by_date"

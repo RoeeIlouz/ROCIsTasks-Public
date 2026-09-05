@@ -39,6 +39,35 @@ SUBREDDIT_GUIDELINES = {
     }
 }
 
+def _parse_reddit_post_json(raw: str) -> Optional[Dict[str, Any]]:
+    """Robust JSON parser with regex fallback for LLM markdown output."""
+    cleaned = _clean_json_markdown(raw)
+    try:
+        return json.loads(cleaned, strict=False)
+    except Exception as e:
+        logger.warning(f"Standard json.loads failed for Reddit post ({e}). Attempting regex recovery...")
+
+    # First try boundary match: between '"title": "' and '", "body"'
+    title_m = re.search(r'"title"\s*:\s*"(.*?)"\s*,\s*"body"', cleaned, re.DOTALL)
+    if not title_m:
+        title_m = re.search(r'"title"\s*:\s*"((?:[^"\\]|\\.)*)"', cleaned)
+
+    topic_m = re.search(r'"topic"\s*:\s*"((?:[^"\\]|\\.)*)"', cleaned)
+    if not topic_m:
+        topic_m = re.search(r'"topic"\s*:\s*"(.*?)"\s*\}', cleaned, re.DOTALL)
+
+    body_m = re.search(r'"body"\s*:\s*"(.*)', cleaned, re.DOTALL)
+    if body_m:
+        raw_body = body_m.group(1)
+        raw_body = re.sub(r'"\s*(?:,\s*"topic".*|\}\s*)$', '', raw_body, flags=re.DOTALL).rstrip('"').strip()
+        clean_body = raw_body.replace('\\n', '\n').replace('\\"', '"').replace('\\\\', '\\')
+        return {
+            "title": title_m.group(1).replace('\\"', '"') if title_m else "Building ROCIs Tasks",
+            "body": clean_body,
+            "topic": topic_m.group(1).replace('\\"', '"') if topic_m else "showcase"
+        }
+    return None
+
 class RedditPostGenerator:
     """
     Generates authentic, high-yield top-level Reddit posts tailored to specific subreddits.
@@ -98,11 +127,9 @@ Return ONLY valid JSON matching this exact structure:
         if not raw_response:
             return None
 
-        cleaned = _clean_json_markdown(raw_response)
-        try:
-            parsed = json.loads(cleaned)
-        except Exception as e:
-            logger.error(f"Failed to parse Reddit post JSON: {e}")
+        parsed = _parse_reddit_post_json(raw_response)
+        if not parsed:
+            logger.error("Failed to parse Reddit post JSON even with regex recovery.")
             return None
 
         raw_title = SecretSanitizer.sanitize(parsed.get("title", f"Building ROCIs Tasks for r/{subreddit}"))

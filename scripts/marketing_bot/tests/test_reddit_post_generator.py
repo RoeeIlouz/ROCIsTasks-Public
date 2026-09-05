@@ -26,6 +26,28 @@ class TestRedditPostGenerator(unittest.TestCase):
         self.assertEqual(draft["topic"], "flutter_widgets")
         self.assertEqual(draft["status"], "pending")
 
+    def test_generate_showcase_post_regex_recovery(self):
+        # Test Gemini output with unescaped quotes and newlines in markdown that break json.loads
+        gemini_mock = MagicMock()
+        gemini_mock.is_available.return_value = True
+        gemini_mock._call_gemini.return_value = '''```json
+{
+  "title": "Why I stopped using "productivity gurus" advice",
+  "body": "Here is a breakdown of why:
+1. It is too complex.
+2. "Simple" systems work better.
+Feedback welcome!",
+  "topic": "indie_journey"
+}
+```'''
+        generator = RedditPostGenerator(gemini_mock)
+        draft = generator.generate_showcase_post(subreddit="SideProject")
+
+        self.assertIsNotNone(draft)
+        self.assertEqual(draft["title"], 'Why I stopped using "productivity gurus" advice')
+        self.assertIn("Feedback welcome!", draft["body"])
+        self.assertEqual(draft["topic"], "indie_journey")
+
     def test_generator_unavailable_when_gemini_missing(self):
         gemini_mock = MagicMock()
         gemini_mock.is_available.return_value = False

@@ -1,4 +1,5 @@
 import logging
+import re
 from datetime import datetime, timezone
 from typing import Optional, Dict, Any, List
 import requests
@@ -92,20 +93,59 @@ class BlueskyClient:
             logger.error(f"Bluesky search error for query '{query}': {e}")
             return []
 
+    @staticmethod
+    def _extract_facets(text: str) -> List[Dict[str, Any]]:
+        """Extracts ATProto link facets with UTF-8 byte offsets for clickable links."""
+        facets = []
+        for m in re.finditer(r'https?://[^\s()]+', text):
+            raw_url = m.group(0)
+            # Strip trailing punctuation that belongs to surrounding prose
+            trailing = re.search(r'[.,!?:;\'"]+$', raw_url)
+            trim_len = len(trailing.group(0)) if trailing else 0
+            url = raw_url[:-trim_len] if trim_len > 0 else raw_url
+
+            start_char = m.start()
+            end_char = m.end() - trim_len
+
+            byte_start = len(text[:start_char].encode("utf-8"))
+            byte_end = len(text[:end_char].encode("utf-8"))
+            facets.append({
+                "index": {"byteStart": byte_start, "byteEnd": byte_end},
+                "features": [{
+                    "$type": "app.bsky.feed.post#link",
+                    "uri": url
+                }]
+            })
+        return facets
+
     def post_reply(self, text: str, reply_to_uri: Optional[str] = None, reply_to_cid: Optional[str] = None) -> Optional[str]:
-        """Publishes a post or reply on Bluesky."""
+        """Publishes a post or reply on Bluesky with strict length safety and link facets."""
         if not self._login():
             return None
+
+        # Bluesky hard limit is 300 characters
+        clean_text = text.strip()
+        if len(clean_text) > 300:
+            logger.warning(f"Bluesky post text exceeds 300 chars ({len(clean_text)}). Truncating to 297...")
+            clean_text = clean_text[:297] + "..."
 
         headers = {
             "Authorization": f"Bearer {self.access_jwt}",
             "Content-Type": "application/json"
         }
+
+        # Format ISO-8601 with trailing Z for strict ATProto schema compliance
+        created_at_iso = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
+
         record: Dict[str, Any] = {
             "$type": "app.bsky.feed.post",
-            "text": text,
-            "createdAt": datetime.now(timezone.utc).isoformat()
+            "text": clean_text,
+            "createdAt": created_at_iso
         }
+
+        facets = self._extract_facets(clean_text)
+        if facets:
+            record["facets"] = facets
 
         if reply_to_uri and reply_to_cid:
             record["reply"] = {
@@ -121,6 +161,8 @@ class BlueskyClient:
 
         try:
             res = requests.post(BSKY_CREATE_RECORD_URL, headers=headers, json=payload, timeout=15)
+            if res.status_code not in (200, 201):
+                logger.error(f"Bluesky createRecord HTTP {res.status_code}: {res.text}")
             res.raise_for_status()
             data = res.json()
             post_uri = data.get("uri", "")

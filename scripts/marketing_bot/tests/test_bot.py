@@ -176,6 +176,53 @@ class TestMarketingBot(unittest.TestCase):
         client_configured = DevtoClient(api_key="valid_devto_key_123")
         self.assertTrue(client_configured.is_configured())
 
+    def test_bluesky_facets_and_length_capping(self):
+        from scripts.marketing_bot.bluesky_client import BlueskyClient
+        text = "Check out our app at https://tasks.rocisapps.com and article at https://dev.to/rocisapps/my-article-123!"
+        facets = BlueskyClient._extract_facets(text)
+        self.assertEqual(len(facets), 2)
+        self.assertEqual(facets[0]["features"][0]["uri"], "https://tasks.rocisapps.com")
+        self.assertEqual(facets[1]["features"][0]["uri"], "https://dev.to/rocisapps/my-article-123")
+        # Check byte offsets
+        for f in facets:
+            self.assertIn("byteStart", f["index"])
+            self.assertIn("byteEnd", f["index"])
+            self.assertGreater(f["index"]["byteEnd"], f["index"]["byteStart"])
+
+    def test_discovery_is_own_content_filter(self):
+        discovery = DiscoveryEngine(self.state_mgr)
+        # Own post from rocisapps
+        self.assertTrue(discovery._is_own_content({
+            "author": "rocisapps",
+            "url": "https://dev.to/rocisapps/why-your-flutter-background-isolates-crash",
+            "title": "Why Your Flutter Background Isolates Crash"
+        }))
+        # Own post mentioning ROCIs Tasks in title
+        self.assertTrue(discovery._is_own_content({
+            "author": "some_user",
+            "url": "https://reddit.com/r/SideProject/comments/123",
+            "title": "ROCIs Tasks: Offline-first Flutter app"
+        }))
+        # Other developer's post
+        self.assertFalse(discovery._is_own_content({
+            "author": "random_dev",
+            "url": "https://reddit.com/r/SideProject/comments/456/my_notes_app",
+            "title": "I built a notes app for college students"
+        }))
+
+    def test_poster_reddit_fallback_escapes_html(self):
+        bot = TelegramBot(token="", chat_id="")
+        poster = Poster(self.state_mgr, bot)
+        draft = {
+            "id": "test_draft_escape",
+            "subreddit": "SideProject",
+            "title": "Building <ROCIs Tasks> with Flutter & Kotlin",
+            "body": "Here is a code snippet with <generics> & \"quotes\":\n```dart\nList<Task> tasks = [];\n```"
+        }
+        # execute_reddit_post will hit fallback clipboard drop since Playwright/PRAW aren't configured
+        res = poster.execute_reddit_post(draft)
+        self.assertTrue(res)
+
 if __name__ == "__main__":
     unittest.main()
 
