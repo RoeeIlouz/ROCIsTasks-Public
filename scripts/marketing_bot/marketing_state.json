@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-05T17:03:44.817443+00:00",
+  "last_run_timestamp": "2026-09-05T17:20:20.658700+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -524,6 +524,18 @@
       "title": "A startup to resolve “schizophrenia”",
       "url": "https://reddit.com/r/roastmystartup/comments/1w861r5/a_startup_to_resolve_schizophrenia/",
       "inspected_at": "2026-09-05T17:02:46.860842+00:00"
+    },
+    "reddit_1w86byx": {
+      "platform": "reddit",
+      "title": "Upload your docs → get an AI agent you can put on your website, Telegram, or API",
+      "url": "https://reddit.com/r/SideProject/comments/1w86byx/upload_your_docs_get_an_ai_agent_you_can_put_on/",
+      "inspected_at": "2026-09-05T17:20:13.678360+00:00"
+    },
+    "reddit_1w86ayk": {
+      "platform": "reddit",
+      "title": "Apply before it hits LinkedIn",
+      "url": "https://reddit.com/r/SideProject/comments/1w86ayk/apply_before_it_hits_linkedin/",
+      "inspected_at": "2026-09-05T17:20:14.845555+00:00"
     }
   },
   "pending_drafts": {
@@ -722,8 +734,9 @@
       "body": "Hey r/SideProject! Like a lot of you, I've gone down the endless rabbit hole of productivity apps. Todoist, TickTick, Notion—they're all great, but they either lock basic features behind a monthly subscription, require constant internet connection, or have clunky widgets that lag when you try to check off a task.\n\nSo, over the last several months, I decided to build what I actually wanted to use: **ROCIs Tasks**.\n\n### Why build another task app?\nI had three non-negotiable rules for myself:\n1. **Offline-First:** It has to work instantly in a subway tunnel or deep in the woods. Zero loading spinners. \n2. **No Subscription Fatigue:** A clean, fast experience without nagging pop-ups asking for $5/month for basic reminders.\n3. **Native Android Integration:** Widgets that actually look and feel native, updating instantly without a clunky web wrapper feel.\n\n### Under the Hood (The Tech Stack)\nBuilding this as a solo indie dev came with some fun architectural hurdles:\n- **Frontend:** Built with **Flutter**. Getting 60fps animations and buttery-smooth scrolling on Android took some tuning, especially with heavy lists.\n- **Local Database:** Powered by **Hive**. Because it's purely local-first, read/write speeds are practically instantaneous. It syncs up quietly in the background with Firebase Firestore whenever an internet connection is detected.\n- **Widgets:** This was the hardest part. Flutter's default widget rendering wasn't cutting it for home screen widgets, so I wrote custom **native Kotlin code** to power the interactive home screen widgets (Daily Focus, Kanban boards, Quick Actions). Bridging Flutter state with native Android AppWidgets without draining the battery was a puzzle, but the zero-lag result was worth it.\n- **UI/UX:** I'm a sucker for true OLED pitch-black modes (`#000000`) paired with subtle glassmorphism and micro-haptics. It just *feels* satisfying to use.\n\n### Key Features I'm Proud Of\n- **Natural Language Parsing:** Typing *\"Submit quarterly report tomorrow at 5pm #urgent @work\"* automatically extracts the dates, priorities, and tags so you aren't tapping through ten different dropdown menus.\n- **Unified Calendar:** Bringing Google Calendar, local device calendars, and to-do tasks into one side-by-side agenda view.\n- **Nested Subtasks & Streaks:** Keeping it simple enough for quick lists, but deep enough for complex project breakdowns.\n\n### What I'd love from you:\nBuilding in a vacuum is tough. I'd love for some fellow makers to take it for a spin, test the widget performance on your specific devices, and rip my UI/UX apart. What are your biggest annoyances with existing task apps?\n\nIf you want to check it out:\n- **Google Play:** [https://play.google.com/store/apps/details?id=com.rocisapps.tasks](https://play.google.com/store/apps/details?id=com.rocisapps.tasks)\n- **Web App:** [https://tasks.rocisapps.com](https://tasks.rocisapps.com)\n\nThanks for reading, and happy building!",
       "topic": "indie_journey",
       "created_at": "2026-09-05T17:03:39.631118+00:00",
-      "status": "pending",
-      "telegram_message_id": 42
+      "status": "approved",
+      "telegram_message_id": 42,
+      "updated_at": "2026-09-05T17:19:55.852767+00:00"
     }
   },
   "posted_threads": {
