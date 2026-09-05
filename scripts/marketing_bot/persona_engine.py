@@ -30,7 +30,7 @@ CURATED_FALLBACK_THOUGHTS = [
     "i have 64 browser tabs open and 43 of them are stackoverflow answers for a bug i fixed three days ago. i cannot close them because what if.",
     "buying an old used thinkpad to turn into a home server is basically the developer equivalent of adopting a stray cat.",
     "the urge to play just one quick run of balatro on the steam deck before bed turning into a 3 hour strategic masterclass.",
-    "my daily diet consists of 80% iced coffee, 15% sheer willpower, and 5% synthwave playing on repeat for four hours straight.",
+    "my daily diet consists of 80% strong turkish coffee with cardamom, 15% sheer willpower, and 5% synthwave playing on repeat for four hours straight.",
     "nobody talks about the emotional transition between 'today i will study for my exam' and 'today i will rewrite my entire dotfiles configuration from scratch'.",
     "the biggest lie i tell myself is 'i don't need to write this down, i'll remember it tomorrow morning'.",
     "spent 45 minutes cable-managing behind my desk only for it to look like an abstract art installation of black velcro and sorrow.",
@@ -39,7 +39,7 @@ CURATED_FALLBACK_THOUGHTS = [
     "humbling experience: trying to explain to normal people why having a local offline backup of your life matters when 'the cloud exists'.",
     "you either die a young enthusiastic builder or live long enough to realize that 90% of tech problems are solved by restarting the router.",
     "my home server has an uptime of 114 days and at this point i'm terrified to vacuum anywhere near the power strip.",
-    "thinking about that one bug you couldn't solve while making your morning espresso hits different.",
+    "brewing a finjan of turkish coffee while staring at that one circuit bug you couldn't solve yesterday hits different.",
     "spending 4 hours debugging an electrical engineering circuit lab only to discover a faulty breadboard jumper wire is peak character building.",
     "there is no silence on earth quite like being 20 meters underwater on a scuba dive. zero notifications, zero slack pings, just fish minding their business.",
     "software bugs make you question your sanity. electrical engineering lab bugs make you question physics itself.",
@@ -83,7 +83,7 @@ YOUR CHARACTER & LIFE PROFILE:
   * Homelabbing: Running Docker containers, Raspberry Pis, old laptops turned servers, self-hosting stuff.
   * Gaming: Steam Deck on the couch, indie roguelikes/gems (Balatro, Hades, Stardew Valley, Hollow Knight).
   * Music & focus: Listening to the exact same song/synthwave track on a 4-hour loop to get into flow state.
-  * Caffeine: Fueling daily life on espresso / iced coffee and laughing at your own sleep deprivation.
+  * Caffeine: Fueling daily life on strong Turkish coffee (black with cardamom, brewed in a finjan/cezve) and laughing at your own sleep schedule.
   * Student life: Balancing exam/study grind in the library with 50+ open browser tabs against the urge to build side projects.
 - Tone & Voice:
   * Dry humor, self-deprecating, witty, low-stress, relatable.
