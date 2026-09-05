@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-05T16:52:19.478589+00:00",
+  "last_run_timestamp": "2026-09-05T16:52:27.904098+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -463,37 +463,37 @@
       "platform": "reddit",
       "title": "Made a translation keyboard for people living in a second language.",
       "url": "https://reddit.com/r/SideProject/comments/1w85vay/made_a_translation_keyboard_for_people_living_in/",
-      "inspected_at": "2026-09-05T16:51:59.513488+00:00"
+      "inspected_at": "2026-09-05T16:52:11.960796+00:00"
     },
     "devto_4578989": {
       "platform": "devto",
       "title": "Beyond Clean Architecture: The Iceberg Pattern for Real-Time Flutter Apps with BlocSignal",
       "url": "https://dev.to/gde/beyond-clean-architecture-the-iceberg-pattern-for-real-time-flutter-apps-with-blocsignal-3l84",
-      "inspected_at": "2026-09-05T16:52:00.783500+00:00"
+      "inspected_at": "2026-09-05T16:52:13.243892+00:00"
     },
     "devto_4567479": {
       "platform": "devto",
       "title": "Taming Flutter Infinite Scroll (Part 2): Turning ScrollController into a Reactive State Machine with CubitSignalMixin",
       "url": "https://dev.to/gde/taming-flutter-infinite-scroll-part-2-turning-scrollcontroller-into-a-reactive-state-machine-cgh",
-      "inspected_at": "2026-09-05T16:52:01.912779+00:00"
+      "inspected_at": "2026-09-05T16:52:14.261267+00:00"
     },
     "devto_4558637": {
       "platform": "devto",
       "title": "Flutter Web SEO: Crawlable Content, JSON-LD, and Share Cards for a Canvas App",
       "url": "https://dev.to/devshakib/flutter-web-seo-crawlable-content-json-ld-and-share-cards-for-a-canvas-app-4a83",
-      "inspected_at": "2026-09-05T16:52:02.799422+00:00"
+      "inspected_at": "2026-09-05T16:52:15.200462+00:00"
     },
     "devto_4582374": {
       "platform": "devto",
       "title": "How I Built a Tech Interview Prep App with 35,000+ Questions in Flutter 🚀",
       "url": "https://dev.to/savankumar_sanghani_949c7/how-i-built-a-tech-interview-prep-app-in-flutter-28gd",
-      "inspected_at": "2026-09-05T16:52:11.828713+00:00"
+      "inspected_at": "2026-09-05T16:52:15.972835+00:00"
     },
     "devto_4581729": {
       "platform": "devto",
       "title": "Flutter Platform Channels",
       "url": "https://dev.to/godofgeeks/flutter-platform-channels-13hg",
-      "inspected_at": "2026-09-05T16:52:12.527408+00:00"
+      "inspected_at": "2026-09-05T16:52:16.706822+00:00"
     }
   },
   "pending_drafts": {
@@ -626,8 +626,29 @@
       "x_text": "Ever wonder why your Google Tasks sync dies after exactly 60 minutes? Turns out silent OAuth exceptions + missing web silent refresh = invisible sync failures. Fixed it with reactive auth states and glassmorphism reconnect banners! #indiedev #flutter",
       "bsky_text": "Spent the week debugging a classic 60-minute OAuth token expiration issue in my offline-first Flutter app. Swallowing token exceptions silently is a trap! Added a reactive token-expired flag and gorgeous tap-to-reconnect glass banners instead. #flutter #indiedev",
       "created_at": "2026-09-05T16:50:47.258000+00:00",
+      "status": "approved",
+      "telegram_message_id": 33,
+      "updated_at": "2026-09-05T16:51:52.202621+00:00"
+    },
+    "devlog_devlog_0_2_2_63_2026_07_17_de92843d11": {
+      "id": "devlog_devlog_0_2_2_63_2026_07_17_de92843d11",
+      "type": "devlog",
+      "milestone_title": "[0.2.2+63] - 2026-07-17",
+      "milestone_date": "2026-07-17",
+      "milestone_slug": "devlog_0_2_2_63_2026_07_17_de92843d11",
+      "devto_title": "Why Your Flutter Background Isolates Crash on Android (And How I Fixed It)",
+      "devto_body": "Building an offline-first task manager with Flutter and native Android widgets means dancing on the edge of two worlds. Recently, while shipping update `0.2.2+63` for **ROCIs Tasks**, I hit a classic multi-threading trap that’s easy to stumble into when dealing with background isolates, platform channels, and cloud sync.\n\nHere is how I debugged it, solved it, and finally closed the loop on true two-way Google Tasks syncing.\n\n---\n\n### The Mystery: Background Crashes and Broken Tests\n\nWhile working on background task completion handlers, my app started throwing intermittent runtime errors on Android. The culprit? `WidgetsBinding.instance`.\n\nIf you've ever tried to trigger state updates, platform channel calls, or bindings initialization inside a detached background isolate, you know the pain. Flutter expects a UI binding to be initialized on the main thread. When a background handler fires asynchronously, `WidgetsBinding.instance` can be null or completely unstable depending on the lifecycle state and platform.\n\nTo make matters worse, my test suite was throwing a couple of red flags: a regex validation failure on my new version string format (`0.2.2+63`), and a Mocktail type-casting error because I hadn't stubbed `getGoogleAccessToken()` during startup synchronization tests. Standard indie dev Tuesday.\n\n---\n\n### The Root Cause\n\n1. **The Isolate Trap**: `WidgetsBinding.instance.platformDispatcher` relies heavily on an active UI view and bound Flutter engine lifecycle. In background execution contexts (like handling quick actions or background sync triggers), that binding simply isn't guaranteed to exist.\n2. **Mocking Blind Spots**: As features grow, mocking external auth tokens in unit tests becomes brittle if your initialization sequence suddenly demands them before the mock is set up.\n\n---\n\n### The Solution & Code Architecture\n\n#### 1. Ditching `WidgetsBinding` for Background Tasks\n\nThe fix for the background isolate issue was surprisingly clean. Instead of reaching for the UI-bound dispatcher, drop down to the global singleton `PlatformDispatcher`:\n\n```dart\n// Before (Unstable in background isolates)\n// final dispatcher = WidgetsBinding.instance.platformDispatcher;\n\n// After (Safe globally, even off-main-thread)\nfinal dispatcher = PlatformDispatcher.instance;\n```\n\nThis simple swap completely stabilized my background handlers without touching the main UI lifecycle.\n\n#### 2. Bulletproofing Google Tasks Back-Sync\n\nWith background stability restored, I tackled true two-way sync. Users expect changes made directly inside Google Tasks (completions, uncompletions, and deletions) to reflect instantly in ROCIs Tasks.\n\nI expanded the `GoogleTasksService` with paginated task retrieval, ensuring we pull completed and hidden items, and implemented `syncGoogleTasksToLocal()` inside the `TaskProvider`:\n\n```dart\nFuture<void> syncGoogleTasksToLocal(List<GoogleTask> remoteTasks) async {\n  for (var remote in remoteTasks) {\n    final local = _localTasks.firstWhereOrNull((t) => t.googleId == remote.id);\n    \n    if (remote.isCompleted && local?.isCompleted == false) {\n      await _markLocalCompleted(local!.id);\n    } else if (!remote.isCompleted && local?.isCompleted == true) {\n      await _markLocalActive(local!.id);\n    }\n  }\n  \n  // Handle deletions: tasks present locally with a Google ID but missing remotely\n  await _reconcileDeletedTasks(remoteTasks);\n}\n```\n\nI hooked this reconciliation logic directly into app startup (`syncWithCloud`), manual settings triggers, and lifecycle tab-switches on both mobile and web (`home_screen.dart` / `web_home_screen.dart`).\n\n---\n\n### Key Lessons for Other Devs\n\n* **Beware of Isolate Assumptions**: Never assume UI-bound singletons like `WidgetsBinding` are available outside the main thread. Use `PlatformDispatcher.instance` for thread-safe global access.\n* **Test Your Version Strings**: If you adopt build number formats like `+63`, update your validation regexes *before* CI/CD complains.\n* **Stub Everything Early**: Keep your Mocktail default stubs updated when expanding authentication flows to prevent mysterious startup crashes in tests.\n\n---\n\n### Try ROCIs Tasks\n\nROCIs Tasks is built completely offline-first with native Kotlin home screen widgets and seamless cloud sync. If you want to check it out, grab it on Google Play or try the web version:\n\n* **Google Play**: [https://play.google.com/store/apps/details?id=com.rocisapps.tasks](https://play.google.com/store/apps/details?id=com.rocisapps.tasks)\n* **Web App**: [https://tasks.rocisapps.com](https://tasks.rocisapps.com)\n\nHappy coding!",
+      "tags": [
+        "flutter",
+        "android",
+        "indiedev",
+        "programming"
+      ],
+      "x_text": "Ever tried accessing WidgetsBinding.instance inside a Flutter background isolate? Spoiler: It crashes. 💥 Fixed this in ROCIs Tasks v0.2.2 by switching to PlatformDispatcher.instance, plus added robust two-way Google Tasks sync! Try it: https://play.google.com/store/apps/details?id=com.rocisapps.tasks",
+      "bsky_text": "Background isolates in Flutter are great until you accidentally touch UI bindings. 😅 Just shipped ROCIs Tasks v0.2.2, replacing WidgetsBinding with PlatformDispatcher for rock-solid background handling and full two-way Google Tasks sync! https://tasks.rocisapps.com",
+      "created_at": "2026-09-05T16:52:23.686309+00:00",
       "status": "pending",
-      "telegram_message_id": 33
+      "telegram_message_id": 37
     }
   },
   "posted_threads": {
@@ -697,6 +718,13 @@
       "x_url": null,
       "bsky_url": null,
       "published_at": "2026-09-05T16:48:27.200369+00:00"
+    },
+    "devlog_0_2_2_62_2026_07_17_1ff5655b91": {
+      "title": "Why Google Tasks Sync Was Silently Failing Every Hour (And How I Fixed It)",
+      "devto_url": "https://dev.to/rocisapps/why-google-tasks-sync-was-silently-failing-every-hour-and-how-i-fixed-it-1cao",
+      "x_url": null,
+      "bsky_url": null,
+      "published_at": "2026-09-05T16:51:52.201136+00:00"
     }
   }
 }
