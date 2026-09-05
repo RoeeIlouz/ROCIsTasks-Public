@@ -65,7 +65,7 @@ class GeminiEngine:
         self._discovered_models = list(GEMINI_MODELS)
         return self._discovered_models
 
-    def _call_gemini(self, prompt: str, temperature: float = 0.7) -> Optional[str]:
+    def _call_gemini(self, prompt: str, temperature: float = 0.7, max_tokens: int = 1000) -> Optional[str]:
         if not self.is_available():
             logger.warning("GEMINI_API_KEY not configured. Skipping LLM call.")
             return None
@@ -81,7 +81,7 @@ class GeminiEngine:
             ],
             "generationConfig": {
                 "temperature": temperature,
-                "maxOutputTokens": 1000
+                "maxOutputTokens": max_tokens
             }
         }
 

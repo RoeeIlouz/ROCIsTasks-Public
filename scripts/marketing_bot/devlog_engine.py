@@ -166,12 +166,12 @@ CRITICAL SECURITY RULES:
 REQUIREMENTS FOR EACH PLATFORM:
 
 1. DEV.TO ARTICLE (`devto_title`, `devto_body`, `tags`):
-   - `devto_title`: Punchy, click-worthy developer title (e.g., 'How I Fixed Android Widgets Rendering Hebrew Weekdays as Y, Y, Y, Y in Flutter' or 'Why My Android Notification Crashed on Flutter Bitmaps').
-   - `devto_body`: Full Markdown article (800-1400 words) structured as:
+   - `devto_title`: Punchy, click-worthy developer title (e.g., 'How I Fixed Android Widgets Rendering Hebrew Weekdays as Y, Y, Y, Y in Flutter').
+   - `devto_body`: Full Markdown article (500-900 words, highly focused, actionable, and punchy) structured as:
      * **The Hook**: Relatable opening about indie dev life / Android development.
-     * **The Mystery / The Bug**: What was happening, why users were seeing it, and why the naive solution failed.
+     * **The Mystery / The Bug**: What was happening, why users saw it.
      * **The Root Cause**: Deep dive into Kotlin / Flutter platform channels / Android OS internals.
-     * **The Solution & Code Architecture**: How you solved it cleanly, with code blocks/snippets.
+     * **The Solution & Code Architecture**: How you solved it cleanly, with focused code blocks/snippets.
      * **Key Lessons for Other Devs**: 2-3 actionable bullet points.
      * **Outro & ROCIs Tasks**: A humble, natural invitation to check out ROCIs Tasks on Google Play ({APP_INFO['play_store_url']}) or web ({APP_INFO['web_url']}).
    - `tags`: Array of up to 4 lowercase tags (e.g. ["flutter", "android", "indiedev", "programming"]).
@@ -195,7 +195,7 @@ Output ONLY valid JSON matching this exact structure:
 }}
 """
 
-        raw_response = self.gemini._call_gemini(prompt, temperature=0.7)
+        raw_response = self.gemini._call_gemini(prompt, temperature=0.7, max_tokens=4000)
         if not raw_response:
             logger.error("Gemini failed to generate DevLog package.")
             return None

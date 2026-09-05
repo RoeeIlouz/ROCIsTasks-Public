@@ -97,9 +97,32 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action [Marketing Bot]"
+          # Fetch latest origin to prevent non-fast-forward conflicts
+          git fetch origin main
+          python -c '
+          import json, os
+          from pathlib import Path
+          sf = Path("scripts/marketing_bot/marketing_state.json")
+          if not sf.exists(): exit(0)
+          local = json.loads(sf.read_text(encoding="utf-8"))
+          # Read remote state if available
+          os.system("git show origin/main:scripts/marketing_bot/marketing_state.json > /tmp/remote_state.json 2>/dev/null")
+          rf = Path("/tmp/remote_state.json")
+          if rf.exists() and rf.stat().st_size > 0:
+              try:
+                  remote = json.loads(rf.read_text(encoding="utf-8"))
+                  for k in ["inspected_threads", "pending_drafts", "posted_threads", "posted_devlogs"]:
+                      if k in remote:
+                          merged = dict(remote[k])
+                          merged.update(local.get(k, {}))
+                          local[k] = merged
+                  sf.write_text(json.dumps(local, indent=2, ensure_ascii=False), encoding="utf-8")
+              except Exception as e:
+                  print(f"Merge error: {e}")
+          '
           git add scripts/marketing_bot/marketing_state.json
           if ! git diff --staged --quiet; then
             git commit -m "chore(marketing): update marketing state [skip ci]"
-            git pull --rebase origin main || git rebase --abort
+            git pull --rebase -X theirs origin main || git rebase --abort
             git push origin main
           fi
