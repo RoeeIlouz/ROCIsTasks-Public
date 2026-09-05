@@ -137,6 +137,52 @@ class TelegramBot:
             return msg.get("message_id")
         return None
 
+    def send_devlog_approval_card(
+        self,
+        draft_id: str,
+        milestone_title: str,
+        milestone_date: str,
+        devto_title: str,
+        devto_preview: str,
+        x_post: str,
+        bsky_post: str
+    ) -> Optional[int]:
+        """
+        Sends an approval card for a generated DevLog to Telegram with inline buttons:
+        [✅ Approve & Publish DevLog] | [❌ Skip DevLog]
+        """
+        safe_m_title = milestone_title.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+        safe_d_title = devto_title.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+        safe_preview = devto_preview[:350].replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+        safe_x = x_post.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+        safe_bsky = bsky_post.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+        text = (
+            f"🛠️ <b>New DevLog Ready ({milestone_date})</b>\n\n"
+            f"📌 <b>Milestone:</b> {safe_m_title}\n"
+            f"📝 <b>Dev.to Article:</b> <i>{safe_d_title}</i>\n"
+            f"<blockquote>{safe_preview}...</blockquote>\n\n"
+            f"🐦 <b>X/Twitter Preview:</b>\n"
+            f"<code>{safe_x}</code>\n\n"
+            f"🦋 <b>Bluesky Preview:</b>\n"
+            f"<code>{safe_bsky}</code>\n\n"
+            f"<i>Tap below to approve publishing across Dev.to, X, and Bluesky:</i>"
+        )
+
+        reply_markup = {
+            "inline_keyboard": [
+                [
+                    {"text": "✅ Approve & Publish DevLog", "callback_data": f"approve:{draft_id}"},
+                    {"text": "❌ Skip DevLog", "callback_data": f"reject:{draft_id}"}
+                ]
+            ]
+        }
+
+        msg = self.send_message(text, reply_markup=reply_markup)
+        if msg:
+            return msg.get("message_id")
+        return None
+
     def send_feedback_alert(
         self,
         category: str,

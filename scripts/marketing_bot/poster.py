@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime, timezone
 from typing import Dict, Any, Optional
 import requests
 
@@ -214,4 +215,112 @@ class Poster:
             "thread_title": thread_title,
             "method": "manual_drop"
         })
+        return True
+
+    def execute_devlog(self, draft: Dict[str, Any]) -> bool:
+        """
+        Publishes an approved DevLog across platforms:
+        1. Dev.to (long-form article, published as live)
+        2. X/Twitter (post with link to Dev.to article + app)
+        3. Bluesky (post with link to Dev.to article + app)
+        4. Updates Telegram message with live publication links.
+        """
+        slug = draft.get("milestone_slug", "unknown")
+        devto_title = draft.get("devto_title", "")
+        devto_body = draft.get("devto_body", "")
+        tags = draft.get("tags", ["flutter", "android", "indiedev", "productivity"])
+        x_text = draft.get("x_text", "")
+        bsky_text = draft.get("bsky_text", "")
+        msg_id = draft.get("telegram_message_id")
+
+        published_links = {}
+
+        # 1. Publish to Dev.to
+        devto_url = None
+        if self.devto.is_configured():
+            try:
+                res = self.devto.publish_article(
+                    title=devto_title,
+                    body_markdown=devto_body,
+                    tags=tags,
+                    published=True
+                )
+                if res and res.get("url"):
+                    devto_url = res["url"]
+                    published_links["Dev.to"] = devto_url
+                    logger.info(f"Dev.to article published live: {devto_url}")
+            except Exception as e:
+                logger.error(f"Failed to publish Dev.to article: {e}")
+        else:
+            logger.warning("Dev.to is not configured. Skipping Dev.to publication.")
+
+        # 2. Publish to X / Twitter
+        x_url = None
+        if self.x_client.is_configured():
+            try:
+                tweet_text = x_text
+                if devto_url:
+                    tweet_text = f"{x_text}\n\nRead breakdown: {devto_url}\n📲 https://tasks.rocisapps.com"
+                else:
+                    tweet_text = f"{x_text}\n\n📲 https://tasks.rocisapps.com"
+
+                res_x = self.x_client.post_tweet(tweet_text)
+                if res_x:
+                    x_url = res_x
+                    published_links["X"] = x_url
+                    self.state_manager.record_x_post()
+            except Exception as e:
+                logger.error(f"Failed to post DevLog to X: {e}")
+
+        # 3. Publish to Bluesky
+        bsky_url = None
+        if self.bluesky.is_configured():
+            try:
+                post_text = bsky_text
+                if devto_url:
+                    post_text = f"{bsky_text}\n\nRead on Dev.to: {devto_url}\n📲 https://tasks.rocisapps.com"
+                else:
+                    post_text = f"{bsky_text}\n\n📲 https://tasks.rocisapps.com"
+
+                res_bsky = self.bluesky.post_update(post_text)
+                if res_bsky:
+                    bsky_url = res_bsky
+                    published_links["Bluesky"] = bsky_url
+            except Exception as e:
+                logger.error(f"Failed to post DevLog to Bluesky: {e}")
+
+        # 4. Update state
+        self.state_manager.record_posted_devlog(slug, {
+            "title": devto_title,
+            "devto_url": devto_url,
+            "x_url": x_url,
+            "bsky_url": bsky_url,
+            "published_at": datetime.now(timezone.utc).isoformat()
+        })
+        self.state_manager.mark_draft_status(draft["id"], "approved")
+
+        # 5. Notify/Edit Telegram Card
+        summary_lines = []
+        if devto_url:
+            summary_lines.append(f"📝 <b>Dev.to:</b> <a href=\"{devto_url}\">{devto_title}</a>")
+        if x_url:
+            summary_lines.append(f"🐦 <b>X/Twitter:</b> <a href=\"{x_url}\">View Tweet</a>")
+        elif self.x_client.is_configured():
+            summary_lines.append("🐦 <b>X/Twitter:</b> Published")
+        if bsky_url:
+            summary_lines.append(f"🦋 <b>Bluesky:</b> <a href=\"{bsky_url}\">View Post</a>")
+        elif self.bluesky.is_configured():
+            summary_lines.append("🦋 <b>Bluesky:</b> Published")
+
+        status_text = (
+            f"🎉 <b>DevLog Published Successfully!</b>\n\n"
+            f"📌 <b>Title:</b> {devto_title}\n\n" +
+            "\n".join(summary_lines)
+        )
+
+        if msg_id:
+            self.telegram.edit_message_text(msg_id, status_text)
+        else:
+            self.telegram.send_message(status_text)
+
         return True

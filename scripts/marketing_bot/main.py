@@ -24,6 +24,7 @@ from .telegram_bot import TelegramBot
 from .discovery import DiscoveryEngine
 from .poster import Poster
 from .feedback_monitor import FeedbackMonitor
+from .devlog_engine import DevlogEngine
 
 logging.basicConfig(
     level=logging.INFO,
@@ -99,28 +100,42 @@ def run_pipeline(dry_run: bool = False):
                 telegram.answer_callback_query(callback_id, f"Already {draft.get('status')}.")
                 continue
 
+            is_devlog = draft.get("type") == "devlog"
+
             if action == "approve":
-                logger.info(f"Draft {draft_id} APPROVED by user.")
+                logger.info(f"Draft {draft_id} (devlog={is_devlog}) APPROVED by user.")
                 state_mgr.mark_draft_status(draft_id, "approved")
                 telegram.answer_callback_query(callback_id, "Approved! Processing...")
-                if msg_id:
-                    telegram.edit_message_text(
-                        msg_id,
-                        f"✅ <b>Approved & Executed!</b>\n📌 <a href=\"{draft['thread_url']}\">{draft['thread_title']}</a>"
-                    )
-                if not dry_run:
-                    poster.execute_post(draft)
+                if is_devlog:
+                    if msg_id:
+                        telegram.edit_message_text(
+                            msg_id,
+                            f"⏳ <b>Publishing DevLog across Dev.to, X, and Bluesky...</b>\n📌 <i>{draft.get('devto_title')}</i>"
+                        )
+                    if not dry_run:
+                        poster.execute_devlog(draft)
+                    else:
+                        logger.info(f"[DRY RUN] Would execute devlog publish for {draft_id}")
                 else:
-                    logger.info(f"[DRY RUN] Would execute post for {draft_id}")
+                    if msg_id:
+                        telegram.edit_message_text(
+                            msg_id,
+                            f"✅ <b>Approved & Executed!</b>\n📌 <a href=\"{draft.get('thread_url', '')}\">{draft.get('thread_title', '')}</a>"
+                        )
+                    if not dry_run:
+                        poster.execute_post(draft)
+                    else:
+                        logger.info(f"[DRY RUN] Would execute post for {draft_id}")
 
             elif action == "reject":
                 logger.info(f"Draft {draft_id} REJECTED by user.")
                 state_mgr.mark_draft_status(draft_id, "rejected")
                 telegram.answer_callback_query(callback_id, "Skipped.")
                 if msg_id:
+                    skip_title = draft.get('devto_title') if is_devlog else draft.get('thread_title', '')
                     telegram.edit_message_text(
                         msg_id,
-                        f"❌ <b>Skipped</b>\n📌 <a href=\"{draft['thread_url']}\">{draft['thread_title']}</a>"
+                        f"❌ <b>Skipped</b>\n📌 <i>{skip_title}</i>"
                     )
 
         state_mgr.telegram_last_update_id = max_update_id
@@ -205,7 +220,55 @@ def run_pipeline(dry_run: bool = False):
     state_mgr.save()
 
     # =========================================================================
-    # Step 3: Monitor Posted Threads for Replies & Feedback
+    # Step 3: Check and Queue Next DevLog from SUMMARY.md (Chronological Backlog)
+    # =========================================================================
+    logger.info("Checking backlog for candidate DevLogs from SUMMARY.md...")
+    devlog_engine = DevlogEngine(gemini)
+    has_pending_devlog = any(
+        d.get("type") == "devlog" and d.get("status") == "pending"
+        for d in state_mgr.data.get("pending_drafts", {}).values()
+    )
+
+    if has_pending_devlog:
+        logger.info("A DevLog draft is already pending user approval. Skipping generation.")
+    elif not gemini.is_available():
+        logger.info("Gemini API not configured. Cannot generate DevLog.")
+    else:
+        posted_slugs = set(state_mgr.data.get("posted_devlogs", {}).keys())
+        pending_slugs = {
+            d.get("milestone_slug")
+            for d in state_mgr.data.get("pending_drafts", {}).values()
+            if d.get("milestone_slug")
+        }
+        milestone = devlog_engine.find_next_milestone(posted_slugs, pending_slugs)
+        if milestone:
+            logger.info(f"Selected milestone for DevLog: '{milestone['title']}' ({milestone['date']})")
+            pkg = devlog_engine.generate_devlog_package(milestone)
+            if pkg:
+                if not dry_run and telegram.is_configured():
+                    msg_id = telegram.send_devlog_approval_card(
+                        draft_id=pkg["id"],
+                        milestone_title=pkg["milestone_title"],
+                        milestone_date=pkg["milestone_date"],
+                        devto_title=pkg["devto_title"],
+                        devto_preview=pkg["devto_body"],
+                        x_post=pkg["x_text"],
+                        bsky_post=pkg["bsky_text"]
+                    )
+                    pkg["telegram_message_id"] = msg_id
+                    state_mgr.add_pending_draft(pkg["id"], pkg)
+                    state_mgr.save()
+                    dispatched_count += 1
+                    logger.info(f"DevLog approval card sent to Telegram (msg_id={msg_id})")
+                else:
+                    logger.info(f"[DRY RUN / NO TELEGRAM] Generated DevLog package: {pkg['devto_title']}")
+                    if dry_run:
+                        state_mgr.add_pending_draft(pkg["id"], pkg)
+        else:
+            logger.info("All SUMMARY.md milestones have already been published or queued.")
+
+    # =========================================================================
+    # Step 4: Monitor Posted Threads for Replies & Feedback
     # =========================================================================
     logger.info("Scanning previously promoted threads for community replies...")
     if not dry_run and gemini.is_available():

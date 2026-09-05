@@ -16,7 +16,8 @@ DEFAULT_STATE = {
     "posted_threads": {},
     "recorded_feedback": [],
     "organic_posts": [],
-    "x_posts_timestamps": []
+    "x_posts_timestamps": [],
+    "posted_devlogs": {}
 }
 
 class StateManager:
@@ -167,3 +168,14 @@ class StateManager:
         if "x_posts_timestamps" not in self.data:
             self.data["x_posts_timestamps"] = []
         self.data["x_posts_timestamps"].append(now_iso)
+
+    def is_devlog_posted(self, slug: str) -> bool:
+        """Checks if a milestone slug has already been published as a devlog."""
+        return slug in self.data.get("posted_devlogs", {})
+
+    def record_posted_devlog(self, slug: str, devlog_data: Dict[str, Any]) -> None:
+        """Records a successfully published DevLog."""
+        if "posted_devlogs" not in self.data:
+            self.data["posted_devlogs"] = {}
+        self.data["posted_devlogs"][slug] = devlog_data
+        self.save()
