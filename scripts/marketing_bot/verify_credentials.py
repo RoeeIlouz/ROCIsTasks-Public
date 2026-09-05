@@ -4,6 +4,9 @@ import requests
 from pathlib import Path
 from dotenv import load_dotenv
 
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+
 base_dir = Path(__file__).resolve().parent
 load_dotenv(base_dir / ".env")
 load_dotenv(base_dir.parent.parent / ".env")
@@ -24,7 +27,7 @@ from .config import (
 def check_telegram():
     print("\n--- 1. Testing Telegram ---")
     if not TELEGRAM_BOT_TOKEN:
-        print("❌ TELEGRAM_BOT_TOKEN is missing.")
+        print("[ERROR] TELEGRAM_BOT_TOKEN is missing.")
         return False
 
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/getMe"
@@ -33,16 +36,16 @@ def check_telegram():
         data = r.json()
         if data.get("ok"):
             bot_name = data["result"].get("username")
-            print(f"✅ Telegram Token Valid! Bot: @{bot_name}")
+            print(f"[OK] Telegram Token Valid! Bot: @{bot_name}")
         else:
-            print(f"❌ Telegram Token Invalid: {data}")
+            print(f"[ERROR] Telegram Token Invalid: {data}")
             return False
     except Exception as e:
-        print(f"❌ Error reaching Telegram: {e}")
+        print(f"[ERROR] Error reaching Telegram: {e}")
         return False
 
     if not TELEGRAM_CHAT_ID:
-        print("❌ TELEGRAM_CHAT_ID is missing.")
+        print("[ERROR] TELEGRAM_CHAT_ID is missing.")
         return False
 
     url_chat = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/getChat?chat_id={TELEGRAM_CHAT_ID}"
@@ -51,33 +54,37 @@ def check_telegram():
         data = r.json()
         if data.get("ok"):
             chat_title = data["result"].get("first_name", "") or data["result"].get("title", "")
-            print(f"✅ Telegram Chat ID Valid! Chat with: {chat_title}")
+            print(f"[OK] Telegram Chat ID Valid! Chat with: {chat_title}")
             return True
         else:
-            print(f"⚠️ Telegram Chat ID Error: {data.get('description')}")
+            print(f"[WARN] Telegram Chat ID Error: {data.get('description')}")
             print("👉 REMINDER: You MUST open Telegram, find your bot, and tap 'START' so the bot can reach you.")
             return False
     except Exception as e:
-        print(f"❌ Error checking Telegram chat: {e}")
+        print(f"[ERROR] Error checking Telegram chat: {e}")
         return False
 
 def check_gemini():
     print("\n--- 2. Testing Google Gemini ---")
     if not GEMINI_API_KEY:
-        print("❌ GEMINI_API_KEY is missing.")
+        print("[ERROR] GEMINI_API_KEY is missing.")
         return False
 
     url = f"https://generativelanguage.googleapis.com/v1beta/models?key={GEMINI_API_KEY}"
     try:
         r = requests.get(url, timeout=10)
         if r.status_code == 200:
-            print("✅ Gemini API Key is Valid!")
+            models_data = r.json().get("models", [])
+            flash_models = [m.get("name", "").replace("models/", "") for m in models_data if "flash" in m.get("name", "")]
+            print(f"[OK] Gemini API Key is Valid! Found {len(models_data)} models.")
+            if flash_models:
+                print(f"   Available Flash models: {', '.join(flash_models[:4])}")
             return True
         else:
-            print(f"❌ Gemini API Key Error ({r.status_code}): {r.text[:200]}")
+            print(f"[ERROR] Gemini API Key Error ({r.status_code}): {r.text[:200]}")
             return False
     except Exception as e:
-        print(f"❌ Error checking Gemini: {e}")
+        print(f"[ERROR] Error checking Gemini: {e}")
         return False
 
 def check_twitter():

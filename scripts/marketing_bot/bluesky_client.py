@@ -8,7 +8,7 @@ from .config import BSKY_HANDLE, BSKY_APP_PASSWORD
 logger = logging.getLogger(__name__)
 
 BSKY_AUTH_URL = "https://bsky.social/xrpc/com.atproto.server.createSession"
-BSKY_SEARCH_URL = "https://public.api.bsky.app/xrpc/app.bsky.feed.searchPosts"
+BSKY_SEARCH_URL = "https://bsky.social/xrpc/app.bsky.feed.searchPosts"
 BSKY_CREATE_RECORD_URL = "https://bsky.social/xrpc/com.atproto.repo.createRecord"
 
 class BlueskyClient:
@@ -50,13 +50,15 @@ class BlueskyClient:
 
         headers = {
             "Authorization": f"Bearer {self.access_jwt}",
-            "User-Agent": "ROCIsTasksMarketing/1.0"
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
         }
         params = {"q": query, "limit": limit}
 
         try:
             res = requests.get(BSKY_SEARCH_URL, headers=headers, params=params, timeout=15)
-            res.raise_for_status()
+            if res.status_code != 200:
+                logger.warning(f"Bluesky search returned status {res.status_code}: {res.text[:150]}")
+                return []
             data = res.json()
             posts = data.get("posts", [])
             results = []

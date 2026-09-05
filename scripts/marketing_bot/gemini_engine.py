@@ -8,7 +8,13 @@ from .config import GEMINI_API_KEY, APP_INFO
 
 logger = logging.getLogger(__name__)
 
-GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
+GEMINI_MODELS = [
+    "gemini-2.0-flash",
+    "gemini-2.5-flash",
+    "gemini-1.5-flash-latest",
+    "gemini-1.5-flash",
+    "gemini-pro"
+]
 
 def _clean_json_markdown(text: str) -> str:
     """Removes ```json ... ``` markdown wrappers if present."""
@@ -21,6 +27,7 @@ def _clean_json_markdown(text: str) -> str:
 class GeminiEngine:
     def __init__(self, api_key: Optional[str] = None):
         self.api_key = api_key or GEMINI_API_KEY
+        self.working_model: Optional[str] = None
 
     def is_available(self) -> bool:
         return bool(self.api_key and len(self.api_key.strip()) > 5)
@@ -30,7 +37,6 @@ class GeminiEngine:
             logger.warning("GEMINI_API_KEY not configured. Skipping LLM call.")
             return None
 
-        url = f"{GEMINI_API_URL}?key={self.api_key}"
         headers = {"Content-Type": "application/json"}
         payload = {
             "contents": [
@@ -46,19 +52,34 @@ class GeminiEngine:
             }
         }
 
-        try:
-            response = requests.post(url, headers=headers, json=payload, timeout=30)
-            response.raise_for_status()
-            data = response.json()
-            candidates = data.get("candidates", [])
-            if candidates:
-                parts = candidates[0].get("content", {}).get("parts", [])
-                if parts:
-                    return parts[0].get("text", "")
-            return None
-        except Exception as e:
-            logger.error(f"Gemini API request failed: {e}")
-            return None
+        # If we already found a working model, try that first
+        models_to_try = [self.working_model] if self.working_model else list(GEMINI_MODELS)
+        for m in GEMINI_MODELS:
+            if m not in models_to_try:
+                models_to_try.append(m)
+
+        for model_name in models_to_try:
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={self.api_key}"
+            try:
+                response = requests.post(url, headers=headers, json=payload, timeout=25)
+                if response.status_code == 404:
+                    logger.warning(f"Model '{model_name}' returned 404. Trying next model...")
+                    continue
+                response.raise_for_status()
+                data = response.json()
+                candidates = data.get("candidates", [])
+                if candidates:
+                    parts = candidates[0].get("content", {}).get("parts", [])
+                    if parts:
+                        self.working_model = model_name
+                        return parts[0].get("text", "")
+            except requests.exceptions.HTTPError as e:
+                logger.error(f"Gemini API error with model '{model_name}' ({response.status_code}): {response.text[:200]}")
+            except Exception as e:
+                logger.error(f"Gemini connection error with model '{model_name}': {e}")
+
+        logger.error("All candidate Gemini models failed.")
+        return None
 
     def evaluate_and_draft_response(self, thread_title: str, thread_body: str, platform: str) -> Optional[Dict[str, Any]]:
         """

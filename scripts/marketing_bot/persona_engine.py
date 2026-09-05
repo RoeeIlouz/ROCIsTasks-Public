@@ -83,7 +83,6 @@ TOPIC INSPIRATION:
 OUTPUT FORMAT:
 Return ONLY the raw tweet text. Do not wrap in quotes or markdown. Just the exact text to post."""
 
-        url = f"{GEMINI_API_URL}?key={self.api_key}"
         headers = {"Content-Type": "application/json"}
         payload = {
             "contents": [
@@ -95,23 +94,27 @@ Return ONLY the raw tweet text. Do not wrap in quotes or markdown. Just the exac
             }
         }
 
-        try:
-            res = requests.post(url, headers=headers, json=payload, timeout=25)
-            res.raise_for_status()
-            data = res.json()
-            candidates = data.get("candidates", [])
-            if candidates:
-                raw_text = candidates[0].get("content", {}).get("parts", [{}])[0].get("text", "").strip()
-                # Clean any surrounding quotes
-                clean_text = raw_text.strip('"\n\r ')
-                if clean_text and len(clean_text) <= 280:
-                    logger.info(f"Generated organic developer thought ({len(clean_text)} chars): {clean_text}")
-                    return {
-                        "text": clean_text,
-                        "topic": chosen_topic
-                    }
-        except Exception as e:
-            logger.warning(f"Failed to generate organic thought via Gemini: {e}. Falling back to curated pool.")
+        from .gemini_engine import GEMINI_MODELS
+        for model_name in GEMINI_MODELS:
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={self.api_key}"
+            try:
+                res = requests.post(url, headers=headers, json=payload, timeout=25)
+                if res.status_code == 404:
+                    continue
+                res.raise_for_status()
+                data = res.json()
+                candidates = data.get("candidates", [])
+                if candidates:
+                    raw_text = candidates[0].get("content", {}).get("parts", [{}])[0].get("text", "").strip()
+                    clean_text = raw_text.strip('"\n\r ')
+                    if clean_text and len(clean_text) <= 280:
+                        logger.info(f"Generated organic developer thought ({len(clean_text)} chars) via {model_name}: {clean_text}")
+                        return {
+                            "text": clean_text,
+                            "topic": chosen_topic
+                        }
+            except Exception as e:
+                logger.warning(f"Error generating thought with {model_name}: {e}")
 
         # Fallback if Gemini fails or exceeds character limit
         fallback = random.choice(CURATED_FALLBACK_THOUGHTS)
