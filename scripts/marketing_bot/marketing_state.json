@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-05T11:42:00.731738+00:00",
+  "last_run_timestamp": "2026-09-05T13:20:09.900728+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -32,6 +32,36 @@
       "title": "Your Scroll Animations Look Amateur. Here's the GSAP + Lenis Setup That Fixes It",
       "url": "https://dev.to/thebitforge/your-scroll-animations-look-amateur-heres-the-gsap-lenis-setup-that-fixes-it-48ni",
       "inspected_at": "2026-09-05T11:42:00.729055+00:00"
+    },
+    "devto_4564537": {
+      "platform": "devto",
+      "title": "Memory Is Not Talent: Talent Is Pattern Recognition and Connection",
+      "url": "https://dev.to/sumit0rn/memory-is-not-talent-talent-is-pattern-recognition-and-connection-3bea",
+      "inspected_at": "2026-09-05T13:20:09.296671+00:00"
+    },
+    "devto_4550869": {
+      "platform": "devto",
+      "title": "Your README is no longer just documentation.",
+      "url": "https://dev.to/tobihbest/your-readme-is-no-longer-just-documentation-1c9m",
+      "inspected_at": "2026-09-05T13:20:09.432559+00:00"
+    },
+    "devto_4581700": {
+      "platform": "devto",
+      "title": "Four lessons from a year of running AI agents on boring tasks",
+      "url": "https://dev.to/arsentevai/four-lessons-from-a-year-of-running-ai-agents-on-boring-tasks-457n",
+      "inspected_at": "2026-09-05T13:20:09.549698+00:00"
+    },
+    "devto_4580570": {
+      "platform": "devto",
+      "title": "I got tired of heavy bloated Electron apps, so I built a 1-keystroke native Mac overlay",
+      "url": "https://dev.to/yash_25/i-got-tired-of-heavy-bloated-electron-apps-so-i-built-a-1-keystroke-native-mac-overlay-5fe8",
+      "inspected_at": "2026-09-05T13:20:09.667676+00:00"
+    },
+    "devto_4581200": {
+      "platform": "devto",
+      "title": "🎨 Software Engineering in the Age of AI: From Code to Craft",
+      "url": "https://dev.to/rahul1994jh/software-engineering-in-the-age-of-ai-from-code-to-craft-5e2i",
+      "inspected_at": "2026-09-05T13:20:09.775136+00:00"
     }
   },
   "pending_drafts": {},
