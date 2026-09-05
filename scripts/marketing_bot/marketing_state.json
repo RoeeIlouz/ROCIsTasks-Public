@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-05T13:20:09.900728+00:00",
+  "last_run_timestamp": "2026-09-05T13:56:19.463866+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -62,6 +62,42 @@
       "title": "🎨 Software Engineering in the Age of AI: From Code to Craft",
       "url": "https://dev.to/rahul1994jh/software-engineering-in-the-age-of-ai-from-code-to-craft-5e2i",
       "inspected_at": "2026-09-05T13:20:09.775136+00:00"
+    },
+    "reddit_1w81dur": {
+      "platform": "reddit",
+      "title": "I was tired of reaching for my phone to control my QCY earbuds, so I built a Windows app",
+      "url": "https://reddit.com/r/SideProject/comments/1w81dur/i_was_tired_of_reaching_for_my_phone_to_control/",
+      "inspected_at": "2026-09-05T13:56:18.588880+00:00"
+    },
+    "reddit_1w81dfi": {
+      "platform": "reddit",
+      "title": "Edgy: Ambient edge lighting for macOS",
+      "url": "https://reddit.com/r/SideProject/comments/1w81dfi/edgy_ambient_edge_lighting_for_macos/",
+      "inspected_at": "2026-09-05T13:56:18.776536+00:00"
+    },
+    "reddit_1w818qd": {
+      "platform": "reddit",
+      "title": "I built ScrollStop after getting tired of losing things inside long ChatGPT conversations",
+      "url": "https://reddit.com/r/SideProject/comments/1w818qd/i_built_scrollstop_after_getting_tired_of_losing/",
+      "inspected_at": "2026-09-05T13:56:18.905813+00:00"
+    },
+    "reddit_1w813ly": {
+      "platform": "reddit",
+      "title": "Testers needed for my App - FlashLyrics",
+      "url": "https://reddit.com/r/SideProject/comments/1w813ly/testers_needed_for_my_app_flashlyrics/",
+      "inspected_at": "2026-09-05T13:56:19.046485+00:00"
+    },
+    "reddit_1w6habm": {
+      "platform": "reddit",
+      "title": "16 conversations with indie AI builders later, here's what I got wrong about distribution",
+      "url": "https://reddit.com/r/indiehackers/comments/1w6habm/16_conversations_with_indie_ai_builders_later/",
+      "inspected_at": "2026-09-05T13:56:19.188441+00:00"
+    },
+    "reddit_1w6cy1h": {
+      "platform": "reddit",
+      "title": "Most startup directories are useless for traffic. Here's what I built to fix it",
+      "url": "https://reddit.com/r/indiehackers/comments/1w6cy1h/most_startup_directories_are_useless_for_traffic/",
+      "inspected_at": "2026-09-05T13:56:19.324675+00:00"
     }
   },
   "pending_drafts": {},
