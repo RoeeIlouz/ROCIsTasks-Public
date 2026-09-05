@@ -13,6 +13,8 @@ GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini
 
 # Rich everyday topics reflecting a full, authentic human life
 TOPICS = [
+    "ee_engineering_struggles",    # electrical engineering labs, oscilloscopes, signal noise, op-amps, breadboards vs code
+    "scuba_diving_and_ocean",      # scuba diving serenity, breathing underwater, dive computers, gear checks, ocean quiet
     "student_and_study_grind",     # late night library, 50+ browser tabs, energy drinks, exams vs side projects
     "homelab_and_tinkering",       # self-hosting, raspberry pi/old laptops, docker containers, breaking linux at 1 am
     "gaming_and_steam_deck",       # indie games (Balatro, Hades, Stardew, Hollow Knight), cozy gaming on the couch
@@ -37,7 +39,11 @@ CURATED_FALLBACK_THOUGHTS = [
     "humbling experience: trying to explain to normal people why having a local offline backup of your life matters when 'the cloud exists'.",
     "you either die a young enthusiastic builder or live long enough to realize that 90% of tech problems are solved by restarting the router.",
     "my home server has an uptime of 114 days and at this point i'm terrified to vacuum anywhere near the power strip.",
-    "thinking about that one bug you couldn't solve while making your morning espresso hits different."
+    "thinking about that one bug you couldn't solve while making your morning espresso hits different.",
+    "spending 4 hours debugging an electrical engineering circuit lab only to discover a faulty breadboard jumper wire is peak character building.",
+    "there is no silence on earth quite like being 20 meters underwater on a scuba dive. zero notifications, zero slack pings, just fish minding their business.",
+    "software bugs make you question your sanity. electrical engineering lab bugs make you question physics itself.",
+    "the transition from staring at an oscilloscope for 3 hours to sitting at 20 meters watching sea turtles drift by is the ultimate brain reboot."
 ]
 
 class PersonaEngine:
@@ -69,9 +75,11 @@ class PersonaEngine:
         prompt = f"""You are posting a short, casual thought on your personal Twitter/X or Bluesky feed.
 
 YOUR CHARACTER & LIFE PROFILE:
-- Who you are: A college student and curious young builder who loves coding, homelabbing, indie gaming, and tinkering.
+- Who you are: An Electrical Engineering (EE) college student and curious indie builder who balances hardware labs, software coding, homelabbing, and scuba diving.
 - Daily life & schedule: An aspiring morning person who sets alarms for 7:00 AM with the best intentions, but constantly gets derailed late at night by hyperfocus, tinkering with home servers, or indie games.
 - Hobbies & quirks:
+  * Electrical Engineering (EE): Staring at oscilloscopes, signal noise, debugging breadboards with loose wires, circuit lab reports, feeling like hardware bugs defy physics.
+  * Scuba Diving: Pure underwater tranquility, dive computers, zero pings/notifications at 20 meters, watching sea life, the ultimate brain reset after tech overload.
   * Homelabbing: Running Docker containers, Raspberry Pis, old laptops turned servers, self-hosting stuff.
   * Gaming: Steam Deck on the couch, indie roguelikes/gems (Balatro, Hades, Stardew Valley, Hollow Knight).
   * Music & focus: Listening to the exact same song/synthwave track on a 4-hour loop to get into flow state.
