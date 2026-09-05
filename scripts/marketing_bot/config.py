@@ -63,7 +63,11 @@ REDDIT_SUBREDDITS = [
     "gtd",
     "SideProject",
     "apps",
+    "android",
     "getdisciplined",
+    "ADHD_Programmers",
+    "ADHD",
+    "studytips",
     "selfhosted"
 ]
 
@@ -75,6 +79,8 @@ DISCOVERY_SEARCH_QUERIES = [
     "natural language task app",
     "todoist alternative android",
     "ticktick alternative offline",
-    "looking for task app recommendation"
+    "looking for task app recommendation",
+    "simple task manager with calendar sync",
+    "offline to-do app without subscription"
 ]
 
