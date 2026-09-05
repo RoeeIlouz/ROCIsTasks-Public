@@ -12,6 +12,7 @@ from .config import (
     REDDIT_USER_AGENT
 )
 from .state_manager import StateManager
+from .bluesky_client import BlueskyClient
 
 logger = logging.getLogger(__name__)
 
@@ -20,6 +21,7 @@ class DiscoveryEngine:
         self.state_manager = state_manager
         self.now_ts = time.time()
         self.min_created_ts = self.now_ts - (MAX_POST_AGE_HOURS * 3600)
+        self.bsky = BlueskyClient()
         self._praw_reddit = None
 
     def _get_praw_reddit(self):
@@ -38,13 +40,13 @@ class DiscoveryEngine:
                 logger.warning(f"Could not initialize PRAW: {e}")
         return self._praw_reddit
 
-    def discover_opportunities(self, max_results: int = 5) -> List[Dict[str, Any]]:
+    def discover_opportunities(self, max_results: int = 6) -> List[Dict[str, Any]]:
         """
-        Discovers active, fresh, and relevant threads across Reddit, Hacker News, and developer communities.
+        Discovers active, fresh, and relevant threads across Reddit, Bluesky, Hacker News, and Dev.to.
         """
         candidates: List[Dict[str, Any]] = []
 
-        # 1. Search Reddit (via PRAW if credentials configured)
+        # 1. Search Reddit (via PRAW if configured)
         praw_reddit = self._get_praw_reddit()
         if praw_reddit:
             for sub_name in REDDIT_SUBREDDITS[:4]:
@@ -69,11 +71,18 @@ class DiscoveryEngine:
                         time.sleep(0.5)
                     except Exception as e:
                         logger.error(f"Error searching Reddit r/{sub_name} for '{query}': {e}")
-        else:
-            logger.info("Reddit API credentials not set. Reddit search will activate once REDDIT_CLIENT_ID is configured.")
 
-        # 2. Search Hacker News (Open Algolia API)
-        for query in DISCOVERY_SEARCH_QUERIES[:3]:
+        # 2. Search Bluesky (if configured)
+        if self.bsky.is_configured():
+            for query in DISCOVERY_SEARCH_QUERIES[:2]:
+                try:
+                    bsky_posts = self.bsky.search_posts(query, limit=5)
+                    candidates.extend(bsky_posts)
+                except Exception as e:
+                    logger.error(f"Error searching Bluesky: {e}")
+
+        # 3. Search Hacker News (Open Algolia API)
+        for query in ["Show HN todo", "Ask HN todo app", "indie app"]:
             if len(candidates) >= max_results * 3:
                 break
             try:
@@ -83,14 +92,15 @@ class DiscoveryEngine:
             except Exception as e:
                 logger.error(f"Error searching Hacker News for '{query}': {e}")
 
-        # 3. Search Dev.to Articles & Discussions (Open Public API)
-        try:
-            devto_threads = self._search_devto()
-            candidates.extend(devto_threads)
-        except Exception as e:
-            logger.error(f"Error searching Dev.to: {e}")
+        # 4. Search Dev.to Articles & Discussions (Tags: showdev, indiehackers, flutter)
+        for tag in ["showdev", "indiehackers", "flutter"]:
+            try:
+                devto_threads = self._search_devto(tag)
+                candidates.extend(devto_threads)
+            except Exception as e:
+                logger.error(f"Error searching Dev.to for #{tag}: {e}")
 
-        # Filter out already inspected or too old
+        # Deduplicate and filter out inspected / stale items
         fresh_unseen = []
         for item in candidates:
             item_id = item["id"]
@@ -111,7 +121,7 @@ class DiscoveryEngine:
             "query": query,
             "tags": "story",
             "numericFilters": f"created_at_i>{int(self.min_created_ts)}",
-            "hitsPerPage": 10
+            "hitsPerPage": 8
         }
         results = []
         res = requests.get(url, params=params, timeout=10)
@@ -137,10 +147,9 @@ class DiscoveryEngine:
             })
         return results
 
-    def _search_devto(self) -> List[Dict[str, Any]]:
-        """Queries Dev.to for productivity and Android discussions."""
+    def _search_devto(self, tag: str) -> List[Dict[str, Any]]:
         url = "https://dev.to/api/articles"
-        params = {"tag": "productivity", "per_page": 10}
+        params = {"tag": tag, "per_page": 6}
         results = []
         res = requests.get(url, params=params, headers={"User-Agent": "ROCIsTasksMarketing/1.0"}, timeout=10)
         if res.status_code != 200:
@@ -164,4 +173,3 @@ class DiscoveryEngine:
                 "created_utc": self.now_ts
             })
         return results
-

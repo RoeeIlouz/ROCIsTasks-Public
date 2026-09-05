@@ -13,6 +13,8 @@ from .config import (
 from .state_manager import StateManager
 from .telegram_bot import TelegramBot
 from .reddit_playwright import RedditPlaywrightPoster
+from .bluesky_client import BlueskyClient
+from .x_client import XClient
 
 logger = logging.getLogger(__name__)
 
@@ -21,6 +23,8 @@ class Poster:
         self.state_manager = state_manager
         self.telegram = telegram_bot
         self.playwright_poster = RedditPlaywrightPoster()
+        self.bluesky = BlueskyClient()
+        self.x_client = XClient()
         self._reddit = None
 
     def _get_reddit_client(self):
@@ -45,7 +49,9 @@ class Poster:
     def execute_post(self, draft: Dict[str, Any]) -> bool:
         """
         Executes posting for an approved draft across platforms:
-        - Reddit: Uses Playwright (Headless Chrome with session cookie) or PRAW OAuth API.
+        - Reddit: Uses Playwright (Headless Chrome) or PRAW API.
+        - Bluesky: Uses AT Protocol API via BlueskyClient.
+        - X (Twitter): Uses Twitter API v2 via XClient.
         - Dev.to: Uses official REST API if DEVTO_API_KEY is present.
         - Fallback: Formats a 1-tap clipboard card so you can paste in 2 seconds.
         """
@@ -59,7 +65,6 @@ class Poster:
         # 1. Reddit Auto-Posting
         # ---------------------------------------------------------------------
         if platform == "reddit":
-            # Priority A: Headless Playwright (No API developer approval required)
             if self.playwright_poster.is_available():
                 logger.info(f"Attempting Reddit posting via Playwright: {thread_url}")
                 comment_url = self.playwright_poster.post_comment(thread_url, draft_text)
@@ -75,13 +80,12 @@ class Poster:
                     self.telegram.send_message(
                         f"🚀 <b>Auto-Posted to Reddit via Playwright!</b>\n\n"
                         f"📌 <b>Thread:</b> <a href=\"{comment_url}\">{thread_title}</a>\n"
-                        f"<i>Now monitoring thread for comments and feature suggestions...</i>"
+                        f"<i>Now monitoring thread for feedback...</i>"
                     )
                     return True
                 else:
                     logger.warning("Playwright submission failed. Falling back to 1-tap drop.")
 
-            # Priority B: Classic PRAW OAuth
             reddit_client = self._get_reddit_client()
             if reddit_client:
                 try:
@@ -101,19 +105,63 @@ class Poster:
                     })
                     self.telegram.send_message(
                         f"🚀 <b>Auto-Posted to Reddit via API!</b>\n\n"
-                        f"📌 <b>Thread:</b> <a href=\"{comment_url}\">{thread_title}</a>\n"
-                        f"<i>Now monitoring thread for comments and feature suggestions...</i>"
+                        f"📌 <b>Thread:</b> <a href=\"{comment_url}\">{thread_title}</a>"
                     )
                     return True
                 except Exception as e:
                     logger.error(f"Failed to auto-post to Reddit via PRAW: {e}")
 
         # ---------------------------------------------------------------------
-        # 2. Dev.to Auto-Posting
+        # 2. Bluesky Auto-Posting
+        # ---------------------------------------------------------------------
+        elif platform == "bluesky" and self.bluesky.is_configured():
+            try:
+                uri = draft.get("uri")
+                cid = draft.get("cid")
+                post_link = self.bluesky.post_reply(draft_text, reply_to_uri=uri, reply_to_cid=cid)
+                if post_link:
+                    self.state_manager.record_posted_thread(thread_id, {
+                        "platform": "bluesky",
+                        "thread_url": post_link,
+                        "posted_text": draft_text,
+                        "thread_title": thread_title,
+                        "method": "api"
+                    })
+                    self.telegram.send_message(
+                        f"🚀 <b>Auto-Posted to Bluesky!</b>\n\n"
+                        f"📌 <b>Post:</b> <a href=\"{post_link}\">{thread_title}</a>"
+                    )
+                    return True
+            except Exception as e:
+                logger.error(f"Failed to post to Bluesky: {e}")
+
+        # ---------------------------------------------------------------------
+        # 3. Twitter / X Auto-Posting
+        # ---------------------------------------------------------------------
+        elif platform == "x" and self.x_client.is_configured():
+            try:
+                tweet_url = self.x_client.post_tweet(draft_text)
+                if tweet_url:
+                    self.state_manager.record_posted_thread(thread_id, {
+                        "platform": "x",
+                        "thread_url": tweet_url,
+                        "posted_text": draft_text,
+                        "thread_title": thread_title,
+                        "method": "api"
+                    })
+                    self.telegram.send_message(
+                        f"🚀 <b>Auto-Posted to X/Twitter!</b>\n\n"
+                        f"📌 <b>Tweet:</b> <a href=\"{tweet_url}\">{thread_title}</a>"
+                    )
+                    return True
+            except Exception as e:
+                logger.error(f"Failed to post to X: {e}")
+
+        # ---------------------------------------------------------------------
+        # 4. Dev.to Auto-Posting
         # ---------------------------------------------------------------------
         elif platform == "devto" and DEVTO_API_KEY:
             try:
-                # Post comment on article if it's a devto article
                 art_id = thread_id.replace("devto_", "")
                 res = requests.post(
                     "https://dev.to/api/comments",
@@ -138,7 +186,7 @@ class Poster:
                 logger.error(f"Failed to post to Dev.to via API: {e}")
 
         # ---------------------------------------------------------------------
-        # 3. Fallback: 1-Tap Manual Clipboard Drop
+        # 5. Fallback: 1-Tap Manual Clipboard Drop
         # ---------------------------------------------------------------------
         safe_title = thread_title.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
         safe_text = draft_text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
@@ -146,7 +194,7 @@ class Poster:
         card_text = (
             f"📋 <b>1-Click Promotion Drop Ready ({platform.upper()})</b>\n\n"
             f"📌 <b>Thread:</b> <a href=\"{thread_url}\">{safe_title}</a>\n\n"
-            f"<i>Tap the block below to copy response to clipboard, then paste into the thread:</i>\n\n"
+            f"<i>Tap the block below to copy response to clipboard, then paste:</i>\n\n"
             f"<code>{safe_text}</code>"
         )
         reply_markup = {

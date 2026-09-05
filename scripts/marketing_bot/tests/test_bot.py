@@ -92,6 +92,24 @@ class TestMarketingBot(unittest.TestCase):
         poster_with_cookie = RedditPlaywrightPoster(session_cookie="dummy_reddit_session_cookie_value_12345")
         self.assertTrue(poster_with_cookie.is_available())
 
+    def test_bluesky_client_configuration(self):
+        from scripts.marketing_bot.bluesky_client import BlueskyClient
+        client_empty = BlueskyClient(handle="", app_password="")
+        self.assertFalse(client_empty.is_configured())
+        self.assertEqual(client_empty.search_posts("todo"), [])
+        self.assertIsNone(client_empty.post_reply("test"))
+
+        client_configured = BlueskyClient(handle="user.bsky.social", app_password="password123")
+        self.assertTrue(client_configured.is_configured())
+
+    def test_x_client_configuration(self):
+        from scripts.marketing_bot.x_client import XClient
+        client = XClient()
+        # When env not set, should report not configured
+        if not client.api_key:
+            self.assertFalse(client.is_configured())
+            self.assertIsNone(client.post_tweet("test"))
+
     def test_feedback_storage(self):
         self.state_mgr.add_feedback({
             "category": "feature_request",
