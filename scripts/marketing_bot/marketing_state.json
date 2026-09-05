@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-05T16:00:43.420823+00:00",
+  "last_run_timestamp": "2026-09-05T16:26:09.635956+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -242,6 +242,42 @@
       "title": "FACTOMANCER - Gameplay Trailer\n\n🎮  Try the demo and wishlist the game during the...",
       "url": "https://bsky.app/profile/voltigegames.bsky.social/post/3mupdxsbpuk2e",
       "inspected_at": "2026-09-05T16:00:41.453891+00:00"
+    },
+    "reddit_1w856uj": {
+      "platform": "reddit",
+      "title": "I’m 16, shipped a bank connected IOS app, posted 28 TikToks got 2 followers",
+      "url": "https://reddit.com/r/SideProject/comments/1w856uj/im_16_shipped_a_bank_connected_ios_app_posted_28/",
+      "inspected_at": "2026-09-05T16:26:02.633065+00:00"
+    },
+    "reddit_1w855aa": {
+      "platform": "reddit",
+      "title": "Building an app for couples - calendar, notes, photos in one place. Is it something required?",
+      "url": "https://reddit.com/r/SideProject/comments/1w855aa/building_an_app_for_couples_calendar_notes_photos/",
+      "inspected_at": "2026-09-05T16:26:05.186822+00:00"
+    },
+    "reddit_1w852lb": {
+      "platform": "reddit",
+      "title": "Made a little browser DJ setup that mixes two YouTube videos",
+      "url": "https://reddit.com/r/SideProject/comments/1w852lb/made_a_little_browser_dj_setup_that_mixes_two/",
+      "inspected_at": "2026-09-05T16:26:05.965096+00:00"
+    },
+    "reddit_1w852at": {
+      "platform": "reddit",
+      "title": "Technical Co-Founder Available: I Build the Full-Stack MVP & Automation for Your Validated Idea",
+      "url": "https://reddit.com/r/SideProject/comments/1w852at/technical_cofounder_available_i_build_the/",
+      "inspected_at": "2026-09-05T16:26:06.934891+00:00"
+    },
+    "reddit_1w84wrp": {
+      "platform": "reddit",
+      "title": "Roast my niche app idea and save me the dev time",
+      "url": "https://reddit.com/r/roastmystartup/comments/1w84wrp/roast_my_niche_app_idea_and_save_me_the_dev_time/",
+      "inspected_at": "2026-09-05T16:26:07.883019+00:00"
+    },
+    "bsky_bafyreidvxot": {
+      "platform": "bluesky",
+      "title": "Another dev callout: I've had so many submissions for my monthly Indie Apps Show...",
+      "url": "https://bsky.app/profile/rolfebox.bsky.social/post/3muk43rmoq22v",
+      "inspected_at": "2026-09-05T16:26:08.622128+00:00"
     }
   },
   "pending_drafts": {
@@ -282,5 +318,6 @@
       "posted_at": "2026-09-05T14:26:29.792124+00:00"
     }
   ],
-  "x_posts_timestamps": []
+  "x_posts_timestamps": [],
+  "posted_devlogs": {}
 }
