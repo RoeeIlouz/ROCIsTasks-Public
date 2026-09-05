@@ -398,6 +398,22 @@ class Poster:
         if threads_url:
             summary_lines.append(f"🧵 <b>Threads:</b> <a href=\"{threads_url}\">View Post</a>")
 
+        # Semi-automated Medium 1-Click Import Helper
+        inline_keyboard = []
+        if not medium_url and (devto_url or hashnode_url):
+            import_source = devto_url or hashnode_url
+            summary_lines.append(
+                f"\n📖 <b>Medium (1-Click Import):</b>\n"
+                f"Tap to copy URL: <code>{import_source}</code>\n"
+                f"Then paste at <a href=\"https://medium.com/p/import\">medium.com/p/import</a>"
+            )
+            inline_keyboard.append([{"text": "📖 Import to Medium", "url": "https://medium.com/p/import"}])
+
+        if devto_url:
+            inline_keyboard.append([{"text": "📝 View on Dev.to", "url": devto_url}])
+
+        reply_markup = {"inline_keyboard": inline_keyboard} if inline_keyboard else None
+
         status_text = (
             f"🎉 <b>DevLog Published Successfully!</b>\n\n"
             f"📌 <b>Title:</b> {devto_title}\n\n" +
@@ -405,9 +421,9 @@ class Poster:
         )
 
         if msg_id:
-            self.telegram.edit_message_text(msg_id, status_text)
+            self.telegram.edit_message_text(msg_id, status_text, reply_markup=reply_markup)
         else:
-            self.telegram.send_message(status_text)
+            self.telegram.send_message(status_text, reply_markup=reply_markup)
 
         return True
 

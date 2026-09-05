@@ -293,5 +293,39 @@ class TestNewPlatforms(unittest.TestCase):
         posted_devlogs = self.state_mgr.data.get("posted_devlogs", {})
         self.assertIn("test_milestone_multi", posted_devlogs)
 
+    def test_poster_execute_devlog_medium_helper_attached(self):
+        mock_bot = MagicMock()
+        poster = Poster(self.state_mgr, mock_bot)
+        poster.devto = MagicMock()
+        poster.devto.is_configured.return_value = True
+        poster.devto.publish_article.return_value = {
+            "id": 123,
+            "url": "https://dev.to/rocisapps/offline-flutter-test"
+        }
+
+        draft = {
+            "id": "devlog_test_medium_helper",
+            "milestone_slug": "test_milestone_medium_helper",
+            "devto_title": "Offline-First Flutter Architecture",
+            "devto_body": "Content",
+            "telegram_message_id": 555
+        }
+
+        res = poster.execute_devlog(draft)
+        self.assertTrue(res)
+
+        mock_bot.edit_message_text.assert_called_once()
+        call_args = mock_bot.edit_message_text.call_args
+        msg_text = call_args[0][1]
+        reply_markup = call_args[1].get("reply_markup")
+
+        self.assertIn("Medium (1-Click Import)", msg_text)
+        self.assertIn("https://dev.to/rocisapps/offline-flutter-test", msg_text)
+        self.assertIsNotNone(reply_markup)
+        buttons = reply_markup.get("inline_keyboard", [])
+        button_urls = [btn["url"] for row in buttons for btn in row if "url" in btn]
+        self.assertIn("https://medium.com/p/import", button_urls)
+        self.assertIn("https://dev.to/rocisapps/offline-flutter-test", button_urls)
+
 if __name__ == "__main__":
     unittest.main()
