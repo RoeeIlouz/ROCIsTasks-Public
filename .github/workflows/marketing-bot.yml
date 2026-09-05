@@ -6,6 +6,11 @@ on:
     - cron: '0 */6 * * *'
   workflow_dispatch:
     inputs:
+      verify_only:
+        description: 'Verify credentials and test API connections only'
+        required: false
+        default: false
+        type: boolean
       dry_run:
         description: 'Run in dry-run mode (no external posting)'
         required: false
@@ -35,10 +40,33 @@ jobs:
           pip install -r scripts/marketing_bot/requirements.txt
 
       - name: Install Playwright Browsers
+        if: ${{ !inputs.verify_only }}
         run: |
           python -m playwright install --with-deps chromium
 
+      - name: Verify Credentials & API Connections
+        if: ${{ inputs.verify_only }}
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          REDDIT_SESSION_COOKIE: ${{ secrets.REDDIT_SESSION_COOKIE }}
+          REDDIT_CLIENT_ID: ${{ secrets.REDDIT_CLIENT_ID }}
+          REDDIT_CLIENT_SECRET: ${{ secrets.REDDIT_CLIENT_SECRET }}
+          REDDIT_USERNAME: ${{ secrets.REDDIT_USERNAME }}
+          REDDIT_PASSWORD: ${{ secrets.REDDIT_PASSWORD }}
+          BSKY_HANDLE: ${{ secrets.BSKY_HANDLE }}
+          BSKY_APP_PASSWORD: ${{ secrets.BSKY_APP_PASSWORD }}
+          DEVTO_API_KEY: ${{ secrets.DEVTO_API_KEY }}
+          X_API_KEY: ${{ secrets.X_API_KEY }}
+          X_API_SECRET: ${{ secrets.X_API_SECRET }}
+          X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
+          X_ACCESS_SECRET: ${{ secrets.X_ACCESS_SECRET }}
+        run: |
+          python -m scripts.marketing_bot.verify_credentials
+
       - name: Run Marketing & Feedback Engine
+        if: ${{ !inputs.verify_only }}
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
@@ -60,6 +88,7 @@ jobs:
           python -m scripts.marketing_bot.main
 
       - name: Commit & Push Updated State
+        if: ${{ !inputs.verify_only }}
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action [Marketing Bot]"
