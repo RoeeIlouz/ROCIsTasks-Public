@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-05T16:47:06.095789+00:00",
+  "last_run_timestamp": "2026-09-05T16:47:19.068030+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -391,37 +391,37 @@
       "platform": "devto",
       "title": "My \"reproducible\" build kept returning the same hash after the code changed. That was the bug.",
       "url": "https://dev.to/maheshwarianmol/my-reproducible-build-kept-returning-the-same-hash-after-the-code-changed-that-was-the-bug-4npj",
-      "inspected_at": "2026-09-05T16:46:57.412227+00:00"
+      "inspected_at": "2026-09-05T16:47:10.883826+00:00"
     },
     "devto_4582112": {
       "platform": "devto",
       "title": "I Built a Search Engine With Zero Dependencies — Just Python 3.14's Standard Library",
       "url": "https://dev.to/rushikesh_shedage/i-built-a-search-engine-with-zero-dependencies-just-python-314s-standard-library-2ob2",
-      "inspected_at": "2026-09-05T16:46:59.063348+00:00"
+      "inspected_at": "2026-09-05T16:47:13.086426+00:00"
     },
     "devto_4582877": {
       "platform": "devto",
       "title": "I Audited My Own CLI",
       "url": "https://dev.to/semtione/i-audited-my-own-cli-1175",
-      "inspected_at": "2026-09-05T16:47:00.971370+00:00"
+      "inspected_at": "2026-09-05T16:47:13.814573+00:00"
     },
     "devto_4579531": {
       "platform": "devto",
       "title": "🚨📢Launching Docgrity 🚀: Documentation integrity for you, your team, and your agent friends. 🤖",
       "url": "https://dev.to/ujja/meet-docgrity-documentation-integrity-for-you-your-team-and-your-agent-friends-14gm",
-      "inspected_at": "2026-09-05T16:47:01.686659+00:00"
+      "inspected_at": "2026-09-05T16:47:14.626727+00:00"
     },
     "devto_4582427": {
       "platform": "devto",
       "title": "I built Forge: A real-time, context-aware AI copywriting engine with Next.js & Server-Sent Events",
       "url": "https://dev.to/frankanya_dev/i-built-forge-a-real-time-context-aware-ai-copywriting-engine-with-nextjs-server-sent-events-32jl",
-      "inspected_at": "2026-09-05T16:47:02.378049+00:00"
+      "inspected_at": "2026-09-05T16:47:15.438725+00:00"
     },
     "devto_4578716": {
       "platform": "devto",
       "title": "Scroll depth couldn't tell my users from my bounces",
       "url": "https://dev.to/hblai_filmlook/scroll-depth-couldnt-tell-my-users-from-my-bounces-3b89",
-      "inspected_at": "2026-09-05T16:47:03.093742+00:00"
+      "inspected_at": "2026-09-05T16:47:16.220250+00:00"
     }
   },
   "pending_drafts": {
@@ -474,7 +474,8 @@
       "draft_text": "It's funny you mention that—that exact frustration with bloated corporate tools is why I ended up building my own as a solo indie dev. I wanted something that actually maps to how we think instead of making you click through endless dropdowns.\n\nI built ROCIs Tasks using Flutter and local-first storage (Hive) precisely for this kind of workflow. It features a natural language parser so you can just type out what you need ('Deploy staging server tomorrow at 3pm #urgent @dev'), and it handles the rest instantly offline. Plus, it has native Android widgets if you like keeping your focus right on your home screen.\n\nIf you want to check out how it handles fast, local-first task orchestration, you can grab it on Google Play (https://play.google.com/store/apps/details?id=com.rocisapps.tasks) or try the web version (https://tasks.rocisapps.com). Would love to hear your thoughts if you give it a spin!",
       "telegram_message_id": 20,
       "created_at": "2026-09-05T16:40:29.970814+00:00",
-      "status": "pending"
+      "status": "rejected",
+      "updated_at": "2026-09-05T16:46:51.275895+00:00"
     },
     "draft_af0113eb": {
       "thread_id": "bsky_bafyreibafw6",
