@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.12+97] - 2026-09-05
+
+### Added
+- Custom color picker with HSV sliders, opacity control, and HEX input for accent, widget highlight, and subcalendar colors.
+- Per-subcalendar color overrides with Google default reset.
+
+### Improved
+- Unified `AppColorPickerSheet` widget across Settings, Widget Customization, Categories, and Calendar screens.
+- Eliminated 3,000+ phantom IDE diagnostics via workspace and analyzer exclusions.
+
 ## [0.2.12+96] - 2026-09-03
 
 ### Fixed

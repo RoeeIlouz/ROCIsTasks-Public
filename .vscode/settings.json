@@ -1,9 +1,49 @@
 {
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true,
+    "**/graphify-out/**": true,
+    "**/functions/node_modules/**": true,
+    "**/.dart_tool/**": true,
+    "**/build/**": true,
+    "**/android/.gradle/**": true,
+    "**/android/app/build/**": true,
+    "**/android/app/.cxx/**": true,
+    "**/ios/Pods/**": true,
+    "**/windows/flutter/ephemeral/**": true
+  },
   "files.watcherExclude": {
     "**/windows/flutter/ephemeral/**": true,
-    "**/.dart_tool/**": true
+    "**/.dart_tool/**": true,
+    "**/build/**": true,
+    "**/graphify-out/**": true,
+    "**/functions/node_modules/**": true,
+    "**/android/.gradle/**": true,
+    "**/android/app/build/**": true,
+    "**/android/app/.cxx/**": true
   },
   "search.exclude": {
-    "**/windows/flutter/ephemeral": true
-  }
+    "**/windows/flutter/ephemeral": true,
+    "**/graphify-out": true,
+    "**/functions/node_modules": true,
+    "**/.dart_tool": true,
+    "**/build": true,
+    "**/android/.gradle": true,
+    "**/android/app/build": true
+  },
+  "python.analysis.exclude": [
+    "**/graphify-out/**",
+    "**/functions/**",
+    "**/build/**",
+    "**/.dart_tool/**",
+    "**/scripts/marketing_bot/**",
+    "**/scripts/marketing_worker/**"
+  ],
+  "python.analysis.ignore": [
+    "**/graphify-out/**"
+  ]
 }

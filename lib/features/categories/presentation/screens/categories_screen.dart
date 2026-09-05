@@ -8,6 +8,7 @@ import 'package:rocis_tasks/core/services/validation_service.dart';
 import 'package:rocis_tasks/core/utils/icon_utils.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rocis_tasks/shared/ui/widgets/glass_container.dart';
+import 'package:rocis_tasks/shared/ui/widgets/app_color_picker_sheet.dart';
 import 'package:rocis_tasks/shared/ui/theme/theme_service.dart';
 import 'package:rocis_tasks/shared/ui/widgets/easter_egg_spinner.dart';
 
@@ -155,14 +156,15 @@ class CategoriesScreen extends StatelessWidget {
           final theme = Theme.of(context);
           final themeService = Provider.of<ThemeService>(context);
           final subscriptionService = Provider.of<SubscriptionService>(context);
-          final useGlass = themeService.useGlassmorphism && subscriptionService.isPremium;
+          final useGlass =
+              themeService.useGlassmorphism && subscriptionService.isPremium;
 
           return EasterEggSpinner(
             child: GlassContainer(
               borderRadius: BorderRadius.circular(16),
               elevation: 4.0,
-              color: useGlass 
-                  ? theme.colorScheme.primary.withValues(alpha: 0.15) 
+              color: useGlass
+                  ? theme.colorScheme.primary.withValues(alpha: 0.15)
                   : theme.colorScheme.primary,
               opacity: 0.15,
               child: Material(
@@ -181,8 +183,8 @@ class CategoriesScreen extends StatelessWidget {
                         Icon(
                           isAtLimit ? Icons.lock_rounded : Icons.add_rounded,
                           size: isAtLimit ? 18 : 24,
-                          color: useGlass 
-                              ? theme.colorScheme.primary 
+                          color: useGlass
+                              ? theme.colorScheme.primary
                               : theme.colorScheme.onPrimary,
                         ),
                         const SizedBox(width: 8),
@@ -190,8 +192,8 @@ class CategoriesScreen extends StatelessWidget {
                           l10n.addCategory,
                           style: GoogleFonts.outfit(
                             fontWeight: FontWeight.bold,
-                            color: useGlass 
-                                ? theme.colorScheme.primary 
+                            color: useGlass
+                                ? theme.colorScheme.primary
                                 : theme.colorScheme.onPrimary,
                           ),
                         ),
@@ -425,9 +427,74 @@ class _CategorySheetState extends State<_CategorySheet> {
               height: 50,
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
-                itemCount: _colors.length,
+                itemCount: _colors.length + 1,
                 separatorBuilder: (context, index) => const SizedBox(width: 12),
                 itemBuilder: (context, index) {
+                  if (index == _colors.length) {
+                    final isCustomSelected = !_colors.any(
+                      (c) => c.toARGB32() == _selectedColor,
+                    );
+                    return Semantics(
+                      label: l10n.customColor,
+                      button: true,
+                      child: GestureDetector(
+                        onTap: () {
+                          AppColorPickerSheet.show(
+                            context: context,
+                            title: l10n.customColor,
+                            initialColor: Color(_selectedColor),
+                            presetColors: _colors,
+                            onColorChanged: (c) {
+                              setState(() => _selectedColor = c.toARGB32());
+                            },
+                          );
+                        },
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          width: 44,
+                          height: 44,
+                          decoration: BoxDecoration(
+                            color: isCustomSelected
+                                ? Color(_selectedColor)
+                                : theme.colorScheme.surfaceContainerHighest
+                                      .withValues(alpha: 0.5),
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: isCustomSelected
+                                  ? theme.colorScheme.onSurface
+                                  : theme.colorScheme.outline.withValues(
+                                      alpha: 0.4,
+                                    ),
+                              width: isCustomSelected ? 3 : 1.5,
+                            ),
+                            boxShadow: [
+                              if (isCustomSelected)
+                                BoxShadow(
+                                  color: Color(
+                                    _selectedColor,
+                                  ).withValues(alpha: 0.4),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                ),
+                            ],
+                          ),
+                          child: Icon(
+                            isCustomSelected
+                                ? Icons.check_rounded
+                                : Icons.colorize_rounded,
+                            size: 20,
+                            color: isCustomSelected
+                                ? (Color(_selectedColor).computeLuminance() >
+                                          0.5
+                                      ? Colors.black
+                                      : Colors.white)
+                                : theme.colorScheme.primary,
+                          ),
+                        ),
+                      ),
+                    );
+                  }
+
                   final color = _colors[index];
                   final isSelected = _selectedColor == color.toARGB32();
                   return Semantics(

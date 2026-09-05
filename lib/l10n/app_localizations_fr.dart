@@ -1464,4 +1464,28 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get kanbanWidgetDesc =>
       'Tableau Kanban interactif avec les colonnes À faire, En cours et Terminé';
+
+  @override
+  String get subcalendars => 'Sous-agendas';
+
+  @override
+  String get customColor => 'Couleur personnalisée';
+
+  @override
+  String get resetToGoogleDefault => 'Rétablir la couleur Google';
+
+  @override
+  String get hexCode => 'Code HEX';
+
+  @override
+  String get opacity => 'Opacité';
+
+  @override
+  String get presets => 'Préréglages';
+
+  @override
+  String get expandCustomPicker => 'Couleur personnalisée';
+
+  @override
+  String get noEnabledCalendars => 'Aucun agenda Google activé';
 }

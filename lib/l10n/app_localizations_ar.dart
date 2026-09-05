@@ -1431,4 +1431,28 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get kanbanWidgetDesc =>
       'لوحة كانبان تفاعلية تحتوي على أعمدة المهام وفي التركيز والمكتملة';
+
+  @override
+  String get subcalendars => 'التقاويم الفرعية';
+
+  @override
+  String get customColor => 'لون مخصص';
+
+  @override
+  String get resetToGoogleDefault => 'إعادة ضبط إلى لون Google';
+
+  @override
+  String get hexCode => 'رمز HEX';
+
+  @override
+  String get opacity => 'الشفافية';
+
+  @override
+  String get presets => 'الإعدادات المسبقة';
+
+  @override
+  String get expandCustomPicker => 'لون مخصص';
+
+  @override
+  String get noEnabledCalendars => 'لا توجد تقاويم Google مفعّلة';
 }

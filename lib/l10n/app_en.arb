@@ -512,5 +512,13 @@
   "mediumPriority": "Medium Priority",
   "lowPriority": "Low Priority",
   "kanbanWidget": "Kanban Board",
-  "kanbanWidgetDesc": "Interactive Kanban board with To Do, In Focus, and Done columns"
+  "kanbanWidgetDesc": "Interactive Kanban board with To Do, In Focus, and Done columns",
+  "subcalendars": "Subcalendars",
+  "customColor": "Custom Color",
+  "resetToGoogleDefault": "Reset to Google Color",
+  "hexCode": "HEX Code",
+  "opacity": "Opacity",
+  "presets": "Presets",
+  "expandCustomPicker": "Custom Color",
+  "noEnabledCalendars": "No enabled Google Calendars"
 }

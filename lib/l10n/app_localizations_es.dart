@@ -1462,4 +1462,28 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get kanbanWidgetDesc =>
       'Tablero Kanban interactivo con columnas Por hacer, En foco y Hecho';
+
+  @override
+  String get subcalendars => 'Subcalendarios';
+
+  @override
+  String get customColor => 'Color personalizado';
+
+  @override
+  String get resetToGoogleDefault => 'Restablecer color de Google';
+
+  @override
+  String get hexCode => 'Código HEX';
+
+  @override
+  String get opacity => 'Opacidad';
+
+  @override
+  String get presets => 'Preajustes';
+
+  @override
+  String get expandCustomPicker => 'Color personalizado';
+
+  @override
+  String get noEnabledCalendars => 'No hay calendarios de Google habilitados';
 }

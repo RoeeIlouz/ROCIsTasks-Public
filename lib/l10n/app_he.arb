@@ -511,5 +511,13 @@
   "mediumPriority": "עדיפות בינונית",
   "lowPriority": "עדיפות נמוכה",
   "kanbanWidget": "לוח קנבן",
-  "kanbanWidgetDesc": "לוח קנבן אינטראקטיבי עם עמודות משימות, במיקוד והושלם"
+  "kanbanWidgetDesc": "לוח קנבן אינטראקטיבי עם עמודות משימות, במיקוד והושלם",
+  "subcalendars": "לוחות שנה משניים",
+  "customColor": "צבע מותאם אישית",
+  "resetToGoogleDefault": "איפוס לצבע ברירת המחדל של גוגל",
+  "hexCode": "קוד HEX",
+  "opacity": "אטימות",
+  "presets": "ערכות צבעים",
+  "expandCustomPicker": "צבע מותאם אישית",
+  "noEnabledCalendars": "אין לוחות שנה של גוגל פעילים"
 }

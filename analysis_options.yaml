@@ -9,6 +9,12 @@ analyzer:
     - windows/**
     - macos/**
     - linux/**
+    - .dart_tool/**
+    - functions/**
+    - graphify-out/**
+    - scripts/**
+    - ignored/**
+    - "**/*.g.dart"
 include: package:flutter_lints/flutter.yaml
 
 linter:

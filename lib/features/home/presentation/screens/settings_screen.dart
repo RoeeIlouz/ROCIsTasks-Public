@@ -24,6 +24,7 @@ import 'package:rocis_tasks/features/auth/presentation/screens/security_settings
 import 'package:rocis_tasks/features/auth/presentation/screens/login_screen.dart';
 import 'package:rocis_tasks/core/services/timezone_service.dart';
 import 'package:rocis_tasks/features/home/presentation/screens/widget_customization_screen.dart';
+import 'package:rocis_tasks/shared/ui/widgets/app_color_picker_sheet.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -456,70 +457,25 @@ class SettingsScreen extends StatelessWidget {
                 const Color(0xFFEC4899),
                 const Color(0xFF64748B),
               ];
-              final selected = await showModalBottomSheet<int>(
-                useSafeArea: true,
+              final currentColor = themeService.customSeedColorValue != null
+                  ? Color(themeService.customSeedColorValue!)
+                  : Theme.of(context).colorScheme.primary;
+
+              await AppColorPickerSheet.show(
                 context: context,
-                builder: (context) {
-                  final current = themeService.customSeedColorValue;
-                  return Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              l10n.accentColor,
-                              style: Theme.of(context).textTheme.titleMedium,
-                            ),
-                            TextButton(
-                              onPressed: () => Navigator.pop(context, -1),
-                              child: Text(l10n.systemDefault),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-                        Wrap(
-                          spacing: 12,
-                          runSpacing: 12,
-                          children: [
-                            for (final c in colors)
-                              InkWell(
-                                onTap: () =>
-                                    Navigator.pop(context, c.toARGB32()),
-                                borderRadius: BorderRadius.circular(999),
-                                child: Container(
-                                  width: 44,
-                                  height: 44,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: c,
-                                    border: Border.all(
-                                      color: current == c.toARGB32()
-                                          ? Theme.of(
-                                              context,
-                                            ).colorScheme.onSurface
-                                          : Colors.transparent,
-                                      width: 3,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                          ],
-                        ),
-                        const SizedBox(height: 20),
-                      ],
-                    ),
+                initialColor: currentColor,
+                title: l10n.accentColor,
+                presetColors: colors,
+                resetLabel: l10n.systemDefault,
+                onResetToDefault: () async {
+                  await themeService.setCustomSeedColorValue(null);
+                },
+                onColorChanged: (newColor) async {
+                  await themeService.setCustomSeedColorValue(
+                    newColor.toARGB32(),
                   );
                 },
               );
-              if (selected == null) return;
-              if (selected == -1) {
-                await themeService.setCustomSeedColorValue(null);
-              } else {
-                await themeService.setCustomSeedColorValue(selected);
-              }
             },
           ),
           SwitchListTile(

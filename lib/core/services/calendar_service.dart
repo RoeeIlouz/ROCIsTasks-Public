@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:rocis_tasks/core/services/auth_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CalendarService {
   final DeviceCalendarPlugin _deviceCalendarPlugin = DeviceCalendarPlugin();
@@ -45,7 +46,11 @@ class CalendarService {
   /// Centralized token resolution that returns null if no token is cached.
   Future<String?> _getAccessToken() async {
     if (_authService != null) {
-      final isGoogleUser = _authService!.currentUser?.providerData.any((p) => p.providerId == 'google.com') ?? false;
+      final isGoogleUser =
+          _authService!.currentUser?.providerData.any(
+            (p) => p.providerId == 'google.com',
+          ) ??
+          false;
       if (!isGoogleUser) return null;
       final token = await _authService!.getGoogleAccessToken();
       if (token != null && token.isNotEmpty) return token;
@@ -182,7 +187,11 @@ class CalendarService {
           );
         }
       } else if (kIsWeb) {
-        final isGoogle = _authService?.currentUser?.providerData.any((p) => p.providerId == 'google.com') ?? false;
+        final isGoogle =
+            _authService?.currentUser?.providerData.any(
+              (p) => p.providerId == 'google.com',
+            ) ??
+            false;
         if (isGoogle) {
           throw GoogleTokenExpiredException(
             'No Web Google access token available.',
@@ -271,6 +280,20 @@ class CalendarService {
             '#${calendar.color!.toUnsigned(32).toRadixString(16).padLeft(8, '0')}';
       }
     }
+    // Overlay custom subcalendar color overrides
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      for (final key in prefs.getKeys()) {
+        if (key.startsWith('calendar_subcal_color_')) {
+          final calId = key.substring('calendar_subcal_color_'.length);
+          final colorInt = prefs.getInt(key);
+          if (colorInt != null) {
+            colorMap[calId] =
+                '#${colorInt.toUnsigned(32).toRadixString(16).padLeft(8, '0')}';
+          }
+        }
+      }
+    } catch (_) {}
     return colorMap;
   }
 

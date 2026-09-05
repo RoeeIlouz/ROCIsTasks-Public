@@ -512,5 +512,13 @@
   "mediumPriority": "Medel prioritet",
   "lowPriority": "Låg prioritet",
   "kanbanWidget": "Kanban-tavla",
-  "kanbanWidgetDesc": "Interaktiv Kanban-tavla med kolumner för Att göra, I fokus och Klart"
+  "kanbanWidgetDesc": "Interaktiv Kanban-tavla med kolumner för Att göra, I fokus och Klart",
+  "subcalendars": "Underkalendrar",
+  "customColor": "Anpassad färg",
+  "resetToGoogleDefault": "Återställ till Google-färg",
+  "hexCode": "HEX-kod",
+  "opacity": "Opacitet",
+  "presets": "Förinställningar",
+  "expandCustomPicker": "Anpassad färg",
+  "noEnabledCalendars": "Inga aktiverade Google-kalendrar"
 }

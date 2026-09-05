@@ -1447,4 +1447,28 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get kanbanWidgetDesc =>
       'कार्य, फोकस और पूर्ण कॉलम के साथ इंटरएक्टिव कैनबन बोर्ड';
+
+  @override
+  String get subcalendars => 'उप-कैलेंडर';
+
+  @override
+  String get customColor => 'कस्टम रंग';
+
+  @override
+  String get resetToGoogleDefault => 'Google रंग पर रीसेट करें';
+
+  @override
+  String get hexCode => 'HEX कोड';
+
+  @override
+  String get opacity => 'अपारदर्शिता';
+
+  @override
+  String get presets => 'प्रीसेट';
+
+  @override
+  String get expandCustomPicker => 'कस्टम रंग';
+
+  @override
+  String get noEnabledCalendars => 'कोई सक्षम Google कैलेंडर नहीं है';
 }

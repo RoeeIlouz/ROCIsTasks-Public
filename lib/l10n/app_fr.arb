@@ -512,5 +512,13 @@
   "mediumPriority": "Priorité moyenne",
   "lowPriority": "Priorité basse",
   "kanbanWidget": "Tableau Kanban",
-  "kanbanWidgetDesc": "Tableau Kanban interactif avec les colonnes À faire, En cours et Terminé"
+  "kanbanWidgetDesc": "Tableau Kanban interactif avec les colonnes À faire, En cours et Terminé",
+  "subcalendars": "Sous-agendas",
+  "customColor": "Couleur personnalisée",
+  "resetToGoogleDefault": "Rétablir la couleur Google",
+  "hexCode": "Code HEX",
+  "opacity": "Opacité",
+  "presets": "Préréglages",
+  "expandCustomPicker": "Couleur personnalisée",
+  "noEnabledCalendars": "Aucun agenda Google activé"
 }

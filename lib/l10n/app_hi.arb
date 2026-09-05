@@ -512,5 +512,13 @@
   "mediumPriority": "मध्यम प्राथमिकता",
   "lowPriority": "कम प्राथमिकता",
   "kanbanWidget": "कैनबन बोर्ड",
-  "kanbanWidgetDesc": "कार्य, फोकस और पूर्ण कॉलम के साथ इंटरएक्टिव कैनबन बोर्ड"
+  "kanbanWidgetDesc": "कार्य, फोकस और पूर्ण कॉलम के साथ इंटरएक्टिव कैनबन बोर्ड",
+  "subcalendars": "उप-कैलेंडर",
+  "customColor": "कस्टम रंग",
+  "resetToGoogleDefault": "Google रंग पर रीसेट करें",
+  "hexCode": "HEX कोड",
+  "opacity": "अपारदर्शिता",
+  "presets": "प्रीसेट",
+  "expandCustomPicker": "कस्टम रंग",
+  "noEnabledCalendars": "कोई सक्षम Google कैलेंडर नहीं है"
 }

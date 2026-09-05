@@ -1465,4 +1465,28 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get kanbanWidgetDesc =>
       'Interaktives Kanban-Board mit Spalten Zu erledigen, Im Fokus und Erledigt';
+
+  @override
+  String get subcalendars => 'Unterkalender';
+
+  @override
+  String get customColor => 'Benutzerdefinierte Farbe';
+
+  @override
+  String get resetToGoogleDefault => 'Auf Google-Farbe zurücksetzen';
+
+  @override
+  String get hexCode => 'HEX-Code';
+
+  @override
+  String get opacity => 'Deckkraft';
+
+  @override
+  String get presets => 'Voreinstellungen';
+
+  @override
+  String get expandCustomPicker => 'Benutzerdefinierte Farbe';
+
+  @override
+  String get noEnabledCalendars => 'Keine aktivierten Google Kalender';
 }

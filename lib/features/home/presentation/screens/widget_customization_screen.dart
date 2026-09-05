@@ -9,6 +9,7 @@ import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.
 import 'package:rocis_tasks/core/services/auth_service.dart';
 import 'package:rocis_tasks/shared/ui/ui_kit.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
+import 'package:rocis_tasks/shared/ui/widgets/app_color_picker_sheet.dart';
 
 class WidgetCustomizationScreen extends StatefulWidget {
   const WidgetCustomizationScreen({super.key});
@@ -1236,6 +1237,7 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
   }
 
   Widget _buildColorPicker(ThemeData theme) {
+    final l10n = AppLocalizations.of(context)!;
     final colors = [
       {'hex': '#6366F1', 'name': 'Indigo', 'color': const Color(0xFF6366F1)},
       {'hex': '#10B981', 'name': 'Emerald', 'color': const Color(0xFF10B981)},
@@ -1245,49 +1247,116 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
       {'hex': '#0284C7', 'name': 'Sky', 'color': const Color(0xFF0284C7)},
     ];
 
+    Color currentColor;
+    try {
+      final hexClean = _highlightColor.replaceFirst('#', '');
+      currentColor = Color(int.parse('FF$hexClean', radix: 16));
+    } catch (_) {
+      currentColor = const Color(0xFF6366F1);
+    }
+
+    final isCustomColor = !colors.any(
+      (c) =>
+          (c['hex'] as String).toLowerCase() == _highlightColor.toLowerCase(),
+    );
+
     return GlassContainer(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: colors.map((c) {
-          final isSelected =
-              _highlightColor.toLowerCase() ==
-              (c['hex'] as String).toLowerCase();
-          final itemColor = c['color'] as Color;
+        children: [
+          ...colors.map((c) {
+            final isSelected =
+                _highlightColor.toLowerCase() ==
+                (c['hex'] as String).toLowerCase();
+            final itemColor = c['color'] as Color;
 
-          return GestureDetector(
-            onTap: () {
+            return GestureDetector(
+              onTap: () {
+                HapticFeedback.selectionClick();
+                setState(() {
+                  _highlightColor = c['hex'] as String;
+                });
+                _saveSetting('full_calendar_highlight_color', c['hex']);
+              },
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: itemColor,
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: isSelected ? Colors.white : Colors.transparent,
+                    width: 3,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: itemColor.withValues(
+                        alpha: isSelected ? 0.6 : 0.2,
+                      ),
+                      blurRadius: isSelected ? 8 : 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: isSelected
+                    ? const Icon(Icons.check, color: Colors.white, size: 18)
+                    : null,
+              ),
+            );
+          }),
+          // Custom color picker button
+          GestureDetector(
+            onTap: () async {
               HapticFeedback.selectionClick();
-              setState(() {
-                _highlightColor = c['hex'] as String;
-              });
-              _saveSetting('full_calendar_highlight_color', c['hex']);
+              await AppColorPickerSheet.show(
+                context: context,
+                initialColor: currentColor,
+                title: l10n.customColor,
+                onColorChanged: (newColor) {
+                  final hexString =
+                      '#${newColor.toARGB32().toRadixString(16).padLeft(8, '0').substring(2).toUpperCase()}';
+                  setState(() {
+                    _highlightColor = hexString;
+                  });
+                  _saveSetting('full_calendar_highlight_color', hexString);
+                },
+              );
             },
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: itemColor,
                 shape: BoxShape.circle,
+                color: isCustomColor ? currentColor : Colors.transparent,
                 border: Border.all(
-                  color: isSelected ? Colors.white : Colors.transparent,
-                  width: 3,
+                  color: isCustomColor
+                      ? Colors.white
+                      : theme.dividerColor.withValues(alpha: 0.4),
+                  width: isCustomColor ? 3 : 1.5,
                 ),
-                boxShadow: [
-                  BoxShadow(
-                    color: itemColor.withValues(alpha: isSelected ? 0.6 : 0.2),
-                    blurRadius: isSelected ? 8 : 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
+                boxShadow: isCustomColor
+                    ? [
+                        BoxShadow(
+                          color: currentColor.withValues(alpha: 0.5),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ]
+                    : null,
               ),
-              child: isSelected
-                  ? const Icon(Icons.check, color: Colors.white, size: 18)
-                  : null,
+              child: Icon(
+                Icons.colorize_rounded,
+                size: 18,
+                color: isCustomColor
+                    ? Colors.white
+                    : theme.colorScheme.onSurfaceVariant,
+              ),
             ),
-          );
-        }).toList(),
+          ),
+        ],
       ),
     );
   }

@@ -1431,4 +1431,28 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get kanbanWidgetDesc =>
       'לוח קנבן אינטראקטיבי עם עמודות משימות, במיקוד והושלם';
+
+  @override
+  String get subcalendars => 'לוחות שנה משניים';
+
+  @override
+  String get customColor => 'צבע מותאם אישית';
+
+  @override
+  String get resetToGoogleDefault => 'איפוס לצבע ברירת המחדל של גוגל';
+
+  @override
+  String get hexCode => 'קוד HEX';
+
+  @override
+  String get opacity => 'אטימות';
+
+  @override
+  String get presets => 'ערכות צבעים';
+
+  @override
+  String get expandCustomPicker => 'צבע מותאם אישית';
+
+  @override
+  String get noEnabledCalendars => 'אין לוחות שנה של גוגל פעילים';
 }

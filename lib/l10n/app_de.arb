@@ -512,5 +512,13 @@
   "mediumPriority": "Mittlere Priorität",
   "lowPriority": "Niedrige Priorität",
   "kanbanWidget": "Kanban-Board",
-  "kanbanWidgetDesc": "Interaktives Kanban-Board mit Spalten Zu erledigen, Im Fokus und Erledigt"
+  "kanbanWidgetDesc": "Interaktives Kanban-Board mit Spalten Zu erledigen, Im Fokus und Erledigt",
+  "subcalendars": "Unterkalender",
+  "customColor": "Benutzerdefinierte Farbe",
+  "resetToGoogleDefault": "Auf Google-Farbe zurücksetzen",
+  "hexCode": "HEX-Code",
+  "opacity": "Deckkraft",
+  "presets": "Voreinstellungen",
+  "expandCustomPicker": "Benutzerdefinierte Farbe",
+  "noEnabledCalendars": "Keine aktivierten Google Kalender"
 }

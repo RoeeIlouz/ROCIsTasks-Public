@@ -1440,4 +1440,28 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get kanbanWidgetDesc =>
       'Interactive Kanban board with To Do, In Focus, and Done columns';
+
+  @override
+  String get subcalendars => 'Subcalendars';
+
+  @override
+  String get customColor => 'Custom Color';
+
+  @override
+  String get resetToGoogleDefault => 'Reset to Google Color';
+
+  @override
+  String get hexCode => 'HEX Code';
+
+  @override
+  String get opacity => 'Opacity';
+
+  @override
+  String get presets => 'Presets';
+
+  @override
+  String get expandCustomPicker => 'Custom Color';
+
+  @override
+  String get noEnabledCalendars => 'No enabled Google Calendars';
 }

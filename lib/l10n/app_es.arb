@@ -511,5 +511,13 @@
   "mediumPriority": "Media prioridad",
   "lowPriority": "Baja prioridad",
   "kanbanWidget": "Tablero Kanban",
-  "kanbanWidgetDesc": "Tablero Kanban interactivo con columnas Por hacer, En foco y Hecho"
+  "kanbanWidgetDesc": "Tablero Kanban interactivo con columnas Por hacer, En foco y Hecho",
+  "subcalendars": "Subcalendarios",
+  "customColor": "Color personalizado",
+  "resetToGoogleDefault": "Restablecer color de Google",
+  "hexCode": "Código HEX",
+  "opacity": "Opacidad",
+  "presets": "Preajustes",
+  "expandCustomPicker": "Color personalizado",
+  "noEnabledCalendars": "No hay calendarios de Google habilitados"
 }

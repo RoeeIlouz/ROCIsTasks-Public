@@ -621,16 +621,21 @@ class _CalendarScreenState extends State<CalendarScreen> {
                             (c) => c.id == item.calendarId,
                             orElse: Calendar.new,
                           );
-                      final googleColor = cal.color != null
+                      final Color? nativeColor = cal.color != null
                           ? Color(cal.color!)
-                          : colorService.googleColor;
+                          : null;
+                      final eventColor = colorService
+                          .getEffectiveSubcalendarColor(
+                            item.calendarId,
+                            nativeColor: nativeColor,
+                          );
                       return GlassContainer(
                         margin: const EdgeInsets.symmetric(
                           horizontal: 16,
                           vertical: 6,
                         ),
-                        selectedBorderColor: googleColor,
-                        isSelected: false,
+                        selectedBorderColor: eventColor.withValues(alpha: 0.18),
+                        isSelected: true,
                         child: Semantics(
                           label:
                               'Google Calendar Event: ${item.title ?? 'No Title'}',
@@ -642,48 +647,58 @@ class _CalendarScreenState extends State<CalendarScreen> {
                             leading: Container(
                               padding: const EdgeInsets.all(10),
                               decoration: BoxDecoration(
-                                color: googleColor.withValues(alpha: 0.1),
+                                color: eventColor.withValues(alpha: 0.12),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Icon(
                                 Icons.event_note_rounded,
-                                color: googleColor,
+                                color: eventColor,
                                 size: 24,
                               ),
                             ),
                             title: Text(
                               item.title ?? 'No Title',
-                              style: Theme.of(context).textTheme.titleMedium
-                                  ?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: -0.5,
-                                  ),
-                            ),
-                            subtitle: Padding(
-                              padding: const EdgeInsets.only(top: 4),
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.access_time_rounded,
-                                    size: 14,
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.onSurfaceVariant,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    '${item.start != null ? timeFormat.format(item.start!) : ''} - '
-                                    '${item.end != null ? timeFormat.format(item.end!) : ''}',
-                                    style: Theme.of(context).textTheme.bodySmall
-                                        ?.copyWith(
-                                          color: Theme.of(
-                                            context,
-                                          ).colorScheme.onSurfaceVariant,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                  ),
-                                ],
+                              style: GoogleFonts.outfit(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 16,
                               ),
+                            ),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const SizedBox(height: 4),
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.access_time_rounded,
+                                      size: 14,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurfaceVariant,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      item.allDay == true
+                                          ? l10n.allDay
+                                          : (item.start != null &&
+                                                item.end != null)
+                                          ? '${timeFormat.format(item.start!)} - ${timeFormat.format(item.end!)}'
+                                          : (item.start != null
+                                                ? timeFormat.format(item.start!)
+                                                : ''),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.copyWith(
+                                            color: Theme.of(
+                                              context,
+                                            ).colorScheme.onSurfaceVariant,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
                             trailing: Container(
                               padding: const EdgeInsets.symmetric(
@@ -691,14 +706,14 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                 vertical: 4,
                               ),
                               decoration: BoxDecoration(
-                                color: googleColor.withValues(alpha: 0.1),
+                                color: eventColor.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text(
                                 'Google',
                                 style: Theme.of(context).textTheme.labelSmall
                                     ?.copyWith(
-                                      color: googleColor,
+                                      color: eventColor,
                                       fontWeight: FontWeight.w600,
                                     ),
                               ),
