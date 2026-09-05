@@ -20,6 +20,10 @@ from .reddit_playwright import RedditPlaywrightPoster
 from .bluesky_client import BlueskyClient
 from .x_client import XClient
 from .devto_client import DevtoClient
+from .mastodon_client import MastodonClient
+from .threads_client import ThreadsClient
+from .hashnode_client import HashnodeClient
+from .medium_client import MediumClient
 
 logger = logging.getLogger(__name__)
 
@@ -31,6 +35,10 @@ class Poster:
         self.bluesky = BlueskyClient()
         self.x_client = XClient()
         self.devto = DevtoClient()
+        self.mastodon = MastodonClient()
+        self.threads = ThreadsClient()
+        self.hashnode = HashnodeClient()
+        self.medium = MediumClient()
         self._reddit = None
 
     def _get_reddit_client(self):
@@ -236,7 +244,7 @@ class Poster:
 
         published_links = {}
 
-        # 1. Publish to Dev.to
+        # 1. Publish to Dev.to (Primary canonical publication)
         devto_url = None
         if self.devto.is_configured():
             try:
@@ -255,7 +263,41 @@ class Poster:
         else:
             logger.warning("Dev.to is not configured. Skipping Dev.to publication.")
 
-        # 2. Publish to X / Twitter
+        # 2. Publish to Hashnode (with canonical URL)
+        hashnode_url = None
+        if self.hashnode.is_configured():
+            try:
+                res_h = self.hashnode.publish_article(
+                    title=devto_title,
+                    body_markdown=devto_body,
+                    tags=tags,
+                    canonical_url=devto_url
+                )
+                if res_h and res_h.get("url"):
+                    hashnode_url = res_h["url"]
+                    published_links["Hashnode"] = hashnode_url
+                    logger.info(f"Hashnode article published: {hashnode_url}")
+            except Exception as e:
+                logger.error(f"Failed to publish to Hashnode: {e}")
+
+        # 3. Publish to Medium (with canonical URL)
+        medium_url = None
+        if self.medium.is_configured():
+            try:
+                res_m = self.medium.publish_article(
+                    title=devto_title,
+                    body_markdown=devto_body,
+                    tags=tags,
+                    canonical_url=devto_url
+                )
+                if res_m and res_m.get("url"):
+                    medium_url = res_m["url"]
+                    published_links["Medium"] = medium_url
+                    logger.info(f"Medium article published: {medium_url}")
+            except Exception as e:
+                logger.error(f"Failed to publish to Medium: {e}")
+
+        # 4. Publish to X / Twitter
         x_url = None
         if self.x_client.is_configured():
             try:
@@ -273,7 +315,7 @@ class Poster:
             except Exception as e:
                 logger.error(f"Failed to post DevLog to X: {e}")
 
-        # 3. Publish to Bluesky
+        # 5. Publish to Bluesky
         bsky_url = None
         if self.bluesky.is_configured():
             try:
@@ -291,28 +333,70 @@ class Poster:
             except Exception as e:
                 logger.error(f"Failed to post DevLog to Bluesky: {e}")
 
-        # 4. Update state
+        # 6. Publish to Mastodon / Fediverse
+        mastodon_url = None
+        if self.mastodon.is_configured():
+            try:
+                primary_link = devto_url or "https://tasks.rocisapps.com"
+                link_footer = f"\n\nRead breakdown: {primary_link}\n📲 https://tasks.rocisapps.com"
+                m_text = (draft.get("mastodon_text") or bsky_text or x_text).strip()
+                max_m_body = 495 - len(link_footer)
+                if len(m_text) > max_m_body:
+                    m_text = m_text[:max_m_body - 1].rstrip() + "…"
+                res_m = self.mastodon.post_status(f"{m_text}{link_footer}")
+                if res_m:
+                    mastodon_url = res_m
+                    published_links["Mastodon"] = mastodon_url
+            except Exception as e:
+                logger.error(f"Failed to post DevLog to Mastodon: {e}")
+
+        # 7. Publish to Meta Threads
+        threads_url = None
+        if self.threads.is_configured():
+            try:
+                primary_link = devto_url or "https://tasks.rocisapps.com"
+                link_footer = f"\n\nRead breakdown: {primary_link}\n📲 https://tasks.rocisapps.com"
+                t_text = (draft.get("threads_text") or bsky_text or x_text).strip()
+                max_t_body = 495 - len(link_footer)
+                if len(t_text) > max_t_body:
+                    t_text = t_text[:max_t_body - 1].rstrip() + "…"
+                res_t = self.threads.post_thread(f"{t_text}{link_footer}")
+                if res_t:
+                    threads_url = res_t
+                    published_links["Threads"] = threads_url
+            except Exception as e:
+                logger.error(f"Failed to post DevLog to Threads: {e}")
+
+        # 8. Update state
         self.state_manager.record_posted_devlog(slug, {
             "title": devto_title,
             "devto_url": devto_url,
+            "hashnode_url": hashnode_url,
+            "medium_url": medium_url,
             "x_url": x_url,
             "bsky_url": bsky_url,
+            "mastodon_url": mastodon_url,
+            "threads_url": threads_url,
             "published_at": datetime.now(timezone.utc).isoformat()
         })
         self.state_manager.mark_draft_status(draft["id"], "approved")
 
-        # 5. Notify/Edit Telegram Card
+        # 9. Notify/Edit Telegram Card
         summary_lines = []
         if devto_url:
             summary_lines.append(f"📝 <b>Dev.to:</b> <a href=\"{devto_url}\">{devto_title}</a>")
+        if hashnode_url:
+            summary_lines.append(f"📘 <b>Hashnode:</b> <a href=\"{hashnode_url}\">Read Article</a>")
+        if medium_url:
+            summary_lines.append(f"📰 <b>Medium:</b> <a href=\"{medium_url}\">Read Article</a>")
         if x_url:
             summary_lines.append(f"🐦 <b>X/Twitter:</b> <a href=\"{x_url}\">View Tweet</a>")
-        elif self.x_client.is_configured():
-            summary_lines.append("🐦 <b>X/Twitter:</b> Published")
         if bsky_url:
             summary_lines.append(f"🦋 <b>Bluesky:</b> <a href=\"{bsky_url}\">View Post</a>")
-        elif self.bluesky.is_configured():
-            summary_lines.append("🦋 <b>Bluesky:</b> Published")
+        if mastodon_url:
+            summary_lines.append(f"🐘 <b>Mastodon:</b> <a href=\"{mastodon_url}\">View Post</a>")
+        if threads_url:
+            summary_lines.append(f"🧵 <b>Threads:</b> <a href=\"{threads_url}\">View Post</a>")
 
         status_text = (
             f"🎉 <b>DevLog Published Successfully!</b>\n\n"

@@ -185,13 +185,23 @@ REQUIREMENTS FOR EACH PLATFORM:
    - Under 260 characters (leaves room for link).
    - Conversational, smart technical takeaway.
 
+4. MASTODON POST (`mastodon_text`):
+   - Under 420 characters (leaves room for link).
+   - Tech/open-source tone with relevant hashtags (#flutter #buildinpublic #androiddev).
+
+5. META THREADS POST (`threads_text`):
+   - Under 420 characters (leaves room for link).
+   - Casual, engaging mobile builder tone.
+
 Output ONLY valid JSON matching this exact structure:
 {{
   "devto_title": "string",
   "devto_body": "string (markdown)",
   "tags": ["tag1", "tag2", "tag3", "tag4"],
   "x_text": "string",
-  "bsky_text": "string"
+  "bsky_text": "string",
+  "mastodon_text": "string",
+  "threads_text": "string"
 }}
 """
 
@@ -202,7 +212,7 @@ Output ONLY valid JSON matching this exact structure:
 
         clean_json = _clean_json_markdown(raw_response)
         try:
-            package = json.loads(clean_json)
+            package = json.loads(clean_json, strict=False)
         except json.JSONDecodeError as e:
             logger.error(f"Failed to parse DevLog JSON from Gemini: {e}\nRaw: {raw_response[:300]}")
             return None
@@ -212,6 +222,8 @@ Output ONLY valid JSON matching this exact structure:
         devto_body = SecretSanitizer.sanitize(package.get("devto_body", ""))
         x_text = SecretSanitizer.sanitize(package.get("x_text", ""))
         bsky_text = SecretSanitizer.sanitize(package.get("bsky_text", ""))
+        mastodon_text = SecretSanitizer.sanitize(package.get("mastodon_text", bsky_text or x_text))
+        threads_text = SecretSanitizer.sanitize(package.get("threads_text", bsky_text or x_text))
         tags = [re.sub(r'[^a-z0-9]', '', t.lower()) for t in package.get("tags", ["flutter", "android", "indiedev", "productivity"])][:4]
 
         # Generate unique draft ID
@@ -228,6 +240,8 @@ Output ONLY valid JSON matching this exact structure:
             "tags": tags,
             "x_text": x_text,
             "bsky_text": bsky_text,
+            "mastodon_text": mastodon_text,
+            "threads_text": threads_text,
             "created_at": datetime.now(timezone.utc).isoformat(),
             "status": "pending"
         }

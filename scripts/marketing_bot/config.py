@@ -31,6 +31,21 @@ X_API_SECRET = os.getenv("X_API_SECRET", "")
 X_ACCESS_TOKEN = os.getenv("X_ACCESS_TOKEN", "")
 X_ACCESS_SECRET = os.getenv("X_ACCESS_SECRET", "")
 
+# Mastodon / Fediverse Configuration
+MASTODON_INSTANCE = os.getenv("MASTODON_INSTANCE", "https://mastodon.social")
+MASTODON_ACCESS_TOKEN = os.getenv("MASTODON_ACCESS_TOKEN", "")
+
+# Meta Threads Configuration
+THREADS_USER_ID = os.getenv("THREADS_USER_ID", "")
+THREADS_ACCESS_TOKEN = os.getenv("THREADS_ACCESS_TOKEN", "")
+
+# Hashnode Configuration
+HASHNODE_ACCESS_TOKEN = os.getenv("HASHNODE_ACCESS_TOKEN", "")
+HASHNODE_PUBLICATION_ID = os.getenv("HASHNODE_PUBLICATION_ID", "")
+
+# Medium Configuration
+MEDIUM_INTEGRATION_TOKEN = os.getenv("MEDIUM_INTEGRATION_TOKEN", "")
+
 # Operational Settings
 DRY_RUN = os.getenv("DRY_RUN", "false").lower() in ("true", "1", "yes")
 MAX_DISCOVERIES_PER_RUN = int(os.getenv("MAX_DISCOVERIES_PER_RUN", "6"))
