@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-05T16:42:26.352606+00:00",
+  "last_run_timestamp": "2026-09-05T16:45:22.743577+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -350,6 +350,42 @@
       "title": "Built a todo app in under 5 minutes:\nyoutube.com/watch?v=2ZKR...\n\nPlayground: ol...",
       "url": "https://bsky.app/profile/eissapk.bsky.social/post/3mtltnynft22a",
       "inspected_at": "2026-09-05T16:40:39.558684+00:00"
+    },
+    "reddit_1w85m8s": {
+      "platform": "reddit",
+      "title": "I created an open source API to get statistics from codewars to display on GitHub README",
+      "url": "https://reddit.com/r/SideProject/comments/1w85m8s/i_created_an_open_source_api_to_get_statistics/",
+      "inspected_at": "2026-09-05T16:45:01.033428+00:00"
+    },
+    "reddit_1w85j9l": {
+      "platform": "reddit",
+      "title": "for the plot",
+      "url": "https://reddit.com/r/roastmystartup/comments/1w85j9l/for_the_plot/",
+      "inspected_at": "2026-09-05T16:45:02.424217+00:00"
+    },
+    "reddit_1w85im0": {
+      "platform": "reddit",
+      "title": "I built a website focused on bringing awareness to hearing loss and helping deaf people train their word interpretation",
+      "url": "https://reddit.com/r/roastmystartup/comments/1w85im0/i_built_a_website_focused_on_bringing_awareness/",
+      "inspected_at": "2026-09-05T16:45:04.110188+00:00"
+    },
+    "bsky_bafyreibafw6": {
+      "platform": "bluesky",
+      "title": "I accidentally built the fastest todo app I’ve ever used.\n\nIt started out as a b...",
+      "url": "https://bsky.app/profile/codestirring.bsky.social/post/3mtjlghtj2e2t",
+      "inspected_at": "2026-09-05T16:45:09.339867+00:00"
+    },
+    "bsky_bafyreifni2y": {
+      "platform": "bluesky",
+      "title": "We kept failing at todo lists — not from lack of discipline, but because every d...",
+      "url": "https://bsky.app/profile/minigoal.bsky.social/post/3msupvalpb22r",
+      "inspected_at": "2026-09-05T16:45:11.514937+00:00"
+    },
+    "devto_4582856": {
+      "platform": "devto",
+      "title": "ToolVerve: 64+ Free, Private Browser Tools Built in the Spirit of Digital Generosity",
+      "url": "https://dev.to/muhammad_abdullahsattar_/toolverve-64-free-private-browser-tools-built-in-the-spirit-of-digital-generosity-3lbi",
+      "inspected_at": "2026-09-05T16:45:14.726938+00:00"
     }
   },
   "pending_drafts": {
@@ -391,18 +427,6 @@
       "created_at": "2026-09-05T16:35:48.484515+00:00",
       "status": "pending"
     },
-    "draft_38c4c4ae": {
-      "thread_id": "bsky_bafyreicurrf",
-      "platform": "bluesky",
-      "thread_title": "whoa! you built a custom todo app that maps to your own mental processes to mana...",
-      "thread_url": "https://bsky.app/profile/whatthefuck.computer/post/3mukr6zpq6k2s",
-      "relevance_score": 85,
-      "reasoning": "The user is expressing enthusiasm for a custom, personalized productivity workflow mapped to their mental processes, opening the door to discuss alternative task and workflow management tools.",
-      "draft_text": "That workflow sounds fascinating—orchestrating agent teams locally on a Mac Mini while needing a system that actually maps to how your brain works is the ultimate productivity puzzle.\n\nIt actually mirrors why I built ROCIs Tasks. I got so frustrated with bloated corporate apps and rigid monthly subscriptions that I coded my own offline-first workspace using Flutter and Hive. It features a natural language parser so you can just type out thoughts like 'Review agent logs tomorrow at 3pm #urgent @dev' without messing around with dropdowns, plus deep AMOLED dark mode and instant local performance.\n\nIf you ever want to check out a fast, no-nonsense web and Android workspace that stays out of your way, you can try it here: https://tasks.rocisapps.com or grab the Android app on Google Play: https://play.google.com/store/apps/details?id=com.rocisapps.tasks.",
-      "telegram_message_id": 18,
-      "created_at": "2026-09-05T16:35:48.484515+00:00",
-      "status": "pending"
-    },
     "draft_6494d625": {
       "thread_id": "bsky_bafyreicurrf",
       "platform": "bluesky",
@@ -414,6 +438,50 @@
       "telegram_message_id": 20,
       "created_at": "2026-09-05T16:40:29.970814+00:00",
       "status": "pending"
+    },
+    "draft_af0113eb": {
+      "thread_id": "bsky_bafyreibafw6",
+      "platform": "bluesky",
+      "thread_title": "I accidentally built the fastest todo app I’ve ever used.\n\nIt started out as a b...",
+      "thread_url": "https://bsky.app/profile/codestirring.bsky.social/post/3mtjlghtj2e2t",
+      "relevance_score": 85,
+      "reasoning": "The user built a fast, micro-interaction-focused personal task/bookmark tool and is sharing it. While they aren't explicitly asking for recommendations, indie developers sharing productivity tools are prime candidates for genuine peer discussion about speed, local-first performance, and minimalist workflows.",
+      "draft_text": "There is honestly nothing quite like that accidental feeling when a side project suddenly turns into the exact tool you reach for every single day. Speed and snappy interactions completely change how a productivity app feels.\n\nThat obsession with speed is actually why I built ROCIs Tasks. I got tired of bloated corporate apps with slow sync loops, so I built an offline-first Flutter & Hive workspace that loads instantly, complete with natural language parsing (type 'meeting tomorrow at 3pm #work') and native Android widgets. \n\nIf you ever check out the Android side of things or want to compare notes on local-first speed, you can check it out here: https://play.google.com/store/apps/details?id=com.rocisapps.tasks or on the web at https://tasks.rocisapps.com. Love seeing fellow devs scratch their own itch!",
+      "telegram_message_id": 22,
+      "created_at": "2026-09-05T16:45:11.514918+00:00",
+      "status": "pending"
+    },
+    "draft_2c6ad630": {
+      "thread_id": "bsky_bafyreifni2y",
+      "platform": "bluesky",
+      "thread_title": "We kept failing at todo lists — not from lack of discipline, but because every d...",
+      "thread_url": "https://bsky.app/profile/minigoal.bsky.social/post/3msupvalpb22r",
+      "relevance_score": 85,
+      "reasoning": "The user is discussing the psychological friction of traditional to-do lists treating every day with the same energy level and proposing a solution. This opens the door for task management discussions, though their solution points to an Apple ecosystem app (Apple Watch), presenting an opportunity to address the underlying philosophy of adaptive/flexible planning from an Android perspective.",
+      "draft_text": "Spot on. Treating high-energy days and low-energy recovery days the exact same way is a recipe for chronic burnout and task avoidance. To-do apps usually act like rigid task wardens instead of flexible workspaces.\n\nThat exact frustration is why I built ROCIs Tasks as an independent solo developer. It's an offline-first Flutter app designed with speed and flexibility in mind—allowing you to quickly brain-dump via natural language parsing ('Submit report tomorrow at 5pm #urgent @work') so you aren't wasting mental energy fighting dropdown menus when you're already low on fuel.\n\nIf you're on Android or want a clean web workspace to manage your tasks alongside your calendar without bloated corporate features or predatory subscriptions, you can check it out here:\nPlay Store: https://play.google.com/store/apps/details?id=com.rocisapps.tasks\nWeb: https://tasks.rocisapps.com",
+      "telegram_message_id": 23,
+      "created_at": "2026-09-05T16:45:14.726919+00:00",
+      "status": "pending"
+    },
+    "devlog_devlog_0_2_2_60_2026_07_17_190f9f3082": {
+      "id": "devlog_devlog_0_2_2_60_2026_07_17_190f9f3082",
+      "type": "devlog",
+      "milestone_title": "[0.2.2+60] - 2026-07-17",
+      "milestone_date": "2026-07-17",
+      "milestone_slug": "devlog_0_2_2_60_2026_07_17_190f9f3082",
+      "devto_title": "Why My Flutter App Was Spamming Google Sign-In Prompts (And How I Fixed It)",
+      "devto_body": "As an indie developer building an offline-first task and calendar app (ROCIs Tasks) using Flutter with native Android Kotlin widgets, nothing gives you sudden micro-heart attacks quite like user bug reports about authentication loops. \n\nRecently, I hit a nasty regression: users were getting hammered with multiple Google sign-in prompts. Tap the Google Tasks sync toggle? Prompt. Tap 'Create Task'? Another prompt. It felt less like a productivity app and more like an aggressive security guard.\n\nHere is the breakdown of why this happened and how I fixed it.\n\n### The Mystery: Death by a Thousand Prompts\n\nUsers trying to sync their tasks were seeing back-to-back sign-in overlays. Even worse, generic email/password users were occasionally getting swept into the credential flow. That is a textbook way to tank your app's retention on Google Play.\n\n### Root Cause Analysis\n\nDigging into the codebase revealed three distinct culprits conspiring against my users:\n\n1. **Decoupled Auth in Google Sign-In v7:** Authentication (ID token) and Authorization (Access token/scopes) are now separate steps. My code was calling `attemptLightweightAuthentication()` inside `getGoogleAccessToken()` whenever the cache missed. On Android, this doesn't always fail silently—it can trigger a Credential Manager overlay chooser.\n2. **The Amnesiac In-Memory Session:** The authenticated `GoogleSignInAccount` object was never stored in memory. Every single token request started completely from scratch.\n3. **Redundant Scopes:** My mobile build was requesting the Google Calendar scope (`https://www.googleapis.com/auth/calendar`). But on mobile, ROCIs Tasks uses `device_calendar` for native OS calendar integration. Asking for the web calendar scope via Google Sign-In triggered redundant, scary permission consent prompts.\n\n### The Solution & Architecture\n\nTo clean this up, I refactored the `AuthService` with a strict caching and platform-aware scope strategy.\n\nFirst, I introduced an in-memory session cache and hooked into the authentication event stream on startup:\n\n```dart\nclass AuthService {\n  GoogleSignInAccount? _googleUser;\n\n  Future<void> initialize() async {\n    _googleSignIn.authenticationEvents.listen((event) {\n      if (event is GoogleSignInAccountEvent) {\n        _googleUser = event.user;\n      }\n    });\n    await _restoreGoogleSignInSession();\n  }\n\n  // Smart startup restoration - only for users who actually linked Google Tasks\n  Future<void> _restoreGoogleSignInSession() async {\n    if (_userHasLinkedGoogleTasks) {\n      _googleUser = await _googleSignIn.attemptLightweightAuthentication();\n    }\n  }\n}\n```\n\nNext, I split the requested scopes by platform. Web needs the Calendar API; mobile handles it natively via the OS device calendar:\n\n```dart\nList<String> getScopesForPlatform() {\n  if (kIsWeb) {\n    return [\n      'email',\n      'profile',\n      'https://www.googleapis.com/auth/tasks',\n      'https://www.googleapis.com/auth/calendar',\n    ];\n  } else {\n    // Mobile uses device_calendar for native OS integration\n    return [\n      'email',\n      'profile',\n      'https://www.googleapis.com/auth/tasks',\n    ];\n  }\n}\n```\n\nFinally, I unified SharedPreferences token caching across platforms so that access tokens survive app restarts without forcing unnecessary network calls.\n\n### Key Lessons for Other Devs\n\n* **Never assume silent auth is silent:** Modern Android credential managers can surface UI when you least expect it. Cache your user state locally.\n* **Audit your OAuth scopes:** Don't request web-only API scopes on mobile if your app handles things natively via platform channels.\n* **Respect your users' intent:** Generic email/password accounts should never touch Google OAuth logic on startup.\n\n### Wrapping Up\n\nBuilding ROCIs Tasks as a solo indie dev means obsessing over details like smooth auth flows so the app feels as native and polished as possible. If you want to check out an offline-first task manager with native Kotlin widgets built in Flutter, take a look at [ROCIs Tasks on Google Play](https://play.google.com/store/apps/details?id=com.rocisapps.tasks) or visit [tasks.rocisapps.com](https://tasks.rocisapps.com). Happy coding!",
+      "tags": [
+        "flutter",
+        "android",
+        "indiedev",
+        "programming"
+      ],
+      "x_text": "Ever had your Flutter app spam users with Google Sign-In prompts? 😅 Fixed a nasty multi-prompt regression in ROCIs Tasks by fixing in-memory session caching, splitting mobile/web OAuth scopes, and stopping silent auth from triggering UI. Details: https://tasks.rocisapps.com",
+      "bsky_text": "Debugging Auth loops in Flutter: Why Google Sign-In v7 was triggering multiple Credential Manager overlays on Android, and how I fixed it with proper in-memory session caching and platform-specific OAuth scopes in ROCIs Tasks. 🛠️✨ https://tasks.rocisapps.com",
+      "created_at": "2026-09-05T16:45:20.561415+00:00",
+      "status": "pending",
+      "telegram_message_id": 24
     }
   },
   "posted_threads": {
