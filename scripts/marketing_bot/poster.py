@@ -324,3 +324,69 @@ class Poster:
             self.telegram.send_message(status_text)
 
         return True
+
+    def execute_reddit_post(self, draft: Dict[str, Any]) -> bool:
+        """
+        Submits an approved top-level Reddit showcase or feedback request.
+        """
+        draft_id = draft["id"]
+        subreddit = draft["subreddit"]
+        title = draft["title"]
+        body = draft["body"]
+        msg_id = draft.get("telegram_message_id")
+
+        post_url = None
+
+        # 1. Try Playwright
+        if self.playwright_poster.is_available():
+            logger.info(f"Submitting Reddit post to r/{subreddit} via Playwright...")
+            post_url = self.playwright_poster.submit_post(subreddit, title, body)
+
+        # 2. Fallback to PRAW API
+        if not post_url:
+            reddit_client = self._get_reddit_client()
+            if reddit_client:
+                try:
+                    logger.info(f"Submitting Reddit post to r/{subreddit} via PRAW API...")
+                    sub = reddit_client.subreddit(subreddit)
+                    submission = sub.submit(title=title, selftext=body)
+                    post_url = f"https://reddit.com{submission.permalink}"
+                except Exception as e:
+                    logger.error(f"Failed to submit post to r/{subreddit} via PRAW: {e}")
+
+        # 3. If both automated methods fail or unconfigured, send 1-tap clipboard drop
+        if not post_url:
+            submit_direct_link = f"https://www.reddit.com/r/{subreddit}/submit"
+            drop_card = (
+                f"📋 <b>Reddit 1-Tap Submission Ready (r/{subreddit})</b>\n\n"
+                f"📌 <b>Title:</b>\n<code>{title}</code>\n\n"
+                f"📝 <b>Body:</b>\n<code>{body}</code>\n\n"
+                f"👉 <a href=\"{submit_direct_link}\">Open r/{subreddit} Submit Page</a>"
+            )
+            self.telegram.send_message(drop_card)
+            self.state_manager.mark_draft_status(draft_id, "approved")
+            return True
+
+        # 4. Success handling
+        self.state_manager.record_posted_thread(f"reddit_post_{draft_id}", {
+            "platform": "reddit",
+            "thread_url": post_url,
+            "posted_text": body,
+            "thread_title": title,
+            "subreddit": subreddit,
+            "method": "auto"
+        })
+        self.state_manager.mark_draft_status(draft_id, "approved")
+
+        status_text = (
+            f"🎉 <b>Top-Level Reddit Post Published to r/{subreddit}!</b>\n\n"
+            f"📌 <b>Title:</b> <a href=\"{post_url}\">{title}</a>\n"
+            f"<i>Now monitoring thread for community comments & feedback...</i>"
+        )
+        if msg_id:
+            self.telegram.edit_message_text(msg_id, status_text)
+        else:
+            self.telegram.send_message(status_text)
+
+        return True
+

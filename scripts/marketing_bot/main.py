@@ -15,7 +15,8 @@ from .config import (
     ORGANIC_POST_MIN_INTERVAL_HOURS,
     X_MAX_MONTHLY_POSTS,
     X_MAX_DAILY_POSTS,
-    GEMINI_MAX_CALLS_PER_RUN
+    GEMINI_MAX_CALLS_PER_RUN,
+    TARGET_SUBREDDITS
 )
 from .state_manager import StateManager
 from .gemini_engine import GeminiEngine
@@ -25,6 +26,7 @@ from .discovery import DiscoveryEngine
 from .poster import Poster
 from .feedback_monitor import FeedbackMonitor
 from .devlog_engine import DevlogEngine
+from .reddit_post_generator import RedditPostGenerator
 
 logging.basicConfig(
     level=logging.INFO,
@@ -100,10 +102,12 @@ def run_pipeline(dry_run: bool = False):
                 telegram.answer_callback_query(callback_id, f"Already {draft.get('status')}.")
                 continue
 
-            is_devlog = draft.get("type") == "devlog"
+            draft_type = draft.get("type")
+            is_devlog = draft_type == "devlog"
+            is_reddit_post = draft_type == "reddit_post"
 
             if action == "approve":
-                logger.info(f"Draft {draft_id} (devlog={is_devlog}) APPROVED by user.")
+                logger.info(f"Draft {draft_id} (type={draft_type}) APPROVED by user.")
                 state_mgr.mark_draft_status(draft_id, "approved")
                 telegram.answer_callback_query(callback_id, "Approved! Processing...")
                 if is_devlog:
@@ -116,6 +120,16 @@ def run_pipeline(dry_run: bool = False):
                         poster.execute_devlog(draft)
                     else:
                         logger.info(f"[DRY RUN] Would execute devlog publish for {draft_id}")
+                elif is_reddit_post:
+                    if msg_id:
+                        telegram.edit_message_text(
+                            msg_id,
+                            f"⏳ <b>Submitting post to r/{draft.get('subreddit')}...</b>\n📌 <i>{draft.get('title')}</i>"
+                        )
+                    if not dry_run:
+                        poster.execute_reddit_post(draft)
+                    else:
+                        logger.info(f"[DRY RUN] Would submit Reddit post for {draft_id}")
                 else:
                     if msg_id:
                         telegram.edit_message_text(
@@ -132,7 +146,12 @@ def run_pipeline(dry_run: bool = False):
                 state_mgr.mark_draft_status(draft_id, "rejected")
                 telegram.answer_callback_query(callback_id, "Skipped.")
                 if msg_id:
-                    skip_title = draft.get('devto_title') if is_devlog else draft.get('thread_title', '')
+                    if is_devlog:
+                        skip_title = draft.get('devto_title', '')
+                    elif is_reddit_post:
+                        skip_title = f"r/{draft.get('subreddit')}: {draft.get('title', '')}"
+                    else:
+                        skip_title = draft.get('thread_title', '')
                     telegram.edit_message_text(
                         msg_id,
                         f"❌ <b>Skipped</b>\n📌 <i>{skip_title}</i>"
@@ -266,6 +285,42 @@ def run_pipeline(dry_run: bool = False):
                         state_mgr.add_pending_draft(pkg["id"], pkg)
         else:
             logger.info("All SUMMARY.md milestones have already been published or queued.")
+
+    # =========================================================================
+    # Step 3b: Check and Queue Reddit Showcase Draft (r/SideProject, r/FlutterDev, etc.)
+    # =========================================================================
+    logger.info("Checking backlog for candidate Reddit showcase posts...")
+    has_pending_reddit_post = any(
+        d.get("type") == "reddit_post" and d.get("status") == "pending"
+        for d in state_mgr.data.get("pending_drafts", {}).values()
+    )
+
+    if has_pending_reddit_post:
+        logger.info("A Reddit post draft is already pending user approval. Skipping generation.")
+    elif gemini.is_available():
+        reddit_gen = RedditPostGenerator(gemini)
+        # Select target subreddit with least recent activity
+        target_sub = TARGET_SUBREDDITS[0]  # Defaults to SideProject
+        logger.info(f"Generating authentic Reddit showcase draft for r/{target_sub}...")
+        r_draft = reddit_gen.generate_showcase_post(subreddit=target_sub)
+        if r_draft:
+            if not dry_run and telegram.is_configured():
+                msg_id = telegram.send_reddit_post_approval_card(
+                    draft_id=r_draft["id"],
+                    subreddit=r_draft["subreddit"],
+                    title=r_draft["title"],
+                    body_preview=r_draft["body"],
+                    topic=r_draft["topic"]
+                )
+                r_draft["telegram_message_id"] = msg_id
+                state_mgr.add_pending_draft(r_draft["id"], r_draft)
+                state_mgr.save()
+                dispatched_count += 1
+                logger.info(f"Reddit showcase approval card sent to Telegram (msg_id={msg_id})")
+            else:
+                logger.info(f"[DRY RUN / NO TELEGRAM] Generated Reddit showcase: {r_draft['title']}")
+                if dry_run:
+                    state_mgr.add_pending_draft(r_draft["id"], r_draft)
 
     # =========================================================================
     # Step 4: Monitor Posted Threads for Replies & Feedback

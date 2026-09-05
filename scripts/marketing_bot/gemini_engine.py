@@ -159,14 +159,14 @@ Thread Content:
 {thread_body[:1500]}
 
 OBJECTIVES:
-1. Determine if this user is genuinely seeking recommendations, solutions, or discussions related to to-do apps, task managers, Android widgets, offline organization, or calendar apps.
-2. Score relevance from 0 to 100.
-3. If relevance >= 70, draft an authentic, empathetic, human-sounding reply.
-   - Tone: Humble indie developer sharing what they built, or a fellow power user offering a genuine recommendation.
-   - STRICT BAN: NO corporate buzzwords, NO fake hyperbole ("the absolute revolutionary app"), NO generic bot replies.
-   - Directly answer their exact questions or frustrations first.
-   - Mention ROCIs Tasks naturally as a relevant option, highlighting the exact feature that addresses their pain point (e.g. true offline sync, natural language typing, or Android home screen widgets).
-   - Provide the Google Play link: {APP_INFO['play_store_url']} and web link {APP_INFO['web_url']}.
+1. STRICT ANTI-PIGGYBACKING CHECK:
+   - If the author is showcasing or promoting THEIR OWN app, game, or tool, DO NOT self-promote ROCIs Tasks! In this case, mark relevance_score < 70 or only write a genuine, supportive 1-2 sentence compliment/peer feedback without mentioning or linking ROCIs Tasks.
+   - ONLY award a high relevance score (90+) if the user is EXPLICITLY asking the community: "What task/calendar app do you recommend?", "How do I fix procrastination?", or asking technical questions about Flutter/widgets/local-first data.
+2. If relevance >= 90: Draft a LIGHT, CONCISE, NON-REPETITIVE comment:
+   - Maximum 2 to 4 sentences total.
+   - NO heavy marketing copy, NO long lists of bullet points, NO repetitive templates.
+   - Speak casually as a solo developer who solved that exact problem.
+   - Include a natural mention or link only if truly helpful to their explicit question.
 
 OUTPUT FORMAT:
 Return ONLY valid JSON matching this exact structure:

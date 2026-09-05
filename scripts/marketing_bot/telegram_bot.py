@@ -183,6 +183,45 @@ class TelegramBot:
             return msg.get("message_id")
         return None
 
+    def send_reddit_post_approval_card(
+        self,
+        draft_id: str,
+        subreddit: str,
+        title: str,
+        body_preview: str,
+        topic: str
+    ) -> Optional[int]:
+        """
+        Sends an approval card for an authentic top-level Reddit submission:
+        [✅ Approve & Post to r/{sub}] | [❌ Skip]
+        """
+        safe_title = title.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+        safe_preview = body_preview[:380].replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+        safe_topic = topic.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+        text = (
+            f"🚀 <b>New Reddit Showcase Draft (r/{subreddit})</b>\n\n"
+            f"📌 <b>Title:</b> {safe_title}\n"
+            f"🏷️ <b>Topic:</b> #{safe_topic}\n\n"
+            f"📝 <b>Body Preview:</b>\n"
+            f"<blockquote>{safe_preview}...</blockquote>\n\n"
+            f"<i>Tap below to approve posting or skip:</i>"
+        )
+
+        reply_markup = {
+            "inline_keyboard": [
+                [
+                    {"text": f"✅ Approve & Post to r/{subreddit}", "callback_data": f"approve:{draft_id}"},
+                    {"text": "❌ Skip", "callback_data": f"reject:{draft_id}"}
+                ]
+            ]
+        }
+
+        msg = self.send_message(text, reply_markup=reply_markup)
+        if msg:
+            return msg.get("message_id")
+        return None
+
     def send_feedback_alert(
         self,
         category: str,
