@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-05T16:33:09.160580+00:00",
+  "last_run_timestamp": "2026-09-05T16:35:56.416625+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -314,6 +314,42 @@
       "title": "Indie games lovers assemble: let's showcase our most awaited human-made titles f...",
       "url": "https://bsky.app/profile/fromthevoid.net/post/3mujm5aysjs2v",
       "inspected_at": "2026-09-05T16:33:03.300512+00:00"
+    },
+    "reddit_1w85f8l": {
+      "platform": "reddit",
+      "title": "I built DitherEYE—a 100% free, offline Android tool for processing retro dither effects and textures for images & videos (No Subscriptions)",
+      "url": "https://reddit.com/r/SideProject/comments/1w85f8l/i_built_dithereyea_100_free_offline_android_tool/",
+      "inspected_at": "2026-09-05T16:35:39.623419+00:00"
+    },
+    "reddit_1w85gf6": {
+      "platform": "reddit",
+      "title": "How I architected an enterprise fitness platform using Flutter BLoC, .NET 10 Minimal APIs, and PostgreSQL",
+      "url": "https://reddit.com/r/FlutterDev/comments/1w85gf6/how_i_architected_an_enterprise_fitness_platform/",
+      "inspected_at": "2026-09-05T16:35:41.406498+00:00"
+    },
+    "bsky_bafyreidu6vk": {
+      "platform": "bluesky",
+      "title": "Demos played:\n\nBloodstone Rising\nstore.steampowered.com/app/3338020/...\n--\nUltim...",
+      "url": "https://bsky.app/profile/charmaemengming.bsky.social/post/3muiitfrgi22v",
+      "inspected_at": "2026-09-05T16:35:45.627673+00:00"
+    },
+    "bsky_bafyreicurrf": {
+      "platform": "bluesky",
+      "title": "whoa! you built a custom todo app that maps to your own mental processes to mana...",
+      "url": "https://bsky.app/profile/whatthefuck.computer/post/3mukr6zpq6k2s",
+      "inspected_at": "2026-09-05T16:35:46.423240+00:00"
+    },
+    "bsky_bafyreihaww2": {
+      "platform": "bluesky",
+      "title": "Esta app tiene todo lo que necesitas en tu Mac gratis y open source:\n\n- Dock Pre...",
+      "url": "https://bsky.app/profile/ikenshu.bsky.social/post/3mudseqmyxv25",
+      "inspected_at": "2026-09-05T16:35:48.484533+00:00"
+    },
+    "bsky_bafyreigyjty": {
+      "platform": "bluesky",
+      "title": "Built a todo app in under 5 minutes:\nyoutube.com/watch?v=2ZKR...\n\nPlayground: ol...",
+      "url": "https://bsky.app/profile/eissapk.bsky.social/post/3mtltnynft22a",
+      "inspected_at": "2026-09-05T16:35:49.299615+00:00"
     }
   },
   "pending_drafts": {
@@ -340,6 +376,19 @@
       "draft_text": "Hey! First off, massive props for building your own tool to tackle procrastination—that's literally why I started building my own app too. As a fellow solo developer who got fed up with bloated corporate apps and crazy monthly subscriptions, I totally get the struggle of trying to find or build something that's actually fast and frictionless.\n\nSince you built Strive to be lightweight, you might appreciate how I tackled a similar problem with ROCIs Tasks. I built it using Flutter and local-first storage (Hive) so it opens instantly with zero lag, alongside a natural language parser so you can just type 'Finish assignment tomorrow at 3pm #school' without messing with endless dropdown menus. It also has a true AMOLED pitch-black mode if you're burning the midnight oil studying.\n\nIf you want to check it out for some indie design inspiration or just see how another solo dev handled local-first data, you can check it out on the web at https://tasks.rocisapps.com or grab it on Google Play at https://play.google.com/store/apps/details?id=com.rocisapps.tasks.\n\nWould love to hear how you handled state management or offline sync in Strive—keep up the great work!",
       "telegram_message_id": 14,
       "created_at": "2026-09-05T16:33:03.300495+00:00",
+      "status": "approved",
+      "updated_at": "2026-09-05T16:35:14.456502+00:00"
+    },
+    "draft_38c4c4ae": {
+      "thread_id": "bsky_bafyreicurrf",
+      "platform": "bluesky",
+      "thread_title": "whoa! you built a custom todo app that maps to your own mental processes to mana...",
+      "thread_url": "https://bsky.app/profile/whatthefuck.computer/post/3mukr6zpq6k2s",
+      "relevance_score": 85,
+      "reasoning": "The user is expressing enthusiasm for a custom, personalized productivity workflow mapped to their mental processes, opening the door to discuss alternative task and workflow management tools.",
+      "draft_text": "That workflow sounds fascinating—orchestrating agent teams locally on a Mac Mini while needing a system that actually maps to how your brain works is the ultimate productivity puzzle.\n\nIt actually mirrors why I built ROCIs Tasks. I got so frustrated with bloated corporate apps and rigid monthly subscriptions that I coded my own offline-first workspace using Flutter and Hive. It features a natural language parser so you can just type out thoughts like 'Review agent logs tomorrow at 3pm #urgent @dev' without messing around with dropdowns, plus deep AMOLED dark mode and instant local performance.\n\nIf you ever want to check out a fast, no-nonsense web and Android workspace that stays out of your way, you can try it here: https://tasks.rocisapps.com or grab the Android app on Google Play: https://play.google.com/store/apps/details?id=com.rocisapps.tasks.",
+      "telegram_message_id": 18,
+      "created_at": "2026-09-05T16:35:48.484515+00:00",
       "status": "pending"
     }
   },
@@ -351,6 +400,15 @@
       "thread_title": "I got tired of keeping track of random deadlines, so I built this",
       "method": "manual_drop",
       "posted_at": "2026-09-05T15:59:01.176367+00:00",
+      "tracked_comments": []
+    },
+    "reddit_1w85902": {
+      "platform": "reddit",
+      "thread_url": "https://reddit.com/r/roastmystartup/comments/1w85902/i_built_strive_a_lightweight_task_focus_app_for/",
+      "posted_text": "Hey! First off, massive props for building your own tool to tackle procrastination—that's literally why I started building my own app too. As a fellow solo developer who got fed up with bloated corporate apps and crazy monthly subscriptions, I totally get the struggle of trying to find or build something that's actually fast and frictionless.\n\nSince you built Strive to be lightweight, you might appreciate how I tackled a similar problem with ROCIs Tasks. I built it using Flutter and local-first storage (Hive) so it opens instantly with zero lag, alongside a natural language parser so you can just type 'Finish assignment tomorrow at 3pm #school' without messing with endless dropdown menus. It also has a true AMOLED pitch-black mode if you're burning the midnight oil studying.\n\nIf you want to check it out for some indie design inspiration or just see how another solo dev handled local-first data, you can check it out on the web at https://tasks.rocisapps.com or grab it on Google Play at https://play.google.com/store/apps/details?id=com.rocisapps.tasks.\n\nWould love to hear how you handled state management or offline sync in Strive—keep up the great work!",
+      "thread_title": "I built Strive — a lightweight task & focus app for students to fix my own procrastination (Looking for feedback!)",
+      "method": "manual_drop",
+      "posted_at": "2026-09-05T16:35:20.208277+00:00",
       "tracked_comments": []
     }
   },
