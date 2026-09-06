@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-06T03:08:29.267952+00:00",
+  "last_run_timestamp": "2026-09-06T09:32:00.752262+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -758,6 +758,42 @@
       "title": "roast Argue - i made an app blocker where an AI decides if ur excuse is good enough",
       "url": "https://reddit.com/r/roastmystartup/comments/1w8e4uc/roast_argue_i_made_an_app_blocker_where_an_ai/",
       "inspected_at": "2026-09-06T03:08:06.731181+00:00"
+    },
+    "reddit_1w8rhiv": {
+      "platform": "reddit",
+      "title": "Roast my pricing: I'm selling countries on a world map as ad slots and nobody has bought one",
+      "url": "https://reddit.com/r/SideProject/comments/1w8rhiv/roast_my_pricing_im_selling_countries_on_a_world/",
+      "inspected_at": "2026-09-06T09:30:35.096036+00:00"
+    },
+    "reddit_1w8r70q": {
+      "platform": "reddit",
+      "title": "Music and Radio Player with ready to play radios and complete music offline management",
+      "url": "https://reddit.com/r/SideProject/comments/1w8r70q/music_and_radio_player_with_ready_to_play_radios/",
+      "inspected_at": "2026-09-06T09:30:53.725042+00:00"
+    },
+    "reddit_1w8r0tw": {
+      "platform": "reddit",
+      "title": "If you use more than one AI assistant, how do you find something you wrote months ago?",
+      "url": "https://reddit.com/r/SideProject/comments/1w8r0tw/if_you_use_more_than_one_ai_assistant_how_do_you/",
+      "inspected_at": "2026-09-06T09:31:26.227793+00:00"
+    },
+    "reddit_1w8r28e": {
+      "platform": "reddit",
+      "title": "Home inventory app: what would make the export good enough for a claim?",
+      "url": "https://reddit.com/r/indiehackers/comments/1w8r28e/home_inventory_app_what_would_make_the_export/",
+      "inspected_at": "2026-09-06T09:31:26.841508+00:00"
+    },
+    "reddit_1w8d3oe": {
+      "platform": "reddit",
+      "title": "TrueTrack – Co-parenting expense & custody tracker for iOS. Roast the product and business model.",
+      "url": "https://reddit.com/r/roastmystartup/comments/1w8d3oe/truetrack_coparenting_expense_custody_tracker_for/",
+      "inspected_at": "2026-09-06T09:31:27.614882+00:00"
+    },
+    "reddit_1w8rahm": {
+      "platform": "reddit",
+      "title": "Using Google Sheets as my backend — trying to figure out if short-interval polling is worth the battery hit",
+      "url": "https://reddit.com/r/FlutterDev/comments/1w8rahm/using_google_sheets_as_my_backend_trying_to/",
+      "inspected_at": "2026-09-06T09:31:44.123082+00:00"
     }
   },
   "pending_drafts": {
