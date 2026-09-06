@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-06T14:59:49.303211+00:00",
+  "last_run_timestamp": "2026-09-06T20:03:10.090758+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -866,6 +866,42 @@
       "title": "Shipping my first MVP at 13 — the hardest part was keeping it simple.",
       "url": "https://reddit.com/r/FlutterDev/comments/1w8v6ln/shipping_my_first_mvp_at_13_the_hardest_part_was/",
       "inspected_at": "2026-09-06T14:59:41.225964+00:00"
+    },
+    "reddit_1w96csb": {
+      "platform": "reddit",
+      "title": "I built a dashboard for monitoring Claude Code, Codex and OpenClaw. Here’s how it works in 56 seconds.",
+      "url": "https://reddit.com/r/SideProject/comments/1w96csb/i_built_a_dashboard_for_monitoring_claude_code/",
+      "inspected_at": "2026-09-06T20:02:54.471554+00:00"
+    },
+    "reddit_1w96blm": {
+      "platform": "reddit",
+      "title": "Finished your book? This turns it into a printed one.",
+      "url": "https://reddit.com/r/SideProject/comments/1w96blm/finished_your_book_this_turns_it_into_a_printed/",
+      "inspected_at": "2026-09-06T20:02:56.970034+00:00"
+    },
+    "reddit_1w96446": {
+      "platform": "reddit",
+      "title": "I know there are already a ton of TV trackers, I built one anyway",
+      "url": "https://reddit.com/r/SideProject/comments/1w96446/i_know_there_are_already_a_ton_of_tv_trackers_i/",
+      "inspected_at": "2026-09-06T20:02:57.806780+00:00"
+    },
+    "reddit_1w92tk1": {
+      "platform": "reddit",
+      "title": "The option pool diluted us before the check hit the bank",
+      "url": "https://reddit.com/r/indiehackers/comments/1w92tk1/the_option_pool_diluted_us_before_the_check_hit/",
+      "inspected_at": "2026-09-06T20:02:58.556875+00:00"
+    },
+    "reddit_1w93roz": {
+      "platform": "reddit",
+      "title": "Roast this: a conv AI builder simple enough that you don't need consultants",
+      "url": "https://reddit.com/r/roastmystartup/comments/1w93roz/roast_this_a_conv_ai_builder_simple_enough_that/",
+      "inspected_at": "2026-09-06T20:02:59.281399+00:00"
+    },
+    "reddit_1w92z3g": {
+      "platform": "reddit",
+      "title": "I shipped my Flutter app: nine daily football puzzles in one app",
+      "url": "https://reddit.com/r/roastmystartup/comments/1w92z3g/i_shipped_my_flutter_app_nine_daily_football/",
+      "inspected_at": "2026-09-06T20:03:00.100206+00:00"
     }
   },
   "pending_drafts": {
@@ -1202,7 +1238,7 @@
     }
   },
   "recorded_feedback": [],
-  "last_organic_post_timestamp": "2026-09-06T03:08:28.795284+00:00",
+  "last_organic_post_timestamp": "2026-09-06T20:03:09.725105+00:00",
   "organic_posts": [
     {
       "text": "you either die a young enthusiastic builder or live long enough to realize that 90% of tech problems are solved by restarting the router.",
@@ -1220,6 +1256,14 @@
         "Bluesky"
       ],
       "posted_at": "2026-09-06T03:08:28.795284+00:00"
+    },
+    {
+      "text": "i have 64 browser tabs open and 43 of them are stackoverflow answers for a bug i fixed three days ago. i cannot close them because what if.",
+      "topic": "gaming_and_steam_deck",
+      "platforms": [
+        "Bluesky"
+      ],
+      "posted_at": "2026-09-06T20:03:09.725105+00:00"
     }
   ],
   "x_posts_timestamps": [
