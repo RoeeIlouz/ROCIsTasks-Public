@@ -2,6 +2,49 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## Telegram Bot Interactive On-Demand Drafting & RAS (ROCI's AI System) Integration - 2026-09-06
+
+#### Problem & Requirements
+* **Lack of Interactive Inbound Control**:
+  * The marketing automation bot previously ran strictly as an outbound batch runner (every 6 hours) or manual CLI execution.
+  * Users had no way to initiate posts on-demand directly from Telegram chat (e.g. typing `/draft bsky <topic>` or `/draft all <topic>`).
+* **Multi-Platform Approval Gap**:
+  * When posting across multiple platforms (Bluesky, X, Mastodon, Threads, etc.), users required both a master 1-tap `[🚀 Approve All]` option and granular per-platform controls (`[Post Bsky]`, `[Post X]`, `[Post Mastodon]`, `[Post Threads]`), plus regenerate and cancel flows.
+* **Disconnection from RAS Core**:
+  * Marketing copy lacked automatic grounding in live app telemetry, active version, DAU/MAU metrics, and release notes managed by RAS (`ROCIs-AI-System`).
+  * Requirement: connect to RAS at `http://localhost:3000` with graceful offline fallback to local git history and `pubspec.yaml` when RAS is not active.
+
+#### Solutions & Architecture Applied
+1. **RAS Client Bridge (`ras_client.py`)**:
+   * Connects to RAS API at `http://localhost:3000` with snappy timeouts (`2.0s`).
+   * Ingests real-time telemetry from `/api/tasks/telemetry` (DAU, MAU, crash-free rates, sync latency, active releases).
+   * Optional cognitive routing via `/api/gemini/stream` (SSE/text response parsing).
+   * **Graceful Offline Fallback**: When RAS is offline, automatically extracts current app version from `pubspec.yaml` and latest commits from `git log` so social copy remains grounded and authentic without raising errors.
+2. **Interactive Telegram Listener Daemon (`telegram_listener.py`)**:
+   * Continuous long-polling loop with `offset` tracking via `/getUpdates`.
+   * **Slash Commands**:
+     * `/draft <platform> <topic>`: Drafts targeted posts for `bsky`, `x`, `mastodon`, `threads`, `devto`, `hashnode`, or `all`.
+     * `/status`: Displays connection and credential health for all platforms and the RAS bridge.
+     * `/analytics`: Dispatches weekly engagement and cross-platform traction report.
+     * `/launchkit`: Generates Show HN and Product Hunt launch cards with 1-tap copy.
+     * `/ras [query]`: Interacts with RAS intelligence or views live telemetry.
+     * `/help`: Detailed manual and syntax examples.
+   * **Callback Handlers**:
+     * `approve:<draft_id>` / `reject:<draft_id>` / `regen:<draft_id>`.
+     * `approve_all:<group_id>`: Concurrently publishes across all platforms and edits the message to show live confirmation URLs.
+     * `approve_single:<group_id>:<platform>`: Publishes a specific platform from a multi-post broadcast card.
+     * `reject_all:<group_id>`: Cancels the entire broadcast group.
+   * **Security Guard**: Restricts commands and callbacks to authorized user IDs (`TELEGRAM_ALLOWED_USERS` / `TELEGRAM_CHAT_ID`).
+3. **Unified Single-Post Publishing (`poster.py`)**:
+   * Added `publish_single_post(platform, text, title, media_url)` supporting Bluesky, X (with rate-limit safety guards), Mastodon, Threads, Dev.to, and Hashnode.
+4. **Interactive Cards (`telegram_bot.py`)**:
+   * `send_interactive_draft_card`: Formats preview block with `[✅ Approve & Post]`, `[🔄 Regenerate]`, `[❌ Cancel]`.
+   * `send_multi_platform_approval_card`: Formats all platform previews with master `[🚀 Approve & Post All]`, 2-column per-platform action buttons, and `[❌ Cancel All]`.
+5. **Verification**:
+   * Created comprehensive test suite in `scripts/marketing_bot/tests/test_ras_and_listener.py` (17 new test cases).
+   * All 60 test suite unit tests passing (`Ran 60 tests - OK`).
+
+
 ## Google Calendar Subcalendar Custom Coloring & Unified Expandable Color Picker - 2026-09-05
 
 #### Problem & Requirements
