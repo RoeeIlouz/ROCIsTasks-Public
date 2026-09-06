@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-06T09:32:00.752262+00:00",
+  "last_run_timestamp": "2026-09-06T10:20:34.065413+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -794,6 +794,42 @@
       "title": "Using Google Sheets as my backend — trying to figure out if short-interval polling is worth the battery hit",
       "url": "https://reddit.com/r/FlutterDev/comments/1w8rahm/using_google_sheets_as_my_backend_trying_to/",
       "inspected_at": "2026-09-06T09:31:44.123082+00:00"
+    },
+    "reddit_1w8sdjy": {
+      "platform": "reddit",
+      "title": "I had 0 conversions, but 6 weeks later I have 3 paying customers",
+      "url": "https://reddit.com/r/SideProject/comments/1w8sdjy/i_had_0_conversions_but_6_weeks_later_i_have_3/",
+      "inspected_at": "2026-09-06T10:20:20.379164+00:00"
+    },
+    "reddit_1w8salz": {
+      "platform": "reddit",
+      "title": "Built a Mac window manager for people juggling too many projects. Thought fellow builders might find it useful.",
+      "url": "https://reddit.com/r/SideProject/comments/1w8salz/built_a_mac_window_manager_for_people_juggling/",
+      "inspected_at": "2026-09-06T10:20:23.131326+00:00"
+    },
+    "reddit_1w8s7ba": {
+      "platform": "reddit",
+      "title": "Holler & PicKey - Two small iOS apps with no networking code",
+      "url": "https://reddit.com/r/SideProject/comments/1w8s7ba/holler_pickey_two_small_ios_apps_with_no/",
+      "inspected_at": "2026-09-06T10:20:23.879144+00:00"
+    },
+    "reddit_1w8ql4s": {
+      "platform": "reddit",
+      "title": "I built a shake-to-report SDK for Flutter. Testers shake the phone, you get the annotated screenshot, the logs and the device info",
+      "url": "https://reddit.com/r/FlutterDev/comments/1w8ql4s/i_built_a_shaketoreport_sdk_for_flutter_testers/",
+      "inspected_at": "2026-09-06T10:20:24.687850+00:00"
+    },
+    "reddit_1w8o6qs": {
+      "platform": "reddit",
+      "title": "Is mobile app development still a good career choice for a fresh grad in 2026?",
+      "url": "https://reddit.com/r/FlutterDev/comments/1w8o6qs/is_mobile_app_development_still_a_good_career/",
+      "inspected_at": "2026-09-06T10:20:25.450202+00:00"
+    },
+    "reddit_1w8g1m1": {
+      "platform": "reddit",
+      "title": "I reviewed 8 mobile codebases from startups and freelancers. These 8 patterns keep breaking apps in production.",
+      "url": "https://reddit.com/r/FlutterDev/comments/1w8g1m1/i_reviewed_8_mobile_codebases_from_startups_and/",
+      "inspected_at": "2026-09-06T10:20:26.161753+00:00"
     }
   },
   "pending_drafts": {
