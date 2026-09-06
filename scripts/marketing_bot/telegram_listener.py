@@ -453,16 +453,16 @@ class TelegramListener:
         """Continuous long-polling loop."""
         if not self.telegram.has_token():
             logger.error("=" * 60)
-            logger.error("[!] CRITICAL: TELEGRAM_BOT_TOKEN is not configured!")
+            logger.error("❌ CRITICAL: TELEGRAM_BOT_TOKEN is not configured!")
             logger.error("The interactive listener requires a Telegram Bot Token.")
             logger.error("Create or edit 'scripts/marketing_bot/.env' and add:")
             logger.error("  TELEGRAM_BOT_TOKEN=your_token_from_BotFather")
             logger.error("  GEMINI_API_KEY=your_gemini_api_key")
             logger.error("=" * 60)
             print("\n" + "=" * 60)
-            print("[!] CRITICAL: TELEGRAM_BOT_TOKEN is not configured in .env!")
+            print("❌ CRITICAL: TELEGRAM_BOT_TOKEN is not configured in .env!")
             print("The bot cannot poll Telegram without a Bot Token.")
-            print("-> Please create 'scripts/marketing_bot/.env' and add:")
+            print("👉 Please create 'scripts/marketing_bot/.env' and add:")
             print("   TELEGRAM_BOT_TOKEN=your_token_from_BotFather")
             print("   GEMINI_API_KEY=your_gemini_api_key")
             print("=" * 60 + "\n")
@@ -470,7 +470,7 @@ class TelegramListener:
 
         self.running = True
         logger.info("=" * 60)
-        logger.info("[*] Telegram Interactive Listener Active!")
+        logger.info("🚀 Telegram Interactive Listener Active!")
         logger.info(f"Target Chat: {TELEGRAM_CHAT_ID or 'ANY (Dynamic routing)'}")
         logger.info(f"RAS Bridge: {self.ras.base_url} ({'ONLINE' if self.ras.is_online() else 'OFFLINE/FALLBACK'})")
         logger.info("Listening for /draft, /status, /analytics, /ras, /help...")
