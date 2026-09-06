@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-06T12:42:18.206724+00:00",
+  "last_run_timestamp": "2026-09-06T14:59:49.303211+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -830,6 +830,42 @@
       "title": "I reviewed 8 mobile codebases from startups and freelancers. These 8 patterns keep breaking apps in production.",
       "url": "https://reddit.com/r/FlutterDev/comments/1w8g1m1/i_reviewed_8_mobile_codebases_from_startups_and/",
       "inspected_at": "2026-09-06T10:20:26.161753+00:00"
+    },
+    "reddit_1w8yej7": {
+      "platform": "reddit",
+      "title": "Edgy: Ambient edge lighting for macOS",
+      "url": "https://reddit.com/r/SideProject/comments/1w8yej7/edgy_ambient_edge_lighting_for_macos/",
+      "inspected_at": "2026-09-06T14:59:35.143666+00:00"
+    },
+    "reddit_1w8yeb7": {
+      "platform": "reddit",
+      "title": "A stranger in Kentucky tried my Mac menu bar app at 3:40 am and bought it 30 minutes later. My first ever sale.",
+      "url": "https://reddit.com/r/SideProject/comments/1w8yeb7/a_stranger_in_kentucky_tried_my_mac_menu_bar_app/",
+      "inspected_at": "2026-09-06T14:59:38.177341+00:00"
+    },
+    "reddit_1w8yci3": {
+      "platform": "reddit",
+      "title": "A Mac app for quickly generating AI prompts",
+      "url": "https://reddit.com/r/SideProject/comments/1w8yci3/a_mac_app_for_quickly_generating_ai_prompts/",
+      "inspected_at": "2026-09-06T14:59:39.010620+00:00"
+    },
+    "reddit_1w8yavv": {
+      "platform": "reddit",
+      "title": "For my first fun little project, I built \"Ok Rich\". Its sole purpose is to make me rich.",
+      "url": "https://reddit.com/r/SideProject/comments/1w8yavv/for_my_first_fun_little_project_i_built_ok_rich/",
+      "inspected_at": "2026-09-06T14:59:39.701039+00:00"
+    },
+    "reddit_1w8y9lj": {
+      "platform": "reddit",
+      "title": "Built an AI Interview + Hiring Platform. What Am I Getting Wrong? Roast It.",
+      "url": "https://reddit.com/r/roastmystartup/comments/1w8y9lj/built_an_ai_interview_hiring_platform_what_am_i/",
+      "inspected_at": "2026-09-06T14:59:40.487170+00:00"
+    },
+    "reddit_1w8v6ln": {
+      "platform": "reddit",
+      "title": "Shipping my first MVP at 13 — the hardest part was keeping it simple.",
+      "url": "https://reddit.com/r/FlutterDev/comments/1w8v6ln/shipping_my_first_mvp_at_13_the_hardest_part_was/",
+      "inspected_at": "2026-09-06T14:59:41.225964+00:00"
     }
   },
   "pending_drafts": {
