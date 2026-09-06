@@ -3,7 +3,17 @@ import logging
 import os
 import sys
 import uuid
+from pathlib import Path
 from typing import Dict, Any
+
+# Ensure project root and marketing_bot package are on sys.path
+_current_dir = Path(__file__).resolve().parent
+_project_root = _current_dir.parent.parent
+if str(_project_root) not in sys.path:
+    sys.path.insert(0, str(_project_root))
+
+if __name__ == "__main__" and not __package__:
+    __package__ = "scripts.marketing_bot"
 
 from .config import (
     STATE_FILE_PATH,
