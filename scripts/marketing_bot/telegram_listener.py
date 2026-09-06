@@ -97,7 +97,7 @@ class TelegramListener:
             logger.info(f"Incoming message from chat {chat_id} (user {user_id}): {text}")
 
             if not self.is_user_authorized(user_id, chat_id):
-                logger.warning(f"Unauthorized command attempt from user_id: {user_id}")
+                logger.warning(f"Unauthorized command attempt from user_id: {user_id} (chat_id: {chat_id}). Expected chat_id={TELEGRAM_CHAT_ID} or allowed_users={TELEGRAM_ALLOWED_USERS}")
                 return
 
             self.handle_command(text, chat_id=chat_id)
@@ -124,7 +124,12 @@ class TelegramListener:
     def handle_command(self, text: str, chat_id: Optional[Any] = None) -> None:
         """Routes slash commands like /draft, /status, /analytics, /ras, /help."""
         parts = text.split()
-        cmd = parts[0].lower() if parts else ""
+        if not parts:
+            return
+
+        raw_cmd = parts[0].lower()
+        cmd = raw_cmd.split("@")[0]  # Strips @BotUsername if sent in groups or via client autocomplete
+        args = text[len(parts[0]):].strip()
 
         if cmd == "/help" or cmd == "/start":
             self._cmd_help(chat_id=chat_id)
@@ -135,13 +140,11 @@ class TelegramListener:
         elif cmd == "/launchkit":
             self._cmd_launchkit(chat_id=chat_id)
         elif cmd == "/ras":
-            query = text[len(cmd):].strip()
-            self._cmd_ras(query, chat_id=chat_id)
+            self._cmd_ras(args, chat_id=chat_id)
         elif cmd == "/draft":
-            args = text[len(cmd):].strip()
             self._cmd_draft(args, chat_id=chat_id)
         else:
-            if text.startswith("/"):
+            if cmd.startswith("/"):
                 self.telegram.send_message(
                     f"❓ Unknown command: <code>{cmd}</code>\n"
                     f"Send /help to see all available drafting and telemetry commands.",
@@ -467,6 +470,11 @@ class TelegramListener:
             print("   GEMINI_API_KEY=your_gemini_api_key")
             print("=" * 60 + "\n")
             return
+
+        # 1. Clear any active Telegram webhook so getUpdates polling is not blocked by 409 Conflict
+        self.telegram.delete_webhook()
+        # 2. Register bot commands with Telegram so mobile/desktop clients show the '/' autocomplete menu
+        self.telegram.sync_commands()
 
         self.running = True
         logger.info("=" * 60)

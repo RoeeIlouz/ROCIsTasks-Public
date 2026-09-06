@@ -7,9 +7,9 @@ from .config import TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID
 logger = logging.getLogger(__name__)
 
 class TelegramBot:
-    def __init__(self, token: Optional[str] = None, chat_id: Optional[str] = None):
-        self.token = token or TELEGRAM_BOT_TOKEN
-        self.chat_id = chat_id or TELEGRAM_CHAT_ID
+    def __init__(self, token: Optional[str] = None, chat_id: Any = "DEFAULT"):
+        self.token = token if token is not None else TELEGRAM_BOT_TOKEN
+        self.chat_id = TELEGRAM_CHAT_ID if chat_id == "DEFAULT" else chat_id
         self.base_url = f"https://api.telegram.org/bot{self.token}"
 
     def has_token(self) -> bool:
@@ -17,6 +17,44 @@ class TelegramBot:
 
     def is_configured(self) -> bool:
         return bool(self.has_token() and self.chat_id)
+
+    def delete_webhook(self, drop_pending_updates: bool = False) -> bool:
+        """Removes any active Telegram webhook so getUpdates polling works properly."""
+        if not self.has_token():
+            return False
+        url = f"{self.base_url}/deleteWebhook"
+        try:
+            res = requests.post(url, json={"drop_pending_updates": drop_pending_updates}, timeout=10)
+            if res.status_code == 200 and res.json().get("ok", False):
+                logger.info("Cleared Telegram webhook successfully for polling mode.")
+                return True
+            return False
+        except Exception as e:
+            logger.warning(f"Failed to delete Telegram webhook: {e}")
+            return False
+
+    def sync_commands(self) -> bool:
+        """Registers the bot's slash commands with Telegram so the client UI shows the command menu."""
+        if not self.has_token():
+            return False
+        commands = [
+            {"command": "draft", "description": "Draft social post (/draft <platform> <topic>)"},
+            {"command": "status", "description": "Check platform APIs & RAS bridge"},
+            {"command": "analytics", "description": "Weekly performance & traction digest"},
+            {"command": "launchkit", "description": "Generate HN & PH launch maker cards"},
+            {"command": "ras", "description": "Query RAS spatial intelligence"},
+            {"command": "help", "description": "Show manual and available commands"}
+        ]
+        url = f"{self.base_url}/setMyCommands"
+        try:
+            res = requests.post(url, json={"commands": commands}, timeout=10)
+            if res.status_code == 200 and res.json().get("ok", False):
+                logger.info("Synchronized Telegram bot commands with Telegram servers.")
+                return True
+            return False
+        except Exception as e:
+            logger.warning(f"Failed to set Telegram commands: {e}")
+            return False
 
     def send_message(
         self,
