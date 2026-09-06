@@ -105,7 +105,7 @@ class LaunchKitGenerator:
             }
         }
 
-    def dispatch_to_telegram(self, version: str = "1.0") -> bool:
+    def dispatch_to_telegram(self, version: str = "1.0", chat_id: Optional[Any] = None) -> bool:
         """Generates launch kit and delivers it to Telegram as interactive drop cards."""
         pkg = self.generate_launch_package(version)
         hn = pkg.get("show_hn", {})
@@ -143,6 +143,6 @@ class LaunchKitGenerator:
             ]
         }
 
-        sent = self.telegram.send_message(card_text, reply_markup=reply_markup)
+        sent = self.telegram.send_message(card_text, reply_markup=reply_markup, chat_id=chat_id)
         return bool(sent)
 

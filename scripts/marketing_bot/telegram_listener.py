@@ -94,6 +94,8 @@ class TelegramListener:
             if not text:
                 return
 
+            logger.info(f"Incoming message from chat {chat_id} (user {user_id}): {text}")
+
             if not self.is_user_authorized(user_id, chat_id):
                 logger.warning(f"Unauthorized command attempt from user_id: {user_id}")
                 return
@@ -111,39 +113,42 @@ class TelegramListener:
             msg_id = msg.get("message_id")
             data = cb.get("data", "")
 
+            logger.info(f"Incoming callback '{data}' from user {user_id} in chat {chat_id}")
+
             if not self.is_user_authorized(user_id, chat_id):
                 self.telegram.answer_callback_query(cb_id, text="⚠️ Unauthorized")
                 return
 
-            self.handle_callback(data, cb_id=cb_id, msg_id=msg_id)
+            self.handle_callback(data, cb_id=cb_id, msg_id=msg_id, chat_id=chat_id)
 
-    def handle_command(self, text: str, chat_id: Optional[int] = None) -> None:
+    def handle_command(self, text: str, chat_id: Optional[Any] = None) -> None:
         """Routes slash commands like /draft, /status, /analytics, /ras, /help."""
         parts = text.split()
         cmd = parts[0].lower() if parts else ""
 
         if cmd == "/help" or cmd == "/start":
-            self._cmd_help()
+            self._cmd_help(chat_id=chat_id)
         elif cmd == "/status":
-            self._cmd_status()
+            self._cmd_status(chat_id=chat_id)
         elif cmd == "/analytics":
-            self._cmd_analytics()
+            self._cmd_analytics(chat_id=chat_id)
         elif cmd == "/launchkit":
-            self._cmd_launchkit()
+            self._cmd_launchkit(chat_id=chat_id)
         elif cmd == "/ras":
             query = text[len(cmd):].strip()
-            self._cmd_ras(query)
+            self._cmd_ras(query, chat_id=chat_id)
         elif cmd == "/draft":
             args = text[len(cmd):].strip()
-            self._cmd_draft(args)
+            self._cmd_draft(args, chat_id=chat_id)
         else:
             if text.startswith("/"):
                 self.telegram.send_message(
                     f"❓ Unknown command: <code>{cmd}</code>\n"
-                    f"Send /help to see all available drafting and telemetry commands."
+                    f"Send /help to see all available drafting and telemetry commands.",
+                    chat_id=chat_id
                 )
 
-    def _cmd_help(self) -> None:
+    def _cmd_help(self, chat_id: Optional[Any] = None) -> None:
         help_text = (
             "🤖 <b>ROCIs Tasks Marketing & RAS Command Center</b>\n\n"
             "<b>Available Commands:</b>\n"
@@ -157,9 +162,9 @@ class TelegramListener:
             "🩺 <code>/status</code> — Check health of social platform APIs & RAS bridge\n"
             "ℹ️ <code>/help</code> — Show this manual"
         )
-        self.telegram.send_message(help_text)
+        self.telegram.send_message(help_text, chat_id=chat_id)
 
-    def _cmd_status(self) -> None:
+    def _cmd_status(self, chat_id: Optional[Any] = None) -> None:
         ras_online = self.ras.is_online()
         ras_status = "🟢 Online (http://localhost:3000)" if ras_online else "🟡 Offline (Fallback Active)"
 
@@ -181,44 +186,45 @@ class TelegramListener:
             f"📑 <b>Hashnode:</b> {hashnode_status}\n\n"
             f"<i>Dry Run Mode:</i> {'🟡 ON' if DRY_RUN else '🟢 LIVE'}"
         )
-        self.telegram.send_message(text)
+        self.telegram.send_message(text, chat_id=chat_id)
 
-    def _cmd_analytics(self) -> None:
-        self.telegram.send_message("📊 Generating weekly traction report...")
-        self.analytics.generate_and_send_digest()
+    def _cmd_analytics(self, chat_id: Optional[Any] = None) -> None:
+        self.telegram.send_message("📊 Generating weekly traction report...", chat_id=chat_id)
+        self.analytics.generate_and_send_digest(chat_id=chat_id)
 
-    def _cmd_launchkit(self) -> None:
-        self.telegram.send_message("🚀 Generating Launch Kit cards...")
-        self.launch_kit.dispatch_to_telegram()
+    def _cmd_launchkit(self, chat_id: Optional[Any] = None) -> None:
+        self.telegram.send_message("🚀 Generating Launch Kit cards...", chat_id=chat_id)
+        self.launch_kit.dispatch_to_telegram(chat_id=chat_id)
 
-    def _cmd_ras(self, query: str) -> None:
+    def _cmd_ras(self, query: str, chat_id: Optional[Any] = None) -> None:
         if not query:
             # Display telemetry overview
             summary = self.ras.get_grounded_context_summary()
-            self.telegram.send_message(f"🧠 <b>RAS Ecosystem Telemetry:</b>\n\n<code>{summary}</code>")
+            self.telegram.send_message(f"🧠 <b>RAS Ecosystem Telemetry:</b>\n\n<code>{summary}</code>", chat_id=chat_id)
             return
 
-        self.telegram.send_message(f"🧠 Asking RAS: <i>\"{query}\"</i>...")
+        self.telegram.send_message(f"🧠 Asking RAS: <i>\"{query}\"</i>...", chat_id=chat_id)
         answer = self.ras.query_ras_cognition(query)
         if answer:
-            self.telegram.send_message(f"🧠 <b>RAS Core:</b>\n\n{answer}")
+            self.telegram.send_message(f"🧠 <b>RAS Core:</b>\n\n{answer}", chat_id=chat_id)
         else:
             # Fallback to standalone Gemini
             fallback_answer = self.gemini.generate_content(
                 f"You are R.A.S, the spatial intelligence of ROCIs Ecosystem. Answer: {query}"
             )
             if fallback_answer:
-                self.telegram.send_message(f"🧠 <b>RAS (Standalone Fallback):</b>\n\n{fallback_answer}")
+                self.telegram.send_message(f"🧠 <b>RAS (Standalone Fallback):</b>\n\n{fallback_answer}", chat_id=chat_id)
             else:
-                self.telegram.send_message("⚠️ Failed to reach RAS Core and standalone Gemini.")
+                self.telegram.send_message("⚠️ Failed to reach RAS Core and standalone Gemini.", chat_id=chat_id)
 
-    def _cmd_draft(self, args: str) -> None:
+    def _cmd_draft(self, args: str, chat_id: Optional[Any] = None) -> None:
         parts = args.split(maxsplit=1)
         if not parts:
             self.telegram.send_message(
                 "✍️ <b>Usage:</b> <code>/draft &lt;platform&gt; &lt;topic&gt;</code>\n"
                 "<i>Example:</i> <code>/draft bsky New offline SQLite and Hive speedup</code>\n"
-                "<i>Example:</i> <code>/draft all Product Hunt launch is live</code>"
+                "<i>Example:</i> <code>/draft all Product Hunt launch is live</code>",
+                chat_id=chat_id
             )
             return
 
@@ -229,16 +235,16 @@ class TelegramListener:
         context_str = self.ras.get_grounded_context_summary()
 
         if target_platform == "all":
-            self._handle_draft_all(topic, context_str)
+            self._handle_draft_all(topic, context_str, chat_id=chat_id)
         else:
-            self._handle_draft_single(target_platform, topic, context_str)
+            self._handle_draft_single(target_platform, topic, context_str, chat_id=chat_id)
 
-    def _handle_draft_single(self, platform: str, topic: str, context_str: str) -> None:
-        self.telegram.send_message(f"✍️ Drafting <b>{platform.upper()}</b> post for: <i>\"{topic}\"</i>...")
+    def _handle_draft_single(self, platform: str, topic: str, context_str: str, chat_id: Optional[Any] = None) -> None:
+        self.telegram.send_message(f"✍️ Drafting <b>{platform.upper()}</b> post for: <i>\"{topic}\"</i>...", chat_id=chat_id)
 
         draft_content = self.gemini.draft_social_post(platform, topic, context_str)
         if not draft_content:
-            self.telegram.send_message(f"⚠️ Failed to generate draft for {platform.upper()}. Please try again.")
+            self.telegram.send_message(f"⚠️ Failed to generate draft for {platform.upper()}. Please try again.", chat_id=chat_id)
             return
 
         draft_id = f"od_{uuid.uuid4().hex[:8]}"
@@ -248,6 +254,7 @@ class TelegramListener:
             "topic": topic,
             "content": draft_content,
             "context_str": context_str,
+            "chat_id": chat_id,
             "created_at": datetime.now(timezone.utc).isoformat()
         }
 
@@ -255,11 +262,12 @@ class TelegramListener:
             draft_id=draft_id,
             platform=platform,
             content=draft_content,
-            topic=topic
+            topic=topic,
+            chat_id=chat_id
         )
 
-    def _handle_draft_all(self, topic: str, context_str: str) -> None:
-        self.telegram.send_message(f"🌐 Drafting multi-platform broadcast for: <i>\"{topic}\"</i>...")
+    def _handle_draft_all(self, topic: str, context_str: str, chat_id: Optional[Any] = None) -> None:
+        self.telegram.send_message(f"🌐 Drafting multi-platform broadcast for: <i>\"{topic}\"</i>...", chat_id=chat_id)
 
         target_platforms = ["bsky", "x", "mastodon", "threads"]
         drafts: Dict[str, str] = {}
@@ -270,7 +278,7 @@ class TelegramListener:
                 drafts[p] = text
 
         if not drafts:
-            self.telegram.send_message("⚠️ Failed to generate drafts across platforms.")
+            self.telegram.send_message("⚠️ Failed to generate drafts across platforms.", chat_id=chat_id)
             return
 
         group_id = f"grp_{uuid.uuid4().hex[:8]}"
@@ -279,16 +287,18 @@ class TelegramListener:
             "topic": topic,
             "drafts": drafts,
             "context_str": context_str,
+            "chat_id": chat_id,
             "created_at": datetime.now(timezone.utc).isoformat()
         }
 
         self.telegram.send_multi_platform_approval_card(
             group_id=group_id,
             drafts=drafts,
-            topic=topic
+            topic=topic,
+            chat_id=chat_id
         )
 
-    def handle_callback(self, data: str, cb_id: Optional[str] = None, msg_id: Optional[int] = None) -> None:
+    def handle_callback(self, data: str, cb_id: Optional[str] = None, msg_id: Optional[int] = None, chat_id: Optional[Any] = None) -> None:
         """Handles inline keyboard button taps."""
         if ":" not in data:
             self.telegram.answer_callback_query(cb_id, text="⚠️ Invalid action")
@@ -304,6 +314,7 @@ class TelegramListener:
                 self.telegram.answer_callback_query(cb_id, text="⚠️ Draft expired or not found")
                 return
 
+            target_chat = chat_id or draft.get("chat_id")
             self.telegram.answer_callback_query(cb_id, text=f"🚀 Publishing to {draft['platform'].upper()}...")
             if DRY_RUN:
                 post_url = "https://example.com/dry-run-post"
@@ -323,22 +334,23 @@ class TelegramListener:
                     f"<blockquote>{draft['content']}</blockquote>"
                 )
                 if msg_id:
-                    self.telegram.edit_message_text(msg_id, confirm_text)
+                    self.telegram.edit_message_text(msg_id, confirm_text, chat_id=target_chat)
                 else:
-                    self.telegram.send_message(confirm_text)
+                    self.telegram.send_message(confirm_text, chat_id=target_chat)
                 self.pending_drafts.pop(draft_id, None)
             else:
                 err = res.get("error", "Unknown error")
-                self.telegram.send_message(f"❌ Failed to publish to {draft['platform'].upper()}: {err}")
+                self.telegram.send_message(f"❌ Failed to publish to {draft['platform'].upper()}: {err}", chat_id=target_chat)
 
         # 2. Single draft reject: reject:<draft_id>
         elif action == "reject":
             draft_id = payload
             draft = self.pending_drafts.pop(draft_id, None)
+            target_chat = chat_id or (draft.get("chat_id") if draft else None)
             self.telegram.answer_callback_query(cb_id, text="❌ Draft canceled")
             if msg_id:
                 platform_name = draft["platform"].upper() if draft else "Draft"
-                self.telegram.edit_message_text(msg_id, f"❌ <b>{platform_name} canceled.</b>")
+                self.telegram.edit_message_text(msg_id, f"❌ <b>{platform_name} canceled.</b>", chat_id=target_chat)
 
         # 3. Single draft regenerate: regen:<draft_id>
         elif action == "regen":
@@ -348,6 +360,7 @@ class TelegramListener:
                 self.telegram.answer_callback_query(cb_id, text="⚠️ Draft not found")
                 return
 
+            target_chat = chat_id or draft.get("chat_id")
             self.telegram.answer_callback_query(cb_id, text="🔄 Regenerating draft...")
             new_content = self.gemini.draft_social_post(draft["platform"], draft["topic"], draft["context_str"])
             if new_content:
@@ -356,10 +369,11 @@ class TelegramListener:
                     draft_id=draft_id,
                     platform=draft["platform"],
                     content=new_content,
-                    topic=draft["topic"]
+                    topic=draft["topic"],
+                    chat_id=target_chat
                 )
             else:
-                self.telegram.send_message("⚠️ Failed to regenerate draft. Please try again.")
+                self.telegram.send_message("⚠️ Failed to regenerate draft. Please try again.", chat_id=target_chat)
 
         # 4. Multi-platform master approve: approve_all:<group_id>
         elif action == "approve_all":
@@ -369,6 +383,7 @@ class TelegramListener:
                 self.telegram.answer_callback_query(cb_id, text="⚠️ Broadcast expired or not found")
                 return
 
+            target_chat = chat_id or group.get("chat_id")
             self.telegram.answer_callback_query(cb_id, text="🚀 Publishing across all platforms...")
             results = []
             for p, text in group["drafts"].items():
@@ -388,9 +403,9 @@ class TelegramListener:
                 "\n".join(results)
             )
             if msg_id:
-                self.telegram.edit_message_text(msg_id, summary_text)
+                self.telegram.edit_message_text(msg_id, summary_text, chat_id=target_chat)
             else:
-                self.telegram.send_message(summary_text)
+                self.telegram.send_message(summary_text, chat_id=target_chat)
             self.pending_groups.pop(group_id, None)
 
         # 5. Multi-platform single approve: approve_single:<group_id>:<platform>
@@ -404,6 +419,7 @@ class TelegramListener:
                 self.telegram.answer_callback_query(cb_id, text="⚠️ Draft not found")
                 return
 
+            target_chat = chat_id or group.get("chat_id")
             text = group["drafts"][p]
             self.telegram.answer_callback_query(cb_id, text=f"🚀 Publishing to {p.upper()}...")
             if DRY_RUN:
@@ -416,27 +432,46 @@ class TelegramListener:
                 self.telegram.send_message(
                     f"✅ <b>Published to {p.upper()}!</b>\n\n"
                     f"🔗 <a href=\"{url}\">View Post</a>\n\n"
-                    f"<blockquote>{text}</blockquote>"
+                    f"<blockquote>{text}</blockquote>",
+                    chat_id=target_chat
                 )
                 # Remove posted item from group
                 group["drafts"].pop(p, None)
             else:
-                self.telegram.send_message(f"❌ Failed to post to {p.upper()}: {res.get('error')}")
+                self.telegram.send_message(f"❌ Failed to post to {p.upper()}: {res.get('error')}", chat_id=target_chat)
 
         # 6. Multi-platform reject all: reject_all:<group_id>
         elif action == "reject_all":
             group_id = payload
-            self.pending_groups.pop(group_id, None)
+            group = self.pending_groups.pop(group_id, None)
+            target_chat = chat_id or (group.get("chat_id") if group else None)
             self.telegram.answer_callback_query(cb_id, text="❌ Broadcast canceled")
             if msg_id:
-                self.telegram.edit_message_text(msg_id, "❌ <b>Multi-platform broadcast canceled.</b>")
+                self.telegram.edit_message_text(msg_id, "❌ <b>Multi-platform broadcast canceled.</b>", chat_id=target_chat)
 
     def run_polling(self, interval: float = 2.0) -> None:
         """Continuous long-polling loop."""
+        if not self.telegram.has_token():
+            logger.error("=" * 60)
+            logger.error("[!] CRITICAL: TELEGRAM_BOT_TOKEN is not configured!")
+            logger.error("The interactive listener requires a Telegram Bot Token.")
+            logger.error("Create or edit 'scripts/marketing_bot/.env' and add:")
+            logger.error("  TELEGRAM_BOT_TOKEN=your_token_from_BotFather")
+            logger.error("  GEMINI_API_KEY=your_gemini_api_key")
+            logger.error("=" * 60)
+            print("\n" + "=" * 60)
+            print("[!] CRITICAL: TELEGRAM_BOT_TOKEN is not configured in .env!")
+            print("The bot cannot poll Telegram without a Bot Token.")
+            print("-> Please create 'scripts/marketing_bot/.env' and add:")
+            print("   TELEGRAM_BOT_TOKEN=your_token_from_BotFather")
+            print("   GEMINI_API_KEY=your_gemini_api_key")
+            print("=" * 60 + "\n")
+            return
+
         self.running = True
         logger.info("=" * 60)
-        logger.info("🚀 Telegram Interactive Listener Active!")
-        logger.info(f"Target Chat: {TELEGRAM_CHAT_ID or 'ANY'}")
+        logger.info("[*] Telegram Interactive Listener Active!")
+        logger.info(f"Target Chat: {TELEGRAM_CHAT_ID or 'ANY (Dynamic routing)'}")
         logger.info(f"RAS Bridge: {self.ras.base_url} ({'ONLINE' if self.ras.is_online() else 'OFFLINE/FALLBACK'})")
         logger.info("Listening for /draft, /status, /analytics, /ras, /help...")
         logger.info("=" * 60)

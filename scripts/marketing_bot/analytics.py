@@ -91,7 +91,7 @@ class AnalyticsTracker:
 
         return metrics
 
-    def generate_and_send_digest(self) -> bool:
+    def generate_and_send_digest(self, chat_id: Optional[Any] = None) -> bool:
         """
         Compiles metrics, computes growth deltas from previous snapshot,
         records new snapshot, and dispatches Telegram traction card.
@@ -130,6 +130,6 @@ class AnalyticsTracker:
         self.state_manager.data["analytics_snapshot"] = metrics
         self.state_manager.save()
 
-        sent = self.telegram.send_message(digest_text)
+        sent = self.telegram.send_message(digest_text, chat_id=chat_id)
         return bool(sent)
 

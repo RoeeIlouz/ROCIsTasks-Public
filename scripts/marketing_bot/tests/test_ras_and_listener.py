@@ -304,6 +304,60 @@ class TestRASAndTelegramListener(unittest.TestCase):
         mock_bot.edit_message_text.assert_called_once()
         self.assertNotIn("grp_100", listener.pending_groups)
 
+    @patch("requests.get")
+    @patch("requests.post")
+    def test_telegram_bot_has_token_and_dynamic_chat_id(self, mock_post, mock_get):
+        bot = TelegramBot(token="123456789:ABCDefghIJKLmnoPQRstuvWXyz", chat_id=None)
+        self.assertTrue(bot.has_token())
+        self.assertFalse(bot.is_configured())  # chat_id is missing
+
+        # get_updates works with token alone
+        mock_res = MagicMock()
+        mock_res.status_code = 200
+        mock_res.json.return_value = {"result": [{"update_id": 1}]}
+        mock_get.return_value = mock_res
+
+        updates = bot.get_updates()
+        self.assertEqual(len(updates), 1)
+
+        # send_message works when dynamic chat_id is passed
+        mock_post_res = MagicMock()
+        mock_post_res.status_code = 200
+        mock_post_res.json.return_value = {"result": {"message_id": 999}}
+        mock_post.return_value = mock_post_res
+
+        msg = bot.send_message("Hello dynamic", chat_id="dynamic_chat_123")
+        self.assertIsNotNone(msg)
+        payload = mock_post.call_args[1]["json"]
+        self.assertEqual(payload["chat_id"], "dynamic_chat_123")
+
+    def test_listener_run_polling_stops_when_no_token(self):
+        mock_bot = MagicMock()
+        mock_bot.has_token.return_value = False
+        listener = TelegramListener(telegram_bot=mock_bot, state_manager=self.state_mgr)
+
+        # run_polling should return immediately and not enter infinite loop
+        listener.run_polling()
+        self.assertFalse(listener.running)
+
+    def test_listener_routes_dynamic_chat_id(self):
+        mock_bot = MagicMock()
+        mock_bot.has_token.return_value = True
+        listener = TelegramListener(telegram_bot=mock_bot, state_manager=self.state_mgr)
+
+        raw_update = {
+            "update_id": 42,
+            "message": {
+                "message_id": 100,
+                "from": {"id": 123456},
+                "chat": {"id": 789012},
+                "text": "/help"
+            }
+        }
+        listener.process_update(raw_update)
+        mock_bot.send_message.assert_called_once()
+        self.assertEqual(mock_bot.send_message.call_args[1].get("chat_id"), 789012)
+
 
 if __name__ == "__main__":
     unittest.main()

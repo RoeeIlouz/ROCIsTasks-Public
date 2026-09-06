@@ -12,22 +12,27 @@ class TelegramBot:
         self.chat_id = chat_id or TELEGRAM_CHAT_ID
         self.base_url = f"https://api.telegram.org/bot{self.token}"
 
+    def has_token(self) -> bool:
+        return bool(self.token and len(str(self.token).strip()) > 10)
+
     def is_configured(self) -> bool:
-        return bool(self.token and self.chat_id and len(self.token.strip()) > 10)
+        return bool(self.has_token() and self.chat_id)
 
     def send_message(
         self,
         text: str,
         reply_markup: Optional[Dict[str, Any]] = None,
-        parse_mode: str = "HTML"
+        parse_mode: str = "HTML",
+        chat_id: Optional[Any] = None
     ) -> Optional[Dict[str, Any]]:
-        if not self.is_configured():
-            logger.warning("TelegramBot not configured. Skipping message dispatch.")
+        target_chat = chat_id or self.chat_id
+        if not self.has_token() or not target_chat:
+            logger.warning("TelegramBot not configured (token or chat_id missing). Skipping message dispatch.")
             return None
 
         url = f"{self.base_url}/sendMessage"
         payload = {
-            "chat_id": self.chat_id,
+            "chat_id": target_chat,
             "text": text,
             "parse_mode": parse_mode,
             "disable_web_page_preview": False
@@ -58,14 +63,16 @@ class TelegramBot:
         message_id: int,
         new_text: str,
         reply_markup: Optional[Dict[str, Any]] = None,
-        parse_mode: str = "HTML"
+        parse_mode: str = "HTML",
+        chat_id: Optional[Any] = None
     ) -> bool:
-        if not self.is_configured():
+        target_chat = chat_id or self.chat_id
+        if not self.has_token() or not target_chat:
             return False
 
         url = f"{self.base_url}/editMessageText"
         payload = {
-            "chat_id": self.chat_id,
+            "chat_id": target_chat,
             "message_id": message_id,
             "text": new_text,
             "parse_mode": parse_mode
@@ -275,7 +282,8 @@ class TelegramBot:
         platform: str,
         content: str,
         topic: str = "",
-        media_url: Optional[str] = None
+        media_url: Optional[str] = None,
+        chat_id: Optional[Any] = None
     ) -> Optional[int]:
         """
         Sends an interactive on-demand draft card with Approve, Regenerate, and Cancel buttons.
@@ -316,7 +324,7 @@ class TelegramBot:
             ]
         }
 
-        msg = self.send_message(text, reply_markup=reply_markup)
+        msg = self.send_message(text, reply_markup=reply_markup, chat_id=chat_id)
         if msg:
             return msg.get("message_id")
         return None
@@ -325,7 +333,8 @@ class TelegramBot:
         self,
         group_id: str,
         drafts: Dict[str, str],
-        topic: str = ""
+        topic: str = "",
+        chat_id: Optional[Any] = None
     ) -> Optional[int]:
         """
         Sends a unified multi-platform draft card with both a master 'Approve All' button
@@ -387,7 +396,7 @@ class TelegramBot:
         ])
 
         reply_markup = {"inline_keyboard": inline_keyboard}
-        msg = self.send_message(text, reply_markup=reply_markup)
+        msg = self.send_message(text, reply_markup=reply_markup, chat_id=chat_id)
         if msg:
             return msg.get("message_id")
         return None
@@ -398,7 +407,7 @@ class TelegramBot:
         Fetches unprocessed Telegram callback query button clicks since last_update_id.
         Returns (list_of_actions, max_update_id_seen).
         """
-        if not self.is_configured():
+        if not self.has_token():
             return [], last_update_id
 
         url = f"{self.base_url}/getUpdates"
@@ -443,7 +452,7 @@ class TelegramBot:
         """
         Fetches raw Telegram updates using long-polling.
         """
-        if not self.is_configured():
+        if not self.has_token():
             return []
         url = f"{self.base_url}/getUpdates"
         params = {"offset": offset, "timeout": timeout}
