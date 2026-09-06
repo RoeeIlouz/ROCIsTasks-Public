@@ -135,7 +135,54 @@ class GeminiEngine:
         logger.error("All candidate Gemini models failed.")
         return None
 
+    def draft_social_post(
+        self,
+        platform: str,
+        topic: str,
+        context_str: str = ""
+    ) -> Optional[str]:
+        """
+        Drafts a high-impact, authentic social post tailored for the specific platform.
+        Adheres to platform character limits and tone.
+        """
+        p = platform.lower().strip()
+        max_chars = 280
+        if p in ("bsky", "bluesky"):
+            max_chars = 290
+        elif p in ("mastodon", "fediverse"):
+            max_chars = 480
+        elif p in ("threads",):
+            max_chars = 480
+        elif p in ("devto", "hashnode"):
+            max_chars = 1500
+
+        prompt = f"""You are the passionate solo builder behind ROCIs Tasks (an offline-first task manager with Kotlin Android home widgets, natural language parsing, and Google Calendar sync).
+
+ECOSYSTEM / TELEMETRY CONTEXT:
+{context_str or "ROCIs Tasks is an indie Android app built with Flutter and local Hive engine."}
+
+TASK:
+Write an authentic, engaging social post for platform: {platform.upper()}
+Topic: {topic}
+
+CONSTRAINTS:
+1. Length: STRICTLY under {max_chars} characters.
+2. Tone: Authentic indie builder / engineer vibe. No corporate cringe, no fake hype.
+3. Call to Action: Subtle and natural, include https://tasks.rocisapps.com or Google Play if relevant.
+4. Emojis / Hashtags: 1-2 relevant emojis, 1-3 hashtags suitable for the platform (e.g. #buildinpublic, #flutter, #android).
+
+Return ONLY the plain post text, no quotes or metadata wrappers.
+"""
+        res = self.generate_content(prompt)
+        if res:
+            text = res.strip()
+            if text.startswith('"') and text.endswith('"'):
+                text = text[1:-1].strip()
+            return text[:max_chars]
+        return None
+
     def evaluate_and_draft_response(self, thread_title: str, thread_body: str, platform: str) -> Optional[Dict[str, Any]]:
+
         """
         Evaluates thread relevance for ROCIs Tasks and drafts a natural, non-spammy response.
         """

@@ -269,6 +269,130 @@ class TelegramBot:
         }
         self.send_message(text, reply_markup=reply_markup)
 
+    def send_interactive_draft_card(
+        self,
+        draft_id: str,
+        platform: str,
+        content: str,
+        topic: str = "",
+        media_url: Optional[str] = None
+    ) -> Optional[int]:
+        """
+        Sends an interactive on-demand draft card with Approve, Regenerate, and Cancel buttons.
+        """
+        safe_content = content.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+        safe_topic = topic.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;") if topic else "General Update"
+
+        icon_map = {
+            "bsky": "🦋",
+            "bluesky": "🦋",
+            "x": "🐦",
+            "twitter": "🐦",
+            "mastodon": "🐘",
+            "threads": "🧵",
+            "devto": "📝",
+            "hashnode": "📑",
+            "reddit": "🚀"
+        }
+        icon = icon_map.get(platform.lower(), "📢")
+
+        text = (
+            f"{icon} <b>On-Demand Draft ({platform.upper()})</b>\n"
+            f"📌 <b>Topic:</b> <i>{safe_topic}</i>\n\n"
+            f"📝 <b>Proposed Post:</b>\n"
+            f"<blockquote>{safe_content}</blockquote>\n\n"
+            f"<i>Tap below to approve or regenerate:</i>"
+        )
+
+        reply_markup = {
+            "inline_keyboard": [
+                [
+                    {"text": f"✅ Approve & Post ({platform.upper()})", "callback_data": f"approve:{draft_id}"},
+                    {"text": "🔄 Regenerate", "callback_data": f"regen:{draft_id}"}
+                ],
+                [
+                    {"text": "❌ Cancel", "callback_data": f"reject:{draft_id}"}
+                ]
+            ]
+        }
+
+        msg = self.send_message(text, reply_markup=reply_markup)
+        if msg:
+            return msg.get("message_id")
+        return None
+
+    def send_multi_platform_approval_card(
+        self,
+        group_id: str,
+        drafts: Dict[str, str],
+        topic: str = ""
+    ) -> Optional[int]:
+        """
+        Sends a unified multi-platform draft card with both a master 'Approve All' button
+        and granular per-platform buttons.
+        """
+        safe_topic = topic.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;") if topic else "Ecosystem Showcase"
+        platforms_str = ", ".join(p.upper() for p in drafts.keys())
+
+        icon_map = {
+            "bsky": "🦋",
+            "bluesky": "🦋",
+            "x": "🐦",
+            "twitter": "🐦",
+            "mastodon": "🐘",
+            "threads": "🧵",
+            "devto": "📝",
+            "hashnode": "📑"
+        }
+
+        body_parts = []
+        for p, text in drafts.items():
+            icon = icon_map.get(p.lower(), "📢")
+            safe_text = text[:280].replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+            if len(text) > 280:
+                safe_text += "..."
+            body_parts.append(f"{icon} <b>{p.upper()}:</b>\n<blockquote>{safe_text}</blockquote>")
+
+        drafts_preview = "\n\n".join(body_parts)
+
+        text = (
+            f"🌐 <b>Multi-Platform Broadcast Draft</b>\n"
+            f"📌 <b>Topic:</b> <i>{safe_topic}</i>\n"
+            f"🎯 <b>Targets:</b> {platforms_str}\n\n"
+            f"{drafts_preview}\n\n"
+            f"<i>Choose an action below:</i>"
+        )
+
+        # Build inline buttons
+        inline_keyboard = [
+            [{"text": "🚀 Approve & Post All", "callback_data": f"approve_all:{group_id}"}]
+        ]
+
+        # Granular per-platform buttons (paired 2 per row)
+        row = []
+        for p in drafts.keys():
+            icon = icon_map.get(p.lower(), "📢")
+            row.append({
+                "text": f"{icon} Post {p.upper()}",
+                "callback_data": f"approve_single:{group_id}:{p}"
+            })
+            if len(row) == 2:
+                inline_keyboard.append(row)
+                row = []
+        if row:
+            inline_keyboard.append(row)
+
+        inline_keyboard.append([
+            {"text": "❌ Cancel All", "callback_data": f"reject_all:{group_id}"}
+        ])
+
+        reply_markup = {"inline_keyboard": inline_keyboard}
+        msg = self.send_message(text, reply_markup=reply_markup)
+        if msg:
+            return msg.get("message_id")
+        return None
+
+
     def get_pending_user_actions(self, last_update_id: int) -> Tuple[List[Dict[str, Any]], int]:
         """
         Fetches unprocessed Telegram callback query button clicks since last_update_id.
@@ -314,4 +438,24 @@ class TelegramBot:
         except Exception as e:
             logger.error(f"Failed to fetch Telegram updates: {e}")
             return [], last_update_id
+
+    def get_updates(self, offset: int = 0, timeout: int = 20) -> List[Dict[str, Any]]:
+        """
+        Fetches raw Telegram updates using long-polling.
+        """
+        if not self.is_configured():
+            return []
+        url = f"{self.base_url}/getUpdates"
+        params = {"offset": offset, "timeout": timeout}
+        try:
+            res = requests.get(url, params=params, timeout=timeout + 5)
+            if res.status_code == 409:
+                logger.info("Telegram webhook is active; skipping getUpdates polling.")
+                return []
+            res.raise_for_status()
+            return res.json().get("result", [])
+        except Exception as e:
+            logger.error(f"Failed to fetch Telegram updates: {e}")
+            return []
+
 

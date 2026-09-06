@@ -517,3 +517,84 @@ class Poster:
 
         return True
 
+    def publish_single_post(
+        self,
+        platform: str,
+        text: str,
+        title: Optional[str] = None,
+        media_url: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """
+        Publishes a single post to any supported platform on demand.
+        Returns {'success': bool, 'url': Optional[str], 'error': Optional[str]}.
+        """
+        p = platform.lower().strip()
+        banner_data = self.media_manager.get_default_banner_data() if not media_url else None
+
+        try:
+            if p in ("bsky", "bluesky"):
+                if not self.bluesky.is_configured():
+                    return {"success": False, "error": "Bluesky credentials not configured"}
+                image_blob = None
+                if banner_data:
+                    image_blob = self.bluesky.upload_blob(banner_data[0], mime_type=banner_data[1])
+                url = self.bluesky.post_reply(text, image_blob=image_blob)
+                return {"success": bool(url), "url": url, "error": None if url else "Bluesky post rejected"}
+
+            elif p in ("x", "twitter"):
+                if not self.x_client.is_configured():
+                    return {"success": False, "error": "X/Twitter credentials not configured"}
+                if not self.x_client.can_post():
+                    return {"success": False, "error": "X monthly or daily rate limits reached"}
+                url = self.x_client.post_tweet(text)
+                if url:
+                    self.state_manager.record_x_post()
+                return {"success": bool(url), "url": url, "error": None if url else "X post failed"}
+
+            elif p in ("mastodon", "fediverse"):
+                if not self.mastodon.is_configured():
+                    return {"success": False, "error": "Mastodon credentials not configured"}
+                media_ids = None
+                if banner_data:
+                    m_id = self.mastodon.upload_media(banner_data[0], mime_type=banner_data[1], description="ROCIs Tasks")
+                    if m_id:
+                        media_ids = [m_id]
+                url = self.mastodon.post_status(text, media_ids=media_ids)
+                return {"success": bool(url), "url": url, "error": None if url else "Mastodon post failed"}
+
+            elif p in ("threads",):
+                if not self.threads.is_configured():
+                    return {"success": False, "error": "Threads credentials not configured"}
+                image_url = media_url or self.media_manager.get_default_banner_url()
+                url = self.threads.post_thread(text, image_url=image_url)
+                return {"success": bool(url), "url": url, "error": None if url else "Threads post failed"}
+
+            elif p in ("devto", "dev.to"):
+                if not self.devto.is_configured():
+                    return {"success": False, "error": "Dev.to credentials not configured"}
+                res = self.devto.publish_article(
+                    title=title or "ROCIs Tasks DevLog",
+                    body_markdown=text,
+                    published=True
+                )
+                url = res.get("url") if res else None
+                return {"success": bool(url), "url": url, "error": None if url else "Dev.to publish failed"}
+
+            elif p in ("hashnode",):
+                if not self.hashnode.is_configured():
+                    return {"success": False, "error": "Hashnode credentials not configured"}
+                res = self.hashnode.publish_article(
+                    title=title or "ROCIs Tasks Update",
+                    body_markdown=text
+                )
+                url = res.get("url") if res else None
+                return {"success": bool(url), "url": url, "error": None if url else "Hashnode publish failed"}
+
+            else:
+                return {"success": False, "error": f"Unsupported platform: {platform}"}
+
+        except Exception as e:
+            logger.error(f"Error publishing to {platform}: {e}")
+            return {"success": False, "error": str(e)}
+
+

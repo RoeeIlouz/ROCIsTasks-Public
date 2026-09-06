@@ -46,6 +46,12 @@ HASHNODE_PUBLICATION_ID = os.getenv("HASHNODE_PUBLICATION_ID", "")
 # Medium Configuration
 MEDIUM_INTEGRATION_TOKEN = os.getenv("MEDIUM_INTEGRATION_TOKEN", "")
 
+# RAS (ROCI's AI System) Configuration
+RAS_URL = os.getenv("RAS_URL", "http://localhost:3000").rstrip("/")
+TELEGRAM_ALLOWED_USERS = [
+    u.strip() for u in os.getenv("TELEGRAM_ALLOWED_USERS", "").split(",") if u.strip()
+]
+
 # Operational Settings
 DRY_RUN = os.getenv("DRY_RUN", "false").lower() in ("true", "1", "yes")
 MAX_DISCOVERIES_PER_RUN = int(os.getenv("MAX_DISCOVERIES_PER_RUN", "6"))

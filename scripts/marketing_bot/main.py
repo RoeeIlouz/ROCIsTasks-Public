@@ -420,6 +420,7 @@ def run_pipeline(dry_run: bool = False):
 def main():
     parser = argparse.ArgumentParser(description="ROCIs Tasks Marketing & Feedback Bot")
     parser.add_argument("--dry-run", action="store_true", help="Run without sending real messages or posting.")
+    parser.add_argument("--listen", action="store_true", help="Run interactive Telegram listener daemon for on-demand drafting and RAS control.")
     parser.add_argument("--analytics", action="store_true", help="Generate and send weekly analytics traction digest to Telegram.")
     parser.add_argument("--launch-kit", action="store_true", help="Generate Show HN and Product Hunt launch packages to Telegram.")
     parser.add_argument("--version-tag", type=str, default="1.0", help="Version string for launch kit (default: 1.0).")
@@ -428,6 +429,13 @@ def main():
 
     state_mgr = StateManager(STATE_FILE_PATH)
     telegram = TelegramBot()
+
+    if args.listen:
+        logger.info("Starting Telegram Interactive Listener Daemon...")
+        from .telegram_listener import TelegramListener
+        listener = TelegramListener(telegram_bot=telegram, state_manager=state_mgr)
+        listener.run_polling()
+        return
 
     if args.analytics:
         logger.info("Executing Weekly Analytics Digest...")
