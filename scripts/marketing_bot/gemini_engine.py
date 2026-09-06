@@ -135,6 +135,14 @@ class GeminiEngine:
         logger.error("All candidate Gemini models failed.")
         return None
 
+    def generate_content(self, prompt: str, temperature: float = 0.7, max_tokens: int = 1000) -> Optional[str]:
+        """Public method to generate raw text from Gemini with dynamic model fallback."""
+        return self._call_gemini(prompt, temperature=temperature, max_tokens=max_tokens)
+
+    def generate_text(self, prompt: str, temperature: float = 0.7, max_tokens: int = 1000) -> Optional[str]:
+        """Alias for generate_content."""
+        return self._call_gemini(prompt, temperature=temperature, max_tokens=max_tokens)
+
     def draft_social_post(
         self,
         platform: str,
