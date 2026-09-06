@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-05T20:59:10.326883+00:00",
+  "last_run_timestamp": "2026-09-06T03:08:29.267952+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -722,6 +722,42 @@
       "title": "I couldn't remember what I'd built in three weeks with Claude Code, so I drew it",
       "url": "https://reddit.com/r/SideProject/comments/1w8c41f/i_couldnt_remember_what_id_built_in_three_weeks/",
       "inspected_at": "2026-09-05T20:58:58.259097+00:00"
+    },
+    "reddit_1w8kehv": {
+      "platform": "reddit",
+      "title": "Toronto hustlers, networking events here are a little dull",
+      "url": "https://reddit.com/r/SideProject/comments/1w8kehv/toronto_hustlers_networking_events_here_are_a/",
+      "inspected_at": "2026-09-06T03:06:54.746622+00:00"
+    },
+    "reddit_1w8k3dq": {
+      "platform": "reddit",
+      "title": "Jourvanta - a calmer place for trip bookings, files, and plans",
+      "url": "https://reddit.com/r/SideProject/comments/1w8k3dq/jourvanta_a_calmer_place_for_trip_bookings_files/",
+      "inspected_at": "2026-09-06T03:07:17.536874+00:00"
+    },
+    "reddit_1w8k01l": {
+      "platform": "reddit",
+      "title": "My local Go tool uses the browser as its UI. Where would you draw the line?",
+      "url": "https://reddit.com/r/SideProject/comments/1w8k01l/my_local_go_tool_uses_the_browser_as_its_ui_where/",
+      "inspected_at": "2026-09-06T03:07:30.105693+00:00"
+    },
+    "reddit_1w8ji3k": {
+      "platform": "reddit",
+      "title": "Lumiana - building personal apps with browser and Node.js APIs together",
+      "url": "https://reddit.com/r/SideProject/comments/1w8ji3k/lumiana_building_personal_apps_with_browser_and/",
+      "inspected_at": "2026-09-06T03:07:41.322040+00:00"
+    },
+    "reddit_1w8jeye": {
+      "platform": "reddit",
+      "title": "Grublette, a spin-the-wheel app for deciding where to eat 🎡🍴✨",
+      "url": "https://reddit.com/r/roastmystartup/comments/1w8jeye/grublette_a_spinthewheel_app_for_deciding_where/",
+      "inspected_at": "2026-09-06T03:07:54.727218+00:00"
+    },
+    "reddit_1w8e4uc": {
+      "platform": "reddit",
+      "title": "roast Argue - i made an app blocker where an AI decides if ur excuse is good enough",
+      "url": "https://reddit.com/r/roastmystartup/comments/1w8e4uc/roast_argue_i_made_an_app_blocker_where_an_ai/",
+      "inspected_at": "2026-09-06T03:08:06.731181+00:00"
     }
   },
   "pending_drafts": {
@@ -1058,7 +1094,7 @@
     }
   },
   "recorded_feedback": [],
-  "last_organic_post_timestamp": "2026-09-05T14:26:29.792124+00:00",
+  "last_organic_post_timestamp": "2026-09-06T03:08:28.795284+00:00",
   "organic_posts": [
     {
       "text": "you either die a young enthusiastic builder or live long enough to realize that 90% of tech problems are solved by restarting the router.",
@@ -1067,9 +1103,20 @@
         "Bluesky"
       ],
       "posted_at": "2026-09-05T14:26:29.792124+00:00"
+    },
+    {
+      "text": "there is no feeling quite like watching your local test build pass on the first try and immediately getting suspicious of what went wrong.",
+      "topic": "student_and_study_grind",
+      "platforms": [
+        "Twitter/X",
+        "Bluesky"
+      ],
+      "posted_at": "2026-09-06T03:08:28.795284+00:00"
     }
   ],
-  "x_posts_timestamps": [],
+  "x_posts_timestamps": [
+    "2026-09-06T03:08:28.084456+00:00"
+  ],
   "posted_devlogs": {
     "devlog_0_2_2_60_2026_07_17_190f9f3082": {
       "title": "Why My Flutter App Was Spamming Google Sign-In Prompts (And How I Fixed It)",
@@ -1092,5 +1139,19 @@
       "bsky_url": null,
       "published_at": "2026-09-05T17:02:02.778815+00:00"
     }
+  },
+  "tuned_queries_cache": {
+    "timestamp": 1788663997.9277103,
+    "queries": [
+      "indie app showcase",
+      "built a todo app",
+      "offline first task app",
+      "flutter task app",
+      "android home widget app",
+      "what todo app do you use",
+      "todo app recommendation indie",
+      "simple task manager with calendar sync",
+      "offline to-do app without subscription"
+    ]
   }
 }
