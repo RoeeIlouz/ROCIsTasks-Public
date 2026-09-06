@@ -7,6 +7,7 @@ base_dir = Path(__file__).resolve().parent
 try:
     from dotenv import load_dotenv
     load_dotenv(base_dir / ".env")
+    load_dotenv(base_dir.parent / ".env")
     load_dotenv(base_dir.parent.parent / ".env")
 except ImportError:
     # Built-in lightweight fallback parser for .env files when python-dotenv is not installed
@@ -24,6 +25,7 @@ except ImportError:
                 pass
 
     _parse_env_file(base_dir / ".env")
+    _parse_env_file(base_dir.parent / ".env")
     _parse_env_file(base_dir.parent.parent / ".env")
 
 # API Keys & Credentials
