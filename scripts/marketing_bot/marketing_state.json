@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-06T10:20:34.065413+00:00",
+  "last_run_timestamp": "2026-09-06T12:42:18.206724+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -1225,5 +1225,39 @@
       "simple task manager with calendar sync",
       "offline to-do app without subscription"
     ]
+  },
+  "analytics_snapshot": {
+    "timestamp": "2026-09-06T12:42:16.103558+00:00",
+    "devto": {
+      "total_views": 37,
+      "total_reactions": 1,
+      "total_comments": 0,
+      "top_article": {
+        "id": 4583420,
+        "title": "Why My Flutter App Was Spamming Google Sign-In Prompts (And How I Fixed It)",
+        "url": "https://dev.to/rocisapps/why-my-flutter-app-was-spamming-google-sign-in-prompts-and-how-i-fixed-it-496h",
+        "page_views_count": 14,
+        "positive_reactions_count": 0,
+        "comments_count": 0,
+        "published": true
+      }
+    },
+    "hashnode": {
+      "total_views": 0,
+      "total_reactions": 0,
+      "total_posts": 0
+    },
+    "bluesky": {
+      "followers": 2,
+      "posts": 3
+    },
+    "mastodon": {
+      "followers": 0,
+      "statuses": 0
+    },
+    "app_stats": {
+      "total_devlogs_published": 3,
+      "total_community_replies": 7
+    }
   }
 }
