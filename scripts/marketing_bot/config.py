@@ -1,11 +1,30 @@
 import os
 from pathlib import Path
-from dotenv import load_dotenv
 
 # Search for .env in current directory or project root
 base_dir = Path(__file__).resolve().parent
-load_dotenv(base_dir / ".env")
-load_dotenv(base_dir.parent.parent / ".env")
+
+try:
+    from dotenv import load_dotenv
+    load_dotenv(base_dir / ".env")
+    load_dotenv(base_dir.parent.parent / ".env")
+except ImportError:
+    # Built-in lightweight fallback parser for .env files when python-dotenv is not installed
+    def _parse_env_file(filepath: Path):
+        if filepath.exists():
+            try:
+                for line in filepath.read_text(encoding="utf-8").splitlines():
+                    line = line.strip()
+                    if line and not line.startswith("#") and "=" in line:
+                        k, v = line.split("=", 1)
+                        k, v = k.strip(), v.strip().strip('"').strip("'")
+                        if k and k not in os.environ:
+                            os.environ[k] = v
+            except Exception:
+                pass
+
+    _parse_env_file(base_dir / ".env")
+    _parse_env_file(base_dir.parent.parent / ".env")
 
 # API Keys & Credentials
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
