@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-07T03:05:20.449693+00:00",
+  "last_run_timestamp": "2026-09-07T11:41:19.337280+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -938,6 +938,42 @@
       "title": "After 11 years in mobile development, where should I go next in the AI era?",
       "url": "https://reddit.com/r/FlutterDev/comments/1w9fes2/after_11_years_in_mobile_development_where_should/",
       "inspected_at": "2026-09-07T03:05:11.482561+00:00"
+    },
+    "reddit_1w9pnk5": {
+      "platform": "reddit",
+      "title": "Next Scene; a multiplayer movie-making game: everyone creates competing 6-second AI scenes, the crowd votes which ones make the cut",
+      "url": "https://reddit.com/r/SideProject/comments/1w9pnk5/next_scene_a_multiplayer_moviemaking_game/",
+      "inspected_at": "2026-09-07T11:40:54.351185+00:00"
+    },
+    "reddit_1w9pmsj": {
+      "platform": "reddit",
+      "title": "I pulled a whole Threads history into one table. What would you do in bulk with it?",
+      "url": "https://reddit.com/r/SideProject/comments/1w9pmsj/i_pulled_a_whole_threads_history_into_one_table/",
+      "inspected_at": "2026-09-07T11:41:06.433584+00:00"
+    },
+    "reddit_1w9pmpk": {
+      "platform": "reddit",
+      "title": "I built a web app to turn old phones and monitors into smart displays.",
+      "url": "https://reddit.com/r/SideProject/comments/1w9pmpk/i_built_a_web_app_to_turn_old_phones_and_monitors/",
+      "inspected_at": "2026-09-07T11:41:07.126387+00:00"
+    },
+    "reddit_1w9n4vl": {
+      "platform": "reddit",
+      "title": "4 months, 40 free users, first launch ever coming in: the actual numbers behind ScreenerHub",
+      "url": "https://reddit.com/r/indiehackers/comments/1w9n4vl/4_months_40_free_users_first_launch_ever_coming/",
+      "inspected_at": "2026-09-07T11:41:07.903358+00:00"
+    },
+    "reddit_1w9khrx": {
+      "platform": "reddit",
+      "title": "Posted into an empty timeline for 4 months, one reply from a stranger fixed something I didn't know was broken",
+      "url": "https://reddit.com/r/indiehackers/comments/1w9khrx/posted_into_an_empty_timeline_for_4_months_one/",
+      "inspected_at": "2026-09-07T11:41:08.720945+00:00"
+    },
+    "reddit_1w9olr7": {
+      "platform": "reddit",
+      "title": "Blume.codes - Turns coding agent sessions into better rules and skills",
+      "url": "https://reddit.com/r/roastmystartup/comments/1w9olr7/blumecodes_turns_coding_agent_sessions_into/",
+      "inspected_at": "2026-09-07T11:41:09.548285+00:00"
     }
   },
   "pending_drafts": {
@@ -1274,7 +1310,7 @@
     }
   },
   "recorded_feedback": [],
-  "last_organic_post_timestamp": "2026-09-06T20:03:09.725105+00:00",
+  "last_organic_post_timestamp": "2026-09-07T11:41:18.918861+00:00",
   "organic_posts": [
     {
       "text": "you either die a young enthusiastic builder or live long enough to realize that 90% of tech problems are solved by restarting the router.",
@@ -1300,10 +1336,20 @@
         "Bluesky"
       ],
       "posted_at": "2026-09-06T20:03:09.725105+00:00"
+    },
+    {
+      "text": "humbling experience: trying to explain to normal people why having a local offline backup of your life matters when 'the cloud exists'.",
+      "topic": "scuba_diving_and_ocean",
+      "platforms": [
+        "Twitter/X",
+        "Bluesky"
+      ],
+      "posted_at": "2026-09-07T11:41:18.918861+00:00"
     }
   ],
   "x_posts_timestamps": [
-    "2026-09-06T03:08:28.084456+00:00"
+    "2026-09-06T03:08:28.084456+00:00",
+    "2026-09-07T11:41:18.669653+00:00"
   ],
   "posted_devlogs": {
     "devlog_0_2_2_60_2026_07_17_190f9f3082": {
