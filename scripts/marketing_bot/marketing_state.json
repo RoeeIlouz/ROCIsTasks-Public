@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-06T20:03:10.090758+00:00",
+  "last_run_timestamp": "2026-09-07T03:05:20.449693+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -902,6 +902,42 @@
       "title": "I shipped my Flutter app: nine daily football puzzles in one app",
       "url": "https://reddit.com/r/roastmystartup/comments/1w92z3g/i_shipped_my_flutter_app_nine_daily_football/",
       "inspected_at": "2026-09-06T20:03:00.100206+00:00"
+    },
+    "reddit_1w9f72d": {
+      "platform": "reddit",
+      "title": "Does this demo make it clear what I built? Looking for honest feedback.",
+      "url": "https://reddit.com/r/SideProject/comments/1w9f72d/does_this_demo_make_it_clear_what_i_built_looking/",
+      "inspected_at": "2026-09-07T03:04:59.641270+00:00"
+    },
+    "reddit_1w9etp2": {
+      "platform": "reddit",
+      "title": "I built a web app that tracks national-team players’ club games, where to watch, and lets you add them to your calendar",
+      "url": "https://reddit.com/r/SideProject/comments/1w9etp2/i_built_a_web_app_that_tracks_nationalteam/",
+      "inspected_at": "2026-09-07T03:05:02.954516+00:00"
+    },
+    "reddit_1w9ejj3": {
+      "platform": "reddit",
+      "title": "We built open-source apps to manage our LanCache and Pi-hole on TrueNAS",
+      "url": "https://reddit.com/r/SideProject/comments/1w9ejj3/we_built_opensource_apps_to_manage_our_lancache/",
+      "inspected_at": "2026-09-07T03:05:05.311131+00:00"
+    },
+    "reddit_1w9ef25": {
+      "platform": "reddit",
+      "title": "Instagram toolbox userscript — mutual checker, follow/unfollow review + DM unsender",
+      "url": "https://reddit.com/r/SideProject/comments/1w9ef25/instagram_toolbox_userscript_mutual_checker/",
+      "inspected_at": "2026-09-07T03:05:07.030767+00:00"
+    },
+    "reddit_1w999w1": {
+      "platform": "reddit",
+      "title": "UGC creators piss me off so god damn much I built my own platform out of hatred",
+      "url": "https://reddit.com/r/indiehackers/comments/1w999w1/ugc_creators_piss_me_off_so_god_damn_much_i_built/",
+      "inspected_at": "2026-09-07T03:05:09.053495+00:00"
+    },
+    "reddit_1w9fes2": {
+      "platform": "reddit",
+      "title": "After 11 years in mobile development, where should I go next in the AI era?",
+      "url": "https://reddit.com/r/FlutterDev/comments/1w9fes2/after_11_years_in_mobile_development_where_should/",
+      "inspected_at": "2026-09-07T03:05:11.482561+00:00"
     }
   },
   "pending_drafts": {
