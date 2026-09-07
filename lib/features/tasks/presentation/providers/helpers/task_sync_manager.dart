@@ -8,6 +8,7 @@ import 'package:rocis_tasks/core/services/google_tasks_service.dart';
 import 'package:rocis_tasks/features/categories/domain/models/category.dart';
 import 'package:rocis_tasks/features/tasks/data/datasources/local_task_source.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
+import 'package:rocis_tasks/core/services/offline_write_queue_service.dart';
 
 class TaskSyncManager {
   final AuthService _authService;
@@ -32,18 +33,21 @@ class TaskSyncManager {
     required CalendarService calendarService,
     required LocalTaskSource source,
     required ErrorHandlingService errorHandlingService,
-  })  : _authService = authService,
-        _firestoreService = firestoreService,
-        _googleTasksService = googleTasksService,
-        _calendarService = calendarService,
-        _source = source,
-        _errorHandlingService = errorHandlingService;
+  }) : _authService = authService,
+       _firestoreService = firestoreService,
+       _googleTasksService = googleTasksService,
+       _calendarService = calendarService,
+       _source = source,
+       _errorHandlingService = errorHandlingService;
 
   void recordPendingWrite(String taskId, bool isCompleted) {
     _pendingLocalWrites[taskId] = isCompleted;
   }
 
-  void schedulePendingWriteCleanup(String taskId, {Duration delay = const Duration(seconds: 15)}) {
+  void schedulePendingWriteCleanup(
+    String taskId, {
+    Duration delay = const Duration(seconds: 15),
+  }) {
     Future.delayed(delay, () {
       _pendingLocalWrites.remove(taskId);
     });
@@ -86,9 +90,9 @@ class TaskSyncManager {
     if (user == null) return;
     if (_completedPrefetchInFlight) return;
 
-    final hasAnyCompletedLocally = _source
-        .getTasks()
-        .any((t) => t.isCompleted && !(t.isDeleted ?? false));
+    final hasAnyCompletedLocally = _source.getTasks().any(
+      (t) => t.isCompleted && !(t.isDeleted ?? false),
+    );
     if (_completedPrefetchUserId == user.uid && hasAnyCompletedLocally) {
       return;
     }
@@ -121,6 +125,9 @@ class TaskSyncManager {
   }) async {
     if (_authService.currentUser == null) return;
 
+    // Flush any pending offline mutations
+    unawaited(_firestoreService.processOfflineQueue());
+
     await cancelSubscriptions();
     try {
       _tasksSubscription = _firestoreService.getActiveTasksStream().listen(
@@ -130,7 +137,9 @@ class TaskSyncManager {
             final cloudTask = event.task;
             final localTask = getTaskById(cloudTask.id);
 
-            if (localTask != null && localTask.isCompleted && !cloudTask.isCompleted) {
+            if (localTask != null &&
+                localTask.isCompleted &&
+                !cloudTask.isCompleted) {
               await cancelNotificationsById(cloudTask.id);
               needsUpdate = true;
               continue;
@@ -164,12 +173,15 @@ class TaskSyncManager {
             }
 
             if (event.type == SyncEventType.removed) {
-              final (latestTask, isMissing) =
-                  await _firestoreService.fetchTaskById(cloudTask.id);
+              final (latestTask, isMissing) = await _firestoreService
+                  .fetchTaskById(cloudTask.id);
               if (latestTask != null) {
-                if (localTask != null && localTask.isCompleted && !latestTask.isCompleted) {
+                if (localTask != null &&
+                    localTask.isCompleted &&
+                    !latestTask.isCompleted) {
                   latestTask.isCompleted = true;
-                  latestTask.completedAt = localTask.completedAt ?? DateTime.now();
+                  latestTask.completedAt =
+                      localTask.completedAt ?? DateTime.now();
                 }
                 await _source.addTask(latestTask);
                 if (latestTask.isCompleted || (latestTask.isDeleted ?? false)) {
@@ -182,12 +194,21 @@ class TaskSyncManager {
                 continue;
               }
             } else {
-              await _source.addTask(cloudTask);
+              final taskToSave = localTask != null
+                  ? TaskConflictResolver.resolveTaskConflict(
+                      localTask: localTask,
+                      remoteTask: cloudTask,
+                      hasPendingLocalWrite: _pendingLocalWrites.containsKey(
+                        cloudTask.id,
+                      ),
+                    )
+                  : cloudTask;
+              await _source.addTask(taskToSave);
 
-              if (cloudTask.isCompleted || (cloudTask.isDeleted ?? false)) {
-                await cancelNotificationsById(cloudTask.id);
+              if (taskToSave.isCompleted || (taskToSave.isDeleted ?? false)) {
+                await cancelNotificationsById(taskToSave.id);
               } else {
-                await scheduleTaskNotifications(cloudTask);
+                await scheduleTaskNotifications(taskToSave);
               }
             }
             needsUpdate = true;
@@ -222,11 +243,13 @@ class TaskSyncManager {
         },
       );
 
-      unawaited(syncGoogleTasksToLocal(
-        cancelTaskNotifications: cancelNotificationsById,
-        scheduleTaskNotifications: scheduleTaskNotifications,
-        onDataChanged: onDataChanged,
-      ));
+      unawaited(
+        syncGoogleTasksToLocal(
+          cancelTaskNotifications: cancelNotificationsById,
+          scheduleTaskNotifications: scheduleTaskNotifications,
+          onDataChanged: onDataChanged,
+        ),
+      );
     } catch (e, s) {
       _errorHandlingService.logError(e, s, reason: 'Starting cloud sync');
     }
@@ -303,7 +326,10 @@ class TaskSyncManager {
           task.googleTaskId = null;
           task.googleTaskListId = null;
           await _source.addTask(task);
-          await syncTaskGoogleTasksState(task, getCategoryById: getCategoryById);
+          await syncTaskGoogleTasksState(
+            task,
+            getCategoryById: getCategoryById,
+          );
         }
       }
     } catch (e, s) {
@@ -345,11 +371,7 @@ class TaskSyncManager {
 
         final localTask = allLocalTasks.firstWhere(
           (t) => t.googleTaskId == gTaskId && !(t.isDeleted ?? false),
-          orElse: () => Task(
-            id: '',
-            title: '',
-            createdAt: DateTime.now(),
-          ),
+          orElse: () => Task(id: '', title: '', createdAt: DateTime.now()),
         );
 
         if (localTask.id.isNotEmpty) {
@@ -378,7 +400,10 @@ class TaskSyncManager {
             await _firestoreService.updateTask(localTask);
             await cancelTaskNotifications(localTask.id);
 
-            schedulePendingWriteCleanup(localTask.id, delay: const Duration(seconds: 15));
+            schedulePendingWriteCleanup(
+              localTask.id,
+              delay: const Duration(seconds: 15),
+            );
             needsUpdate = true;
           } else if (!isCompletedInGoogle && localTask.isCompleted) {
             localTask.isCompleted = false;
@@ -387,11 +412,15 @@ class TaskSyncManager {
             _pendingLocalWrites[localTask.id] = false;
             await _source.addTask(localTask);
             await _firestoreService.updateTask(localTask);
-            if (localTask.dueDate != null && localTask.dueDate!.isAfter(DateTime.now())) {
+            if (localTask.dueDate != null &&
+                localTask.dueDate!.isAfter(DateTime.now())) {
               await scheduleTaskNotifications(localTask);
             }
 
-            schedulePendingWriteCleanup(localTask.id, delay: const Duration(seconds: 3));
+            schedulePendingWriteCleanup(
+              localTask.id,
+              delay: const Duration(seconds: 3),
+            );
             needsUpdate = true;
           }
         }

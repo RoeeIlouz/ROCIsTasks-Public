@@ -23,7 +23,7 @@ class CalendarService {
   /// timezones are uninitialized on Web.
   tz.TZDateTime _toTZDateTime(DateTime dt) {
     try {
-      return tz.TZDateTime.from(dt.toUtc(), tz.local);
+      return tz.TZDateTime.from(dt, tz.local);
     } catch (_) {
       final localDt = dt.toLocal();
       try {
@@ -45,7 +45,11 @@ class CalendarService {
   /// Centralized token resolution that returns null if no token is cached.
   Future<String?> _getAccessToken() async {
     if (_authService != null) {
-      final isGoogleUser = _authService!.currentUser?.providerData.any((p) => p.providerId == 'google.com') ?? false;
+      final isGoogleUser =
+          _authService!.currentUser?.providerData.any(
+            (p) => p.providerId == 'google.com',
+          ) ??
+          false;
       if (!isGoogleUser) return null;
       final token = await _authService!.getGoogleAccessToken();
       if (token != null && token.isNotEmpty) return token;
@@ -116,12 +120,11 @@ class CalendarService {
               'Google Calendar list API returned ${response.statusCode} (Unauthorized/Forbidden).',
               tag: 'Calendar',
             );
-            if (kIsWeb) {
-              throw GoogleTokenExpiredException(
-                'Google Calendar token rejected by server (${response.statusCode}).',
-                true,
-              );
-            }
+            await _authService?.handleTokenRevokedOrExpired();
+            throw GoogleTokenExpiredException(
+              'Google Calendar token rejected by server (${response.statusCode}).',
+              true,
+            );
           } else if (response.statusCode == 200) {
             final data = json.decode(response.body);
             final items = data['items'] as List<dynamic>? ?? [];
@@ -182,7 +185,11 @@ class CalendarService {
           );
         }
       } else if (kIsWeb) {
-        final isGoogle = _authService?.currentUser?.providerData.any((p) => p.providerId == 'google.com') ?? false;
+        final isGoogle =
+            _authService?.currentUser?.providerData.any(
+              (p) => p.providerId == 'google.com',
+            ) ??
+            false;
         if (isGoogle) {
           throw GoogleTokenExpiredException(
             'No Web Google access token available.',
@@ -262,6 +269,10 @@ class CalendarService {
     List<Calendar> rawCalendars,
   ) => _sanitizeAndFilterCalendars(rawCalendars);
 
+  @visibleForTesting
+  List<Event> deduplicateEventsForTesting(List<Event> events) =>
+      _deduplicateEvents(events);
+
   Future<Map<String, String>> getCalendarColors() async {
     final calendars = await getAvailableCalendars();
     final Map<String, String> colorMap = {};
@@ -272,6 +283,39 @@ class CalendarService {
       }
     }
     return colorMap;
+  }
+
+  /// Deduplicates calendar events using eventId and composite title/time fingerprint.
+  List<Event> _deduplicateEvents(List<Event> events) {
+    final seenIds = <String>{};
+    final seenFingerprints = <String>{};
+    final List<Event> deduplicated = [];
+
+    for (final event in events) {
+      final eventId = event.eventId?.trim();
+      final hasValidId = eventId != null && eventId.isNotEmpty;
+
+      if (hasValidId && seenIds.contains(eventId)) {
+        continue;
+      }
+
+      final title = event.title?.trim().toLowerCase() ?? '';
+      final startMs = event.start?.millisecondsSinceEpoch ?? 0;
+      final endMs = event.end?.millisecondsSinceEpoch ?? 0;
+      final fingerprint = '${title}_${startMs}_${endMs}_${event.allDay}';
+
+      if (seenFingerprints.contains(fingerprint)) {
+        continue;
+      }
+
+      if (hasValidId) {
+        seenIds.add(eventId);
+      }
+      seenFingerprints.add(fingerprint);
+      deduplicated.add(event);
+    }
+
+    return deduplicated;
   }
 
   Future<List<Event>> getEvents({
@@ -356,12 +400,11 @@ class CalendarService {
               'Google Calendar API request returned ${response.statusCode} for $calendarId: ${response.body}',
               tag: 'Calendar',
             );
-            if (kIsWeb) {
-              throw GoogleTokenExpiredException(
-                'Google Calendar token rejected by server (${response.statusCode}).',
-                true,
-              );
-            }
+            await _authService?.handleTokenRevokedOrExpired();
+            throw GoogleTokenExpiredException(
+              'Google Calendar token rejected by server (${response.statusCode}).',
+              true,
+            );
           } else if (response.statusCode == 200) {
             final data = json.decode(response.body);
             final items = data['items'] as List<dynamic>? ?? [];
@@ -438,7 +481,7 @@ class CalendarService {
             }
           }
         } on GoogleTokenExpiredException {
-          if (kIsWeb) rethrow;
+          rethrow;
         } catch (e) {
           AppLogger.error(
             'Error fetching events for calendar $calendarId via API',
@@ -448,7 +491,7 @@ class CalendarService {
       }
     }
 
-    return allEvents;
+    return _deduplicateEvents(allEvents);
   }
 
   Future<Calendar?> getDefaultWritableCalendar() async {
@@ -513,12 +556,11 @@ class CalendarService {
         }
 
         if (response.statusCode == 401 || response.statusCode == 403) {
-          if (kIsWeb) {
-            throw GoogleTokenExpiredException(
-              'Google Calendar token rejected by server.',
-              true,
-            );
-          }
+          await _authService?.handleTokenRevokedOrExpired();
+          throw GoogleTokenExpiredException(
+            'Google Calendar token rejected by server.',
+            true,
+          );
         }
 
         if (response.statusCode == 200 || response.statusCode == 201) {
@@ -526,7 +568,7 @@ class CalendarService {
           return data['id'] as String?;
         }
       } on GoogleTokenExpiredException {
-        if (kIsWeb) rethrow;
+        rethrow;
       } catch (e, s) {
         AppLogger.error(
           'Error creating/updating calendar event via API',
@@ -598,19 +640,18 @@ class CalendarService {
         );
 
         if (response.statusCode == 401 || response.statusCode == 403) {
-          if (kIsWeb) {
-            throw GoogleTokenExpiredException(
-              'Google Calendar token rejected by server.',
-              true,
-            );
-          }
+          await _authService?.handleTokenRevokedOrExpired();
+          throw GoogleTokenExpiredException(
+            'Google Calendar token rejected by server.',
+            true,
+          );
         }
 
         if (response.statusCode == 200 || response.statusCode == 204) {
           return true;
         }
       } on GoogleTokenExpiredException {
-        if (kIsWeb) rethrow;
+        rethrow;
       } catch (e, s) {
         AppLogger.error(
           'Error deleting calendar event via API',

@@ -35,6 +35,11 @@ class AuthService extends ChangeNotifier {
     );
   }
 
+  Future<void> handleTokenRevokedOrExpired() async {
+    await _oauthManager.invalidateToken();
+    setGoogleTasksTokenExpired(true);
+  }
+
   Future<void> get initialized => _initCompleter.future;
 
   FirebaseAuth? _scheduleAuth;

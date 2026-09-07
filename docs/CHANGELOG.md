@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.13+97] - 2026-09-07
+
+### Added
+- Persistent offline write queue with auto-retry and visual sync indicator.
+- Instant draft task import from web landing page into workspace.
+
+### Fixed
+- Fixed Google Calendar all-day event dates (RFC 5545 compliance).
+- Prevented duplicate calendar events between native device and Google accounts.
+- Resolved web initialization and service worker deprecation warnings.
+
 ## [0.2.12+96] - 2026-09-03
 
 ### Fixed
