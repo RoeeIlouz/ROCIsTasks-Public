@@ -4,6 +4,7 @@ import 'package:rocis_tasks/features/categories/domain/models/category.dart';
 import 'package:rocis_tasks/core/services/retry_service.dart';
 import 'package:rocis_tasks/core/services/logger_service.dart';
 import 'package:rocis_tasks/core/services/sync_status_service.dart';
+import 'package:rocis_tasks/core/services/offline_write_queue_service.dart';
 import 'package:firebase_performance/firebase_performance.dart';
 
 enum SyncEventType { added, modified, removed }
@@ -86,6 +87,17 @@ class FirestoreService {
         tag: 'Firestore',
       );
       _syncStatus.setError('Failed to sync category. Changes saved locally.');
+      await OfflineWriteQueueService().enqueue(
+        type: OfflineOperationType.createCategory,
+        entityId: category.id,
+        payload: {
+          'id': category.id,
+          'name': category.name,
+          'colorValue': category.colorValue,
+          'iconCode': category.iconCode,
+          'isPrivate': category.isPrivate,
+        },
+      );
     } finally {
       await trace.stop();
     }
@@ -118,6 +130,16 @@ class FirestoreService {
       _syncStatus.setError(
         'Failed to sync category update. Changes saved locally.',
       );
+      await OfflineWriteQueueService().enqueue(
+        type: OfflineOperationType.updateCategory,
+        entityId: category.id,
+        payload: {
+          'name': category.name,
+          'colorValue': category.colorValue,
+          'iconCode': category.iconCode,
+          'isPrivate': category.isPrivate,
+        },
+      );
     } finally {
       await trace.stop();
     }
@@ -144,6 +166,10 @@ class FirestoreService {
       );
       _syncStatus.setError(
         'Failed to sync category deletion. Will retry later.',
+      );
+      await OfflineWriteQueueService().enqueue(
+        type: OfflineOperationType.deleteCategory,
+        entityId: id,
       );
     } finally {
       await trace.stop();
@@ -196,6 +222,11 @@ class FirestoreService {
     } catch (e) {
       AppLogger.error('Firestore addTask failed', error: e, tag: 'Firestore');
       _syncStatus.setError('Failed to sync task. Changes saved locally.');
+      await OfflineWriteQueueService().enqueue(
+        type: OfflineOperationType.createTask,
+        entityId: task.id,
+        payload: task.toFirestoreMap(),
+      );
     } finally {
       await trace.stop();
     }
@@ -225,6 +256,11 @@ class FirestoreService {
       _syncStatus.setError(
         'Failed to sync task update. Changes saved locally.',
       );
+      await OfflineWriteQueueService().enqueue(
+        type: OfflineOperationType.updateTask,
+        entityId: task.id,
+        payload: task.toFirestoreMap(),
+      );
     } finally {
       await trace.stop();
     }
@@ -250,9 +286,54 @@ class FirestoreService {
         tag: 'Firestore',
       );
       _syncStatus.setError('Failed to sync task deletion. Will retry later.');
+      await OfflineWriteQueueService().enqueue(
+        type: OfflineOperationType.deleteTask,
+        entityId: id,
+      );
     } finally {
       await trace.stop();
     }
+  }
+
+  /// Drains any pending offline mutations with exponential backoff
+  Future<void> processOfflineQueue() async {
+    final queueService = OfflineWriteQueueService();
+    if (!queueService.hasPendingWrites || !_shouldSync) return;
+
+    await queueService.drainQueue(
+      executor: (op) async {
+        final tasksCol = _tasksCollection;
+        final catsCol = _categoriesCollection;
+
+        switch (op.type) {
+          case OfflineOperationType.createTask:
+          case OfflineOperationType.updateTask:
+            if (tasksCol == null || op.payload == null) return false;
+            final data = Map<String, dynamic>.from(op.payload!);
+            data['updatedAt'] = FieldValue.serverTimestamp();
+            await tasksCol.doc(op.entityId).set(data, SetOptions(merge: true));
+            return true;
+
+          case OfflineOperationType.deleteTask:
+            if (tasksCol == null) return false;
+            await tasksCol.doc(op.entityId).delete();
+            return true;
+
+          case OfflineOperationType.createCategory:
+          case OfflineOperationType.updateCategory:
+            if (catsCol == null || op.payload == null) return false;
+            await catsCol
+                .doc(op.entityId)
+                .set(op.payload!, SetOptions(merge: true));
+            return true;
+
+          case OfflineOperationType.deleteCategory:
+            if (catsCol == null) return false;
+            await catsCol.doc(op.entityId).delete();
+            return true;
+        }
+      },
+    );
   }
 
   Future<(Task? task, bool isMissing)> fetchTaskById(String id) async {
@@ -294,28 +375,28 @@ class FirestoreService {
         .where('isDeleted', isEqualTo: false)
         .snapshots()
         .map((snapshot) {
-      if (firstEvent) {
-        trace.stop();
-        firstEvent = false;
-      }
-      
-      return snapshot.docChanges.map((change) {
-        final task = Task.fromMap(change.doc.data()!);
-        SyncEventType type;
-        switch (change.type) {
-          case DocumentChangeType.added:
-            type = SyncEventType.added;
-            break;
-          case DocumentChangeType.modified:
-            type = SyncEventType.modified;
-            break;
-          case DocumentChangeType.removed:
-            type = SyncEventType.removed;
-            break;
-        }
-        return TaskSyncEvent(type, task);
-      }).toList();
-    });
+          if (firstEvent) {
+            trace.stop();
+            firstEvent = false;
+          }
+
+          return snapshot.docChanges.map((change) {
+            final task = Task.fromMap(change.doc.data()!);
+            SyncEventType type;
+            switch (change.type) {
+              case DocumentChangeType.added:
+                type = SyncEventType.added;
+                break;
+              case DocumentChangeType.modified:
+                type = SyncEventType.modified;
+                break;
+              case DocumentChangeType.removed:
+                type = SyncEventType.removed;
+                break;
+            }
+            return TaskSyncEvent(type, task);
+          }).toList();
+        });
   }
 
   DocumentSnapshot? _lastCompletedTaskDoc;
@@ -341,7 +422,9 @@ class FirestoreService {
       query = query.startAfterDocument(_lastCompletedTaskDoc!);
     }
 
-    final trace = FirebasePerformance.instance.newTrace('firestore_get_completed_tasks');
+    final trace = FirebasePerformance.instance.newTrace(
+      'firestore_get_completed_tasks',
+    );
     await trace.start();
     try {
       final snapshot = await query.get();
@@ -349,15 +432,19 @@ class FirestoreService {
         _hasMoreCompletedTasks = false;
         return [];
       }
-      
+
       if (snapshot.docs.length < limit) {
         _hasMoreCompletedTasks = false;
       }
-      
+
       _lastCompletedTaskDoc = snapshot.docs.last;
       return snapshot.docs.map((doc) => Task.fromMap(doc.data())).toList();
     } catch (e) {
-      AppLogger.error('Failed to fetch completed tasks', error: e, tag: 'Firestore');
+      AppLogger.error(
+        'Failed to fetch completed tasks',
+        error: e,
+        tag: 'Firestore',
+      );
       return [];
     } finally {
       await trace.stop();

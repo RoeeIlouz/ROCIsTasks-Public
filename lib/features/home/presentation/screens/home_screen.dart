@@ -26,6 +26,7 @@ import 'package:rocis_tasks/shared/ui/theme/theme_service.dart';
 import 'package:rocis_tasks/shared/ui/widgets/easter_egg_spinner.dart';
 import 'package:rocis_tasks/features/tasks/presentation/widgets/kanban/kanban_board_view.dart';
 import 'package:rocis_tasks/core/services/subscription_service.dart';
+import 'package:rocis_tasks/shared/ui/widgets/sync_status_badge.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -346,6 +347,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     )
                   : null,
               actions: [
+                const Center(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 4),
+                    child: SyncStatusBadge(compact: true),
+                  ),
+                ),
                 if (_currentIndex == 0) ...[
                   IconButton(
                     icon: Icon(_isSearching ? Icons.close : Icons.search),

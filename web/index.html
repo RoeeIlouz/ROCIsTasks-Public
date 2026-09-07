@@ -112,6 +112,14 @@
       <div class="tagline">Smart productivity, localized & premium</div>
     </div>
   </div>
+  <script>
+    window.addEventListener('flutter-first-frame', function () {
+      const loadingDiv = document.getElementById("loading");
+      if (loadingDiv) {
+        loadingDiv.remove();
+      }
+    });
+  </script>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>

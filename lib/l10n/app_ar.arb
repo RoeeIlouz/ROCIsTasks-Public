@@ -512,13 +512,5 @@
   "mediumPriority": "أولوية متوسطة",
   "lowPriority": "أولوية منخفضة",
   "kanbanWidget": "لوحة كانبان",
-  "kanbanWidgetDesc": "لوحة كانبان تفاعلية تحتوي على أعمدة المهام وفي التركيز والمكتملة",
-  "subcalendars": "التقاويم الفرعية",
-  "customColor": "لون مخصص",
-  "resetToGoogleDefault": "إعادة ضبط إلى لون Google",
-  "hexCode": "رمز HEX",
-  "opacity": "الشفافية",
-  "presets": "الإعدادات المسبقة",
-  "expandCustomPicker": "لون مخصص",
-  "noEnabledCalendars": "لا توجد تقاويم Google مفعّلة"
+  "kanbanWidgetDesc": "لوحة كانبان تفاعلية تحتوي على أعمدة المهام وفي التركيز والمكتملة"
 }

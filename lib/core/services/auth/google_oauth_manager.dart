@@ -151,6 +151,21 @@ class GoogleOAuthManager {
     }
   }
 
+  Future<void> invalidateToken() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(keyAccessToken);
+      await prefs.remove(keyAccessTokenExpiresAt);
+      _isGoogleTasksTokenExpired = true;
+      AppLogger.info('Cached Google access token invalidated.', tag: 'Auth');
+    } catch (e) {
+      AppLogger.warning(
+        'Failed to invalidate Google access token: $e',
+        tag: 'Auth',
+      );
+    }
+  }
+
   Future<String?> getGoogleAccessToken() async {
     try {
       final prefs = await SharedPreferences.getInstance();

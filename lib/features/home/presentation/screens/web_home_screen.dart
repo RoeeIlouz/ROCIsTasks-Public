@@ -21,6 +21,7 @@ import 'package:rocis_tasks/features/auth/presentation/screens/login_screen.dart
 import 'package:rocis_tasks/features/tasks/presentation/widgets/kanban/kanban_board_view.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:rocis_tasks/shared/ui/widgets/sync_status_badge.dart';
 
 class WebHomeScreen extends StatefulWidget {
   const WebHomeScreen({super.key});
@@ -58,6 +59,55 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
     super.initState();
     _titleController = TextEditingController();
     _descController = TextEditingController();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkAndLoadUrlDraft();
+    });
+  }
+
+  void _checkAndLoadUrlDraft() {
+    try {
+      final uri = Uri.base;
+      final params = uri.queryParameters;
+      final draftTitle = params['draftTitle'];
+      if (draftTitle != null && draftTitle.trim().isNotEmpty) {
+        final draftDue = params['draftDue'];
+        final draftSubtasks = params['draftSubtasks'];
+
+        DateTime? parsedDueDate;
+        if (draftDue != null && draftDue.isNotEmpty) {
+          parsedDueDate = DateTime.tryParse(draftDue);
+        }
+
+        List<SubTask> subtasks = [];
+        if (draftSubtasks != null && draftSubtasks.isNotEmpty) {
+          final titles = draftSubtasks
+              .split(',')
+              .map((s) => s.trim())
+              .where((s) => s.isNotEmpty);
+          subtasks = titles
+              .map(
+                (title) => SubTask(
+                  id: '${DateTime.now().millisecondsSinceEpoch}_${title.hashCode}',
+                  title: title,
+                  isCompleted: false,
+                ),
+              )
+              .toList();
+        }
+
+        setState(() {
+          _selectedTask = null;
+          _isCreatingTask = true;
+          _titleController.text = draftTitle.trim();
+          _descController.text = 'Imported from ROCIs Planner demo';
+          _dueDate = parsedDueDate;
+          _priority = TaskPriority.high;
+          _subTasks = subtasks;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error parsing URL draft task: $e');
+    }
   }
 
   @override
@@ -559,7 +609,9 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                     margin: const EdgeInsets.only(bottom: 16),
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.errorContainer.withValues(alpha: 0.4),
+                      color: theme.colorScheme.errorContainer.withValues(
+                        alpha: 0.4,
+                      ),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
                         color: theme.colorScheme.error.withValues(alpha: 0.3),
@@ -620,7 +672,8 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                 ? Padding(
                     padding: const EdgeInsets.only(bottom: 12),
                     child: Tooltip(
-                      message: '${l10n.googleTasksDisconnected} - ${l10n.reconnect}',
+                      message:
+                          '${l10n.googleTasksDisconnected} - ${l10n.reconnect}',
                       child: IconButton(
                         icon: Icon(
                           Icons.warning_amber_rounded,
@@ -642,7 +695,9 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                     margin: const EdgeInsets.only(bottom: 16),
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.errorContainer.withValues(alpha: 0.4),
+                      color: theme.colorScheme.errorContainer.withValues(
+                        alpha: 0.4,
+                      ),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
                         color: theme.colorScheme.error.withValues(alpha: 0.3),
@@ -709,7 +764,10 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                       'https://play.google.com/store/apps/details?id=com.rocisapps.tasks&pcampaignid=web_share',
                     );
                     if (await canLaunchUrl(url)) {
-                      await launchUrl(url, mode: LaunchMode.externalApplication);
+                      await launchUrl(
+                        url,
+                        mode: LaunchMode.externalApplication,
+                      );
                     }
                   },
                   borderRadius: BorderRadius.circular(16),
@@ -775,6 +833,12 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
               ),
             ),
 
+          // Sync Status Indicator
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: SyncStatusBadge(compact: isCompact),
+          ),
+
           // User Profile Card
           if (user != null)
             isCompact
@@ -786,7 +850,8 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                         alpha: 0.15,
                       ),
                       child: Text(
-                        (user.displayName != null && user.displayName!.isNotEmpty)
+                        (user.displayName != null &&
+                                user.displayName!.isNotEmpty)
                             ? user.displayName![0].toUpperCase()
                             : (user.email != null && user.email!.isNotEmpty
                                   ? user.email![0].toUpperCase()
@@ -817,7 +882,8 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                             alpha: 0.1,
                           ),
                           child: Text(
-                            (user.displayName != null && user.displayName!.isNotEmpty)
+                            (user.displayName != null &&
+                                    user.displayName!.isNotEmpty)
                                 ? user.displayName![0].toUpperCase()
                                 : (user.email != null && user.email!.isNotEmpty
                                       ? user.email![0].toUpperCase()
@@ -903,7 +969,9 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                       children: [
                         CircleAvatar(
                           radius: 18,
-                          backgroundColor: Colors.orangeAccent.withValues(alpha: 0.1),
+                          backgroundColor: Colors.orangeAccent.withValues(
+                            alpha: 0.1,
+                          ),
                           child: const Icon(
                             Icons.person_outline_rounded,
                             size: 20,
@@ -1183,6 +1251,8 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                 ),
               ),
               const SizedBox(width: 16),
+              const SyncStatusBadge(compact: false),
+              const SizedBox(width: 12),
               FilledButton.icon(
                 onPressed: _initCreateTask,
                 icon: const Icon(Icons.add, size: 18),
