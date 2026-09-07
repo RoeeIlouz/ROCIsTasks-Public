@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-07T17:19:27.958651+00:00",
+  "last_run_timestamp": "2026-09-07T21:10:08.491370+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -1010,6 +1010,42 @@
       "title": "I built an app that makes you do push-ups before opening TikTok 🤔💭",
       "url": "https://reddit.com/r/roastmystartup/comments/1w9xwi0/i_built_an_app_that_makes_you_do_pushups_before/",
       "inspected_at": "2026-09-07T17:19:19.484499+00:00"
+    },
+    "reddit_1wa4jev": {
+      "platform": "reddit",
+      "title": "Roast my first SaaS: I’m a marketer who built a GMB review tool for a clinic, but I’m struggling with the landing page copy.",
+      "url": "https://reddit.com/r/SideProject/comments/1wa4jev/roast_my_first_saas_im_a_marketer_who_built_a_gmb/",
+      "inspected_at": "2026-09-07T21:09:54.964615+00:00"
+    },
+    "reddit_1wa4ik2": {
+      "platform": "reddit",
+      "title": "I asked GPT-6 Astra to build a Road Rash-style game. Here’s the playable result.",
+      "url": "https://reddit.com/r/SideProject/comments/1wa4ik2/i_asked_gpt6_astra_to_build_a_road_rashstyle_game/",
+      "inspected_at": "2026-09-07T21:09:57.558350+00:00"
+    },
+    "reddit_1wa4hl5": {
+      "platform": "reddit",
+      "title": "Trying to counter the extremely one-sided home buying process. Any helpful feedback is greatly appreciated!",
+      "url": "https://reddit.com/r/SideProject/comments/1wa4hl5/trying_to_counter_the_extremely_onesided_home/",
+      "inspected_at": "2026-09-07T21:09:58.317446+00:00"
+    },
+    "reddit_1wa4aeb": {
+      "platform": "reddit",
+      "title": "I built an app where you get paired with one stranger, trade songs for 24 hours, and then the chat deletes itself",
+      "url": "https://reddit.com/r/SideProject/comments/1wa4aeb/i_built_an_app_where_you_get_paired_with_one/",
+      "inspected_at": "2026-09-07T21:09:59.136760+00:00"
+    },
+    "reddit_1wa4fki": {
+      "platform": "reddit",
+      "title": "I built an app where you get paired with one stranger, trade songs for 24 hours, and then the chat deletes itself",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wa4fki/i_built_an_app_where_you_get_paired_with_one/",
+      "inspected_at": "2026-09-07T21:09:59.853511+00:00"
+    },
+    "reddit_1wa26u1": {
+      "platform": "reddit",
+      "title": "I built \"Duolingo for finance\" — PleAsE tear it apart",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wa26u1/i_built_duolingo_for_finance_please_tear_it_apart/",
+      "inspected_at": "2026-09-07T21:10:00.566780+00:00"
     }
   },
   "pending_drafts": {
