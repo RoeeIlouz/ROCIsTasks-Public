@@ -252,14 +252,17 @@ class CalendarProvider extends ChangeNotifier {
         // Special case: if end is exactly midnight and it is not the start time (i.e. not a 0-duration event at midnight),
         // we might not want to include that day depending on interpretation.
         // But for "overlap", if it ends at 00:00 of Day 2, it does not overlap Day 2's 00:00-23:59.
-        // For all-day events, we treat the end date as inclusive if it's the last day.
+        // RFC 5545 & Google Calendar API standard:
+        // When an event ends at midnight (00:00:00.000) on a date after its start date,
+        // that end day represents an exclusive boundary for both timed and all-day events.
         if (currentDay == endDay &&
-            event.allDay != true &&
             end.hour == 0 &&
             end.minute == 0 &&
             end.second == 0 &&
             end.millisecond == 0 &&
-            currentDay != start) {
+            (currentDay.year != start.year ||
+                currentDay.month != start.month ||
+                currentDay.day != start.day)) {
           break;
         }
 

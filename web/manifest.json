@@ -1,13 +1,48 @@
 {
-    "name": "ROCI's Tasks",
-    "short_name": "ROCI's Tasks",
-    "start_url": ".",
+    "id": "/?source=pwa",
+    "name": "ROCIs Tasks",
+    "short_name": "ROCIs Tasks",
+    "start_url": "/",
+    "scope": "/",
     "display": "standalone",
+    "orientation": "any",
     "background_color": "#0F172A",
-    "theme_color": "#6366F1",
-    "description": "A powerful, minimalist productivity app with smart NLP input, bulk actions, and deep insights.",
-    "orientation": "portrait-primary",
+    "theme_color": "#F37000",
+    "description": "Turn academic deadlines into a realistic daily plan with offline-first synchronization, smart NLP input, and Google Calendar integration.",
+    "lang": "en",
+    "dir": "auto",
+    "categories": [
+        "productivity",
+        "education",
+        "utilities"
+    ],
     "prefer_related_applications": false,
+    "shortcuts": [
+        {
+            "name": "Add New Task",
+            "short_name": "Add Task",
+            "description": "Quickly capture an academic deadline or milestone",
+            "url": "/#/add-task",
+            "icons": [
+                {
+                    "src": "icons/Icon-192.png",
+                    "sizes": "192x192"
+                }
+            ]
+        },
+        {
+            "name": "Calendar Agenda",
+            "short_name": "Calendar",
+            "description": "View scheduled workload and timetable",
+            "url": "/#/calendar",
+            "icons": [
+                {
+                    "src": "icons/Icon-192.png",
+                    "sizes": "192x192"
+                }
+            ]
+        }
+    ],
     "icons": [
         {
             "src": "icons/Icon-192.png",

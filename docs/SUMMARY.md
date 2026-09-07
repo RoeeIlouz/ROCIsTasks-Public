@@ -2,6 +2,38 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## Landing Page Academic Planner Overhaul, PWA Offline Engine & Google Calendar RFC 5545 Audit - 2026-09-07
+
+#### Problem & Requirements
+* **Landing Page Conversion & Messaging Gap**:
+  * Copy was feature-centric rather than outcome-focused for students and academic workloads.
+  * Preview simulator math had a discrepancy (showing 66% instead of mathematically accurate 67% for 2 done out of 3).
+  * Missing interactive "try before sign-up" mechanism to demonstrate immediate value without friction.
+* **PWA & Offline Reliability**:
+  * Web PWA manifest lacked rich categories, launch URL query tracking, and service worker registration configuration.
+  * Offline mutations were vulnerable to lost network states without an exponential-backoff write queue or deterministic subtask conflict merging.
+  * No visual sync badge indicating offline/syncing/synced state.
+* **Google Calendar Integration & RFC 5545 Compliance**:
+  * All-day events were displayed across an extra day due to `event.allDay != true` in the day-span loop ignoring RFC 5545 exclusive midnight end dates.
+  * Lack of event deduplication led to duplicated events when device calendar and Google REST API both returned events for the same account.
+  * 401/403 unauthorized token responses did not invalidate cached tokens, leading to repeated failed calls.
+
+#### Solutions & Architecture Applied
+1. **Landing Page (`ROCIsApp.github.io`)**:
+   * Overhauled hero section with verified academic value propositions ("Turn academic deadlines into a realistic daily plan").
+   * Added 3-step visual workflow and interactive demo with client-side NLP parsing, auto-generated subtasks, and context preservation passing query parameters into web onboarding.
+   * Fixed dashboard preview math to exact 67% and stroke offset 37.32.
+2. **PWA & Offline Engine (`ROCIs-tasks`)**:
+   * Upgraded `web/manifest.json` for web.dev compliance.
+   * Migrated web bootstrap to clean Flutter 3.22+ standard: removed deprecated `web/flutter_bootstrap.js` template (resolving IDE syntax errors on `{{...}}` tokens and deprecation warnings) and moved `#loading` splash screen removal to `web/index.html` using the native `flutter-first-frame` DOM event.
+   * Implemented persistent `OfflineWriteQueueService` with operation collapsing, exponential backoff drain, and deterministic `TaskConflictResolver` (subtask ID merging + timestamp comparison).
+   * Integrated `SyncStatusBadge` using decoupled `ListenableBuilder` over singletons into mobile `AppBar` and web workspace header.
+   * Wired deep link draft task ingestion in `WebHomeScreen.initState`.
+3. **Google Calendar Audit & RFC 5545 Fix**:
+   * Removed `event.allDay != true` and enforced exclusive midnight boundary check for multi-day and single-day all-day events in `CalendarProvider`.
+   * Added composite event deduplication (`_deduplicateEvents`) by ID and title/time/allDay fingerprint.
+   * Implemented `invalidateToken` and `handleTokenRevokedOrExpired` across `GoogleOAuthManager`, `AuthService`, and `CalendarService`.
+
 ## Telegram Bot Interactive On-Demand Drafting & RAS (ROCI's AI System) Integration - 2026-09-06
 
 #### Problem & Requirements

@@ -117,13 +117,18 @@ void main() {
     ).thenAnswer((_) => const Stream.empty());
     when(() => mockSource.clearAll()).thenAnswer((_) async => {});
     when(() => mockSource.updateTask(any())).thenAnswer((_) async => {});
+    when(
+      () => mockFirestoreService.processOfflineQueue(),
+    ).thenAnswer((_) async => {});
     when(() => mockConnectivityService.init()).thenAnswer((_) async => {});
     when(() => mockConnectivityService.isOnline).thenReturn(true);
     when(
       () => mockAuthService.authStateChanges,
     ).thenAnswer((_) => Stream.value(null));
     when(() => mockAuthService.currentUser).thenReturn(null);
-    when(() => mockAuthService.getGoogleAccessToken()).thenAnswer((_) async => null);
+    when(
+      () => mockAuthService.getGoogleAccessToken(),
+    ).thenAnswer((_) async => null);
     when(
       () => mockErrorHandlingService.logError(
         any(),
@@ -205,48 +210,61 @@ void main() {
   });
 
   group('TaskProvider Completed Prefetch', () {
-    test('fetches completed tasks after login when showCompleted is enabled', () async {
-      final user = MockUser();
-      when(() => user.uid).thenReturn('u1');
+    test(
+      'fetches completed tasks after login when showCompleted is enabled',
+      () async {
+        final user = MockUser();
+        when(() => user.uid).thenReturn('u1');
 
-      when(() => mockAuthService.authStateChanges).thenAnswer(
-        (_) => Stream.value(user),
-      );
-      when(() => mockAuthService.currentUser).thenReturn(user);
+        when(
+          () => mockAuthService.authStateChanges,
+        ).thenAnswer((_) => Stream.value(user));
+        when(() => mockAuthService.currentUser).thenReturn(user);
 
-      when(() => mockFirestoreService.setUserId(any())).thenReturn(null);
-      when(() => mockFirestoreService.getActiveTasksStream()).thenAnswer(
-        (_) => const Stream.empty(),
-      );
-      when(() => mockFirestoreService.getCategoriesStream()).thenAnswer(
-        (_) => const Stream.empty(),
-      );
-      when(() => mockFirestoreService.addTask(any())).thenAnswer((_) async => {});
-      when(() => mockFirestoreService.addCategory(any())).thenAnswer((_) async => {});
+        when(() => mockFirestoreService.setUserId(any())).thenReturn(null);
+        when(
+          () => mockFirestoreService.getActiveTasksStream(),
+        ).thenAnswer((_) => const Stream.empty());
+        when(
+          () => mockFirestoreService.getCategoriesStream(),
+        ).thenAnswer((_) => const Stream.empty());
+        when(
+          () => mockFirestoreService.addTask(any()),
+        ).thenAnswer((_) async => {});
+        when(
+          () => mockFirestoreService.addCategory(any()),
+        ).thenAnswer((_) async => {});
 
-      final completedTask = Task(
-        id: 'c1',
-        title: 'Completed',
-        isCompleted: true,
-      );
-      when(() => mockFirestoreService.getNextCompletedTasksBatch()).thenAnswer(
-        (_) async => [completedTask],
-      );
-      when(() => mockSource.addTask(any())).thenAnswer((_) async => {});
+        final completedTask = Task(
+          id: 'c1',
+          title: 'Completed',
+          isCompleted: true,
+        );
+        when(
+          () => mockFirestoreService.getNextCompletedTasksBatch(),
+        ).thenAnswer((_) async => [completedTask]);
+        when(() => mockSource.addTask(any())).thenAnswer((_) async => {});
 
-      await taskProvider.init();
+        await taskProvider.init();
 
-      await untilCalled(() => mockFirestoreService.getNextCompletedTasksBatch());
-      verify(() => mockSource.addTask(completedTask)).called(1);
-    });
+        await untilCalled(
+          () => mockFirestoreService.getNextCompletedTasksBatch(),
+        );
+        verify(() => mockSource.addTask(completedTask)).called(1);
+      },
+    );
   });
 
   group('TaskProvider Recurring Tasks', () {
     test('spawns next recurring task when completed by premium user', () async {
       when(() => mockSubscriptionService.isPremium).thenReturn(true);
       when(() => mockSource.addTask(any())).thenAnswer((_) async => {});
-      when(() => mockFirestoreService.updateTask(any())).thenAnswer((_) async => {});
-      when(() => mockFirestoreService.addTask(any())).thenAnswer((_) async => {});
+      when(
+        () => mockFirestoreService.updateTask(any()),
+      ).thenAnswer((_) async => {});
+      when(
+        () => mockFirestoreService.addTask(any()),
+      ).thenAnswer((_) async => {});
 
       await taskProvider.init();
 
@@ -262,7 +280,9 @@ void main() {
 
       expect(recurringTask.isCompleted, isTrue);
       // Verify adding the completed task and adding the next instance
-      final capturedTasks = verify(() => mockSource.addTask(captureAny())).captured;
+      final capturedTasks = verify(
+        () => mockSource.addTask(captureAny()),
+      ).captured;
       expect(capturedTasks.length, 2);
 
       final nextTask = capturedTasks[1] as Task;
@@ -272,28 +292,35 @@ void main() {
       expect(nextTask.dueDate, DateTime(2026, 8, 16, 9, 0));
     });
 
-    test('does not spawn next recurring task when user is not premium', () async {
-      when(() => mockSubscriptionService.isPremium).thenReturn(false);
-      when(() => mockSource.addTask(any())).thenAnswer((_) async => {});
-      when(() => mockFirestoreService.updateTask(any())).thenAnswer((_) async => {});
+    test(
+      'does not spawn next recurring task when user is not premium',
+      () async {
+        when(() => mockSubscriptionService.isPremium).thenReturn(false);
+        when(() => mockSource.addTask(any())).thenAnswer((_) async => {});
+        when(
+          () => mockFirestoreService.updateTask(any()),
+        ).thenAnswer((_) async => {});
 
-      await taskProvider.init();
+        await taskProvider.init();
 
-      final recurringTask = Task(
-        id: 'rec-2',
-        title: 'Daily Standup Free',
-        isCompleted: false,
-        dueDate: DateTime(2026, 8, 15, 9, 0),
-        recurrenceRule: 'FREQ=DAILY;INTERVAL=1',
-      );
+        final recurringTask = Task(
+          id: 'rec-2',
+          title: 'Daily Standup Free',
+          isCompleted: false,
+          dueDate: DateTime(2026, 8, 15, 9, 0),
+          recurrenceRule: 'FREQ=DAILY;INTERVAL=1',
+        );
 
-      await taskProvider.toggleTaskCompletion(recurringTask);
+        await taskProvider.toggleTaskCompletion(recurringTask);
 
-      expect(recurringTask.isCompleted, isTrue);
-      // Only the completed task should be saved
-      final capturedTasks = verify(() => mockSource.addTask(captureAny())).captured;
-      expect(capturedTasks.length, 1);
-      expect((capturedTasks.first as Task).id, 'rec-2');
-    });
+        expect(recurringTask.isCompleted, isTrue);
+        // Only the completed task should be saved
+        final capturedTasks = verify(
+          () => mockSource.addTask(captureAny()),
+        ).captured;
+        expect(capturedTasks.length, 1);
+        expect((capturedTasks.first as Task).id, 'rec-2');
+      },
+    );
   });
 }
