@@ -33,6 +33,12 @@ This file summarizes errors encountered and changes made to the codebase, ensuri
    * Removed `event.allDay != true` and enforced exclusive midnight boundary check for multi-day and single-day all-day events in `CalendarProvider`.
    * Added composite event deduplication (`_deduplicateEvents`) by ID and title/time/allDay fingerprint.
    * Implemented `invalidateToken` and `handleTokenRevokedOrExpired` across `GoogleOAuthManager`, `AuthService`, and `CalendarService`.
+4. **Dual Channel Release `v0.2.13+97` (GitHub & Google Play)**:
+   * Synchronized `pubspec.yaml` and `app_config.dart` to `0.2.13+97`.
+   * Updated `docs/CHANGELOG.md` with concise release notes (<500 characters).
+   * Pushed to `ROCIsApp.github.io` (`fbe8d3b`) and `ROCIs-tasks` (`2b5f79b`, tag `v0.2.13+97`).
+   * Published release `v0.2.13+97` on GitHub Releases with signed standalone `app-release.apk` (74.5MB).
+   * Built and registered Shorebird release `0.2.13+97` with signed Play Store App Bundle `app-release.aab` (70.2MB).
 
 ## Telegram Bot Interactive On-Demand Drafting & RAS (ROCI's AI System) Integration - 2026-09-06
 
