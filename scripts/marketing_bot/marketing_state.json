@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-07T11:41:19.337280+00:00",
+  "last_run_timestamp": "2026-09-07T17:19:27.958651+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -974,6 +974,42 @@
       "title": "Blume.codes - Turns coding agent sessions into better rules and skills",
       "url": "https://reddit.com/r/roastmystartup/comments/1w9olr7/blumecodes_turns_coding_agent_sessions_into/",
       "inspected_at": "2026-09-07T11:41:09.548285+00:00"
+    },
+    "reddit_1w9y97u": {
+      "platform": "reddit",
+      "title": "Platinum trophy on pc",
+      "url": "https://reddit.com/r/SideProject/comments/1w9y97u/platinum_trophy_on_pc/",
+      "inspected_at": "2026-09-07T17:19:13.101389+00:00"
+    },
+    "reddit_1w9y8d9": {
+      "platform": "reddit",
+      "title": "Finder is so frustrating and has been since day one, so I built my own",
+      "url": "https://reddit.com/r/SideProject/comments/1w9y8d9/finder_is_so_frustrating_and_has_been_since_day/",
+      "inspected_at": "2026-09-07T17:19:15.743959+00:00"
+    },
+    "reddit_1w9y5tv": {
+      "platform": "reddit",
+      "title": "I stopped demoing my project and started just handing it to people.",
+      "url": "https://reddit.com/r/SideProject/comments/1w9y5tv/i_stopped_demoing_my_project_and_started_just/",
+      "inspected_at": "2026-09-07T17:19:16.690964+00:00"
+    },
+    "reddit_1w9xw8k": {
+      "platform": "reddit",
+      "title": "After months in beta, I launched ApplyForMe. Here is what beta testing actually taught me about users vs. testers.",
+      "url": "https://reddit.com/r/SideProject/comments/1w9xw8k/after_months_in_beta_i_launched_applyforme_here/",
+      "inspected_at": "2026-09-07T17:19:17.678750+00:00"
+    },
+    "reddit_1w9s3dl": {
+      "platform": "reddit",
+      "title": "charging €4.99 for a waitlist spot before the product exist to find out if anyone wants it",
+      "url": "https://reddit.com/r/indiehackers/comments/1w9s3dl/charging_499_for_a_waitlist_spot_before_the/",
+      "inspected_at": "2026-09-07T17:19:18.646610+00:00"
+    },
+    "reddit_1w9xwi0": {
+      "platform": "reddit",
+      "title": "I built an app that makes you do push-ups before opening TikTok 🤔💭",
+      "url": "https://reddit.com/r/roastmystartup/comments/1w9xwi0/i_built_an_app_that_makes_you_do_pushups_before/",
+      "inspected_at": "2026-09-07T17:19:19.484499+00:00"
     }
   },
   "pending_drafts": {
