@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-08T16:05:04.428277+00:00",
+  "last_run_timestamp": "2026-09-08T20:47:44.586082+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -1154,6 +1154,42 @@
       "title": "Roast my affiliate site service. Three calls I made on purpose.",
       "url": "https://reddit.com/r/roastmystartup/comments/1warea8/roast_my_affiliate_site_service_three_calls_i/",
       "inspected_at": "2026-09-08T16:04:52.896433+00:00"
+    },
+    "reddit_1wb0ki9": {
+      "platform": "reddit",
+      "title": "(Continuity) Opensource Project.",
+      "url": "https://reddit.com/r/SideProject/comments/1wb0ki9/continuity_opensource_project/",
+      "inspected_at": "2026-09-08T20:46:26.075479+00:00"
+    },
+    "reddit_1wb0jnm": {
+      "platform": "reddit",
+      "title": "Mapped 120,523 open source AI skills onto an org chart",
+      "url": "https://reddit.com/r/SideProject/comments/1wb0jnm/mapped_120523_open_source_ai_skills_onto_an_org/",
+      "inspected_at": "2026-09-08T20:46:29.047701+00:00"
+    },
+    "reddit_1wb044j": {
+      "platform": "reddit",
+      "title": "Cold outbound is dead. Staking an upfront \"Omega Bond\" is how I flipped enterprise sales psychology.",
+      "url": "https://reddit.com/r/SideProject/comments/1wb044j/cold_outbound_is_dead_staking_an_upfront_omega/",
+      "inspected_at": "2026-09-08T20:46:47.150111+00:00"
+    },
+    "reddit_1wb02lb": {
+      "platform": "reddit",
+      "title": "AIPass Update #20 - v2.8.2 + v2.8.3: the checker that manufactured tests, and the red cross that returned 0",
+      "url": "https://reddit.com/r/SideProject/comments/1wb02lb/aipass_update_20_v282_v283_the_checker_that/",
+      "inspected_at": "2026-09-08T20:47:17.710278+00:00"
+    },
+    "reddit_1wavp9w": {
+      "platform": "reddit",
+      "title": "Built an AI mock test & doubt-solving platform for India's CA students (<10% pass rate), tell me why it'll fail",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wavp9w/built_an_ai_mock_test_doubtsolving_platform_for/",
+      "inspected_at": "2026-09-08T20:47:30.741234+00:00"
+    },
+    "reddit_1wavltc": {
+      "platform": "reddit",
+      "title": "Roast Hookpost: An $8/month flat-rate social media manager built to kill per-channel billing.",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wavltc/roast_hookpost_an_8month_flatrate_social_media/",
+      "inspected_at": "2026-09-08T20:47:32.124357+00:00"
     }
   },
   "pending_drafts": {
