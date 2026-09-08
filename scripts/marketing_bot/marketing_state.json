@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-08T10:40:10.141942+00:00",
+  "last_run_timestamp": "2026-09-08T16:05:04.428277+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -1118,6 +1118,42 @@
       "title": "Roast my habit tracker: solo dev, zero ratings, and I'm asking $9.99/mo in a category full of free apps",
       "url": "https://reddit.com/r/roastmystartup/comments/1wahjva/roast_my_habit_tracker_solo_dev_zero_ratings_and/",
       "inspected_at": "2026-09-08T10:40:02.079260+00:00"
+    },
+    "reddit_1wasci9": {
+      "platform": "reddit",
+      "title": "An open-source offline productivity monitoring app",
+      "url": "https://reddit.com/r/SideProject/comments/1wasci9/an_opensource_offline_productivity_monitoring_app/",
+      "inspected_at": "2026-09-08T16:03:45.581575+00:00"
+    },
+    "reddit_1wasaz6": {
+      "platform": "reddit",
+      "title": "Why I verify an agent's effect before allowing a retry",
+      "url": "https://reddit.com/r/SideProject/comments/1wasaz6/why_i_verify_an_agents_effect_before_allowing_a/",
+      "inspected_at": "2026-09-08T16:04:16.444271+00:00"
+    },
+    "reddit_1was3gj": {
+      "platform": "reddit",
+      "title": "1,600+ directory submissions in - what actually works, and what's a scam",
+      "url": "https://reddit.com/r/SideProject/comments/1was3gj/1600_directory_submissions_in_what_actually_works/",
+      "inspected_at": "2026-09-08T16:04:24.116690+00:00"
+    },
+    "reddit_1wao53i": {
+      "platform": "reddit",
+      "title": "Shipped more code in 3 days than the last 2.5 months. VC demo does something to you!!",
+      "url": "https://reddit.com/r/indiehackers/comments/1wao53i/shipped_more_code_in_3_days_than_the_last_25/",
+      "inspected_at": "2026-09-08T16:04:51.229984+00:00"
+    },
+    "reddit_1wasivf": {
+      "platform": "reddit",
+      "title": "Roast my movie/TV tracker (watchpapa.tv) - 25 signups, 2 active users, and I can't explain why anyone would pick it over Trakt or Letterboxd",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wasivf/roast_my_movietv_tracker_watchpapatv_25_signups_2/",
+      "inspected_at": "2026-09-08T16:04:52.199688+00:00"
+    },
+    "reddit_1warea8": {
+      "platform": "reddit",
+      "title": "Roast my affiliate site service. Three calls I made on purpose.",
+      "url": "https://reddit.com/r/roastmystartup/comments/1warea8/roast_my_affiliate_site_service_three_calls_i/",
+      "inspected_at": "2026-09-08T16:04:52.896433+00:00"
     }
   },
   "pending_drafts": {
@@ -1454,7 +1490,7 @@
     }
   },
   "recorded_feedback": [],
-  "last_organic_post_timestamp": "2026-09-08T03:14:27.859944+00:00",
+  "last_organic_post_timestamp": "2026-09-08T16:05:03.856443+00:00",
   "organic_posts": [
     {
       "text": "you either die a young enthusiastic builder or live long enough to realize that 90% of tech problems are solved by restarting the router.",
@@ -1497,11 +1533,21 @@
         "Bluesky"
       ],
       "posted_at": "2026-09-08T03:14:27.859944+00:00"
+    },
+    {
+      "text": "my home server has an uptime of 114 days and at this point i'm terrified to vacuum anywhere near the power strip.",
+      "topic": "focus_and_music_loops",
+      "platforms": [
+        "Twitter/X",
+        "Bluesky"
+      ],
+      "posted_at": "2026-09-08T16:05:03.856443+00:00"
     }
   ],
   "x_posts_timestamps": [
     "2026-09-06T03:08:28.084456+00:00",
-    "2026-09-07T11:41:18.669653+00:00"
+    "2026-09-07T11:41:18.669653+00:00",
+    "2026-09-08T16:05:02.814388+00:00"
   ],
   "posted_devlogs": {
     "devlog_0_2_2_60_2026_07_17_190f9f3082": {
