@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-08T03:14:28.183361+00:00",
+  "last_run_timestamp": "2026-09-08T10:40:10.141942+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -1082,6 +1082,42 @@
       "title": "Shipped a turn-based kendo game built in Flutter — happy to answer anything about the stack",
       "url": "https://reddit.com/r/FlutterDev/comments/1wacqnt/shipped_a_turnbased_kendo_game_built_in_flutter/",
       "inspected_at": "2026-09-08T03:14:18.162641+00:00"
+    },
+    "reddit_1wakrrf": {
+      "platform": "reddit",
+      "title": "My shell knows me better than my mom",
+      "url": "https://reddit.com/r/SideProject/comments/1wakrrf/my_shell_knows_me_better_than_my_mom/",
+      "inspected_at": "2026-09-08T10:39:54.383072+00:00"
+    },
+    "reddit_1wakqpe": {
+      "platform": "reddit",
+      "title": "I built minimo — a free, open-source video compressor for iOS & Android",
+      "url": "https://reddit.com/r/SideProject/comments/1wakqpe/i_built_minimo_a_free_opensource_video_compressor/",
+      "inspected_at": "2026-09-08T10:39:58.703421+00:00"
+    },
+    "reddit_1wakqbf": {
+      "platform": "reddit",
+      "title": "I built Finzo — a loan tracker that goes beyond just calculating EMI",
+      "url": "https://reddit.com/r/SideProject/comments/1wakqbf/i_built_finzo_a_loan_tracker_that_goes_beyond/",
+      "inspected_at": "2026-09-08T10:39:59.543795+00:00"
+    },
+    "reddit_1wakm6i": {
+      "platform": "reddit",
+      "title": "I made an automatic golf tracker app",
+      "url": "https://reddit.com/r/SideProject/comments/1wakm6i/i_made_an_automatic_golf_tracker_app/",
+      "inspected_at": "2026-09-08T10:40:00.313764+00:00"
+    },
+    "reddit_1waik1c": {
+      "platform": "reddit",
+      "title": "Roast my AI app builder. 20k signups, ~100 daily actives, and a name that sounds like a plagiarism tool.",
+      "url": "https://reddit.com/r/roastmystartup/comments/1waik1c/roast_my_ai_app_builder_20k_signups_100_daily/",
+      "inspected_at": "2026-09-08T10:40:01.236110+00:00"
+    },
+    "reddit_1wahjva": {
+      "platform": "reddit",
+      "title": "Roast my habit tracker: solo dev, zero ratings, and I'm asking $9.99/mo in a category full of free apps",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wahjva/roast_my_habit_tracker_solo_dev_zero_ratings_and/",
+      "inspected_at": "2026-09-08T10:40:02.079260+00:00"
     }
   },
   "pending_drafts": {
