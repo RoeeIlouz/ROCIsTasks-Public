@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-07T21:10:08.491370+00:00",
+  "last_run_timestamp": "2026-09-08T03:14:28.183361+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -1046,6 +1046,42 @@
       "title": "I built \"Duolingo for finance\" — PleAsE tear it apart",
       "url": "https://reddit.com/r/roastmystartup/comments/1wa26u1/i_built_duolingo_for_finance_please_tear_it_apart/",
       "inspected_at": "2026-09-07T21:10:00.566780+00:00"
+    },
+    "reddit_1wacmbc": {
+      "platform": "reddit",
+      "title": "Created a hacking simulation script with some Easter eggs inside",
+      "url": "https://reddit.com/r/SideProject/comments/1wacmbc/created_a_hacking_simulation_script_with_some/",
+      "inspected_at": "2026-09-08T03:14:13.902101+00:00"
+    },
+    "reddit_1wacec9": {
+      "platform": "reddit",
+      "title": "I stopped being present in my own meetings, so I built the thing I wanted",
+      "url": "https://reddit.com/r/SideProject/comments/1wacec9/i_stopped_being_present_in_my_own_meetings_so_i/",
+      "inspected_at": "2026-09-08T03:14:15.037427+00:00"
+    },
+    "reddit_1wabvj1": {
+      "platform": "reddit",
+      "title": "Got my first GitHub star today 🎉",
+      "url": "https://reddit.com/r/SideProject/comments/1wabvj1/got_my_first_github_star_today/",
+      "inspected_at": "2026-09-08T03:14:15.753116+00:00"
+    },
+    "reddit_1wabu8y": {
+      "platform": "reddit",
+      "title": "I made a lightweight way to cull hundreds of video clips without opening each one",
+      "url": "https://reddit.com/r/SideProject/comments/1wabu8y/i_made_a_lightweight_way_to_cull_hundreds_of/",
+      "inspected_at": "2026-09-08T03:14:16.499374+00:00"
+    },
+    "reddit_1wa4lti": {
+      "platform": "reddit",
+      "title": "Roast my first SaaS: I’m a marketer who built a GMB review tool for a clinic, but I’m struggling with the landing page copy.",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wa4lti/roast_my_first_saas_im_a_marketer_who_built_a_gmb/",
+      "inspected_at": "2026-09-08T03:14:17.395945+00:00"
+    },
+    "reddit_1wacqnt": {
+      "platform": "reddit",
+      "title": "Shipped a turn-based kendo game built in Flutter — happy to answer anything about the stack",
+      "url": "https://reddit.com/r/FlutterDev/comments/1wacqnt/shipped_a_turnbased_kendo_game_built_in_flutter/",
+      "inspected_at": "2026-09-08T03:14:18.162641+00:00"
     }
   },
   "pending_drafts": {
@@ -1382,7 +1418,7 @@
     }
   },
   "recorded_feedback": [],
-  "last_organic_post_timestamp": "2026-09-07T11:41:18.918861+00:00",
+  "last_organic_post_timestamp": "2026-09-08T03:14:27.859944+00:00",
   "organic_posts": [
     {
       "text": "you either die a young enthusiastic builder or live long enough to realize that 90% of tech problems are solved by restarting the router.",
@@ -1417,6 +1453,14 @@
         "Bluesky"
       ],
       "posted_at": "2026-09-07T11:41:18.918861+00:00"
+    },
+    {
+      "text": "i have 64 browser tabs open and 43 of them are stackoverflow answers for a bug i fixed three days ago. i cannot close them because what if.",
+      "topic": "focus_and_music_loops",
+      "platforms": [
+        "Bluesky"
+      ],
+      "posted_at": "2026-09-08T03:14:27.859944+00:00"
     }
   ],
   "x_posts_timestamps": [
