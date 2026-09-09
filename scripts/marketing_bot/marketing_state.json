@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-09T03:16:59.992715+00:00",
+  "last_run_timestamp": "2026-09-09T10:50:50.224893+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -1226,6 +1226,42 @@
       "title": "Spec Driven Dev template",
       "url": "https://reddit.com/r/FlutterDev/comments/1waw4bl/spec_driven_dev_template/",
       "inspected_at": "2026-09-09T03:16:52.035844+00:00"
+    },
+    "reddit_1wbi4f4": {
+      "platform": "reddit",
+      "title": "Built a small game hosting service as a side project, would love honest feedback",
+      "url": "https://reddit.com/r/SideProject/comments/1wbi4f4/built_a_small_game_hosting_service_as_a_side/",
+      "inspected_at": "2026-09-09T10:49:47.402930+00:00"
+    },
+    "reddit_1wbi4ea": {
+      "platform": "reddit",
+      "title": "I built a TikTok alternative for education — first month: ~200 users, zero marketing",
+      "url": "https://reddit.com/r/SideProject/comments/1wbi4ea/i_built_a_tiktok_alternative_for_education_first/",
+      "inspected_at": "2026-09-09T10:49:51.805042+00:00"
+    },
+    "reddit_1wbi0j2": {
+      "platform": "reddit",
+      "title": "I went to 5 interviews and nobody asked me a single LeetCode question. So I built an AI mock interviewer that runs locally",
+      "url": "https://reddit.com/r/SideProject/comments/1wbi0j2/i_went_to_5_interviews_and_nobody_asked_me_a/",
+      "inspected_at": "2026-09-09T10:49:52.805179+00:00"
+    },
+    "reddit_1wbhqbn": {
+      "platform": "reddit",
+      "title": "What AI tools would you recommend for growing a niche website through SEO and social media?",
+      "url": "https://reddit.com/r/SideProject/comments/1wbhqbn/what_ai_tools_would_you_recommend_for_growing_a/",
+      "inspected_at": "2026-09-09T10:49:53.777590+00:00"
+    },
+    "reddit_1wbi21l": {
+      "platform": "reddit",
+      "title": "Roast my SEO tool. 15 years in SEO, first product I built myself, and I cannot tell if anyone would pay for it.",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wbi21l/roast_my_seo_tool_15_years_in_seo_first_product_i/",
+      "inspected_at": "2026-09-09T10:50:37.392158+00:00"
+    },
+    "reddit_1wbhjfh": {
+      "platform": "reddit",
+      "title": "Roast my free tool — Sprout Design (brand kits for founders). Please be blunt",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wbhjfh/roast_my_free_tool_sprout_design_brand_kits_for/",
+      "inspected_at": "2026-09-09T10:50:38.410959+00:00"
     }
   },
   "pending_drafts": {
@@ -1562,7 +1598,7 @@
     }
   },
   "recorded_feedback": [],
-  "last_organic_post_timestamp": "2026-09-08T16:05:03.856443+00:00",
+  "last_organic_post_timestamp": "2026-09-09T10:50:49.637150+00:00",
   "organic_posts": [
     {
       "text": "you either die a young enthusiastic builder or live long enough to realize that 90% of tech problems are solved by restarting the router.",
@@ -1614,6 +1650,14 @@
         "Bluesky"
       ],
       "posted_at": "2026-09-08T16:05:03.856443+00:00"
+    },
+    {
+      "text": "my home server has an uptime of 114 days and at this point i'm terrified to vacuum anywhere near the power strip.",
+      "topic": "gaming_and_steam_deck",
+      "platforms": [
+        "Bluesky"
+      ],
+      "posted_at": "2026-09-09T10:50:49.637150+00:00"
     }
   ],
   "x_posts_timestamps": [
