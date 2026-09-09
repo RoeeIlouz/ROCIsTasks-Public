@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-08T20:47:44.586082+00:00",
+  "last_run_timestamp": "2026-09-09T03:16:59.992715+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -1190,6 +1190,42 @@
       "title": "Roast Hookpost: An $8/month flat-rate social media manager built to kill per-channel billing.",
       "url": "https://reddit.com/r/roastmystartup/comments/1wavltc/roast_hookpost_an_8month_flatrate_social_media/",
       "inspected_at": "2026-09-08T20:47:32.124357+00:00"
+    },
+    "reddit_1wb9qra": {
+      "platform": "reddit",
+      "title": "GigDelivery+: delivery earnings, mileage, and expenses in one iPhone app",
+      "url": "https://reddit.com/r/SideProject/comments/1wb9qra/gigdelivery_delivery_earnings_mileage_and/",
+      "inspected_at": "2026-09-09T03:16:46.284991+00:00"
+    },
+    "reddit_1wb9nxd": {
+      "platform": "reddit",
+      "title": "I spent the last few months building a real-time, stealth AI copilot for Google Meet & Zoom. Here’s a raw 40s demo.",
+      "url": "https://reddit.com/r/SideProject/comments/1wb9nxd/i_spent_the_last_few_months_building_a_realtime/",
+      "inspected_at": "2026-09-09T03:16:49.083707+00:00"
+    },
+    "reddit_1wb9nv7": {
+      "platform": "reddit",
+      "title": "I revived a dead Gmail extension on weekends — now it's live on Chrome + Firefox (Inbundly)",
+      "url": "https://reddit.com/r/SideProject/comments/1wb9nv7/i_revived_a_dead_gmail_extension_on_weekends_now/",
+      "inspected_at": "2026-09-09T03:16:49.874183+00:00"
+    },
+    "reddit_1wb4l99": {
+      "platform": "reddit",
+      "title": "Six apps photograph your fridge and give you recipes. None of them remember what was in it — so I built that.",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wb4l99/six_apps_photograph_your_fridge_and_give_you/",
+      "inspected_at": "2026-09-09T03:16:50.681034+00:00"
+    },
+    "reddit_1wat4mr": {
+      "platform": "reddit",
+      "title": "Trading journal where the record can't be faked. \nI think the core idea is right and the retention is doomed. Roast it.",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wat4mr/trading_journal_where_the_record_cant_be_faked_i/",
+      "inspected_at": "2026-09-09T03:16:51.365224+00:00"
+    },
+    "reddit_1waw4bl": {
+      "platform": "reddit",
+      "title": "Spec Driven Dev template",
+      "url": "https://reddit.com/r/FlutterDev/comments/1waw4bl/spec_driven_dev_template/",
+      "inspected_at": "2026-09-09T03:16:52.035844+00:00"
     }
   },
   "pending_drafts": {
