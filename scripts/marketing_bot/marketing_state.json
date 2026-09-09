@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-09T10:50:50.224893+00:00",
+  "last_run_timestamp": "2026-09-09T16:04:39.193640+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -1262,6 +1262,42 @@
       "title": "Roast my free tool — Sprout Design (brand kits for founders). Please be blunt",
       "url": "https://reddit.com/r/roastmystartup/comments/1wbhjfh/roast_my_free_tool_sprout_design_brand_kits_for/",
       "inspected_at": "2026-09-09T10:50:38.410959+00:00"
+    },
+    "reddit_1wbpk8r": {
+      "platform": "reddit",
+      "title": "What if politicians had a live public ranking that changed with the news?",
+      "url": "https://reddit.com/r/SideProject/comments/1wbpk8r/what_if_politicians_had_a_live_public_ranking/",
+      "inspected_at": "2026-09-09T15:59:51.324419+00:00"
+    },
+    "reddit_1wbpdt4": {
+      "platform": "reddit",
+      "title": "Junior DevOps - Looking to handle Docker/CI/CD/Deployment for your side project!",
+      "url": "https://reddit.com/r/SideProject/comments/1wbpdt4/junior_devops_looking_to_handle/",
+      "inspected_at": "2026-09-09T16:01:12.634318+00:00"
+    },
+    "reddit_1wbp81f": {
+      "platform": "reddit",
+      "title": "Runna got me injured so I built an alternative",
+      "url": "https://reddit.com/r/SideProject/comments/1wbp81f/runna_got_me_injured_so_i_built_an_alternative/",
+      "inspected_at": "2026-09-09T16:02:42.763988+00:00"
+    },
+    "reddit_1wbp3tj": {
+      "platform": "reddit",
+      "title": "I built a Chrome extension that turns web pages into organized Notion entries with AI — would love some feedback",
+      "url": "https://reddit.com/r/SideProject/comments/1wbp3tj/i_built_a_chrome_extension_that_turns_web_pages/",
+      "inspected_at": "2026-09-09T16:03:09.760933+00:00"
+    },
+    "reddit_1wbpb3r": {
+      "platform": "reddit",
+      "title": "Focused in-product micro surveys. Need your feedback",
+      "url": "https://reddit.com/r/indiehackers/comments/1wbpb3r/focused_inproduct_micro_surveys_need_your_feedback/",
+      "inspected_at": "2026-09-09T16:04:21.965585+00:00"
+    },
+    "reddit_1wbk3dy": {
+      "platform": "reddit",
+      "title": "Share what you're building",
+      "url": "https://reddit.com/r/indiehackers/comments/1wbk3dy/share_what_youre_building/",
+      "inspected_at": "2026-09-09T16:04:28.588418+00:00"
     }
   },
   "pending_drafts": {
