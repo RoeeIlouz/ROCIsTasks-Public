@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-09T16:04:39.193640+00:00",
+  "last_run_timestamp": "2026-09-09T20:29:56.399576+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -1298,6 +1298,42 @@
       "title": "Share what you're building",
       "url": "https://reddit.com/r/indiehackers/comments/1wbk3dy/share_what_youre_building/",
       "inspected_at": "2026-09-09T16:04:28.588418+00:00"
+    },
+    "reddit_1wbxb76": {
+      "platform": "reddit",
+      "title": "I have a digital graveyard of 1,000 dead dreams. So I built an anti-productivity app.",
+      "url": "https://reddit.com/r/SideProject/comments/1wbxb76/i_have_a_digital_graveyard_of_1000_dead_dreams_so/",
+      "inspected_at": "2026-09-09T20:29:37.053532+00:00"
+    },
+    "reddit_1wbxahi": {
+      "platform": "reddit",
+      "title": "Introducing ToddleBits — an app I'm building for new parents (feedback wanted)",
+      "url": "https://reddit.com/r/SideProject/comments/1wbxahi/introducing_toddlebits_an_app_im_building_for_new/",
+      "inspected_at": "2026-09-09T20:29:40.017767+00:00"
+    },
+    "reddit_1wbx5t7": {
+      "platform": "reddit",
+      "title": "Rebuilt an old 2M-book search demo to be FAST without CACHING!",
+      "url": "https://reddit.com/r/SideProject/comments/1wbx5t7/rebuilt_an_old_2mbook_search_demo_to_be_fast/",
+      "inspected_at": "2026-09-09T20:29:42.191156+00:00"
+    },
+    "reddit_1wbwy1y": {
+      "platform": "reddit",
+      "title": "Got sick of writing the same Express boilerplate for every project, so I built a zero-config framework to replace it.",
+      "url": "https://reddit.com/r/SideProject/comments/1wbwy1y/got_sick_of_writing_the_same_express_boilerplate/",
+      "inspected_at": "2026-09-09T20:29:44.841180+00:00"
+    },
+    "reddit_1waox17": {
+      "platform": "reddit",
+      "title": "I’m building a Canadian hosting company — is the plan and renewal story actually clear?",
+      "url": "https://reddit.com/r/indiehackers/comments/1waox17/im_building_a_canadian_hosting_company_is_the/",
+      "inspected_at": "2026-09-09T20:29:47.667752+00:00"
+    },
+    "reddit_1wbwqay": {
+      "platform": "reddit",
+      "title": "I built a browser extension that auto-declines cookie pop-ups. Roast it.",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wbwqay/i_built_a_browser_extension_that_autodeclines/",
+      "inspected_at": "2026-09-09T20:29:48.369749+00:00"
     }
   },
   "pending_drafts": {
