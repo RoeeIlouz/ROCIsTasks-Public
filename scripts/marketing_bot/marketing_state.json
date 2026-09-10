@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-09T20:29:56.399576+00:00",
+  "last_run_timestamp": "2026-09-10T03:16:36.482200+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -1334,6 +1334,42 @@
       "title": "I built a browser extension that auto-declines cookie pop-ups. Roast it.",
       "url": "https://reddit.com/r/roastmystartup/comments/1wbwqay/i_built_a_browser_extension_that_autodeclines/",
       "inspected_at": "2026-09-09T20:29:48.369749+00:00"
+    },
+    "reddit_1wc707m": {
+      "platform": "reddit",
+      "title": "nowbuild.ing - free forever task manager for building in public",
+      "url": "https://reddit.com/r/SideProject/comments/1wc707m/nowbuilding_free_forever_task_manager_for/",
+      "inspected_at": "2026-09-10T03:16:16.019989+00:00"
+    },
+    "reddit_1wc6yau": {
+      "platform": "reddit",
+      "title": "I built a YAML-based CV compiler: version-control your CV like code, generate pixel-perfect PDF/DOCX/HTML/Markdown output with one command",
+      "url": "https://reddit.com/r/SideProject/comments/1wc6yau/i_built_a_yamlbased_cv_compiler_versioncontrol/",
+      "inspected_at": "2026-09-10T03:16:20.492090+00:00"
+    },
+    "reddit_1wc6s8v": {
+      "platform": "reddit",
+      "title": "RhythmSeekr in IOS App Store( College planner)",
+      "url": "https://reddit.com/r/SideProject/comments/1wc6s8v/rhythmseekr_in_ios_app_store_college_planner/",
+      "inspected_at": "2026-09-10T03:16:21.919416+00:00"
+    },
+    "reddit_1wc6rph": {
+      "platform": "reddit",
+      "title": "I spent months building a live 1v1 sports debate app. It launched three weeks ago and not one debate has happened.",
+      "url": "https://reddit.com/r/SideProject/comments/1wc6rph/i_spent_months_building_a_live_1v1_sports_debate/",
+      "inspected_at": "2026-09-10T03:16:23.293892+00:00"
+    },
+    "reddit_1wbr513": {
+      "platform": "reddit",
+      "title": "I sell nothing for $100–$10,000. Roast it before I find out the hard way.",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wbr513/i_sell_nothing_for_10010000_roast_it_before_i/",
+      "inspected_at": "2026-09-10T03:16:24.950328+00:00"
+    },
+    "reddit_1wbjloo": {
+      "platform": "reddit",
+      "title": "My employees could hear my emails. Naturally, I responded by building an entire SaaS.",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wbjloo/my_employees_could_hear_my_emails_naturally_i/",
+      "inspected_at": "2026-09-10T03:16:26.290678+00:00"
     }
   },
   "pending_drafts": {
@@ -1670,7 +1706,7 @@
     }
   },
   "recorded_feedback": [],
-  "last_organic_post_timestamp": "2026-09-09T10:50:49.637150+00:00",
+  "last_organic_post_timestamp": "2026-09-10T03:16:36.110341+00:00",
   "organic_posts": [
     {
       "text": "you either die a young enthusiastic builder or live long enough to realize that 90% of tech problems are solved by restarting the router.",
@@ -1730,12 +1766,22 @@
         "Bluesky"
       ],
       "posted_at": "2026-09-09T10:50:49.637150+00:00"
+    },
+    {
+      "text": "spending 4 hours debugging an electrical engineering circuit lab only to discover a faulty breadboard jumper wire is peak character building.",
+      "topic": "everyday_observations",
+      "platforms": [
+        "Twitter/X",
+        "Bluesky"
+      ],
+      "posted_at": "2026-09-10T03:16:36.110341+00:00"
     }
   ],
   "x_posts_timestamps": [
     "2026-09-06T03:08:28.084456+00:00",
     "2026-09-07T11:41:18.669653+00:00",
-    "2026-09-08T16:05:02.814388+00:00"
+    "2026-09-08T16:05:02.814388+00:00",
+    "2026-09-10T03:16:35.720705+00:00"
   ],
   "posted_devlogs": {
     "devlog_0_2_2_60_2026_07_17_190f9f3082": {
