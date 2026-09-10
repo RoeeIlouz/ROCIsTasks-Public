@@ -194,6 +194,20 @@ class FullCalendarWidgetService {
             calendarIds: filters.selectedCalendarIds,
           );
           calendarColors = await _calendarService.getCalendarColors();
+          for (final key in prefs.getKeys()) {
+            if (key.startsWith(
+              CalendarColorService.keySubcalendarColorsPrefix,
+            )) {
+              final calId = key.substring(
+                CalendarColorService.keySubcalendarColorsPrefix.length,
+              );
+              final colorInt = prefs.getInt(key);
+              if (colorInt != null) {
+                calendarColors[calId] =
+                    '#${colorInt.toRadixString(16).padLeft(8, '0')}';
+              }
+            }
+          }
         }
       } catch (e, stack) {
         AppLogger.error(
@@ -361,6 +375,35 @@ class FullCalendarWidgetService {
         }
       }
 
+      // If the newly generated grid has 0 summaries but previous grid was populated,
+      // preserve previous grid to prevent empty-screen wipe during background sleep/offline
+      final int totalSummaries = gridData.fold<int>(
+        0,
+        (sum, day) => sum + ((day['summaries'] as List?)?.length ?? 0),
+      );
+      if (totalSummaries == 0) {
+        final existingData = await HomeWidget.getWidgetData<String>(
+          'full_calendar_grid_data',
+        );
+        if (existingData != null &&
+            existingData.isNotEmpty &&
+            existingData != '[]') {
+          try {
+            final decoded = jsonDecode(existingData) as List<dynamic>;
+            final int existingSummaries = decoded.fold<int>(
+              0,
+              (sum, day) => sum + ((day['summaries'] as List?)?.length ?? 0),
+            );
+            if (existingSummaries > 0) {
+              AppLogger.warning(
+                'Newly generated grid has 0 summaries while existing grid has $existingSummaries. Preserving existing grid.',
+              );
+              return;
+            }
+          } catch (_) {}
+        }
+      }
+
       // Save all widget data atomically
       final gridDataJson = jsonEncode(gridData);
 
@@ -406,7 +449,14 @@ class FullCalendarWidgetService {
         error: e,
         stack: stack,
       );
-      await _generateFallbackGrid(monthOffset, userId);
+      final existingData = await HomeWidget.getWidgetData<String>(
+        'full_calendar_grid_data',
+      );
+      if (existingData == null ||
+          existingData.isEmpty ||
+          existingData == '[]') {
+        await _generateFallbackGrid(monthOffset, userId);
+      }
     }
   }
 
@@ -431,6 +481,18 @@ class FullCalendarWidgetService {
   /// Generates a grid with just dates (no events) to prevent blank widget
   Future<void> _generateFallbackGrid(int? monthOffset, String? userId) async {
     try {
+      final existingData = await HomeWidget.getWidgetData<String>(
+        'full_calendar_grid_data',
+      );
+      if (existingData != null &&
+          existingData.isNotEmpty &&
+          existingData != '[]') {
+        AppLogger.info(
+          'Preserving existing full_calendar_grid_data instead of overwriting with fallback',
+        );
+        return;
+      }
+
       final int offset =
           monthOffset ??
           (await HomeWidget.getWidgetData<int>('full_calendar_offset') ?? 0);

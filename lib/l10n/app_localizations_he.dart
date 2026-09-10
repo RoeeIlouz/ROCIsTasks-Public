@@ -300,6 +300,30 @@ class AppLocalizationsHe extends AppLocalizations {
   String get selectColor => 'בחר צבע';
 
   @override
+  String get subcalendars => 'יומני משנה';
+
+  @override
+  String get customColor => 'צבע מותאם אישית';
+
+  @override
+  String get resetToGoogleDefault => 'אפס לצבע המקורי של Google';
+
+  @override
+  String get hexCode => 'קוד HEX';
+
+  @override
+  String get opacity => 'אטימות';
+
+  @override
+  String get presets => 'צבעים מוגדרים מראש';
+
+  @override
+  String get expandCustomPicker => 'צבע מותאם אישית';
+
+  @override
+  String get noEnabledCalendars => 'אין יומני Google מופעלים';
+
+  @override
   String get selectGoogleCalendars => 'בחר יומני Google';
 
   @override

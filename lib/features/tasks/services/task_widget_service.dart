@@ -150,6 +150,16 @@ class TaskWidgetService {
         }
       }
 
+      // If allTasks is empty, verify whether previous tasks existed to prevent transient background wipes
+      if (allTasks.isEmpty) {
+        final existing = await HomeWidget.getWidgetData<String>(
+          'pending_tasks_list',
+        );
+        if (existing != null && existing.isNotEmpty && existing != '[]') {
+          return chartPath;
+        }
+      }
+
       // Save widget data with error handling
       try {
         final jsonString = jsonEncode(tasksJson);
@@ -158,7 +168,7 @@ class TaskWidgetService {
           jsonString,
         );
       } catch (e) {
-        await HomeWidget.saveWidgetData<String>('pending_tasks_list', '[]');
+        // Failed to save pending_tasks_list - preserve existing data instead of wiping
       }
 
       // Update the widget
@@ -169,15 +179,7 @@ class TaskWidgetService {
 
       return chartPath;
     } catch (e) {
-      try {
-        await HomeWidget.saveWidgetData<String>('pending_tasks_list', '[]');
-        await HomeWidget.updateWidget(
-          name: 'TaskWidgetProvider',
-          iOSName: 'TaskWidget',
-        );
-      } catch (fallbackError) {
-        // Fallback update failed
-      }
+      // Failed to update TaskWidget - preserve existing data instead of wiping
       return null;
     }
   }

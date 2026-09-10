@@ -28,7 +28,6 @@ class KanbanWidgetFactory(private val context: Context) : RemoteViewsService.Rem
     }
 
     override fun onDataSetChanged() {
-        items.clear()
         try {
             val widgetData = HomeWidgetPlugin.getData(context)
             widgetTheme = widgetData.getString("full_calendar_theme", "system") ?: "system"
@@ -51,12 +50,15 @@ class KanbanWidgetFactory(private val context: Context) : RemoteViewsService.Rem
             }
 
             val jsonArray = kanbanJson.optJSONArray(columnKey) ?: JSONArray()
+            val newItems = ArrayList<JSONObject>()
             for (i in 0 until jsonArray.length()) {
                 val item = jsonArray.optJSONObject(i) ?: continue
-                items.add(item)
+                newItems.add(item)
             }
-        } catch (_: Exception) {
             items.clear()
+            items.addAll(newItems)
+        } catch (_: Exception) {
+            // Keep existing items on error
         }
     }
 

@@ -91,6 +91,7 @@ def main():
     parser.add_argument("--credentials", help="Path to service account JSON key")
     parser.add_argument("--package-name", default=DEFAULT_PACKAGE_NAME, help="Android package name")
     parser.add_argument("--track", default="internal", help="Track to upload to (default: internal)")
+    parser.add_argument("--changelog", help="Changelog text or path to changelog file")
     args = parser.parse_args()
 
     aab_path = args.aab
@@ -158,14 +159,29 @@ def main():
     # 4. Assign to track
     print(f"\n[4/5] Assigning to '{args.track}' track...")
     track_url = f"{base_url}/edits/{edit_id}/tracks/{args.track}"
+    release_dict = {
+        "versionCodes": [str(version_code)],
+        "status": "completed",
+    }
+    changelog_text = None
+    if args.changelog:
+        if os.path.exists(args.changelog):
+            with open(args.changelog, "r", encoding="utf-8") as cf:
+                changelog_text = cf.read().strip()
+        else:
+            changelog_text = args.changelog.strip()
+
+    if changelog_text:
+        if len(changelog_text) > 500:
+            changelog_text = changelog_text[:497] + "..."
+        release_dict["releaseNotes"] = [
+            {"language": "en-US", "text": changelog_text}
+        ]
+        print(f"[INFO] Attaching release notes ({len(changelog_text)} chars)")
+
     track_body = {
         "track": args.track,
-        "releases": [
-            {
-                "versionCodes": [str(version_code)],
-                "status": "completed",
-            }
-        ],
+        "releases": [release_dict],
     }
     track_resp = requests.put(
         track_url,

@@ -390,13 +390,22 @@ class WidgetDataService {
       (a, b) => DateTime.parse(a['date']).compareTo(DateTime.parse(b['date'])),
     );
 
+    if (agendaItems.isEmpty) {
+      final existing = await HomeWidget.getWidgetData<String>(
+        'today_agenda_data',
+      );
+      if (existing != null && existing.isNotEmpty && existing != '[]') {
+        return;
+      }
+    }
+
     try {
       await HomeWidget.saveWidgetData<String>(
         'today_agenda_data',
         jsonEncode(agendaItems),
       );
     } catch (e) {
-      await HomeWidget.saveWidgetData<String>('today_agenda_data', '[]');
+      AppLogger.debug('Failed to save today_agenda_data: $e');
     }
 
     try {
@@ -668,13 +677,22 @@ class WidgetDataService {
       timelineData.add(item);
     }
 
+    if (timelineData.isEmpty) {
+      final existing = await HomeWidget.getWidgetData<String>(
+        'timeline_agenda_data',
+      );
+      if (existing != null && existing.isNotEmpty && existing != '[]') {
+        return;
+      }
+    }
+
     try {
       await HomeWidget.saveWidgetData<String>(
         'timeline_agenda_data',
         jsonEncode(timelineData),
       );
     } catch (e) {
-      await HomeWidget.saveWidgetData<String>('timeline_agenda_data', '[]');
+      AppLogger.debug('Failed to save timeline_agenda_data: $e');
     }
 
     try {
@@ -922,13 +940,20 @@ class WidgetDataService {
       (a, b) => DateTime.parse(a['date']).compareTo(DateTime.parse(b['date'])),
     );
 
+    if (scheduleItems.isEmpty) {
+      final existing = await HomeWidget.getWidgetData<String>('schedule_list');
+      if (existing != null && existing.isNotEmpty && existing != '[]') {
+        return;
+      }
+    }
+
     try {
       await HomeWidget.saveWidgetData<String>(
         'schedule_list',
         jsonEncode(scheduleItems),
       );
     } catch (e) {
-      await HomeWidget.saveWidgetData<String>('schedule_list', '[]');
+      AppLogger.debug('Failed to save schedule_list: $e');
     }
 
     try {
@@ -1074,13 +1099,22 @@ class WidgetDataService {
       );
     }
 
+    if (eventsByDay.isEmpty) {
+      final existing = await HomeWidget.getWidgetData<String>(
+        'month_events_map',
+      );
+      if (existing != null && existing.isNotEmpty && existing != '{}') {
+        return;
+      }
+    }
+
     try {
       await HomeWidget.saveWidgetData<String>(
         'month_events_map',
         jsonEncode(eventsByDay),
       );
     } catch (e) {
-      await HomeWidget.saveWidgetData<String>('month_events_map', '{}');
+      AppLogger.debug('Failed to save month_events_map: $e');
     }
 
     try {
@@ -1168,13 +1202,22 @@ class WidgetDataService {
       'column_done': doneTasks,
     };
 
+    final bool isKanbanEmpty =
+        todoTasks.isEmpty && inFocusTasks.isEmpty && doneTasks.isEmpty;
+    if (isKanbanEmpty) {
+      final existing = await HomeWidget.getWidgetData<String>('kanban_data');
+      if (existing != null && existing.isNotEmpty && existing != '{}') {
+        return;
+      }
+    }
+
     try {
       await HomeWidget.saveWidgetData<String>(
         'kanban_data',
         jsonEncode(kanbanData),
       );
     } catch (e) {
-      await HomeWidget.saveWidgetData<String>('kanban_data', '{}');
+      AppLogger.debug('Failed to save kanban_data: $e');
     }
 
     try {

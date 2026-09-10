@@ -302,6 +302,30 @@ class AppLocalizationsHi extends AppLocalizations {
   String get selectColor => 'रंग चुनें';
 
   @override
+  String get subcalendars => 'उप-कैलेंडर';
+
+  @override
+  String get customColor => 'कस्टम रंग';
+
+  @override
+  String get resetToGoogleDefault => 'Google रंग पर रीसेट करें';
+
+  @override
+  String get hexCode => 'HEX कोड';
+
+  @override
+  String get opacity => 'पारदर्शिता';
+
+  @override
+  String get presets => 'प्रीसेट';
+
+  @override
+  String get expandCustomPicker => 'कस्टम रंग';
+
+  @override
+  String get noEnabledCalendars => 'कोई Google कैलेंडर सक्षम नहीं है';
+
+  @override
   String get selectGoogleCalendars => 'Google कैलेंडर चुनें';
 
   @override
