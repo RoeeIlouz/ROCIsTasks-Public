@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-10T03:16:36.482200+00:00",
+  "last_run_timestamp": "2026-09-10T10:42:49.566533+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -1370,6 +1370,42 @@
       "title": "My employees could hear my emails. Naturally, I responded by building an entire SaaS.",
       "url": "https://reddit.com/r/roastmystartup/comments/1wbjloo/my_employees_could_hear_my_emails_naturally_i/",
       "inspected_at": "2026-09-10T03:16:26.290678+00:00"
+    },
+    "reddit_1wcffmw": {
+      "platform": "reddit",
+      "title": "Travolp - Trip planner that reshuffles your day when the plan breaks",
+      "url": "https://reddit.com/r/SideProject/comments/1wcffmw/travolp_trip_planner_that_reshuffles_your_day/",
+      "inspected_at": "2026-09-10T10:42:19.100024+00:00"
+    },
+    "reddit_1wcf7e6": {
+      "platform": "reddit",
+      "title": "I built AutoHours: A local-first Windows time tracker that automatically categorizes your work using customizable rules (No manual start/stop)",
+      "url": "https://reddit.com/r/SideProject/comments/1wcf7e6/i_built_autohours_a_localfirst_windows_time/",
+      "inspected_at": "2026-09-10T10:42:37.478188+00:00"
+    },
+    "reddit_1wcf60f": {
+      "platform": "reddit",
+      "title": "I got tired of forgetting one thing about my car… so I built an app 😂",
+      "url": "https://reddit.com/r/SideProject/comments/1wcf60f/i_got_tired_of_forgetting_one_thing_about_my_car/",
+      "inspected_at": "2026-09-10T10:42:38.474945+00:00"
+    },
+    "reddit_1wcaw6r": {
+      "platform": "reddit",
+      "title": "Less tabs, more impact: Why I combined two of my indie apps",
+      "url": "https://reddit.com/r/indiehackers/comments/1wcaw6r/less_tabs_more_impact_why_i_combined_two_of_my/",
+      "inspected_at": "2026-09-10T10:42:39.373443+00:00"
+    },
+    "reddit_1wcf1jy": {
+      "platform": "reddit",
+      "title": "I’m building ChatyDesk for small teams losing customer context across WhatsApp, what am I missing?",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wcf1jy/im_building_chatydesk_for_small_teams_losing/",
+      "inspected_at": "2026-09-10T10:42:40.391739+00:00"
+    },
+    "reddit_1wcdfah": {
+      "platform": "reddit",
+      "title": "I built a Security layer for AI Agents which got me in EF + a16z while still in college.",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wcdfah/i_built_a_security_layer_for_ai_agents_which_got/",
+      "inspected_at": "2026-09-10T10:42:41.386855+00:00"
     }
   },
   "pending_drafts": {
