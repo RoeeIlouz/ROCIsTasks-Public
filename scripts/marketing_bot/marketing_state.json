@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-10T10:42:49.566533+00:00",
+  "last_run_timestamp": "2026-09-10T15:55:25.606924+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -1406,6 +1406,42 @@
       "title": "I built a Security layer for AI Agents which got me in EF + a16z while still in college.",
       "url": "https://reddit.com/r/roastmystartup/comments/1wcdfah/i_built_a_security_layer_for_ai_agents_which_got/",
       "inspected_at": "2026-09-10T10:42:41.386855+00:00"
+    },
+    "reddit_1wcn3bd": {
+      "platform": "reddit",
+      "title": "I Built an NYC restaurant ranking tool based on real Reddit information",
+      "url": "https://reddit.com/r/SideProject/comments/1wcn3bd/i_built_an_nyc_restaurant_ranking_tool_based_on/",
+      "inspected_at": "2026-09-10T15:53:54.257268+00:00"
+    },
+    "reddit_1wcmyq8": {
+      "platform": "reddit",
+      "title": "I turned Apple’s on-device model into a Character.AI-like app",
+      "url": "https://reddit.com/r/SideProject/comments/1wcmyq8/i_turned_apples_ondevice_model_into_a/",
+      "inspected_at": "2026-09-10T15:54:40.682538+00:00"
+    },
+    "reddit_1wcmw7p": {
+      "platform": "reddit",
+      "title": "Building a SaaS with local AI is going to be a breeze",
+      "url": "https://reddit.com/r/SideProject/comments/1wcmw7p/building_a_saas_with_local_ai_is_going_to_be_a/",
+      "inspected_at": "2026-09-10T15:54:41.569116+00:00"
+    },
+    "reddit_1wcl8od": {
+      "platform": "reddit",
+      "title": "Spent my weekend building a reading tool because I was drowning in tabs and retaining nothing",
+      "url": "https://reddit.com/r/indiehackers/comments/1wcl8od/spent_my_weekend_building_a_reading_tool_because/",
+      "inspected_at": "2026-09-10T15:54:49.579498+00:00"
+    },
+    "reddit_1wcmjmq": {
+      "platform": "reddit",
+      "title": "roast my \"no signup required\" pivot — removed the account wall from my project tool, tell me what's wrong with it",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wcmjmq/roast_my_no_signup_required_pivot_removed_the/",
+      "inspected_at": "2026-09-10T15:54:56.221619+00:00"
+    },
+    "reddit_1wclbth": {
+      "platform": "reddit",
+      "title": "is this good idea ?",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wclbth/is_this_good_idea/",
+      "inspected_at": "2026-09-10T15:54:57.327632+00:00"
     }
   },
   "pending_drafts": {
@@ -1742,7 +1778,7 @@
     }
   },
   "recorded_feedback": [],
-  "last_organic_post_timestamp": "2026-09-10T03:16:36.110341+00:00",
+  "last_organic_post_timestamp": "2026-09-10T15:55:25.168042+00:00",
   "organic_posts": [
     {
       "text": "you either die a young enthusiastic builder or live long enough to realize that 90% of tech problems are solved by restarting the router.",
@@ -1811,6 +1847,14 @@
         "Bluesky"
       ],
       "posted_at": "2026-09-10T03:16:36.110341+00:00"
+    },
+    {
+      "text": "software bugs make you question your sanity. electrical engineering lab bugs make you question physics itself.",
+      "topic": "mobile_and_code_quirks",
+      "platforms": [
+        "Bluesky"
+      ],
+      "posted_at": "2026-09-10T15:55:25.168042+00:00"
     }
   ],
   "x_posts_timestamps": [
