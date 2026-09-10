@@ -2,6 +2,29 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## Android Widget Idle Persistence, Calendar Color Overhaul & v0.2.13+99 Release - 2026-09-11
+
+#### Problem & Requirements
+* **Widget Blanking After Idle/Doze**: Homescreen widgets stopped rendering tasks and calendar events after the device remained idle overnight or dozed, caused by uncached events relying on in-memory collections not shared with background widget isolates, database lock timeouts, and missing native widget fallback data.
+* **Subcalendar Color Customization**: Users could not independently customize the color of each subcalendar (work, school, personal, etc.), nor retain Google's native calendar colors.
+* **Color Picker Flexibility**: Color picker was limited to a rigid preset list across category and app accent pickers.
+* **Release Artifacts**: Bump only `+` version (`0.2.13+99`), Shorebird cloud release & AAB upload to Play Console Internal Testing track, and APK upload to GitHub Releases.
+
+#### Solutions & Architecture Applied
+1. **Resilient Widget Data Engine**:
+   * Stored calendar events into a dedicated persistent Hive cache (`calendar_events_cache`) in [CalendarService](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/services/calendar_service.dart) updated on every sync.
+   * Updated [FullCalendarWidgetService](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/home/services/full_calendar_widget_service.dart) and [MonthWidgetService](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/home/services/month_widget_service.dart) to query the persistent cache if in-memory events are empty.
+   * Added `readTasksSafelyWithRetry` and isolate-safe Hive lock recovery in [LocalTaskSource](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/tasks/data/datasources/local_task_source.dart) and [TaskWidgetService](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/tasks/services/task_widget_service.dart).
+   * Hardened native Android Kotlin RemoteViews widget providers to gracefully fallback to SharedPreferences cached snapshots.
+2. **Subcalendar Custom Coloring**:
+   * Created [CalendarColorService](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/core/services/calendar_color_service.dart) storing user color overrides per calendar ID.
+   * Created [AppColorPickerSheet](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/shared/ui/widgets/app_color_picker_sheet.dart) with curated preset swatches and an expandable HSV custom picker with hex input and opacity slider (0.05 to 1.0).
+   * Integrated into [CalendarColoringSheet](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/calendar/presentation/widgets/calendar_coloring_sheet.dart), Categories screen, and Settings accent picker.
+3. **Deployment**:
+   * Version bumped to `0.2.13+99`.
+   * Shorebird AAB generated and uploaded to Google Play Console Internal Testing track with release notes.
+   * Release APK built and published to GitHub Releases (`v0.2.13+99`).
+
 ## Landing Page Academic Planner Overhaul, PWA Offline Engine & Google Calendar RFC 5545 Audit - 2026-09-07
 
 #### Problem & Requirements
