@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-10T15:55:25.606924+00:00",
+  "last_run_timestamp": "2026-09-10T20:28:33.112540+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -1442,6 +1442,42 @@
       "title": "is this good idea ?",
       "url": "https://reddit.com/r/roastmystartup/comments/1wclbth/is_this_good_idea/",
       "inspected_at": "2026-09-10T15:54:57.327632+00:00"
+    },
+    "reddit_1wcutil": {
+      "platform": "reddit",
+      "title": "I built a marketplace for electric dirt bike parts because I was tired of Zelling strangers on Facebook",
+      "url": "https://reddit.com/r/SideProject/comments/1wcutil/i_built_a_marketplace_for_electric_dirt_bike/",
+      "inspected_at": "2026-09-10T20:28:16.516354+00:00"
+    },
+    "reddit_1wcupoo": {
+      "platform": "reddit",
+      "title": "I built Splitso — a web (for now) app that keeps track of who owes who in a friend group. Useful for roommates n stuff.",
+      "url": "https://reddit.com/r/SideProject/comments/1wcupoo/i_built_splitso_a_web_for_now_app_that_keeps/",
+      "inspected_at": "2026-09-10T20:28:22.106225+00:00"
+    },
+    "reddit_1wcupcn": {
+      "platform": "reddit",
+      "title": "I built QuiRun — turn voice notes, meetings and ideas into approved work",
+      "url": "https://reddit.com/r/SideProject/comments/1wcupcn/i_built_quirun_turn_voice_notes_meetings_and/",
+      "inspected_at": "2026-09-10T20:28:22.838238+00:00"
+    },
+    "reddit_1wcumy0": {
+      "platform": "reddit",
+      "title": "What’s your AI setup for building side projects? Claude vs ChatGPT dilemma.",
+      "url": "https://reddit.com/r/SideProject/comments/1wcumy0/whats_your_ai_setup_for_building_side_projects/",
+      "inspected_at": "2026-09-10T20:28:23.625691+00:00"
+    },
+    "reddit_1wcusli": {
+      "platform": "reddit",
+      "title": "Roast my app to listen to songs with your friends with overlayed lyrics.",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wcusli/roast_my_app_to_listen_to_songs_with_your_friends/",
+      "inspected_at": "2026-09-10T20:28:24.318198+00:00"
+    },
+    "reddit_1wcssuq": {
+      "platform": "reddit",
+      "title": "Built a digital art app for Windows with a real brush engine — pencils, ink, airbrush, charcoal that actually feel different",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wcssuq/built_a_digital_art_app_for_windows_with_a_real/",
+      "inspected_at": "2026-09-10T20:28:25.059963+00:00"
     }
   },
   "pending_drafts": {
