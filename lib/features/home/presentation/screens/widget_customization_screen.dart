@@ -8,6 +8,7 @@ import 'package:rocis_tasks/core/services/widget_data_service.dart';
 import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
 import 'package:rocis_tasks/core/services/auth_service.dart';
 import 'package:rocis_tasks/shared/ui/ui_kit.dart';
+import 'package:rocis_tasks/shared/ui/widgets/app_color_picker_sheet.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
 
 class WidgetCustomizationScreen extends StatefulWidget {
@@ -1245,49 +1246,124 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
       {'hex': '#0284C7', 'name': 'Sky', 'color': const Color(0xFF0284C7)},
     ];
 
+    final isCustomSelected = !colors.any(
+      (c) =>
+          (c['hex'] as String).toLowerCase() == _highlightColor.toLowerCase(),
+    );
+
+    Color currentColor;
+    try {
+      final hexClean = _highlightColor.replaceFirst('#', '');
+      currentColor = Color(
+        int.parse(hexClean.length == 6 ? 'FF$hexClean' : hexClean, radix: 16),
+      );
+    } catch (_) {
+      currentColor = const Color(0xFF6366F1);
+    }
+
     return GlassContainer(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: colors.map((c) {
-          final isSelected =
-              _highlightColor.toLowerCase() ==
-              (c['hex'] as String).toLowerCase();
-          final itemColor = c['color'] as Color;
+        children: [
+          ...colors.map((c) {
+            final isSelected =
+                _highlightColor.toLowerCase() ==
+                (c['hex'] as String).toLowerCase();
+            final itemColor = c['color'] as Color;
 
-          return GestureDetector(
+            return GestureDetector(
+              onTap: () {
+                HapticFeedback.selectionClick();
+                setState(() {
+                  _highlightColor = c['hex'] as String;
+                });
+                _saveSetting('full_calendar_highlight_color', c['hex']);
+              },
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: itemColor,
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: isSelected ? Colors.white : Colors.transparent,
+                    width: 3,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: itemColor.withValues(
+                        alpha: isSelected ? 0.6 : 0.2,
+                      ),
+                      blurRadius: isSelected ? 8 : 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: isSelected
+                    ? const Icon(Icons.check, color: Colors.white, size: 18)
+                    : null,
+              ),
+            );
+          }),
+          // Expandable custom color picker button
+          GestureDetector(
             onTap: () {
               HapticFeedback.selectionClick();
-              setState(() {
-                _highlightColor = c['hex'] as String;
-              });
-              _saveSetting('full_calendar_highlight_color', c['hex']);
+              AppColorPickerSheet.show(
+                context: context,
+                title: AppLocalizations.of(context)!.widgetAccentColor,
+                initialColor: currentColor,
+                presetColors: colors.map((c) => c['color'] as Color).toList(),
+                onColorChanged: (newColor) {
+                  final hex =
+                      '#${newColor.toARGB32().toRadixString(16).padLeft(8, '0')}';
+                  setState(() {
+                    _highlightColor = hex;
+                  });
+                  _saveSetting('full_calendar_highlight_color', hex);
+                },
+              );
             },
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: itemColor,
+                color: isCustomSelected
+                    ? currentColor
+                    : theme.colorScheme.surfaceContainerHighest.withValues(
+                        alpha: 0.5,
+                      ),
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: isSelected ? Colors.white : Colors.transparent,
-                  width: 3,
+                  color: isCustomSelected
+                      ? Colors.white
+                      : theme.colorScheme.outline.withValues(alpha: 0.4),
+                  width: isCustomSelected ? 3 : 1.5,
                 ),
                 boxShadow: [
-                  BoxShadow(
-                    color: itemColor.withValues(alpha: isSelected ? 0.6 : 0.2),
-                    blurRadius: isSelected ? 8 : 4,
-                    offset: const Offset(0, 2),
-                  ),
+                  if (isCustomSelected)
+                    BoxShadow(
+                      color: currentColor.withValues(alpha: 0.6),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
                 ],
               ),
-              child: isSelected
-                  ? const Icon(Icons.check, color: Colors.white, size: 18)
-                  : null,
+              child: Icon(
+                isCustomSelected ? Icons.check : Icons.colorize_rounded,
+                color: isCustomSelected
+                    ? (currentColor.computeLuminance() > 0.5
+                          ? Colors.black
+                          : Colors.white)
+                    : theme.colorScheme.primary,
+                size: 16,
+              ),
             ),
-          );
-        }).toList(),
+          ),
+        ],
       ),
     );
   }

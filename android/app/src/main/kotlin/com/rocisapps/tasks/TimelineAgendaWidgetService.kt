@@ -27,7 +27,6 @@ class TimelineAgendaWidgetFactory(private val context: Context) : RemoteViewsSer
     }
 
     override fun onDataSetChanged() {
-        items.clear()
         try {
             val widgetData = HomeWidgetPlugin.getData(context)
             widgetTheme = widgetData.getString("full_calendar_theme", "system") ?: "system"
@@ -41,12 +40,15 @@ class TimelineAgendaWidgetFactory(private val context: Context) : RemoteViewsSer
             val rawJson = widgetData.getString("timeline_agenda_data", "[]") ?: "[]"
             val jsonArray = JSONArray(rawJson)
 
+            val newItems = mutableListOf<JSONObject>()
             for (i in 0 until jsonArray.length()) {
                 val obj = jsonArray.optJSONObject(i) ?: continue
-                items.add(obj)
+                newItems.add(obj)
             }
-        } catch (_: Exception) {
             items.clear()
+            items.addAll(newItems)
+        } catch (_: Exception) {
+            // Keep existing items on error
         }
     }
 

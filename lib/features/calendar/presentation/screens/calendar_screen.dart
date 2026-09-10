@@ -94,10 +94,14 @@ class _CalendarScreenState extends State<CalendarScreen> {
       final matches = calendarProvider.availableCalendars.where(
         (c) => c.id == event.calendarId,
       );
-      if (matches.isNotEmpty && matches.first.color != null) {
-        return Color(matches.first.color!);
-      }
-      return colorService.googleColor;
+      final Color? nativeColor =
+          matches.isNotEmpty && matches.first.color != null
+          ? Color(matches.first.color!)
+          : null;
+      return colorService.getEffectiveSubcalendarColor(
+        event.calendarId,
+        nativeColor: nativeColor,
+      );
     }
     return colorService.taskColor;
   }
@@ -621,16 +625,21 @@ class _CalendarScreenState extends State<CalendarScreen> {
                             (c) => c.id == item.calendarId,
                             orElse: Calendar.new,
                           );
-                      final googleColor = cal.color != null
+                      final Color? nativeColor = cal.color != null
                           ? Color(cal.color!)
-                          : colorService.googleColor;
+                          : null;
+                      final eventColor = colorService
+                          .getEffectiveSubcalendarColor(
+                            item.calendarId,
+                            nativeColor: nativeColor,
+                          );
                       return GlassContainer(
                         margin: const EdgeInsets.symmetric(
                           horizontal: 16,
                           vertical: 6,
                         ),
-                        selectedBorderColor: googleColor,
-                        isSelected: false,
+                        selectedBorderColor: eventColor.withValues(alpha: 0.18),
+                        isSelected: true,
                         child: Semantics(
                           label:
                               'Google Calendar Event: ${item.title ?? 'No Title'}',
@@ -642,12 +651,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
                             leading: Container(
                               padding: const EdgeInsets.all(10),
                               decoration: BoxDecoration(
-                                color: googleColor.withValues(alpha: 0.1),
+                                color: eventColor.withValues(alpha: 0.12),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Icon(
                                 Icons.event_note_rounded,
-                                color: googleColor,
+                                color: eventColor,
                                 size: 24,
                               ),
                             ),
@@ -691,14 +700,14 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                 vertical: 4,
                               ),
                               decoration: BoxDecoration(
-                                color: googleColor.withValues(alpha: 0.1),
+                                color: eventColor.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text(
                                 'Google',
                                 style: Theme.of(context).textTheme.labelSmall
                                     ?.copyWith(
-                                      color: googleColor,
+                                      color: eventColor,
                                       fontWeight: FontWeight.w600,
                                     ),
                               ),

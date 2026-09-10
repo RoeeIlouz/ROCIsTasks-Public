@@ -68,10 +68,19 @@ class BackgroundHandler {
     }
   }
 
+  static CalendarService _createCalendarService() {
+    try {
+      final authService = AuthService(ErrorHandlingService());
+      return CalendarService(authService: authService);
+    } catch (_) {
+      return CalendarService();
+    }
+  }
+
   static Future<void> _handleKanbanSync() async {
     try {
       await AppInitializer.initialize(isBackground: true);
-      final calendarService = CalendarService();
+      final calendarService = _createCalendarService();
       await calendarService.init();
 
       final taskSource = LocalTaskSource();
@@ -94,14 +103,19 @@ class BackgroundHandler {
         userId: FirebaseAuth.instance.currentUser?.uid,
       );
     } catch (e, s) {
-      AppLogger.error('Error handling kanban widget sync', error: e, stack: s, tag: 'Background');
+      AppLogger.error(
+        'Error handling kanban widget sync',
+        error: e,
+        stack: s,
+        tag: 'Background',
+      );
     }
   }
 
   static Future<void> _handleTodayAgendaSync() async {
     try {
       await AppInitializer.initialize(isBackground: true);
-      final calendarService = CalendarService();
+      final calendarService = _createCalendarService();
       await calendarService.init();
 
       final taskSource = LocalTaskSource();
@@ -124,14 +138,19 @@ class BackgroundHandler {
         userId: FirebaseAuth.instance.currentUser?.uid,
       );
     } catch (e, s) {
-      AppLogger.error('Error handling today agenda sync', error: e, stack: s, tag: 'Background');
+      AppLogger.error(
+        'Error handling today agenda sync',
+        error: e,
+        stack: s,
+        tag: 'Background',
+      );
     }
   }
 
   static Future<void> _handleMonthAgendaSync() async {
     try {
       await AppInitializer.initialize(isBackground: true);
-      final calendarService = CalendarService();
+      final calendarService = _createCalendarService();
       await calendarService.init();
 
       final taskSource = LocalTaskSource();
@@ -154,7 +173,12 @@ class BackgroundHandler {
         userId: FirebaseAuth.instance.currentUser?.uid,
       );
     } catch (e, s) {
-      AppLogger.error('Error handling month agenda sync', error: e, stack: s, tag: 'Background');
+      AppLogger.error(
+        'Error handling month agenda sync',
+        error: e,
+        stack: s,
+        tag: 'Background',
+      );
     }
   }
 
@@ -186,7 +210,7 @@ class BackgroundHandler {
         tag: 'Background',
       );
 
-      final calendarService = CalendarService();
+      final calendarService = _createCalendarService();
       await calendarService.init();
 
       final taskSource = LocalTaskSource();
@@ -227,7 +251,7 @@ class BackgroundHandler {
     try {
       await AppInitializer.initialize(isBackground: true);
 
-      final calendarService = CalendarService();
+      final calendarService = _createCalendarService();
       await calendarService.init();
 
       final taskSource = LocalTaskSource();
@@ -367,7 +391,7 @@ class BackgroundHandler {
       );
 
       // Update all new Android widgets in background
-      final calendarService = CalendarService();
+      final calendarService = _createCalendarService();
       await calendarService.init();
       final widgetDataService = WidgetDataService(calendarService);
       await widgetDataService.updateAllWidgets(

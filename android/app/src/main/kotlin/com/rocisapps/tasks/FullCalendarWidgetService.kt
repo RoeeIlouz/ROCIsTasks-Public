@@ -167,7 +167,7 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
     }
 
     override fun onDataSetChanged() {
-        days.clear()
+        val newDays = ArrayList<JSONObject>()
         try {
             val widgetData = HomeWidgetPlugin.getData(context)
             
@@ -219,18 +219,23 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
                     }
                 }
                 
-                days.add(day)
+                newDays.add(day)
             }
 
-            if (days.isEmpty()) {
+            if (newDays.isNotEmpty()) {
+                days.clear()
+                days.addAll(newDays)
+            } else if (days.isEmpty()) {
                 generateFallbackCalendar(widgetData)
             }
         } catch (e: Exception) {
             android.util.Log.e("FullCalendarWidget", "Error parsing widget data", e)
-            try {
-                val widgetData = HomeWidgetPlugin.getData(context)
-                generateFallbackCalendar(widgetData)
-            } catch (_: Exception) {}
+            if (days.isEmpty()) {
+                try {
+                    val widgetData = HomeWidgetPlugin.getData(context)
+                    generateFallbackCalendar(widgetData)
+                } catch (_: Exception) {}
+            }
         }
     }
 
