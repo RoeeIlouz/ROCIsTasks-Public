@@ -88,11 +88,19 @@ class KanbanCard extends StatelessWidget {
     Widget cardContent({bool isDragging = false}) {
       return GlassContainer(
         borderRadius: BorderRadius.circular(16),
-        color: primaryCategory != null
-            ? categoryColor
-            : (task.isCompleted
-                  ? (isDark ? Colors.grey.shade900 : Colors.grey.shade200)
-                  : null),
+        color: task.isCompleted
+            ? (isDark ? Colors.grey.shade900 : Colors.grey.shade200)
+            : null,
+        border: Border.all(
+          color: isDark
+              ? (primaryCategory != null
+                  ? categoryColor.withValues(alpha: 0.25)
+                  : theme.colorScheme.outlineVariant.withValues(alpha: 0.2))
+              : (primaryCategory != null
+                  ? categoryColor.withValues(alpha: 0.18)
+                  : theme.colorScheme.outlineVariant.withValues(alpha: 0.15)),
+          width: 1.0,
+        ),
         elevation: isDragging ? 8.0 : 1.5,
         child: InkWell(
           onTap:
@@ -108,14 +116,35 @@ class KanbanCard extends StatelessWidget {
                 );
               },
           borderRadius: BorderRadius.circular(16),
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
+          child: IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Priority, Categories & Sync Icons Row
-                Row(
+                if (primaryCategory != null)
+                  Container(
+                    width: 3.5,
+                    margin: const EdgeInsets.symmetric(vertical: 8).copyWith(left: 6),
+                    decoration: BoxDecoration(
+                      color: task.isCompleted
+                          ? categoryColor.withValues(alpha: 0.4)
+                          : categoryColor,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                      left: primaryCategory != null ? 8 : 12,
+                      right: 12,
+                      top: 12,
+                      bottom: 12,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Priority, Categories & Sync Icons Row
+                        Row(
                   children: [
                     // Priority pill
                     Container(
@@ -468,8 +497,12 @@ class KanbanCard extends StatelessWidget {
             ),
           ),
         ),
-      );
-    }
+      ],
+    ),
+  ),
+),
+);
+}
 
     final isDesktopOrWeb =
         kIsWeb ||
