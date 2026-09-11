@@ -65,8 +65,8 @@ class GlassContainer extends StatelessWidget {
           color: isSelected
               ? (selectedBorderColor ?? theme.colorScheme.primary)
               : (isDark
-                    ? borderTint.withValues(alpha: 0.12)
-                    : borderTint.withValues(alpha: 0.08)),
+                    ? borderTint.withValues(alpha: useGlass ? 0.12 : 0.18)
+                    : borderTint.withValues(alpha: useGlass ? 0.08 : 0.12)),
           width: isSelected ? 1.5 : 1.0,
         );
 
@@ -89,14 +89,10 @@ class GlassContainer extends StatelessWidget {
             ? glassColor.withValues(alpha: isSelected ? opacity + 0.1 : opacity)
             : (isSelected
                   ? (color?.withValues(alpha: 0.2) ??
-                        theme.colorScheme.primaryContainer)
+                        theme.colorScheme.primary.withValues(alpha: 0.12))
                   : (color ?? theme.colorScheme.surfaceContainerLow)),
         borderRadius: radius,
-        border: useGlass
-            ? glassBorder
-            : (isSelected
-                  ? glassBorder
-                  : Border.all(color: Colors.transparent)),
+        border: glassBorder,
         boxShadow: shadow,
       ),
       child: Material(

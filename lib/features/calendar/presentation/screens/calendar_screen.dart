@@ -626,13 +626,19 @@ class _CalendarScreenState extends State<CalendarScreen> {
                             item.calendarId,
                             nativeColor: nativeColor,
                           );
+                      final isDark = Theme.of(context).brightness == Brightness.dark;
                       return GlassContainer(
                         margin: const EdgeInsets.symmetric(
                           horizontal: 16,
                           vertical: 6,
                         ),
-                        selectedBorderColor: eventColor.withValues(alpha: 0.18),
-                        isSelected: true,
+                        border: Border.all(
+                          color: isDark
+                              ? eventColor.withValues(alpha: 0.25)
+                              : eventColor.withValues(alpha: 0.18),
+                          width: 1.0,
+                        ),
+                        isSelected: false,
                         child: Semantics(
                           label:
                               'Google Calendar Event: ${item.title ?? 'No Title'}',

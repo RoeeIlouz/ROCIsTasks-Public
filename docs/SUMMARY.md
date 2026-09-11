@@ -2,6 +2,27 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## Non-Glassmorphic Surface Styling & Category Stripe Alignment - 2026-09-11
+
+#### Problem & Requirements
+* **Broken Non-Glassmorphic Card Backgrounds**: When glassmorphism was turned off (which is configurable on mobile and always false on web), event cards in the calendar page were filled with opaque `primaryContainer` due to hardcoded `isSelected: true`, and Kanban cards were filled with 100% solid saturated `categoryColor` due to `color: categoryColor` passed into `GlassContainer`.
+* **Border Discard in `GlassContainer`**: When `!useGlass && !isSelected`, `GlassContainer` previously forced `Border.all(color: Colors.transparent)`, throwing away custom caller borders.
+
+#### Solutions Applied
+1. **`GlassContainer` Fix**:
+   - Always respects explicit caller `border` in all modes instead of overriding with transparent border.
+   - Softened selection background fallback to `theme.colorScheme.primary.withValues(alpha: 0.12)`.
+2. **Calendar Events Refinement**:
+   - Set `isSelected: false` on the event `GlassContainer` in [`calendar_screen.dart`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/calendar/presentation/screens/calendar_screen.dart), allowing event cards to sit on clean `surfaceContainerLow` matching `TaskTile`.
+   - Added explicit 1px hairline border tinted with the event's subcalendar color (`eventColor.withValues(alpha: isDark ? 0.25 : 0.18)`).
+3. **Kanban Cards Refinement**:
+   - In [`kanban_card.dart`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/tasks/presentation/widgets/kanban/kanban_card.dart), removed `color: categoryColor` so active cards cleanly use `surfaceContainerLow` matching `TaskTile`.
+   - Added 1px hairline border tinted with the primary category color (`categoryColor.withValues(alpha: isDark ? 0.25 : 0.18)`).
+   - Added a slim 3.5px rounded vertical category accent stripe on the left edge for immediate category identification at a glance.
+4. **Verification**:
+   - `flutter analyze`: 0 issues found.
+   - `flutter test`: 325 / 325 tests passed (100%).
+
 ## Version 0.2.14+100 Release & Deployment Pipeline - 2026-09-11
 
 #### Summary & Operations
