@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-11T10:42:25.042575+00:00",
+  "last_run_timestamp": "2026-09-11T15:57:09.333858+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -1550,6 +1550,42 @@
       "title": "Sto creando una startup per aiutare gli studenti a trovare casa più facilmente",
       "url": "https://reddit.com/r/roastmystartup/comments/1wdc7ty/sto_creando_una_startup_per_aiutare_gli_studenti/",
       "inspected_at": "2026-09-11T10:41:52.337759+00:00"
+    },
+    "reddit_1wdk3p2": {
+      "platform": "reddit",
+      "title": "Weekend project: I've just built a pocket toolbox with over 60 tools",
+      "url": "https://reddit.com/r/SideProject/comments/1wdk3p2/weekend_project_ive_just_built_a_pocket_toolbox/",
+      "inspected_at": "2026-09-11T15:56:06.064013+00:00"
+    },
+    "reddit_1wdk0g4": {
+      "platform": "reddit",
+      "title": "I've been working on an open source studio management/proofing tool for video creators, I hope you check it out and enjoy!",
+      "url": "https://reddit.com/r/SideProject/comments/1wdk0g4/ive_been_working_on_an_open_source_studio/",
+      "inspected_at": "2026-09-11T15:56:52.418114+00:00"
+    },
+    "reddit_1wdjzl7": {
+      "platform": "reddit",
+      "title": "Built a cassette-player-like digital audio player for iOS. Lossless files, fully offline, highly skeuomorphic.",
+      "url": "https://reddit.com/r/SideProject/comments/1wdjzl7/built_a_cassetteplayerlike_digital_audio_player/",
+      "inspected_at": "2026-09-11T15:56:53.227374+00:00"
+    },
+    "reddit_1wdjp2d": {
+      "platform": "reddit",
+      "title": "I keep asking people to roast our site…",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wdjp2d/i_keep_asking_people_to_roast_our_site/",
+      "inspected_at": "2026-09-11T15:56:58.502854+00:00"
+    },
+    "reddit_1wdie0n": {
+      "platform": "reddit",
+      "title": "most places would rather avoid tbh.",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wdie0n/most_places_would_rather_avoid_tbh/",
+      "inspected_at": "2026-09-11T15:56:59.507150+00:00"
+    },
+    "reddit_1wdeltk": {
+      "platform": "reddit",
+      "title": "My signage software took a long time to build but costs almost nothing to serve. The screens are where the money and the friction both are. Roast my sales.",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wdeltk/my_signage_software_took_a_long_time_to_build_but/",
+      "inspected_at": "2026-09-11T15:57:01.241099+00:00"
     }
   },
   "pending_drafts": {
