@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-10T20:28:33.112540+00:00",
+  "last_run_timestamp": "2026-09-11T03:12:08.733282+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -1478,6 +1478,42 @@
       "title": "Built a digital art app for Windows with a real brush engine — pencils, ink, airbrush, charcoal that actually feel different",
       "url": "https://reddit.com/r/roastmystartup/comments/1wcssuq/built_a_digital_art_app_for_windows_with_a_real/",
       "inspected_at": "2026-09-10T20:28:25.059963+00:00"
+    },
+    "reddit_1wd4ccu": {
+      "platform": "reddit",
+      "title": "FlowIn - Turn a work process into a shareable flowchart",
+      "url": "https://reddit.com/r/SideProject/comments/1wd4ccu/flowin_turn_a_work_process_into_a_shareable/",
+      "inspected_at": "2026-09-11T03:11:53.432448+00:00"
+    },
+    "reddit_1wd447f": {
+      "platform": "reddit",
+      "title": "Built a freelancer Client OS (Markdown/CSV ops kit) — would love a roast on what to cut",
+      "url": "https://reddit.com/r/SideProject/comments/1wd447f/built_a_freelancer_client_os_markdowncsv_ops_kit/",
+      "inspected_at": "2026-09-11T03:11:56.725858+00:00"
+    },
+    "reddit_1wd41dn": {
+      "platform": "reddit",
+      "title": "The Sojourn iOS App Was 45 One-Shot Prompts",
+      "url": "https://reddit.com/r/SideProject/comments/1wd41dn/the_sojourn_ios_app_was_45_oneshot_prompts/",
+      "inspected_at": "2026-09-11T03:11:57.885782+00:00"
+    },
+    "reddit_1wd3upg": {
+      "platform": "reddit",
+      "title": "Doodlyo is live on Product Hunt — would love your feedback 🚀",
+      "url": "https://reddit.com/r/SideProject/comments/1wd3upg/doodlyo_is_live_on_product_hunt_would_love_your/",
+      "inspected_at": "2026-09-11T03:11:58.712741+00:00"
+    },
+    "reddit_1wd1hn2": {
+      "platform": "reddit",
+      "title": "Roast my Chinese fortune telling app",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wd1hn2/roast_my_chinese_fortune_telling_app/",
+      "inspected_at": "2026-09-11T03:11:59.538234+00:00"
+    },
+    "reddit_1wcy7vz": {
+      "platform": "reddit",
+      "title": "what's your vision? my version of uber. (stop flagging me, im not ai -__-)",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wcy7vz/whats_your_vision_my_version_of_uber_stop/",
+      "inspected_at": "2026-09-11T03:12:00.264994+00:00"
     }
   },
   "pending_drafts": {
