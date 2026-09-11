@@ -94,11 +94,11 @@ class KanbanCard extends StatelessWidget {
         border: Border.all(
           color: isDark
               ? (primaryCategory != null
-                  ? categoryColor.withValues(alpha: 0.25)
-                  : theme.colorScheme.outlineVariant.withValues(alpha: 0.2))
+                    ? categoryColor.withValues(alpha: 0.25)
+                    : theme.colorScheme.outlineVariant.withValues(alpha: 0.2))
               : (primaryCategory != null
-                  ? categoryColor.withValues(alpha: 0.18)
-                  : theme.colorScheme.outlineVariant.withValues(alpha: 0.15)),
+                    ? categoryColor.withValues(alpha: 0.18)
+                    : theme.colorScheme.outlineVariant.withValues(alpha: 0.15)),
           width: 1.0,
         ),
         elevation: isDragging ? 8.0 : 1.5,
@@ -123,7 +123,9 @@ class KanbanCard extends StatelessWidget {
                 if (primaryCategory != null)
                   Container(
                     width: 3.5,
-                    margin: const EdgeInsets.symmetric(vertical: 8).copyWith(left: 6),
+                    margin: const EdgeInsets.symmetric(
+                      vertical: 8,
+                    ).copyWith(left: 6),
                     decoration: BoxDecoration(
                       color: task.isCompleted
                           ? categoryColor.withValues(alpha: 0.4)
@@ -145,364 +147,380 @@ class KanbanCard extends StatelessWidget {
                       children: [
                         // Priority, Categories & Sync Icons Row
                         Row(
-                  children: [
-                    // Priority pill
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 7,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: priorityColor.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(6),
-                        border: Border.all(
-                          color: priorityColor.withValues(alpha: 0.3),
-                          width: 0.8,
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            width: 6,
-                            height: 6,
-                            decoration: BoxDecoration(
-                              color: priorityColor,
-                              shape: BoxShape.circle,
+                          children: [
+                            // Priority pill
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 7,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: priorityColor.withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(
+                                  color: priorityColor.withValues(alpha: 0.3),
+                                  width: 0.8,
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Container(
+                                    width: 6,
+                                    height: 6,
+                                    decoration: BoxDecoration(
+                                      color: priorityColor,
+                                      shape: BoxShape.circle,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    task.priority.name.toUpperCase(),
+                                    style: GoogleFonts.outfit(
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.bold,
+                                      color: priorityColor,
+                                      letterSpacing: 0.5,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            task.priority.name.toUpperCase(),
-                            style: GoogleFonts.outfit(
-                              fontSize: 9,
-                              fontWeight: FontWeight.bold,
-                              color: priorityColor,
-                              letterSpacing: 0.5,
+                            const Spacer(),
+                            if (task.syncWithGoogleTasks)
+                              Padding(
+                                padding: const EdgeInsets.only(left: 4),
+                                child: Icon(
+                                  Icons.sync_rounded,
+                                  size: 13,
+                                  color: theme.colorScheme.primary.withValues(
+                                    alpha: 0.7,
+                                  ),
+                                ),
+                              ),
+                            if (task.recurrenceRule != null)
+                              Padding(
+                                padding: const EdgeInsets.only(left: 4),
+                                child: Icon(
+                                  Icons.repeat_rounded,
+                                  size: 13,
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                            if (task.isPinned ?? false)
+                              Padding(
+                                padding: const EdgeInsets.only(left: 4),
+                                child: Icon(
+                                  Icons.push_pin_rounded,
+                                  size: 13,
+                                  color: theme.colorScheme.primary,
+                                ),
+                              ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+
+                        // Checkbox and Title Row
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(top: 1, right: 8),
+                              child: BouncyCheckbox(
+                                isChecked: task.isCompleted,
+                                size: 20,
+                                activeColor: primaryCategory != null
+                                    ? categoryColor
+                                    : theme.colorScheme.primary,
+                                borderColor:
+                                    (primaryCategory != null
+                                            ? categoryColor
+                                            : theme.colorScheme.primary)
+                                        .withValues(alpha: 0.5),
+                                enableHaptics: hasTaskFeedback,
+                                enableSparkles: true,
+                                onTap: () {
+                                  if (onToggle != null) {
+                                    onToggle!();
+                                  } else {
+                                    Provider.of<TaskProvider>(
+                                      context,
+                                      listen: false,
+                                    ).toggleTaskCompletion(task);
+                                  }
+                                },
+                              ),
+                            ),
+                            Expanded(
+                              child: Text(
+                                task.title,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: GoogleFonts.outfit(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: task.isCompleted
+                                      ? theme.colorScheme.onSurface.withValues(
+                                          alpha: 0.45,
+                                        )
+                                      : theme.colorScheme.onSurface,
+                                  decoration: task.isCompleted
+                                      ? TextDecoration.lineThrough
+                                      : TextDecoration.none,
+                                  decorationColor: theme.colorScheme.onSurface
+                                      .withValues(alpha: 0.4),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        // Description preview if available
+                        if (task.description.trim().isNotEmpty) ...[
+                          const SizedBox(height: 6),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 28),
+                            child: Text(
+                              task.description.trim(),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                fontSize: 11,
+                                color: theme.colorScheme.onSurfaceVariant
+                                    .withValues(alpha: 0.8),
+                              ),
                             ),
                           ),
                         ],
-                      ),
-                    ),
-                    const Spacer(),
-                    if (task.syncWithGoogleTasks)
-                      Padding(
-                        padding: const EdgeInsets.only(left: 4),
-                        child: Icon(
-                          Icons.sync_rounded,
-                          size: 13,
-                          color: theme.colorScheme.primary.withValues(
-                            alpha: 0.7,
-                          ),
-                        ),
-                      ),
-                    if (task.recurrenceRule != null)
-                      Padding(
-                        padding: const EdgeInsets.only(left: 4),
-                        child: Icon(
-                          Icons.repeat_rounded,
-                          size: 13,
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    if (task.isPinned ?? false)
-                      Padding(
-                        padding: const EdgeInsets.only(left: 4),
-                        child: Icon(
-                          Icons.push_pin_rounded,
-                          size: 13,
-                          color: theme.colorScheme.primary,
-                        ),
-                      ),
-                  ],
-                ),
-                const SizedBox(height: 8),
 
-                // Checkbox and Title Row
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(top: 1, right: 8),
-                      child: BouncyCheckbox(
-                        isChecked: task.isCompleted,
-                        size: 20,
-                        activeColor: primaryCategory != null
-                            ? categoryColor
-                            : theme.colorScheme.primary,
-                        borderColor:
-                            (primaryCategory != null
-                                    ? categoryColor
-                                    : theme.colorScheme.primary)
-                                .withValues(alpha: 0.5),
-                        enableHaptics: hasTaskFeedback,
-                        enableSparkles: true,
-                        onTap: () {
-                          if (onToggle != null) {
-                            onToggle!();
-                          } else {
-                            Provider.of<TaskProvider>(
-                              context,
-                              listen: false,
-                            ).toggleTaskCompletion(task);
-                          }
-                        },
-                      ),
-                    ),
-                    Expanded(
-                      child: Text(
-                        task.title,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.outfit(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: task.isCompleted
-                              ? theme.colorScheme.onSurface.withValues(
-                                  alpha: 0.45,
-                                )
-                              : theme.colorScheme.onSurface,
-                          decoration: task.isCompleted
-                              ? TextDecoration.lineThrough
-                              : TextDecoration.none,
-                          decorationColor: theme.colorScheme.onSurface
-                              .withValues(alpha: 0.4),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                        const SizedBox(height: 10),
 
-                // Description preview if available
-                if (task.description.trim().isNotEmpty) ...[
-                  const SizedBox(height: 6),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 28),
-                    child: Text(
-                      task.description.trim(),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        fontSize: 11,
-                        color: theme.colorScheme.onSurfaceVariant.withValues(
-                          alpha: 0.8,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-
-                const SizedBox(height: 10),
-
-                // Footer row: Category chips, Subtasks count, Due Date
-                Row(
-                  children: [
-                    Expanded(
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          // Category chip
-                          if (categories.isNotEmpty) ...[
-                            Flexible(
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 6,
-                                  vertical: 2,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Color(
-                                    categories.first.colorValue,
-                                  ).withValues(alpha: 0.12),
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
-                                child: Text(
-                                  categories.first.name,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: GoogleFonts.outfit(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w500,
-                                    color: Color(categories.first.colorValue),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            if (categories.length > 1) ...[
-                              const SizedBox(width: 3),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 4,
-                                  vertical: 2,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: theme
-                                      .colorScheme
-                                      .surfaceContainerHighest
-                                      .withValues(alpha: 0.5),
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
-                                child: Text(
-                                  '+${categories.length - 1}',
-                                  style: GoogleFonts.outfit(
-                                    fontSize: 9,
-                                    fontWeight: FontWeight.bold,
-                                    color: theme.colorScheme.onSurfaceVariant,
-                                  ),
-                                ),
-                              ),
-                            ],
-                            const SizedBox(width: 6),
-                          ],
-
-                          // Subtasks indicator (Linear style progress pill)
-                          if (subtasks.isNotEmpty) ...[
-                            Builder(
-                              builder: (context) {
-                                final allDone =
-                                    completedSubtasks == subtasks.length;
-                                final progress = subtasks.isEmpty
-                                    ? 0.0
-                                    : (completedSubtasks / subtasks.length);
-                                final pillColor = allDone
-                                    ? const Color(0xFF10B981)
-                                    : theme.colorScheme.primary;
-
-                                return Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 6,
-                                    vertical: 3,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: pillColor.withValues(
-                                      alpha: allDone ? 0.15 : 0.08,
-                                    ),
-                                    borderRadius: BorderRadius.circular(6),
-                                    border: Border.all(
-                                      color: pillColor.withValues(
-                                        alpha: allDone ? 0.35 : 0.15,
-                                      ),
-                                      width: 0.8,
-                                    ),
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      if (allDone)
-                                        Icon(
-                                          Icons.check_rounded,
-                                          size: 11,
-                                          color: pillColor,
-                                        )
-                                      else
-                                        Container(
-                                          width: 16,
-                                          height: 3.5,
-                                          margin: const EdgeInsets.only(
-                                            right: 4,
+                        // Footer row: Category chips, Subtasks count, Due Date
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  // Category chip
+                                  if (categories.isNotEmpty) ...[
+                                    Flexible(
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 6,
+                                          vertical: 2,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Color(
+                                            categories.first.colorValue,
+                                          ).withValues(alpha: 0.12),
+                                          borderRadius: BorderRadius.circular(
+                                            6,
                                           ),
-                                          decoration: BoxDecoration(
-                                            color: theme.colorScheme.outline
-                                                .withValues(alpha: 0.2),
-                                            borderRadius: BorderRadius.circular(
-                                              2,
-                                            ),
-                                          ),
-                                          child: FractionallySizedBox(
-                                            alignment: Alignment.centerLeft,
-                                            widthFactor: progress.clamp(
-                                              0.0,
-                                              1.0,
-                                            ),
-                                            child: Container(
-                                              decoration: BoxDecoration(
-                                                color: pillColor,
-                                                borderRadius:
-                                                    BorderRadius.circular(2),
-                                              ),
+                                        ),
+                                        child: Text(
+                                          categories.first.name,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: GoogleFonts.outfit(
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.w500,
+                                            color: Color(
+                                              categories.first.colorValue,
                                             ),
                                           ),
                                         ),
-                                      Text(
-                                        '$completedSubtasks/${subtasks.length}',
-                                        style: GoogleFonts.outfit(
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.w600,
-                                          color: allDone
-                                              ? pillColor
-                                              : theme
-                                                    .colorScheme
-                                                    .onSurfaceVariant,
+                                      ),
+                                    ),
+                                    if (categories.length > 1) ...[
+                                      const SizedBox(width: 3),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 4,
+                                          vertical: 2,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: theme
+                                              .colorScheme
+                                              .surfaceContainerHighest
+                                              .withValues(alpha: 0.5),
+                                          borderRadius: BorderRadius.circular(
+                                            6,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          '+${categories.length - 1}',
+                                          style: GoogleFonts.outfit(
+                                            fontSize: 9,
+                                            fontWeight: FontWeight.bold,
+                                            color: theme
+                                                .colorScheme
+                                                .onSurfaceVariant,
+                                          ),
                                         ),
                                       ),
                                     ],
-                                  ),
-                                );
-                              },
+                                    const SizedBox(width: 6),
+                                  ],
+
+                                  // Subtasks indicator (Linear style progress pill)
+                                  if (subtasks.isNotEmpty) ...[
+                                    Builder(
+                                      builder: (context) {
+                                        final allDone =
+                                            completedSubtasks ==
+                                            subtasks.length;
+                                        final progress = subtasks.isEmpty
+                                            ? 0.0
+                                            : (completedSubtasks /
+                                                  subtasks.length);
+                                        final pillColor = allDone
+                                            ? const Color(0xFF10B981)
+                                            : theme.colorScheme.primary;
+
+                                        return Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 6,
+                                            vertical: 3,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: pillColor.withValues(
+                                              alpha: allDone ? 0.15 : 0.08,
+                                            ),
+                                            borderRadius: BorderRadius.circular(
+                                              6,
+                                            ),
+                                            border: Border.all(
+                                              color: pillColor.withValues(
+                                                alpha: allDone ? 0.35 : 0.15,
+                                              ),
+                                              width: 0.8,
+                                            ),
+                                          ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              if (allDone)
+                                                Icon(
+                                                  Icons.check_rounded,
+                                                  size: 11,
+                                                  color: pillColor,
+                                                )
+                                              else
+                                                Container(
+                                                  width: 16,
+                                                  height: 3.5,
+                                                  margin: const EdgeInsets.only(
+                                                    right: 4,
+                                                  ),
+                                                  decoration: BoxDecoration(
+                                                    color: theme
+                                                        .colorScheme
+                                                        .outline
+                                                        .withValues(alpha: 0.2),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          2,
+                                                        ),
+                                                  ),
+                                                  child: FractionallySizedBox(
+                                                    alignment:
+                                                        Alignment.centerLeft,
+                                                    widthFactor: progress.clamp(
+                                                      0.0,
+                                                      1.0,
+                                                    ),
+                                                    child: Container(
+                                                      decoration: BoxDecoration(
+                                                        color: pillColor,
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                              2,
+                                                            ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              Text(
+                                                '$completedSubtasks/${subtasks.length}',
+                                                style: GoogleFonts.outfit(
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: allDone
+                                                      ? pillColor
+                                                      : theme
+                                                            .colorScheme
+                                                            .onSurfaceVariant,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ],
+                                ],
+                              ),
                             ),
+
+                            // Due Date Chip
+                            if (task.dueDate != null) ...[
+                              const SizedBox(width: 6),
+                              Builder(
+                                builder: (context) {
+                                  final isOverdue = _isOverdue(task.dueDate!);
+                                  final dateColor = isOverdue
+                                      ? theme.colorScheme.error
+                                      : theme.colorScheme.primary;
+
+                                  return Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 6,
+                                      vertical: 2,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: isOverdue
+                                          ? theme.colorScheme.errorContainer
+                                                .withValues(alpha: 0.4)
+                                          : theme.colorScheme.primaryContainer
+                                                .withValues(alpha: 0.3),
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          Icons.schedule_rounded,
+                                          size: 10,
+                                          color: dateColor,
+                                        ),
+                                        const SizedBox(width: 3),
+                                        Text(
+                                          _formatDueDate(task.dueDate!),
+                                          style: GoogleFonts.outfit(
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.bold,
+                                            color: dateColor,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
+                            ],
                           ],
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-
-                    // Due Date Chip
-                    if (task.dueDate != null) ...[
-                      const SizedBox(width: 6),
-                      Builder(
-                        builder: (context) {
-                          final isOverdue = _isOverdue(task.dueDate!);
-                          final dateColor = isOverdue
-                              ? theme.colorScheme.error
-                              : theme.colorScheme.primary;
-
-                          return Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: isOverdue
-                                  ? theme.colorScheme.errorContainer.withValues(
-                                      alpha: 0.4,
-                                    )
-                                  : theme.colorScheme.primaryContainer
-                                        .withValues(alpha: 0.3),
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  Icons.schedule_rounded,
-                                  size: 10,
-                                  color: dateColor,
-                                ),
-                                const SizedBox(width: 3),
-                                Text(
-                                  _formatDueDate(task.dueDate!),
-                                  style: GoogleFonts.outfit(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.bold,
-                                    color: dateColor,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
-                    ],
-                  ],
+                  ),
                 ),
               ],
             ),
           ),
         ),
-      ],
-    ),
-  ),
-),
-);
-}
+      );
+    }
 
     final isDesktopOrWeb =
         kIsWeb ||
