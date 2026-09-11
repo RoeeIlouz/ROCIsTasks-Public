@@ -193,6 +193,9 @@ class TaskTile extends StatelessWidget {
               selectedBorderColor: categories.isNotEmpty
                   ? Color(categories.first.colorValue)
                   : theme.colorScheme.primary,
+              tintColor: categories.isNotEmpty
+                  ? Color(categories.first.colorValue)
+                  : null,
               color: isSelected
                   ? (categories.isNotEmpty
                         ? Color(categories.first.colorValue)
@@ -901,11 +904,16 @@ class _MaskedPrivateTaskTile extends StatelessWidget {
     final themeService = Provider.of<ThemeService>(context, listen: false);
     final priorityColor = _getPriorityColor(priority);
 
+    final categoryColor = categories.isNotEmpty
+        ? Color(categories.first.colorValue)
+        : null;
+
     return GlassContainer(
       margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
       isSelected: isSelected,
-      selectedBorderColor: theme.colorScheme.primary,
-      color: isSelected ? theme.colorScheme.primary : null,
+      selectedBorderColor: categoryColor ?? theme.colorScheme.primary,
+      tintColor: categoryColor,
+      color: isSelected ? (categoryColor ?? theme.colorScheme.primary) : null,
       child: InkWell(
         onTap: () => _handleTap(context),
         onLongPress: onLongPress,

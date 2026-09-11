@@ -91,6 +91,7 @@ class KanbanCard extends StatelessWidget {
         color: task.isCompleted
             ? (isDark ? Colors.grey.shade900 : Colors.grey.shade200)
             : null,
+        tintColor: primaryCategory != null ? categoryColor : null,
         border: Border.all(
           color: isDark
               ? (primaryCategory != null

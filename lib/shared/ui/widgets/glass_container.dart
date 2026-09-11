@@ -14,6 +14,7 @@ class GlassContainer extends StatelessWidget {
   final EdgeInsetsGeometry? margin;
   final BoxBorder? border;
   final Color? color;
+  final Color? tintColor;
   final bool isSelected;
   final Color? selectedBorderColor;
   final double? elevation;
@@ -28,6 +29,7 @@ class GlassContainer extends StatelessWidget {
     this.margin,
     this.border,
     this.color,
+    this.tintColor,
     this.isSelected = false,
     this.selectedBorderColor,
     this.elevation,
@@ -45,7 +47,7 @@ class GlassContainer extends StatelessWidget {
         !kIsWeb;
 
     // Default glass color adapts to theme if not provided, with a beautiful primary/category tint
-    final tintColor = color ?? theme.colorScheme.primary;
+    final effectiveTint = tintColor ?? color ?? theme.colorScheme.primary;
     final baseColor = isDark
         ? (themeService.useMaterialTheme
               ? theme.colorScheme.surface
@@ -53,12 +55,16 @@ class GlassContainer extends StatelessWidget {
         : (themeService.useMaterialTheme
               ? theme.colorScheme.surface
               : Colors.white);
-    final glassColor = Color.lerp(baseColor, tintColor, isDark ? 0.18 : 0.12)!;
+    final glassColor = Color.lerp(
+      baseColor,
+      effectiveTint,
+      isDark ? 0.18 : 0.12,
+    )!;
 
     final radius = borderRadius ?? BorderRadius.circular(24.0);
 
     // Default border if not provided, subtly tinted with the primary/category color
-    final borderTint = color ?? theme.colorScheme.primary;
+    final borderTint = tintColor ?? color ?? theme.colorScheme.primary;
     final glassBorder =
         border ??
         Border.all(
@@ -89,7 +95,8 @@ class GlassContainer extends StatelessWidget {
             ? glassColor.withValues(alpha: isSelected ? opacity + 0.1 : opacity)
             : (isSelected
                   ? (color?.withValues(alpha: 0.2) ??
-                        theme.colorScheme.primary.withValues(alpha: 0.12))
+                        (tintColor?.withValues(alpha: 0.2) ??
+                            theme.colorScheme.primary.withValues(alpha: 0.12)))
                   : (color ?? theme.colorScheme.surfaceContainerLow)),
         borderRadius: radius,
         border: glassBorder,
