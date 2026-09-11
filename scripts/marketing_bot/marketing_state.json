@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-11T03:12:08.733282+00:00",
+  "last_run_timestamp": "2026-09-11T10:42:25.042575+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -1514,6 +1514,42 @@
       "title": "what's your vision? my version of uber. (stop flagging me, im not ai -__-)",
       "url": "https://reddit.com/r/roastmystartup/comments/1wcy7vz/whats_your_vision_my_version_of_uber_stop/",
       "inspected_at": "2026-09-11T03:12:00.264994+00:00"
+    },
+    "reddit_1wdciwm": {
+      "platform": "reddit",
+      "title": "Would you keep auth and payments close together when starting again?",
+      "url": "https://reddit.com/r/SideProject/comments/1wdciwm/would_you_keep_auth_and_payments_close_together/",
+      "inspected_at": "2026-09-11T10:41:02.664861+00:00"
+    },
+    "reddit_1wdcegx": {
+      "platform": "reddit",
+      "title": "My Final Year Project 🫪",
+      "url": "https://reddit.com/r/SideProject/comments/1wdcegx/my_final_year_project/",
+      "inspected_at": "2026-09-11T10:41:48.861658+00:00"
+    },
+    "reddit_1wdcczk": {
+      "platform": "reddit",
+      "title": "Student-built marketplace now live on google play- listings needed :)",
+      "url": "https://reddit.com/r/SideProject/comments/1wdcczk/studentbuilt_marketplace_now_live_on_google_play/",
+      "inspected_at": "2026-09-11T10:41:49.765801+00:00"
+    },
+    "reddit_1wdc72r": {
+      "platform": "reddit",
+      "title": "I built a free, local-first Chrome extension that checks YouTube sermon claims against Scripture (Zero server, offline vector search in Wasm)",
+      "url": "https://reddit.com/r/SideProject/comments/1wdc72r/i_built_a_free_localfirst_chrome_extension_that/",
+      "inspected_at": "2026-09-11T10:41:50.551570+00:00"
+    },
+    "reddit_1wd6h5t": {
+      "platform": "reddit",
+      "title": "Can't believe a rough one-pager turned into a real agent verification engine people actually use",
+      "url": "https://reddit.com/r/indiehackers/comments/1wd6h5t/cant_believe_a_rough_onepager_turned_into_a_real/",
+      "inspected_at": "2026-09-11T10:41:51.380704+00:00"
+    },
+    "reddit_1wdc7ty": {
+      "platform": "reddit",
+      "title": "Sto creando una startup per aiutare gli studenti a trovare casa più facilmente",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wdc7ty/sto_creando_una_startup_per_aiutare_gli_studenti/",
+      "inspected_at": "2026-09-11T10:41:52.337759+00:00"
     }
   },
   "pending_drafts": {
@@ -1850,7 +1886,7 @@
     }
   },
   "recorded_feedback": [],
-  "last_organic_post_timestamp": "2026-09-10T15:55:25.168042+00:00",
+  "last_organic_post_timestamp": "2026-09-11T10:42:24.619962+00:00",
   "organic_posts": [
     {
       "text": "you either die a young enthusiastic builder or live long enough to realize that 90% of tech problems are solved by restarting the router.",
@@ -1927,13 +1963,23 @@
         "Bluesky"
       ],
       "posted_at": "2026-09-10T15:55:25.168042+00:00"
+    },
+    {
+      "text": "spent 45 minutes cable-managing behind my desk only for it to look like an abstract art installation of black velcro and sorrow.",
+      "topic": "ee_engineering_struggles",
+      "platforms": [
+        "Twitter/X",
+        "Bluesky"
+      ],
+      "posted_at": "2026-09-11T10:42:24.619962+00:00"
     }
   ],
   "x_posts_timestamps": [
     "2026-09-06T03:08:28.084456+00:00",
     "2026-09-07T11:41:18.669653+00:00",
     "2026-09-08T16:05:02.814388+00:00",
-    "2026-09-10T03:16:35.720705+00:00"
+    "2026-09-10T03:16:35.720705+00:00",
+    "2026-09-11T10:42:24.100237+00:00"
   ],
   "posted_devlogs": {
     "devlog_0_2_2_60_2026_07_17_190f9f3082": {
