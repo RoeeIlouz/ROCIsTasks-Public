@@ -2,6 +2,29 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## Version Revert & Glassmorphic Category/Event Hue Tinting - 2026-09-11
+
+#### Problem & Requirements
+* **Version Revert**: Reverted unnecessary version bump from `0.2.14+100` back to `0.2.13+99` (`appVersion = '0.2.13'`) and synchronized `docs/CHANGELOG.md`.
+* **Glassmorphic Category Tinting**: When glassmorphism was enabled, `TaskTile` and calendar event cards were using the default primary theme color rather than reflecting their specific category or calendar colors in the frosted glass blend.
+
+#### Solutions Applied
+1. **Version Synchronization**:
+   - Reverted `pubspec.yaml` to `0.2.13+99`.
+   - Reverted `lib/core/config/app_config.dart` to `0.2.13`.
+   - Synchronized `docs/CHANGELOG.md` to keep `[0.2.13+99]` as the active release section.
+2. **`GlassContainer` `tintColor` Engine**:
+   - Added dedicated `tintColor` parameter to `GlassContainer`.
+   - In glass mode (`useGlass = true`), `tintColor` is lerped at 12-18% onto `baseColor` to produce a refined, subtle colored translucent backdrop.
+   - In non-glass mode (`useGlass = false`), `tintColor` does not override `color`, preserving the neutral `surfaceContainerLow` surface and preventing saturated solid color fills on Web and non-glass mobile.
+3. **Widget Integration**:
+   - `TaskTile` & `_MaskedPrivateTaskTile`: Now pass `tintColor: categories.isNotEmpty ? Color(categories.first.colorValue) : null`.
+   - `CalendarScreen`: Passes `tintColor: eventColor` for Google Calendar event cards.
+   - `KanbanCard`: Passes `tintColor: primaryCategory != null ? categoryColor : null`.
+4. **Verification**:
+   - `flutter analyze`: 0 issues found.
+   - `flutter test`: 332 / 332 tests passed (100%).
+
 ## Non-Glassmorphic Surface Styling & Category Stripe Alignment - 2026-09-11
 
 #### Problem & Requirements

@@ -640,6 +640,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                           width: 1.0,
                         ),
                         isSelected: false,
+                        tintColor: eventColor,
                         child: Semantics(
                           label:
                               'Google Calendar Event: ${item.title ?? 'No Title'}',
