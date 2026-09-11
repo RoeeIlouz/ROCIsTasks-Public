@@ -2,6 +2,22 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## Version 0.2.14+100 Release & Deployment Pipeline - 2026-09-11
+
+#### Summary & Operations
+* **Version Bump & Sync**: Synchronized `pubspec.yaml` and `lib/core/config/app_config.dart` to `0.2.14+100`.
+* **Changelog Compliance**: Added concise, <500 char release notes to `docs/CHANGELOG.md` covering UI/UX overhaul, Kanban enhancements, and Android widget refinements.
+* **Shorebird & Google Play Console Deployment**:
+  - Resolved Dart kernel binary mismatch (Flutter 3.44.9 host vs. Flutter 3.47.2 Shorebird) by clearing stale build hooks.
+  - Built Shorebird AAB release (`70.5 MB`, Release ID `824180`).
+  - Successfully published AAB v100 to Google Play Console `internal` track via `scripts/upload_aab_internal.py` with service account credentials.
+* **Standalone Release APK & GitHub Release**:
+  - Built signed release APK (`86.1 MB`).
+  - Created GitHub Release `v0.2.14+100` with attached release APK and release notes: [Release v0.2.14+100](https://github.com/RoeeIlouz/ROCIs-Tasks/releases/tag/v0.2.14%2B100).
+* **Code & Test Integrity**:
+  - 325 / 325 tests passed (100%).
+  - `flutter analyze`: 0 issues found.
+
 ## Mobbin UI/UX Optimization: Phase 4 (Android Home Screen Widgets Visual Overhaul) - 2026-09-11
 
 #### Problem & Requirements
