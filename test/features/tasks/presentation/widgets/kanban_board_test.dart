@@ -289,4 +289,26 @@ void main() {
       ).called(1);
     },
   );
+
+  testWidgets(
+    'renders category accent stripe on KanbanCard when task has category',
+    (tester) async {
+      tester.view.physicalSize = const Size(1200, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(buildTestWidget());
+      await tester.pumpAndSettle();
+
+      // Find Container widgets with width 3.5 representing the vertical category accent stripe
+      final stripeFinder = find.byWidgetPredicate(
+        (widget) =>
+            widget is Container &&
+            widget.constraints?.maxWidth == 3.5 &&
+            widget.constraints?.minWidth == 3.5,
+      );
+      expect(stripeFinder, findsWidgets);
+    },
+  );
 }

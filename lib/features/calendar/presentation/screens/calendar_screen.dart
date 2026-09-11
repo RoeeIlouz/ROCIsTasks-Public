@@ -626,7 +626,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
                             item.calendarId,
                             nativeColor: nativeColor,
                           );
-                      final isDark = Theme.of(context).brightness == Brightness.dark;
+                      final isDark =
+                          Theme.of(context).brightness == Brightness.dark;
                       return GlassContainer(
                         margin: const EdgeInsets.symmetric(
                           horizontal: 16,
