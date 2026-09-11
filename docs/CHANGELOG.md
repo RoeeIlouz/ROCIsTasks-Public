@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.14+100] - 2026-09-11
+
+### Improved
+- Complete UI/UX redesign benchmarked against modern standards (Amie, Linear, Things 3).
+- Android home screen widgets visual overhaul with floating cards and circular frosted controls.
+- Fast inline Kanban card creation and platform-aware drag & drop.
+- Delightful spring physics, haptic bursts, and particle celebrations.
+- Desktop command palette (Ctrl+K / ⌘K) and power-user keyboard shortcuts.
+
 ## [0.2.13+99] - 2026-09-11
 
 ### Added

@@ -8,7 +8,7 @@ import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
 import 'package:rocis_tasks/features/tasks/presentation/widgets/task_tile.dart';
 import 'package:rocis_tasks/features/tasks/presentation/widgets/task_skeleton.dart';
-import 'package:rocis_tasks/features/tasks/presentation/screens/add_task_screen.dart';
+import 'package:rocis_tasks/features/tasks/presentation/widgets/quick_add_task_bottom_sheet.dart';
 import 'package:rocis_tasks/features/calendar/presentation/providers/calendar_provider.dart';
 import 'package:rocis_tasks/core/services/auth_service.dart';
 import 'package:rocis_tasks/core/services/calendar_color_service.dart';
@@ -537,28 +537,21 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                 ),
                           ),
                           const SizedBox(height: 16),
-                          OutlinedButton.icon(
+                          FilledButton.icon(
                             onPressed: () {
                               HapticFeedback.lightImpact();
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => AddTaskScreen(
-                                    initialDueDate:
-                                        calendarProvider.selectedDate,
-                                  ),
-                                  fullscreenDialog: true,
+                              showModalBottomSheet(
+                                context: context,
+                                isScrollControlled: true,
+                                backgroundColor: Colors.transparent,
+                                builder: (context) => QuickAddTaskBottomSheet(
+                                  initialDueDate: calendarProvider.selectedDate,
                                 ),
                               );
                             },
-                            style: OutlinedButton.styleFrom(
+                            style: FilledButton.styleFrom(
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(14),
-                              ),
-                              side: BorderSide(
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.primary.withValues(alpha: 0.4),
                               ),
                             ),
                             icon: const Icon(Icons.add_rounded, size: 18),
@@ -611,7 +604,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       return TaskTile(
                         task: item,
                         categories: categories,
-                        enableSwipeToDelete: false,
+                        enableSwipeToDelete: true,
                         enablePin: false,
                         onToggle: () => taskProvider.toggleTaskCompletion(item),
                         onDelete: () => taskProvider.deleteTask(item.id),

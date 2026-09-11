@@ -2,6 +2,149 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## Mobbin UI/UX Optimization: Phase 4 (Android Home Screen Widgets Visual Overhaul) - 2026-09-11
+
+#### Problem & Requirements
+* **Legacy Widget Visual Language**: Android home screen widgets utilized older, harsh solid backgrounds (`#E0E0E0`, hardcoded coral `#EF3842`, opaque dark greys), low-contrast sharp corners (12dp–16dp), and flat navigation controls without frosted visual affordances benchmarked against top Mobbin apps (Amie, Linear).
+* **Strict RemoteViews & Zero-Breaking-Change Mandate**: Any layout or drawable upgrade had to strictly preserve RemoteViews XML compatibility (only `LinearLayout`, `RelativeLayout`, `FrameLayout`, `TextView`, `ImageView`, `ListView`), view types (e.g. Kotlin callers requiring `setTextViewText` on navigation views), exact IDs, and click fill-in intents for seamless interactivity.
+
+#### Solutions & Architecture Applied
+1. **Squircle Outer Container & Glass Background Hierarchy**:
+   * Upgraded [`widget_background.xml`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/drawable/widget_background.xml) to 24dp radius (Android 14/15 launcher standard) with `#B3101216` obsidian tint and `#25FFFFFF` border.
+   * Upgraded [`widget_background_glass.xml`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/drawable/widget_background_glass.xml) with `#B3121316` tint and `#28FFFFFF` frosted border.
+   * Synchronized 24dp squircle geometry across [`widget_background_dark.xml`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/drawable/widget_background_dark.xml) and [`widget_background_light.xml`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/drawable/widget_background_light.xml).
+2. **Standardized Floating Cards & Circular Frosted Nav Affordances**:
+   * Applied [`widget_card_bg.xml`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/drawable/widget_card_bg.xml) (14dp radius, `#18FFFFFF` fill, `#22FFFFFF` hairline stroke) across all list item rows with 2dp margins for floating card elevation.
+   * Modernized [`widget_nav_icon_bg.xml`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/drawable/widget_nav_icon_bg.xml) (translucent `#22808080` fill, `#33808080` stroke) and wired into circular action buttons across widgets.
+   * Upgraded [`widget_pill_bg.xml`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/drawable/widget_pill_bg.xml) and [`widget_filter_button_active_bg.xml`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/drawable/widget_filter_button_active_bg.xml) from hardcoded coral to primary indigo accent (`#256366F1` fill, `#6366F1` stroke).
+   * Upgraded [`widget_button_bg.xml`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/drawable/widget_button_bg.xml) from solid `#E0E0E0` grey to translucent pill.
+3. **Comprehensive Layout Refinements**:
+   * [`widget_task_item.xml`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/layout/widget_task_item.xml) & [`widget_kanban_item.xml`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/layout/widget_kanban_item.xml): Floating card container, 3.5dp rounded category strip, 24dp circular checkbox, 13.5sp bold typography, and aligned metadata row.
+   * [`widget_today_agenda_layout.xml`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/layout/widget_today_agenda_layout.xml) & [`widget_today_agenda_item.xml`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/layout/widget_today_agenda_item.xml): Equipped prev, next, jump, and add buttons with `widget_nav_icon_bg`; modernized 3.5dp strip, 24dp check, 20dp calendar event icon, and `#20FFFFFF` hairline divider.
+   * [`widget_timeline_agenda_layout.xml`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/layout/widget_timeline_agenda_layout.xml) & [`widget_timeline_event_item.xml`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/layout/widget_timeline_event_item.xml): Frosted nav buttons, card padding, and aligned time/subtitle row.
+   * [`widget_month_agenda_layout.xml`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/layout/widget_month_agenda_layout.xml): Frosted navigation buttons, `#20FFFFFF` vertical divider.
+   * [`widget_up_next_layout.xml`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/layout/widget_up_next_layout.xml): Modernized strip, 24dp checkbox, 20dp calendar icon, and pill time badge.
+   * [`widget_full_calendar_layout.xml`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/android/app/src/main/res/layout/widget_full_calendar_layout.xml): Dynamic filter buttons wired with updated active state drawables and nav buttons.
+4. **Verification & Zero Regressions**:
+   * All 12 property tests in [`test/widget_data_serialization_test.dart`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/test/widget_data_serialization_test.dart) passed.
+   * `flutter analyze`: **0 issues found**.
+   * `flutter test`: **325 / 325 unit & widget tests passed (100%)**.
+
+## Mobbin UI/UX Optimization: Phase 5 (Kanban Board View Evolution) - 2026-09-11
+
+#### Problem & Requirements
+* **Drag-and-Drop Interaction Disparity**: Desktop/Web mouse users had to hold click for 500ms due to `LongPressDraggable`, feeling sluggish compared to native Kanban boards like Linear and Trello.
+* **Column Card Creation Friction**: Adding tasks in a specific Kanban column required opening the full modal `AddTaskScreen`, breaking flow when quickly brainstorming or triaging cards.
+* **Drop Target Feedback**: When dragging a card across columns, only the column border changed without a luminous drop slot indicator showing where the card would land.
+* **Card Component Consistency**: `KanbanCard` used a manual circular container for checkmark without the spring bounce, micro-sparkles, or tactile feedback introduced in Phase 6, and subtasks lacked the sleek Linear-style progress pill.
+
+#### Solutions & Architecture Applied
+1. **Platform-Aware Drag & Drop**:
+   * Updated [`KanbanCard`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/tasks/presentation/widgets/kanban/kanban_card.dart) with platform detection: immediate `Draggable<Task>` on Web, macOS, Windows, and Linux for instant mouse drag; resilient `LongPressDraggable<Task>` on touchscreen mobile devices (iOS, Android) to avoid gesture conflicts with vertical/horizontal scrolling.
+   * Enhanced drag feedback card with 4-degree tilt (`-0.04` rad), 0.92 opacity, and glass elevation.
+2. **Integrated `BouncyCheckbox` & Tactile Feedback**:
+   * Replaced static checkbox container in `KanbanCard` with [`BouncyCheckbox`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/shared/ui/widgets/bouncy_checkbox.dart).
+   * Added safe theme feedback preference detection (`_isTaskFeedbackEnabled`).
+3. **Linear-Style Subtask Progress Pill**:
+   * Upgraded subtasks count pill: completed state displays radiant emerald (`#10B981`) with `✓ N/N`; in-progress state displays a compact 16px mini progress bar indicator alongside the count with overflow-safe flexible layout.
+4. **Fast Inline Card Creation**:
+   * Added `onInlineAddTask` callback to [`KanbanColumn`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/tasks/presentation/widgets/kanban/kanban_column.dart).
+   * Implemented inline creation card with autofocus `TextField`, Enter-to-submit, "Add", "Cancel", and an expand icon to transition into full `AddTaskScreen`.
+   * Added a quick `+` button in the column header next to the task count badge.
+   * Implemented glowing drop placeholder slot in `KanbanColumn` during `_isHovering`.
+5. **Kanban Board View Integration**:
+   * Wired `onInlineAddTask` into Status (To Do, In Focus, Done), Priority (High, Medium, Low), and Category columns in [`KanbanBoardView`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/tasks/presentation/widgets/kanban/kanban_board_view.dart).
+6. **Testing & Verification**:
+   * Expanded [`test/features/tasks/presentation/widgets/kanban_board_test.dart`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/test/features/tasks/presentation/widgets/kanban_board_test.dart) with inline task creation and subtask indicator tests (6/6 tests passing).
+   * `flutter analyze`: **0 issues found**.
+   * `flutter test`: **325 / 325 unit & widget tests passed (100%)**.
+
+## Mobbin UI/UX Optimization: Phase 6 (Micro-Interactions, Haptics & Delight) - 2026-09-11
+
+#### Problem & Requirements
+* **Checkbox Interaction Lack of Tactile Feedback**: Tapping checkboxes felt flat and instantaneous without a satisfying spring-physics bounce, completion particle burst, or multi-stage haptic curve.
+* **Subtask Completion Visibility**: Progress indicators showed raw numbers without celebrating 100% completion milestone or providing distinct haptic feedback on the final item.
+* **Inbox Zero Empty State**: When users completed all active tasks for the day, the screen fell back to generic "No tasks yet / create first task", missing the motivating "All caught up" celebration moment benchmarked in Amie and Things 3.
+
+#### Solutions & Architecture Applied
+1. **Zero-Dependency Particle Burst Engine (`CelebrationParticleBurst`)**:
+   * Implemented [`CelebrationParticleBurst`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/shared/ui/widgets/celebration_particle_burst.dart) using a hardware-accelerated canvas `CustomPainter` with trigonometric velocity, particle rotation, alpha fade, and deceleration physics (`Curves.easeOutCubic`).
+   * Provides `CelebrationParticleBurst.triggerAt(context, globalCenter)` to dynamically spawn an overlay sparkle burst anywhere on tap.
+2. **Spring Bouncy Checkbox & Haptics (`BouncyCheckbox`)**:
+   * Implemented [`BouncyCheckbox`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/shared/ui/widgets/bouncy_checkbox.dart) with spring sequence physics ($1.0 \rightarrow 0.82 \rightarrow 1.18 \rightarrow 1.0$), double-pulse haptic feedback (`HapticFeedback.heavyImpact()` followed by `lightImpact()`), and localized sparkle burst.
+   * Integrated into [`TaskTile`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/tasks/presentation/widgets/task_tile.dart) and web views.
+3. **Subtask Completion Milestone & Haptics**:
+   * Upgraded subtasks progress indicator in `TaskTile`: when reaching 100% completion, progress bar transitions to radiant emerald (`#10B981`) with `✓ All done` badge.
+   * Completing the final subtask triggers double-pulse haptic feedback.
+4. **Inbox Zero Delight State**:
+   * Updated [`TaskListScreen`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/tasks/presentation/screens/task_list_screen.dart) to detect when active tasks are empty but tasks were completed today.
+   * Renders a celebratory "All done for today! 🎉" card with ambient emerald glow, live completed task counter pill, and localized motivating copy (`l10n.allCaughtUpToday`, `l10n.allCaughtUpSubtitle`).
+5. **Testing & Quality Assurance**:
+   * Created [`test/shared/ui/celebration_particle_burst_test.dart`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/test/shared/ui/celebration_particle_burst_test.dart) (3 tests passing).
+   * Guarded against unstubbed mock errors in older tests (`MockTaskProvider.allTasks`, `MockThemeService.taskCompletionFeedback`).
+   * `flutter analyze`: **0 issues found**.
+   * `flutter test`: **323 / 323 unit & widget tests passed (100%)**.
+
+## Mobbin UI/UX Optimization: Phase 3 (Web & Desktop Workspace Evolution) - 2026-09-11
+
+#### Problem & Requirements
+* **Desktop Keyboard First Ergonomics**: Navigating tasks, switching views, or triggering global commands required manual mouse clicks without a centralized command center.
+* **Workspace Density & Speed**: Center workspace lacked density controls (compact vs. comfortable) and inline fast capture.
+* **Inspector Form Clutter**: The task inspector functioned as a modal-like form with a rigid "Save Changes" button rather than a sleek, auto-saving Linear-style property panel with interactive subtasks checklist.
+
+#### Solutions & Architecture Applied
+1. **Linear-Style Command Palette (`⌘K` / `Ctrl+K`)**:
+   * Created [`CommandPaletteDialog`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/home/presentation/widgets/command_palette_dialog.dart) featuring full keyboard navigation (`↑`/`↓` to navigate, `Enter` to select, `Esc` to close) and real-time fuzzy search across actions, active tasks, and categories.
+   * Bound `Ctrl+K` and `Cmd+K` globally in [`WebHomeScreen`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/home/presentation/screens/web_home_screen.dart), and added a clickable `⌘K` badge inside the search bar.
+2. **Desktop Keyboard Ergonomics**:
+   * Single-key shortcut `C` for instant task capture (guarded against editable text focus).
+   * Key `/` to open search / command palette.
+   * Numeric keys `1`-`5` for instant workspace tab switching (Tasks, Board, Calendar, Categories, Settings).
+   * Key `Esc` to dismiss modals, deselect inspector, or clear active search.
+3. **Sidebar Live Badges & Navigation Rail**:
+   * Updated `_buildSidebarTab` with live numerical count badges showing active task totals in both comfortable and compact icon rail modes.
+4. **Center Workspace Polish & Inline Fast Capture**:
+   * Added an inline quick-add input bar at the head of the columns allowing rapid task capture with `Enter` directly into Today.
+   * Implemented a density toggle button (Comfortable vs. Compact) adjusting vertical card padding dynamically.
+5. **Linear-Style Property Inspector & Debounced Auto-Save**:
+   * Redesigned inspector with borderless title and notes editing in `GoogleFonts.outfit`.
+   * Built interactive property rows: Status toggle pill, due date picker with relative previews, 3-tier priority pills with colored dots, and category filter chips.
+   * Built an interactive subtasks checklist with checkboxes and an inline `+ Add subtask... (Enter)` input.
+   * Debounced auto-save (600ms) with a subtle `✓ Saved` / `Saving...` status badge.
+6. **Testing & Verification**:
+   * Created [`test/features/home/command_palette_test.dart`](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/test/features/home/command_palette_test.dart) (3 tests passing).
+   * `flutter analyze`: **0 issues found**.
+   * `flutter test`: **320 / 320 unit & widget tests passed (100%)**.
+
+## Mobbin UI/UX Optimization: Phase 1 (Tokens & Glassmorphism) & Phase 2 (Mobile Overhaul) - 2026-09-11
+
+#### Problem & Requirements
+* **Mobile Task Card Ergonomics**: Tasks only supported one-way swipe to delete. Toggling completion required a tap on an off-center checkbox. Card typography lacked consistent visual weighting and subtask progress was rendered as an unconstrained vertical dump.
+* **Friction in Task Creation**: Creating a task opened a full-screen form modal (`AddTaskScreen`), disrupting quick capture workflows.
+* **Glassmorphic Precision**: Container borders needed tighter contrast bounds (`0.12` dark, `0.08` light) to match modern high-density benchmarks (Linear, Things 3).
+
+#### Solutions & Architecture Applied
+1. **Glassmorphism Hairline Refinement**:
+   * Updated [GlassContainer](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/shared/ui/widgets/glass_container.dart) with calibrated border opacities (`0.12` dark mode, `0.08` light mode) and `1.5px` active highlight border for crisp edge definition.
+2. **Two-Way Swipe Gestures & Animated Task Card**:
+   * Upgraded [TaskTile](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/tasks/presentation/widgets/task_tile.dart) `Dismissible` to `DismissDirection.horizontal`.
+   * **Swipe Right (`startToEnd`)**: Toggles task completion with emerald green background, dynamic label ("Mark as Complete" / "Mark as Incomplete"), and `HapticFeedback.mediumImpact()` while bouncing back into place.
+   * **Swipe Left (`endToStart`)**: Deletes task with red error background and trash icon.
+   * Centered check-circle touch target and standardized typography on `GoogleFonts.outfit`.
+   * Implemented Linear-style compact subtask progress bar (`[━━━━░░] 3/5`) in subtask list header.
+3. **Smart NLP Quick Add Bottom Sheet**:
+   * Created [QuickAddTaskBottomSheet](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/tasks/presentation/widgets/quick_add_task_bottom_sheet.dart) docked above the software keyboard with autofocus.
+   * Live NLP tokenizer listening to keystrokes and rendering dynamic interactive tokens (Date/Time, Category, Priority chips) with 1-tap removal.
+   * Quick action buttons for Today, Tomorrow, Date Picker, Priority cycler, Category picker, and seamless "More Options" transition into full `AddTaskScreen`.
+   * Wired into [HomeScreen](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/home/presentation/screens/home_screen.dart) FAB (`onTap` opens quick sheet, `onLongPress` opens full screen).
+   * Enforced $\ge 48\text{dp}$ touch target constraints in `HomeScreen._buildNavItem`.
+4. **Calendar Screen Integration**:
+   * Upgraded empty state in [CalendarScreen](file:///c:/Users/roeei/Documents/rocis_apps/ROCIs-tasks/lib/features/calendar/presentation/screens/calendar_screen.dart) to launch `QuickAddTaskBottomSheet` with pre-selected date.
+   * Enabled two-way swipe gestures on calendar task cards.
+5. **Testing & Verification**:
+   * `flutter analyze`: **0 issues found**.
+   * `flutter test`: **317 / 317 unit & widget tests passed (100%)**.
+
 ## Android Widget Idle Persistence, Calendar Color Overhaul & v0.2.13+99 Release - 2026-09-11
 
 #### Problem & Requirements

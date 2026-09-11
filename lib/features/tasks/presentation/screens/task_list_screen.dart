@@ -240,7 +240,11 @@ class _TaskListViewState extends State<TaskListView> {
     );
   }
 
-  Widget _buildCelebrationBanner(BuildContext context, AppLocalizations l10n, ThemeData theme) {
+  Widget _buildCelebrationBanner(
+    BuildContext context,
+    AppLocalizations l10n,
+    ThemeData theme,
+  ) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: GlassContainer(
@@ -254,7 +258,11 @@ class _TaskListViewState extends State<TaskListView> {
                 color: Colors.green.withValues(alpha: 0.15),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.celebration_rounded, color: Colors.green, size: 24),
+              child: const Icon(
+                Icons.celebration_rounded,
+                color: Colors.green,
+                size: 24,
+              ),
             ),
             const SizedBox(width: 14),
             Expanded(
@@ -287,7 +295,13 @@ class _TaskListViewState extends State<TaskListView> {
     );
   }
 
-  Widget _buildTaskItem(BuildContext context, dynamic task, TaskProvider provider, {bool animated = false, int index = 0}) {
+  Widget _buildTaskItem(
+    BuildContext context,
+    dynamic task,
+    TaskProvider provider, {
+    bool animated = false,
+    int index = 0,
+  }) {
     final categoryIds = task.categoryIds.isNotEmpty
         ? task.categoryIds
         : (task.categoryId != null ? [task.categoryId!] : []);
@@ -337,9 +351,7 @@ class _TaskListViewState extends State<TaskListView> {
       duration: const Duration(milliseconds: 250),
       child: SlideAnimation(
         verticalOffset: 30.0,
-        child: FadeInAnimation(
-          child: tile,
-        ),
+        child: FadeInAnimation(child: tile),
       ),
     );
   }
@@ -352,7 +364,8 @@ class _TaskListViewState extends State<TaskListView> {
     final theme = Theme.of(context);
 
     return Selector<TaskProvider, ({List tasks, bool isLoading})>(
-      selector: (_, provider) => (tasks: provider.tasks, isLoading: provider.isLoading),
+      selector: (_, provider) =>
+          (tasks: provider.tasks, isLoading: provider.isLoading),
       builder: (context, data, _) {
         final tasks = data.tasks;
         final isLoading = data.isLoading;
@@ -376,20 +389,40 @@ class _TaskListViewState extends State<TaskListView> {
         Widget mainContent;
 
         if (isLoading) {
-          mainContent = const Expanded(
-            child: TaskListSkeleton(),
-          );
+          mainContent = const Expanded(child: TaskListSkeleton());
         } else if (tasks.isEmpty) {
+          int todayCompletedCount = 0;
+          try {
+            todayCompletedCount = taskProvider.allTasks.where((t) {
+              if (!t.isCompleted) return false;
+              if (t.completedAt == null) return false;
+              final now = DateTime.now();
+              return t.completedAt!.year == now.year &&
+                  t.completedAt!.month == now.month &&
+                  t.completedAt!.day == now.day;
+            }).length;
+          } catch (_) {
+            todayCompletedCount = 0;
+          }
+
+          final isInboxZero = todayCompletedCount > 0;
+
           mainContent = Expanded(
             child: Center(
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 24,
+                ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     GlassContainer(
-                      padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 32),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 28,
+                        vertical: 32,
+                      ),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -397,18 +430,41 @@ class _TaskListViewState extends State<TaskListView> {
                           Container(
                             padding: const EdgeInsets.all(20),
                             decoration: BoxDecoration(
-                              color: theme.colorScheme.primary.withValues(alpha: 0.12),
+                              color: isInboxZero
+                                  ? const Color(
+                                      0xFF10B981,
+                                    ).withValues(alpha: 0.14)
+                                  : theme.colorScheme.primary.withValues(
+                                      alpha: 0.12,
+                                    ),
                               shape: BoxShape.circle,
+                              boxShadow: isInboxZero
+                                  ? [
+                                      BoxShadow(
+                                        color: const Color(
+                                          0xFF10B981,
+                                        ).withValues(alpha: 0.25),
+                                        blurRadius: 20,
+                                        spreadRadius: 2,
+                                      ),
+                                    ]
+                                  : null,
                             ),
                             child: Icon(
-                              Icons.checklist_rtl_rounded,
+                              isInboxZero
+                                  ? Icons.verified_rounded
+                                  : Icons.checklist_rtl_rounded,
                               size: 56,
-                              color: theme.colorScheme.primary,
+                              color: isInboxZero
+                                  ? const Color(0xFF10B981)
+                                  : theme.colorScheme.primary,
                             ),
                           ),
                           const SizedBox(height: 20),
                           Text(
-                            l10n.noTasksYet,
+                            isInboxZero
+                                ? l10n.allCaughtUpToday
+                                : l10n.noTasksYet,
                             textAlign: TextAlign.center,
                             style: GoogleFonts.outfit(
                               fontSize: 20,
@@ -416,12 +472,45 @@ class _TaskListViewState extends State<TaskListView> {
                               color: theme.colorScheme.onSurface,
                             ),
                           ),
+                          if (isInboxZero) ...[
+                            const SizedBox(height: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: const Color(
+                                  0xFF10B981,
+                                ).withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: const Color(
+                                    0xFF10B981,
+                                  ).withValues(alpha: 0.3),
+                                  width: 1,
+                                ),
+                              ),
+                              child: Text(
+                                '✨ $todayCompletedCount ${l10n.tasks} completed today',
+                                style: GoogleFonts.outfit(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: const Color(0xFF10B981),
+                                ),
+                              ),
+                            ),
+                          ],
                           const SizedBox(height: 8),
                           Text(
-                            'Keep your mind clear and your day organized.',
+                            isInboxZero
+                                ? l10n.allCaughtUpSubtitle
+                                : 'Keep your mind clear and your day organized.',
                             textAlign: TextAlign.center,
                             style: theme.textTheme.bodyMedium?.copyWith(
-                              color: theme.colorScheme.onSurface.withValues(alpha: 0.65),
+                              color: theme.colorScheme.onSurface.withValues(
+                                alpha: 0.65,
+                              ),
                             ),
                           ),
                           const SizedBox(height: 24),
@@ -437,15 +526,23 @@ class _TaskListViewState extends State<TaskListView> {
                               );
                             },
                             style: FilledButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 24,
+                                vertical: 12,
+                              ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(16),
                               ),
+                              backgroundColor: isInboxZero
+                                  ? const Color(0xFF10B981)
+                                  : null,
                             ),
                             icon: const Icon(Icons.add_rounded, size: 20),
                             label: Text(
                               l10n.createFirstTask,
-                              style: const TextStyle(fontWeight: FontWeight.w600),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                         ],
@@ -459,9 +556,14 @@ class _TaskListViewState extends State<TaskListView> {
             ),
           );
         } else {
-          final activeTasks = tasks.where((t) => !(t.isCompleted as bool)).toList();
-          final completedTasks = tasks.where((t) => t.isCompleted as bool).toList();
-          final isAllCaughtUp = activeTasks.isEmpty && completedTasks.isNotEmpty;
+          final activeTasks = tasks
+              .where((t) => !(t.isCompleted as bool))
+              .toList();
+          final completedTasks = tasks
+              .where((t) => t.isCompleted as bool)
+              .toList();
+          final isAllCaughtUp =
+              activeTasks.isEmpty && completedTasks.isNotEmpty;
 
           mainContent = Expanded(
             child: ListView(
@@ -472,7 +574,9 @@ class _TaskListViewState extends State<TaskListView> {
                   _buildCelebrationBanner(context, l10n, theme),
 
                 if (kIsWeb)
-                  ...activeTasks.map((t) => _buildTaskItem(context, t, taskProvider))
+                  ...activeTasks.map(
+                    (t) => _buildTaskItem(context, t, taskProvider),
+                  )
                 else
                   AnimationLimiter(
                     child: Column(
@@ -495,7 +599,10 @@ class _TaskListViewState extends State<TaskListView> {
                     padding: const EdgeInsets.only(top: 8),
                     child: GlassContainer(
                       borderRadius: BorderRadius.circular(16),
-                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 4,
+                        vertical: 2,
+                      ),
                       child: Theme(
                         data: theme.copyWith(dividerColor: Colors.transparent),
                         child: ExpansionTile(
@@ -520,7 +627,9 @@ class _TaskListViewState extends State<TaskListView> {
                             ),
                           ),
                           children: completedTasks
-                              .map((t) => _buildTaskItem(context, t, taskProvider))
+                              .map(
+                                (t) => _buildTaskItem(context, t, taskProvider),
+                              )
                               .toList(),
                         ),
                       ),
@@ -553,7 +662,9 @@ class _TaskListViewState extends State<TaskListView> {
       child: GlassContainer(
         padding: const EdgeInsets.all(12),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: theme.colorScheme.error.withValues(alpha: 0.3)),
+        border: Border.all(
+          color: theme.colorScheme.error.withValues(alpha: 0.3),
+        ),
         child: Row(
           children: [
             Icon(
@@ -591,16 +702,25 @@ class _TaskListViewState extends State<TaskListView> {
               onPressed: () async {
                 final success = await authService.linkGoogleTasks();
                 if (success && context.mounted) {
-                  final calendarProvider = Provider.of<CalendarProvider>(context, listen: false);
+                  final calendarProvider = Provider.of<CalendarProvider>(
+                    context,
+                    listen: false,
+                  );
                   calendarProvider.resetTokenExpiredState();
                   calendarProvider.loadEvents();
-                  final taskProvider = Provider.of<TaskProvider>(context, listen: false);
+                  final taskProvider = Provider.of<TaskProvider>(
+                    context,
+                    listen: false,
+                  );
                   taskProvider.syncGoogleTasksToLocal();
                 }
               },
               style: TextButton.styleFrom(
                 foregroundColor: theme.colorScheme.error,
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
               ),
               child: Text(
                 l10n.reconnect,

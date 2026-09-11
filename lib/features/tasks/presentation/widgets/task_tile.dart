@@ -56,10 +56,20 @@ class TaskTile extends StatelessWidget {
   static final _timeFormat24 = DateFormat.Hm();
   static final _timeFormat12 = DateFormat.jm();
 
+  bool _isTaskFeedbackEnabled(ThemeService service) {
+    try {
+      final dynamic val = service.taskCompletionFeedback;
+      return val == true;
+    } catch (_) {
+      return true;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final themeService = Provider.of<ThemeService>(context);
+    final hasTaskFeedback = _isTaskFeedbackEnabled(themeService);
     final l10n = AppLocalizations.of(context)!;
     SubscriptionService? subscriptionService;
     try {
@@ -83,22 +93,86 @@ class TaskTile extends StatelessWidget {
     return Dismissible(
       key: Key(task.id),
       direction: enableSwipeToDelete
-          ? DismissDirection.startToEnd
+          ? DismissDirection.horizontal
           : DismissDirection.none,
+      confirmDismiss: (direction) async {
+        if (direction == DismissDirection.startToEnd) {
+          if (hasTaskFeedback) {
+            if (!task.isCompleted) {
+              HapticFeedback.heavyImpact();
+              Future.delayed(
+                const Duration(milliseconds: 55),
+                HapticFeedback.lightImpact,
+              );
+            } else {
+              HapticFeedback.lightImpact();
+            }
+          }
+          onToggle();
+          return false;
+        } else if (direction == DismissDirection.endToStart) {
+          if (hasTaskFeedback) {
+            HapticFeedback.mediumImpact();
+          }
+          return true;
+        }
+        return false;
+      },
       onDismissed: (_) => onDelete(),
       background: Container(
+        margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+        decoration: BoxDecoration(
+          color: const Color(0xFF10B981).withValues(alpha: 0.9),
+          borderRadius: BorderRadius.circular(24),
+        ),
+        alignment: Alignment.centerLeft,
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Row(
+          children: [
+            Icon(
+              task.isCompleted
+                  ? Icons.undo_rounded
+                  : Icons.check_circle_rounded,
+              color: Colors.white,
+              size: 26,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              task.isCompleted ? l10n.markAsIncomplete : l10n.markAsComplete,
+              style: GoogleFonts.outfit(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
+      ),
+      secondaryBackground: Container(
         margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
         decoration: BoxDecoration(
           color: theme.colorScheme.error.withValues(alpha: 0.9),
           borderRadius: BorderRadius.circular(24),
         ),
-        alignment: Alignment.centerLeft,
+        alignment: Alignment.centerRight,
         padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: const Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            Icon(Icons.delete_outline, color: Colors.white, size: 28),
-            Icon(Icons.delete_outline, color: Colors.white, size: 28),
+            Text(
+              l10n.delete,
+              style: GoogleFonts.outfit(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              ),
+            ),
+            const SizedBox(width: 8),
+            const Icon(
+              Icons.delete_outline_rounded,
+              color: Colors.white,
+              size: 26,
+            ),
           ],
         ),
       ),
@@ -136,11 +210,9 @@ class TaskTile extends StatelessWidget {
                   children: [
                     if (!isSelectionMode && task.isGroceryList)
                       Padding(
-                        padding: const EdgeInsets.only(
-                          left: 10,
-                          right: 10,
-                          top: 2,
-                          bottom: 18,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
                         ),
                         child: Icon(
                           task.isCompleted
@@ -156,79 +228,31 @@ class TaskTile extends StatelessWidget {
                         ),
                       )
                     else
-                      GestureDetector(
-                        behavior: HitTestBehavior.opaque,
+                      BouncyCheckbox(
+                        isChecked: isSelectionMode
+                            ? isSelected
+                            : task.isCompleted,
                         onTap: isSelectionMode
                             ? () => onLongPress?.call()
-                            : () {
-                                if (themeService.taskCompletionFeedback) {
-                                  // Stronger impact when completing, lighter when un-completing
-                                  if (!task.isCompleted) {
-                                    HapticFeedback.mediumImpact();
-                                  } else {
-                                    HapticFeedback.lightImpact();
-                                  }
-                                }
-                                onToggle();
-                              },
-                        child: Padding(
-                          padding: const EdgeInsets.only(
-                            left: 10,
-                            right: 10,
-                            top: 2,
-                            bottom: 18,
-                          ),
-                          child: Semantics(
-                            label: isSelectionMode
-                                ? (isSelected ? 'Selected' : 'Not selected')
-                                : (task.isCompleted
-                                      ? l10n.markAsIncomplete
-                                      : l10n.markAsComplete),
-                            checked: isSelectionMode
-                                ? isSelected
-                                : task.isCompleted,
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 300),
-                              width: 28,
-                              height: 28,
-                              decoration: BoxDecoration(
-                                color:
-                                    (isSelectionMode
-                                        ? isSelected
-                                        : task.isCompleted)
-                                    ? (categories.isNotEmpty
-                                          ? Color(categories.first.colorValue)
-                                          : theme.colorScheme.primary)
-                                    : Colors.transparent,
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color:
-                                      (isSelectionMode
-                                          ? isSelected
-                                          : task.isCompleted)
-                                      ? Colors.transparent
-                                      : (categories.isNotEmpty
-                                                ? Color(
-                                                    categories.first.colorValue,
-                                                  )
-                                                : theme.colorScheme.primary)
-                                            .withValues(alpha: 0.5),
-                                  width: 2,
-                                ),
-                              ),
-                              child:
-                                  (isSelectionMode
-                                      ? isSelected
-                                      : task.isCompleted)
-                                  ? const Icon(
-                                      Icons.check,
-                                      color: Colors.white,
-                                      size: 18,
-                                    )
-                                  : null,
-                            ),
-                          ),
-                        ),
+                            : onToggle,
+                        size: 26,
+                        activeColor: isSelectionMode
+                            ? theme.colorScheme.primary
+                            : (categories.isNotEmpty
+                                  ? Color(categories.first.colorValue)
+                                  : const Color(0xFF10B981)),
+                        borderColor:
+                            (categories.isNotEmpty
+                                    ? Color(categories.first.colorValue)
+                                    : theme.colorScheme.primary)
+                                .withValues(alpha: 0.5),
+                        enableHaptics: hasTaskFeedback,
+                        enableSparkles: !isSelectionMode,
+                        semanticsLabel: isSelectionMode
+                            ? (isSelected ? 'Selected' : 'Not selected')
+                            : (task.isCompleted
+                                  ? l10n.markAsIncomplete
+                                  : l10n.markAsComplete),
                       ),
                     const SizedBox(width: 6),
                     Expanded(
@@ -252,16 +276,17 @@ class TaskTile extends StatelessWidget {
                                     Flexible(
                                       child: Text(
                                         task.title,
-                                        style: theme.textTheme.titleMedium
-                                            ?.copyWith(
-                                              fontWeight: FontWeight.bold,
-                                              color: task.isCompleted
-                                                  ? theme.disabledColor
-                                                  : theme.colorScheme.onSurface,
-                                              decoration: task.isCompleted
-                                                  ? TextDecoration.lineThrough
-                                                  : null,
-                                            ),
+                                        style: GoogleFonts.outfit(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                          letterSpacing: -0.2,
+                                          color: task.isCompleted
+                                              ? theme.disabledColor
+                                              : theme.colorScheme.onSurface,
+                                          decoration: task.isCompleted
+                                              ? TextDecoration.lineThrough
+                                              : null,
+                                        ),
                                       ),
                                     ),
                                     if (task.syncWithGoogleTasks) ...[
@@ -271,15 +296,16 @@ class TaskTile extends StatelessWidget {
                                   ],
                                 ),
                                 if (task.description.isNotEmpty) ...[
-                                  const SizedBox(height: 8),
+                                  const SizedBox(height: 6),
                                   Text(
                                     task.description,
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
-                                    style: theme.textTheme.bodySmall?.copyWith(
+                                    style: GoogleFonts.outfit(
+                                      fontSize: 13,
                                       color: theme.colorScheme.onSurface
                                           .withValues(alpha: 0.6),
-                                      height: 1.4,
+                                      height: 1.35,
                                     ),
                                   ),
                                 ],
@@ -713,47 +739,107 @@ class TaskTile extends StatelessWidget {
   Widget _buildSubTasksList(BuildContext context) {
     final theme = Theme.of(context);
     final provider = Provider.of<TaskProvider>(context, listen: false);
+    final subTasks = task.subTasks!;
+    final completedCount = subTasks.where((st) => st.isCompleted).length;
+    final totalCount = subTasks.length;
+    final progress = totalCount > 0 ? completedCount / totalCount : 0.0;
+    final activeColor = categories.isNotEmpty
+        ? Color(categories.first.colorValue)
+        : theme.colorScheme.primary;
+
+    final isAllDone = totalCount > 0 && completedCount == totalCount;
+    final themeService = Provider.of<ThemeService>(context, listen: false);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: task.subTasks!.map((subTask) {
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 4),
-          child: InkWell(
-            onTap: () => provider.toggleSubTask(task, subTask.id),
-            borderRadius: BorderRadius.circular(8),
-            child: Row(
-              children: [
-                Icon(
-                  subTask.isCompleted
-                      ? Icons.check_box_rounded
-                      : Icons.check_box_outline_blank_rounded,
-                  size: 16,
-                  color: subTask.isCompleted
-                      ? (categories.isNotEmpty
-                            ? Color(categories.first.colorValue)
-                            : theme.colorScheme.primary)
-                      : theme.disabledColor,
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    subTask.title,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: subTask.isCompleted
-                          ? theme.disabledColor
-                          : theme.colorScheme.onSurface,
-                      decoration: subTask.isCompleted
-                          ? TextDecoration.lineThrough
-                          : null,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 6, top: 2),
+          child: Row(
+            children: [
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: LinearProgressIndicator(
+                    value: progress,
+                    minHeight: 5,
+                    backgroundColor: activeColor.withValues(alpha: 0.12),
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      isAllDone ? const Color(0xFF10B981) : activeColor,
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                isAllDone
+                    ? '✓ $completedCount/$totalCount'
+                    : '$completedCount/$totalCount',
+                style: GoogleFonts.outfit(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: isAllDone
+                      ? const Color(0xFF10B981)
+                      : theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                ),
+              ),
+            ],
           ),
-        );
-      }).toList(),
+        ),
+        ...subTasks.map((subTask) {
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 4),
+            child: InkWell(
+              onTap: () {
+                if (_isTaskFeedbackEnabled(themeService)) {
+                  if (!subTask.isCompleted &&
+                      completedCount == totalCount - 1) {
+                    HapticFeedback.heavyImpact();
+                    Future.delayed(
+                      const Duration(milliseconds: 55),
+                      HapticFeedback.lightImpact,
+                    );
+                  } else {
+                    HapticFeedback.lightImpact();
+                  }
+                }
+                provider.toggleSubTask(task, subTask.id);
+              },
+              borderRadius: BorderRadius.circular(8),
+              child: Row(
+                children: [
+                  Icon(
+                    subTask.isCompleted
+                        ? Icons.check_box_rounded
+                        : Icons.check_box_outline_blank_rounded,
+                    size: 16,
+                    color: subTask.isCompleted
+                        ? (isAllDone ? const Color(0xFF10B981) : activeColor)
+                        : theme.disabledColor,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      subTask.title,
+                      style: GoogleFonts.outfit(
+                        fontSize: 12,
+                        color: subTask.isCompleted
+                            ? theme.disabledColor
+                            : theme.colorScheme.onSurface.withValues(
+                                alpha: 0.85,
+                              ),
+                        decoration: subTask.isCompleted
+                            ? TextDecoration.lineThrough
+                            : null,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }),
+      ],
     );
   }
 }
