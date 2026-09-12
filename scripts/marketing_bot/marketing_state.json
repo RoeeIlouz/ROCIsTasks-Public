@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-11T20:31:42.619554+00:00",
+  "last_run_timestamp": "2026-09-12T03:19:07.901461+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -1622,6 +1622,42 @@
       "title": "A LcD display that shows your goals + App with templates",
       "url": "https://reddit.com/r/roastmystartup/comments/1wdp77s/a_lcd_display_that_shows_your_goals_app_with/",
       "inspected_at": "2026-09-11T20:31:34.656016+00:00"
+    },
+    "reddit_1we1328": {
+      "platform": "reddit",
+      "title": "Spent a week doing outreach instead of building. Here's what actually happened.",
+      "url": "https://reddit.com/r/SideProject/comments/1we1328/spent_a_week_doing_outreach_instead_of_building/",
+      "inspected_at": "2026-09-12T03:18:02.006057+00:00"
+    },
+    "reddit_1we0u4x": {
+      "platform": "reddit",
+      "title": "VITA/NEXO — Un lenguaje declarativo para agentes IA que corren en web, móvil, escritorio y consola con el mismo motor",
+      "url": "https://reddit.com/r/SideProject/comments/1we0u4x/vitanexo_un_lenguaje_declarativo_para_agentes_ia/",
+      "inspected_at": "2026-09-12T03:18:06.121565+00:00"
+    },
+    "reddit_1we0suj": {
+      "platform": "reddit",
+      "title": "VITA/NEXO — A declarative language for AI agents that run on web, mobile, desktop, and CLI using the same engine",
+      "url": "https://reddit.com/r/SideProject/comments/1we0suj/vitanexo_a_declarative_language_for_ai_agents/",
+      "inspected_at": "2026-09-12T03:18:54.162877+00:00"
+    },
+    "reddit_1we0dc9": {
+      "platform": "reddit",
+      "title": "I built a free YouTube transcript downloader that does whole channels",
+      "url": "https://reddit.com/r/SideProject/comments/1we0dc9/i_built_a_free_youtube_transcript_downloader_that/",
+      "inspected_at": "2026-09-12T03:18:55.209725+00:00"
+    },
+    "reddit_1wdv4wl": {
+      "platform": "reddit",
+      "title": "Vent: a voice app for people in therapy. Landing page only. Roast the idea and the page.",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wdv4wl/vent_a_voice_app_for_people_in_therapy_landing/",
+      "inspected_at": "2026-09-12T03:18:56.095851+00:00"
+    },
+    "reddit_1wdt8eo": {
+      "platform": "reddit",
+      "title": "Roast my app",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wdt8eo/roast_my_app/",
+      "inspected_at": "2026-09-12T03:18:56.963220+00:00"
     }
   },
   "pending_drafts": {
@@ -1958,7 +1994,7 @@
     }
   },
   "recorded_feedback": [],
-  "last_organic_post_timestamp": "2026-09-11T10:42:24.619962+00:00",
+  "last_organic_post_timestamp": "2026-09-12T03:19:07.338106+00:00",
   "organic_posts": [
     {
       "text": "you either die a young enthusiastic builder or live long enough to realize that 90% of tech problems are solved by restarting the router.",
@@ -2044,6 +2080,14 @@
         "Bluesky"
       ],
       "posted_at": "2026-09-11T10:42:24.619962+00:00"
+    },
+    {
+      "text": "there is no feeling quite like watching your local test build pass on the first try and immediately getting suspicious of what went wrong.",
+      "topic": "gaming_and_steam_deck",
+      "platforms": [
+        "Bluesky"
+      ],
+      "posted_at": "2026-09-12T03:19:07.338106+00:00"
     }
   ],
   "x_posts_timestamps": [
