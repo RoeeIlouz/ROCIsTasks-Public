@@ -93,6 +93,7 @@
   "deleteTaskTitle": "Ta bort uppgift",
   "deleteTaskConfirmation": "Är du säker på att du vill ta bort den här uppgiften?",
   "calendarColors": "Kalenderfärger",
+  "calendarColorThemingHint": "För att anpassa kalenderfärger, öppna panelen Kalenderfärger (palettikon).",
   "calendarFiltersTitle": "Kalenderfilter",
   "showCalendarTasks": "Visa uppgifter",
   "showGoogleCalendar": "Visa Google Kalender",

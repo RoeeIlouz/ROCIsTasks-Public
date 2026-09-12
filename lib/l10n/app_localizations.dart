@@ -625,6 +625,12 @@ abstract class AppLocalizations {
   /// **'Calendar Colors'**
   String get calendarColors;
 
+  /// No description provided for @calendarColorThemingHint.
+  ///
+  /// In en, this message translates to:
+  /// **'To customize calendar colors, open the Calendar Colors sheet (palette icon).'**
+  String get calendarColorThemingHint;
+
   /// No description provided for @calendarFiltersTitle.
   ///
   /// In en, this message translates to:

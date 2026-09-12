@@ -271,6 +271,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get calendarColors => 'ألوان التقويم';
 
   @override
+  String get calendarColorThemingHint =>
+      'لتخصيص ألوان التقويم، افتح لوحة ألوان التقويم (رمز اللوحة).';
+
+  @override
   String get calendarFiltersTitle => 'فلاتر التقويم';
 
   @override

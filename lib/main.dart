@@ -79,6 +79,7 @@ class _AppRootState extends State<AppRoot> {
   late final _fullCalendarWidgetService = FullCalendarWidgetService(
     _calendarService,
     _taskSource,
+    scheduleService: _scheduleService,
   );
   late final _googleTasksService = GoogleTasksService(_authService);
   late final _taskProvider = TaskProvider(

@@ -272,6 +272,10 @@ class AppLocalizationsHi extends AppLocalizations {
   String get calendarColors => 'कैलेंडर रंग';
 
   @override
+  String get calendarColorThemingHint =>
+      'कैलेंडर के रंगों को अनुकूलित करने के लिए, कैलेंडर रंग शीट (पैलेट आइकन) खोलें।';
+
+  @override
   String get calendarFiltersTitle => 'कैलेंडर फ़िल्टर';
 
   @override

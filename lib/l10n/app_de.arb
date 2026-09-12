@@ -93,6 +93,7 @@
   "deleteTaskTitle": "Aufgabe löschen",
   "deleteTaskConfirmation": "Sind Sie sicher, dass Sie diese Aufgabe löschen möchten?",
   "calendarColors": "Kalenderfarben",
+  "calendarColorThemingHint": "Um Kalenderfarben anzupassen, öffnen Sie das Kalenderfarben-Menü (Palettensymbol).",
   "calendarFiltersTitle": "Kalenderfilter",
   "showCalendarTasks": "Aufgaben anzeigen",
   "showGoogleCalendar": "Google Kalender anzeigen",

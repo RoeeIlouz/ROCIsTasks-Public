@@ -93,6 +93,7 @@
   "deleteTaskTitle": "حذف المهمة",
   "deleteTaskConfirmation": "هل أنت متأكد أنك تريد حذف هذه المهمة؟",
   "calendarColors": "ألوان التقويم",
+  "calendarColorThemingHint": "لتخصيص ألوان التقويم، افتح لوحة ألوان التقويم (رمز اللوحة).",
   "calendarFiltersTitle": "فلاتر التقويم",
   "showCalendarTasks": "إظهار المهام",
   "showGoogleCalendar": "إظهار تقويم Google",

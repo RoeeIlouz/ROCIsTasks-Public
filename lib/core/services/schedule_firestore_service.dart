@@ -147,18 +147,22 @@ class ScheduleFirestoreService {
 
   FirebaseFirestore? _scheduleDb;
   bool _isInitialized = false;
+  String? _userEmail;
+  String? _cachedScheduleUserId;
 
   bool get isReady => _isInitialized && _scheduleDb != null;
 
-  /// Compatibility: the old service used email-based lookup.
-  /// The new service uses UID-based lookup, so this is a no-op.
+  /// Set user email for cross-app lookup
   void setUserEmail(String? email) {
-    // No-op: this service now uses UID-based lookup via fetchEvents(uid).
+    if (_userEmail != email) {
+      _userEmail = email;
+      _cachedScheduleUserId = null;
+    }
   }
 
   /// Compatibility: clear any in-memory cached data.
   void clearCache() {
-    // No persistent cache in this simplified service — nothing to clear.
+    _cachedScheduleUserId = null;
   }
 
   Future<void> initialize() async {
@@ -193,6 +197,57 @@ class ScheduleFirestoreService {
     }
   }
 
+  /// Resolve ROCIs Schedule user ID. Checks direct UID doc first, then queries by email.
+  Future<String?> _resolveScheduleUserId({String? uid, String? email}) async {
+    if (_cachedScheduleUserId != null && _cachedScheduleUserId!.isNotEmpty) {
+      return _cachedScheduleUserId;
+    }
+
+    final db = _scheduleDb;
+    if (db == null) return null;
+
+    // 1. Direct UID document lookup
+    if (uid != null && uid.isNotEmpty) {
+      try {
+        final doc = await db.collection('users').doc(uid).get();
+        if (doc.exists) {
+          _cachedScheduleUserId = uid;
+          debugPrint(
+            'ScheduleFirestoreService: Resolved user by UID doc: $uid',
+          );
+          return _cachedScheduleUserId;
+        }
+      } catch (e) {
+        debugPrint('ScheduleFirestoreService: Error checking doc by uid: $e');
+      }
+    }
+
+    // 2. Email lookup across users collection
+    final targetEmail = email ?? _userEmail;
+    if (targetEmail != null && targetEmail.isNotEmpty) {
+      try {
+        final query = await db
+            .collection('users')
+            .where('email', isEqualTo: targetEmail)
+            .limit(1)
+            .get();
+        if (query.docs.isNotEmpty) {
+          _cachedScheduleUserId = query.docs.first.id;
+          debugPrint(
+            'ScheduleFirestoreService: Resolved user by email ($targetEmail) -> $_cachedScheduleUserId',
+          );
+          return _cachedScheduleUserId;
+        }
+      } catch (e) {
+        debugPrint(
+          'ScheduleFirestoreService: Error querying user by email: $e',
+        );
+      }
+    }
+
+    return null;
+  }
+
   /// Stream of courses for user
   Stream<Map<String, Map<String, dynamic>>> streamCourses(String uid) {
     if (!isReady || uid.isEmpty) {
@@ -217,17 +272,32 @@ class ScheduleFirestoreService {
         });
   }
 
-  /// Fetch schedule events combined with course metadata
-  Future<List<SyncedScheduleEvent>> fetchEvents(String uid) async {
+  /// Fetch schedule events combined with course metadata.
+  /// Supports optional email for cross-app project resolution.
+  Future<List<SyncedScheduleEvent>> fetchEvents({
+    String? uid,
+    String? email,
+  }) async {
     if (!isReady) {
       await initialize();
     }
-    if (!isReady || uid.isEmpty) return [];
+    if (!isReady) return [];
+
+    final targetUserId = await _resolveScheduleUserId(
+      uid: uid,
+      email: email ?? _userEmail,
+    );
+    if (targetUserId == null || targetUserId.isEmpty) {
+      debugPrint(
+        'ScheduleFirestoreService: Could not resolve schedule user (uid: $uid, email: ${email ?? _userEmail})',
+      );
+      return [];
+    }
 
     try {
       final coursesSnap = await _scheduleDb!
           .collection('users')
-          .doc(uid)
+          .doc(targetUserId)
           .collection('courses')
           .get();
       final coursesMap = <String, Map<String, dynamic>>{};
@@ -237,7 +307,7 @@ class ScheduleFirestoreService {
 
       final eventsSnap = await _scheduleDb!
           .collection('users')
-          .doc(uid)
+          .doc(targetUserId)
           .collection('events')
           .get();
 

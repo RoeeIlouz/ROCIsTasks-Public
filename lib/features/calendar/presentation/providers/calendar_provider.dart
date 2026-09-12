@@ -23,6 +23,7 @@ class CalendarProvider extends ChangeNotifier {
   bool _showRocisSchedule = false;
   bool _isLoading = false;
   String? _userId;
+  String? _userEmail;
   List<Calendar> _availableCalendars = [];
   Set<String> _selectedCalendarIds = {};
   bool _isGoogleCalendarTokenExpired = false;
@@ -58,11 +59,24 @@ class CalendarProvider extends ChangeNotifier {
   DateTime _selectedDate = DateTime.now();
   DateTime get selectedDate => _selectedDate;
 
+  /// Set the user ID and email for fetching schedule data
+  void setUser(String? userId, String? userEmail) {
+    _userId = userId;
+    _userEmail = userEmail;
+    _scheduleFirestoreService.setUserEmail(userEmail);
+  }
+
   /// Set the user ID for fetching schedule data
   /// Note: This does NOT automatically reload events to avoid setState during build.
   /// Call loadEvents() separately after setting the user ID.
   void setUserId(String? userId) {
     _userId = userId;
+  }
+
+  /// Set the user email for fetching schedule data
+  void setUserEmail(String? userEmail) {
+    _userEmail = userEmail;
+    _scheduleFirestoreService.setUserEmail(userEmail);
   }
 
   void setSelectedDate(DateTime date) {
@@ -186,7 +200,10 @@ class CalendarProvider extends ChangeNotifier {
       selectedCalendarIds: _selectedCalendarIds.toList(),
     );
     await _widgetService.saveFilters(filters);
-    await _widgetService.updateFullCalendarWidget(userId: _userId);
+    await _widgetService.updateFullCalendarWidget(
+      userId: _userId,
+      userEmail: _userEmail,
+    );
   }
 
   Future<void> loadEvents() async {
@@ -230,10 +247,12 @@ class CalendarProvider extends ChangeNotifier {
       _processEventsToMap();
 
       // Load ROCIs Schedule events if user is logged in
-      if (_userId != null && _userId!.isNotEmpty) {
+      if ((_userId != null && _userId!.isNotEmpty) ||
+          (_userEmail != null && _userEmail!.isNotEmpty)) {
         try {
           _scheduleEvents = await _scheduleFirestoreService.fetchEvents(
-            _userId!,
+            uid: _userId,
+            email: _userEmail,
           );
           _processScheduleEventsToMap();
         } catch (e) {
