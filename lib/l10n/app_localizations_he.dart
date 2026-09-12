@@ -270,6 +270,10 @@ class AppLocalizationsHe extends AppLocalizations {
   String get calendarColors => 'צבעי לוח שנה';
 
   @override
+  String get calendarColorThemingHint =>
+      'כדי להתאים אישית צבעים, פתח את חלונית צבעי לוח השנה (סמל פלטת הצבעים).';
+
+  @override
   String get calendarFiltersTitle => 'מסנני לוח שנה';
 
   @override

@@ -93,6 +93,7 @@
   "deleteTaskTitle": "कार्य हटाएं",
   "deleteTaskConfirmation": "क्या आप निश्चित रूप से इस कार्य को हटाना चाहते हैं?",
   "calendarColors": "कैलेंडर रंग",
+  "calendarColorThemingHint": "कैलेंडर के रंगों को अनुकूलित करने के लिए, कैलेंडर रंग शीट (पैलेट आइकन) खोलें।",
   "calendarFiltersTitle": "कैलेंडर फ़िल्टर",
   "showCalendarTasks": "कार्य दिखाएं",
   "showGoogleCalendar": "Google कैलेंडर दिखाएं",

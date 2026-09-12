@@ -92,6 +92,7 @@
   "deleteTaskTitle": "מחק משימה",
   "deleteTaskConfirmation": "האם אתה בטוח שברצונך למחוק משימה זו?",
   "calendarColors": "צבעי לוח שנה",
+  "calendarColorThemingHint": "כדי להתאים אישית צבעים, פתח את חלונית צבעי לוח השנה (סמל פלטת הצבעים).",
   "calendarFiltersTitle": "מסנני לוח שנה",
   "showCalendarTasks": "הצג משימות",
   "showGoogleCalendar": "הצג יומן Google",

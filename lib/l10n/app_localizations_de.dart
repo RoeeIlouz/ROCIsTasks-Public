@@ -274,6 +274,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get calendarColors => 'Kalenderfarben';
 
   @override
+  String get calendarColorThemingHint =>
+      'Um Kalenderfarben anzupassen, öffnen Sie das Kalenderfarben-Menü (Palettensymbol).';
+
+  @override
   String get calendarFiltersTitle => 'Kalenderfilter';
 
   @override

@@ -274,6 +274,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get calendarColors => 'Couleurs d\'agenda';
 
   @override
+  String get calendarColorThemingHint =>
+      'Pour personnaliser les couleurs, ouvrez le panneau Couleurs d\'agenda (icône de palette).';
+
+  @override
   String get calendarFiltersTitle => 'Filtres d\'agenda';
 
   @override

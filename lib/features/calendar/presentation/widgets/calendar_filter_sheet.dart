@@ -3,11 +3,10 @@ import 'package:provider/provider.dart';
 import 'package:rocis_tasks/core/services/auth_service.dart';
 import 'package:rocis_tasks/core/services/calendar_color_service.dart';
 import 'package:rocis_tasks/features/calendar/presentation/providers/calendar_provider.dart';
-import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rocis_tasks/core/services/subscription_service.dart';
-import 'package:rocis_tasks/shared/ui/widgets/app_color_picker_sheet.dart';
+import 'package:rocis_tasks/features/calendar/presentation/widgets/calendar_coloring_sheet.dart';
 import 'package:rocis_tasks/shared/ui/widgets/glass_container.dart';
 
 class CalendarFilterSheet extends StatelessWidget {
@@ -206,10 +205,6 @@ class CalendarFilterSheet extends StatelessWidget {
                                     calendar.accountName != calendarName;
                                 final colorService =
                                     Provider.of<CalendarColorService>(context);
-                                final taskProvider = Provider.of<TaskProvider>(
-                                  context,
-                                  listen: false,
-                                );
                                 final Color? nativeColor =
                                     calendar.color != null
                                     ? Color(calendar.color!)
@@ -218,11 +213,6 @@ class CalendarFilterSheet extends StatelessWidget {
                                     .getEffectiveSubcalendarColor(
                                       calendar.id,
                                       nativeColor: nativeColor,
-                                    );
-                                final bool hasCustom =
-                                    calendar.id != null &&
-                                    colorService.hasCustomSubcalendarColor(
-                                      calendar.id!,
                                     );
 
                                 return CheckboxListTile(
@@ -238,80 +228,72 @@ class CalendarFilterSheet extends StatelessWidget {
                                       );
                                     }
                                   },
-                                  secondary: IconButton(
-                                    visualDensity: VisualDensity.compact,
-                                    tooltip:
-                                        '${l10n.customColor}: $calendarName',
-                                    onPressed: () {
-                                      AppColorPickerSheet.show(
-                                        context: context,
-                                        title: calendarName,
-                                        initialColor: effectiveColor,
-                                        onResetToDefault: hasCustom
-                                            ? () async {
-                                                if (calendar.id != null) {
-                                                  await colorService
-                                                      .resetSubcalendarColor(
-                                                        calendar.id!,
-                                                      );
-                                                  if (context.mounted) {
-                                                    await taskProvider
-                                                        .updateHomeWidget();
-                                                  }
-                                                }
-                                              }
-                                            : null,
-                                        resetLabel: l10n.resetToGoogleDefault,
-                                        onColorChanged: (newColor) async {
-                                          if (calendar.id != null) {
-                                            await colorService
-                                                .setSubcalendarColor(
-                                                  calendar.id!,
-                                                  newColor,
-                                                );
-                                            if (context.mounted) {
-                                              await taskProvider
-                                                  .updateHomeWidget();
-                                            }
-                                          }
-                                        },
-                                      );
-                                    },
-                                    icon: Container(
-                                      width: 24,
-                                      height: 24,
-                                      decoration: BoxDecoration(
-                                        color: effectiveColor,
-                                        shape: BoxShape.circle,
-                                        border: Border.all(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .outline
-                                              .withValues(alpha: 0.3),
-                                          width: 1.5,
-                                        ),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: effectiveColor.withValues(
-                                              alpha: 0.3,
-                                            ),
-                                            blurRadius: 4,
-                                            offset: const Offset(0, 1),
+                                  secondary: Tooltip(
+                                    message: l10n.calendarColorThemingHint,
+                                    child: InkResponse(
+                                      radius: 20,
+                                      onTap: () {
+                                        Navigator.of(context).pop();
+                                        showModalBottomSheet(
+                                          context: context,
+                                          isScrollControlled: true,
+                                          backgroundColor: Colors.transparent,
+                                          constraints: const BoxConstraints(
+                                            maxWidth: 500,
                                           ),
-                                        ],
+                                          builder: (context) =>
+                                              const CalendarColoringSheet(),
+                                        );
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            content: Row(
+                                              children: [
+                                                const Icon(
+                                                  Icons.palette_outlined,
+                                                  color: Colors.white,
+                                                  size: 18,
+                                                ),
+                                                const SizedBox(width: 8),
+                                                Expanded(
+                                                  child: Text(
+                                                    l10n.calendarColorThemingHint,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            behavior: SnackBarBehavior.floating,
+                                            duration: const Duration(
+                                              seconds: 3,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      child: Container(
+                                        width: 16,
+                                        height: 16,
+                                        decoration: BoxDecoration(
+                                          color: effectiveColor,
+                                          shape: BoxShape.circle,
+                                          border: Border.all(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .outline
+                                                .withValues(alpha: 0.3),
+                                            width: 1.5,
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: effectiveColor.withValues(
+                                                alpha: 0.35,
+                                              ),
+                                              blurRadius: 4,
+                                              offset: const Offset(0, 1),
+                                            ),
+                                          ],
+                                        ),
                                       ),
-                                      child: hasCustom
-                                          ? Icon(
-                                              Icons.palette_rounded,
-                                              size: 12,
-                                              color:
-                                                  effectiveColor
-                                                          .computeLuminance() >
-                                                      0.5
-                                                  ? Colors.black87
-                                                  : Colors.white,
-                                            )
-                                          : null,
                                     ),
                                   ),
                                 );

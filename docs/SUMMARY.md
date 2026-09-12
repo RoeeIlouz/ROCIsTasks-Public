@@ -2,6 +2,55 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## ROCIs Schedule Sync & Calendar Theming Consolidation - 2026-09-12
+
+#### Problem & Root Causes
+* **Schedule Sync Not Showing Events**: ROCIs Schedule university timetable events were not appearing in the user's Calendar page or in the Android FullCalendar home widget.
+  - *Root Cause 1 (Cross-Project Auth UIDs)*: ROCIs Tasks (`rocis-todo`) and ROCIs Schedule (`rocis-schedule`) are separate Firebase projects. Users authenticated via Google Sign-In have differing Firebase Auth UIDs across projects. Querying by Tasks UID returned zero documents in the Schedule Firestore project.
+  - *Root Cause 2 (FullCalendar Widget Integration)*: `FullCalendarWidgetService.dart` hardcoded `showRocisSchedule = false` and did not query schedule events or merge them into the 42-day widget grid.
+  - *Root Cause 3 (Widget Schedule Filter Chip Missing)*: The Android native FullCalendar widget header lacked a filter toggle for ROCIs Schedule.
+* **Conflicting Calendar Color Pickers**: Users could change Google calendar coloring in two distinct places (`CalendarFilterSheet` and `CalendarColoringSheet` via theme palette button), causing state conflicts, duplicate settings, and unexpected color shifts.
+
+#### Solutions Applied
+1. **Cross-Project User Resolution in ScheduleFirestoreService**:
+   - Updated `ScheduleFirestoreService._resolveScheduleUserId()` to attempt direct UID lookup first, and seamlessly fall back to querying the `users` collection by Google account email (`where('email', isEqualTo: targetEmail).limit(1)`).
+   - Injected user email into `CalendarProvider` and `FullCalendarWidgetService` to resolve timetable data across project boundaries.
+2. **Android FullCalendar Widget Schedule Overlay**:
+   - Updated `FullCalendarWidgetService.dart` to fetch `SyncedScheduleEvent`s for the rendered month range and merge them into the day cell events summaries.
+   - Updated `FullCalendarWidgetProvider.kt` to conditionally display `widget_filter_rocis` chip in the widget header *only* when the beta feature (`beta_schedule_integration`) is enabled. Added `ACTION_FILTER_ROCIS` broadcast handling.
+   - Updated `FullCalendarWidgetService.kt` to respect `showSchedule` filter state when rendering event indicators.
+3. **Consolidated Calendar Theming Architecture**:
+   - In `CalendarFilterSheet`, removed the interactive color picker and replaced it with a non-interactive 16px indicator dot.
+   - Tapping the indicator dot pops the filter sheet, opens `CalendarColoringSheet`, and displays a localized snackbar (`calendarColorThemingHint`) directing the user to manage all calendar theming in one place.
+   - Added `calendarColorThemingHint` localization across all 8 supported languages (`en`, `he`, `es`, `de`, `fr`, `ar`, `hi`, `sv`).
+4. **Verification**:
+   - `flutter analyze`: 0 issues found.
+   - `flutter test`: 338 / 338 tests passed (100%), including new tests in `synced_schedule_event_test.dart`.
+
+## FullCalendar Home Widget Month Navigation Fix - 2026-09-12
+
+#### Problem & Root Causes
+* **Stale Dates on Month Navigation**: Tapping the month navigation arrows (`‹` and `›`) on the Android FullCalendar home widget updated the month name in the header, but left the previous month's dates intact.
+* **Root Causes**:
+  1. `FullCalendarWidgetFactory.onDataSetChanged()` previously consumed `full_calendar_grid_data` from SharedPreferences as the single source of truth for day cells. Since this JSON held the previously rendered month's dates, `generateFallbackCalendar` was never invoked and the old month's numbers were displayed.
+  2. In `FullCalendarWidgetService.dart`, empty-month grids (e.g. Navigating to an upcoming/past month with 0 tasks or events) triggered an early return that preserved the previous month's populated grid, preventing empty months from updating.
+  3. In `FullCalendarWidgetProvider.kt`, `editor.apply()` was executed after dispatching `backgroundIntent.send()`, creating a race condition for background isolate retrieval.
+
+#### Solutions Applied
+1. **Dynamic Kotlin Month Grid Calculation**:
+   - Refactored `FullCalendarWidgetFactory.onDataSetChanged()` to dynamically generate the 42 day cells (6 weeks) for the current `PREF_OFFSET` natively in Kotlin, matching the zero-latency behavior of `MonthAgendaWidgetService`.
+   - Indexed summaries from `full_calendar_grid_data` by date (`yyyy-MM-dd`) so cached events overlay onto the correct dates immediately without waiting for Dart.
+2. **Empty Months Allowance for Non-Zero Offsets**:
+   - In `FullCalendarWidgetService.dart`, updated the empty-grid protection so it only preserves existing grids for the current month (`offset == 0`) to prevent offline wipes, but allows new month offsets (`offset != 0`) to persist cleanly.
+   - Added persistent saving of `full_calendar_offset` in SharedPreferences.
+3. **Deterministic Offset Passing & Selection Reset**:
+   - Appended `?offset=$newOffset` to the broadcast URI in `FullCalendarWidgetProvider.kt` and updated `BackgroundHandler` to consume `targetOffset` directly from query parameters.
+   - Cleared `full_calendar_selected_date` to `""` on month switch to prevent stale selected date highlights.
+   - Committed SharedPreferences via `.apply()` immediately prior to dispatching `backgroundIntent.send()`.
+4. **Verification**:
+   - `flutter analyze`: 0 issues found.
+   - `flutter test`: 333 / 333 tests passed (100%).
+
 ## ROCIs Schedule Synergy Integration & v0.2.14+101 Release - 2026-09-12
 
 #### Features & Architecture Implemented

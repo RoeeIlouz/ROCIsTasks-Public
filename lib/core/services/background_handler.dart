@@ -50,11 +50,18 @@ class BackgroundHandler {
         host == 'next_month') {
       final isNext = host == 'full_calendar_next' || host == 'next_month';
       final isAndroidWidget = host.startsWith('full_calendar_');
+      final offsetParam = queryParams['offset'];
+      final targetOffset = offsetParam != null
+          ? int.tryParse(offsetParam)
+          : null;
       await _handleFullCalendarNavigation(
-        isNext: isAndroidWidget ? null : isNext,
+        isNext: isAndroidWidget && targetOffset == null ? null : isNext,
+        targetOffset: targetOffset,
       );
     } else if (host == 'full_calendar_today') {
-      await _handleFullCalendarNavigation();
+      final offsetParam = queryParams['offset'];
+      final targetOffset = offsetParam != null ? int.tryParse(offsetParam) : 0;
+      await _handleFullCalendarNavigation(targetOffset: targetOffset);
     } else if (host == 'full_calendar_filter_tasks') {
       await _handleFullCalendarFilterToggle('tasks');
     } else if (host == 'full_calendar_filter_google') {

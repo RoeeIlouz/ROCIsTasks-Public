@@ -93,6 +93,7 @@
   "deleteTaskTitle": "Delete Task",
   "deleteTaskConfirmation": "Are you sure you want to delete this task?",
   "calendarColors": "Calendar Colors",
+  "calendarColorThemingHint": "To customize calendar colors, open the Calendar Colors sheet (palette icon).",
   "calendarFiltersTitle": "Calendar Filters",
   "showCalendarTasks": "Show Tasks",
   "showGoogleCalendar": "Show Google Calendar",

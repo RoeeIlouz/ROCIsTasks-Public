@@ -93,6 +93,7 @@
   "deleteTaskTitle": "Supprimer la tâche",
   "deleteTaskConfirmation": "Êtes-vous sûr de vouloir supprimer cette tâche ?",
   "calendarColors": "Couleurs d'agenda",
+  "calendarColorThemingHint": "Pour personnaliser les couleurs, ouvrez le panneau Couleurs d'agenda (icône de palette).",
   "calendarFiltersTitle": "Filtres d'agenda",
   "showCalendarTasks": "Afficher les tâches",
   "showGoogleCalendar": "Afficher Google Agenda",

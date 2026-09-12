@@ -221,5 +221,14 @@ class ThemeService extends ChangeNotifier {
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('beta_schedule_integration', value);
+    if (!kIsWeb) {
+      await HomeWidget.saveWidgetData<bool>('beta_schedule_integration', value);
+      try {
+        await HomeWidget.updateWidget(
+          name: 'FullCalendarWidgetProvider',
+          androidName: 'FullCalendarWidgetProvider',
+        );
+      } catch (_) {}
+    }
   }
 }

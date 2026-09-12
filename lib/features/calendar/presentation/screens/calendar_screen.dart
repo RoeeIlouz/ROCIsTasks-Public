@@ -50,7 +50,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted) return;
       final authService = Provider.of<AuthService>(context, listen: false);
-      provider.setUserId(authService.currentUser?.uid);
+      provider.setUser(
+        authService.currentUser?.uid,
+        authService.currentUser?.email,
+      );
       await provider.loadFilters();
       if (!mounted) return;
       await provider.loadEvents();

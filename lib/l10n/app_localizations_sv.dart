@@ -272,6 +272,10 @@ class AppLocalizationsSv extends AppLocalizations {
   String get calendarColors => 'Kalenderfärger';
 
   @override
+  String get calendarColorThemingHint =>
+      'För att anpassa kalenderfärger, öppna panelen Kalenderfärger (palettikon).';
+
+  @override
   String get calendarFiltersTitle => 'Kalenderfilter';
 
   @override
