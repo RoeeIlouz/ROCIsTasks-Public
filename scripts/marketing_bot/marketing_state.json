@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-12T03:19:07.901461+00:00",
+  "last_run_timestamp": "2026-09-12T10:10:59.378415+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -1658,6 +1658,42 @@
       "title": "Roast my app",
       "url": "https://reddit.com/r/roastmystartup/comments/1wdt8eo/roast_my_app/",
       "inspected_at": "2026-09-12T03:18:56.963220+00:00"
+    },
+    "reddit_1we8kte": {
+      "platform": "reddit",
+      "title": "Kelpie: the herdr terminal UI on iPad and iPhone, over SSH (free, open source, beta)",
+      "url": "https://reddit.com/r/SideProject/comments/1we8kte/kelpie_the_herdr_terminal_ui_on_ipad_and_iphone/",
+      "inspected_at": "2026-09-12T10:10:40.630027+00:00"
+    },
+    "reddit_1we8c4x": {
+      "platform": "reddit",
+      "title": "I built a french leaderboard where startups literally pay to outrank each other — starting at €1",
+      "url": "https://reddit.com/r/SideProject/comments/1we8c4x/i_built_a_french_leaderboard_where_startups/",
+      "inspected_at": "2026-09-12T10:10:48.194826+00:00"
+    },
+    "reddit_1we8b1y": {
+      "platform": "reddit",
+      "title": "Feedback needed for a chrome extension vibe-coding platform | robomonkey.io",
+      "url": "https://reddit.com/r/SideProject/comments/1we8b1y/feedback_needed_for_a_chrome_extension_vibecoding/",
+      "inspected_at": "2026-09-12T10:10:49.152317+00:00"
+    },
+    "reddit_1we896z": {
+      "platform": "reddit",
+      "title": "I built an all-in-one browser workspace with 42+ productivity tools that runs entirely client-side. No signups, completely private.",
+      "url": "https://reddit.com/r/SideProject/comments/1we896z/i_built_an_allinone_browser_workspace_with_42/",
+      "inspected_at": "2026-09-12T10:10:49.822666+00:00"
+    },
+    "reddit_1we5th1": {
+      "platform": "reddit",
+      "title": "🔥 Roast my startup: LINKUP",
+      "url": "https://reddit.com/r/roastmystartup/comments/1we5th1/roast_my_startup_linkup/",
+      "inspected_at": "2026-09-12T10:10:50.556644+00:00"
+    },
+    "reddit_1we447w": {
+      "platform": "reddit",
+      "title": "App Tester Tool/Service That Has Real Users (NO AI)",
+      "url": "https://reddit.com/r/roastmystartup/comments/1we447w/app_tester_toolservice_that_has_real_users_no_ai/",
+      "inspected_at": "2026-09-12T10:10:51.315983+00:00"
     }
   },
   "pending_drafts": {
