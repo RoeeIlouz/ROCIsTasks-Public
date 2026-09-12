@@ -384,6 +384,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
                           title = event.title;
                         } else if (event is Event) {
                           title = event.title ?? 'No Title';
+                        } else if (event is SyncedScheduleEvent) {
+                          title = event.title.isNotEmpty
+                              ? event.title
+                              : (event.courseName.isNotEmpty
+                                    ? event.courseName
+                                    : 'Class');
                         }
 
                         return Positioned(

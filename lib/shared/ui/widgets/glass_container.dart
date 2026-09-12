@@ -38,23 +38,25 @@ class GlassContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final themeService = Provider.of<ThemeService>(context);
+    final useGlassmorphism = context.select<ThemeService, bool>(
+      (s) => s.useGlassmorphism,
+    );
+    final useMaterialTheme = context.select<ThemeService, bool>(
+      (s) => s.useMaterialTheme,
+    );
+    final isPremium = context.select<SubscriptionService, bool>(
+      (s) => s.isPremium,
+    );
     final isDark = theme.brightness == Brightness.dark;
-    final subscriptionService = Provider.of<SubscriptionService>(context);
-    final useGlass =
-        themeService.useGlassmorphism &&
-        subscriptionService.isPremium &&
-        !kIsWeb;
+    final useGlass = useGlassmorphism && isPremium && !kIsWeb;
 
     // Default glass color adapts to theme if not provided, with a beautiful primary/category tint
     final effectiveTint = tintColor ?? color ?? theme.colorScheme.primary;
     final baseColor = isDark
-        ? (themeService.useMaterialTheme
+        ? (useMaterialTheme
               ? theme.colorScheme.surface
               : const Color(0xFF151824))
-        : (themeService.useMaterialTheme
-              ? theme.colorScheme.surface
-              : Colors.white);
+        : (useMaterialTheme ? theme.colorScheme.surface : Colors.white);
     final glassColor = Color.lerp(
       baseColor,
       effectiveTint,

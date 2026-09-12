@@ -26,6 +26,19 @@ class TaskListView extends StatefulWidget {
 
 class _TaskListViewState extends State<TaskListView> {
   bool _isCompletedExpanded = false;
+  bool _hasInitiallyAnimated = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        setState(() {
+          _hasInitiallyAnimated = true;
+        });
+      }
+    });
+  }
 
   Future<void> _createTemplateTask(
     BuildContext context,
@@ -565,77 +578,77 @@ class _TaskListViewState extends State<TaskListView> {
           final isAllCaughtUp =
               activeTasks.isEmpty && completedTasks.isNotEmpty;
 
+          final showCompletedTile = completedTasks.isNotEmpty;
+          final headerCount = isAllCaughtUp ? 1 : 0;
+          final activeCount = activeTasks.length;
+          final footerCount = showCompletedTile ? 1 : 0;
+          final totalItems = headerCount + activeCount + footerCount;
+
           mainContent = Expanded(
-            child: ListView(
+            child: ListView.builder(
               physics: const BouncingScrollPhysics(),
               padding: const EdgeInsets.fromLTRB(8, 8, 8, 100),
-              children: [
-                if (isAllCaughtUp)
-                  _buildCelebrationBanner(context, l10n, theme),
+              addRepaintBoundaries: true,
+              itemCount: totalItems,
+              itemBuilder: (context, index) {
+                if (isAllCaughtUp && index == 0) {
+                  return _buildCelebrationBanner(context, l10n, theme);
+                }
 
-                if (kIsWeb)
-                  ...activeTasks.map(
-                    (t) => _buildTaskItem(context, t, taskProvider),
-                  )
-                else
-                  AnimationLimiter(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: List.generate(
-                        activeTasks.length,
-                        (index) => _buildTaskItem(
-                          context,
-                          activeTasks[index],
-                          taskProvider,
-                          animated: true,
-                          index: index,
+                final taskIndex = index - headerCount;
+                if (taskIndex < activeCount) {
+                  final task = activeTasks[taskIndex];
+                  final shouldAnimate = !_hasInitiallyAnimated && !kIsWeb;
+                  return _buildTaskItem(
+                    context,
+                    task,
+                    taskProvider,
+                    animated: shouldAnimate,
+                    index: taskIndex,
+                  );
+                }
+
+                return Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: GlassContainer(
+                    borderRadius: BorderRadius.circular(16),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 4,
+                      vertical: 2,
+                    ),
+                    child: Theme(
+                      data: theme.copyWith(dividerColor: Colors.transparent),
+                      child: ExpansionTile(
+                        initiallyExpanded: _isCompletedExpanded,
+                        onExpansionChanged: (expanded) {
+                          HapticFeedback.lightImpact();
+                          setState(() {
+                            _isCompletedExpanded = expanded;
+                          });
+                        },
+                        leading: Icon(
+                          Icons.check_circle_rounded,
+                          color: theme.colorScheme.primary,
+                          size: 20,
                         ),
+                        title: Text(
+                          l10n.completedTasksHeader(completedTasks.length),
+                          style: GoogleFonts.outfit(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                            color: theme.colorScheme.onSurface,
+                          ),
+                        ),
+                        children: completedTasks
+                            .map(
+                              (t) => _buildTaskItem(context, t, taskProvider),
+                            )
+                            .toList(),
                       ),
                     ),
                   ),
-
-                if (completedTasks.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8),
-                    child: GlassContainer(
-                      borderRadius: BorderRadius.circular(16),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 4,
-                        vertical: 2,
-                      ),
-                      child: Theme(
-                        data: theme.copyWith(dividerColor: Colors.transparent),
-                        child: ExpansionTile(
-                          initiallyExpanded: _isCompletedExpanded,
-                          onExpansionChanged: (expanded) {
-                            HapticFeedback.lightImpact();
-                            setState(() {
-                              _isCompletedExpanded = expanded;
-                            });
-                          },
-                          leading: Icon(
-                            Icons.check_circle_rounded,
-                            color: theme.colorScheme.primary,
-                            size: 20,
-                          ),
-                          title: Text(
-                            l10n.completedTasksHeader(completedTasks.length),
-                            style: GoogleFonts.outfit(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 14,
-                              color: theme.colorScheme.onSurface,
-                            ),
-                          ),
-                          children: completedTasks
-                              .map(
-                                (t) => _buildTaskItem(context, t, taskProvider),
-                              )
-                              .toList(),
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
+                );
+              },
             ),
           );
         }

@@ -8,6 +8,15 @@ import 'package:rocis_tasks/shared/ui/ui_kit.dart';
 
 /// Service responsible for preparing and updating Task Widget data
 class TaskWidgetService {
+  static String? _cachedChartPath;
+  static String? _cachedChartKey;
+
+  /// Invalidate cached chart image path
+  static void invalidateChartCache() {
+    _cachedChartPath = null;
+    _cachedChartKey = null;
+  }
+
   /// Standardized task data structure for widget consumption
   static Map<String, dynamic> _serializeTaskForWidget(
     Task task,
@@ -101,35 +110,42 @@ class TaskWidgetService {
       }
 
       final pendingCount = high + medium + low;
+      final chartKey = '${high}_${medium}_${low}_$isDarkText';
 
-      // Generate Progressive Circle Chart
-      try {
-        chartPath = await HomeWidget.renderFlutterWidget(
-          Stack(
-            alignment: Alignment.center,
-            children: [
-              CircularTaskChart(
-                high: high,
-                medium: medium,
-                low: low,
-                size: 200,
-              ),
-              Text(
-                pendingCount > 99 ? '99+' : '$pendingCount',
-                style: TextStyle(
-                  fontSize: 110,
-                  fontWeight: FontWeight.bold,
-                  color: isDarkText ? Colors.black : Colors.white,
-                  decoration: TextDecoration.none,
+      // Generate Progressive Circle Chart (cached to avoid redundant off-screen renders)
+      if (_cachedChartPath != null && _cachedChartKey == chartKey) {
+        chartPath = _cachedChartPath;
+      } else {
+        try {
+          chartPath = await HomeWidget.renderFlutterWidget(
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                CircularTaskChart(
+                  high: high,
+                  medium: medium,
+                  low: low,
+                  size: 200,
                 ),
-              ),
-            ],
-          ),
-          key: 'chart_image_path',
-          logicalSize: const Size(200, 200),
-        );
-      } catch (e) {
-        // Error generating chart widget
+                Text(
+                  pendingCount > 99 ? '99+' : '$pendingCount',
+                  style: TextStyle(
+                    fontSize: 110,
+                    fontWeight: FontWeight.bold,
+                    color: isDarkText ? Colors.black : Colors.white,
+                    decoration: TextDecoration.none,
+                  ),
+                ),
+              ],
+            ),
+            key: 'chart_image_path',
+            logicalSize: const Size(200, 200),
+          );
+          _cachedChartPath = chartPath;
+          _cachedChartKey = chartKey;
+        } catch (e) {
+          // Error generating chart widget
+        }
       }
 
       // Filter to get only pending tasks
