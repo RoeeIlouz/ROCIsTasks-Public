@@ -2,6 +2,26 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## Version 0.2.14+103 Release & Multi-Channel Deployment Pipeline - 2026-09-12
+
+#### Summary & Operations
+* **Version Bump & Sync**: Bumped `pubspec.yaml` to `0.2.14+103` and verified synchronization with `lib/core/config/app_config.dart`.
+* **Changelog Compliance**: Added release notes under 500 characters to `docs/CHANGELOG.md` covering first-frame startup boot, 60fps task list virtualization, and concurrent widget sync pipelines.
+* **Shorebird & Google Play Console Deployment**:
+  - Cleared stale Dart `.dart_tool\hooks_runner` build hooks to align Shorebird's Flutter 3.47.2 engine with host tools.
+  - Built production Shorebird release AAB (`70.6 MB`, version `0.2.14+103`).
+  - Successfully registered release on Shorebird cloud and uploaded AAB v103 to Google Play Console `internal` testing track using `scripts/upload_aab_internal.py`.
+* **Standalone Release APK & GitHub Release**:
+  - Built signed standalone release APK (`79.2 MB`).
+  - Created Git tag `v0.2.14+103`, pushed changes to GitHub repository.
+  - Created GitHub Release `v0.2.14+103` with attached APK artifact: [Release v0.2.14+103](https://github.com/RoeeIlouz/ROCIs-Tasks/releases/tag/v0.2.14%2B103).
+* **Web App Deployment**:
+  - Built release web bundle via `flutter build web --release`.
+  - Deployed to Firebase Hosting: [https://rocis-todo.web.app](https://rocis-todo.web.app).
+* **Code & Test Integrity**:
+  - 338 / 338 tests passed (100%).
+  - `flutter analyze`: 0 issues found.
+
 ## Comprehensive 5-Pillar App Speed & Performance Optimization - 2026-09-12
 
 #### Problem & Root Causes
