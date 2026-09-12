@@ -19,6 +19,8 @@ import 'package:rocis_tasks/features/calendar/presentation/widgets/calendar_filt
 import 'package:rocis_tasks/features/calendar/presentation/widgets/calendar_coloring_sheet.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:rocis_tasks/shared/ui/ui_kit.dart';
+import 'package:rocis_tasks/core/services/schedule_firestore_service.dart';
+import 'package:rocis_tasks/core/services/schedule_bridge_service.dart';
 
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({super.key});
@@ -102,6 +104,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
         event.calendarId,
         nativeColor: nativeColor,
       );
+    } else if (event is SyncedScheduleEvent) {
+      return event.color;
     }
     return colorService.taskColor;
   }
@@ -713,6 +717,161 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                     ),
                               ),
                             ),
+                          ),
+                        ),
+                      );
+                    } else if (item is SyncedScheduleEvent) {
+                      final timeFormat = themeService.use24HourFormat
+                          ? DateFormat.Hm()
+                          : DateFormat.jm();
+                      final eventColor = item.color;
+                      final isDark =
+                          Theme.of(context).brightness == Brightness.dark;
+                      return GlassContainer(
+                        margin: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 6,
+                        ),
+                        border: Border.all(
+                          color: isDark
+                              ? eventColor.withValues(alpha: 0.25)
+                              : eventColor.withValues(alpha: 0.18),
+                          width: 1.0,
+                        ),
+                        isSelected: false,
+                        tintColor: eventColor,
+                        child: Semantics(
+                          label: 'ROCIs Schedule Event: ${item.title}',
+                          child: ListTile(
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
+                            leading: Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: eventColor.withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Icon(
+                                Icons.school_rounded,
+                                color: eventColor,
+                                size: 24,
+                              ),
+                            ),
+                            title: Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    item.title.isNotEmpty
+                                        ? item.title
+                                        : (item.courseName.isNotEmpty
+                                              ? item.courseName
+                                              : 'Class'),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium
+                                        ?.copyWith(
+                                          fontWeight: FontWeight.bold,
+                                          letterSpacing: -0.5,
+                                        ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                if (item.courseCode.isNotEmpty) ...[
+                                  const SizedBox(width: 6),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 6,
+                                      vertical: 2,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: eventColor.withValues(alpha: 0.15),
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                    child: Text(
+                                      item.courseCode,
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold,
+                                        color: eventColor,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
+                            subtitle: Padding(
+                              padding: const EdgeInsets.only(top: 4.0),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.access_time_rounded,
+                                    size: 14,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurfaceVariant,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    '${timeFormat.format(item.startTime)} - ${timeFormat.format(item.endTime)}',
+                                    style: Theme.of(context).textTheme.bodySmall
+                                        ?.copyWith(
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.onSurfaceVariant,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                  ),
+                                  if (item.location.isNotEmpty) ...[
+                                    const SizedBox(width: 8),
+                                    Icon(
+                                      Icons.location_on_outlined,
+                                      size: 14,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurfaceVariant,
+                                    ),
+                                    const SizedBox(width: 2),
+                                    Expanded(
+                                      child: Text(
+                                        item.location,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodySmall
+                                            ?.copyWith(
+                                              color: Theme.of(
+                                                context,
+                                              ).colorScheme.onSurfaceVariant,
+                                            ),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ),
+                            trailing: IconButton(
+                              icon: Icon(
+                                Icons.open_in_new_rounded,
+                                size: 18,
+                                color: eventColor,
+                              ),
+                              tooltip: 'Open in ROCIs Schedule',
+                              onPressed: () {
+                                HapticFeedback.lightImpact();
+                                ScheduleBridgeService.openScheduleEvent(
+                                  eventId: item.id,
+                                );
+                              },
+                            ),
+                            onTap: () {
+                              HapticFeedback.lightImpact();
+                              ScheduleBridgeService.openScheduleEvent(
+                                eventId: item.id,
+                              );
+                            },
                           ),
                         ),
                       );

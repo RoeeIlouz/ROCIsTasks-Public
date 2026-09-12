@@ -5,6 +5,8 @@ import 'package:rocis_tasks/core/services/calendar_color_service.dart';
 import 'package:rocis_tasks/features/calendar/presentation/providers/calendar_provider.dart';
 import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:rocis_tasks/core/services/subscription_service.dart';
 import 'package:rocis_tasks/shared/ui/widgets/app_color_picker_sheet.dart';
 import 'package:rocis_tasks/shared/ui/widgets/glass_container.dart';
 
@@ -14,6 +16,8 @@ class CalendarFilterSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final subscriptionService = context.watch<SubscriptionService>();
+    final isPremium = subscriptionService.isPremium;
     return Consumer<CalendarProvider>(
       builder: (context, provider, child) {
         return DraggableScrollableSheet(
@@ -35,17 +39,18 @@ class CalendarFilterSheet extends StatelessWidget {
                     child: Container(
                       width: 40,
                       height: 4,
-                      margin: const EdgeInsets.only(bottom: 20),
                       decoration: BoxDecoration(
-                        color: Theme.of(context).dividerColor,
+                        color: Colors.grey.withValues(alpha: 0.3),
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
                   ),
+                  const SizedBox(height: 16),
                   Text(
                     l10n.calendarFiltersTitle,
-                    style: Theme.of(context).textTheme.headlineSmall,
-                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 24),
                   GlassContainer(
@@ -68,6 +73,44 @@ class CalendarFilterSheet extends StatelessWidget {
                             provider.updateFilters(showGoogleCalendar: value);
                           },
                           secondary: const Icon(Icons.event_note_rounded),
+                        ),
+                        const Divider(height: 1),
+                        SwitchListTile(
+                          title: Row(
+                            children: [
+                              Text(l10n.showRocisSchedule),
+                              if (!isPremium) ...[
+                                const SizedBox(width: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 6,
+                                    vertical: 2,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.amber.withValues(alpha: 0.2),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Text(
+                                    'PRO',
+                                    style: GoogleFonts.outfit(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.amber[800],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                          value: provider.showRocisSchedule && isPremium,
+                          onChanged: (value) {
+                            if (value && !isPremium) {
+                              subscriptionService.showPaywall();
+                              return;
+                            }
+                            provider.updateFilters(showRocisSchedule: value);
+                          },
+                          secondary: const Icon(Icons.school_rounded),
                         ),
                         if (provider.isGoogleCalendarTokenExpired) ...[
                           const Divider(height: 1),

@@ -36,7 +36,7 @@ class FullCalendarFilters {
     return FullCalendarFilters(
       showTasks: map['showTasks'] ?? true,
       showGoogleCalendar: map['showGoogleCalendar'] ?? true,
-      showRocisSchedule: false,
+      showRocisSchedule: map['showRocisSchedule'] ?? false,
       selectedCalendarIds: List<String>.from(map['selectedCalendarIds'] ?? []),
     );
   }
