@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-12T10:10:59.378415+00:00",
+  "last_run_timestamp": "2026-09-12T15:03:50.723865+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -1694,6 +1694,42 @@
       "title": "App Tester Tool/Service That Has Real Users (NO AI)",
       "url": "https://reddit.com/r/roastmystartup/comments/1we447w/app_tester_toolservice_that_has_real_users_no_ai/",
       "inspected_at": "2026-09-12T10:10:51.315983+00:00"
+    },
+    "reddit_1weer8e": {
+      "platform": "reddit",
+      "title": "Chrome extension that actually saves money",
+      "url": "https://reddit.com/r/SideProject/comments/1weer8e/chrome_extension_that_actually_saves_money/",
+      "inspected_at": "2026-09-12T15:03:32.235869+00:00"
+    },
+    "reddit_1weepth": {
+      "platform": "reddit",
+      "title": "I made a social app for locking in ( 700 + users in 2 weeks )",
+      "url": "https://reddit.com/r/SideProject/comments/1weepth/i_made_a_social_app_for_locking_in_700_users_in_2/",
+      "inspected_at": "2026-09-12T15:03:37.473573+00:00"
+    },
+    "reddit_1weel4u": {
+      "platform": "reddit",
+      "title": "Financial Tracker",
+      "url": "https://reddit.com/r/SideProject/comments/1weel4u/financial_tracker/",
+      "inspected_at": "2026-09-12T15:03:40.228449+00:00"
+    },
+    "reddit_1weej8o": {
+      "platform": "reddit",
+      "title": "Note Taking App With Invisibility Settings From Screen Share and AI Integration",
+      "url": "https://reddit.com/r/SideProject/comments/1weej8o/note_taking_app_with_invisibility_settings_from/",
+      "inspected_at": "2026-09-12T15:03:41.062519+00:00"
+    },
+    "reddit_1we3qxg": {
+      "platform": "reddit",
+      "title": "I’m building a “student living super-app”",
+      "url": "https://reddit.com/r/roastmystartup/comments/1we3qxg/im_building_a_student_living_superapp/",
+      "inspected_at": "2026-09-12T15:03:41.978599+00:00"
+    },
+    "reddit_1we6mlm": {
+      "platform": "reddit",
+      "title": "More ideas for list_smith (a theme-neutral pagination + search + PTR library)",
+      "url": "https://reddit.com/r/FlutterDev/comments/1we6mlm/more_ideas_for_list_smith_a_themeneutral/",
+      "inspected_at": "2026-09-12T15:03:42.703464+00:00"
     }
   },
   "pending_drafts": {
