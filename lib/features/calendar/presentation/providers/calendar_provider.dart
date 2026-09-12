@@ -2,24 +2,41 @@ import 'package:flutter/material.dart';
 import 'package:device_calendar/device_calendar.dart';
 import 'package:rocis_tasks/core/services/auth_service.dart';
 import 'package:rocis_tasks/core/services/calendar_service.dart';
+import 'package:rocis_tasks/core/services/schedule_firestore_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rocis_tasks/features/home/services/full_calendar_widget_service.dart';
 import 'package:rocis_tasks/core/services/logger_service.dart';
 
+import 'package:rocis_tasks/core/services/subscription_service.dart';
+
 class CalendarProvider extends ChangeNotifier {
   final CalendarService _calendarService;
   final FullCalendarWidgetService _widgetService;
+  final ScheduleFirestoreService _scheduleFirestoreService;
+  final SubscriptionService? _subscriptionService;
   Map<DateTime, List<dynamic>> _eventsMap = {};
+  Map<DateTime, List<SyncedScheduleEvent>> _scheduleEventsMap = {};
   List<Event> _events = [];
+  List<SyncedScheduleEvent> _scheduleEvents = [];
   bool _showTasks = true;
   bool _showGoogleCalendar = true;
+  bool _showRocisSchedule = false;
   bool _isLoading = false;
   String? _userId;
   List<Calendar> _availableCalendars = [];
   Set<String> _selectedCalendarIds = {};
   bool _isGoogleCalendarTokenExpired = false;
 
-  CalendarProvider(this._calendarService, this._widgetService);
+  CalendarProvider(
+    this._calendarService,
+    this._widgetService, {
+    ScheduleFirestoreService? scheduleFirestoreService,
+    SubscriptionService? subscriptionService,
+  }) : _scheduleFirestoreService =
+           scheduleFirestoreService ?? ScheduleFirestoreService(),
+       _subscriptionService = subscriptionService;
+
+  bool get isPremium => _subscriptionService?.isPremium ?? true;
 
   bool get isGoogleCalendarTokenExpired => _isGoogleCalendarTokenExpired;
 
@@ -33,6 +50,8 @@ class CalendarProvider extends ChangeNotifier {
   List<Event> get events => _events;
   bool get showTasks => _showTasks;
   bool get showGoogleCalendar => _showGoogleCalendar;
+  bool get showRocisSchedule => _showRocisSchedule;
+  List<SyncedScheduleEvent> get scheduleEvents => _scheduleEvents;
   bool get isLoading => _isLoading;
   List<Calendar> get availableCalendars => _availableCalendars;
   Set<String> get selectedCalendarIds => _selectedCalendarIds;
@@ -65,15 +84,19 @@ class CalendarProvider extends ChangeNotifier {
     final nextShowTasks = prefs.getBool('full_calendar_show_tasks') ?? true;
     final nextShowGoogleCalendar =
         prefs.getBool('full_calendar_show_google') ?? true;
+    final nextShowRocisSchedule =
+        prefs.getBool('full_calendar_show_schedule') ?? false;
     final savedCalendarIds = prefs.getStringList('full_calendar_selected_ids');
 
     final hasChanges =
         nextShowTasks != _showTasks ||
         nextShowGoogleCalendar != _showGoogleCalendar ||
+        nextShowRocisSchedule != _showRocisSchedule ||
         savedCalendarIds != null;
 
     _showTasks = nextShowTasks;
     _showGoogleCalendar = nextShowGoogleCalendar;
+    _showRocisSchedule = nextShowRocisSchedule;
     if (savedCalendarIds != null && savedCalendarIds.isNotEmpty) {
       _selectedCalendarIds = savedCalendarIds.toSet();
     }
@@ -92,16 +115,20 @@ class CalendarProvider extends ChangeNotifier {
   Future<void> updateFilters({
     bool? showTasks,
     bool? showGoogleCalendar,
+    bool? showRocisSchedule,
   }) async {
     final nextShowTasks = showTasks ?? _showTasks;
     final nextShowGoogleCalendar = showGoogleCalendar ?? _showGoogleCalendar;
+    final nextShowRocisSchedule = showRocisSchedule ?? _showRocisSchedule;
 
     final hasChanges =
         nextShowTasks != _showTasks ||
-        nextShowGoogleCalendar != _showGoogleCalendar;
+        nextShowGoogleCalendar != _showGoogleCalendar ||
+        nextShowRocisSchedule != _showRocisSchedule;
 
     _showTasks = nextShowTasks;
     _showGoogleCalendar = nextShowGoogleCalendar;
+    _showRocisSchedule = nextShowRocisSchedule;
 
     if (hasChanges) {
       notifyListeners();
@@ -111,6 +138,7 @@ class CalendarProvider extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('full_calendar_show_tasks', _showTasks);
     await prefs.setBool('full_calendar_show_google', _showGoogleCalendar);
+    await prefs.setBool('full_calendar_show_schedule', _showRocisSchedule);
   }
 
   Future<void> toggleCalendarSelection(String calendarId) async {
@@ -154,6 +182,7 @@ class CalendarProvider extends ChangeNotifier {
     final filters = FullCalendarFilters(
       showTasks: _showTasks,
       showGoogleCalendar: _showGoogleCalendar,
+      showRocisSchedule: _showRocisSchedule,
       selectedCalendarIds: _selectedCalendarIds.toList(),
     );
     await _widgetService.saveFilters(filters);
@@ -199,6 +228,22 @@ class CalendarProvider extends ChangeNotifier {
       );
 
       _processEventsToMap();
+
+      // Load ROCIs Schedule events if user is logged in
+      if (_userId != null && _userId!.isNotEmpty) {
+        try {
+          _scheduleEvents = await _scheduleFirestoreService.fetchEvents(
+            _userId!,
+          );
+          _processScheduleEventsToMap();
+        } catch (e) {
+          AppLogger.warning(
+            'CalendarProvider: Could not fetch schedule events: $e',
+          );
+          _scheduleEvents = [];
+          _scheduleEventsMap = {};
+        }
+      }
     } on GoogleTokenExpiredException catch (e) {
       if (e.isServerRejection) {
         _isGoogleCalendarTokenExpired = true;
@@ -280,15 +325,51 @@ class CalendarProvider extends ChangeNotifier {
     }
   }
 
-  /// Get all events for a specific day (device calendar events)
+  void _processScheduleEventsToMap() {
+    _scheduleEventsMap = {};
+    for (final event in _scheduleEvents) {
+      if (event.recurring) {
+        // Map across upcoming weeks around selected date
+        final base = DateTime(_selectedDate.year, _selectedDate.month - 1, 1);
+        final end = DateTime(_selectedDate.year, _selectedDate.month + 2, 0);
+        DateTime cur = base;
+        while (!cur.isAfter(end)) {
+          if (event.occursOnDay(cur)) {
+            final norm = DateTime(cur.year, cur.month, cur.day);
+            _scheduleEventsMap.putIfAbsent(norm, () => []).add(event);
+          }
+          cur = cur.add(const Duration(days: 1));
+        }
+      } else {
+        final norm = DateTime(
+          event.startTime.year,
+          event.startTime.month,
+          event.startTime.day,
+        );
+        _scheduleEventsMap.putIfAbsent(norm, () => []).add(event);
+      }
+    }
+  }
+
+  /// Get all events for a specific day (device calendar events + schedule events)
   List<dynamic> getEventsForDay(DateTime day) {
     // Normalize day to midnight
     final normalizedDay = DateTime(day.year, day.month, day.day);
-    final events = _eventsMap[normalizedDay] ?? [];
+    final events = <dynamic>[];
     if (_showGoogleCalendar) {
-      return events;
+      events.addAll(_eventsMap[normalizedDay] ?? []);
     }
-    return [];
+    if (_showRocisSchedule && isPremium) {
+      events.addAll(_scheduleEventsMap[normalizedDay] ?? []);
+    }
+    return events;
+  }
+
+  /// Get university schedule events for a specific day (Pro only)
+  List<SyncedScheduleEvent> getScheduleEventsForDay(DateTime day) {
+    if (!isPremium) return [];
+    final normalizedDay = DateTime(day.year, day.month, day.day);
+    return _scheduleEventsMap[normalizedDay] ?? [];
   }
 }
 

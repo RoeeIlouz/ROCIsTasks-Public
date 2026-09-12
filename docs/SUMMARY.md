@@ -2,6 +2,27 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## ROCIs Schedule Synergy Integration & v0.2.14+101 Release - 2026-09-12
+
+#### Features & Architecture Implemented
+* **ROCIs Schedule Synergy (Beta)**:
+  - Enabled two-way cross-app synergy between ROCIs Tasks and ROCIs Schedule.
+  - Secret Easter Egg unlock in About Dialog (5 taps on version) reveals Beta Features and enables "ROCIs Schedule Synergy (Beta)".
+  - New "ROCIs Ecosystem" section in Settings with 1-tap open button to ROCIs Schedule and cloud sync status.
+* **University Timetable Overlay**:
+  - `ScheduleFirestoreService`: Connects to secondary Firebase app (`rocis-schedule`) with UID-based lookup to fetch courses and timetable events with backward-compatible method stubs (`setUserEmail`, `clearCache`).
+  - `CalendarProvider`: Merges university schedule events into the calendar alongside device calendar events, supporting recurring event rules and day-by-day mapping.
+  - `CalendarFilterSheet`: Added toggle switch for "ROCIs Schedule" filter with persistent storage in SharedPreferences.
+  - `CalendarScreen`: Renders rich `SyncedScheduleEvent` cards with school icons, course code badges, time ranges, locations, and "Open in ROCIs Schedule" action.
+* **Deep Link Receiver**:
+  - `HomeScreen` & `AddTaskScreen`: Parse incoming `rocistasks://add_task` queries (`title`, `notes`/`description`, `dueDate`, `priority`) to launch the pre-populated task creation dialog.
+* **Pro Feature Gating**:
+  - Gated ROCIs Schedule synergy behind `SubscriptionService.isPremium` (PRO).
+  - `CalendarFilterSheet`: Displays amber `PRO` badge next to timetable switch; triggers `subscriptionService.showPaywall()` when free users attempt to enable.
+  - `SettingsScreen`: Displays `PRO` badge on "ROCIs Schedule Synergy (Beta)" tile and triggers paywall on toggle; "ROCIs Ecosystem" section only appears for Pro users.
+  - `CalendarProvider`: Strictly verifies `isPremium` before blending timetable events into `getEventsForDay` and `getScheduleEventsForDay`.
+* **Version Bump**: Bumped to `v0.2.14+101` (`pubspec.yaml`, `app_config.dart`, `docs/CHANGELOG.md`).
+
 ## Version Revert & Glassmorphic Category/Event Hue Tinting - 2026-09-11
 
 #### Problem & Requirements

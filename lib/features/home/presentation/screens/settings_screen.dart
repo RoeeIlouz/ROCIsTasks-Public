@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:rocis_tasks/core/services/auth_service.dart';
@@ -25,6 +26,7 @@ import 'package:rocis_tasks/features/auth/presentation/screens/login_screen.dart
 import 'package:rocis_tasks/core/services/timezone_service.dart';
 import 'package:rocis_tasks/features/home/presentation/screens/widget_customization_screen.dart';
 import 'package:rocis_tasks/shared/ui/widgets/app_color_picker_sheet.dart';
+import 'package:rocis_tasks/core/services/schedule_bridge_service.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -1204,6 +1206,29 @@ class SettingsScreen extends StatelessWidget {
             },
           ),
         ]),
+        if (themeService.enableScheduleIntegration &&
+            subscriptionService.isPremium) ...[
+          _buildSectionHeader(context, 'ROCIs Ecosystem'),
+          _buildSectionCard(context, [
+            ListTile(
+              leading: _buildLeadingIcon(
+                context,
+                Icons.school_rounded,
+                Colors.indigo,
+              ),
+              title: const Text('ROCIs Schedule Synergy'),
+              subtitle: const Text('Cloud sync active with ROCIs Schedule'),
+              trailing: FilledButton.tonalIcon(
+                onPressed: () {
+                  HapticFeedback.selectionClick();
+                  ScheduleBridgeService.openScheduleApp();
+                },
+                icon: const Icon(Icons.open_in_new_rounded, size: 16),
+                label: const Text('Open'),
+              ),
+            ),
+          ]),
+        ],
         _buildSectionHeader(context, l10n.about),
         _buildSectionCard(context, [
           ListTile(
@@ -1264,12 +1289,16 @@ class SettingsScreen extends StatelessWidget {
                                 onTap: () {
                                   tapCount++;
                                   if (tapCount == 5) {
+                                    themeService.unlockBetaFeatures();
                                     setState(() {
                                       isDebugUnlocked = true;
                                     });
+                                    HapticFeedback.mediumImpact();
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
-                                        content: Text(l10n.debugModeUnlocked),
+                                        content: Text(
+                                          '${l10n.debugModeUnlocked} & Beta Features Unlocked! 🚀',
+                                        ),
                                       ),
                                     );
                                   }
@@ -1358,6 +1387,115 @@ class SettingsScreen extends StatelessWidget {
                                   }
                                 },
                               ),
+                              if (isDebugUnlocked ||
+                                  themeService.betaFeaturesUnlocked) ...[
+                                const SizedBox(height: 16),
+                                Material(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .primaryContainer
+                                      .withValues(alpha: 0.2),
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Container(
+                                    padding: const EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary
+                                            .withValues(alpha: 0.3),
+                                      ),
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Icon(
+                                              Icons.science_rounded,
+                                              size: 18,
+                                              color: Theme.of(
+                                                context,
+                                              ).colorScheme.primary,
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Text(
+                                              'Beta Features',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                color: Theme.of(
+                                                  context,
+                                                ).colorScheme.primary,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 8),
+                                        SwitchListTile(
+                                          contentPadding: EdgeInsets.zero,
+                                          title: Row(
+                                            children: [
+                                              const Text(
+                                                'ROCIs Schedule Synergy (Beta)',
+                                              ),
+                                              if (!subscriptionService
+                                                  .isPremium) ...[
+                                                const SizedBox(width: 8),
+                                                Container(
+                                                  padding:
+                                                      const EdgeInsets.symmetric(
+                                                        horizontal: 6,
+                                                        vertical: 2,
+                                                      ),
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.amber
+                                                        .withValues(alpha: 0.2),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          6,
+                                                        ),
+                                                  ),
+                                                  child: Text(
+                                                    'PRO',
+                                                    style: GoogleFonts.outfit(
+                                                      fontSize: 10,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors.amber[800],
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ],
+                                          ),
+                                          subtitle: const Text(
+                                            'Sync university timetable events and enable cross-app launcher',
+                                          ),
+                                          value:
+                                              themeService
+                                                  .enableScheduleIntegration &&
+                                              subscriptionService.isPremium,
+                                          onChanged: (val) {
+                                            if (val &&
+                                                !subscriptionService
+                                                    .isPremium) {
+                                              subscriptionService.showPaywall();
+                                              return;
+                                            }
+                                            themeService
+                                                .setEnableScheduleIntegration(
+                                                  val,
+                                                );
+                                            setState(() {});
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
                               if (isDebugUnlocked)
                                 ListTile(
                                   contentPadding: EdgeInsets.zero,

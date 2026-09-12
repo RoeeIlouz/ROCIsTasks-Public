@@ -5,6 +5,7 @@ import 'package:rocis_tasks/features/home/presentation/screens/web_home_screen.d
 import 'package:rocis_tasks/features/calendar/presentation/screens/calendar_screen.dart';
 import 'package:rocis_tasks/features/categories/presentation/screens/categories_screen.dart';
 import 'package:rocis_tasks/features/tasks/presentation/screens/add_task_screen.dart';
+import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/features/tasks/presentation/screens/task_detail_screen.dart';
 import 'package:rocis_tasks/features/tasks/presentation/screens/task_list_screen.dart';
 import 'package:rocis_tasks/features/tasks/presentation/widgets/task_sort_filter_sheet.dart';
@@ -89,11 +90,23 @@ class _HomeScreenState extends State<HomeScreen> {
     return null;
   }
 
-  void _navigateToAddTask() {
+  void _navigateToAddTask({
+    String? initialTitle,
+    String? initialDescription,
+    DateTime? initialDueDate,
+    TaskPriority? initialPriority,
+    String? initialCategoryId,
+  }) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const AddTaskScreen(),
+        builder: (context) => AddTaskScreen(
+          initialTitle: initialTitle,
+          initialDescription: initialDescription,
+          initialDueDate: initialDueDate,
+          initialPriority: initialPriority,
+          initialCategoryId: initialCategoryId,
+        ),
         fullscreenDialog: true,
       ),
     );
@@ -126,7 +139,28 @@ class _HomeScreenState extends State<HomeScreen> {
     // Widget launch with uri handled
 
     if (uri.host == 'add_task') {
-      _navigateToAddTask();
+      final title = uri.queryParameters['title'];
+      final notes =
+          uri.queryParameters['notes'] ?? uri.queryParameters['description'];
+      final dueDateStr = uri.queryParameters['dueDate'];
+      final priorityStr = uri.queryParameters['priority'];
+      DateTime? dueDate;
+      if (dueDateStr != null) {
+        dueDate = DateTime.tryParse(dueDateStr);
+      }
+      TaskPriority? priority;
+      if (priorityStr != null) {
+        priority = TaskPriority.values
+            .where((p) => p.name.toLowerCase() == priorityStr.toLowerCase())
+            .firstOrNull;
+      }
+
+      _navigateToAddTask(
+        initialTitle: title,
+        initialDescription: notes,
+        initialDueDate: dueDate,
+        initialPriority: priority,
+      );
       return;
     }
 
