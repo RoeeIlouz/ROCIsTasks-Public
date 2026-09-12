@@ -1,5 +1,8 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:device_calendar/device_calendar.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:rocis_tasks/core/services/auth_service.dart';
 import 'package:rocis_tasks/core/services/calendar_service.dart';
 import 'package:rocis_tasks/core/services/schedule_firestore_service.dart';
@@ -14,6 +17,8 @@ class CalendarProvider extends ChangeNotifier {
   final FullCalendarWidgetService _widgetService;
   final ScheduleFirestoreService _scheduleFirestoreService;
   final SubscriptionService? _subscriptionService;
+  final AuthService? _authService;
+  StreamSubscription? _authSub;
   Map<DateTime, List<dynamic>> _eventsMap = {};
   Map<DateTime, List<SyncedScheduleEvent>> _scheduleEventsMap = {};
   List<Event> _events = [];
@@ -33,9 +38,35 @@ class CalendarProvider extends ChangeNotifier {
     this._widgetService, {
     ScheduleFirestoreService? scheduleFirestoreService,
     SubscriptionService? subscriptionService,
+    AuthService? authService,
   }) : _scheduleFirestoreService =
            scheduleFirestoreService ?? ScheduleFirestoreService(),
-       _subscriptionService = subscriptionService;
+       _subscriptionService = subscriptionService,
+       _authService = authService {
+    if (_authService != null) {
+      _userId = _authService.currentUser?.uid;
+      _userEmail = _authService.currentUser?.email;
+      _scheduleFirestoreService.setUserEmail(_userEmail);
+      _authSub = _authService.authStateChanges.listen((user) {
+        final newUid = user?.uid;
+        final newEmail = user?.email;
+        if (newUid != _userId || newEmail != _userEmail) {
+          _userId = newUid;
+          _userEmail = newEmail;
+          _scheduleFirestoreService.setUserEmail(_userEmail);
+          if (_showRocisSchedule) {
+            loadEvents();
+          }
+        }
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _authSub?.cancel();
+    super.dispose();
+  }
 
   bool get isPremium => _subscriptionService?.isPremium ?? true;
 
@@ -153,6 +184,10 @@ class CalendarProvider extends ChangeNotifier {
     await prefs.setBool('full_calendar_show_tasks', _showTasks);
     await prefs.setBool('full_calendar_show_google', _showGoogleCalendar);
     await prefs.setBool('full_calendar_show_schedule', _showRocisSchedule);
+
+    if (nextShowRocisSchedule && _scheduleEvents.isEmpty) {
+      loadEvents();
+    }
   }
 
   Future<void> toggleCalendarSelection(String calendarId) async {
@@ -247,12 +282,25 @@ class CalendarProvider extends ChangeNotifier {
       _processEventsToMap();
 
       // Load ROCIs Schedule events if user is logged in
-      if ((_userId != null && _userId!.isNotEmpty) ||
-          (_userEmail != null && _userEmail!.isNotEmpty)) {
+      final effectiveUid =
+          _userId ??
+          _authService?.currentUser?.uid ??
+          (Firebase.apps.isNotEmpty
+              ? FirebaseAuth.instance.currentUser?.uid
+              : null);
+      final effectiveEmail =
+          _userEmail ??
+          _authService?.currentUser?.email ??
+          (Firebase.apps.isNotEmpty
+              ? FirebaseAuth.instance.currentUser?.email
+              : null);
+
+      if ((effectiveUid != null && effectiveUid.isNotEmpty) ||
+          (effectiveEmail != null && effectiveEmail.isNotEmpty)) {
         try {
           _scheduleEvents = await _scheduleFirestoreService.fetchEvents(
-            uid: _userId,
-            email: _userEmail,
+            uid: effectiveUid,
+            email: effectiveEmail,
           );
           _processScheduleEventsToMap();
         } catch (e) {
@@ -348,9 +396,9 @@ class CalendarProvider extends ChangeNotifier {
     _scheduleEventsMap = {};
     for (final event in _scheduleEvents) {
       if (event.recurring) {
-        // Map across upcoming weeks around selected date
-        final base = DateTime(_selectedDate.year, _selectedDate.month - 1, 1);
-        final end = DateTime(_selectedDate.year, _selectedDate.month + 2, 0);
+        // Map across upcoming weeks around selected date (+/- 1 full academic year)
+        final base = DateTime(_selectedDate.year - 1, 1, 1);
+        final end = DateTime(_selectedDate.year + 1, 12, 31);
         DateTime cur = base;
         while (!cur.isAfter(end)) {
           if (event.occursOnDay(cur)) {

@@ -37,6 +37,9 @@ void main() {
       when(
         () => mockWidgetService.updateFullCalendarWidget(
           userId: any(named: 'userId'),
+          userEmail: any(named: 'userEmail'),
+          monthOffset: any(named: 'monthOffset'),
+          forceRefresh: any(named: 'forceRefresh'),
         ),
       ).thenAnswer((_) async {});
 

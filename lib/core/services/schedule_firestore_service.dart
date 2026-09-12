@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -68,7 +69,7 @@ class SyncedScheduleEvent {
       return fallback;
     }
 
-    final start = parseDate(map['startTime'], DateTime.now());
+    final start = parseDate(map['startTime'], DateTime(2020, 1, 1));
     final end = parseDate(map['endTime'], start.add(const Duration(hours: 1)));
 
     List<int> parsedDays = [];
@@ -149,6 +150,9 @@ class ScheduleFirestoreService {
   bool _isInitialized = false;
   String? _userEmail;
   String? _cachedScheduleUserId;
+  List<SyncedScheduleEvent>? _cachedEvents;
+  DateTime? _lastFetchTime;
+  static const Duration _cacheTtl = Duration(minutes: 5);
 
   bool get isReady => _isInitialized && _scheduleDb != null;
 
@@ -157,12 +161,16 @@ class ScheduleFirestoreService {
     if (_userEmail != email) {
       _userEmail = email;
       _cachedScheduleUserId = null;
+      _cachedEvents = null;
+      _lastFetchTime = null;
     }
   }
 
   /// Compatibility: clear any in-memory cached data.
   void clearCache() {
     _cachedScheduleUserId = null;
+    _cachedEvents = null;
+    _lastFetchTime = null;
   }
 
   Future<void> initialize() async {
@@ -197,7 +205,7 @@ class ScheduleFirestoreService {
     }
   }
 
-  /// Resolve ROCIs Schedule user ID. Checks direct UID doc first, then queries by email.
+  /// Resolve ROCIs Schedule user ID. Checks secondary auth first, direct UID doc, then queries by email.
   Future<String?> _resolveScheduleUserId({String? uid, String? email}) async {
     if (_cachedScheduleUserId != null && _cachedScheduleUserId!.isNotEmpty) {
       return _cachedScheduleUserId;
@@ -205,6 +213,20 @@ class ScheduleFirestoreService {
 
     final db = _scheduleDb;
     if (db == null) return null;
+
+    // 0. Check secondary Firebase Auth currentUser first
+    try {
+      final scheduleApp = Firebase.app('rocis-schedule');
+      final scheduleAuth = FirebaseAuth.instanceFor(app: scheduleApp);
+      final secUid = scheduleAuth.currentUser?.uid;
+      if (secUid != null && secUid.isNotEmpty) {
+        _cachedScheduleUserId = secUid;
+        debugPrint(
+          'ScheduleFirestoreService: Resolved user by secondary auth UID: $_cachedScheduleUserId',
+        );
+        return _cachedScheduleUserId;
+      }
+    } catch (_) {}
 
     // 1. Direct UID document lookup
     if (uid != null && uid.isNotEmpty) {
@@ -222,7 +244,7 @@ class ScheduleFirestoreService {
       }
     }
 
-    // 2. Email lookup across users collection
+    // 2. Email lookup across users collection (standard + lowercase fallback)
     final targetEmail = email ?? _userEmail;
     if (targetEmail != null && targetEmail.isNotEmpty) {
       try {
@@ -237,6 +259,22 @@ class ScheduleFirestoreService {
             'ScheduleFirestoreService: Resolved user by email ($targetEmail) -> $_cachedScheduleUserId',
           );
           return _cachedScheduleUserId;
+        }
+
+        final lowerEmail = targetEmail.toLowerCase();
+        if (lowerEmail != targetEmail) {
+          final queryLower = await db
+              .collection('users')
+              .where('email', isEqualTo: lowerEmail)
+              .limit(1)
+              .get();
+          if (queryLower.docs.isNotEmpty) {
+            _cachedScheduleUserId = queryLower.docs.first.id;
+            debugPrint(
+              'ScheduleFirestoreService: Resolved user by lowercase email ($lowerEmail) -> $_cachedScheduleUserId',
+            );
+            return _cachedScheduleUserId;
+          }
         }
       } catch (e) {
         debugPrint(
@@ -277,7 +315,15 @@ class ScheduleFirestoreService {
   Future<List<SyncedScheduleEvent>> fetchEvents({
     String? uid,
     String? email,
+    bool forceRefresh = false,
   }) async {
+    if (!forceRefresh &&
+        _cachedEvents != null &&
+        _lastFetchTime != null &&
+        DateTime.now().difference(_lastFetchTime!) < _cacheTtl) {
+      return _cachedEvents!;
+    }
+
     if (!isReady) {
       await initialize();
     }
@@ -311,7 +357,7 @@ class ScheduleFirestoreService {
           .collection('events')
           .get();
 
-      return eventsSnap.docs.map((doc) {
+      final events = eventsSnap.docs.map((doc) {
         final data = doc.data();
         final courseId = data['courseId']?.toString() ?? '';
         return SyncedScheduleEvent.fromMap(
@@ -319,6 +365,10 @@ class ScheduleFirestoreService {
           courseMap: coursesMap[courseId],
         );
       }).toList();
+
+      _cachedEvents = events;
+      _lastFetchTime = DateTime.now();
+      return events;
     } catch (e) {
       debugPrint('ScheduleFirestoreService: Error fetching events: $e');
       return [];
