@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-12T15:03:50.723865+00:00",
+  "last_run_timestamp": "2026-09-12T20:15:30.999415+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -1730,6 +1730,42 @@
       "title": "More ideas for list_smith (a theme-neutral pagination + search + PTR library)",
       "url": "https://reddit.com/r/FlutterDev/comments/1we6mlm/more_ideas_for_list_smith_a_themeneutral/",
       "inspected_at": "2026-09-12T15:03:42.703464+00:00"
+    },
+    "reddit_1wemnqb": {
+      "platform": "reddit",
+      "title": "Personal voice assistant: which use-case to start with?",
+      "url": "https://reddit.com/r/SideProject/comments/1wemnqb/personal_voice_assistant_which_usecase_to_start/",
+      "inspected_at": "2026-09-12T20:14:00.943916+00:00"
+    },
+    "reddit_1wemh5l": {
+      "platform": "reddit",
+      "title": "🚀 Looking for a Technical Co-Founder",
+      "url": "https://reddit.com/r/SideProject/comments/1wemh5l/looking_for_a_technical_cofounder/",
+      "inspected_at": "2026-09-12T20:14:47.101500+00:00"
+    },
+    "reddit_1wem8r3": {
+      "platform": "reddit",
+      "title": "I turned Chinese astrology into a stock chart of one's life",
+      "url": "https://reddit.com/r/SideProject/comments/1wem8r3/i_turned_chinese_astrology_into_a_stock_chart_of/",
+      "inspected_at": "2026-09-12T20:14:56.473446+00:00"
+    },
+    "reddit_1wem4r6": {
+      "platform": "reddit",
+      "title": "Finished built my app, but how to sell, also thoughts wanted 😭",
+      "url": "https://reddit.com/r/SideProject/comments/1wem4r6/finished_built_my_app_but_how_to_sell_also/",
+      "inspected_at": "2026-09-12T20:15:01.980443+00:00"
+    },
+    "reddit_1wemqt1": {
+      "platform": "reddit",
+      "title": "Styling service with app distribution. Tell me why it's a bad idea.",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wemqt1/styling_service_with_app_distribution_tell_me_why/",
+      "inspected_at": "2026-09-12T20:15:10.918117+00:00"
+    },
+    "reddit_1wemje6": {
+      "platform": "reddit",
+      "title": "Match with people near or far to achieve mutual goals, not promote doomscrolls",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wemje6/match_with_people_near_or_far_to_achieve_mutual/",
+      "inspected_at": "2026-09-12T20:15:20.231719+00:00"
     }
   },
   "pending_drafts": {
@@ -2066,7 +2102,7 @@
     }
   },
   "recorded_feedback": [],
-  "last_organic_post_timestamp": "2026-09-12T03:19:07.338106+00:00",
+  "last_organic_post_timestamp": "2026-09-12T20:15:30.425726+00:00",
   "organic_posts": [
     {
       "text": "you either die a young enthusiastic builder or live long enough to realize that 90% of tech problems are solved by restarting the router.",
@@ -2160,6 +2196,15 @@
         "Bluesky"
       ],
       "posted_at": "2026-09-12T03:19:07.338106+00:00"
+    },
+    {
+      "text": "spent 45 minutes cable-managing behind my desk only for it to look like an abstract art installation of black velcro and sorrow.",
+      "topic": "ee_engineering_struggles",
+      "platforms": [
+        "Twitter/X",
+        "Bluesky"
+      ],
+      "posted_at": "2026-09-12T20:15:30.425726+00:00"
     }
   ],
   "x_posts_timestamps": [
@@ -2167,7 +2212,8 @@
     "2026-09-07T11:41:18.669653+00:00",
     "2026-09-08T16:05:02.814388+00:00",
     "2026-09-10T03:16:35.720705+00:00",
-    "2026-09-11T10:42:24.100237+00:00"
+    "2026-09-11T10:42:24.100237+00:00",
+    "2026-09-12T20:15:29.769250+00:00"
   ],
   "posted_devlogs": {
     "devlog_0_2_2_60_2026_07_17_190f9f3082": {
