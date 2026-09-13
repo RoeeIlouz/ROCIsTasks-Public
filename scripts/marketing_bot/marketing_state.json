@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-12T20:15:30.999415+00:00",
+  "last_run_timestamp": "2026-09-13T03:23:14.960187+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -1766,6 +1766,42 @@
       "title": "Match with people near or far to achieve mutual goals, not promote doomscrolls",
       "url": "https://reddit.com/r/roastmystartup/comments/1wemje6/match_with_people_near_or_far_to_achieve_mutual/",
       "inspected_at": "2026-09-12T20:15:20.231719+00:00"
+    },
+    "reddit_1wewaxo": {
+      "platform": "reddit",
+      "title": "Artifex - My Windows AI workspace, with a recorded browser-to-file demo",
+      "url": "https://reddit.com/r/SideProject/comments/1wewaxo/artifex_my_windows_ai_workspace_with_a_recorded/",
+      "inspected_at": "2026-09-13T03:22:38.235859+00:00"
+    },
+    "reddit_1wewajs": {
+      "platform": "reddit",
+      "title": "batch. - A demo of why AI requests sometimes wait",
+      "url": "https://reddit.com/r/SideProject/comments/1wewajs/batch_a_demo_of_why_ai_requests_sometimes_wait/",
+      "inspected_at": "2026-09-13T03:22:43.286572+00:00"
+    },
+    "reddit_1wew9ou": {
+      "platform": "reddit",
+      "title": "We built Todochi, a reminder app with friendly voices you can feel comfortable with!",
+      "url": "https://reddit.com/r/SideProject/comments/1wew9ou/we_built_todochi_a_reminder_app_with_friendly/",
+      "inspected_at": "2026-09-13T03:22:47.951918+00:00"
+    },
+    "reddit_1weuse5": {
+      "platform": "reddit",
+      "title": "Don't you dare put your website link in here.",
+      "url": "https://reddit.com/r/roastmystartup/comments/1weuse5/dont_you_dare_put_your_website_link_in_here/",
+      "inspected_at": "2026-09-13T03:22:50.127933+00:00"
+    },
+    "reddit_1weunry": {
+      "platform": "reddit",
+      "title": "Connect with people who can help achieve your goals, not increase your doomscrolls",
+      "url": "https://reddit.com/r/roastmystartup/comments/1weunry/connect_with_people_who_can_help_achieve_your/",
+      "inspected_at": "2026-09-13T03:23:06.178930+00:00"
+    },
+    "reddit_1wep9ua": {
+      "platform": "reddit",
+      "title": "roast my $49.99/mo tool for small business owners. 8 users, and I think both of my main assumptions might be wrong",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wep9ua/roast_my_4999mo_tool_for_small_business_owners_8/",
+      "inspected_at": "2026-09-13T03:23:06.994398+00:00"
     }
   },
   "pending_drafts": {
@@ -2239,17 +2275,13 @@
     }
   },
   "tuned_queries_cache": {
-    "timestamp": 1788663997.9277103,
+    "timestamp": 1789269724.7735054,
     "queries": [
-      "indie app showcase",
-      "built a todo app",
-      "offline first task app",
-      "flutter task app",
-      "android home widget app",
-      "what todo app do you use",
-      "todo app recommendation indie",
-      "simple task manager with calendar sync",
-      "offline to-do app without subscription"
+      "flutter offline task manager",
+      "calendar sync todo list",
+      "offline first productivity app",
+      "task manager with home widgets",
+      "university timetable task app"
     ]
   },
   "analytics_snapshot": {
