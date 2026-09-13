@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-13T15:42:21.519178+00:00",
+  "last_run_timestamp": "2026-09-13T20:23:38.885306+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -1874,6 +1874,42 @@
       "title": "Example application that uses bloc_signals",
       "url": "https://reddit.com/r/FlutterDev/comments/1wf96fs/example_application_that_uses_bloc_signals/",
       "inspected_at": "2026-09-13T15:42:13.489650+00:00"
+    },
+    "reddit_1wfifzn": {
+      "platform": "reddit",
+      "title": "J'ai créé un carnet d'entretien numérique parce que je perdais tout le temps mes factures et mes garanties",
+      "url": "https://reddit.com/r/SideProject/comments/1wfifzn/jai_créé_un_carnet_dentretien_numérique_parce_que/",
+      "inspected_at": "2026-09-13T20:23:17.210831+00:00"
+    },
+    "reddit_1wfien4": {
+      "platform": "reddit",
+      "title": "What’s your side project that uses under 100MB of RAM?",
+      "url": "https://reddit.com/r/SideProject/comments/1wfien4/whats_your_side_project_that_uses_under_100mb_of/",
+      "inspected_at": "2026-09-13T20:23:19.486988+00:00"
+    },
+    "reddit_1wfi3ti": {
+      "platform": "reddit",
+      "title": "My Indie Game Reached Top 20 Most Played Demos On Steam",
+      "url": "https://reddit.com/r/SideProject/comments/1wfi3ti/my_indie_game_reached_top_20_most_played_demos_on/",
+      "inspected_at": "2026-09-13T20:23:21.270065+00:00"
+    },
+    "reddit_1wfi3q2": {
+      "platform": "reddit",
+      "title": "I spent 3 months to build the only tool required to make viral content",
+      "url": "https://reddit.com/r/SideProject/comments/1wfi3q2/i_spent_3_months_to_build_the_only_tool_required/",
+      "inspected_at": "2026-09-13T20:23:25.560731+00:00"
+    },
+    "reddit_1wf77r5": {
+      "platform": "reddit",
+      "title": "I built a NIN and BVN retrieval platform because people kept coming back to me after I left my business centre",
+      "url": "https://reddit.com/r/indiehackers/comments/1wf77r5/i_built_a_nin_and_bvn_retrieval_platform_because/",
+      "inspected_at": "2026-09-13T20:23:30.153945+00:00"
+    },
+    "reddit_1wfh258": {
+      "platform": "reddit",
+      "title": "Roast my SDK for per-task AI agent spend ceilings (pretty sure the wedge is wrong)",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wfh258/roast_my_sdk_for_pertask_ai_agent_spend_ceilings/",
+      "inspected_at": "2026-09-13T20:23:30.953625+00:00"
     }
   },
   "pending_drafts": {
