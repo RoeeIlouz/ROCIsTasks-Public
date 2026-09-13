@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-13T13:43:10.959007+00:00",
+  "last_run_timestamp": "2026-09-13T15:42:21.519178+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -1838,6 +1838,42 @@
       "title": "What’s something you’ve spent way too long Googling/TikToking/Redditing because you couldn’t get a straight answer?",
       "url": "https://reddit.com/r/roastmystartup/comments/1wexq0z/whats_something_youve_spent_way_too_long/",
       "inspected_at": "2026-09-13T11:10:36.801755+00:00"
+    },
+    "reddit_1wfavi2": {
+      "platform": "reddit",
+      "title": "GameSquire: added BGG play-history import",
+      "url": "https://reddit.com/r/SideProject/comments/1wfavi2/gamesquire_added_bgg_playhistory_import/",
+      "inspected_at": "2026-09-13T15:41:32.193084+00:00"
+    },
+    "reddit_1wfaod6": {
+      "platform": "reddit",
+      "title": "Make music with strangers",
+      "url": "https://reddit.com/r/SideProject/comments/1wfaod6/make_music_with_strangers/",
+      "inspected_at": "2026-09-13T15:42:10.808544+00:00"
+    },
+    "reddit_1wfao6z": {
+      "platform": "reddit",
+      "title": "Redflagscan — a contract red-flag checker for dev/IT freelancers (free, no signup)",
+      "url": "https://reddit.com/r/SideProject/comments/1wfao6z/redflagscan_a_contract_redflag_checker_for_devit/",
+      "inspected_at": "2026-09-13T15:42:11.375907+00:00"
+    },
+    "reddit_1wfain4": {
+      "platform": "reddit",
+      "title": "Built Nenapu, roast it before I keep going",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wfain4/built_nenapu_roast_it_before_i_keep_going/",
+      "inspected_at": "2026-09-13T15:42:12.093505+00:00"
+    },
+    "reddit_1wf5cmn": {
+      "platform": "reddit",
+      "title": "Roast my startup: appscreenshots - App Store screenshots in minutes",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wf5cmn/roast_my_startup_appscreenshots_app_store/",
+      "inspected_at": "2026-09-13T15:42:12.789393+00:00"
+    },
+    "reddit_1wf96fs": {
+      "platform": "reddit",
+      "title": "Example application that uses bloc_signals",
+      "url": "https://reddit.com/r/FlutterDev/comments/1wf96fs/example_application_that_uses_bloc_signals/",
+      "inspected_at": "2026-09-13T15:42:13.489650+00:00"
     }
   },
   "pending_drafts": {
