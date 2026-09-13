@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-13T03:23:14.960187+00:00",
+  "last_run_timestamp": "2026-09-13T11:10:46.793107+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -1802,6 +1802,42 @@
       "title": "roast my $49.99/mo tool for small business owners. 8 users, and I think both of my main assumptions might be wrong",
       "url": "https://reddit.com/r/roastmystartup/comments/1wep9ua/roast_my_4999mo_tool_for_small_business_owners_8/",
       "inspected_at": "2026-09-13T03:23:06.994398+00:00"
+    },
+    "reddit_1wf4r14": {
+      "platform": "reddit",
+      "title": "What are you building? I’ll will help you to create video to gain new user.",
+      "url": "https://reddit.com/r/SideProject/comments/1wf4r14/what_are_you_building_ill_will_help_you_to_create/",
+      "inspected_at": "2026-09-13T11:09:41.817397+00:00"
+    },
+    "reddit_1wf4qa0": {
+      "platform": "reddit",
+      "title": "I made listed.as — a simple, free profile site with no ads or clutter",
+      "url": "https://reddit.com/r/SideProject/comments/1wf4qa0/i_made_listedas_a_simple_free_profile_site_with/",
+      "inspected_at": "2026-09-13T11:10:07.903884+00:00"
+    },
+    "reddit_1wf4ory": {
+      "platform": "reddit",
+      "title": "I used AI to guess interview questions",
+      "url": "https://reddit.com/r/SideProject/comments/1wf4ory/i_used_ai_to_guess_interview_questions/",
+      "inspected_at": "2026-09-13T11:10:08.673386+00:00"
+    },
+    "reddit_1wf474o": {
+      "platform": "reddit",
+      "title": "I made 10 ad videos for our side project with AI, about ₹500 in credits each. Here's the stack and what didn't work.",
+      "url": "https://reddit.com/r/SideProject/comments/1wf474o/i_made_10_ad_videos_for_our_side_project_with_ai/",
+      "inspected_at": "2026-09-13T11:10:16.681473+00:00"
+    },
+    "reddit_1wexmyr": {
+      "platform": "reddit",
+      "title": "I wanted ChatGPT to actually use my browser, so I built this",
+      "url": "https://reddit.com/r/indiehackers/comments/1wexmyr/i_wanted_chatgpt_to_actually_use_my_browser_so_i/",
+      "inspected_at": "2026-09-13T11:10:35.889626+00:00"
+    },
+    "reddit_1wexq0z": {
+      "platform": "reddit",
+      "title": "What’s something you’ve spent way too long Googling/TikToking/Redditing because you couldn’t get a straight answer?",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wexq0z/whats_something_youve_spent_way_too_long/",
+      "inspected_at": "2026-09-13T11:10:36.801755+00:00"
     }
   },
   "pending_drafts": {
@@ -2138,7 +2174,7 @@
     }
   },
   "recorded_feedback": [],
-  "last_organic_post_timestamp": "2026-09-12T20:15:30.425726+00:00",
+  "last_organic_post_timestamp": "2026-09-13T11:10:46.302168+00:00",
   "organic_posts": [
     {
       "text": "you either die a young enthusiastic builder or live long enough to realize that 90% of tech problems are solved by restarting the router.",
@@ -2241,6 +2277,14 @@
         "Bluesky"
       ],
       "posted_at": "2026-09-12T20:15:30.425726+00:00"
+    },
+    {
+      "text": "casual reminder that listening to the exact same 3-minute song on loop for an entire afternoon is completely normal human behavior.",
+      "topic": "focus_and_music_loops",
+      "platforms": [
+        "Bluesky"
+      ],
+      "posted_at": "2026-09-13T11:10:46.302168+00:00"
     }
   ],
   "x_posts_timestamps": [
