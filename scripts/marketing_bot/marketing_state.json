@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-14T03:34:02.674347+00:00",
+  "last_run_timestamp": "2026-09-14T11:55:30.575692+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -1946,6 +1946,42 @@
       "title": "What ya think",
       "url": "https://reddit.com/r/roastmystartup/comments/1wfrrmv/what_ya_think/",
       "inspected_at": "2026-09-14T03:33:51.671166+00:00"
+    },
+    "reddit_1wg1avt": {
+      "platform": "reddit",
+      "title": "I'm building a project planner around systems, components and Gantt charts",
+      "url": "https://reddit.com/r/SideProject/comments/1wg1avt/im_building_a_project_planner_around_systems/",
+      "inspected_at": "2026-09-14T11:55:07.957119+00:00"
+    },
+    "reddit_1wg1a45": {
+      "platform": "reddit",
+      "title": "I built an SSH and serial terminal manager inside VS Code",
+      "url": "https://reddit.com/r/SideProject/comments/1wg1a45/i_built_an_ssh_and_serial_terminal_manager_inside/",
+      "inspected_at": "2026-09-14T11:55:17.445527+00:00"
+    },
+    "reddit_1wg155h": {
+      "platform": "reddit",
+      "title": "We open-sourced our GPU orchestration project, Tahuna — looking for feedback on the self-hosted setup",
+      "url": "https://reddit.com/r/SideProject/comments/1wg155h/we_opensourced_our_gpu_orchestration_project/",
+      "inspected_at": "2026-09-14T11:55:19.776659+00:00"
+    },
+    "reddit_1wg13f7": {
+      "platform": "reddit",
+      "title": "I’m building a tool to make applying to jobs less repetitive - looking for brutal feedback",
+      "url": "https://reddit.com/r/SideProject/comments/1wg13f7/im_building_a_tool_to_make_applying_to_jobs_less/",
+      "inspected_at": "2026-09-14T11:55:20.682643+00:00"
+    },
+    "reddit_1wfxz5r": {
+      "platform": "reddit",
+      "title": "Would a free shift planner actually be useful, or do existing apps already do enough?",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wfxz5r/would_a_free_shift_planner_actually_be_useful_or/",
+      "inspected_at": "2026-09-14T11:55:21.462619+00:00"
+    },
+    "reddit_1wfx26u": {
+      "platform": "reddit",
+      "title": "Roast my startup: An open pay-to-rank directory where startups outbid legacy tech giants (saasrivals.com)",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wfx26u/roast_my_startup_an_open_paytorank_directory/",
+      "inspected_at": "2026-09-14T11:55:22.273494+00:00"
     }
   },
   "pending_drafts": {
