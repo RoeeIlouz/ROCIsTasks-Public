@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-13T20:23:38.885306+00:00",
+  "last_run_timestamp": "2026-09-14T03:34:02.674347+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -1910,6 +1910,42 @@
       "title": "Roast my SDK for per-task AI agent spend ceilings (pretty sure the wedge is wrong)",
       "url": "https://reddit.com/r/roastmystartup/comments/1wfh258/roast_my_sdk_for_pertask_ai_agent_spend_ceilings/",
       "inspected_at": "2026-09-13T20:23:30.953625+00:00"
+    },
+    "reddit_1wfrrlx": {
+      "platform": "reddit",
+      "title": "Mahjongit: a gamified daily brain workout you can play in Reddit",
+      "url": "https://reddit.com/r/SideProject/comments/1wfrrlx/mahjongit_a_gamified_daily_brain_workout_you_can/",
+      "inspected_at": "2026-09-14T03:33:44.196901+00:00"
+    },
+    "reddit_1wfrqs8": {
+      "platform": "reddit",
+      "title": "I built an infrastructure layer for headless WhatsApp automation without Meta business verification",
+      "url": "https://reddit.com/r/SideProject/comments/1wfrqs8/i_built_an_infrastructure_layer_for_headless/",
+      "inspected_at": "2026-09-14T03:33:46.606741+00:00"
+    },
+    "reddit_1wfrnql": {
+      "platform": "reddit",
+      "title": "Remember slider phones?",
+      "url": "https://reddit.com/r/SideProject/comments/1wfrnql/remember_slider_phones/",
+      "inspected_at": "2026-09-14T03:33:49.249562+00:00"
+    },
+    "reddit_1wfrhsb": {
+      "platform": "reddit",
+      "title": "I made a tiny Mac app that turns a long mouse press into a screenshot",
+      "url": "https://reddit.com/r/SideProject/comments/1wfrhsb/i_made_a_tiny_mac_app_that_turns_a_long_mouse/",
+      "inspected_at": "2026-09-14T03:33:50.211584+00:00"
+    },
+    "reddit_1wfplv8": {
+      "platform": "reddit",
+      "title": "I need help",
+      "url": "https://reddit.com/r/indiehackers/comments/1wfplv8/i_need_help/",
+      "inspected_at": "2026-09-14T03:33:50.992773+00:00"
+    },
+    "reddit_1wfrrmv": {
+      "platform": "reddit",
+      "title": "What ya think",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wfrrmv/what_ya_think/",
+      "inspected_at": "2026-09-14T03:33:51.671166+00:00"
     }
   },
   "pending_drafts": {
@@ -2246,7 +2282,7 @@
     }
   },
   "recorded_feedback": [],
-  "last_organic_post_timestamp": "2026-09-13T11:10:46.302168+00:00",
+  "last_organic_post_timestamp": "2026-09-14T03:34:02.342131+00:00",
   "organic_posts": [
     {
       "text": "you either die a young enthusiastic builder or live long enough to realize that 90% of tech problems are solved by restarting the router.",
@@ -2357,6 +2393,15 @@
         "Bluesky"
       ],
       "posted_at": "2026-09-13T11:10:46.302168+00:00"
+    },
+    {
+      "text": "brewing a finjan of turkish coffee while staring at that one circuit bug you couldn't solve yesterday hits different.",
+      "topic": "focus_and_music_loops",
+      "platforms": [
+        "Twitter/X",
+        "Bluesky"
+      ],
+      "posted_at": "2026-09-14T03:34:02.342131+00:00"
     }
   ],
   "x_posts_timestamps": [
@@ -2365,7 +2410,8 @@
     "2026-09-08T16:05:02.814388+00:00",
     "2026-09-10T03:16:35.720705+00:00",
     "2026-09-11T10:42:24.100237+00:00",
-    "2026-09-12T20:15:29.769250+00:00"
+    "2026-09-12T20:15:29.769250+00:00",
+    "2026-09-14T03:34:01.052334+00:00"
   ],
   "posted_devlogs": {
     "devlog_0_2_2_60_2026_07_17_190f9f3082": {
