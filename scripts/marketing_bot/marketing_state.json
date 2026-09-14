@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-14T11:55:30.575692+00:00",
+  "last_run_timestamp": "2026-09-14T17:47:25.369947+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -1982,6 +1982,42 @@
       "title": "Roast my startup: An open pay-to-rank directory where startups outbid legacy tech giants (saasrivals.com)",
       "url": "https://reddit.com/r/roastmystartup/comments/1wfx26u/roast_my_startup_an_open_paytorank_directory/",
       "inspected_at": "2026-09-14T11:55:22.273494+00:00"
+    },
+    "reddit_1wgah26": {
+      "platform": "reddit",
+      "title": "I built an AI-powered hiring platform — looking for feedback",
+      "url": "https://reddit.com/r/SideProject/comments/1wgah26/i_built_an_aipowered_hiring_platform_looking_for/",
+      "inspected_at": "2026-09-14T17:47:01.144528+00:00"
+    },
+    "reddit_1wgafl4": {
+      "platform": "reddit",
+      "title": "Are AI referrals actually becoming useful for side projects?",
+      "url": "https://reddit.com/r/SideProject/comments/1wgafl4/are_ai_referrals_actually_becoming_useful_for/",
+      "inspected_at": "2026-09-14T17:47:10.667827+00:00"
+    },
+    "reddit_1wgaedc": {
+      "platform": "reddit",
+      "title": "I built an iPhone app that lets kids see their screen-time limit before it arrives",
+      "url": "https://reddit.com/r/SideProject/comments/1wgaedc/i_built_an_iphone_app_that_lets_kids_see_their/",
+      "inspected_at": "2026-09-14T17:47:11.441719+00:00"
+    },
+    "reddit_1wga74q": {
+      "platform": "reddit",
+      "title": "I added a guided tutorial to my math puzzle game — does it explain the concept clearly?",
+      "url": "https://reddit.com/r/SideProject/comments/1wga74q/i_added_a_guided_tutorial_to_my_math_puzzle_game/",
+      "inspected_at": "2026-09-14T17:47:12.936095+00:00"
+    },
+    "reddit_1wg3rb1": {
+      "platform": "reddit",
+      "title": "I built almost 5 figures $ project in a saturated niche, I want more B2B though",
+      "url": "https://reddit.com/r/indiehackers/comments/1wg3rb1/i_built_almost_5_figures_project_in_a_saturated/",
+      "inspected_at": "2026-09-14T17:47:13.702332+00:00"
+    },
+    "reddit_1wg96hc": {
+      "platform": "reddit",
+      "title": "TickrDash: I made a live scores/stocks/weather dashboard for your TV so you'd stop checking your phone mid-game. Please be brutal.",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wg96hc/tickrdash_i_made_a_live_scoresstocksweather/",
+      "inspected_at": "2026-09-14T17:47:14.591569+00:00"
     }
   },
   "pending_drafts": {
@@ -2318,7 +2354,7 @@
     }
   },
   "recorded_feedback": [],
-  "last_organic_post_timestamp": "2026-09-14T03:34:02.342131+00:00",
+  "last_organic_post_timestamp": "2026-09-14T17:47:24.906054+00:00",
   "organic_posts": [
     {
       "text": "you either die a young enthusiastic builder or live long enough to realize that 90% of tech problems are solved by restarting the router.",
@@ -2438,6 +2474,14 @@
         "Bluesky"
       ],
       "posted_at": "2026-09-14T03:34:02.342131+00:00"
+    },
+    {
+      "text": "spending 4 hours debugging an electrical engineering circuit lab only to discover a faulty breadboard jumper wire is peak character building.",
+      "topic": "coffee_and_sleep_delusions",
+      "platforms": [
+        "Bluesky"
+      ],
+      "posted_at": "2026-09-14T17:47:24.906054+00:00"
     }
   ],
   "x_posts_timestamps": [
