@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-14T17:47:25.369947+00:00",
+  "last_run_timestamp": "2026-09-14T21:32:54.860940+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -2018,6 +2018,42 @@
       "title": "TickrDash: I made a live scores/stocks/weather dashboard for your TV so you'd stop checking your phone mid-game. Please be brutal.",
       "url": "https://reddit.com/r/roastmystartup/comments/1wg96hc/tickrdash_i_made_a_live_scoresstocksweather/",
       "inspected_at": "2026-09-14T17:47:14.591569+00:00"
+    },
+    "reddit_1wggn6m": {
+      "platform": "reddit",
+      "title": "Saga Reads - Fantasy and Sci-Fi Book Companion App",
+      "url": "https://reddit.com/r/SideProject/comments/1wggn6m/saga_reads_fantasy_and_scifi_book_companion_app/",
+      "inspected_at": "2026-09-14T21:32:39.888106+00:00"
+    },
+    "reddit_1wgggo0": {
+      "platform": "reddit",
+      "title": "I'm building Testimoon, a testimonial collection tool",
+      "url": "https://reddit.com/r/SideProject/comments/1wgggo0/im_building_testimoon_a_testimonial_collection/",
+      "inspected_at": "2026-09-14T21:32:43.450200+00:00"
+    },
+    "reddit_1wggajh": {
+      "platform": "reddit",
+      "title": "Life in the UK Test Practice - just went live on Play Store, feedback welcome",
+      "url": "https://reddit.com/r/SideProject/comments/1wggajh/life_in_the_uk_test_practice_just_went_live_on/",
+      "inspected_at": "2026-09-14T21:32:44.191688+00:00"
+    },
+    "reddit_1wgfvdv": {
+      "platform": "reddit",
+      "title": "600 website visits in a week but only a single app download - advice",
+      "url": "https://reddit.com/r/indiehackers/comments/1wgfvdv/600_website_visits_in_a_week_but_only_a_single/",
+      "inspected_at": "2026-09-14T21:32:44.936441+00:00"
+    },
+    "reddit_1wgffhi": {
+      "platform": "reddit",
+      "title": "Roast my recipe app: every new user finished onboarding and left at the paywall",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wgffhi/roast_my_recipe_app_every_new_user_finished/",
+      "inspected_at": "2026-09-14T21:32:45.725439+00:00"
+    },
+    "reddit_1wgeeyc": {
+      "platform": "reddit",
+      "title": "Roast my startup: did I solve a real job-search decision problem or overcomplicate it?",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wgeeyc/roast_my_startup_did_i_solve_a_real_jobsearch/",
+      "inspected_at": "2026-09-14T21:32:46.581387+00:00"
     }
   },
   "pending_drafts": {
