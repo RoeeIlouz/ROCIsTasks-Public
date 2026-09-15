@@ -9,7 +9,7 @@ import cloud_firestore
 import connectivity_plus
 import device_info_plus
 import dynamic_color
-import file_picker
+import file_picker_darwin
 import firebase_analytics
 import firebase_auth
 import firebase_core
