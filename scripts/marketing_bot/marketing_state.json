@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-15T16:21:49.069514+00:00",
+  "last_run_timestamp": "2026-09-15T20:55:03.126784+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -2162,6 +2162,42 @@
       "title": "Does the “blank cursor” moment before sending a prompt to ChatGPT/Claude actually bother you?",
       "url": "https://reddit.com/r/roastmystartup/comments/1wgyau2/does_the_blank_cursor_moment_before_sending_a/",
       "inspected_at": "2026-09-15T16:21:40.797417+00:00"
+    },
+    "reddit_1whcgox": {
+      "platform": "reddit",
+      "title": "SPELLBANK - Looking for playtesters & feedback",
+      "url": "https://reddit.com/r/SideProject/comments/1whcgox/spellbank_looking_for_playtesters_feedback/",
+      "inspected_at": "2026-09-15T20:54:33.189594+00:00"
+    },
+    "reddit_1whce6d": {
+      "platform": "reddit",
+      "title": "I got tired of asking “what is this port?”",
+      "url": "https://reddit.com/r/SideProject/comments/1whce6d/i_got_tired_of_asking_what_is_this_port/",
+      "inspected_at": "2026-09-15T20:54:41.237862+00:00"
+    },
+    "reddit_1whc0bv": {
+      "platform": "reddit",
+      "title": "Website To Turn Any Keyboard Layout 3D",
+      "url": "https://reddit.com/r/SideProject/comments/1whc0bv/website_to_turn_any_keyboard_layout_3d/",
+      "inspected_at": "2026-09-15T20:54:44.054090+00:00"
+    },
+    "reddit_1whbyxn": {
+      "platform": "reddit",
+      "title": "I’m building a community-funded pixel art wall — what would make the first-run flow trustworthy?",
+      "url": "https://reddit.com/r/SideProject/comments/1whbyxn/im_building_a_communityfunded_pixel_art_wall_what/",
+      "inspected_at": "2026-09-15T20:54:53.280932+00:00"
+    },
+    "reddit_1whbezk": {
+      "platform": "reddit",
+      "title": "Roast my app: Travel Ties—tracks friends/connections you make while traveling",
+      "url": "https://reddit.com/r/roastmystartup/comments/1whbezk/roast_my_app_travel_tiestracks_friendsconnections/",
+      "inspected_at": "2026-09-15T20:54:54.096558+00:00"
+    },
+    "reddit_1whao6h": {
+      "platform": "reddit",
+      "title": "Roast the UI of my Romanian flat-search site — backend dev, zero design skill, interface built with AI",
+      "url": "https://reddit.com/r/roastmystartup/comments/1whao6h/roast_the_ui_of_my_romanian_flatsearch_site/",
+      "inspected_at": "2026-09-15T20:54:54.898914+00:00"
     }
   },
   "pending_drafts": {
