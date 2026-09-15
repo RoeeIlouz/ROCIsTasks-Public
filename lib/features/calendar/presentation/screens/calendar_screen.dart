@@ -8,7 +8,7 @@ import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
 import 'package:rocis_tasks/features/tasks/presentation/widgets/task_tile.dart';
 import 'package:rocis_tasks/features/tasks/presentation/widgets/task_skeleton.dart';
-import 'package:rocis_tasks/features/tasks/presentation/screens/add_task_screen.dart';
+import 'package:rocis_tasks/features/tasks/presentation/widgets/quick_add_task_bottom_sheet.dart';
 import 'package:rocis_tasks/features/calendar/presentation/providers/calendar_provider.dart';
 import 'package:rocis_tasks/core/services/auth_service.dart';
 import 'package:rocis_tasks/core/services/calendar_color_service.dart';
@@ -19,6 +19,8 @@ import 'package:rocis_tasks/features/calendar/presentation/widgets/calendar_filt
 import 'package:rocis_tasks/features/calendar/presentation/widgets/calendar_coloring_sheet.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:rocis_tasks/shared/ui/ui_kit.dart';
+import 'package:rocis_tasks/core/services/schedule_firestore_service.dart';
+import 'package:rocis_tasks/core/services/schedule_bridge_service.dart';
 
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({super.key});
@@ -48,7 +50,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted) return;
       final authService = Provider.of<AuthService>(context, listen: false);
-      provider.setUserId(authService.currentUser?.uid);
+      provider.setUser(
+        authService.currentUser?.uid,
+        authService.currentUser?.email,
+      );
       await provider.loadFilters();
       if (!mounted) return;
       await provider.loadEvents();
@@ -94,10 +99,16 @@ class _CalendarScreenState extends State<CalendarScreen> {
       final matches = calendarProvider.availableCalendars.where(
         (c) => c.id == event.calendarId,
       );
-      if (matches.isNotEmpty && matches.first.color != null) {
-        return Color(matches.first.color!);
-      }
-      return colorService.googleColor;
+      final Color? nativeColor =
+          matches.isNotEmpty && matches.first.color != null
+          ? Color(matches.first.color!)
+          : null;
+      return colorService.getEffectiveSubcalendarColor(
+        event.calendarId,
+        nativeColor: nativeColor,
+      );
+    } else if (event is SyncedScheduleEvent) {
+      return event.color;
     }
     return colorService.taskColor;
   }
@@ -373,6 +384,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
                           title = event.title;
                         } else if (event is Event) {
                           title = event.title ?? 'No Title';
+                        } else if (event is SyncedScheduleEvent) {
+                          title = event.title.isNotEmpty
+                              ? event.title
+                              : (event.courseName.isNotEmpty
+                                    ? event.courseName
+                                    : 'Class');
                         }
 
                         return Positioned(
@@ -533,28 +550,21 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                 ),
                           ),
                           const SizedBox(height: 16),
-                          OutlinedButton.icon(
+                          FilledButton.icon(
                             onPressed: () {
                               HapticFeedback.lightImpact();
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => AddTaskScreen(
-                                    initialDueDate:
-                                        calendarProvider.selectedDate,
-                                  ),
-                                  fullscreenDialog: true,
+                              showModalBottomSheet(
+                                context: context,
+                                isScrollControlled: true,
+                                backgroundColor: Colors.transparent,
+                                builder: (context) => QuickAddTaskBottomSheet(
+                                  initialDueDate: calendarProvider.selectedDate,
                                 ),
                               );
                             },
-                            style: OutlinedButton.styleFrom(
+                            style: FilledButton.styleFrom(
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(14),
-                              ),
-                              side: BorderSide(
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.primary.withValues(alpha: 0.4),
                               ),
                             ),
                             icon: const Icon(Icons.add_rounded, size: 18),
@@ -607,7 +617,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       return TaskTile(
                         task: item,
                         categories: categories,
-                        enableSwipeToDelete: false,
+                        enableSwipeToDelete: true,
                         enablePin: false,
                         onToggle: () => taskProvider.toggleTaskCompletion(item),
                         onDelete: () => taskProvider.deleteTask(item.id),
@@ -621,16 +631,29 @@ class _CalendarScreenState extends State<CalendarScreen> {
                             (c) => c.id == item.calendarId,
                             orElse: Calendar.new,
                           );
-                      final googleColor = cal.color != null
+                      final Color? nativeColor = cal.color != null
                           ? Color(cal.color!)
-                          : colorService.googleColor;
+                          : null;
+                      final eventColor = colorService
+                          .getEffectiveSubcalendarColor(
+                            item.calendarId,
+                            nativeColor: nativeColor,
+                          );
+                      final isDark =
+                          Theme.of(context).brightness == Brightness.dark;
                       return GlassContainer(
                         margin: const EdgeInsets.symmetric(
                           horizontal: 16,
                           vertical: 6,
                         ),
-                        selectedBorderColor: googleColor,
+                        border: Border.all(
+                          color: isDark
+                              ? eventColor.withValues(alpha: 0.25)
+                              : eventColor.withValues(alpha: 0.18),
+                          width: 1.0,
+                        ),
                         isSelected: false,
+                        tintColor: eventColor,
                         child: Semantics(
                           label:
                               'Google Calendar Event: ${item.title ?? 'No Title'}',
@@ -642,12 +665,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
                             leading: Container(
                               padding: const EdgeInsets.all(10),
                               decoration: BoxDecoration(
-                                color: googleColor.withValues(alpha: 0.1),
+                                color: eventColor.withValues(alpha: 0.12),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Icon(
                                 Icons.event_note_rounded,
-                                color: googleColor,
+                                color: eventColor,
                                 size: 24,
                               ),
                             ),
@@ -691,18 +714,173 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                 vertical: 4,
                               ),
                               decoration: BoxDecoration(
-                                color: googleColor.withValues(alpha: 0.1),
+                                color: eventColor.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text(
                                 'Google',
                                 style: Theme.of(context).textTheme.labelSmall
                                     ?.copyWith(
-                                      color: googleColor,
+                                      color: eventColor,
                                       fontWeight: FontWeight.w600,
                                     ),
                               ),
                             ),
+                          ),
+                        ),
+                      );
+                    } else if (item is SyncedScheduleEvent) {
+                      final timeFormat = themeService.use24HourFormat
+                          ? DateFormat.Hm()
+                          : DateFormat.jm();
+                      final eventColor = item.color;
+                      final isDark =
+                          Theme.of(context).brightness == Brightness.dark;
+                      return GlassContainer(
+                        margin: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 6,
+                        ),
+                        border: Border.all(
+                          color: isDark
+                              ? eventColor.withValues(alpha: 0.25)
+                              : eventColor.withValues(alpha: 0.18),
+                          width: 1.0,
+                        ),
+                        isSelected: false,
+                        tintColor: eventColor,
+                        child: Semantics(
+                          label: 'ROCIs Schedule Event: ${item.title}',
+                          child: ListTile(
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
+                            leading: Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: eventColor.withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Icon(
+                                Icons.school_rounded,
+                                color: eventColor,
+                                size: 24,
+                              ),
+                            ),
+                            title: Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    item.title.isNotEmpty
+                                        ? item.title
+                                        : (item.courseName.isNotEmpty
+                                              ? item.courseName
+                                              : 'Class'),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium
+                                        ?.copyWith(
+                                          fontWeight: FontWeight.bold,
+                                          letterSpacing: -0.5,
+                                        ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                if (item.courseCode.isNotEmpty) ...[
+                                  const SizedBox(width: 6),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 6,
+                                      vertical: 2,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: eventColor.withValues(alpha: 0.15),
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                    child: Text(
+                                      item.courseCode,
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold,
+                                        color: eventColor,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
+                            subtitle: Padding(
+                              padding: const EdgeInsets.only(top: 4.0),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.access_time_rounded,
+                                    size: 14,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurfaceVariant,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    '${timeFormat.format(item.startTime)} - ${timeFormat.format(item.endTime)}',
+                                    style: Theme.of(context).textTheme.bodySmall
+                                        ?.copyWith(
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.onSurfaceVariant,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                  ),
+                                  if (item.location.isNotEmpty) ...[
+                                    const SizedBox(width: 8),
+                                    Icon(
+                                      Icons.location_on_outlined,
+                                      size: 14,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurfaceVariant,
+                                    ),
+                                    const SizedBox(width: 2),
+                                    Expanded(
+                                      child: Text(
+                                        item.location,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodySmall
+                                            ?.copyWith(
+                                              color: Theme.of(
+                                                context,
+                                              ).colorScheme.onSurfaceVariant,
+                                            ),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ),
+                            trailing: IconButton(
+                              icon: Icon(
+                                Icons.open_in_new_rounded,
+                                size: 18,
+                                color: eventColor,
+                              ),
+                              tooltip: 'Open in ROCIs Schedule',
+                              onPressed: () {
+                                HapticFeedback.lightImpact();
+                                ScheduleBridgeService.openScheduleEvent(
+                                  eventId: item.id,
+                                );
+                              },
+                            ),
+                            onTap: () {
+                              HapticFeedback.lightImpact();
+                              ScheduleBridgeService.openScheduleEvent(
+                                eventId: item.id,
+                              );
+                            },
                           ),
                         ),
                       );

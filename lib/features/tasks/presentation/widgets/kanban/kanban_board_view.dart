@@ -9,11 +9,7 @@ import 'package:rocis_tasks/features/tasks/presentation/widgets/kanban/kanban_co
 import 'package:rocis_tasks/features/tasks/presentation/screens/add_task_screen.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
 
-enum KanbanGrouping {
-  status,
-  priority,
-  category,
-}
+enum KanbanGrouping { status, priority, category }
 
 class KanbanBoardView extends StatefulWidget {
   const KanbanBoardView({super.key});
@@ -32,7 +28,8 @@ class _KanbanBoardViewState extends State<KanbanBoardView> {
     return date.isBefore(todayEnd);
   }
 
-  void _openAddTask(BuildContext context, {
+  void _openAddTask(
+    BuildContext context, {
     TaskPriority? priority,
     String? categoryId,
     DateTime? dueDate,
@@ -104,7 +101,14 @@ class _KanbanBoardViewState extends State<KanbanBoardView> {
             scrollDirection: Axis.horizontal,
             physics: const BouncingScrollPhysics(),
             padding: const EdgeInsets.fromLTRB(10, 0, 10, 80),
-            children: _buildColumns(context, allTasks, categories, taskProvider, l10n, theme),
+            children: _buildColumns(
+              context,
+              allTasks,
+              categories,
+              taskProvider,
+              l10n,
+              theme,
+            ),
           ),
         ),
       ],
@@ -135,7 +139,9 @@ class _KanbanBoardViewState extends State<KanbanBoardView> {
         decoration: BoxDecoration(
           color: isSelected
               ? theme.colorScheme.primary.withValues(alpha: 0.15)
-              : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+              : theme.colorScheme.surfaceContainerHighest.withValues(
+                  alpha: 0.4,
+                ),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: isSelected
@@ -185,7 +191,14 @@ class _KanbanBoardViewState extends State<KanbanBoardView> {
       case KanbanGrouping.priority:
         return _buildPriorityColumns(context, tasks, taskProvider, l10n, theme);
       case KanbanGrouping.category:
-        return _buildCategoryColumns(context, tasks, categories, taskProvider, l10n, theme);
+        return _buildCategoryColumns(
+          context,
+          tasks,
+          categories,
+          taskProvider,
+          l10n,
+          theme,
+        );
     }
   }
 
@@ -221,6 +234,15 @@ class _KanbanBoardViewState extends State<KanbanBoardView> {
         accentColor: theme.colorScheme.primary,
         tasks: todoTasks,
         onAddTask: () => _openAddTask(context),
+        onInlineAddTask: (title) async {
+          await taskProvider.addTask(
+            title,
+            '',
+            null,
+            TaskPriority.medium,
+            null,
+          );
+        },
         onTaskDropped: (task) async {
           if (task.isCompleted) {
             await taskProvider.toggleTaskCompletion(task);
@@ -237,6 +259,17 @@ class _KanbanBoardViewState extends State<KanbanBoardView> {
         accentColor: const Color(0xFFF59E0B),
         tasks: inFocusTasks,
         onAddTask: () => _openAddTask(context, dueDate: DateTime.now()),
+        onInlineAddTask: (title) async {
+          final now = DateTime.now();
+          final todayNoon = DateTime(now.year, now.month, now.day, 12, 0);
+          await taskProvider.addTask(
+            title,
+            '',
+            todayNoon,
+            TaskPriority.medium,
+            null,
+          );
+        },
         onTaskDropped: (task) async {
           if (task.isCompleted) {
             await taskProvider.toggleTaskCompletion(task);
@@ -252,6 +285,21 @@ class _KanbanBoardViewState extends State<KanbanBoardView> {
         icon: Icons.check_circle_outline_rounded,
         accentColor: const Color(0xFF10B981),
         tasks: doneTasks,
+        onInlineAddTask: (title) async {
+          await taskProvider.addTask(
+            title,
+            '',
+            null,
+            TaskPriority.medium,
+            null,
+          );
+          final created = taskProvider.allTasks
+              .where((t) => t.title == title)
+              .toList();
+          if (created.isNotEmpty) {
+            await taskProvider.toggleTaskCompletion(created.last);
+          }
+        },
         onTaskDropped: (task) async {
           if (!task.isCompleted) {
             await taskProvider.toggleTaskCompletion(task);
@@ -269,9 +317,15 @@ class _KanbanBoardViewState extends State<KanbanBoardView> {
     ThemeData theme,
   ) {
     final activeTasks = tasks.where((t) => !t.isCompleted).toList();
-    final highTasks = activeTasks.where((t) => t.priority == TaskPriority.high).toList();
-    final medTasks = activeTasks.where((t) => t.priority == TaskPriority.medium).toList();
-    final lowTasks = activeTasks.where((t) => t.priority == TaskPriority.low).toList();
+    final highTasks = activeTasks
+        .where((t) => t.priority == TaskPriority.high)
+        .toList();
+    final medTasks = activeTasks
+        .where((t) => t.priority == TaskPriority.medium)
+        .toList();
+    final lowTasks = activeTasks
+        .where((t) => t.priority == TaskPriority.low)
+        .toList();
 
     return [
       KanbanColumn(
@@ -281,6 +335,9 @@ class _KanbanBoardViewState extends State<KanbanBoardView> {
         accentColor: const Color(0xFFEF4444),
         tasks: highTasks,
         onAddTask: () => _openAddTask(context, priority: TaskPriority.high),
+        onInlineAddTask: (title) async {
+          await taskProvider.addTask(title, '', null, TaskPriority.high, null);
+        },
         onTaskDropped: (task) async {
           task.priority = TaskPriority.high;
           await taskProvider.updateTask(task);
@@ -293,6 +350,15 @@ class _KanbanBoardViewState extends State<KanbanBoardView> {
         accentColor: const Color(0xFFF59E0B),
         tasks: medTasks,
         onAddTask: () => _openAddTask(context, priority: TaskPriority.medium),
+        onInlineAddTask: (title) async {
+          await taskProvider.addTask(
+            title,
+            '',
+            null,
+            TaskPriority.medium,
+            null,
+          );
+        },
         onTaskDropped: (task) async {
           task.priority = TaskPriority.medium;
           await taskProvider.updateTask(task);
@@ -305,6 +371,9 @@ class _KanbanBoardViewState extends State<KanbanBoardView> {
         accentColor: const Color(0xFF10B981),
         tasks: lowTasks,
         onAddTask: () => _openAddTask(context, priority: TaskPriority.low),
+        onInlineAddTask: (title) async {
+          await taskProvider.addTask(title, '', null, TaskPriority.low, null);
+        },
         onTaskDropped: (task) async {
           task.priority = TaskPriority.low;
           await taskProvider.updateTask(task);
@@ -340,6 +409,16 @@ class _KanbanBoardViewState extends State<KanbanBoardView> {
           accentColor: Color(cat.colorValue),
           tasks: catTasks,
           onAddTask: () => _openAddTask(context, categoryId: cat.id),
+          onInlineAddTask: (title) async {
+            await taskProvider.addTask(
+              title,
+              '',
+              null,
+              TaskPriority.medium,
+              cat.id,
+              categoryIds: [cat.id],
+            );
+          },
           onTaskDropped: (task) async {
             task.categoryId = cat.id;
             task.categoryIds = [cat.id];
@@ -351,7 +430,8 @@ class _KanbanBoardViewState extends State<KanbanBoardView> {
 
     // Uncategorized column
     final uncategorizedTasks = activeTasks.where((t) {
-      final hasCategory = (t.categoryId != null && t.categoryId!.isNotEmpty) ||
+      final hasCategory =
+          (t.categoryId != null && t.categoryId!.isNotEmpty) ||
           t.categoryIds.isNotEmpty;
       return !hasCategory;
     }).toList();
@@ -364,6 +444,15 @@ class _KanbanBoardViewState extends State<KanbanBoardView> {
         accentColor: theme.colorScheme.onSurfaceVariant,
         tasks: uncategorizedTasks,
         onAddTask: () => _openAddTask(context),
+        onInlineAddTask: (title) async {
+          await taskProvider.addTask(
+            title,
+            '',
+            null,
+            TaskPriority.medium,
+            null,
+          );
+        },
         onTaskDropped: (task) async {
           task.categoryId = null;
           task.categoryIds = [];

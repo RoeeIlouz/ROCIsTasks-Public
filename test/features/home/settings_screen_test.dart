@@ -80,6 +80,8 @@ void main() {
     when(() => mockThemeService.locale).thenReturn(const Locale('en'));
     when(() => mockThemeService.customSeedColorValue).thenReturn(null);
     when(() => mockThemeService.useCustomSeedColor).thenReturn(false);
+    when(() => mockThemeService.betaFeaturesUnlocked).thenReturn(false);
+    when(() => mockThemeService.enableScheduleIntegration).thenReturn(false);
 
     when(() => mockSubscriptionService.isPremium).thenReturn(true);
 

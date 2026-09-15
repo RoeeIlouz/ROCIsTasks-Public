@@ -272,6 +272,10 @@ class AppLocalizationsSv extends AppLocalizations {
   String get calendarColors => 'Kalenderfärger';
 
   @override
+  String get calendarColorThemingHint =>
+      'För att anpassa kalenderfärger, öppna panelen Kalenderfärger (palettikon).';
+
+  @override
   String get calendarFiltersTitle => 'Kalenderfilter';
 
   @override
@@ -300,6 +304,30 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get selectColor => 'Välj färg';
+
+  @override
+  String get subcalendars => 'Underkalendrar';
+
+  @override
+  String get customColor => 'Anpassad färg';
+
+  @override
+  String get resetToGoogleDefault => 'Återställ till Google-färg';
+
+  @override
+  String get hexCode => 'HEX-kod';
+
+  @override
+  String get opacity => 'Opacitet';
+
+  @override
+  String get presets => 'Förinställningar';
+
+  @override
+  String get expandCustomPicker => 'Anpassad färg';
+
+  @override
+  String get noEnabledCalendars => 'Inga aktiverade Google-kalendrar';
 
   @override
   String get selectGoogleCalendars => 'Välj Google-kalendrar';

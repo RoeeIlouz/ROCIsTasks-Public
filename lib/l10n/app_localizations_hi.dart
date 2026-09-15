@@ -272,6 +272,10 @@ class AppLocalizationsHi extends AppLocalizations {
   String get calendarColors => 'कैलेंडर रंग';
 
   @override
+  String get calendarColorThemingHint =>
+      'कैलेंडर के रंगों को अनुकूलित करने के लिए, कैलेंडर रंग शीट (पैलेट आइकन) खोलें।';
+
+  @override
   String get calendarFiltersTitle => 'कैलेंडर फ़िल्टर';
 
   @override
@@ -300,6 +304,30 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get selectColor => 'रंग चुनें';
+
+  @override
+  String get subcalendars => 'उप-कैलेंडर';
+
+  @override
+  String get customColor => 'कस्टम रंग';
+
+  @override
+  String get resetToGoogleDefault => 'Google रंग पर रीसेट करें';
+
+  @override
+  String get hexCode => 'HEX कोड';
+
+  @override
+  String get opacity => 'पारदर्शिता';
+
+  @override
+  String get presets => 'प्रीसेट';
+
+  @override
+  String get expandCustomPicker => 'कस्टम रंग';
+
+  @override
+  String get noEnabledCalendars => 'कोई Google कैलेंडर सक्षम नहीं है';
 
   @override
   String get selectGoogleCalendars => 'Google कैलेंडर चुनें';

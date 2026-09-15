@@ -855,24 +855,23 @@ class TaskProvider extends ChangeNotifier {
           _widgetDataService.setUserEmail(userEmail);
           _fullCalendarWidgetService.setUserEmail(userEmail);
 
-          await _widgetDataService.updateAllWidgets(
-            tasksForPublicSurfaces,
-            getCategoryById,
-            userId: userId,
-          );
-          await _widgetDataService.updateMonthEventsMap(
-            tasksForPublicSurfaces,
-            userId: userId,
-          );
-          await _widgetDataService.updateCalendarListWidget(
-            tasksForPublicSurfaces,
-            userId: userId,
-          );
-
-          await _monthWidgetService.updateMonthWidget();
-          await _fullCalendarWidgetService.updateFullCalendarWidget(
-            userId: userId,
-          );
+          await Future.wait([
+            _widgetDataService.updateAllWidgets(
+              tasksForPublicSurfaces,
+              getCategoryById,
+              userId: userId,
+            ),
+            _widgetDataService.updateMonthEventsMap(
+              tasksForPublicSurfaces,
+              userId: userId,
+            ),
+            _widgetDataService.updateCalendarListWidget(
+              tasksForPublicSurfaces,
+              userId: userId,
+            ),
+            _monthWidgetService.updateMonthWidget(),
+            _fullCalendarWidgetService.updateFullCalendarWidget(userId: userId),
+          ]);
         } catch (e, s) {
           _errorHandlingService.logError(e, s, reason: 'Updating home widgets');
         } finally {

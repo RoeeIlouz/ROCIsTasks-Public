@@ -79,6 +79,7 @@ class _AppRootState extends State<AppRoot> {
   late final _fullCalendarWidgetService = FullCalendarWidgetService(
     _calendarService,
     _taskSource,
+    scheduleService: _scheduleService,
   );
   late final _googleTasksService = GoogleTasksService(_authService);
   late final _taskProvider = TaskProvider(
@@ -110,7 +111,22 @@ class _AppRootState extends State<AppRoot> {
     _calendarService.setAuthService(_authService);
 
     try {
+      // Tier 1: Critical services required for the immediate first frame UI
       await Future.wait([
+        _themeService.init().catchError(
+          (e, stack) => AppLogger.error(
+            'Failed to init theme service',
+            error: e,
+            stack: stack,
+          ),
+        ),
+        _privateModeService.init().catchError(
+          (e, stack) => AppLogger.error(
+            'Failed to init private mode service',
+            error: e,
+            stack: stack,
+          ),
+        ),
         _taskSource.init().catchError(
           (e, stack) => AppLogger.error(
             'Failed to init task source',
@@ -125,67 +141,55 @@ class _AppRootState extends State<AppRoot> {
             stack: stack,
           ),
         ),
-        _calendarService.init().catchError(
-          (e, stack) => AppLogger.error(
-            'Failed to init calendar service',
-            error: e,
-            stack: stack,
-          ),
-        ),
-        _themeService.init().catchError(
-          (e, stack) => AppLogger.error(
-            'Failed to init theme service',
-            error: e,
-            stack: stack,
-          ),
-        ),
-        _timezoneService.init().catchError(
-          (e, stack) => AppLogger.error(
-            'Failed to init timezone service',
-            error: e,
-            stack: stack,
-          ),
-        ),
-        _calendarColorService.init().catchError(
-          (e, stack) => AppLogger.error(
-            'Failed to init calendar color service',
-            error: e,
-            stack: stack,
-          ),
-        ),
-        _subscriptionService.init().catchError(
-          (e, stack) => AppLogger.error(
-            'Failed to init subscription service',
-            error: e,
-            stack: stack,
-          ),
-        ),
-        _connectivityService.init().catchError(
-          (e, stack) => AppLogger.error(
-            'Failed to init connectivity service',
-            error: e,
-            stack: stack,
-          ),
-        ),
-        _privateModeService.init().catchError(
-          (e, stack) => AppLogger.error(
-            'Failed to init private mode service',
-            error: e,
-            stack: stack,
-          ),
-        ),
         _authService.initialized,
       ]);
 
-      // Initialize secondary schedule service non-blockingly
+      // Tier 2: Deferred background services initialized non-blockingly
       unawaited(
-        _scheduleService.initialize().catchError(
-          (e, stack) => AppLogger.error(
-            'Failed to init schedule service in background',
-            error: e,
-            stack: stack,
+        Future.wait([
+          _timezoneService.init().catchError(
+            (e, stack) => AppLogger.error(
+              'Failed to init timezone service in background',
+              error: e,
+              stack: stack,
+            ),
           ),
-        ),
+          _calendarService.init().catchError(
+            (e, stack) => AppLogger.error(
+              'Failed to init calendar service in background',
+              error: e,
+              stack: stack,
+            ),
+          ),
+          _calendarColorService.init().catchError(
+            (e, stack) => AppLogger.error(
+              'Failed to init calendar color service in background',
+              error: e,
+              stack: stack,
+            ),
+          ),
+          _subscriptionService.init().catchError(
+            (e, stack) => AppLogger.error(
+              'Failed to init subscription service in background',
+              error: e,
+              stack: stack,
+            ),
+          ),
+          _connectivityService.init().catchError(
+            (e, stack) => AppLogger.error(
+              'Failed to init connectivity service in background',
+              error: e,
+              stack: stack,
+            ),
+          ),
+          _scheduleService.initialize().catchError(
+            (e, stack) => AppLogger.error(
+              'Failed to init schedule service in background',
+              error: e,
+              stack: stack,
+            ),
+          ),
+        ]),
       );
 
       // Log session start
@@ -386,6 +390,9 @@ class _AppRootState extends State<AppRoot> {
               create: (_) => CalendarProvider(
                 _calendarService,
                 _fullCalendarWidgetService,
+                scheduleFirestoreService: _scheduleService,
+                subscriptionService: _subscriptionService,
+                authService: _authService,
               ),
             ),
             ChangeNotifierProvider.value(value: _onboardingService),

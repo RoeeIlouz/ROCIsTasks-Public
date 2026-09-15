@@ -24,6 +24,8 @@ import 'package:rocis_tasks/features/auth/presentation/screens/security_settings
 import 'package:rocis_tasks/features/auth/presentation/screens/login_screen.dart';
 import 'package:rocis_tasks/core/services/timezone_service.dart';
 import 'package:rocis_tasks/features/home/presentation/screens/widget_customization_screen.dart';
+import 'package:rocis_tasks/shared/ui/widgets/app_color_picker_sheet.dart';
+import 'package:rocis_tasks/core/services/schedule_bridge_service.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -456,70 +458,24 @@ class SettingsScreen extends StatelessWidget {
                 const Color(0xFFEC4899),
                 const Color(0xFF64748B),
               ];
-              final selected = await showModalBottomSheet<int>(
-                useSafeArea: true,
+              final current = themeService.customSeedColorValue;
+              final initial = current != null
+                  ? Color(current)
+                  : Theme.of(context).colorScheme.primary;
+
+              await AppColorPickerSheet.show(
                 context: context,
-                builder: (context) {
-                  final current = themeService.customSeedColorValue;
-                  return Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              l10n.accentColor,
-                              style: Theme.of(context).textTheme.titleMedium,
-                            ),
-                            TextButton(
-                              onPressed: () => Navigator.pop(context, -1),
-                              child: Text(l10n.systemDefault),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-                        Wrap(
-                          spacing: 12,
-                          runSpacing: 12,
-                          children: [
-                            for (final c in colors)
-                              InkWell(
-                                onTap: () =>
-                                    Navigator.pop(context, c.toARGB32()),
-                                borderRadius: BorderRadius.circular(999),
-                                child: Container(
-                                  width: 44,
-                                  height: 44,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: c,
-                                    border: Border.all(
-                                      color: current == c.toARGB32()
-                                          ? Theme.of(
-                                              context,
-                                            ).colorScheme.onSurface
-                                          : Colors.transparent,
-                                      width: 3,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                          ],
-                        ),
-                        const SizedBox(height: 20),
-                      ],
-                    ),
-                  );
+                title: l10n.accentColor,
+                initialColor: initial,
+                presetColors: colors,
+                onResetToDefault: () async {
+                  await themeService.setCustomSeedColorValue(null);
+                },
+                resetLabel: l10n.systemDefault,
+                onColorChanged: (c) async {
+                  await themeService.setCustomSeedColorValue(c.toARGB32());
                 },
               );
-              if (selected == null) return;
-              if (selected == -1) {
-                await themeService.setCustomSeedColorValue(null);
-              } else {
-                await themeService.setCustomSeedColorValue(selected);
-              }
             },
           ),
           SwitchListTile(
@@ -1249,6 +1205,28 @@ class SettingsScreen extends StatelessWidget {
             },
           ),
         ]),
+        if (themeService.enableScheduleIntegration) ...[
+          _buildSectionHeader(context, 'ROCIs Ecosystem'),
+          _buildSectionCard(context, [
+            ListTile(
+              leading: _buildLeadingIcon(
+                context,
+                Icons.school_rounded,
+                Colors.indigo,
+              ),
+              title: const Text('ROCIs Schedule Synergy'),
+              subtitle: const Text('Cloud sync active with ROCIs Schedule'),
+              trailing: FilledButton.tonalIcon(
+                onPressed: () {
+                  HapticFeedback.selectionClick();
+                  ScheduleBridgeService.openScheduleApp();
+                },
+                icon: const Icon(Icons.open_in_new_rounded, size: 16),
+                label: const Text('Open'),
+              ),
+            ),
+          ]),
+        ],
         _buildSectionHeader(context, l10n.about),
         _buildSectionCard(context, [
           ListTile(
@@ -1309,12 +1287,16 @@ class SettingsScreen extends StatelessWidget {
                                 onTap: () {
                                   tapCount++;
                                   if (tapCount == 5) {
+                                    themeService.unlockBetaFeatures();
                                     setState(() {
                                       isDebugUnlocked = true;
                                     });
+                                    HapticFeedback.mediumImpact();
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
-                                        content: Text(l10n.debugModeUnlocked),
+                                        content: Text(
+                                          '${l10n.debugModeUnlocked} & Beta Features Unlocked! 🚀',
+                                        ),
                                       ),
                                     );
                                   }
@@ -1403,6 +1385,75 @@ class SettingsScreen extends StatelessWidget {
                                   }
                                 },
                               ),
+                              if (isDebugUnlocked ||
+                                  themeService.betaFeaturesUnlocked) ...[
+                                const SizedBox(height: 16),
+                                Material(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .primaryContainer
+                                      .withValues(alpha: 0.2),
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Container(
+                                    padding: const EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary
+                                            .withValues(alpha: 0.3),
+                                      ),
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Icon(
+                                              Icons.science_rounded,
+                                              size: 18,
+                                              color: Theme.of(
+                                                context,
+                                              ).colorScheme.primary,
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Text(
+                                              'Beta Features',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                color: Theme.of(
+                                                  context,
+                                                ).colorScheme.primary,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 8),
+                                        SwitchListTile(
+                                          contentPadding: EdgeInsets.zero,
+                                          title: const Text(
+                                            'ROCIs Schedule Synergy (Beta)',
+                                          ),
+                                          subtitle: const Text(
+                                            'Sync university timetable events and enable cross-app launcher',
+                                          ),
+                                          value: themeService
+                                              .enableScheduleIntegration,
+                                          onChanged: (val) {
+                                            themeService
+                                                .setEnableScheduleIntegration(
+                                                  val,
+                                                );
+                                            setState(() {});
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
                               if (isDebugUnlocked)
                                 ListTile(
                                   contentPadding: EdgeInsets.zero,

@@ -30,7 +30,6 @@ class TodayAgendaWidgetFactory(private val context: Context) : RemoteViewsServic
     }
 
     override fun onDataSetChanged() {
-        items.clear()
         try {
             val widgetData = HomeWidgetPlugin.getData(context)
             widgetTheme = widgetData.getString("full_calendar_theme", "system") ?: "system"
@@ -75,9 +74,10 @@ class TodayAgendaWidgetFactory(private val context: Context) : RemoteViewsServic
                 aTime.compareTo(bTime)
             })
 
+            items.clear()
             items.addAll(dayItems)
         } catch (_: Exception) {
-            items.clear()
+            // Keep existing items on error
         }
     }
 

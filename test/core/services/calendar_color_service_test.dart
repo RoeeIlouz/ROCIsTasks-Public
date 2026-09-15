@@ -7,100 +7,102 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('CalendarColorService', () {
-    late CalendarColorService colorService;
+    late CalendarColorService service;
 
     setUp(() async {
       SharedPreferences.setMockInitialValues({});
-      colorService = CalendarColorService();
-      await colorService.init();
+      service = CalendarColorService();
+      await service.init();
     });
 
-    test('initializes with default colors and empty subcalendars', () {
-      expect(colorService.taskColor, CalendarColorService.defaultTaskColor);
-      expect(colorService.googleColor, CalendarColorService.defaultGoogleColor);
-      expect(colorService.subcalendarColors.isEmpty, isTrue);
-    });
-
-    test('getEffectiveSubcalendarColor falls back correctly', () async {
-      const calId = 'work_cal_123';
-      const nativeColor = Color(0xFF00FF00);
-
-      // 1. Without native color or custom color -> falls back to googleColor
+    test('initializes with default colors', () {
+      expect(service.taskColor, CalendarColorService.defaultTaskColor);
+      expect(service.googleColor, CalendarColorService.defaultGoogleColor);
+      expect(service.scheduleColor, CalendarColorService.defaultScheduleColor);
       expect(
-        colorService.getEffectiveSubcalendarColor(calId),
-        colorService.googleColor,
+        service.assignmentColor,
+        CalendarColorService.defaultAssignmentColor,
       );
-
-      // 2. With native color, no custom color -> uses native color
-      expect(
-        colorService.getEffectiveSubcalendarColor(
-          calId,
-          nativeColor: nativeColor,
-        ),
-        nativeColor,
-      );
-
-      // 3. With custom color override -> uses custom color over native color
-      const customColor = Color(0xFFFF0055);
-      await colorService.setSubcalendarColor(calId, customColor);
-
-      expect(colorService.hasCustomSubcalendarColor(calId), isTrue);
-      expect(colorService.getSubcalendarColor(calId), customColor);
-      expect(
-        colorService.getEffectiveSubcalendarColor(
-          calId,
-          nativeColor: nativeColor,
-        ),
-        customColor,
-      );
-    });
-
-    test('resetSubcalendarColor removes override', () async {
-      const calId = 'personal_cal_456';
-      const customColor = Color(0xFF9C27B0);
-      const nativeColor = Color(0xFF4285F4);
-
-      await colorService.setSubcalendarColor(calId, customColor);
-      expect(colorService.hasCustomSubcalendarColor(calId), isTrue);
-
-      await colorService.resetSubcalendarColor(calId);
-      expect(colorService.hasCustomSubcalendarColor(calId), isFalse);
-      expect(
-        colorService.getEffectiveSubcalendarColor(
-          calId,
-          nativeColor: nativeColor,
-        ),
-        nativeColor,
-      );
-    });
-
-    test('resetToDefaults clears all subcalendar overrides', () async {
-      await colorService.setSubcalendarColor('cal_1', const Color(0xFF111111));
-      await colorService.setSubcalendarColor('cal_2', const Color(0xFF222222));
-      expect(colorService.subcalendarColors.length, 2);
-
-      await colorService.resetToDefaults();
-      expect(colorService.subcalendarColors.isEmpty, isTrue);
-      expect(colorService.hasCustomSubcalendarColor('cal_1'), isFalse);
-      expect(colorService.hasCustomSubcalendarColor('cal_2'), isFalse);
     });
 
     test(
-      'reloads subcalendar colors from SharedPreferences during init',
-      () async {
-        SharedPreferences.setMockInitialValues({
-          '${CalendarColorService.keySubcalendarColorsPrefix}school':
-              0xFF123456,
-        });
-
-        final newService = CalendarColorService();
-        await newService.init();
-
-        expect(newService.hasCustomSubcalendarColor('school'), isTrue);
-        expect(
-          newService.getSubcalendarColor('school')?.toARGB32(),
-          0xFF123456,
+      'returns native color by default when no subcalendar override exists',
+      () {
+        const nativeColor = Color(0xFF039BE5);
+        final effective = service.getEffectiveSubcalendarColor(
+          'work@group.calendar.google.com',
+          nativeColor: nativeColor,
         );
+        expect(effective, nativeColor);
+        expect(
+          service.hasCustomSubcalendarColor('work@group.calendar.google.com'),
+          isFalse,
+        );
+      },
+    );
+
+    test(
+      'falls back to global googleColor when both subcalendar override and native color are missing',
+      () {
+        final effective = service.getEffectiveSubcalendarColor('unknown_id');
+        expect(effective, service.googleColor);
+      },
+    );
+
+    test('sets, persists, and retrieves subcalendar color override', () async {
+      const customColor = Color(0xFFE91E63);
+      const calId = 'school@group.calendar.google.com';
+
+      await service.setSubcalendarColor(calId, customColor);
+
+      expect(service.hasCustomSubcalendarColor(calId), isTrue);
+      expect(service.getSubcalendarColor(calId), customColor);
+      expect(
+        service.getEffectiveSubcalendarColor(
+          calId,
+          nativeColor: const Color(0xFF00FF00),
+        ),
+        customColor,
+      );
+
+      // Verify re-initialization from SharedPreferences
+      final reloadedService = CalendarColorService();
+      await reloadedService.init();
+      expect(reloadedService.hasCustomSubcalendarColor(calId), isTrue);
+      expect(reloadedService.getSubcalendarColor(calId), customColor);
+    });
+
+    test('resets subcalendar color to native default', () async {
+      const customColor = Color(0xFFFF9800);
+      const calId = 'family@group.calendar.google.com';
+      const nativeColor = Color(0xFF4CAF50);
+
+      await service.setSubcalendarColor(calId, customColor);
+      expect(
+        service.getEffectiveSubcalendarColor(calId, nativeColor: nativeColor),
+        customColor,
+      );
+
+      await service.resetSubcalendarColor(calId);
+      expect(service.hasCustomSubcalendarColor(calId), isFalse);
+      expect(
+        service.getEffectiveSubcalendarColor(calId, nativeColor: nativeColor),
+        nativeColor,
+      );
+    });
+
+    test(
+      'resets all colors to defaults including subcalendar overrides',
+      () async {
+        await service.setTaskColor(const Color(0xFF112233));
+        await service.setGoogleColor(const Color(0xFF445566));
+        await service.setSubcalendarColor('cal1', const Color(0xFF778899));
+
+        await service.resetToDefaults();
+
+        expect(service.taskColor, CalendarColorService.defaultTaskColor);
+        expect(service.googleColor, CalendarColorService.defaultGoogleColor);
+        expect(service.hasCustomSubcalendarColor('cal1'), isFalse);
       },
     );
   });

@@ -274,6 +274,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get calendarColors => 'Couleurs d\'agenda';
 
   @override
+  String get calendarColorThemingHint =>
+      'Pour personnaliser les couleurs, ouvrez le panneau Couleurs d\'agenda (icône de palette).';
+
+  @override
   String get calendarFiltersTitle => 'Filtres d\'agenda';
 
   @override
@@ -301,10 +305,34 @@ class AppLocalizationsFr extends AppLocalizations {
   String get resetColors => 'Réinitialiser par défaut';
 
   @override
-  String get selectColor => 'Sélectionner une couleur';
+  String get selectColor => 'Sélectionner la couleur';
 
   @override
-  String get selectGoogleCalendars => 'Sélectionner des agendas Google';
+  String get subcalendars => 'Sous-agendas';
+
+  @override
+  String get customColor => 'Couleur personnalisée';
+
+  @override
+  String get resetToGoogleDefault => 'Rétablir la couleur Google';
+
+  @override
+  String get hexCode => 'Code HEX';
+
+  @override
+  String get opacity => 'Opacité';
+
+  @override
+  String get presets => 'Préréglages';
+
+  @override
+  String get expandCustomPicker => 'Couleur personnalisée';
+
+  @override
+  String get noEnabledCalendars => 'Aucun agenda Google activé';
+
+  @override
+  String get selectGoogleCalendars => 'Sélectionner les agendas Google';
 
   @override
   String get selectAll => 'Tout sélectionner';

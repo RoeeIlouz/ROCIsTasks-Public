@@ -16,7 +16,7 @@
         <!-- Color Accent Strip -->
         <FrameLayout
             android:id="@+id/widget_up_next_color_strip"
-            android:layout_width="4dp"
+            android:layout_width="3.5dp"
             android:layout_height="match_parent"
             android:background="@color/widget_primary"
             android:layout_marginEnd="8dp" />
@@ -24,8 +24,8 @@
         <!-- Checkbox / Action (for tasks) -->
         <ImageView
             android:id="@+id/widget_up_next_check"
-            android:layout_width="26dp"
-            android:layout_height="26dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
             android:src="@drawable/ic_circle_outline"
             android:layout_marginEnd="8dp"
             android:clickable="true"
@@ -35,8 +35,8 @@
         <!-- Event Icon (for events) -->
         <ImageView
             android:id="@+id/widget_up_next_event_icon"
-            android:layout_width="22dp"
-            android:layout_height="22dp"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
             android:src="@drawable/ic_calendar_event"
             android:layout_marginEnd="8dp"
             android:visibility="gone"
@@ -65,7 +65,7 @@
                 android:layout_height="wrap_content"
                 android:text="Next Task or Meeting"
                 android:textColor="@color/widget_title_text"
-                android:textSize="13sp"
+                android:textSize="13.5sp"
                 android:fontFamily="sans-serif"
                 android:textStyle="bold"
                 android:maxLines="1"

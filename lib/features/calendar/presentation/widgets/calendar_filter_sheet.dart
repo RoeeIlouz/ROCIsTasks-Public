@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rocis_tasks/core/services/auth_service.dart';
+import 'package:rocis_tasks/core/services/calendar_color_service.dart';
 import 'package:rocis_tasks/features/calendar/presentation/providers/calendar_provider.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
+import 'package:rocis_tasks/features/calendar/presentation/widgets/calendar_coloring_sheet.dart';
 import 'package:rocis_tasks/shared/ui/widgets/glass_container.dart';
 
 class CalendarFilterSheet extends StatelessWidget {
@@ -32,17 +34,18 @@ class CalendarFilterSheet extends StatelessWidget {
                     child: Container(
                       width: 40,
                       height: 4,
-                      margin: const EdgeInsets.only(bottom: 20),
                       decoration: BoxDecoration(
-                        color: Theme.of(context).dividerColor,
+                        color: Colors.grey.withValues(alpha: 0.3),
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
                   ),
+                  const SizedBox(height: 16),
                   Text(
                     l10n.calendarFiltersTitle,
-                    style: Theme.of(context).textTheme.headlineSmall,
-                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 24),
                   GlassContainer(
@@ -65,6 +68,15 @@ class CalendarFilterSheet extends StatelessWidget {
                             provider.updateFilters(showGoogleCalendar: value);
                           },
                           secondary: const Icon(Icons.event_note_rounded),
+                        ),
+                        const Divider(height: 1),
+                        SwitchListTile(
+                          title: Text(l10n.showRocisSchedule),
+                          value: provider.showRocisSchedule,
+                          onChanged: (value) {
+                            provider.updateFilters(showRocisSchedule: value);
+                          },
+                          secondary: const Icon(Icons.school_rounded),
                         ),
                         if (provider.isGoogleCalendarTokenExpired) ...[
                           const Divider(height: 1),
@@ -158,6 +170,18 @@ class CalendarFilterSheet extends StatelessWidget {
                                     calendar.accountName != null &&
                                     calendar.accountName!.trim().isNotEmpty &&
                                     calendar.accountName != calendarName;
+                                final colorService =
+                                    Provider.of<CalendarColorService>(context);
+                                final Color? nativeColor =
+                                    calendar.color != null
+                                    ? Color(calendar.color!)
+                                    : null;
+                                final Color effectiveColor = colorService
+                                    .getEffectiveSubcalendarColor(
+                                      calendar.id,
+                                      nativeColor: nativeColor,
+                                    );
+
                                 return CheckboxListTile(
                                   title: Text(calendarName),
                                   subtitle: hasSubtitle
@@ -171,14 +195,72 @@ class CalendarFilterSheet extends StatelessWidget {
                                       );
                                     }
                                   },
-                                  secondary: Container(
-                                    width: 12,
-                                    height: 12,
-                                    decoration: BoxDecoration(
-                                      color: calendar.color != null
-                                          ? Color(calendar.color!)
-                                          : Colors.grey,
-                                      shape: BoxShape.circle,
+                                  secondary: Tooltip(
+                                    message: l10n.calendarColorThemingHint,
+                                    child: InkResponse(
+                                      radius: 20,
+                                      onTap: () {
+                                        Navigator.of(context).pop();
+                                        showModalBottomSheet(
+                                          context: context,
+                                          isScrollControlled: true,
+                                          backgroundColor: Colors.transparent,
+                                          constraints: const BoxConstraints(
+                                            maxWidth: 500,
+                                          ),
+                                          builder: (context) =>
+                                              const CalendarColoringSheet(),
+                                        );
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            content: Row(
+                                              children: [
+                                                const Icon(
+                                                  Icons.palette_outlined,
+                                                  color: Colors.white,
+                                                  size: 18,
+                                                ),
+                                                const SizedBox(width: 8),
+                                                Expanded(
+                                                  child: Text(
+                                                    l10n.calendarColorThemingHint,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            behavior: SnackBarBehavior.floating,
+                                            duration: const Duration(
+                                              seconds: 3,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      child: Container(
+                                        width: 16,
+                                        height: 16,
+                                        decoration: BoxDecoration(
+                                          color: effectiveColor,
+                                          shape: BoxShape.circle,
+                                          border: Border.all(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .outline
+                                                .withValues(alpha: 0.3),
+                                            width: 1.5,
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: effectiveColor.withValues(
+                                                alpha: 0.35,
+                                              ),
+                                              blurRadius: 4,
+                                              offset: const Offset(0, 1),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 );

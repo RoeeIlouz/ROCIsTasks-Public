@@ -56,10 +56,20 @@ class TaskTile extends StatelessWidget {
   static final _timeFormat24 = DateFormat.Hm();
   static final _timeFormat12 = DateFormat.jm();
 
+  bool _isTaskFeedbackEnabled(ThemeService service) {
+    try {
+      final dynamic val = service.taskCompletionFeedback;
+      return val == true;
+    } catch (_) {
+      return true;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final themeService = Provider.of<ThemeService>(context);
+    final hasTaskFeedback = _isTaskFeedbackEnabled(themeService);
     final l10n = AppLocalizations.of(context)!;
     SubscriptionService? subscriptionService;
     try {
@@ -80,425 +90,453 @@ class TaskTile extends StatelessWidget {
         (privateModeService?.hasPin ?? false) &&
         (categories.any((c) => c.isPrivate));
 
-    return Dismissible(
-      key: Key(task.id),
-      direction: enableSwipeToDelete
-          ? DismissDirection.startToEnd
-          : DismissDirection.none,
-      onDismissed: (_) => onDelete(),
-      background: Container(
-        margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-        decoration: BoxDecoration(
-          color: theme.colorScheme.error.withValues(alpha: 0.9),
-          borderRadius: BorderRadius.circular(24),
-        ),
-        alignment: Alignment.centerLeft,
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: const Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Icon(Icons.delete_outline, color: Colors.white, size: 28),
-            Icon(Icons.delete_outline, color: Colors.white, size: 28),
-          ],
-        ),
-      ),
-      child: shouldMaskPrivate
-          ? _MaskedPrivateTaskTile(
-              title: l10n.privateTask,
-              categories: categories,
-              dueDate: task.dueDate,
-              priority: task.priority,
-              isSelected: isSelected,
-              onTap: onTap,
-              onLongPress: onLongPress,
-              isSelectionMode: isSelectionMode,
-            )
-          : GlassContainer(
-              margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-              isSelected: isSelected,
-              selectedBorderColor: categories.isNotEmpty
-                  ? Color(categories.first.colorValue)
-                  : theme.colorScheme.primary,
-              color: isSelected
-                  ? (categories.isNotEmpty
-                        ? Color(categories.first.colorValue)
-                        : theme.colorScheme.primary)
-                  : null,
-              child: Padding(
-                padding: const EdgeInsets.only(
-                  left: 6,
-                  right: 16,
-                  top: 10,
-                  bottom: 10,
+    return RepaintBoundary(
+      child: Dismissible(
+        key: Key(task.id),
+        direction: enableSwipeToDelete
+            ? DismissDirection.horizontal
+            : DismissDirection.none,
+        confirmDismiss: (direction) async {
+          if (direction == DismissDirection.startToEnd) {
+            if (hasTaskFeedback) {
+              if (!task.isCompleted) {
+                HapticFeedback.heavyImpact();
+                Future.delayed(
+                  const Duration(milliseconds: 55),
+                  HapticFeedback.lightImpact,
+                );
+              } else {
+                HapticFeedback.lightImpact();
+              }
+            }
+            onToggle();
+            return false;
+          } else if (direction == DismissDirection.endToStart) {
+            if (hasTaskFeedback) {
+              HapticFeedback.mediumImpact();
+            }
+            return true;
+          }
+          return false;
+        },
+        onDismissed: (_) => onDelete(),
+        background: Container(
+          margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+          decoration: BoxDecoration(
+            color: const Color(0xFF10B981).withValues(alpha: 0.9),
+            borderRadius: BorderRadius.circular(24),
+          ),
+          alignment: Alignment.centerLeft,
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Row(
+            children: [
+              Icon(
+                task.isCompleted
+                    ? Icons.undo_rounded
+                    : Icons.check_circle_rounded,
+                color: Colors.white,
+                size: 26,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                task.isCompleted ? l10n.markAsIncomplete : l10n.markAsComplete,
+                style: GoogleFonts.outfit(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
                 ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (!isSelectionMode && task.isGroceryList)
-                      Padding(
-                        padding: const EdgeInsets.only(
-                          left: 10,
-                          right: 10,
-                          top: 2,
-                          bottom: 18,
-                        ),
-                        child: Icon(
-                          task.isCompleted
-                              ? Icons.check_circle_rounded
-                              : Icons.checklist_rounded,
-                          color: task.isCompleted
-                              ? theme.colorScheme.primary
-                              : (categories.isNotEmpty
-                                        ? Color(categories.first.colorValue)
-                                        : theme.colorScheme.primary)
-                                    .withValues(alpha: 0.7),
-                          size: 26,
-                        ),
-                      )
-                    else
-                      GestureDetector(
-                        behavior: HitTestBehavior.opaque,
-                        onTap: isSelectionMode
-                            ? () => onLongPress?.call()
-                            : () {
-                                if (themeService.taskCompletionFeedback) {
-                                  // Stronger impact when completing, lighter when un-completing
-                                  if (!task.isCompleted) {
-                                    HapticFeedback.mediumImpact();
-                                  } else {
-                                    HapticFeedback.lightImpact();
-                                  }
-                                }
-                                onToggle();
-                              },
-                        child: Padding(
-                          padding: const EdgeInsets.only(
-                            left: 10,
-                            right: 10,
-                            top: 2,
-                            bottom: 18,
+              ),
+            ],
+          ),
+        ),
+        secondaryBackground: Container(
+          margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.error.withValues(alpha: 0.9),
+            borderRadius: BorderRadius.circular(24),
+          ),
+          alignment: Alignment.centerRight,
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Text(
+                l10n.delete,
+                style: GoogleFonts.outfit(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
+              ),
+              const SizedBox(width: 8),
+              const Icon(
+                Icons.delete_outline_rounded,
+                color: Colors.white,
+                size: 26,
+              ),
+            ],
+          ),
+        ),
+        child: shouldMaskPrivate
+            ? _MaskedPrivateTaskTile(
+                title: l10n.privateTask,
+                categories: categories,
+                dueDate: task.dueDate,
+                priority: task.priority,
+                isSelected: isSelected,
+                onTap: onTap,
+                onLongPress: onLongPress,
+                isSelectionMode: isSelectionMode,
+              )
+            : GlassContainer(
+                margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                isSelected: isSelected,
+                selectedBorderColor: categories.isNotEmpty
+                    ? Color(categories.first.colorValue)
+                    : theme.colorScheme.primary,
+                tintColor: categories.isNotEmpty
+                    ? Color(categories.first.colorValue)
+                    : null,
+                color: isSelected
+                    ? (categories.isNotEmpty
+                          ? Color(categories.first.colorValue)
+                          : theme.colorScheme.primary)
+                    : null,
+                child: Padding(
+                  padding: const EdgeInsets.only(
+                    left: 6,
+                    right: 16,
+                    top: 10,
+                    bottom: 10,
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (!isSelectionMode && task.isGroceryList)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
                           ),
-                          child: Semantics(
-                            label: isSelectionMode
-                                ? (isSelected ? 'Selected' : 'Not selected')
-                                : (task.isCompleted
-                                      ? l10n.markAsIncomplete
-                                      : l10n.markAsComplete),
-                            checked: isSelectionMode
-                                ? isSelected
-                                : task.isCompleted,
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 300),
-                              width: 28,
-                              height: 28,
-                              decoration: BoxDecoration(
-                                color:
-                                    (isSelectionMode
-                                        ? isSelected
-                                        : task.isCompleted)
-                                    ? (categories.isNotEmpty
+                          child: Icon(
+                            task.isCompleted
+                                ? Icons.check_circle_rounded
+                                : Icons.checklist_rounded,
+                            color: task.isCompleted
+                                ? theme.colorScheme.primary
+                                : (categories.isNotEmpty
                                           ? Color(categories.first.colorValue)
                                           : theme.colorScheme.primary)
-                                    : Colors.transparent,
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color:
-                                      (isSelectionMode
-                                          ? isSelected
-                                          : task.isCompleted)
-                                      ? Colors.transparent
-                                      : (categories.isNotEmpty
-                                                ? Color(
-                                                    categories.first.colorValue,
-                                                  )
-                                                : theme.colorScheme.primary)
-                                            .withValues(alpha: 0.5),
-                                  width: 2,
-                                ),
-                              ),
-                              child:
-                                  (isSelectionMode
-                                      ? isSelected
-                                      : task.isCompleted)
-                                  ? const Icon(
-                                      Icons.check,
-                                      color: Colors.white,
-                                      size: 18,
-                                    )
-                                  : null,
-                            ),
+                                      .withValues(alpha: 0.7),
+                            size: 26,
                           ),
+                        )
+                      else
+                        BouncyCheckbox(
+                          isChecked: isSelectionMode
+                              ? isSelected
+                              : task.isCompleted,
+                          onTap: isSelectionMode
+                              ? () => onLongPress?.call()
+                              : onToggle,
+                          size: 26,
+                          activeColor: isSelectionMode
+                              ? theme.colorScheme.primary
+                              : (categories.isNotEmpty
+                                    ? Color(categories.first.colorValue)
+                                    : const Color(0xFF10B981)),
+                          borderColor:
+                              (categories.isNotEmpty
+                                      ? Color(categories.first.colorValue)
+                                      : theme.colorScheme.primary)
+                                  .withValues(alpha: 0.5),
+                          enableHaptics: hasTaskFeedback,
+                          enableSparkles: !isSelectionMode,
+                          semanticsLabel: isSelectionMode
+                              ? (isSelected ? 'Selected' : 'Not selected')
+                              : (task.isCompleted
+                                    ? l10n.markAsIncomplete
+                                    : l10n.markAsComplete),
                         ),
-                      ),
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: InkWell(
-                        onTap: isSelectionMode ? onLongPress : onTap,
-                        onLongPress: onLongPress,
-                        borderRadius: BorderRadius.circular(12),
-                        child: Semantics(
-                          label: '${l10n.tasks}: ${task.title}',
-                          hint: l10n.editTaskDetailsHint,
-                          container: true,
-                          child: Padding(
-                            padding: const EdgeInsets.all(4.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Flexible(
-                                      child: Text(
-                                        task.title,
-                                        style: theme.textTheme.titleMedium
-                                            ?.copyWith(
-                                              fontWeight: FontWeight.bold,
-                                              color: task.isCompleted
-                                                  ? theme.disabledColor
-                                                  : theme.colorScheme.onSurface,
-                                              decoration: task.isCompleted
-                                                  ? TextDecoration.lineThrough
-                                                  : null,
-                                            ),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: InkWell(
+                          onTap: isSelectionMode ? onLongPress : onTap,
+                          onLongPress: onLongPress,
+                          borderRadius: BorderRadius.circular(12),
+                          child: Semantics(
+                            label: '${l10n.tasks}: ${task.title}',
+                            hint: l10n.editTaskDetailsHint,
+                            container: true,
+                            child: Padding(
+                              padding: const EdgeInsets.all(4.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Flexible(
+                                        child: Text(
+                                          task.title,
+                                          style: GoogleFonts.outfit(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600,
+                                            letterSpacing: -0.2,
+                                            color: task.isCompleted
+                                                ? theme.disabledColor
+                                                : theme.colorScheme.onSurface,
+                                            decoration: task.isCompleted
+                                                ? TextDecoration.lineThrough
+                                                : null,
+                                          ),
+                                        ),
+                                      ),
+                                      if (task.syncWithGoogleTasks) ...[
+                                        const SizedBox(width: 6),
+                                        const _GTasksBadge(),
+                                      ],
+                                    ],
+                                  ),
+                                  if (task.description.isNotEmpty) ...[
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      task.description,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: GoogleFonts.outfit(
+                                        fontSize: 13,
+                                        color: theme.colorScheme.onSurface
+                                            .withValues(alpha: 0.6),
+                                        height: 1.35,
                                       ),
                                     ),
-                                    if (task.syncWithGoogleTasks) ...[
-                                      const SizedBox(width: 6),
-                                      const _GTasksBadge(),
-                                    ],
                                   ],
-                                ),
-                                if (task.description.isNotEmpty) ...[
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    task.description,
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: theme.textTheme.bodySmall?.copyWith(
-                                      color: theme.colorScheme.onSurface
-                                          .withValues(alpha: 0.6),
-                                      height: 1.4,
-                                    ),
+                                  if (task.subTasks != null &&
+                                      task.subTasks!.isNotEmpty) ...[
+                                    const SizedBox(height: 8),
+                                    _buildSubTasksList(context),
+                                  ],
+                                  const SizedBox(height: 12),
+                                  Wrap(
+                                    spacing: 6,
+                                    runSpacing: 4,
+                                    children: [
+                                      ...categories.map(
+                                        (c) => _buildChip(
+                                          context,
+                                          icon: IconUtils.getIconData(
+                                            c.iconCode,
+                                          ),
+                                          label: c.name,
+                                          color: Color(c.colorValue),
+                                          onTap: isSelectionMode
+                                              ? null
+                                              : () {
+                                                  HapticFeedback.lightImpact();
+                                                  Provider.of<TaskProvider>(
+                                                    context,
+                                                    listen: false,
+                                                  ).selectSingleCategoryFilter(
+                                                    c.id,
+                                                  );
+                                                },
+                                        ),
+                                      ),
+                                      if (task.isGroceryList)
+                                        _buildChip(
+                                          context,
+                                          icon: Icons.checklist_rounded,
+                                          label:
+                                              '${task.subTasks?.where((st) => st.isCompleted).length ?? 0}/${task.subTasks?.length ?? 0}',
+                                          color: theme.colorScheme.primary,
+                                        ),
+                                      if (task.dueDate != null)
+                                        _buildChip(
+                                          context,
+                                          icon: Icons.access_time_rounded,
+                                          label: themeService.use24HourFormat
+                                              ? _timeFormat24.format(
+                                                  task.dueDate!,
+                                                )
+                                              : _timeFormat12.format(
+                                                  task.dueDate!,
+                                                ),
+                                          color:
+                                              (!task.isCompleted &&
+                                                  task.dueDate!.isBefore(
+                                                    DateTime.now(),
+                                                  ))
+                                              ? theme.colorScheme.error
+                                              : theme.colorScheme.primary,
+                                          onTap:
+                                              isSelectionMode ||
+                                                  task.isCompleted
+                                              ? null
+                                              : () => _showRescheduleSheet(
+                                                  context,
+                                                  task,
+                                                  l10n,
+                                                  theme,
+                                                ),
+                                        ),
+                                      if (task.recurrenceRule != null &&
+                                          task.recurrenceRule!
+                                              .trim()
+                                              .isNotEmpty)
+                                        _buildChip(
+                                          context,
+                                          icon: Icons.repeat_rounded,
+                                          label:
+                                              TaskRecurrenceService.getRecurrenceLabel(
+                                                task.recurrenceRule,
+                                                l10n,
+                                              ),
+                                          color: theme.colorScheme.primary,
+                                        ),
+                                      if (task.customFields != null &&
+                                          task.customFields!.isNotEmpty)
+                                        ...task.customFields!
+                                            .where(
+                                              (cf) =>
+                                                  cf.value.isNotEmpty ||
+                                                  cf.label.isNotEmpty,
+                                            )
+                                            .map((cf) {
+                                              final icon =
+                                                  CustomFieldActionService.getIcon(
+                                                    cf.type,
+                                                    cf.value,
+                                                  );
+                                              final displayLabel =
+                                                  cf.value.isNotEmpty
+                                                  ? cf.value
+                                                  : cf.label;
+                                              return _buildChip(
+                                                context,
+                                                icon: icon,
+                                                label: displayLabel,
+                                                color:
+                                                    theme.colorScheme.primary,
+                                              );
+                                            }),
+                                    ],
                                   ),
                                 ],
-                                if (task.subTasks != null &&
-                                    task.subTasks!.isNotEmpty) ...[
-                                  const SizedBox(height: 8),
-                                  _buildSubTasksList(context),
-                                ],
-                                const SizedBox(height: 12),
-                                Wrap(
-                                  spacing: 6,
-                                  runSpacing: 4,
-                                  children: [
-                                    ...categories.map(
-                                      (c) => _buildChip(
-                                        context,
-                                        icon: IconUtils.getIconData(c.iconCode),
-                                        label: c.name,
-                                        color: Color(c.colorValue),
-                                        onTap: isSelectionMode
-                                            ? null
-                                            : () {
-                                                HapticFeedback.lightImpact();
-                                                Provider.of<TaskProvider>(
-                                                  context,
-                                                  listen: false,
-                                                ).selectSingleCategoryFilter(
-                                                  c.id,
-                                                );
-                                              },
-                                      ),
-                                    ),
-                                    if (task.isGroceryList)
-                                      _buildChip(
-                                        context,
-                                        icon: Icons.checklist_rounded,
-                                        label:
-                                            '${task.subTasks?.where((st) => st.isCompleted).length ?? 0}/${task.subTasks?.length ?? 0}',
-                                        color: theme.colorScheme.primary,
-                                      ),
-                                    if (task.dueDate != null)
-                                      _buildChip(
-                                        context,
-                                        icon: Icons.access_time_rounded,
-                                        label: themeService.use24HourFormat
-                                            ? _timeFormat24.format(
-                                                task.dueDate!,
-                                              )
-                                            : _timeFormat12.format(
-                                                task.dueDate!,
-                                              ),
-                                        color:
-                                            (!task.isCompleted &&
-                                                task.dueDate!.isBefore(
-                                                  DateTime.now(),
-                                                ))
-                                            ? theme.colorScheme.error
-                                            : theme.colorScheme.primary,
-                                        onTap:
-                                            isSelectionMode || task.isCompleted
-                                            ? null
-                                            : () => _showRescheduleSheet(
-                                                context,
-                                                task,
-                                                l10n,
-                                                theme,
-                                              ),
-                                      ),
-                                    if (task.recurrenceRule != null &&
-                                        task.recurrenceRule!.trim().isNotEmpty)
-                                      _buildChip(
-                                        context,
-                                        icon: Icons.repeat_rounded,
-                                        label:
-                                            TaskRecurrenceService.getRecurrenceLabel(
-                                              task.recurrenceRule,
-                                              l10n,
-                                            ),
-                                        color: theme.colorScheme.primary,
-                                      ),
-                                    if (task.customFields != null &&
-                                        task.customFields!.isNotEmpty)
-                                      ...task.customFields!
-                                          .where(
-                                            (cf) =>
-                                                cf.value.isNotEmpty ||
-                                                cf.label.isNotEmpty,
-                                          )
-                                          .map((cf) {
-                                            final icon =
-                                                CustomFieldActionService.getIcon(
-                                                  cf.type,
-                                                  cf.value,
-                                                );
-                                            final displayLabel =
-                                                cf.value.isNotEmpty
-                                                ? cf.value
-                                                : cf.label;
-                                            return _buildChip(
-                                              context,
-                                              icon: icon,
-                                              label: displayLabel,
-                                              color: theme.colorScheme.primary,
-                                            );
-                                          }),
-                                  ],
-                                ),
-                              ],
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 16),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (enablePin)
+                      const SizedBox(width: 16),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (enablePin)
+                            Semantics(
+                              label: (task.isPinned ?? false)
+                                  ? l10n.unpinTask
+                                  : l10n.pinTask,
+                              button: true,
+                              child: IconButton(
+                                icon: Icon(
+                                  (task.isPinned ?? false)
+                                      ? Icons.push_pin
+                                      : Icons.push_pin_outlined,
+                                  size: 20,
+                                  color: (task.isPinned ?? false)
+                                      ? theme.colorScheme.primary
+                                      : theme.disabledColor,
+                                ),
+                                onPressed: () {
+                                  HapticFeedback.lightImpact();
+                                  Provider.of<TaskProvider>(
+                                    context,
+                                    listen: false,
+                                  ).toggleTaskPin(task);
+                                },
+                                constraints: const BoxConstraints(
+                                  minWidth: 44,
+                                  minHeight: 44,
+                                ),
+                                padding: const EdgeInsets.all(8),
+                              ),
+                            )
+                          else
+                            const SizedBox(height: 40),
+                          const SizedBox(height: 8),
                           Semantics(
-                            label: (task.isPinned ?? false)
-                                ? l10n.unpinTask
-                                : l10n.pinTask,
-                            button: true,
-                            child: IconButton(
-                              icon: Icon(
-                                (task.isPinned ?? false)
-                                    ? Icons.push_pin
-                                    : Icons.push_pin_outlined,
-                                size: 20,
-                                color: (task.isPinned ?? false)
-                                    ? theme.colorScheme.primary
-                                    : theme.disabledColor,
+                            label: '${l10n.priority}: ${task.priority.name}',
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 3,
                               ),
-                              onPressed: () {
-                                HapticFeedback.lightImpact();
-                                Provider.of<TaskProvider>(
-                                  context,
-                                  listen: false,
-                                ).toggleTaskPin(task);
-                              },
-                              constraints: const BoxConstraints(
-                                minWidth: 44,
-                                minHeight: 44,
-                              ),
-                              padding: const EdgeInsets.all(8),
-                            ),
-                          )
-                        else
-                          const SizedBox(height: 40),
-                        const SizedBox(height: 8),
-                        Semantics(
-                          label: '${l10n.priority}: ${task.priority.name}',
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 3,
-                            ),
-                            decoration: BoxDecoration(
-                              color: _getPriorityColor(
-                                context,
-                                task.priority,
-                              ).withValues(alpha: 0.12),
-                              borderRadius: BorderRadius.circular(6),
-                              border: Border.all(
+                              decoration: BoxDecoration(
                                 color: _getPriorityColor(
                                   context,
                                   task.priority,
-                                ).withValues(alpha: 0.3),
-                                width: 1,
+                                ).withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(
+                                  color: _getPriorityColor(
+                                    context,
+                                    task.priority,
+                                  ).withValues(alpha: 0.3),
+                                  width: 1,
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Container(
+                                    width: 6,
+                                    height: 6,
+                                    decoration: BoxDecoration(
+                                      color: _getPriorityColor(
+                                        context,
+                                        task.priority,
+                                      ),
+                                      shape: BoxShape.circle,
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: _getPriorityColor(
+                                            context,
+                                            task.priority,
+                                          ).withValues(alpha: 0.6),
+                                          blurRadius: 4,
+                                          spreadRadius: 1,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    task.priority.name.toUpperCase(),
+                                    style: GoogleFonts.outfit(
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.bold,
+                                      color: _getPriorityColor(
+                                        context,
+                                        task.priority,
+                                      ),
+                                      letterSpacing: 0.5,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Container(
-                                  width: 6,
-                                  height: 6,
-                                  decoration: BoxDecoration(
-                                    color: _getPriorityColor(
-                                      context,
-                                      task.priority,
-                                    ),
-                                    shape: BoxShape.circle,
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: _getPriorityColor(
-                                          context,
-                                          task.priority,
-                                        ).withValues(alpha: 0.6),
-                                        blurRadius: 4,
-                                        spreadRadius: 1,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  task.priority.name.toUpperCase(),
-                                  style: GoogleFonts.outfit(
-                                    fontSize: 9,
-                                    fontWeight: FontWeight.bold,
-                                    color: _getPriorityColor(
-                                      context,
-                                      task.priority,
-                                    ),
-                                    letterSpacing: 0.5,
-                                  ),
-                                ),
-                              ],
-                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
+      ),
     );
   }
 
@@ -713,47 +751,107 @@ class TaskTile extends StatelessWidget {
   Widget _buildSubTasksList(BuildContext context) {
     final theme = Theme.of(context);
     final provider = Provider.of<TaskProvider>(context, listen: false);
+    final subTasks = task.subTasks!;
+    final completedCount = subTasks.where((st) => st.isCompleted).length;
+    final totalCount = subTasks.length;
+    final progress = totalCount > 0 ? completedCount / totalCount : 0.0;
+    final activeColor = categories.isNotEmpty
+        ? Color(categories.first.colorValue)
+        : theme.colorScheme.primary;
+
+    final isAllDone = totalCount > 0 && completedCount == totalCount;
+    final themeService = Provider.of<ThemeService>(context, listen: false);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: task.subTasks!.map((subTask) {
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 4),
-          child: InkWell(
-            onTap: () => provider.toggleSubTask(task, subTask.id),
-            borderRadius: BorderRadius.circular(8),
-            child: Row(
-              children: [
-                Icon(
-                  subTask.isCompleted
-                      ? Icons.check_box_rounded
-                      : Icons.check_box_outline_blank_rounded,
-                  size: 16,
-                  color: subTask.isCompleted
-                      ? (categories.isNotEmpty
-                            ? Color(categories.first.colorValue)
-                            : theme.colorScheme.primary)
-                      : theme.disabledColor,
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    subTask.title,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: subTask.isCompleted
-                          ? theme.disabledColor
-                          : theme.colorScheme.onSurface,
-                      decoration: subTask.isCompleted
-                          ? TextDecoration.lineThrough
-                          : null,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 6, top: 2),
+          child: Row(
+            children: [
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: LinearProgressIndicator(
+                    value: progress,
+                    minHeight: 5,
+                    backgroundColor: activeColor.withValues(alpha: 0.12),
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      isAllDone ? const Color(0xFF10B981) : activeColor,
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                isAllDone
+                    ? '✓ $completedCount/$totalCount'
+                    : '$completedCount/$totalCount',
+                style: GoogleFonts.outfit(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: isAllDone
+                      ? const Color(0xFF10B981)
+                      : theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                ),
+              ),
+            ],
           ),
-        );
-      }).toList(),
+        ),
+        ...subTasks.map((subTask) {
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 4),
+            child: InkWell(
+              onTap: () {
+                if (_isTaskFeedbackEnabled(themeService)) {
+                  if (!subTask.isCompleted &&
+                      completedCount == totalCount - 1) {
+                    HapticFeedback.heavyImpact();
+                    Future.delayed(
+                      const Duration(milliseconds: 55),
+                      HapticFeedback.lightImpact,
+                    );
+                  } else {
+                    HapticFeedback.lightImpact();
+                  }
+                }
+                provider.toggleSubTask(task, subTask.id);
+              },
+              borderRadius: BorderRadius.circular(8),
+              child: Row(
+                children: [
+                  Icon(
+                    subTask.isCompleted
+                        ? Icons.check_box_rounded
+                        : Icons.check_box_outline_blank_rounded,
+                    size: 16,
+                    color: subTask.isCompleted
+                        ? (isAllDone ? const Color(0xFF10B981) : activeColor)
+                        : theme.disabledColor,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      subTask.title,
+                      style: GoogleFonts.outfit(
+                        fontSize: 12,
+                        color: subTask.isCompleted
+                            ? theme.disabledColor
+                            : theme.colorScheme.onSurface.withValues(
+                                alpha: 0.85,
+                              ),
+                        decoration: subTask.isCompleted
+                            ? TextDecoration.lineThrough
+                            : null,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }),
+      ],
     );
   }
 }
@@ -815,11 +913,16 @@ class _MaskedPrivateTaskTile extends StatelessWidget {
     final themeService = Provider.of<ThemeService>(context, listen: false);
     final priorityColor = _getPriorityColor(priority);
 
+    final categoryColor = categories.isNotEmpty
+        ? Color(categories.first.colorValue)
+        : null;
+
     return GlassContainer(
       margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
       isSelected: isSelected,
-      selectedBorderColor: theme.colorScheme.primary,
-      color: isSelected ? theme.colorScheme.primary : null,
+      selectedBorderColor: categoryColor ?? theme.colorScheme.primary,
+      tintColor: categoryColor,
+      color: isSelected ? (categoryColor ?? theme.colorScheme.primary) : null,
       child: InkWell(
         onTap: () => _handleTap(context),
         onLongPress: onLongPress,

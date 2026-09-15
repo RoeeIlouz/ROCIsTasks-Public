@@ -167,20 +167,13 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
     }
 
     override fun onDataSetChanged() {
-        days.clear()
         try {
             val widgetData = HomeWidgetPlugin.getData(context)
             
             showTasks = widgetData.getBoolean(FullCalendarWidgetProvider.PREF_SHOW_TASKS, true)
             showGoogle = widgetData.getBoolean(FullCalendarWidgetProvider.PREF_SHOW_GOOGLE, true)
+            val showSchedule = widgetData.getBoolean(FullCalendarWidgetProvider.PREF_SHOW_SCHEDULE, true)
             selectedDateStr = widgetData.getString("full_calendar_selected_date", "") ?: ""
-            if (selectedDateStr.isEmpty()) {
-                val today = Calendar.getInstance()
-                selectedDateStr = String.format("%04d-%02d-%02d", 
-                    today.get(Calendar.YEAR),
-                    today.get(Calendar.MONTH) + 1,
-                    today.get(Calendar.DAY_OF_MONTH))
-            }
             widgetTheme = widgetData.getString("full_calendar_theme", "system") ?: "system"
             showWeekNumbers = widgetData.getBoolean("full_calendar_show_week_numbers", true)
             weekendHighlight = widgetData.getBoolean("full_calendar_weekend_highlight", true)
@@ -192,45 +185,87 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
                 highlightColor = Color.parseColor("#EF3842")
             }
             
-            val gridDataJson = widgetData.getString("full_calendar_grid_data", "[]") ?: "[]"
-            val gridData = JSONArray(gridDataJson)
-            for (i in 0 until gridData.length()) {
-                val day = gridData.getJSONObject(i)
-                
-                if (!day.optBoolean("isWeekNumber", false)) {
-                    val summaries = day.optJSONArray("summaries")
-                    if (summaries != null) {
-                        val filteredSummaries = JSONArray()
-                        for (j in 0 until summaries.length()) {
-                            val summary = summaries.getJSONObject(j)
-                            val type = summary.optString("type", "")
-                            
-                            val shouldInclude = when (type) {
-                                "task" -> showTasks
-                                "google" -> showGoogle
-                                else -> true
+            // 1. Index existing summaries by date ("yyyy-MM-dd")
+            val summariesByDate = HashMap<String, JSONArray>()
+            try {
+                val gridDataJson = widgetData.getString("full_calendar_grid_data", "[]") ?: "[]"
+                val gridData = JSONArray(gridDataJson)
+                for (i in 0 until gridData.length()) {
+                    val day = gridData.getJSONObject(i)
+                    if (!day.optBoolean("isWeekNumber", false)) {
+                        val dStr = day.optString("date", "")
+                        if (dStr.isNotEmpty()) {
+                            val summaries = day.optJSONArray("summaries")
+                            val filteredSummaries = JSONArray()
+                            if (summaries != null) {
+                                for (j in 0 until summaries.length()) {
+                                    val summary = summaries.getJSONObject(j)
+                                    val type = summary.optString("type", "")
+                                    val shouldInclude = when (type) {
+                                        "task" -> showTasks
+                                        "google" -> showGoogle
+                                        "schedule", "rocis" -> showSchedule
+                                        else -> true
+                                    }
+                                    if (shouldInclude) {
+                                        filteredSummaries.put(summary)
+                                    }
+                                }
                             }
-                            
-                            if (shouldInclude) {
-                                filteredSummaries.put(summary)
-                            }
+                            summariesByDate[dStr] = filteredSummaries
                         }
-                        day.put("summaries", filteredSummaries)
                     }
                 }
-                
-                days.add(day)
+            } catch (e: Exception) {
+                android.util.Log.e("FullCalendarWidget", "Error indexing summaries by date", e)
             }
 
-            if (days.isEmpty()) {
-                generateFallbackCalendar(widgetData)
+            // 2. Dynamically generate calendar grid for the target PREF_OFFSET
+            days.clear()
+            val offset = widgetData.getInt(FullCalendarWidgetProvider.PREF_OFFSET, 0)
+            val startOfWeek = widgetData.getInt("full_calendar_start_of_week", 7) // 7 = Sun, 1 = Mon, 6 = Sat
+
+            val cal = Calendar.getInstance()
+            cal.set(Calendar.DAY_OF_MONTH, 1)
+            if (offset != 0) {
+                cal.add(Calendar.MONTH, offset)
+            }
+            val targetMonth = cal.get(Calendar.MONTH)
+
+            // Find difference for startOfWeek
+            val javaDayOfWeek = cal.get(Calendar.DAY_OF_WEEK) // 1=Sun, 2=Mon...
+            val dayOfWeekNormalized = if (javaDayOfWeek == Calendar.SUNDAY) 7 else javaDayOfWeek - 1 // 1=Mon, ..., 7=Sun
+            val diff = (dayOfWeekNormalized - startOfWeek + 7) % 7
+            cal.add(Calendar.DAY_OF_MONTH, -diff)
+
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+            for (row in 0 until 6) {
+                val weekObj = JSONObject()
+                weekObj.put("isWeekNumber", true)
+                weekObj.put("weekNumber", cal.get(Calendar.WEEK_OF_YEAR))
+                days.add(weekObj)
+
+                for (col in 0 until 7) {
+                    val dateStr = dateFormat.format(cal.time)
+                    val dayObj = JSONObject()
+                    dayObj.put("isWeekNumber", false)
+                    dayObj.put("date", dateStr)
+                    dayObj.put("day", cal.get(Calendar.DAY_OF_MONTH))
+                    dayObj.put("isCurrentMonth", cal.get(Calendar.MONTH) == targetMonth)
+                    dayObj.put("summaries", summariesByDate[dateStr] ?: JSONArray())
+                    days.add(dayObj)
+
+                    cal.add(Calendar.DAY_OF_MONTH, 1)
+                }
             }
         } catch (e: Exception) {
-            android.util.Log.e("FullCalendarWidget", "Error parsing widget data", e)
-            try {
-                val widgetData = HomeWidgetPlugin.getData(context)
-                generateFallbackCalendar(widgetData)
-            } catch (_: Exception) {}
+            android.util.Log.e("FullCalendarWidget", "Error updating widget dataset", e)
+            if (days.isEmpty()) {
+                try {
+                    val widgetData = HomeWidgetPlugin.getData(context)
+                    generateFallbackCalendar(widgetData)
+                } catch (_: Exception) {}
+            }
         }
     }
 

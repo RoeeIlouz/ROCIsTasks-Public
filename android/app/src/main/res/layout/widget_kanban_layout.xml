@@ -17,13 +17,15 @@
 
         <TextView
             android:id="@+id/widget_kanban_prev"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:gravity="center"
-            android:text="❮"
+            android:text="‹"
             android:textColor="@color/widget_title_text"
-            android:textSize="15sp"
+            android:textSize="18sp"
             android:textStyle="bold"
+            android:background="@drawable/widget_nav_icon_bg"
+            android:layout_marginEnd="4dp"
             android:clickable="true"
             android:focusable="true" />
 
@@ -64,25 +66,29 @@
 
         <TextView
             android:id="@+id/widget_kanban_next"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:gravity="center"
-            android:text="❯"
+            android:text="›"
             android:textColor="@color/widget_title_text"
-            android:textSize="15sp"
+            android:textSize="18sp"
             android:textStyle="bold"
+            android:background="@drawable/widget_nav_icon_bg"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp"
             android:clickable="true"
             android:focusable="true" />
 
         <TextView
             android:id="@+id/widget_kanban_add_btn"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:gravity="center"
             android:text="+"
             android:textColor="@color/widget_primary"
-            android:textSize="24sp"
+            android:textSize="20sp"
             android:textStyle="bold"
+            android:background="@drawable/widget_nav_icon_bg"
             android:clickable="true"
             android:focusable="true" />
     </LinearLayout>
@@ -100,12 +106,13 @@
         <TextView
             android:id="@+id/widget_kanban_tab_todo"
             android:layout_width="0dp"
-            android:layout_height="26dp"
+            android:layout_height="28dp"
             android:layout_weight="1"
             android:gravity="center"
             android:text="To Do"
             android:textColor="@color/widget_title_text"
             android:textSize="11sp"
+            android:fontFamily="sans-serif-medium"
             android:textStyle="bold"
             android:background="@drawable/widget_pill_bg"
             android:layout_marginEnd="4dp"
@@ -115,12 +122,13 @@
         <TextView
             android:id="@+id/widget_kanban_tab_focus"
             android:layout_width="0dp"
-            android:layout_height="26dp"
+            android:layout_height="28dp"
             android:layout_weight="1"
             android:gravity="center"
             android:text="In Focus"
             android:textColor="@color/widget_secondary_text"
             android:textSize="11sp"
+            android:fontFamily="sans-serif-medium"
             android:textStyle="bold"
             android:layout_marginEnd="4dp"
             android:clickable="true"
@@ -129,12 +137,13 @@
         <TextView
             android:id="@+id/widget_kanban_tab_done"
             android:layout_width="0dp"
-            android:layout_height="26dp"
+            android:layout_height="28dp"
             android:layout_weight="1"
             android:gravity="center"
             android:text="Done"
             android:textColor="@color/widget_secondary_text"
             android:textSize="11sp"
+            android:fontFamily="sans-serif-medium"
             android:textStyle="bold"
             android:clickable="true"
             android:focusable="true" />

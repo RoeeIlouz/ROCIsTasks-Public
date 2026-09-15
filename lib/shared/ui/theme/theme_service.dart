@@ -16,6 +16,8 @@ class ThemeService extends ChangeNotifier {
   Locale? _locale;
   bool _useCustomSeedColor = false;
   int? _customSeedColorValue;
+  bool _betaFeaturesUnlocked = false;
+  bool _enableScheduleIntegration = false;
 
   ThemeMode get themeMode => _themeMode;
   bool get useMaterialTheme => _useMaterialTheme;
@@ -27,6 +29,8 @@ class ThemeService extends ChangeNotifier {
   Locale? get locale => _locale;
   bool get useCustomSeedColor => _useCustomSeedColor;
   int? get customSeedColorValue => _customSeedColorValue;
+  bool get betaFeaturesUnlocked => _betaFeaturesUnlocked;
+  bool get enableScheduleIntegration => _enableScheduleIntegration;
 
   Future<void> init() async {
     final prefs = await SharedPreferences.getInstance();
@@ -47,6 +51,10 @@ class ThemeService extends ChangeNotifier {
     _autoRemoveNlpDates = prefs.getBool('auto_remove_nlp_dates') ?? true;
     // Load task completion feedback
     _taskCompletionFeedback = prefs.getBool('task_completion_feedback') ?? true;
+    // Load Beta Features & Schedule Integration
+    _betaFeaturesUnlocked = prefs.getBool('beta_features_unlocked') ?? false;
+    _enableScheduleIntegration =
+        prefs.getBool('beta_schedule_integration') ?? false;
     // Load Locale
     final languageCode = prefs.getString('language_code');
     if (languageCode != null) {
@@ -199,5 +207,28 @@ class ThemeService extends ChangeNotifier {
       await prefs.setInt('custom_seed_color_value', colorValue);
     }
     await prefs.setBool('use_custom_seed_color', _useCustomSeedColor);
+  }
+
+  Future<void> unlockBetaFeatures() async {
+    _betaFeaturesUnlocked = true;
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('beta_features_unlocked', true);
+  }
+
+  Future<void> setEnableScheduleIntegration(bool value) async {
+    _enableScheduleIntegration = value;
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('beta_schedule_integration', value);
+    if (!kIsWeb) {
+      await HomeWidget.saveWidgetData<bool>('beta_schedule_integration', value);
+      try {
+        await HomeWidget.updateWidget(
+          name: 'FullCalendarWidgetProvider',
+          androidName: 'FullCalendarWidgetProvider',
+        );
+      } catch (_) {}
+    }
   }
 }

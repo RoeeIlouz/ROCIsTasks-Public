@@ -1,741 +1,491 @@
-// Service for fetching schedule data from ROCIs-Schedule Firestore database
-// Uses email-based lookup to find the user's data across Firebase projects
-
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:rocis_tasks/core/models/schedule_data.dart';
-import 'package:rocis_tasks/core/services/logger_service.dart';
-import 'package:firebase_performance/firebase_performance.dart';
-import 'package:hive_ce_flutter/hive_ce_flutter.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:rocis_tasks/core/services/analytics_service.dart';
 
-/// Service to fetch schedule data from the ROCIs-Schedule Firestore database.
-///
-/// This connects to the rocis-schedule Firebase project as a secondary app
-/// and uses email-based lookup to find the user's data across Firebase projects.
+class SyncedScheduleEvent {
+  final String id;
+  final String title;
+  final String courseId;
+  final String courseName;
+  final String courseCode;
+  final String location;
+  final int typeIndex;
+  final DateTime startTime;
+  final DateTime endTime;
+  final bool recurring;
+  final List<int> daysOfWeek;
+  final Color color;
+  final String notes;
+
+  const SyncedScheduleEvent({
+    required this.id,
+    required this.title,
+    required this.courseId,
+    required this.courseName,
+    required this.courseCode,
+    required this.location,
+    required this.typeIndex,
+    required this.startTime,
+    required this.endTime,
+    required this.recurring,
+    required this.daysOfWeek,
+    required this.color,
+    required this.notes,
+  });
+
+  bool occursOnDay(DateTime day) {
+    if (recurring) {
+      final normalizedDay = DateTime(day.year, day.month, day.day);
+      final eventStartDay = DateTime(
+        startTime.year,
+        startTime.month,
+        startTime.day,
+      );
+      if (normalizedDay.isBefore(eventStartDay)) return false;
+
+      // Dart DateTime weekday: 1=Mon ... 7=Sun.
+      // Schedule app convention: 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat.
+      final int scheduleWeekday = day.weekday == DateTime.sunday
+          ? 0
+          : day.weekday;
+      return daysOfWeek.contains(scheduleWeekday);
+    } else {
+      return startTime.year == day.year &&
+          startTime.month == day.month &&
+          startTime.day == day.day;
+    }
+  }
+
+  /// Construct SyncedScheduleEvent from Firestore map with course lookup.
+  factory SyncedScheduleEvent.fromMap(
+    Map<String, dynamic> map, {
+    Map<String, dynamic>? courseMap,
+  }) {
+    DateTime parseDate(dynamic val, DateTime fallback) {
+      if (val is Timestamp) return val.toDate();
+      if (val is String) return DateTime.tryParse(val) ?? fallback;
+      return fallback;
+    }
+
+    final start = parseDate(map['startTime'], DateTime(2020, 1, 1));
+    final end = parseDate(map['endTime'], start.add(const Duration(hours: 1)));
+
+    List<int> parsedDays = [];
+    final rawDays = map['daysOfWeek'];
+    if (rawDays is List) {
+      parsedDays = rawDays
+          .map((e) => int.tryParse(e.toString()))
+          .whereType<int>()
+          .toList();
+    } else if (rawDays is String && rawDays.isNotEmpty) {
+      parsedDays = rawDays
+          .split(',')
+          .map((e) => int.tryParse(e.trim()))
+          .whereType<int>()
+          .toList();
+    }
+
+    Color eventColor = const Color(0xFF3F51B5);
+    String courseName = '';
+    String courseCode = '';
+
+    if (courseMap != null) {
+      courseName = courseMap['name']?.toString() ?? '';
+      courseCode = courseMap['code']?.toString() ?? '';
+      final rawColor = courseMap['color'];
+      if (rawColor is int) {
+        eventColor = Color(rawColor);
+      } else if (rawColor is num) {
+        eventColor = Color(rawColor.toInt());
+      } else if (rawColor != null) {
+        final parsed = int.tryParse(rawColor.toString());
+        if (parsed != null) eventColor = Color(parsed);
+      }
+    }
+
+    return SyncedScheduleEvent(
+      id: map['id']?.toString() ?? '',
+      title: map['title']?.toString() ?? '',
+      courseId: map['courseId']?.toString() ?? '',
+      courseName: courseName,
+      courseCode: courseCode,
+      location: map['location']?.toString() ?? '',
+      typeIndex: (map['type'] is num) ? (map['type'] as num).toInt() : 0,
+      startTime: start,
+      endTime: end,
+      recurring: map['recurring'] == 1 || map['recurring'] == true,
+      daysOfWeek: parsedDays,
+      color: eventColor,
+      notes: map['notes']?.toString() ?? '',
+    );
+  }
+}
+
 class ScheduleFirestoreService {
+  static const FirebaseOptions _webOptions = FirebaseOptions(
+    apiKey: 'AIzaSyD2OHYo8F6h486p58HkL8VCFDSdu7HH67c',
+    appId: '1:318456267857:web:0d72df7ff505f88c53a470',
+    messagingSenderId: '318456267857',
+    projectId: 'rocis-schedule',
+    authDomain: 'rocis-schedule.firebaseapp.com',
+    storageBucket: 'rocis-schedule.firebasestorage.app',
+  );
+
+  static const FirebaseOptions _androidOptions = FirebaseOptions(
+    apiKey: 'AIzaSyDfHAfG-A3o0ZUyMtudxKkah6wsTKy9z10',
+    appId: '1:318456267857:android:4e12279b28b58c3353a470',
+    messagingSenderId: '318456267857',
+    projectId: 'rocis-schedule',
+    storageBucket: 'rocis-schedule.firebasestorage.app',
+  );
+
+  static FirebaseOptions get _platformOptions {
+    if (kIsWeb) return _webOptions;
+    return _androidOptions;
+  }
+
   FirebaseFirestore? _scheduleDb;
   bool _isInitialized = false;
-  Map<String, CourseData>? _coursesCache;
-  DateTime? _lastCacheTime;
-  String? _cachedScheduleUserId;
   String? _userEmail;
-  Box? _cacheBox;
-  static const String _boxName = 'scheduleCacheBox';
+  String? _cachedScheduleUserId;
+  List<SyncedScheduleEvent>? _cachedEvents;
+  DateTime? _lastFetchTime;
+  static const Duration _cacheTtl = Duration(minutes: 5);
 
-  // Range-based cache
-  List<ScheduleEventData>? _eventsCache;
-  DateTime? _lastEventsCacheTime;
-  String? _eventsCacheKey; // userId_start_end
+  bool get isReady => _isInitialized && _scheduleDb != null;
 
-  List<AssignmentData>? _assignmentsCache;
-  DateTime? _lastAssignmentsCacheTime;
-  String? _assignmentsCacheKey;
+  /// Set user email for cross-app lookup
+  void setUserEmail(String? email) {
+    if (_userEmail != email) {
+      _userEmail = email;
+      _cachedScheduleUserId = null;
+      _cachedEvents = null;
+      _lastFetchTime = null;
+      SharedPreferences.getInstance()
+          .then((prefs) {
+            prefs.remove('cached_schedule_user_id');
+          })
+          .catchError((_) {});
+    }
+  }
 
-  static const _cacheTtl = Duration(hours: 1);
+  /// Compatibility: clear any in-memory cached data.
+  void clearCache() {
+    _cachedScheduleUserId = null;
+    _cachedEvents = null;
+    _lastFetchTime = null;
+    SharedPreferences.getInstance()
+        .then((prefs) {
+          prefs.remove('cached_schedule_user_id');
+        })
+        .catchError((_) {});
+  }
 
-  /// Initialize the service with the secondary Firebase app.
-  ///
-  /// Throws an error if the 'rocis-schedule' app is not configured.
+  Future<void> _saveCachedUserId(String userId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('cached_schedule_user_id', userId);
+    } catch (_) {}
+  }
+
   Future<void> initialize() async {
     if (_isInitialized) return;
-
     try {
-      // Check if default Firebase app is initialized first
       if (Firebase.apps.isEmpty) {
-        AppLogger.warning(
-          'Default Firebase not initialized yet, skipping Schedule service init',
+        debugPrint(
+          'ScheduleFirestoreService: Default Firebase not initialized',
         );
         return;
       }
 
-      // Get the secondary Firebase app (rocis-schedule)
-      final scheduleApp = Firebase.app('rocis-schedule');
+      FirebaseApp scheduleApp;
+      try {
+        scheduleApp = Firebase.app('rocis-schedule');
+      } catch (_) {
+        scheduleApp = await Firebase.initializeApp(
+          name: 'rocis-schedule',
+          options: _platformOptions,
+        );
+      }
+
       _scheduleDb = FirebaseFirestore.instanceFor(app: scheduleApp);
-
-      // Initialize Hive box for caching
-      _cacheBox = await Hive.openBox(_boxName);
-
       _isInitialized = true;
-      AppLogger.info('ScheduleFirestoreService initialized successfully');
-    } catch (e) {
-      AppLogger.error(
-        'Failed to initialize ScheduleFirestoreService',
-        error: e,
+      debugPrint(
+        'ScheduleFirestoreService: Connected to rocis-schedule secondary app',
       );
-      _isInitialized = false;
+    } catch (e) {
+      debugPrint(
+        'ScheduleFirestoreService: Secondary app init error (non-critical): $e',
+      );
     }
   }
 
-  /// Check if the service is ready to use.
-  bool get isReady => _isInitialized && _scheduleDb != null;
-
-  /// Check if user email is set (required for cross-app access).
-  bool get isAuthenticated => _userEmail != null && _userEmail!.isNotEmpty;
-
-  /// Get the cached schedule user ID (from rocis-schedule project).
-  String? get authenticatedUserId => _cachedScheduleUserId;
-
-  /// Set the user's email for cross-app lookup.
-  ///
-  /// Automatically clears the cache if the email changes.
-  void setUserEmail(String? email) {
-    if (_userEmail != email) {
-      _userEmail = email;
-      clearCache();
-      AppLogger.info('User email set for schedule sync', tag: 'Schedule');
-    }
-  }
-
-  /// Find the user's document ID in rocis-schedule by email.
-  Future<String?> _findUserIdByEmail() async {
-    if (!isReady || _userEmail == null) return null;
-
-    // Return cached ID if available
-    if (_cachedScheduleUserId != null) {
+  /// Resolve ROCIs Schedule user ID. Checks local cache, secondary auth, direct UID doc, then queries by email.
+  Future<String?> _resolveScheduleUserId({String? uid, String? email}) async {
+    if (_cachedScheduleUserId != null && _cachedScheduleUserId!.isNotEmpty) {
       return _cachedScheduleUserId;
     }
 
-    final trace = FirebasePerformance.instance.newTrace('schedule_find_user');
-    await trace.start();
     try {
-      AppLogger.info('Looking up schedule user by email', tag: 'Schedule');
+      final prefs = await SharedPreferences.getInstance();
+      final persistedUid = prefs.getString('cached_schedule_user_id');
+      if (persistedUid != null && persistedUid.isNotEmpty) {
+        _cachedScheduleUserId = persistedUid;
+        return _cachedScheduleUserId;
+      }
+    } catch (_) {}
 
-      // Query users collection for matching email
-      final snapshot = await _scheduleDb!
-          .collection('users')
-          .where('email', isEqualTo: _userEmail)
-          .limit(1)
-          .get();
+    final db = _scheduleDb;
+    if (db == null) return null;
 
-      if (snapshot.docs.isNotEmpty) {
-        _cachedScheduleUserId = snapshot.docs.first.id;
-        AppLogger.info(
-          'Found schedule user ID: $_cachedScheduleUserId',
-          tag: 'Schedule',
+    // 0. Check secondary Firebase Auth currentUser first
+    try {
+      final scheduleApp = Firebase.app('rocis-schedule');
+      final scheduleAuth = FirebaseAuth.instanceFor(app: scheduleApp);
+      final secUid = scheduleAuth.currentUser?.uid;
+      if (secUid != null && secUid.isNotEmpty) {
+        _cachedScheduleUserId = secUid;
+        _saveCachedUserId(secUid);
+        debugPrint(
+          'ScheduleFirestoreService: Resolved user by secondary auth UID: $_cachedScheduleUserId',
         );
         return _cachedScheduleUserId;
-      } else {
-        AppLogger.warning(
-          'No schedule user found with email: $_userEmail',
-          tag: 'Schedule',
-        );
-        return null;
       }
-    } catch (e) {
-      AppLogger.error('Error finding user by email', tag: 'Schedule', error: e);
-      return null;
-    } finally {
-      await trace.stop();
-    }
-  }
+    } catch (_) {}
 
-  /// Fetch all courses for a user.
-  ///
-  /// Used for mapping course IDs to titles and colors.
-  Future<Map<String, CourseData>> getCourses(String userId) async {
-    if (!isReady) {
-      AppLogger.warning(
-        'Schedule service not initialized, returning empty courses',
-      );
-      return {};
-    }
-
-    // Return memory cache if fresh
-    if (_coursesCache != null &&
-        _lastCacheTime != null &&
-        DateTime.now().difference(_lastCacheTime!) < _cacheTtl) {
-      return _coursesCache!;
+    // 1. Direct UID document lookup
+    if (uid != null && uid.isNotEmpty) {
+      try {
+        final doc = await db.collection('users').doc(uid).get();
+        if (doc.exists) {
+          _cachedScheduleUserId = uid;
+          _saveCachedUserId(uid);
+          debugPrint(
+            'ScheduleFirestoreService: Resolved user by UID doc: $uid',
+          );
+          return _cachedScheduleUserId;
+        }
+      } catch (e) {
+        debugPrint('ScheduleFirestoreService: Error checking doc by uid: $e');
+      }
     }
 
-    // Try Hive cache next
-    if (_coursesCache == null && _cacheBox != null) {
-      final cachedData = _cacheBox!.get('courses_$userId');
-      final cachedTime = _cacheBox!.get('courses_time_$userId');
-      if (cachedData != null && cachedTime != null) {
-        final time = DateTime.parse(cachedTime);
-        if (DateTime.now().difference(time) < _cacheTtl) {
-          final Map<String, dynamic> data = Map<String, dynamic>.from(
-            cachedData,
+    // 2. Email lookup across users collection (standard + lowercase + Gmail dotless fallback)
+    final targetEmail = email ?? _userEmail;
+    if (targetEmail != null && targetEmail.isNotEmpty) {
+      final emailVariants = <String>{targetEmail, targetEmail.toLowerCase()};
+      if (targetEmail.contains('@gmail.com') ||
+          targetEmail.toLowerCase().contains('@gmail.com')) {
+        final parts = targetEmail.split('@');
+        final userPart = parts[0];
+        final domainPart = parts[1];
+        final dotless = '${userPart.replaceAll('.', '')}@$domainPart';
+        emailVariants.add(dotless);
+        emailVariants.add(dotless.toLowerCase());
+      }
+
+      for (final variant in emailVariants) {
+        try {
+          final query = await db
+              .collection('users')
+              .where('email', isEqualTo: variant)
+              .limit(1)
+              .get();
+          if (query.docs.isNotEmpty) {
+            _cachedScheduleUserId = query.docs.first.id;
+            _saveCachedUserId(_cachedScheduleUserId!);
+            if (variant != targetEmail) {
+              AnalyticsService().logEvent(
+                name: 'schedule_synergy_dot_fallback',
+                parameters: {'match_type': 'query_variant'},
+              );
+            }
+            debugPrint(
+              'ScheduleFirestoreService: Resolved user by email ($variant) -> $_cachedScheduleUserId',
+            );
+            return _cachedScheduleUserId;
+          }
+        } catch (e) {
+          debugPrint(
+            'ScheduleFirestoreService: Error querying user by email ($variant): $e',
           );
-          _coursesCache = data.map(
-            (key, value) => MapEntry(
-              key,
-              CourseData.fromMap(Map<String, dynamic>.from(value)),
-            ),
-          );
-          _lastCacheTime = time;
-          AppLogger.info(
-            'Loaded courses from persistent cache',
-            tag: 'Schedule',
-          );
-          return _coursesCache!;
         }
       }
+
+      // 3. Fallback: scan user docs with client-side normalized email comparison
+      try {
+        final usersSnap = await db.collection('users').limit(50).get();
+        final normTarget = targetEmail
+            .split('@')
+            .first
+            .replaceAll('.', '')
+            .toLowerCase();
+        for (final doc in usersSnap.docs) {
+          final docEmail = doc.data()['email']?.toString();
+          if (docEmail != null) {
+            final normDoc = docEmail
+                .split('@')
+                .first
+                .replaceAll('.', '')
+                .toLowerCase();
+            if (normDoc == normTarget) {
+              _cachedScheduleUserId = doc.id;
+              _saveCachedUserId(_cachedScheduleUserId!);
+              AnalyticsService().logEvent(
+                name: 'schedule_synergy_dot_fallback',
+                parameters: {'match_type': 'normalized_scan'},
+              );
+              debugPrint(
+                'ScheduleFirestoreService: Resolved user by normalized scan ($docEmail) -> $_cachedScheduleUserId',
+              );
+              return _cachedScheduleUserId;
+            }
+          }
+        }
+      } catch (e) {
+        debugPrint(
+          'ScheduleFirestoreService: Error during user collection scan: $e',
+        );
+      }
+    }
+
+    return null;
+  }
+
+  /// Stream of courses for user
+  Stream<Map<String, Map<String, dynamic>>> streamCourses(String uid) {
+    if (!isReady || uid.isEmpty) {
+      return Stream.value({});
+    }
+
+    return _scheduleDb!
+        .collection('users')
+        .doc(uid)
+        .collection('courses')
+        .snapshots()
+        .map((snapshot) {
+          final coursesMap = <String, Map<String, dynamic>>{};
+          for (final doc in snapshot.docs) {
+            coursesMap[doc.id] = doc.data();
+          }
+          return coursesMap;
+        })
+        .handleError((e) {
+          debugPrint('ScheduleFirestoreService: Error streaming courses: $e');
+          return <String, Map<String, dynamic>>{};
+        });
+  }
+
+  /// Fetch schedule events combined with course metadata.
+  /// Supports optional email for cross-app project resolution.
+  Future<List<SyncedScheduleEvent>> fetchEvents({
+    String? uid,
+    String? email,
+    bool forceRefresh = false,
+  }) async {
+    if (!forceRefresh &&
+        _cachedEvents != null &&
+        _lastFetchTime != null &&
+        DateTime.now().difference(_lastFetchTime!) < _cacheTtl) {
+      return _cachedEvents!;
     }
 
     if (!isReady) {
-      AppLogger.warning(
-        'Schedule service not initialized, returning empty courses',
-      );
-      return {};
+      await initialize();
     }
-
-    // Find the user ID in rocis-schedule by email
-    final scheduleUserId = await _findUserIdByEmail();
-    if (scheduleUserId == null) {
-      return {};
-    }
-
-    final trace = FirebasePerformance.instance.newTrace(
-      'schedule_fetch_courses',
-    );
-    await trace.start();
-    try {
-      AppLogger.info(
-        'Fetching courses for user $scheduleUserId',
-        tag: 'Schedule',
-      );
-      final snapshot = await _scheduleDb!
-          .collection('users')
-          .doc(scheduleUserId)
-          .collection('courses')
-          .get();
-
-      final courses = <String, CourseData>{};
-      for (final doc in snapshot.docs) {
-        final course = CourseData.fromMap(doc.data());
-        courses[course.id] = course;
-      }
-
-      // Update cache
-      _coursesCache = courses;
-      _lastCacheTime = DateTime.now();
-
-      // Persist to Hive
-      if (_cacheBox != null) {
-        final Map<String, dynamic> persistData = courses.map(
-          (key, value) => MapEntry(key, value.toMap()),
-        );
-        _cacheBox!.put('courses_$userId', persistData);
-        _cacheBox!.put(
-          'courses_time_$userId',
-          _lastCacheTime!.toIso8601String(),
-        );
-      }
-
-      AppLogger.info('Fetched ${courses.length} courses', tag: 'Schedule');
-      return courses;
-    } catch (e) {
-      AppLogger.error('Error fetching courses', tag: 'Schedule', error: e);
-      return {};
-    } finally {
-      await trace.stop();
-    }
-  }
-
-  /// Fetch schedule events for a user within a date range.
-  Future<List<ScheduleEventData>> getScheduleEvents(
-    String userId,
-    DateTime startDate,
-    DateTime endDate,
-  ) async {
     if (!isReady) return [];
 
-    final scheduleUserId = await _findUserIdByEmail();
-    if (scheduleUserId == null) return [];
-
-    final cacheKey =
-        '${scheduleUserId}_${startDate.millisecondsSinceEpoch}_${endDate.millisecondsSinceEpoch}';
-
-    if (_eventsCache != null &&
-        _eventsCacheKey == cacheKey &&
-        _lastEventsCacheTime != null &&
-        DateTime.now().difference(_lastEventsCacheTime!) < _cacheTtl) {
-      return _eventsCache!;
-    }
-
-    // Try Hive cache next
-    if (_eventsCache == null && _cacheBox != null) {
-      final cachedData = _cacheBox!.get('events_$cacheKey');
-      final cachedTime = _cacheBox!.get('events_time_$cacheKey');
-      if (cachedData != null && cachedTime != null) {
-        final time = DateTime.parse(cachedTime);
-        if (DateTime.now().difference(time) < _cacheTtl) {
-          final List<dynamic> data = List<dynamic>.from(cachedData);
-          _eventsCache = data
-              .map(
-                (e) => ScheduleEventData.fromMap(Map<String, dynamic>.from(e)),
-              )
-              .toList();
-          _eventsCacheKey = cacheKey;
-          _lastEventsCacheTime = time;
-          AppLogger.info(
-            'Loaded events from persistent cache',
-            tag: 'Schedule',
-          );
-          return _eventsCache!;
-        }
-      }
-    }
-
-    final trace = FirebasePerformance.instance.newTrace(
-      'schedule_fetch_events',
+    final targetUserId = await _resolveScheduleUserId(
+      uid: uid,
+      email: email ?? _userEmail,
     );
-    await trace.start();
-    try {
-      AppLogger.info(
-        'Fetching events for user $scheduleUserId',
-        tag: 'Schedule',
+    if (targetUserId == null || targetUserId.isEmpty) {
+      debugPrint(
+        'ScheduleFirestoreService: Could not resolve schedule user (uid: $uid, email: ${email ?? _userEmail})',
       );
+      return [];
+    }
 
-      // First get courses for color mapping
-      final courses = await getCourses(userId);
-
-      // Fetch all events
-      final snapshot = await _scheduleDb!
+    try {
+      final coursesSnap = await _scheduleDb!
           .collection('users')
-          .doc(scheduleUserId)
+          .doc(targetUserId)
+          .collection('courses')
+          .get();
+      final coursesMap = <String, Map<String, dynamic>>{};
+      for (final doc in coursesSnap.docs) {
+        coursesMap[doc.id] = doc.data();
+      }
+
+      final eventsSnap = await _scheduleDb!
+          .collection('users')
+          .doc(targetUserId)
           .collection('events')
           .get();
 
-      final events = <ScheduleEventData>[];
-
-      for (final doc in snapshot.docs) {
-        try {
-          final data = doc.data();
-          final courseId = data['courseId'] as String?;
-          final courseColor = courseId != null
-              ? courses[courseId]?.color
-              : null;
-
-          final event = ScheduleEventData.fromMap(
-            data,
-            courseColor: courseColor,
-          );
-
-          if (event.recurring && event.daysOfWeek.isNotEmpty) {
-            events.addAll(_expandRecurringEvent(event, startDate, endDate));
-          } else {
-            // Check for event overlap with the range [startDate, endDate]
-            // An event overlaps if it starts before endDate AND ends after startDate
-            if (event.startTime.isBefore(endDate) && 
-                event.endTime.isAfter(startDate)) {
-              events.add(event);
-            }
-          }
-        } catch (e) {
-          AppLogger.error(
-            'Error parsing event ${doc.id}',
-            tag: 'Schedule',
-            error: e,
-          );
-        }
-      }
-
-      events.sort((a, b) => a.startTime.compareTo(b.startTime));
-
-      _eventsCache = events;
-      _eventsCacheKey = cacheKey;
-      _lastEventsCacheTime = DateTime.now();
-
-      // Persist to Hive
-      if (_cacheBox != null) {
-        final List<Map<String, dynamic>> persistData = events
-            .map((e) => e.toMap())
-            .toList();
-        _cacheBox!.put('events_$cacheKey', persistData);
-        _cacheBox!.put(
-          'events_time_$cacheKey',
-          _lastEventsCacheTime!.toIso8601String(),
+      final events = eventsSnap.docs.map((doc) {
+        final data = doc.data();
+        final courseId = data['courseId']?.toString() ?? '';
+        return SyncedScheduleEvent.fromMap(
+          data,
+          courseMap: coursesMap[courseId],
         );
-      }
+      }).toList();
 
+      _cachedEvents = events;
+      _lastFetchTime = DateTime.now();
       return events;
     } catch (e) {
-      AppLogger.error('Error fetching events', tag: 'Schedule', error: e);
+      debugPrint('ScheduleFirestoreService: Error fetching events: $e');
       return [];
-    } finally {
-      await trace.stop();
     }
   }
 
-  /// Fetch schedule events stream for a user within a date range.
-  Stream<List<ScheduleEventData>> getScheduleEventsStream(
-    String userId,
-    DateTime startDate,
-    DateTime endDate,
-  ) async* {
-    if (!isReady) {
-      yield [];
-      return;
+  /// Stream schedule events with course metadata
+  Stream<List<SyncedScheduleEvent>> streamEvents(String uid) {
+    if (!isReady || uid.isEmpty) {
+      return Stream.value([]);
     }
 
-    final scheduleUserId = await _findUserIdByEmail();
-    if (scheduleUserId == null) {
-      yield [];
-      return;
-    }
-
-    AppLogger.info(
-      'Subscribing to events stream for user $scheduleUserId',
-      tag: 'Schedule',
-    );
-
-    yield* _scheduleDb!
+    return _scheduleDb!
         .collection('users')
-        .doc(scheduleUserId)
+        .doc(uid)
         .collection('events')
         .snapshots()
-        .asyncMap((snapshot) async {
+        .asyncMap((eventSnap) async {
           try {
-            final courses = await getCourses(userId);
-            final events = <ScheduleEventData>[];
-
-            for (final doc in snapshot.docs) {
-              try {
-                final data = doc.data();
-                final courseId = data['courseId'] as String?;
-                final courseColor = courseId != null
-                    ? courses[courseId]?.color
-                    : null;
-
-                final event = ScheduleEventData.fromMap(
-                  data,
-                  courseColor: courseColor,
-                );
-
-                if (event.recurring && event.daysOfWeek.isNotEmpty) {
-                  events.addAll(
-                    _expandRecurringEvent(event, startDate, endDate),
-                  );
-                } else {
-                  // Check for event overlap with the range [startDate, endDate]
-                  if (event.startTime.isBefore(endDate) && 
-                      event.endTime.isAfter(startDate)) {
-                    events.add(event);
-                  }
-                }
-              } catch (e) {
-                AppLogger.error(
-                  'Error parsing event in stream',
-                  tag: 'Schedule',
-                  error: e,
-                );
-              }
+            final coursesSnap = await _scheduleDb!
+                .collection('users')
+                .doc(uid)
+                .collection('courses')
+                .get();
+            final coursesMap = <String, Map<String, dynamic>>{};
+            for (final doc in coursesSnap.docs) {
+              coursesMap[doc.id] = doc.data();
             }
 
-            events.sort((a, b) => a.startTime.compareTo(b.startTime));
-            return events;
+            return eventSnap.docs.map((doc) {
+              final data = doc.data();
+              final courseId = data['courseId']?.toString() ?? '';
+              return SyncedScheduleEvent.fromMap(
+                data,
+                courseMap: coursesMap[courseId],
+              );
+            }).toList();
           } catch (e) {
-            AppLogger.error(
-              'Error processing events stream',
-              tag: 'Schedule',
-              error: e,
+            debugPrint(
+              'ScheduleFirestoreService: Error mapping events stream: $e',
             );
-            return <ScheduleEventData>[];
+            return <SyncedScheduleEvent>[];
           }
+        })
+        .handleError((e) {
+          debugPrint('ScheduleFirestoreService: Stream error: $e');
+          return <SyncedScheduleEvent>[];
         });
-  }
-
-  /// Fetch assignments stream for a user within a date range.
-  Stream<List<AssignmentData>> getAssignmentsStream(
-    String userId,
-    DateTime startDate,
-    DateTime endDate,
-  ) async* {
-    if (!isReady) {
-      yield [];
-      return;
-    }
-
-    final scheduleUserId = await _findUserIdByEmail();
-    if (scheduleUserId == null) {
-      yield [];
-      return;
-    }
-
-    AppLogger.info(
-      'Subscribing to assignments stream for user $scheduleUserId',
-      tag: 'Schedule',
-    );
-
-    yield* _scheduleDb!
-        .collection('users')
-        .doc(scheduleUserId)
-        .collection('assignments')
-        .snapshots()
-        .asyncMap((snapshot) async {
-          try {
-            final courses = await getCourses(userId);
-            final assignments = <AssignmentData>[];
-
-            for (final doc in snapshot.docs) {
-              try {
-                final data = doc.data();
-                final courseId = data['courseId'] as String?;
-                final courseColor = courseId != null
-                    ? courses[courseId]?.color
-                    : null;
-
-                final assignment = AssignmentData.fromMap(
-                  data,
-                  courseColor: courseColor,
-                );
-
-                if (!assignment.isCompleted &&
-                    assignment.dueDate.isAfter(startDate.subtract(const Duration(seconds: 1))) &&
-                    assignment.dueDate.isBefore(endDate.add(const Duration(seconds: 1)))) {
-                  assignments.add(assignment);
-                }
-              } catch (e) {
-                AppLogger.error(
-                  'Error parsing assignment in stream',
-                  tag: 'Schedule',
-                  error: e,
-                );
-              }
-            }
-
-            assignments.sort((a, b) => a.dueDate.compareTo(b.dueDate));
-            return assignments;
-          } catch (e) {
-            AppLogger.error(
-              'Error processing assignments stream',
-              tag: 'Schedule',
-              error: e,
-            );
-            return <AssignmentData>[];
-          }
-        });
-  }
-
-  /// Clear the courses cache (call when user changes).
-  void clearCache() {
-    _coursesCache = null;
-    _lastCacheTime = null;
-    _cachedScheduleUserId = null;
-    _eventsCache = null;
-    _eventsCacheKey = null;
-    _lastEventsCacheTime = null;
-    _assignmentsCache = null;
-    _assignmentsCacheKey = null;
-    _lastAssignmentsCacheTime = null;
-    _cacheBox?.clear();
-  }
-
-  /// Get all schedule data combined (events + assignments) for widget display.
-  Future<List<Map<String, dynamic>>> getScheduleDataForWidget(
-    String userId,
-    DateTime startDate,
-    DateTime endDate,
-  ) async {
-    final widgetData = <Map<String, dynamic>>[];
-
-    final events = await getScheduleEvents(userId, startDate, endDate);
-    for (final event in events) {
-      widgetData.add({
-        'type': 'schedule_event',
-        'id': event.id,
-        'title': event.title,
-        'description': event.notes,
-        'category_color': event.courseColor != null
-            ? '#${event.courseColor!.toARGB32().toRadixString(16).padLeft(8, '0')}'
-            : '#4285F4',
-        'date': event.startTime.toIso8601String(),
-        'endDate': event.endTime.toIso8601String(),
-        'isAllDay': false,
-        'location': event.location,
-        'eventType': event.eventTypeName,
-        'courseId': event.courseId,
-      });
-    }
-
-    final assignments = await getAssignments(userId, startDate, endDate);
-    for (final assignment in assignments) {
-      widgetData.add({
-        'type': 'assignment',
-        'id': assignment.id,
-        'title': assignment.title,
-        'description': assignment.description,
-        'category_color': assignment.courseColor != null
-            ? '#${assignment.courseColor!.toARGB32().toRadixString(16).padLeft(8, '0')}'
-            : '#FF9800',
-        'date': assignment.dueDate.toIso8601String(),
-        'isAllDay': true,
-        'priority': assignment.priorityName,
-        'courseId': assignment.courseId,
-      });
-    }
-
-    widgetData.sort((a, b) {
-      final dateA = DateTime.parse(a['date'] as String);
-      final dateB = DateTime.parse(b['date'] as String);
-      return dateA.compareTo(dateB);
-    });
-
-    return widgetData;
-  }
-
-  /// Fetch assignments for a user within a date range (synchronous helper).
-  Future<List<AssignmentData>> getAssignments(
-    String userId,
-    DateTime startDate,
-    DateTime endDate,
-  ) async {
-    if (!isReady) return [];
-
-    final scheduleUserId = await _findUserIdByEmail();
-    if (scheduleUserId == null) return [];
-
-    final cacheKey =
-        '${scheduleUserId}_${startDate.millisecondsSinceEpoch}_${endDate.millisecondsSinceEpoch}';
-
-    if (_assignmentsCache != null &&
-        _assignmentsCacheKey == cacheKey &&
-        _lastAssignmentsCacheTime != null &&
-        DateTime.now().difference(_lastAssignmentsCacheTime!) < _cacheTtl) {
-      return _assignmentsCache!;
-    }
-
-    // Try Hive cache next
-    if (_assignmentsCache == null && _cacheBox != null) {
-      final cachedData = _cacheBox!.get('assignments_$cacheKey');
-      final cachedTime = _cacheBox!.get('assignments_time_$cacheKey');
-      if (cachedData != null && cachedTime != null) {
-        final time = DateTime.parse(cachedTime);
-        if (DateTime.now().difference(time) < _cacheTtl) {
-          final List<dynamic> data = List<dynamic>.from(cachedData);
-          _assignmentsCache = data
-              .map((e) => AssignmentData.fromMap(Map<String, dynamic>.from(e)))
-              .toList();
-          _assignmentsCacheKey = cacheKey;
-          _lastAssignmentsCacheTime = time;
-          AppLogger.info(
-            'Loaded assignments from persistent cache',
-            tag: 'Schedule',
-          );
-          return _assignmentsCache!;
-        }
-      }
-    }
-
-    final trace = FirebasePerformance.instance.newTrace(
-      'schedule_fetch_assignments',
-    );
-    await trace.start();
-    try {
-      final courses = await getCourses(userId);
-      final snapshot = await _scheduleDb!
-          .collection('users')
-          .doc(scheduleUserId)
-          .collection('assignments')
-          .get();
-
-      final assignments = <AssignmentData>[];
-
-      for (final doc in snapshot.docs) {
-        try {
-          final data = doc.data();
-          final courseId = data['courseId'] as String?;
-          final courseColor = courseId != null
-              ? courses[courseId]?.color
-              : null;
-          final assignment = AssignmentData.fromMap(
-            data,
-            courseColor: courseColor,
-          );
-
-          if (!assignment.isCompleted &&
-              assignment.dueDate.isAfter(startDate.subtract(const Duration(seconds: 1))) &&
-              assignment.dueDate.isBefore(endDate.add(const Duration(seconds: 1)))) {
-            assignments.add(assignment);
-          }
-        } catch (e) {
-          AppLogger.error(
-            'Error parsing assignment',
-            tag: 'Schedule',
-            error: e,
-          );
-        }
-      }
-
-      assignments.sort((a, b) => a.dueDate.compareTo(b.dueDate));
-
-      _assignmentsCache = assignments;
-      _assignmentsCacheKey = cacheKey;
-      _lastAssignmentsCacheTime = DateTime.now();
-
-      // Persist to Hive
-      if (_cacheBox != null) {
-        final List<Map<String, dynamic>> persistData = assignments
-            .map((e) => e.toMap())
-            .toList();
-        _cacheBox!.put('assignments_$cacheKey', persistData);
-        _cacheBox!.put(
-          'assignments_time_$cacheKey',
-          _lastAssignmentsCacheTime!.toIso8601String(),
-        );
-      }
-
-      return assignments;
-    } catch (e) {
-      AppLogger.error('Error fetching assignments', tag: 'Schedule', error: e);
-      return [];
-    } finally {
-      await trace.stop();
-    }
-  }
-
-  /// Expand a recurring event into individual occurrences within the date range.
-  List<ScheduleEventData> _expandRecurringEvent(
-    ScheduleEventData event,
-    DateTime rangeStart,
-    DateTime rangeEnd,
-  ) {
-    final occurrences = <ScheduleEventData>[];
-    var current = rangeStart;
-
-    int maxIterations = 365;
-    int iterations = 0;
-
-    while (current.isBefore(rangeEnd) && iterations < maxIterations) {
-      final dartWeekday = current.weekday;
-      final scheduleWeekday = dartWeekday == 7 ? 0 : dartWeekday;
-
-      if (event.daysOfWeek.contains(scheduleWeekday)) {
-        final occurrenceStart = DateTime(
-          current.year,
-          current.month,
-          current.day,
-          event.startTime.hour,
-          event.startTime.minute,
-        );
-        final occurrenceEnd = DateTime(
-          current.year,
-          current.month,
-          current.day,
-          event.endTime.hour,
-          event.endTime.minute,
-        );
-
-        if (occurrenceStart.isAfter(
-              rangeStart.subtract(const Duration(days: 1)),
-            ) &&
-            occurrenceStart.isBefore(rangeEnd.add(const Duration(days: 1)))) {
-          occurrences.add(
-            event.copyWith(
-              id: '${event.id}_${current.toIso8601String().split('T')[0]}',
-              startTime: occurrenceStart,
-              endTime: occurrenceEnd,
-            ),
-          );
-        }
-      }
-
-      current = current.add(const Duration(days: 1));
-      iterations++;
-    }
-
-    return occurrences;
   }
 }

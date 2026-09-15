@@ -3,3 +3,5 @@ export 'theme/theme_service.dart';
 export 'widgets/circular_task_chart.dart';
 export 'widgets/input_decorations.dart';
 export 'widgets/glass_container.dart';
+export 'widgets/celebration_particle_burst.dart';
+export 'widgets/bouncy_checkbox.dart';

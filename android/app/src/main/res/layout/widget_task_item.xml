@@ -4,65 +4,83 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="0dp"
-    android:gravity="fill_vertical">
+    android:gravity="center_vertical"
+    android:background="@drawable/widget_card_bg"
+    android:layout_marginTop="2dp"
+    android:layout_marginBottom="2dp"
+    android:layout_marginStart="2dp"
+    android:layout_marginEnd="2dp"
+    android:paddingStart="4dp"
+    android:paddingEnd="10dp"
+    android:paddingTop="7dp"
+    android:paddingBottom="7dp">
 
+    <!-- Category Accent Strip -->
     <FrameLayout
         android:id="@+id/widget_task_category_color"
-        android:layout_width="4dp"
-        android:layout_height="match_parent"
+        android:layout_width="3.5dp"
+        android:layout_height="30dp"
         android:background="@color/widget_primary"
-        android:layout_marginEnd="8dp"/>
+        android:layout_marginEnd="8dp" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="8dp"
-        android:gravity="center_vertical">
-
+    <!-- Checkbox Icon -->
     <ImageView
         android:id="@+id/widget_task_check"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:src="@drawable/ic_check_circle_outline"
+        android:src="@drawable/ic_circle_outline"
         android:contentDescription="Complete Task"
         android:clickable="true"
         android:focusable="true"
-        android:layout_marginEnd="8dp"
-        android:tint="@color/widget_primary"/>
+        android:layout_marginEnd="10dp" />
 
+    <!-- Task Details -->
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/widget_task_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Task Title"
-                android:textSize="14sp" 
-                android:textColor="@color/widget_title_text"
-                android:textStyle="bold"/>
+        <TextView
+            android:id="@+id/widget_task_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Task Title"
+            android:textSize="13.5sp"
+            android:fontFamily="sans-serif"
+            android:textColor="@color/widget_title_text"
+            android:textStyle="bold"
+            android:maxLines="1"
+            android:ellipsize="end" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="2dp">
 
             <TextView
                 android:id="@+id/widget_task_meta"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text="Category • High"
                 android:textSize="11sp"
-                android:textColor="@color/widget_body_text"/>
+                android:textColor="@color/widget_secondary_text"
+                android:maxLines="1"
+                android:ellipsize="end" />
 
             <TextView
                 android:id="@+id/widget_task_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Today"
-                android:textSize="12sp"
-                android:textColor="@color/widget_body_text"/>
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:textColor="@color/widget_secondary_text"
+                android:layout_marginStart="6dp" />
+        </LinearLayout>
     </LinearLayout>
 
-    </LinearLayout>
 </LinearLayout>

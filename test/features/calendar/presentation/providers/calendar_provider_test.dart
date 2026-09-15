@@ -4,6 +4,7 @@ import 'package:device_calendar/device_calendar.dart';
 import 'package:rocis_tasks/features/calendar/presentation/providers/calendar_provider.dart';
 import 'package:rocis_tasks/core/services/calendar_service.dart';
 import 'package:rocis_tasks/features/home/services/full_calendar_widget_service.dart';
+import 'package:rocis_tasks/core/services/subscription_service.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz_data;
 
@@ -11,6 +12,8 @@ class MockCalendarService extends Mock implements CalendarService {}
 
 class MockFullCalendarWidgetService extends Mock
     implements FullCalendarWidgetService {}
+
+class MockSubscriptionService extends Mock implements SubscriptionService {}
 
 void main() {
   setUpAll(() {
@@ -34,6 +37,9 @@ void main() {
       when(
         () => mockWidgetService.updateFullCalendarWidget(
           userId: any(named: 'userId'),
+          userEmail: any(named: 'userEmail'),
+          monthOffset: any(named: 'monthOffset'),
+          forceRefresh: any(named: 'forceRefresh'),
         ),
       ).thenAnswer((_) async {});
 
@@ -160,5 +166,26 @@ void main() {
         expect(eventsSep8.isEmpty, isTrue);
       },
     );
+
+    test('ROCIs Schedule synergy is gated behind Pro (isPremium)', () {
+      final mockSubService = MockSubscriptionService();
+      when(() => mockSubService.isPremium).thenReturn(false);
+
+      final proGatedProvider = CalendarProvider(
+        mockCalendarService,
+        mockWidgetService,
+        subscriptionService: mockSubService,
+      );
+
+      expect(proGatedProvider.isPremium, isFalse);
+      expect(
+        proGatedProvider.getScheduleEventsForDay(DateTime(2026, 9, 7)),
+        isEmpty,
+      );
+
+      // When upgraded to Pro
+      when(() => mockSubService.isPremium).thenReturn(true);
+      expect(proGatedProvider.isPremium, isTrue);
+    });
   });
 }

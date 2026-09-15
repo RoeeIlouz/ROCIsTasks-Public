@@ -168,6 +168,29 @@ class MonthWidgetService {
         }
       }
 
+      // Guard against wiping populated data on transient empty fetch
+      final int totalSummaries = gridData.fold<int>(
+        0,
+        (sum, day) => sum + ((day['summaries'] as List?)?.length ?? 0),
+      );
+      if (totalSummaries == 0) {
+        final existing = await HomeWidget.getWidgetData<String>(
+          'month_grid_data',
+        );
+        if (existing != null && existing.isNotEmpty && existing != '[]') {
+          try {
+            final decoded = jsonDecode(existing) as List<dynamic>;
+            final int existingSummaries = decoded.fold<int>(
+              0,
+              (sum, day) => sum + ((day['summaries'] as List?)?.length ?? 0),
+            );
+            if (existingSummaries > 0) {
+              return;
+            }
+          } catch (_) {}
+        }
+      }
+
       // Save Data
       await HomeWidget.saveWidgetData<String>(
         'month_grid_data',

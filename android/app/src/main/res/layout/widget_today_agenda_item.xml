@@ -5,25 +5,29 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:gravity="center_vertical"
+    android:background="@drawable/widget_card_bg"
+    android:layout_marginTop="2dp"
+    android:layout_marginBottom="2dp"
+    android:layout_marginStart="2dp"
+    android:layout_marginEnd="2dp"
     android:paddingStart="4dp"
-    android:paddingEnd="8dp"
-    android:paddingTop="6dp"
-    android:paddingBottom="6dp"
-    android:background="@drawable/widget_card_bg">
+    android:paddingEnd="10dp"
+    android:paddingTop="7dp"
+    android:paddingBottom="7dp">
 
     <!-- Category / Calendar Color Strip -->
     <FrameLayout
         android:id="@+id/widget_agenda_color_strip"
-        android:layout_width="4dp"
-        android:layout_height="32dp"
+        android:layout_width="3.5dp"
+        android:layout_height="30dp"
         android:background="@color/widget_primary"
         android:layout_marginEnd="8dp" />
 
     <!-- Action Checkbox (Visible for Tasks) -->
     <ImageView
         android:id="@+id/widget_agenda_check"
-        android:layout_width="26dp"
-        android:layout_height="26dp"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
         android:src="@drawable/ic_circle_outline"
         android:layout_marginEnd="8dp"
         android:clickable="true"
@@ -33,8 +37,8 @@
     <!-- Event Calendar Icon (Visible for Events) -->
     <ImageView
         android:id="@+id/widget_agenda_event_icon"
-        android:layout_width="22dp"
-        android:layout_height="22dp"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
         android:src="@drawable/ic_calendar_event"
         android:layout_marginEnd="8dp"
         android:visibility="gone"
@@ -60,7 +64,7 @@
                 android:layout_weight="1"
                 android:text="Task or Event Title"
                 android:textColor="@color/widget_title_text"
-                android:textSize="13sp"
+                android:textSize="13.5sp"
                 android:fontFamily="sans-serif"
                 android:textStyle="bold"
                 android:maxLines="1"
@@ -95,6 +99,7 @@
                 android:text="09:00 - 10:00"
                 android:textColor="@color/widget_secondary_text"
                 android:textSize="11sp"
+                android:textStyle="bold"
                 android:layout_marginEnd="6dp" />
 
             <TextView

@@ -50,11 +50,18 @@ class BackgroundHandler {
         host == 'next_month') {
       final isNext = host == 'full_calendar_next' || host == 'next_month';
       final isAndroidWidget = host.startsWith('full_calendar_');
+      final offsetParam = queryParams['offset'];
+      final targetOffset = offsetParam != null
+          ? int.tryParse(offsetParam)
+          : null;
       await _handleFullCalendarNavigation(
-        isNext: isAndroidWidget ? null : isNext,
+        isNext: isAndroidWidget && targetOffset == null ? null : isNext,
+        targetOffset: targetOffset,
       );
     } else if (host == 'full_calendar_today') {
-      await _handleFullCalendarNavigation();
+      final offsetParam = queryParams['offset'];
+      final targetOffset = offsetParam != null ? int.tryParse(offsetParam) : 0;
+      await _handleFullCalendarNavigation(targetOffset: targetOffset);
     } else if (host == 'full_calendar_filter_tasks') {
       await _handleFullCalendarFilterToggle('tasks');
     } else if (host == 'full_calendar_filter_google') {
@@ -68,10 +75,19 @@ class BackgroundHandler {
     }
   }
 
+  static CalendarService _createCalendarService() {
+    try {
+      final authService = AuthService(ErrorHandlingService());
+      return CalendarService(authService: authService);
+    } catch (_) {
+      return CalendarService();
+    }
+  }
+
   static Future<void> _handleKanbanSync() async {
     try {
       await AppInitializer.initialize(isBackground: true);
-      final calendarService = CalendarService();
+      final calendarService = _createCalendarService();
       await calendarService.init();
 
       final taskSource = LocalTaskSource();
@@ -94,14 +110,19 @@ class BackgroundHandler {
         userId: FirebaseAuth.instance.currentUser?.uid,
       );
     } catch (e, s) {
-      AppLogger.error('Error handling kanban widget sync', error: e, stack: s, tag: 'Background');
+      AppLogger.error(
+        'Error handling kanban widget sync',
+        error: e,
+        stack: s,
+        tag: 'Background',
+      );
     }
   }
 
   static Future<void> _handleTodayAgendaSync() async {
     try {
       await AppInitializer.initialize(isBackground: true);
-      final calendarService = CalendarService();
+      final calendarService = _createCalendarService();
       await calendarService.init();
 
       final taskSource = LocalTaskSource();
@@ -124,14 +145,19 @@ class BackgroundHandler {
         userId: FirebaseAuth.instance.currentUser?.uid,
       );
     } catch (e, s) {
-      AppLogger.error('Error handling today agenda sync', error: e, stack: s, tag: 'Background');
+      AppLogger.error(
+        'Error handling today agenda sync',
+        error: e,
+        stack: s,
+        tag: 'Background',
+      );
     }
   }
 
   static Future<void> _handleMonthAgendaSync() async {
     try {
       await AppInitializer.initialize(isBackground: true);
-      final calendarService = CalendarService();
+      final calendarService = _createCalendarService();
       await calendarService.init();
 
       final taskSource = LocalTaskSource();
@@ -154,7 +180,12 @@ class BackgroundHandler {
         userId: FirebaseAuth.instance.currentUser?.uid,
       );
     } catch (e, s) {
-      AppLogger.error('Error handling month agenda sync', error: e, stack: s, tag: 'Background');
+      AppLogger.error(
+        'Error handling month agenda sync',
+        error: e,
+        stack: s,
+        tag: 'Background',
+      );
     }
   }
 
@@ -186,7 +217,7 @@ class BackgroundHandler {
         tag: 'Background',
       );
 
-      final calendarService = CalendarService();
+      final calendarService = _createCalendarService();
       await calendarService.init();
 
       final taskSource = LocalTaskSource();
@@ -200,13 +231,19 @@ class BackgroundHandler {
       // Initialize schedule service and set user email for ROCIs-Schedule integration
       await fullCalendarService.initScheduleService();
       final currentUser = FirebaseAuth.instance.currentUser;
-      if (currentUser != null) {
-        fullCalendarService.setUserEmail(currentUser.email);
+      final prefs = await SharedPreferences.getInstance();
+      final userEmail =
+          currentUser?.email ??
+          prefs.getString('google_user_email') ??
+          prefs.getString('user_email');
+      if (userEmail != null) {
+        fullCalendarService.setUserEmail(userEmail);
       }
 
       await fullCalendarService.updateFullCalendarWidget(
         monthOffset: offset,
         userId: currentUser?.uid,
+        userEmail: userEmail,
       );
 
       AppLogger.info(
@@ -227,7 +264,7 @@ class BackgroundHandler {
     try {
       await AppInitializer.initialize(isBackground: true);
 
-      final calendarService = CalendarService();
+      final calendarService = _createCalendarService();
       await calendarService.init();
 
       final taskSource = LocalTaskSource();
@@ -244,17 +281,22 @@ class BackgroundHandler {
       // Initialize schedule service and set user email for ROCIs-Schedule integration
       await fullCalendarService.initScheduleService();
       final currentUser = FirebaseAuth.instance.currentUser;
-      if (currentUser != null) {
-        fullCalendarService.setUserEmail(currentUser.email);
+      final prefs = await SharedPreferences.getInstance();
+      final userEmail =
+          currentUser?.email ??
+          prefs.getString('google_user_email') ??
+          prefs.getString('user_email');
+      if (userEmail != null) {
+        fullCalendarService.setUserEmail(userEmail);
       }
 
       // Refresh the widget with current offset
-      final prefs = await SharedPreferences.getInstance();
       final offset = prefs.getInt('full_calendar_offset') ?? 0;
 
       await fullCalendarService.updateFullCalendarWidget(
         monthOffset: offset,
         userId: currentUser?.uid,
+        userEmail: userEmail,
       );
     } catch (e, stackTrace) {
       AppLogger.error(
@@ -367,7 +409,7 @@ class BackgroundHandler {
       );
 
       // Update all new Android widgets in background
-      final calendarService = CalendarService();
+      final calendarService = _createCalendarService();
       await calendarService.init();
       final widgetDataService = WidgetDataService(calendarService);
       await widgetDataService.updateAllWidgets(

@@ -23,7 +23,6 @@ class TaskWidgetFactory(private val context: Context) : RemoteViewsService.Remot
     }
 
     override fun onDataSetChanged() {
-        tasks.clear()
         try {
             val widgetData = HomeWidgetPlugin.getData(context)
             
@@ -73,10 +72,10 @@ class TaskWidgetFactory(private val context: Context) : RemoteViewsService.Remot
                 })
             }
 
-            tasks.addAll(processedList)
-            
-        } catch (e: Exception) {
             tasks.clear()
+            tasks.addAll(processedList)
+        } catch (e: Exception) {
+            // Keep existing tasks on error instead of clearing
         }
     }
 

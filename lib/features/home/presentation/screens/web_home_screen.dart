@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
@@ -22,6 +23,8 @@ import 'package:rocis_tasks/features/tasks/presentation/widgets/kanban/kanban_bo
 import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:rocis_tasks/shared/ui/widgets/sync_status_badge.dart';
+import 'package:rocis_tasks/features/home/presentation/widgets/command_palette_dialog.dart';
+import 'package:rocis_tasks/shared/ui/theme/theme_service.dart';
 
 class WebHomeScreen extends StatefulWidget {
   const WebHomeScreen({super.key});
@@ -51,8 +54,14 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
   final FocusNode _rootFocusNode = FocusNode();
   final FocusNode _searchFocusNode = FocusNode();
   final FocusNode _titleFocusNode = FocusNode();
+  final TextEditingController _quickAddController = TextEditingController();
+  final FocusNode _quickAddFocusNode = FocusNode();
+  final TextEditingController _newSubtaskController = TextEditingController();
   String _selectedPriorityFilter = 'All';
   String? _selectedCategoryFilter;
+  bool _compactDensity = false;
+  Timer? _autoSaveDebounce;
+  String _saveStatus = 'saved'; // 'saved', 'saving', 'idle'
 
   @override
   void initState() {
@@ -112,12 +121,16 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
 
   @override
   void dispose() {
+    _autoSaveDebounce?.cancel();
     _titleController.dispose();
     _descController.dispose();
     _searchController.dispose();
     _rootFocusNode.dispose();
     _searchFocusNode.dispose();
     _titleFocusNode.dispose();
+    _quickAddController.dispose();
+    _quickAddFocusNode.dispose();
+    _newSubtaskController.dispose();
     super.dispose();
   }
 
@@ -125,6 +138,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
     setState(() {
       _selectedTask = task;
       _isCreatingTask = false;
+      _saveStatus = 'saved';
       if (task != null) {
         _titleController.text = task.title;
         _descController.text = task.description;
@@ -147,6 +161,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
     setState(() {
       _selectedTask = null;
       _isCreatingTask = true;
+      _saveStatus = 'idle';
       _titleController.clear();
       _descController.clear();
       _dueDate = null;
@@ -157,6 +172,99 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
       _syncWithGoogleTasks = false;
       _skipReminders = false;
     });
+  }
+
+  void _triggerAutoSave() {
+    if (_selectedTask == null) return;
+    setState(() {
+      _saveStatus = 'saving';
+    });
+    _autoSaveDebounce?.cancel();
+    _autoSaveDebounce = Timer(const Duration(milliseconds: 600), () {
+      if (!mounted || _selectedTask == null) return;
+      final title = _titleController.text.trim();
+      if (title.isEmpty) return;
+      final desc = _descController.text.trim();
+      final catId = _categoryIds.isNotEmpty ? _categoryIds.first : null;
+      final validCustomFields = _customFields
+          .where(
+            (cf) => cf.label.trim().isNotEmpty || cf.value.trim().isNotEmpty,
+          )
+          .toList();
+
+      final provider = Provider.of<TaskProvider>(context, listen: false);
+      provider.updateTask(
+        _selectedTask!,
+        title: title,
+        description: desc,
+        dueDate: _dueDate,
+        clearDueDate: _dueDate == null,
+        priority: _priority,
+        categoryId: catId,
+        categoryIds: _categoryIds,
+        subTasks: _subTasks,
+        syncWithGoogleTasks: _syncWithGoogleTasks,
+        skipReminders: _skipReminders,
+        customFields: validCustomFields,
+      );
+
+      if (mounted) {
+        setState(() {
+          _saveStatus = 'saved';
+        });
+      }
+    });
+  }
+
+  void _submitQuickAdd(TaskProvider provider) {
+    final title = _quickAddController.text.trim();
+    if (title.isEmpty) return;
+    provider.addTask(
+      title,
+      '',
+      DateTime.now(),
+      TaskPriority.medium,
+      _selectedCategoryFilter,
+      categoryIds: _selectedCategoryFilter != null
+          ? [_selectedCategoryFilter!]
+          : [],
+    );
+    _quickAddController.clear();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Added "$title" to Today'),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _openCommandPalette() {
+    final taskProvider = Provider.of<TaskProvider>(context, listen: false);
+    final themeService = Provider.of<ThemeService>(context, listen: false);
+
+    CommandPaletteDialog.show(
+      context: context,
+      tasks: taskProvider.tasks.where((t) => !t.isCompleted).toList(),
+      categories: taskProvider.categories,
+      onSelectTask: _selectTask,
+      onCreateTask: _initCreateTask,
+      onSwitchTab: (tab) {
+        setState(() {
+          _activeTab = tab;
+          _selectTask(null);
+        });
+        if (tab == 'tasks') {
+          taskProvider.syncGoogleTasksToLocal();
+        }
+      },
+      onSyncTasks: taskProvider.syncGoogleTasksToLocal,
+      onToggleTheme: themeService.toggleTheme,
+      onSelectCategory: (catId) {
+        setState(() {
+          _selectedCategoryFilter = catId;
+        });
+      },
+    );
   }
 
   void _addCustomField(CustomFieldType type) {
@@ -281,15 +389,26 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
     final user = authService.currentUser;
 
     final shortcutBindings = <ShortcutActivator, VoidCallback>{
+      const SingleActivator(LogicalKeyboardKey.keyK, control: true):
+          _openCommandPalette,
+      const SingleActivator(LogicalKeyboardKey.keyK, meta: true):
+          _openCommandPalette,
       const SingleActivator(LogicalKeyboardKey.keyN, control: true):
           _initCreateTask,
       const SingleActivator(LogicalKeyboardKey.keyN, meta: true):
           _initCreateTask,
+      const SingleActivator(LogicalKeyboardKey.keyC): () {
+        final currentFocus = FocusManager.instance.primaryFocus;
+        if (currentFocus == null ||
+            currentFocus.context?.widget is! EditableText) {
+          _initCreateTask();
+        }
+      },
       const SingleActivator(LogicalKeyboardKey.slash): () {
         final currentFocus = FocusManager.instance.primaryFocus;
         if (currentFocus == null ||
             currentFocus.context?.widget is! EditableText) {
-          _searchFocusNode.requestFocus();
+          _openCommandPalette();
         }
       },
       const SingleActivator(LogicalKeyboardKey.escape): () {
@@ -301,6 +420,8 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
               taskProvider.setSearchQuery('');
             });
           }
+        } else if (_quickAddFocusNode.hasFocus) {
+          _quickAddFocusNode.unfocus();
         } else if (_selectedTask != null || _isCreatingTask) {
           _selectTask(null);
         }
@@ -522,61 +643,78 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
           const SizedBox(height: 32),
 
           // Navigation Tabs List
-          _buildSidebarTab(
-            icon: Icons.task_alt_rounded,
-            label: l10n.tasks,
-            isActive: _activeTab == 'tasks',
-            isCompact: isCompact,
-            onTap: () {
-              setState(() {
-                _activeTab = 'tasks';
-                _selectTask(null);
-              });
-              Provider.of<TaskProvider>(
-                context,
-                listen: false,
-              ).syncGoogleTasksToLocal();
+          Builder(
+            builder: (context) {
+              final activeTasksCount = taskProvider.tasks
+                  .where((t) => !t.isCompleted)
+                  .length;
+              return Column(
+                children: [
+                  _buildSidebarTab(
+                    icon: Icons.task_alt_rounded,
+                    label: l10n.tasks,
+                    shortcut: '1',
+                    badgeCount: activeTasksCount,
+                    isActive: _activeTab == 'tasks',
+                    isCompact: isCompact,
+                    onTap: () {
+                      setState(() {
+                        _activeTab = 'tasks';
+                        _selectTask(null);
+                      });
+                      Provider.of<TaskProvider>(
+                        context,
+                        listen: false,
+                      ).syncGoogleTasksToLocal();
+                    },
+                  ),
+                  _buildSidebarTab(
+                    icon: Icons.view_kanban_outlined,
+                    label: l10n.boardView,
+                    shortcut: '2',
+                    isActive: _activeTab == 'board',
+                    isCompact: isCompact,
+                    onTap: () => setState(() {
+                      _activeTab = 'board';
+                      _selectTask(null);
+                    }),
+                  ),
+                  _buildSidebarTab(
+                    icon: Icons.calendar_month_rounded,
+                    label: l10n.calendar,
+                    shortcut: '3',
+                    isActive: _activeTab == 'calendar',
+                    isCompact: isCompact,
+                    onTap: () => setState(() {
+                      _activeTab = 'calendar';
+                      _selectTask(null);
+                    }),
+                  ),
+                  _buildSidebarTab(
+                    icon: Icons.dashboard_customize_outlined,
+                    label: l10n.categories,
+                    shortcut: '4',
+                    isActive: _activeTab == 'categories',
+                    isCompact: isCompact,
+                    onTap: () => setState(() {
+                      _activeTab = 'categories';
+                      _selectTask(null);
+                    }),
+                  ),
+                  _buildSidebarTab(
+                    icon: Icons.settings_rounded,
+                    label: l10n.settings,
+                    shortcut: '5',
+                    isActive: _activeTab == 'settings',
+                    isCompact: isCompact,
+                    onTap: () => setState(() {
+                      _activeTab = 'settings';
+                      _selectTask(null);
+                    }),
+                  ),
+                ],
+              );
             },
-          ),
-          _buildSidebarTab(
-            icon: Icons.view_kanban_outlined,
-            label: l10n.boardView,
-            isActive: _activeTab == 'board',
-            isCompact: isCompact,
-            onTap: () => setState(() {
-              _activeTab = 'board';
-              _selectTask(null);
-            }),
-          ),
-          _buildSidebarTab(
-            icon: Icons.calendar_month_rounded,
-            label: l10n.calendar,
-            isActive: _activeTab == 'calendar',
-            isCompact: isCompact,
-            onTap: () => setState(() {
-              _activeTab = 'calendar';
-              _selectTask(null);
-            }),
-          ),
-          _buildSidebarTab(
-            icon: Icons.dashboard_customize_outlined,
-            label: l10n.categories,
-            isActive: _activeTab == 'categories',
-            isCompact: isCompact,
-            onTap: () => setState(() {
-              _activeTab = 'categories';
-              _selectTask(null);
-            }),
-          ),
-          _buildSidebarTab(
-            icon: Icons.settings_rounded,
-            label: l10n.settings,
-            isActive: _activeTab == 'settings',
-            isCompact: isCompact,
-            onTap: () => setState(() {
-              _activeTab = 'settings';
-              _selectTask(null);
-            }),
           ),
 
           const Spacer(),
@@ -1037,6 +1175,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
     required IconData icon,
     required String label,
     String? shortcut,
+    int? badgeCount,
     required bool isActive,
     required VoidCallback onTap,
     bool isCompact = false,
@@ -1048,7 +1187,9 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 4.0),
         child: Tooltip(
-          message: label,
+          message: badgeCount != null && badgeCount > 0
+              ? '$label ($badgeCount)'
+              : label,
           child: InkWell(
             onTap: onTap,
             borderRadius: BorderRadius.circular(12),
@@ -1061,12 +1202,33 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                     : Colors.transparent,
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(
-                icon,
-                color: isActive
-                    ? theme.colorScheme.primary
-                    : theme.disabledColor,
-                size: 22,
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Icon(
+                    icon,
+                    color: isActive
+                        ? theme.colorScheme.primary
+                        : theme.disabledColor,
+                    size: 22,
+                  ),
+                  if (badgeCount != null && badgeCount > 0)
+                    Positioned(
+                      top: -3,
+                      right: -5,
+                      child: Container(
+                        padding: const EdgeInsets.all(3.5),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.primary,
+                          shape: BoxShape.circle,
+                        ),
+                        constraints: const BoxConstraints(
+                          minWidth: 8,
+                          minHeight: 8,
+                        ),
+                      ),
+                    ),
+                ],
               ),
             ),
           ),
@@ -1109,6 +1271,32 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                   ),
                 ),
               ),
+              if (badgeCount != null && badgeCount > 0)
+                Container(
+                  margin: const EdgeInsets.only(right: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 7,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isActive
+                        ? theme.colorScheme.primary.withValues(alpha: 0.2)
+                        : (isDark
+                              ? Colors.white.withValues(alpha: 0.08)
+                              : Colors.black.withValues(alpha: 0.06)),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    '$badgeCount',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      color: isActive
+                          ? theme.colorScheme.primary
+                          : theme.disabledColor,
+                    ),
+                  ),
+                ),
               if (shortcut != null)
                 Container(
                   padding: const EdgeInsets.symmetric(
@@ -1172,6 +1360,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
     AppLocalizations l10n,
   ) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final activeTasks = provider.tasks.where((t) => !t.isCompleted).toList();
 
     // Sort logic to match filters
@@ -1256,32 +1445,9 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
               FilledButton.icon(
                 onPressed: _initCreateTask,
                 icon: const Icon(Icons.add, size: 18),
-                label: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'New Task',
-                      style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: const Text(
-                        'Ctrl+N',
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
+                label: Text(
+                  'New Task',
+                  style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
                 ),
                 style: FilledButton.styleFrom(
                   padding: const EdgeInsets.symmetric(
@@ -1324,15 +1490,64 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
           ),
           const SizedBox(height: 28),
 
-          // Inline Search & Filters
+          // Inline Search, Density & Filters
           Row(
             children: [
               Expanded(
                 child: TextField(
                   controller: _searchController,
                   focusNode: _searchFocusNode,
+                  style: GoogleFonts.outfit(fontSize: 14),
                   decoration: InputDecoration(
-                    prefixIcon: const Icon(Icons.search, size: 20),
+                    prefixIcon: const Icon(Icons.search_rounded, size: 20),
+                    hintText: 'Search tasks or jump to... (⌘K)',
+                    hintStyle: TextStyle(
+                      fontSize: 13,
+                      color: theme.disabledColor,
+                    ),
+                    suffixIcon: Padding(
+                      padding: const EdgeInsets.only(right: 6.0),
+                      child: InkWell(
+                        onTap: _openCommandPalette,
+                        borderRadius: BorderRadius.circular(6),
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(vertical: 8),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 3,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isDark
+                                ? Colors.white.withValues(alpha: 0.08)
+                                : Colors.black.withValues(alpha: 0.05),
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(
+                              color: isDark ? Colors.white12 : Colors.black12,
+                              width: 0.5,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.terminal_rounded,
+                                size: 12,
+                                color: theme.disabledColor,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                '⌘K',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  color: theme.disabledColor,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -1384,9 +1599,109 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                   });
                 },
               ),
+              const SizedBox(width: 12),
+              Tooltip(
+                message: _compactDensity
+                    ? 'Switch to Comfortable View'
+                    : 'Switch to Compact View',
+                child: InkWell(
+                  onTap: () {
+                    setState(() {
+                      _compactDensity = !_compactDensity;
+                    });
+                  },
+                  borderRadius: BorderRadius.circular(10),
+                  child: Container(
+                    padding: const EdgeInsets.all(9),
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? Colors.white.withValues(alpha: 0.05)
+                          : Colors.black.withValues(alpha: 0.04),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: isDark ? Colors.white10 : Colors.black12,
+                      ),
+                    ),
+                    child: Icon(
+                      _compactDensity
+                          ? Icons.density_small_rounded
+                          : Icons.density_medium_rounded,
+                      size: 18,
+                      color: theme.colorScheme.onSurface,
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
+
+          // Inline Quick Add Bar (Linear / Things 3 style)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
+            decoration: BoxDecoration(
+              color: isDark
+                  ? Colors.white.withValues(alpha: 0.04)
+                  : Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: isDark ? Colors.white12 : Colors.black12,
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.add_circle_outline_rounded,
+                  size: 18,
+                  color: theme.colorScheme.primary,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: TextField(
+                    controller: _quickAddController,
+                    focusNode: _quickAddFocusNode,
+                    style: GoogleFonts.outfit(fontSize: 13),
+                    decoration: InputDecoration(
+                      hintText: 'Quick add task to Today... (Press Enter)',
+                      hintStyle: TextStyle(
+                        fontSize: 13,
+                        color: theme.disabledColor,
+                      ),
+                      border: InputBorder.none,
+                      isDense: true,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                    ),
+                    onSubmitted: (text) => _submitQuickAdd(provider),
+                  ),
+                ),
+                InkWell(
+                  onTap: () => _submitQuickAdd(provider),
+                  borderRadius: BorderRadius.circular(6),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 3,
+                    ),
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? Colors.white10
+                          : Colors.black.withValues(alpha: 0.05),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      '↵ Enter',
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: theme.disabledColor,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
 
           // Task Columns
           Expanded(
@@ -1567,7 +1882,9 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                     final isSelected = _selectedTask?.id == task.id;
 
                     return Padding(
-                      padding: const EdgeInsets.only(bottom: 8.0),
+                      padding: EdgeInsets.only(
+                        bottom: _compactDensity ? 4.0 : 8.0,
+                      ),
                       child: InkWell(
                         onTap: () => _selectTask(task),
                         child: Container(
@@ -1643,169 +1960,493 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
     final isEditing = _selectedTask != null;
 
     return Padding(
-      padding: const EdgeInsets.all(24.0),
+      padding: const EdgeInsets.all(20.0),
       child: Form(
         key: _inspectorFormKey,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Inspector Header
+            // Inspector Header (Linear style)
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  isEditing ? 'Task Details' : 'New Task',
-                  style: GoogleFonts.outfit(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+                Row(
+                  children: [
+                    Text(
+                      isEditing ? 'Task Details' : 'New Task',
+                      style: GoogleFonts.outfit(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    if (isEditing) ...[
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 7,
+                          vertical: 2.5,
+                        ),
+                        decoration: BoxDecoration(
+                          color: _saveStatus == 'saving'
+                              ? Colors.amber.withValues(alpha: 0.15)
+                              : Colors.green.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (_saveStatus == 'saving')
+                              const SizedBox(
+                                width: 8,
+                                height: 8,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 1.5,
+                                  color: Colors.amber,
+                                ),
+                              )
+                            else
+                              const Icon(
+                                Icons.check_rounded,
+                                size: 11,
+                                color: Colors.green,
+                              ),
+                            const SizedBox(width: 4),
+                            Text(
+                              _saveStatus == 'saving' ? 'Saving' : 'Saved',
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                                color: _saveStatus == 'saving'
+                                    ? Colors.amber
+                                    : Colors.green,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
-                IconButton(
-                  icon: const Icon(Icons.close, size: 20),
-                  onPressed: () => _selectTask(null),
+                Row(
+                  children: [
+                    if (isEditing)
+                      IconButton(
+                        icon: const Icon(
+                          Icons.delete_outline_rounded,
+                          size: 18,
+                        ),
+                        color: Colors.redAccent,
+                        tooltip: 'Delete Task',
+                        onPressed: () {
+                          provider.deleteTask(_selectedTask!.id);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Task deleted')),
+                          );
+                          _selectTask(null);
+                        },
+                      ),
+                    IconButton(
+                      icon: const Icon(Icons.close_rounded, size: 18),
+                      tooltip: 'Close (ESC)',
+                      onPressed: () => _selectTask(null),
+                    ),
+                  ],
                 ),
               ],
             ),
-            const Divider(height: 24),
+            const SizedBox(height: 12),
+            const Divider(height: 1),
+            const SizedBox(height: 16),
 
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // Title Input
+                    // Title Input (Borderless, prominent Outfit font)
                     TextFormField(
                       controller: _titleController,
+                      focusNode: _titleFocusNode,
                       style: GoogleFonts.outfit(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: theme.colorScheme.onSurface,
+                        letterSpacing: -0.3,
                       ),
                       decoration: InputDecoration(
-                        labelText: l10n.title,
-                        prefixIcon: const Icon(Icons.title, size: 18),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
+                        hintText: 'Task title...',
+                        hintStyle: TextStyle(
+                          color: theme.disabledColor.withValues(alpha: 0.5),
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
                         ),
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.zero,
+                        isDense: true,
                       ),
                       validator: (value) =>
                           value == null || value.trim().isEmpty
                           ? 'Title is required'
                           : null,
+                      onChanged: (_) => _triggerAutoSave(),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 12),
 
-                    // Description Input
+                    // Description Input (Clean notes area)
                     TextFormField(
                       controller: _descController,
-                      style: GoogleFonts.outfit(fontSize: 13),
+                      style: TextStyle(
+                        fontSize: 13,
+                        height: 1.5,
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.85,
+                        ),
+                      ),
                       decoration: InputDecoration(
-                        labelText: l10n.description,
-                        prefixIcon: const Icon(
-                          Icons.description_outlined,
-                          size: 18,
+                        hintText: 'Add description or notes...',
+                        hintStyle: TextStyle(
+                          color: theme.disabledColor.withValues(alpha: 0.6),
+                          fontSize: 13,
                         ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.zero,
                       ),
                       maxLines: 4,
+                      onChanged: (_) => _triggerAutoSave(),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 18),
 
-                    // Due Date Picker Trigger
-                    InkWell(
-                      onTap: () => _selectDueDate(context),
-                      borderRadius: BorderRadius.circular(12),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 12,
+                    // Property Rows Container (Linear Style)
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? Colors.white.withValues(alpha: 0.03)
+                            : Colors.black.withValues(alpha: 0.02),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: isDark ? Colors.white10 : Colors.black12,
                         ),
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: isDark ? Colors.white24 : Colors.black12,
-                          ),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.calendar_today_rounded,
-                              size: 16,
-                              color: theme.colorScheme.primary,
-                            ),
-                            const SizedBox(width: 12),
-                            Text(
-                              _dueDate == null
-                                  ? 'Set Due Date'
-                                  : DateFormat.yMMMd().add_jm().format(
-                                      _dueDate!,
+                      ),
+                      child: Column(
+                        children: [
+                          // Status Row (if editing)
+                          if (isEditing) ...[
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.check_circle_outline_rounded,
+                                      size: 16,
+                                      color: theme.disabledColor,
                                     ),
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: _dueDate == null
-                                    ? theme.disabledColor
-                                    : theme.colorScheme.onSurface,
-                              ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      'Status',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: theme.disabledColor,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                InkWell(
+                                  onTap: () {
+                                    provider.toggleTaskCompletion(
+                                      _selectedTask!,
+                                    );
+                                    setState(() {
+                                      _selectedTask = _selectedTask!.copyWith(
+                                        isCompleted:
+                                            !_selectedTask!.isCompleted,
+                                      );
+                                    });
+                                  },
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 3,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color:
+                                          (_selectedTask?.isCompleted ?? false)
+                                          ? const Color(
+                                              0xFF10B981,
+                                            ).withValues(alpha: 0.15)
+                                          : theme.disabledColor.withValues(
+                                              alpha: 0.12,
+                                            ),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          (_selectedTask?.isCompleted ?? false)
+                                              ? Icons.check_circle_rounded
+                                              : Icons
+                                                    .radio_button_unchecked_rounded,
+                                          size: 13,
+                                          color:
+                                              (_selectedTask?.isCompleted ??
+                                                  false)
+                                              ? const Color(0xFF10B981)
+                                              : theme.disabledColor,
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          (_selectedTask?.isCompleted ?? false)
+                                              ? 'Completed'
+                                              : 'In Progress',
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w600,
+                                            color:
+                                                (_selectedTask?.isCompleted ??
+                                                    false)
+                                                ? const Color(0xFF10B981)
+                                                : theme.colorScheme.onSurface,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                            const Spacer(),
-                            if (_dueDate != null)
-                              GestureDetector(
-                                onTap: () => setState(() {
-                                  _dueDate = null;
-                                }),
-                                child: Icon(
-                                  Icons.cancel_rounded,
-                                  size: 16,
-                                  color: theme.disabledColor,
+                            const Divider(height: 16),
+                          ],
+
+                          // Due Date Property Row
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.calendar_today_rounded,
+                                    size: 16,
+                                    color: theme.disabledColor,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'Due Date',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: theme.disabledColor,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              InkWell(
+                                onTap: () async {
+                                  await _selectDueDate(context);
+                                  _triggerAutoSave();
+                                },
+                                borderRadius: BorderRadius.circular(8),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 3,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: _dueDate != null
+                                        ? theme.colorScheme.primary.withValues(
+                                            alpha: 0.12,
+                                          )
+                                        : Colors.transparent,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        _dueDate == null
+                                            ? 'Set Date'
+                                            : DateFormat.yMMMd()
+                                                  .add_jm()
+                                                  .format(_dueDate!),
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w600,
+                                          color: _dueDate != null
+                                              ? theme.colorScheme.primary
+                                              : theme.disabledColor,
+                                        ),
+                                      ),
+                                      if (_dueDate != null) ...[
+                                        const SizedBox(width: 4),
+                                        GestureDetector(
+                                          onTap: () {
+                                            setState(() {
+                                              _dueDate = null;
+                                            });
+                                            _triggerAutoSave();
+                                          },
+                                          child: Icon(
+                                            Icons.close_rounded,
+                                            size: 13,
+                                            color: theme.disabledColor,
+                                          ),
+                                        ),
+                                      ],
+                                    ],
+                                  ),
                                 ),
                               ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-
-                    // Priority Selector
-                    DropdownButtonFormField<TaskPriority>(
-                      key: ValueKey('priority_${_selectedTask?.id ?? 'new'}'),
-                      initialValue: _priority,
-                      decoration: InputDecoration(
-                        labelText: l10n.priorityLabel,
-                        prefixIcon: const Icon(Icons.flag_outlined, size: 18),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      items: TaskPriority.values.map((p) {
-                        return DropdownMenuItem(
-                          value: p,
-                          child: Text(
-                            p == TaskPriority.high
-                                ? 'High'
-                                : p == TaskPriority.medium
-                                ? 'Medium'
-                                : 'Low',
-                            style: const TextStyle(fontSize: 13),
+                            ],
                           ),
-                        );
-                      }).toList(),
-                      onChanged: (val) {
-                        if (val != null) {
-                          setState(() {
-                            _priority = val;
-                          });
-                        }
-                      },
-                    ),
-                    const SizedBox(height: 20),
+                          const Divider(height: 16),
 
-                    // Category Selector
+                          // Priority Property Row
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.flag_rounded,
+                                    size: 16,
+                                    color: theme.disabledColor,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'Priority',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: theme.disabledColor,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: TaskPriority.values.map((p) {
+                                  final isSelected = _priority == p;
+                                  final pColor = p == TaskPriority.high
+                                      ? Colors.redAccent
+                                      : (p == TaskPriority.medium
+                                            ? Colors.orangeAccent
+                                            : Colors.green);
+                                  return Padding(
+                                    padding: const EdgeInsets.only(left: 4.0),
+                                    child: InkWell(
+                                      onTap: () {
+                                        setState(() {
+                                          _priority = p;
+                                        });
+                                        _triggerAutoSave();
+                                      },
+                                      borderRadius: BorderRadius.circular(6),
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 6,
+                                          vertical: 2.5,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: isSelected
+                                              ? pColor.withValues(alpha: 0.15)
+                                              : Colors.transparent,
+                                          borderRadius: BorderRadius.circular(
+                                            6,
+                                          ),
+                                          border: Border.all(
+                                            color: isSelected
+                                                ? pColor.withValues(alpha: 0.4)
+                                                : Colors.transparent,
+                                          ),
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Container(
+                                              width: 6,
+                                              height: 6,
+                                              decoration: BoxDecoration(
+                                                color: pColor,
+                                                shape: BoxShape.circle,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 4),
+                                            Text(
+                                              p.name[0].toUpperCase() +
+                                                  p.name.substring(1),
+                                              style: TextStyle(
+                                                fontSize: 10,
+                                                fontWeight: isSelected
+                                                    ? FontWeight.bold
+                                                    : FontWeight.normal,
+                                                color: isSelected
+                                                    ? pColor
+                                                    : theme.disabledColor,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }).toList(),
+                              ),
+                            ],
+                          ),
+                          const Divider(height: 16),
+
+                          // Google Tasks Sync Switch
+                          SwitchListTile(
+                            contentPadding: EdgeInsets.zero,
+                            visualDensity: VisualDensity.compact,
+                            dense: true,
+                            title: Text(
+                              l10n.syncWithGoogleTasks,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            value: _syncWithGoogleTasks,
+                            onChanged: (value) {
+                              setState(() {
+                                _syncWithGoogleTasks = value;
+                              });
+                              _triggerAutoSave();
+                            },
+                          ),
+
+                          // Skip Reminders Switch
+                          SwitchListTile(
+                            contentPadding: EdgeInsets.zero,
+                            visualDensity: VisualDensity.compact,
+                            dense: true,
+                            title: Text(
+                              l10n.doNotRemind,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            value: _skipReminders,
+                            onChanged: (value) {
+                              setState(() {
+                                _skipReminders = value;
+                              });
+                              _triggerAutoSave();
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+
+                    // Category Selector Section
                     Text(
                       l10n.category,
-                      style: const TextStyle(
+                      style: GoogleFonts.outfit(
                         fontWeight: FontWeight.bold,
                         fontSize: 12,
+                        color: theme.disabledColor,
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -1815,67 +2456,167 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                       children: provider.categories.map((cat) {
                         final isSelected = _categoryIds.contains(cat.id);
                         return FilterChip(
+                          visualDensity: VisualDensity.compact,
                           labelStyle: const TextStyle(fontSize: 11),
                           selected: isSelected,
+                          avatar: Container(
+                            width: 8,
+                            height: 8,
+                            decoration: BoxDecoration(
+                              color: Color(cat.colorValue),
+                              shape: BoxShape.circle,
+                            ),
+                          ),
                           label: Text(cat.name),
                           onSelected: (selected) {
                             setState(() {
                               if (selected) {
-                                _categoryIds = [
-                                  cat.id,
-                                ]; // For web let's allow single category at a time
+                                _categoryIds = [cat.id];
                               } else {
                                 _categoryIds.remove(cat.id);
                               }
                             });
+                            _triggerAutoSave();
                           },
                         );
                       }).toList(),
                     ),
                     const SizedBox(height: 20),
 
-                    // Google Tasks Sync Switch
-                    SwitchListTile(
-                      contentPadding: EdgeInsets.zero,
-                      title: Text(
-                        l10n.syncWithGoogleTasks,
-                        style: const TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.bold,
+                    // Subtasks Section (Interactive checklist)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Subtasks (${_subTasks.where((s) => s.isCompleted).length}/${_subTasks.length})',
+                          style: GoogleFonts.outfit(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                            color: theme.disabledColor,
+                          ),
                         ),
-                      ),
-                      subtitle: Text(
-                        l10n.syncWithGoogleTasksSubtitle,
-                        style: const TextStyle(fontSize: 11),
-                      ),
-                      value: _syncWithGoogleTasks,
-                      onChanged: (value) {
-                        setState(() {
-                          _syncWithGoogleTasks = value;
-                        });
-                      },
+                      ],
                     ),
+                    const SizedBox(height: 8),
 
-                    // Skip Reminders Switch
-                    SwitchListTile(
-                      contentPadding: EdgeInsets.zero,
-                      title: Text(
-                        l10n.doNotRemind,
-                        style: const TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.bold,
+                    ...List.generate(_subTasks.length, (index) {
+                      final st = _subTasks[index];
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 6.0),
+                        child: Row(
+                          children: [
+                            SizedBox(
+                              width: 22,
+                              height: 22,
+                              child: Checkbox(
+                                value: st.isCompleted,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                onChanged: (val) {
+                                  setState(() {
+                                    _subTasks[index] = st.copyWith(
+                                      isCompleted: val ?? false,
+                                    );
+                                  });
+                                  _triggerAutoSave();
+                                },
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                st.title,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  decoration: st.isCompleted
+                                      ? TextDecoration.lineThrough
+                                      : TextDecoration.none,
+                                  color: st.isCompleted
+                                      ? theme.disabledColor
+                                      : theme.colorScheme.onSurface,
+                                ),
+                              ),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.close_rounded, size: 14),
+                              color: theme.disabledColor,
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(
+                                minWidth: 20,
+                                minHeight: 20,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _subTasks.removeAt(index);
+                                });
+                                _triggerAutoSave();
+                              },
+                            ),
+                          ],
                         ),
+                      );
+                    }),
+
+                    // Inline Add Subtask Input
+                    Container(
+                      margin: const EdgeInsets.only(top: 4),
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? Colors.white.withValues(alpha: 0.03)
+                            : Colors.black.withValues(alpha: 0.02),
+                        borderRadius: BorderRadius.circular(8),
                       ),
-                      value: _skipReminders,
-                      onChanged: (value) {
-                        setState(() {
-                          _skipReminders = value;
-                        });
-                      },
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.add_rounded,
+                            size: 16,
+                            color: theme.disabledColor,
+                          ),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: TextField(
+                              controller: _newSubtaskController,
+                              style: const TextStyle(fontSize: 12),
+                              decoration: InputDecoration(
+                                hintText: 'Add a subtask... (Press Enter)',
+                                hintStyle: TextStyle(
+                                  fontSize: 12,
+                                  color: theme.disabledColor,
+                                ),
+                                border: InputBorder.none,
+                                isDense: true,
+                                contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 8,
+                                ),
+                              ),
+                              onSubmitted: (text) {
+                                if (text.trim().isNotEmpty) {
+                                  setState(() {
+                                    _subTasks.add(
+                                      SubTask(
+                                        id: DateTime.now()
+                                            .millisecondsSinceEpoch
+                                            .toString(),
+                                        title: text.trim(),
+                                        isCompleted: false,
+                                      ),
+                                    );
+                                    _newSubtaskController.clear();
+                                  });
+                                  _triggerAutoSave();
+                                }
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                     const SizedBox(height: 20),
 
-                    // Custom Lines Section
+                    // Custom Fields Section
                     TaskCustomFieldsSection(
                       customFields: _customFields,
                       onAddField: _addCustomField,
@@ -1889,43 +2630,32 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
 
             const SizedBox(height: 16),
 
-            // Delete & Save Actions
-            Row(
-              children: [
-                if (isEditing) ...[
-                  IconButton(
-                    icon: const Icon(
-                      Icons.delete_outline,
-                      color: Colors.redAccent,
-                    ),
-                    onPressed: () {
-                      provider.deleteTask(_selectedTask!.id);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Task deleted')),
-                      );
-                      _selectTask(null);
-                    },
-                    tooltip: 'Delete Task',
-                  ),
-                  const SizedBox(width: 8),
-                ],
-                Expanded(
-                  child: FilledButton(
-                    onPressed: () => _saveInspectorTask(provider),
-                    style: FilledButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: Text(
-                      isEditing ? 'Save Changes' : 'Create Task',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
+            // Bottom Actions
+            if (_isCreatingTask)
+              FilledButton(
+                onPressed: () => _saveInspectorTask(provider),
+                style: FilledButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-              ],
-            ),
+                child: Text(
+                  l10n.newTask,
+                  style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
+                ),
+              )
+            else
+              OutlinedButton(
+                onPressed: () => _selectTask(null),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: Text(l10n.save),
+              ),
           ],
         ),
       ),

@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:provider/provider.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
+import 'package:rocis_tasks/features/tasks/domain/models/sub_task.dart';
 import 'package:rocis_tasks/features/categories/domain/models/category.dart';
 import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
 import 'package:rocis_tasks/features/tasks/presentation/widgets/kanban/kanban_board_view.dart';
@@ -15,9 +16,13 @@ import 'package:rocis_tasks/core/services/security_service.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
 
 class MockTaskProvider extends Mock implements TaskProvider {}
+
 class MockThemeService extends Mock implements ThemeService {}
+
 class MockSubscriptionService extends Mock implements SubscriptionService {}
+
 class MockPrivateModeService extends Mock implements PrivateModeService {}
+
 class FakeTask extends Fake implements Task {}
 
 void main() {
@@ -25,6 +30,7 @@ void main() {
 
   setUpAll(() {
     registerFallbackValue(FakeTask());
+    registerFallbackValue(TaskPriority.medium);
   });
 
   late MockTaskProvider mockTaskProvider;
@@ -47,6 +53,10 @@ void main() {
     categoryId: 'cat-1',
     categoryIds: ['cat-1'],
     dueDate: DateTime.now().add(const Duration(days: 5)),
+    subTasks: [
+      SubTask(title: 'Subtask 1', isCompleted: true),
+      SubTask(title: 'Subtask 2', isCompleted: false),
+    ],
   );
 
   final sampleInFocusTask = Task(
@@ -71,18 +81,38 @@ void main() {
     mockSubscriptionService = MockSubscriptionService();
     mockPrivateModeService = MockPrivateModeService();
 
-    when(() => mockTaskProvider.tasks).thenReturn([
-      sampleTodoTask,
-      sampleInFocusTask,
-      sampleDoneTask,
-    ]);
+    when(
+      () => mockTaskProvider.tasks,
+    ).thenReturn([sampleTodoTask, sampleInFocusTask, sampleDoneTask]);
+    when(
+      () => mockTaskProvider.allTasks,
+    ).thenReturn([sampleTodoTask, sampleInFocusTask, sampleDoneTask]);
     when(() => mockTaskProvider.categories).thenReturn([sampleCategory]);
-    when(() => mockTaskProvider.getCategoryById('cat-1')).thenReturn(sampleCategory);
-    when(() => mockTaskProvider.getCategoryById(any(that: isNot('cat-1')))).thenReturn(null);
+    when(
+      () => mockTaskProvider.getCategoryById('cat-1'),
+    ).thenReturn(sampleCategory);
+    when(
+      () => mockTaskProvider.getCategoryById(any(that: isNot('cat-1'))),
+    ).thenReturn(null);
     when(() => mockTaskProvider.isLoading).thenReturn(false);
     when(() => mockTaskProvider.errorMessage).thenReturn(null);
-    when(() => mockTaskProvider.toggleTaskCompletion(any())).thenAnswer((_) async {});
+    when(
+      () => mockTaskProvider.toggleTaskCompletion(any()),
+    ).thenAnswer((_) async {});
     when(() => mockTaskProvider.updateTask(any())).thenAnswer((_) async {});
+    when(
+      () => mockTaskProvider.addTask(
+        any(),
+        any(),
+        any(),
+        any(),
+        any(),
+        categoryIds: any(named: 'categoryIds'),
+      ),
+    ).thenAnswer((_) async {});
+    when(
+      () => mockTaskProvider.addTask(any(), any(), any(), any(), any()),
+    ).thenAnswer((_) async {});
 
     when(() => mockThemeService.useGlassmorphism).thenReturn(true);
     when(() => mockThemeService.useMaterialTheme).thenReturn(false);
@@ -98,61 +128,71 @@ void main() {
       providers: [
         ChangeNotifierProvider<TaskProvider>.value(value: mockTaskProvider),
         ChangeNotifierProvider<ThemeService>.value(value: mockThemeService),
-        ChangeNotifierProvider<SubscriptionService>.value(value: mockSubscriptionService),
-        ChangeNotifierProvider<PrivateModeService>.value(value: mockPrivateModeService),
+        ChangeNotifierProvider<SubscriptionService>.value(
+          value: mockSubscriptionService,
+        ),
+        ChangeNotifierProvider<PrivateModeService>.value(
+          value: mockPrivateModeService,
+        ),
       ],
       child: MaterialApp(
         theme: AppTheme.lightTheme,
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        home: const Scaffold(
-          body: KanbanBoardView(),
-        ),
+        home: const Scaffold(body: KanbanBoardView()),
       ),
     );
   }
 
-  testWidgets('renders KanbanBoardView with Status columns (To Do, In Focus, Done)', (tester) async {
-    tester.view.physicalSize = const Size(1200, 800);
-    tester.view.devicePixelRatio = 1.0;
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
+  testWidgets(
+    'renders KanbanBoardView with Status columns (To Do, In Focus, Done)',
+    (tester) async {
+      tester.view.physicalSize = const Size(1200, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
 
-    await tester.pumpWidget(buildTestWidget());
-    await tester.pumpAndSettle();
+      await tester.pumpWidget(buildTestWidget());
+      await tester.pumpAndSettle();
 
-    expect(find.byType(KanbanBoardView), findsOneWidget);
-    expect(find.byType(KanbanColumn), findsNWidgets(3));
-    expect(find.text('To Do'), findsOneWidget);
-    expect(find.text('In Focus'), findsOneWidget);
-    expect(find.text('Done'), findsOneWidget);
+      expect(find.byType(KanbanBoardView), findsOneWidget);
+      expect(find.byType(KanbanColumn), findsNWidgets(3));
+      expect(find.text('To Do'), findsOneWidget);
+      expect(find.text('In Focus'), findsOneWidget);
+      expect(find.text('Done'), findsOneWidget);
 
-    expect(find.text('Future Backlog Task'), findsOneWidget);
-    expect(find.text('Today Task'), findsOneWidget);
-    expect(find.text('Done Task'), findsOneWidget);
-  });
+      expect(find.text('Future Backlog Task'), findsOneWidget);
+      expect(find.text('Today Task'), findsOneWidget);
+      expect(find.text('Done Task'), findsOneWidget);
+    },
+  );
 
-  testWidgets('switches grouping mode to Priority and shows High, Medium, Low columns', (tester) async {
-    tester.view.physicalSize = const Size(1200, 800);
-    tester.view.devicePixelRatio = 1.0;
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
+  testWidgets(
+    'switches grouping mode to Priority and shows High, Medium, Low columns',
+    (tester) async {
+      tester.view.physicalSize = const Size(1200, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
 
-    await tester.pumpWidget(buildTestWidget());
-    await tester.pumpAndSettle();
+      await tester.pumpWidget(buildTestWidget());
+      await tester.pumpAndSettle();
 
-    // Tap Priority grouping chip
-    final priorityChip = find.text('Priority');
-    expect(priorityChip, findsOneWidget);
-    await tester.tap(priorityChip);
-    await tester.pumpAndSettle();
+      // Tap Priority grouping chip
+      final priorityChip = find.text('Priority');
+      expect(priorityChip, findsOneWidget);
+      await tester.tap(priorityChip);
+      await tester.pumpAndSettle();
 
-    expect(find.text('High Priority'), findsOneWidget);
-    expect(find.text('Medium Priority'), findsOneWidget);
-    expect(find.text('Low Priority'), findsOneWidget);
-  });
+      expect(find.text('High Priority'), findsOneWidget);
+      expect(find.text('Medium Priority'), findsOneWidget);
+      expect(find.text('Low Priority'), findsOneWidget);
+    },
+  );
 
-  testWidgets('switches grouping mode to Category and shows Category columns', (tester) async {
+  testWidgets('switches grouping mode to Category and shows Category columns', (
+    tester,
+  ) async {
     tester.view.physicalSize = const Size(1200, 800);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
@@ -171,7 +211,9 @@ void main() {
     expect(find.text('Uncategorized'), findsOneWidget);
   });
 
-  testWidgets('toggling checkmark on KanbanCard toggles task completion', (tester) async {
+  testWidgets('toggling checkmark on KanbanCard toggles task completion', (
+    tester,
+  ) async {
     tester.view.physicalSize = const Size(1200, 800);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
@@ -187,6 +229,86 @@ void main() {
     await tester.tap(doneCheck);
     await tester.pumpAndSettle();
 
-    verify(() => mockTaskProvider.toggleTaskCompletion(sampleDoneTask)).called(1);
+    verify(
+      () => mockTaskProvider.toggleTaskCompletion(sampleDoneTask),
+    ).called(1);
   });
+
+  testWidgets('renders subtasks indicator on KanbanCard', (tester) async {
+    tester.view.physicalSize = const Size(1200, 800);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(buildTestWidget());
+    await tester.pumpAndSettle();
+
+    // sampleTodoTask has 2 subtasks, 1 completed -> "1/2"
+    expect(find.text('1/2'), findsOneWidget);
+  });
+
+  testWidgets(
+    'quick inline card addition in To Do column creates task via taskProvider',
+    (tester) async {
+      tester.view.physicalSize = const Size(1200, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(buildTestWidget());
+      await tester.pumpAndSettle();
+
+      // Tap the "+ New Task" bottom button on the first column (To Do)
+      final newTaskButtons = find.text('New Task');
+      expect(newTaskButtons, findsWidgets);
+      await tester.tap(newTaskButtons.first);
+      await tester.pumpAndSettle();
+
+      // The inline textfield should now be displayed
+      final textField = find.byType(TextField);
+      expect(textField, findsOneWidget);
+
+      // Enter a task title and tap 'Add'
+      await tester.enterText(textField, 'New Backlog Item');
+      await tester.pumpAndSettle();
+
+      final addButton = find.widgetWithText(ElevatedButton, 'Add');
+      expect(addButton, findsOneWidget);
+      await tester.tap(addButton);
+      await tester.pumpAndSettle();
+
+      // Verify task was added
+      verify(
+        () => mockTaskProvider.addTask(
+          'New Backlog Item',
+          any(),
+          any(),
+          any(),
+          any(),
+        ),
+      ).called(1);
+    },
+  );
+
+  testWidgets(
+    'renders category accent stripe on KanbanCard when task has category',
+    (tester) async {
+      tester.view.physicalSize = const Size(1200, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(buildTestWidget());
+      await tester.pumpAndSettle();
+
+      // Find Container widgets with width 3.5 representing the vertical category accent stripe
+      final stripeFinder = find.byWidgetPredicate(
+        (widget) =>
+            widget is Container &&
+            widget.constraints?.maxWidth == 3.5 &&
+            widget.constraints?.minWidth == 3.5,
+      );
+      expect(stripeFinder, findsWidgets);
+    },
+  );
 }

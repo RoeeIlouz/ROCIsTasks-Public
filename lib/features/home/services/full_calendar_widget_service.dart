@@ -7,9 +7,13 @@ import 'package:intl/intl.dart';
 import 'package:rocis_tasks/core/services/logger_service.dart';
 import 'package:rocis_tasks/core/services/calendar_service.dart';
 import 'package:rocis_tasks/core/services/calendar_color_service.dart';
+import 'package:rocis_tasks/core/services/schedule_firestore_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:rocis_tasks/features/tasks/data/datasources/local_task_source.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
+import 'package:rocis_tasks/core/services/auth/google_oauth_manager.dart';
 
 /// Filter options for the full calendar widget
 class FullCalendarFilters {
@@ -21,7 +25,7 @@ class FullCalendarFilters {
   const FullCalendarFilters({
     this.showTasks = true,
     this.showGoogleCalendar = true,
-    this.showRocisSchedule = false,
+    this.showRocisSchedule = true,
     this.selectedCalendarIds = const [],
   });
 
@@ -36,7 +40,7 @@ class FullCalendarFilters {
     return FullCalendarFilters(
       showTasks: map['showTasks'] ?? true,
       showGoogleCalendar: map['showGoogleCalendar'] ?? true,
-      showRocisSchedule: false,
+      showRocisSchedule: map['showRocisSchedule'] ?? true,
       selectedCalendarIds: List<String>.from(map['selectedCalendarIds'] ?? []),
     );
   }
@@ -59,27 +63,62 @@ class FullCalendarFilters {
 class FullCalendarWidgetService {
   final CalendarService _calendarService;
   final LocalTaskSource _taskSource;
+  final ScheduleFirestoreService _scheduleService;
 
-  FullCalendarWidgetService(this._calendarService, this._taskSource);
+  static List<dynamic>? _cachedEvents;
+  static String? _cachedEventsKey;
+  static DateTime? _cachedEventsTime;
+
+  static List<SyncedScheduleEvent>? _cachedScheduleEvents;
+  static String? _cachedScheduleKey;
+  static DateTime? _cachedScheduleTime;
+
+  static AppLocalizations? _cachedL10n;
+  static String? _cachedLocaleCode;
+
+  static const _widgetCacheTtl = Duration(minutes: 5);
+
+  /// Invalidate widget in-memory caches
+  static void invalidateCaches() {
+    _cachedEvents = null;
+    _cachedEventsKey = null;
+    _cachedEventsTime = null;
+    _cachedScheduleEvents = null;
+    _cachedScheduleKey = null;
+    _cachedScheduleTime = null;
+    _cachedL10n = null;
+    _cachedLocaleCode = null;
+  }
+
+  FullCalendarWidgetService(
+    this._calendarService,
+    this._taskSource, {
+    ScheduleFirestoreService? scheduleService,
+  }) : _scheduleService = scheduleService ?? ScheduleFirestoreService();
 
   /// Initialize the schedule service
-  Future<void> initScheduleService() async {}
+  Future<void> initScheduleService() async {
+    await _scheduleService.initialize();
+  }
 
   /// Set the user email for ROCIs-Schedule lookup
-  void setUserEmail(String? email) {}
+  void setUserEmail(String? email) {
+    _scheduleService.setUserEmail(email);
+  }
 
   /// Get current filter settings
   Future<FullCalendarFilters> getFilters() async {
     final prefs = await SharedPreferences.getInstance();
     final showTasks = prefs.getBool('full_calendar_show_tasks') ?? true;
     final showGoogle = prefs.getBool('full_calendar_show_google') ?? true;
+    final showSchedule = prefs.getBool('full_calendar_show_schedule') ?? true;
     final selectedCalendarIds =
         prefs.getStringList('full_calendar_selected_ids') ?? [];
 
     return FullCalendarFilters(
       showTasks: showTasks,
       showGoogleCalendar: showGoogle,
-      showRocisSchedule: false,
+      showRocisSchedule: showSchedule,
       selectedCalendarIds: selectedCalendarIds,
     );
   }
@@ -92,7 +131,10 @@ class FullCalendarWidgetService {
       'full_calendar_show_google',
       filters.showGoogleCalendar,
     );
-    await prefs.setBool('full_calendar_show_rocis', false);
+    await prefs.setBool(
+      'full_calendar_show_schedule',
+      filters.showRocisSchedule,
+    );
     await prefs.setStringList(
       'full_calendar_selected_ids',
       filters.selectedCalendarIds,
@@ -108,7 +150,10 @@ class FullCalendarWidgetService {
       'full_calendar_show_google',
       filters.showGoogleCalendar,
     );
-    await HomeWidget.saveWidgetData<bool>('full_calendar_show_rocis', false);
+    await HomeWidget.saveWidgetData<bool>(
+      'full_calendar_show_schedule',
+      filters.showRocisSchedule,
+    );
     await HomeWidget.saveWidgetData<String>(
       'full_calendar_selected_ids',
       jsonEncode(filters.selectedCalendarIds),
@@ -129,6 +174,12 @@ class FullCalendarWidgetService {
           showGoogleCalendar: !current.showGoogleCalendar,
         );
         break;
+      case 'schedule':
+      case 'rocis':
+        updated = current.copyWith(
+          showRocisSchedule: !current.showRocisSchedule,
+        );
+        break;
       default:
         updated = current;
     }
@@ -140,9 +191,15 @@ class FullCalendarWidgetService {
   Future<void> updateFullCalendarWidget({
     int? monthOffset,
     String? userId,
+    String? userEmail,
+    bool forceRefresh = false,
   }) async {
     if (kIsWeb) return;
     try {
+      if (forceRefresh) {
+        invalidateCaches();
+      }
+
       final prefs = await SharedPreferences.getInstance();
       final int offset =
           monthOffset ??
@@ -152,6 +209,14 @@ class FullCalendarWidgetService {
       if (monthOffset != null) {
         await HomeWidget.saveWidgetData<int>('full_calendar_offset', offset);
       }
+
+      // Save beta integration flag to home widget
+      final betaScheduleIntegration =
+          prefs.getBool('beta_schedule_integration') ?? false;
+      await HomeWidget.saveWidgetData<bool>(
+        'beta_schedule_integration',
+        betaScheduleIntegration,
+      );
 
       // Get filter settings
       final filters = await getFilters();
@@ -183,27 +248,141 @@ class FullCalendarWidgetService {
       final startDate = firstDayOfMonth.subtract(Duration(days: difference));
       final endDate = startDate.add(const Duration(days: 41));
 
-      // Fetch Google Calendar events (if filter enabled)
-      var events = <dynamic>[];
-      Map<String, String> calendarColors = {};
-      try {
-        if (filters.showGoogleCalendar) {
-          events = await _calendarService.getEvents(
+      // 1. Fetch Google Calendar events (if filter enabled)
+      Future<List<dynamic>> fetchGoogleEvents() async {
+        if (!filters.showGoogleCalendar) return [];
+        final cacheKey =
+            '${startDate.toIso8601String()}_${endDate.toIso8601String()}_${filters.selectedCalendarIds.join(',')}';
+        if (!forceRefresh &&
+            _cachedEvents != null &&
+            _cachedEventsKey == cacheKey &&
+            _cachedEventsTime != null &&
+            DateTime.now().difference(_cachedEventsTime!) < _widgetCacheTtl) {
+          return _cachedEvents!;
+        }
+        try {
+          final res = await _calendarService.getEvents(
             startDate: startDate,
             endDate: endDate,
             calendarIds: filters.selectedCalendarIds,
           );
-          calendarColors = await _calendarService.getCalendarColors();
+          _cachedEvents = res;
+          _cachedEventsKey = cacheKey;
+          _cachedEventsTime = DateTime.now();
+          return res;
+        } catch (e, stack) {
+          AppLogger.error(
+            'Failed to fetch Google Calendar events for widget',
+            error: e,
+            stack: stack,
+          );
+          return _cachedEvents ?? [];
         }
-      } catch (e, stack) {
-        AppLogger.error(
-          'Failed to fetch Google Calendar events for widget',
-          error: e,
-          stack: stack,
-        );
       }
 
-      // Pre-index events by date for O(1) lookup instead of O(n) per day
+      // 2. Fetch Google Calendar colors
+      Future<Map<String, String>> fetchColors() async {
+        if (!filters.showGoogleCalendar) return {};
+        try {
+          final colors = await _calendarService.getCalendarColors(
+            forceRefresh: forceRefresh,
+          );
+          for (final key in prefs.getKeys()) {
+            if (key.startsWith(
+              CalendarColorService.keySubcalendarColorsPrefix,
+            )) {
+              final calId = key.substring(
+                CalendarColorService.keySubcalendarColorsPrefix.length,
+              );
+              final colorInt = prefs.getInt(key);
+              if (colorInt != null) {
+                colors[calId] =
+                    '#${colorInt.toRadixString(16).padLeft(8, '0')}';
+              }
+            }
+          }
+          return colors;
+        } catch (_) {
+          return {};
+        }
+      }
+
+      // 3. Fetch ROCIs Schedule events (if filter enabled)
+      Future<List<SyncedScheduleEvent>> fetchScheduleEvents() async {
+        if (!filters.showRocisSchedule) return [];
+        final effectiveUid =
+            userId ??
+            (Firebase.apps.isNotEmpty
+                ? FirebaseAuth.instance.currentUser?.uid
+                : null);
+        final effectiveEmail =
+            userEmail ??
+            (Firebase.apps.isNotEmpty
+                ? FirebaseAuth.instance.currentUser?.email
+                : null) ??
+            prefs.getString(GoogleOAuthManager.keyUserEmail) ??
+            prefs.getString('user_email');
+        final scheduleKey = '${effectiveUid ?? ''}_${effectiveEmail ?? ''}';
+
+        if (!forceRefresh &&
+            _cachedScheduleEvents != null &&
+            _cachedScheduleKey == scheduleKey &&
+            _cachedScheduleTime != null &&
+            DateTime.now().difference(_cachedScheduleTime!) < _widgetCacheTtl) {
+          return _cachedScheduleEvents!;
+        }
+        try {
+          final res = await _scheduleService.fetchEvents(
+            uid: effectiveUid,
+            email: effectiveEmail,
+            forceRefresh: forceRefresh,
+          );
+          _cachedScheduleEvents = res;
+          _cachedScheduleKey = scheduleKey;
+          _cachedScheduleTime = DateTime.now();
+          return res;
+        } catch (e, stack) {
+          AppLogger.error(
+            'Failed to fetch ROCIs Schedule events for widget',
+            error: e,
+            stack: stack,
+          );
+          return _cachedScheduleEvents ?? [];
+        }
+      }
+
+      // 4. Load localization
+      Future<AppLocalizations?> fetchL10n() async {
+        if (_cachedLocaleCode == localeCode && _cachedL10n != null) {
+          return _cachedL10n;
+        }
+        try {
+          final loaded = await AppLocalizations.delegate.load(
+            Locale(localeCode),
+          );
+          _cachedLocaleCode = localeCode;
+          _cachedL10n = loaded;
+          return loaded;
+        } catch (e) {
+          AppLogger.debug('Failed to load l10n for widget service: $e');
+          return _cachedL10n;
+        }
+      }
+
+      // Run network/IO queries in parallel
+      final asyncResults = await Future.wait([
+        fetchGoogleEvents(),
+        fetchColors(),
+        fetchScheduleEvents(),
+        fetchL10n(),
+      ]);
+
+      final events = asyncResults[0] as List<dynamic>;
+      final calendarColors = asyncResults[1] as Map<String, String>;
+      final scheduleEvents = asyncResults[2] as List<SyncedScheduleEvent>;
+      final l10n = asyncResults[3] as AppLocalizations?;
+
+      // Pre-index Google events by date for O(1) lookup
       final eventsByDate = <String, List<dynamic>>{};
       for (final event in events) {
         if (event.start == null) continue;
@@ -230,6 +409,26 @@ class FullCalendarWidgetService {
           final key = DateFormat('yyyy-MM-dd').format(day);
           eventsByDate.putIfAbsent(key, () => []).add(event);
           day = day.add(const Duration(days: 1));
+        }
+      }
+
+      // Pre-index ROCIs Schedule events by date for O(1) lookup
+      final scheduleEventsByDate = <String, List<SyncedScheduleEvent>>{};
+      if (filters.showRocisSchedule) {
+        for (final sEvent in scheduleEvents) {
+          if (sEvent.recurring) {
+            DateTime day = startDate;
+            while (!day.isAfter(endDate)) {
+              if (sEvent.occursOnDay(day)) {
+                final key = DateFormat('yyyy-MM-dd').format(day);
+                scheduleEventsByDate.putIfAbsent(key, () => []).add(sEvent);
+              }
+              day = day.add(const Duration(days: 1));
+            }
+          } else {
+            final key = DateFormat('yyyy-MM-dd').format(sEvent.startTime);
+            scheduleEventsByDate.putIfAbsent(key, () => []).add(sEvent);
+          }
         }
       }
 
@@ -263,15 +462,6 @@ class FullCalendarWidgetService {
 
       // Pre-load categories for color lookup
       final categories = _taskSource.getCategories();
-
-      // Load localization for background strings
-      AppLocalizations? l10n;
-      try {
-        final localeCode = prefs.getString('language_code') ?? 'en';
-        l10n = await AppLocalizations.delegate.load(Locale(localeCode));
-      } catch (e) {
-        AppLogger.debug('Failed to load l10n for widget service: $e');
-      }
 
       final gridData = <Map<String, dynamic>>[];
 
@@ -347,6 +537,30 @@ class FullCalendarWidgetService {
             });
           }
 
+          for (final s in (scheduleEventsByDate[dateKey] ?? [])) {
+            if (summaries.length >= 4) break;
+            final timeStr = _formatEventTime(s.startTime, s.endTime, l10n);
+            final displayTitle = s.title.isNotEmpty
+                ? s.title
+                : (l10n?.event ?? 'Class');
+            final title = displayTitle.length > 25
+                ? '${displayTitle.substring(0, 22)}...'
+                : displayTitle;
+            final location = s.location.length > 20
+                ? '${s.location.substring(0, 17)}...'
+                : s.location;
+            final eventColor =
+                '#${s.color.toARGB32().toRadixString(16).padLeft(8, '0')}';
+
+            summaries.add({
+              'text': title,
+              'time': timeStr,
+              'subtitle': location,
+              'color': eventColor,
+              'type': 'schedule',
+            });
+          }
+
           gridData.add({
             'isWeekNumber': false,
             'date': dateKey,
@@ -358,6 +572,36 @@ class FullCalendarWidgetService {
                 date.day == now.day,
             'summaries': summaries,
           });
+        }
+      }
+
+      // If the newly generated grid has 0 summaries but previous grid was populated,
+      // preserve previous grid to prevent empty-screen wipe during background sleep/offline
+      // ONLY for the current month (offset == 0). For navigated months (offset != 0), allow empty grids.
+      final int totalSummaries = gridData.fold<int>(
+        0,
+        (sum, day) => sum + ((day['summaries'] as List?)?.length ?? 0),
+      );
+      if (totalSummaries == 0 && offset == 0) {
+        final existingData = await HomeWidget.getWidgetData<String>(
+          'full_calendar_grid_data',
+        );
+        if (existingData != null &&
+            existingData.isNotEmpty &&
+            existingData != '[]') {
+          try {
+            final decoded = jsonDecode(existingData) as List<dynamic>;
+            final int existingSummaries = decoded.fold<int>(
+              0,
+              (sum, day) => sum + ((day['summaries'] as List?)?.length ?? 0),
+            );
+            if (existingSummaries > 0) {
+              AppLogger.warning(
+                'Newly generated grid has 0 summaries while existing grid has $existingSummaries. Preserving existing grid for current month.',
+              );
+              return;
+            }
+          } catch (_) {}
         }
       }
 
@@ -380,6 +624,7 @@ class FullCalendarWidgetService {
           'full_calendar_month_name',
           monthName,
         ),
+        HomeWidget.saveWidgetData<int>('full_calendar_offset', offset),
         HomeWidget.saveWidgetData<bool>(
           'full_calendar_show_tasks',
           filters.showTasks,
@@ -388,7 +633,10 @@ class FullCalendarWidgetService {
           'full_calendar_show_google',
           filters.showGoogleCalendar,
         ),
-        HomeWidget.saveWidgetData<bool>('full_calendar_show_rocis', false),
+        HomeWidget.saveWidgetData<bool>(
+          'full_calendar_show_schedule',
+          filters.showRocisSchedule,
+        ),
       ]);
 
       // Small delay to ensure SharedPreferences are flushed to disk
@@ -406,7 +654,14 @@ class FullCalendarWidgetService {
         error: e,
         stack: stack,
       );
-      await _generateFallbackGrid(monthOffset, userId);
+      final existingData = await HomeWidget.getWidgetData<String>(
+        'full_calendar_grid_data',
+      );
+      if (existingData == null ||
+          existingData.isEmpty ||
+          existingData == '[]') {
+        await _generateFallbackGrid(monthOffset, userId);
+      }
     }
   }
 
@@ -431,6 +686,18 @@ class FullCalendarWidgetService {
   /// Generates a grid with just dates (no events) to prevent blank widget
   Future<void> _generateFallbackGrid(int? monthOffset, String? userId) async {
     try {
+      final existingData = await HomeWidget.getWidgetData<String>(
+        'full_calendar_grid_data',
+      );
+      if (existingData != null &&
+          existingData.isNotEmpty &&
+          existingData != '[]') {
+        AppLogger.info(
+          'Preserving existing full_calendar_grid_data instead of overwriting with fallback',
+        );
+        return;
+      }
+
       final int offset =
           monthOffset ??
           (await HomeWidget.getWidgetData<int>('full_calendar_offset') ?? 0);

@@ -406,6 +406,8 @@ class _AppColorPickerSheetState extends State<AppColorPickerSheet> {
                         _currentHsv = _currentHsv.withHue(val);
                         _hexController.text = _formatHex(_currentColor);
                       });
+                    },
+                    onChangeEnd: (_) {
                       widget.onColorChanged(_currentColor);
                     },
                   ),
@@ -455,6 +457,8 @@ class _AppColorPickerSheetState extends State<AppColorPickerSheet> {
                         _currentHsv = _currentHsv.withSaturation(val);
                         _hexController.text = _formatHex(_currentColor);
                       });
+                    },
+                    onChangeEnd: (_) {
                       widget.onColorChanged(_currentColor);
                     },
                   ),
@@ -504,6 +508,8 @@ class _AppColorPickerSheetState extends State<AppColorPickerSheet> {
                         _currentHsv = _currentHsv.withValue(val);
                         _hexController.text = _formatHex(_currentColor);
                       });
+                    },
+                    onChangeEnd: (_) {
                       widget.onColorChanged(_currentColor);
                     },
                   ),
@@ -548,6 +554,8 @@ class _AppColorPickerSheetState extends State<AppColorPickerSheet> {
                         _opacity = val;
                         _hexController.text = _formatHex(_currentColor);
                       });
+                    },
+                    onChangeEnd: (_) {
                       widget.onColorChanged(_currentColor);
                     },
                   ),
@@ -593,6 +601,7 @@ class _AppColorPickerSheetState extends State<AppColorPickerSheet> {
             FilledButton.icon(
               onPressed: () {
                 HapticFeedback.lightImpact();
+                widget.onColorChanged(_currentColor);
                 Navigator.of(context).pop(_currentColor);
               },
               icon: const Icon(Icons.check_rounded, size: 20),

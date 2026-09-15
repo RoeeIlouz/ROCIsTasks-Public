@@ -272,6 +272,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get calendarColors => 'Calendar Colors';
 
   @override
+  String get calendarColorThemingHint =>
+      'To customize calendar colors, open the Calendar Colors sheet (palette icon).';
+
+  @override
   String get calendarFiltersTitle => 'Calendar Filters';
 
   @override
@@ -300,6 +304,30 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get selectColor => 'Select Color';
+
+  @override
+  String get subcalendars => 'Subcalendars';
+
+  @override
+  String get customColor => 'Custom Color';
+
+  @override
+  String get resetToGoogleDefault => 'Reset to Google Color';
+
+  @override
+  String get hexCode => 'HEX Code';
+
+  @override
+  String get opacity => 'Opacity';
+
+  @override
+  String get presets => 'Presets';
+
+  @override
+  String get expandCustomPicker => 'Custom Color';
+
+  @override
+  String get noEnabledCalendars => 'No enabled Google Calendars';
 
   @override
   String get selectGoogleCalendars => 'Select Google Calendars';

@@ -4,14 +4,29 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:async';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rocis_tasks/core/services/auth_service.dart';
+import 'package:rocis_tasks/core/services/auth/google_oauth_manager.dart';
+import 'package:rocis_tasks/core/services/error_handling_service.dart';
 
 class CalendarService {
   final DeviceCalendarPlugin _deviceCalendarPlugin = DeviceCalendarPlugin();
   AuthService? _authService;
+  static const String _keyCachedEvents = 'cached_calendar_events_v2';
+  List<Calendar>? _cachedCalendars;
+  DateTime? _cachedCalendarsTime;
+  static const Duration _calendarCacheTtl = Duration(minutes: 5);
+
+  CalendarService({AuthService? authService}) : _authService = authService;
 
   void setAuthService(AuthService authService) {
     _authService = authService;
+  }
+
+  void invalidateCalendarsCache() {
+    _cachedCalendars = null;
+    _cachedCalendarsTime = null;
   }
 
   Future<void> init() async {
@@ -42,7 +57,7 @@ class CalendarService {
     }
   }
 
-  /// Centralized token resolution that returns null if no token is cached.
+  /// Centralized token resolution that supports background isolates and silent refresh.
   Future<String?> _getAccessToken() async {
     if (_authService != null) {
       final isGoogleUser =
@@ -50,9 +65,43 @@ class CalendarService {
             (p) => p.providerId == 'google.com',
           ) ??
           false;
-      if (!isGoogleUser) return null;
-      final token = await _authService!.getGoogleAccessToken();
-      if (token != null && token.isNotEmpty) return token;
+      if (isGoogleUser) {
+        final token = await _authService!.getGoogleAccessToken();
+        if (token != null && token.isNotEmpty) return token;
+      }
+    }
+
+    // Background isolate fallback: read directly from SharedPreferences or attempt silent refresh
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('google_access_token');
+      final expiresAtStr = prefs.getString('google_access_token_expires_at');
+      if (token != null && token.isNotEmpty) {
+        if (expiresAtStr != null) {
+          final expiresAt = DateTime.tryParse(expiresAtStr);
+          if (expiresAt != null && DateTime.now().isBefore(expiresAt)) {
+            return token;
+          }
+        } else {
+          return token;
+        }
+      }
+
+      // Proactive silent refresh using GoogleOAuthManager
+      final oauthManager = GoogleOAuthManager(ErrorHandlingService());
+      final freshToken = await oauthManager.getGoogleAccessToken();
+      if (freshToken != null && freshToken.isNotEmpty) {
+        return freshToken;
+      }
+
+      // If silent refresh failed (e.g. network cutoff in doze), fall back to cached token
+      if (token != null && token.isNotEmpty) {
+        return token;
+      }
+    } catch (e) {
+      AppLogger.warning(
+        'Failed to resolve Google access token in background: $e',
+      );
     }
     return null;
   }
@@ -77,7 +126,16 @@ class CalendarService {
     }
   }
 
-  Future<List<Calendar>> getAvailableCalendars() async {
+  Future<List<Calendar>> getAvailableCalendars({
+    bool forceRefresh = false,
+  }) async {
+    if (!forceRefresh &&
+        _cachedCalendars != null &&
+        _cachedCalendarsTime != null &&
+        DateTime.now().difference(_cachedCalendarsTime!) < _calendarCacheTtl) {
+      return _cachedCalendars!;
+    }
+
     final List<Calendar> rawCalendars = [];
     final token = await _getAccessToken();
 
@@ -101,105 +159,134 @@ class CalendarService {
       }
     }
 
-    // 2. If Web or if no device calendars were found, query Google Calendar REST API
-    if (kIsWeb || rawCalendars.isEmpty) {
-      if (token != null && token.isNotEmpty) {
-        try {
-          final uri = Uri.https(
-            'www.googleapis.com',
-            '/calendar/v3/users/me/calendarList',
+    // 2. Query Google Calendar REST API whenever authenticated
+    final List<Calendar> googleApiCalendars = [];
+    if (token != null && token.isNotEmpty) {
+      try {
+        final uri = Uri.https(
+          'www.googleapis.com',
+          '/calendar/v3/users/me/calendarList',
+        );
+
+        final response = await http
+            .get(uri, headers: {'Authorization': 'Bearer $token'})
+            .timeout(const Duration(seconds: 5));
+
+        if (response.statusCode == 401 || response.statusCode == 403) {
+          AppLogger.warning(
+            'Google Calendar list API returned ${response.statusCode} (Unauthorized/Forbidden).',
+            tag: 'Calendar',
           );
-
-          final response = await http.get(
-            uri,
-            headers: {'Authorization': 'Bearer $token'},
-          );
-
-          if (response.statusCode == 401 || response.statusCode == 403) {
-            AppLogger.warning(
-              'Google Calendar list API returned ${response.statusCode} (Unauthorized/Forbidden).',
-              tag: 'Calendar',
-            );
-            await _authService?.handleTokenRevokedOrExpired();
-            throw GoogleTokenExpiredException(
-              'Google Calendar token rejected by server (${response.statusCode}).',
-              true,
-            );
-          } else if (response.statusCode == 200) {
-            final data = json.decode(response.body);
-            final items = data['items'] as List<dynamic>? ?? [];
-
-            for (final item in items) {
-              final id = item['id'] as String?;
-              if (id == null || id.trim().isEmpty) continue;
-              if (item['deleted'] == true || item['hidden'] == true) continue;
-
-              final summaryOverride = (item['summaryOverride'] as String?)
-                  ?.trim();
-              final summary = (item['summary'] as String?)?.trim();
-              final description = (item['description'] as String?)?.trim();
-              final isPrimary = item['primary'] == true;
-
-              String? name;
-              if (summaryOverride != null && summaryOverride.isNotEmpty) {
-                name = summaryOverride;
-              } else if (summary != null && summary.isNotEmpty) {
-                name = summary;
-              } else if (description != null && description.isNotEmpty) {
-                name = description;
-              } else if (isPrimary || id.contains('@')) {
-                name = id;
-              }
-
-              final accessRole = item['accessRole'] as String?;
-              final isReadOnly =
-                  accessRole == 'reader' || accessRole == 'freeBusyReader';
-
-              final bgHex = item['backgroundColor'] as String? ?? '#6366F1';
-              int colorVal = 0xFF6366F1;
-              try {
-                final hex = bgHex.replaceAll('#', '');
-                colorVal = int.parse('FF$hex', radix: 16);
-              } catch (_) {}
-
-              rawCalendars.add(
-                Calendar(
-                  id: id,
-                  name: name,
-                  accountName: isPrimary ? id : (id.contains('@') ? id : null),
-                  accountType: 'com.google',
-                  isReadOnly: isReadOnly,
-                  isDefault: isPrimary,
-                  color: colorVal,
-                ),
-              );
-            }
-          }
-        } on GoogleTokenExpiredException {
-          if (kIsWeb) rethrow;
-        } catch (e, s) {
-          AppLogger.error(
-            'Error retrieving Google Calendars via API',
-            error: e,
-            stack: s,
-          );
-        }
-      } else if (kIsWeb) {
-        final isGoogle =
-            _authService?.currentUser?.providerData.any(
-              (p) => p.providerId == 'google.com',
-            ) ??
-            false;
-        if (isGoogle) {
+          await _authService?.handleTokenRevokedOrExpired();
           throw GoogleTokenExpiredException(
-            'No Web Google access token available.',
+            'Google Calendar token rejected by server (${response.statusCode}).',
             true,
           );
+        } else if (response.statusCode == 200) {
+          final data = json.decode(response.body);
+          final items = data['items'] as List<dynamic>? ?? [];
+
+          for (final item in items) {
+            final id = item['id'] as String?;
+            if (id == null || id.trim().isEmpty) continue;
+            if (item['deleted'] == true || item['hidden'] == true) continue;
+
+            final summaryOverride = (item['summaryOverride'] as String?)
+                ?.trim();
+            final summary = (item['summary'] as String?)?.trim();
+            final description = (item['description'] as String?)?.trim();
+            final isPrimary = item['primary'] == true;
+
+            String? name;
+            if (summaryOverride != null && summaryOverride.isNotEmpty) {
+              name = summaryOverride;
+            } else if (summary != null && summary.isNotEmpty) {
+              name = summary;
+            } else if (description != null && description.isNotEmpty) {
+              name = description;
+            } else if (isPrimary || id.contains('@')) {
+              name = id;
+            }
+
+            final accessRole = item['accessRole'] as String?;
+            final isReadOnly =
+                accessRole == 'reader' || accessRole == 'freeBusyReader';
+
+            final bgHex = item['backgroundColor'] as String? ?? '#6366F1';
+            int colorVal = 0xFF6366F1;
+            try {
+              final hex = bgHex.replaceAll('#', '');
+              colorVal = int.parse('FF$hex', radix: 16);
+            } catch (_) {}
+
+            googleApiCalendars.add(
+              Calendar(
+                id: id,
+                name: name,
+                accountName: isPrimary ? id : (id.contains('@') ? id : null),
+                accountType: 'com.google',
+                isReadOnly: isReadOnly,
+                isDefault: isPrimary,
+                color: colorVal,
+              ),
+            );
+          }
         }
+      } on GoogleTokenExpiredException {
+        if (kIsWeb) rethrow;
+      } catch (e, s) {
+        AppLogger.error(
+          'Error retrieving Google Calendars via API',
+          error: e,
+          stack: s,
+        );
+      }
+    } else if (kIsWeb) {
+      final isGoogle =
+          _authService?.currentUser?.providerData.any(
+            (p) => p.providerId == 'google.com',
+          ) ??
+          false;
+      if (isGoogle) {
+        throw GoogleTokenExpiredException(
+          'No Web Google access token available.',
+          true,
+        );
       }
     }
 
-    final calendars = _sanitizeAndFilterCalendars(rawCalendars);
+    final List<Calendar> combined = [];
+    if (googleApiCalendars.isNotEmpty) {
+      // Find the primary Google email if present
+      String? primaryEmail;
+      for (final c in googleApiCalendars) {
+        if (c.isDefault == true ||
+            (c.id != null &&
+                c.id!.contains('@') &&
+                !c.id!.contains('group.calendar.google.com'))) {
+          primaryEmail = c.id?.toLowerCase();
+          break;
+        }
+      }
+
+      // Filter out device calendars that match the authenticated Google account to prevent duplicates
+      for (final devCal in rawCalendars) {
+        final acc = devCal.accountName?.toLowerCase();
+        final type = devCal.accountType?.toLowerCase();
+        final isAuthGoogle =
+            (type == 'com.google' &&
+                (primaryEmail == null || acc == primaryEmail)) ||
+            (primaryEmail != null && acc == primaryEmail);
+        if (!isAuthGoogle) {
+          combined.add(devCal);
+        }
+      }
+      combined.addAll(googleApiCalendars);
+    } else {
+      combined.addAll(rawCalendars);
+    }
+
+    final calendars = _sanitizeAndFilterCalendars(combined);
 
     if (calendars.isEmpty && (kIsWeb || (token != null && token.isNotEmpty))) {
       calendars.add(
@@ -212,6 +299,8 @@ class CalendarService {
         ),
       );
     }
+    _cachedCalendars = calendars;
+    _cachedCalendarsTime = DateTime.now();
     return calendars;
   }
 
@@ -273,8 +362,10 @@ class CalendarService {
   List<Event> deduplicateEventsForTesting(List<Event> events) =>
       _deduplicateEvents(events);
 
-  Future<Map<String, String>> getCalendarColors() async {
-    final calendars = await getAvailableCalendars();
+  Future<Map<String, String>> getCalendarColors({
+    bool forceRefresh = false,
+  }) async {
+    final calendars = await getAvailableCalendars(forceRefresh: forceRefresh);
     final Map<String, String> colorMap = {};
     for (final calendar in calendars) {
       if (calendar.id != null && calendar.color != null) {
@@ -341,6 +432,7 @@ class CalendarService {
       final hasPermission = await requestPermissions();
       if (hasPermission) {
         for (final calendarId in targetCalendarIds) {
+          if (calendarId == 'primary' || calendarId.contains('@')) continue;
           try {
             final eventsResult = await _deviceCalendarPlugin.retrieveEvents(
               calendarId,
@@ -375,123 +467,218 @@ class CalendarService {
         googleIds.add('primary');
       }
 
-      for (final calendarId in googleIds) {
-        try {
-          final queryParams = {
-            'timeMin': start.toUtc().toIso8601String(),
-            'timeMax': end.toUtc().toIso8601String(),
-            'singleEvents': 'true',
-            'orderBy': 'startTime',
-          };
+      final List<Event> apiEvents = [];
+      await Future.wait(
+        googleIds.map((calendarId) async {
+          try {
+            final queryParams = {
+              'timeMin': start.toUtc().toIso8601String(),
+              'timeMax': end.toUtc().toIso8601String(),
+              'singleEvents': 'true',
+              'orderBy': 'startTime',
+            };
 
-          final uri = Uri.https(
-            'www.googleapis.com',
-            '/calendar/v3/calendars/$calendarId/events',
-            queryParams,
-          );
-
-          final response = await http.get(
-            uri,
-            headers: {'Authorization': 'Bearer $token'},
-          );
-
-          if (response.statusCode == 401 || response.statusCode == 403) {
-            AppLogger.warning(
-              'Google Calendar API request returned ${response.statusCode} for $calendarId: ${response.body}',
-              tag: 'Calendar',
+            final uri = Uri.https(
+              'www.googleapis.com',
+              '/calendar/v3/calendars/$calendarId/events',
+              queryParams,
             );
-            await _authService?.handleTokenRevokedOrExpired();
-            throw GoogleTokenExpiredException(
-              'Google Calendar token rejected by server (${response.statusCode}).',
-              true,
-            );
-          } else if (response.statusCode == 200) {
-            final data = json.decode(response.body);
-            final items = data['items'] as List<dynamic>? ?? [];
 
-            for (final item in items) {
-              if (item['status'] == 'cancelled') continue;
+            final response = await http
+                .get(uri, headers: {'Authorization': 'Bearer $token'})
+                .timeout(const Duration(seconds: 5));
 
-              final id = item['id'] as String?;
-              final title = item['summary'] as String? ?? 'No Title';
-              final desc = item['description'] as String?;
+            if (response.statusCode == 401 || response.statusCode == 403) {
+              AppLogger.warning(
+                'Google Calendar API request returned ${response.statusCode} for $calendarId: ${response.body}',
+                tag: 'Calendar',
+              );
+              await _authService?.handleTokenRevokedOrExpired();
+              throw GoogleTokenExpiredException(
+                'Google Calendar token rejected by server (${response.statusCode}).',
+                true,
+              );
+            } else if (response.statusCode == 200) {
+              final data = json.decode(response.body);
+              final items = data['items'] as List<dynamic>? ?? [];
 
-              final startData = item['start'] as Map<String, dynamic>?;
-              final endData = item['end'] as Map<String, dynamic>?;
+              for (final item in items) {
+                if (item['status'] == 'cancelled') continue;
 
-              if (startData == null) continue;
+                final id = item['id'] as String?;
+                final title = item['summary'] as String? ?? 'No Title';
+                final desc = item['description'] as String?;
 
-              DateTime? startTime;
-              DateTime? endTime;
-              bool allDay = false;
+                final startData = item['start'] as Map<String, dynamic>?;
+                final endData = item['end'] as Map<String, dynamic>?;
 
-              if (startData.containsKey('dateTime')) {
-                startTime = DateTime.parse(
-                  startData['dateTime'] as String,
-                ).toLocal();
-              } else if (startData.containsKey('date')) {
-                final dateStr = startData['date'] as String;
-                final parts = dateStr.split('-');
-                if (parts.length == 3) {
-                  startTime = DateTime(
-                    int.parse(parts[0]),
-                    int.parse(parts[1]),
-                    int.parse(parts[2]),
-                  );
-                } else {
-                  startTime = DateTime.parse(dateStr).toLocal();
-                }
-                allDay = true;
-              }
+                if (startData == null) continue;
 
-              if (endData != null) {
-                if (endData.containsKey('dateTime')) {
-                  endTime = DateTime.parse(
-                    endData['dateTime'] as String,
+                DateTime? startTime;
+                DateTime? endTime;
+                bool allDay = false;
+
+                if (startData.containsKey('dateTime')) {
+                  startTime = DateTime.parse(
+                    startData['dateTime'] as String,
                   ).toLocal();
-                } else if (endData.containsKey('date')) {
-                  final dateStr = endData['date'] as String;
+                } else if (startData.containsKey('date')) {
+                  final dateStr = startData['date'] as String;
                   final parts = dateStr.split('-');
                   if (parts.length == 3) {
-                    endTime = DateTime(
+                    startTime = DateTime(
                       int.parse(parts[0]),
                       int.parse(parts[1]),
                       int.parse(parts[2]),
                     );
                   } else {
-                    endTime = DateTime.parse(dateStr).toLocal();
+                    startTime = DateTime.parse(dateStr).toLocal();
+                  }
+                  allDay = true;
+                }
+
+                if (endData != null) {
+                  if (endData.containsKey('dateTime')) {
+                    endTime = DateTime.parse(
+                      endData['dateTime'] as String,
+                    ).toLocal();
+                  } else if (endData.containsKey('date')) {
+                    final dateStr = endData['date'] as String;
+                    final parts = dateStr.split('-');
+                    if (parts.length == 3) {
+                      endTime = DateTime(
+                        int.parse(parts[0]),
+                        int.parse(parts[1]),
+                        int.parse(parts[2]),
+                      );
+                    } else {
+                      endTime = DateTime.parse(dateStr).toLocal();
+                    }
                   }
                 }
+
+                if (startTime == null) continue;
+                endTime ??= startTime.add(const Duration(hours: 1));
+
+                apiEvents.add(
+                  Event(
+                    calendarId,
+                    eventId: id,
+                    title: title,
+                    description: desc,
+                    start: _toTZDateTime(startTime),
+                    end: _toTZDateTime(endTime),
+                    allDay: allDay,
+                  ),
+                );
               }
-
-              if (startTime == null) continue;
-              endTime ??= startTime.add(const Duration(hours: 1));
-
-              allEvents.add(
-                Event(
-                  calendarId,
-                  eventId: id,
-                  title: title,
-                  description: desc,
-                  start: _toTZDateTime(startTime),
-                  end: _toTZDateTime(endTime),
-                  allDay: allDay,
-                ),
-              );
             }
+          } on GoogleTokenExpiredException {
+            rethrow;
+          } catch (e) {
+            AppLogger.error(
+              'Error fetching events for calendar $calendarId via API',
+              error: e,
+            );
           }
-        } on GoogleTokenExpiredException {
-          rethrow;
-        } catch (e) {
-          AppLogger.error(
-            'Error fetching events for calendar $calendarId via API',
-            error: e,
-          );
-        }
-      }
+        }),
+      );
+      allEvents.addAll(apiEvents);
     }
 
-    return _deduplicateEvents(allEvents);
+    final result = _deduplicateEvents(allEvents);
+    if (result.isNotEmpty) {
+      // Proactively update cache
+      unawaited(_cacheEvents(result));
+      return result;
+    }
+
+    // Fallback: If 0 events were found (e.g. offline, background isolate, token expired),
+    // restore from cache for the requested range so widgets never go blank
+    final cached = await _getCachedEvents(
+      startDate: start,
+      endDate: end,
+      calendarIds: targetCalendarIds,
+    );
+    if (cached.isNotEmpty) {
+      AppLogger.info(
+        'Restored ${cached.length} calendar events from local cache for widget/background',
+      );
+      return _deduplicateEvents(cached);
+    }
+
+    return result;
+  }
+
+  Future<void> _cacheEvents(List<Event> events) async {
+    try {
+      if (events.isEmpty) return;
+      final prefs = await SharedPreferences.getInstance();
+      final list = events.map((e) {
+        return {
+          'calendarId': e.calendarId,
+          'eventId': e.eventId,
+          'title': e.title,
+          'description': e.description,
+          'start': e.start?.toIso8601String(),
+          'end': e.end?.toIso8601String(),
+          'allDay': e.allDay,
+        };
+      }).toList();
+      await prefs.setString(_keyCachedEvents, jsonEncode(list));
+    } catch (e) {
+      AppLogger.debug('Failed to cache calendar events: $e');
+    }
+  }
+
+  Future<List<Event>> _getCachedEvents({
+    DateTime? startDate,
+    DateTime? endDate,
+    List<String>? calendarIds,
+  }) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final jsonStr = prefs.getString(_keyCachedEvents);
+      if (jsonStr == null || jsonStr.isEmpty || jsonStr == '[]') return [];
+
+      final list = jsonDecode(jsonStr) as List<dynamic>;
+      final result = <Event>[];
+      for (final item in list) {
+        final map = item as Map<String, dynamic>;
+        final calId = map['calendarId'] as String?;
+        if (calendarIds != null && calendarIds.isNotEmpty && calId != null) {
+          if (!calendarIds.contains(calId)) continue;
+        }
+
+        final startStr = map['start'] as String?;
+        final endStr = map['end'] as String?;
+        if (startStr == null) continue;
+
+        final start = DateTime.parse(startStr);
+        final end = endStr != null
+            ? DateTime.parse(endStr)
+            : start.add(const Duration(hours: 1));
+
+        if (startDate != null && end.isBefore(startDate)) continue;
+        if (endDate != null && start.isAfter(endDate)) continue;
+
+        result.add(
+          Event(
+            calId,
+            eventId: map['eventId'] as String?,
+            title: map['title'] as String?,
+            description: map['description'] as String?,
+            start: _toTZDateTime(start),
+            end: _toTZDateTime(end),
+            allDay: map['allDay'] == true,
+          ),
+        );
+      }
+      return result;
+    } catch (e) {
+      AppLogger.debug('Failed to read cached calendar events: $e');
+      return [];
+    }
   }
 
   Future<Calendar?> getDefaultWritableCalendar() async {

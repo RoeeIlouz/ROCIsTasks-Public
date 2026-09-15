@@ -5,10 +5,12 @@ import 'package:rocis_tasks/features/home/presentation/screens/web_home_screen.d
 import 'package:rocis_tasks/features/calendar/presentation/screens/calendar_screen.dart';
 import 'package:rocis_tasks/features/categories/presentation/screens/categories_screen.dart';
 import 'package:rocis_tasks/features/tasks/presentation/screens/add_task_screen.dart';
+import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/features/tasks/presentation/screens/task_detail_screen.dart';
 import 'package:rocis_tasks/features/tasks/presentation/screens/task_list_screen.dart';
 import 'package:rocis_tasks/features/tasks/presentation/widgets/task_sort_filter_sheet.dart';
 import 'package:rocis_tasks/features/home/presentation/screens/settings_screen.dart';
+import 'package:rocis_tasks/features/tasks/presentation/widgets/quick_add_task_bottom_sheet.dart';
 import 'package:rocis_tasks/features/home/presentation/screens/app_guide_screen.dart';
 import 'package:rocis_tasks/features/auth/presentation/screens/security_settings_screen.dart';
 import 'package:home_widget/home_widget.dart' as hw;
@@ -88,13 +90,34 @@ class _HomeScreenState extends State<HomeScreen> {
     return null;
   }
 
-  void _navigateToAddTask() {
+  void _navigateToAddTask({
+    String? initialTitle,
+    String? initialDescription,
+    DateTime? initialDueDate,
+    TaskPriority? initialPriority,
+    String? initialCategoryId,
+  }) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const AddTaskScreen(),
+        builder: (context) => AddTaskScreen(
+          initialTitle: initialTitle,
+          initialDescription: initialDescription,
+          initialDueDate: initialDueDate,
+          initialPriority: initialPriority,
+          initialCategoryId: initialCategoryId,
+        ),
         fullscreenDialog: true,
       ),
+    );
+  }
+
+  void _showQuickAddTask() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => const QuickAddTaskBottomSheet(),
     );
   }
 
@@ -116,7 +139,28 @@ class _HomeScreenState extends State<HomeScreen> {
     // Widget launch with uri handled
 
     if (uri.host == 'add_task') {
-      _navigateToAddTask();
+      final title = uri.queryParameters['title'];
+      final notes =
+          uri.queryParameters['notes'] ?? uri.queryParameters['description'];
+      final dueDateStr = uri.queryParameters['dueDate'];
+      final priorityStr = uri.queryParameters['priority'];
+      DateTime? dueDate;
+      if (dueDateStr != null) {
+        dueDate = DateTime.tryParse(dueDateStr);
+      }
+      TaskPriority? priority;
+      if (priorityStr != null) {
+        priority = TaskPriority.values
+            .where((p) => p.name.toLowerCase() == priorityStr.toLowerCase())
+            .firstOrNull;
+      }
+
+      _navigateToAddTask(
+        initialTitle: title,
+        initialDescription: notes,
+        initialDueDate: dueDate,
+        initialPriority: priority,
+      );
       return;
     }
 
@@ -487,6 +531,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: InkWell(
                     onTap: () {
                       HapticFeedback.lightImpact();
+                      _showQuickAddTask();
+                    },
+                    onLongPress: () {
+                      HapticFeedback.mediumImpact();
                       _navigateToAddTask();
                     },
                     borderRadius: BorderRadius.circular(16),
@@ -578,43 +626,49 @@ class _HomeScreenState extends State<HomeScreen> {
         child: InkWell(
           onTap: () => _onItemTapped(index),
           borderRadius: BorderRadius.circular(16),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 4,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 48),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? theme.colorScheme.primary.withValues(alpha: 0.15)
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Icon(
+                      isSelected ? selectedIcon : icon,
+                      color: isSelected
+                          ? theme.colorScheme.primary
+                          : theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                      size: 24,
+                    ),
                   ),
-                  decoration: BoxDecoration(
-                    color: isSelected
-                        ? theme.colorScheme.primary.withValues(alpha: 0.15)
-                        : Colors.transparent,
-                    borderRadius: BorderRadius.circular(16),
+                  const SizedBox(height: 4),
+                  Text(
+                    label,
+                    style: GoogleFonts.outfit(
+                      fontSize: 11,
+                      fontWeight: isSelected
+                          ? FontWeight.bold
+                          : FontWeight.w500,
+                      color: isSelected
+                          ? theme.colorScheme.primary
+                          : theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                    ),
                   ),
-                  child: Icon(
-                    isSelected ? selectedIcon : icon,
-                    color: isSelected
-                        ? theme.colorScheme.primary
-                        : theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                    size: 24,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  label,
-                  style: GoogleFonts.outfit(
-                    fontSize: 11,
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                    color: isSelected
-                        ? theme.colorScheme.primary
-                        : theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

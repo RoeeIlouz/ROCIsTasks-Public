@@ -27,6 +27,8 @@ import 'package:google_fonts/google_fonts.dart';
 
 class AddTaskScreen extends StatefulWidget {
   final Task? task;
+  final String? initialTitle;
+  final String? initialDescription;
   final DateTime? initialDueDate;
   final TaskPriority? initialPriority;
   final String? initialCategoryId;
@@ -34,6 +36,8 @@ class AddTaskScreen extends StatefulWidget {
   const AddTaskScreen({
     super.key,
     this.task,
+    this.initialTitle,
+    this.initialDescription,
     this.initialDueDate,
     this.initialPriority,
     this.initialCategoryId,
@@ -70,9 +74,11 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   @override
   void initState() {
     super.initState();
-    _titleController = TextEditingController(text: widget.task?.title ?? '');
+    _titleController = TextEditingController(
+      text: widget.task?.title ?? widget.initialTitle ?? '',
+    );
     _descriptionController = TextEditingController(
-      text: widget.task?.description ?? '',
+      text: widget.task?.description ?? widget.initialDescription ?? '',
     );
     _selectedDate = widget.task?.dueDate ?? widget.initialDueDate;
     _priority =
@@ -1183,13 +1189,19 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                           width: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2.5,
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.white,
+                            ),
                           ),
                         )
                       : Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(isEditing ? Icons.check_rounded : Icons.add_rounded),
+                            Icon(
+                              isEditing
+                                  ? Icons.check_rounded
+                                  : Icons.add_rounded,
+                            ),
                             const SizedBox(width: 8),
                             Text(
                               isEditing ? l10n.updateTask : l10n.saveTask,

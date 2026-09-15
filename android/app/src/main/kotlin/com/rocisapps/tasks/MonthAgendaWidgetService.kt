@@ -135,6 +135,7 @@ class MonthAgendaGridFactory(private val context: Context) : RemoteViewsService.
             } catch (_: Exception) {}
 
             // Generate exactly 42 days (6 weeks x 7 days)
+            val newDays = ArrayList<JSONObject>()
             for (i in 0 until 42) {
                 val year = gridCal.get(Calendar.YEAR)
                 val month = gridCal.get(Calendar.MONTH)
@@ -151,11 +152,13 @@ class MonthAgendaGridFactory(private val context: Context) : RemoteViewsService.
                     put("isToday", isToday)
                     put("hasEvents", hasEvents)
                 }
-                days.add(dayObj)
+                newDays.add(dayObj)
                 gridCal.add(Calendar.DAY_OF_MONTH, 1)
             }
-        } catch (_: Exception) {
             days.clear()
+            days.addAll(newDays)
+        } catch (_: Exception) {
+            // Keep existing days on error
         }
     }
 

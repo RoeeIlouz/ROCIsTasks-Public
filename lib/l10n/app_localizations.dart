@@ -625,6 +625,12 @@ abstract class AppLocalizations {
   /// **'Calendar Colors'**
   String get calendarColors;
 
+  /// No description provided for @calendarColorThemingHint.
+  ///
+  /// In en, this message translates to:
+  /// **'To customize calendar colors, open the Calendar Colors sheet (palette icon).'**
+  String get calendarColorThemingHint;
+
   /// No description provided for @calendarFiltersTitle.
   ///
   /// In en, this message translates to:
@@ -684,6 +690,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Select Color'**
   String get selectColor;
+
+  /// No description provided for @subcalendars.
+  ///
+  /// In en, this message translates to:
+  /// **'Subcalendars'**
+  String get subcalendars;
+
+  /// No description provided for @customColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom Color'**
+  String get customColor;
+
+  /// No description provided for @resetToGoogleDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset to Google Color'**
+  String get resetToGoogleDefault;
+
+  /// No description provided for @hexCode.
+  ///
+  /// In en, this message translates to:
+  /// **'HEX Code'**
+  String get hexCode;
+
+  /// No description provided for @opacity.
+  ///
+  /// In en, this message translates to:
+  /// **'Opacity'**
+  String get opacity;
+
+  /// No description provided for @presets.
+  ///
+  /// In en, this message translates to:
+  /// **'Presets'**
+  String get presets;
+
+  /// No description provided for @expandCustomPicker.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom Color'**
+  String get expandCustomPicker;
+
+  /// No description provided for @noEnabledCalendars.
+  ///
+  /// In en, this message translates to:
+  /// **'No enabled Google Calendars'**
+  String get noEnabledCalendars;
 
   /// No description provided for @selectGoogleCalendars.
   ///

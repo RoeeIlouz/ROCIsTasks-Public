@@ -5,6 +5,44 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.14+104] - 2026-09-15
+
+### Fixed
+- Restored ROCIs Schedule timetable events in FullCalendar widget and calendar screen.
+- Enabled schedule filter chip by default in homescreen widget with background sync.
+- Made ROCIs Schedule Synergy free for all users across settings and calendar.
+
+## [0.2.14+103] - 2026-09-12
+
+### Improved
+- Instant first-frame startup boot and virtualized 60fps task list rendering.
+- Parallelized background home widget sync with off-screen chart caching.
+
+## [0.2.14+102] - 2026-09-12
+
+### Fixed
+- Accelerated FullCalendar widget with parallel event loading & caching.
+- Restored ROCIs Schedule events on Calendar page with auto-auth & filter sync.
+- Replaced widget filter buttons purple outline with brand coral red.
+- Unified Google Calendar color customization into a single settings sheet.
+
+## [0.2.14+101] - 2026-09-12
+
+### Added
+- ROCIs Schedule synergy: view university timetable events and class schedules directly inside Calendar.
+- Seamless cross-app shortcuts to view lecture details or import assignments as tasks with one tap.
+- Customizable schedule visibility toggle in calendar filters.
+- Beta features unlock in the About screen.
+
+## [0.2.13+99] - 2026-09-11
+
+### Added
+- Per-calendar custom color picker and Google Calendar sync color support.
+
+### Fixed
+- Fixed homescreen widgets blanking after idle/doze by caching events & tasks across isolates.
+- Hardened Android widget services against database lock delays.
+
 ## [0.2.13+98] - 2026-09-07
 
 ### Added

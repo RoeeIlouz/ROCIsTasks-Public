@@ -5,27 +5,31 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:gravity="center_vertical"
+    android:background="@drawable/widget_card_bg"
+    android:layout_marginTop="2dp"
+    android:layout_marginBottom="2dp"
+    android:layout_marginStart="2dp"
+    android:layout_marginEnd="2dp"
     android:paddingStart="4dp"
-    android:paddingEnd="8dp"
-    android:paddingTop="6dp"
-    android:paddingBottom="6dp"
-    android:background="@drawable/widget_card_bg">
+    android:paddingEnd="10dp"
+    android:paddingTop="7dp"
+    android:paddingBottom="7dp">
 
     <!-- Category Accent Strip -->
     <FrameLayout
         android:id="@+id/widget_kanban_color_strip"
-        android:layout_width="4dp"
-        android:layout_height="32dp"
+        android:layout_width="3.5dp"
+        android:layout_height="30dp"
         android:background="@color/widget_primary"
         android:layout_marginEnd="8dp" />
 
     <!-- Action Checkbox -->
     <ImageView
         android:id="@+id/widget_kanban_check"
-        android:layout_width="26dp"
-        android:layout_height="26dp"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
         android:src="@drawable/ic_circle_outline"
-        android:layout_marginEnd="8dp"
+        android:layout_marginEnd="10dp"
         android:clickable="true"
         android:focusable="true"
         android:contentDescription="Toggle Task Status" />
@@ -50,7 +54,7 @@
                 android:layout_weight="1"
                 android:text="Task Title"
                 android:textColor="@color/widget_title_text"
-                android:textSize="13sp"
+                android:textSize="13.5sp"
                 android:fontFamily="sans-serif"
                 android:textStyle="bold"
                 android:maxLines="1"

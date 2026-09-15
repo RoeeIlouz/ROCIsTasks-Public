@@ -271,6 +271,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get calendarColors => 'ألوان التقويم';
 
   @override
+  String get calendarColorThemingHint =>
+      'لتخصيص ألوان التقويم، افتح لوحة ألوان التقويم (رمز اللوحة).';
+
+  @override
   String get calendarFiltersTitle => 'فلاتر التقويم';
 
   @override
@@ -299,6 +303,30 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get selectColor => 'اختر لونًا';
+
+  @override
+  String get subcalendars => 'التقاويم الفرعية';
+
+  @override
+  String get customColor => 'لون مخصص';
+
+  @override
+  String get resetToGoogleDefault => 'إعادة التعيين إلى لون Google';
+
+  @override
+  String get hexCode => 'رمز HEX';
+
+  @override
+  String get opacity => 'الشفافية';
+
+  @override
+  String get presets => 'الإعدادات المسبقة';
+
+  @override
+  String get expandCustomPicker => 'لون مخصص';
+
+  @override
+  String get noEnabledCalendars => 'لا توجد تقاويم Google مفعّلة';
 
   @override
   String get selectGoogleCalendars => 'اختر تقاويم Google';
