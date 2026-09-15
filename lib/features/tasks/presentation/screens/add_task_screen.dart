@@ -316,15 +316,13 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
       return;
     }
 
-    final result = await FilePicker.platform.pickFiles(
-      allowMultiple: true,
-      withData: false,
-    );
-    if (!mounted || result == null) return;
+    final files = await FilePicker.pickFiles();
+    if (!mounted || files.isEmpty) return;
 
-    final pickedPaths = result.paths.whereType<String>().where(
-      (p) => p.isNotEmpty,
-    );
+    final pickedPaths = files
+        .map((f) => f.path)
+        .whereType<String>()
+        .where((p) => p.isNotEmpty);
     if (pickedPaths.isEmpty) return;
 
     setState(() {

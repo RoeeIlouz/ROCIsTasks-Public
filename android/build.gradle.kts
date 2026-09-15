@@ -14,6 +14,10 @@ subprojects {
 }
 
 subprojects {
+    if (project.name != "app") {
+        evaluationDependsOn(":app")
+    }
+
     project.configurations.all {
         resolutionStrategy {
             force("androidx.glance:glance-appwidget:1.1.1")
@@ -33,7 +37,7 @@ subprojects {
                     
                     androidExtension.compileOptions.sourceCompatibility = JavaVersion.VERSION_17
                     androidExtension.compileOptions.targetCompatibility = JavaVersion.VERSION_17
-                    androidExtension.compileSdk = 36
+                    androidExtension.compileSdk = 37
                 }
             } catch (e: Exception) {
                 // Fallback for non-standard android extensions
