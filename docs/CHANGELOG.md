@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.14+104] - 2026-09-15
+
+### Fixed
+- Restored ROCIs Schedule timetable events in FullCalendar widget and calendar screen.
+- Enabled schedule filter chip by default in homescreen widget with background sync.
+- Made ROCIs Schedule Synergy free for all users across settings and calendar.
+
 ## [0.2.14+103] - 2026-09-12
 
 ### Improved

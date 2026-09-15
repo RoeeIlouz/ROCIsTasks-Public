@@ -172,7 +172,7 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
             
             showTasks = widgetData.getBoolean(FullCalendarWidgetProvider.PREF_SHOW_TASKS, true)
             showGoogle = widgetData.getBoolean(FullCalendarWidgetProvider.PREF_SHOW_GOOGLE, true)
-            val showSchedule = widgetData.getBoolean(FullCalendarWidgetProvider.PREF_SHOW_SCHEDULE, false)
+            val showSchedule = widgetData.getBoolean(FullCalendarWidgetProvider.PREF_SHOW_SCHEDULE, true)
             selectedDateStr = widgetData.getString("full_calendar_selected_date", "") ?: ""
             widgetTheme = widgetData.getString("full_calendar_theme", "system") ?: "system"
             showWeekNumbers = widgetData.getBoolean("full_calendar_show_week_numbers", true)

@@ -1445,32 +1445,9 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
               FilledButton.icon(
                 onPressed: _initCreateTask,
                 icon: const Icon(Icons.add, size: 18),
-                label: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'New Task',
-                      style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: const Text(
-                        'Ctrl+N',
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
+                label: Text(
+                  'New Task',
+                  style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
                 ),
                 style: FilledButton.styleFrom(
                   padding: const EdgeInsets.symmetric(

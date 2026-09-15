@@ -187,8 +187,7 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
                 // 5. Filter Buttons - Pill toggle design
                 val showTasks = widgetData.getBoolean(PREF_SHOW_TASKS, true)
                 val showGoogle = widgetData.getBoolean(PREF_SHOW_GOOGLE, true)
-                val showSchedule = widgetData.getBoolean(PREF_SHOW_SCHEDULE, false)
-                val betaScheduleIntegration = widgetData.getBoolean("beta_schedule_integration", false)
+                val showSchedule = widgetData.getBoolean(PREF_SHOW_SCHEDULE, true)
 
                 // Background pills
                 views.setInt(
@@ -201,17 +200,13 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
                     "setBackgroundResource",
                     if (showGoogle) R.drawable.widget_filter_button_active_bg else R.drawable.widget_filter_button_bg
                 )
-                if (betaScheduleIntegration) {
-                    views.setViewVisibility(R.id.widget_filter_rocis, android.view.View.VISIBLE)
-                    views.setInt(
-                        R.id.widget_filter_rocis,
-                        "setBackgroundResource",
-                        if (showSchedule) R.drawable.widget_filter_button_active_bg else R.drawable.widget_filter_button_bg
-                    )
-                    views.setTextColor(R.id.widget_filter_rocis, if (showSchedule) primaryColor else weekdaySecondaryColor)
-                } else {
-                    views.setViewVisibility(R.id.widget_filter_rocis, android.view.View.GONE)
-                }
+                views.setViewVisibility(R.id.widget_filter_rocis, android.view.View.VISIBLE)
+                views.setInt(
+                    R.id.widget_filter_rocis,
+                    "setBackgroundResource",
+                    if (showSchedule) R.drawable.widget_filter_button_active_bg else R.drawable.widget_filter_button_bg
+                )
+                views.setTextColor(R.id.widget_filter_rocis, if (showSchedule) primaryColor else weekdaySecondaryColor)
 
                 // Text colors and localized labels
                 views.setTextViewText(R.id.widget_filter_tasks, WidgetLocaleHelper.getTasksFilterText(widgetLocale))
@@ -330,14 +325,32 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
                 ACTION_FILTER_TASKS -> {
                     val current = widgetData.getBoolean(PREF_SHOW_TASKS, true)
                     editor.putBoolean(PREF_SHOW_TASKS, !current).apply()
+                    val backgroundIntent = es.antonborri.home_widget.HomeWidgetBackgroundIntent.getBroadcast(
+                        context, Uri.parse("rocistasks://full_calendar_filter_tasks")
+                    )
+                    try {
+                        backgroundIntent.send()
+                    } catch (e: Exception) {}
                 }
                 ACTION_FILTER_GOOGLE -> {
                     val current = widgetData.getBoolean(PREF_SHOW_GOOGLE, true)
                     editor.putBoolean(PREF_SHOW_GOOGLE, !current).apply()
+                    val backgroundIntent = es.antonborri.home_widget.HomeWidgetBackgroundIntent.getBroadcast(
+                        context, Uri.parse("rocistasks://full_calendar_filter_google")
+                    )
+                    try {
+                        backgroundIntent.send()
+                    } catch (e: Exception) {}
                 }
                 ACTION_FILTER_ROCIS -> {
-                    val current = widgetData.getBoolean(PREF_SHOW_SCHEDULE, false)
+                    val current = widgetData.getBoolean(PREF_SHOW_SCHEDULE, true)
                     editor.putBoolean(PREF_SHOW_SCHEDULE, !current).apply()
+                    val backgroundIntent = es.antonborri.home_widget.HomeWidgetBackgroundIntent.getBroadcast(
+                        context, Uri.parse("rocistasks://full_calendar_filter_rocis")
+                    )
+                    try {
+                        backgroundIntent.send()
+                    } catch (e: Exception) {}
                 }
                 ACTION_PREV_MONTH -> {
                     val currentOffset = widgetData.getInt(PREF_OFFSET, 0)

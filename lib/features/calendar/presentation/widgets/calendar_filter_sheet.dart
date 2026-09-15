@@ -4,8 +4,6 @@ import 'package:rocis_tasks/core/services/auth_service.dart';
 import 'package:rocis_tasks/core/services/calendar_color_service.dart';
 import 'package:rocis_tasks/features/calendar/presentation/providers/calendar_provider.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:rocis_tasks/core/services/subscription_service.dart';
 import 'package:rocis_tasks/features/calendar/presentation/widgets/calendar_coloring_sheet.dart';
 import 'package:rocis_tasks/shared/ui/widgets/glass_container.dart';
 
@@ -15,8 +13,6 @@ class CalendarFilterSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final subscriptionService = context.watch<SubscriptionService>();
-    final isPremium = subscriptionService.isPremium;
     return Consumer<CalendarProvider>(
       builder: (context, provider, child) {
         return DraggableScrollableSheet(
@@ -75,38 +71,9 @@ class CalendarFilterSheet extends StatelessWidget {
                         ),
                         const Divider(height: 1),
                         SwitchListTile(
-                          title: Row(
-                            children: [
-                              Text(l10n.showRocisSchedule),
-                              if (!isPremium) ...[
-                                const SizedBox(width: 8),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 6,
-                                    vertical: 2,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.amber.withValues(alpha: 0.2),
-                                    borderRadius: BorderRadius.circular(6),
-                                  ),
-                                  child: Text(
-                                    'PRO',
-                                    style: GoogleFonts.outfit(
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.amber[800],
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ],
-                          ),
-                          value: provider.showRocisSchedule && isPremium,
+                          title: Text(l10n.showRocisSchedule),
+                          value: provider.showRocisSchedule,
                           onChanged: (value) {
-                            if (value && !isPremium) {
-                              subscriptionService.showPaywall();
-                              return;
-                            }
                             provider.updateFilters(showRocisSchedule: value);
                           },
                           secondary: const Icon(Icons.school_rounded),
