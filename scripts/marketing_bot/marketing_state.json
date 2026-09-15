@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-14T21:32:54.860940+00:00",
+  "last_run_timestamp": "2026-09-15T03:36:00.525844+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -2054,6 +2054,42 @@
       "title": "Roast my startup: did I solve a real job-search decision problem or overcomplicate it?",
       "url": "https://reddit.com/r/roastmystartup/comments/1wgeeyc/roast_my_startup_did_i_solve_a_real_jobsearch/",
       "inspected_at": "2026-09-14T21:32:46.581387+00:00"
+    },
+    "reddit_1wgoqob": {
+      "platform": "reddit",
+      "title": "built a cabinet-planning tool for my own cabinet project",
+      "url": "https://reddit.com/r/SideProject/comments/1wgoqob/built_a_cabinetplanning_tool_for_my_own_cabinet/",
+      "inspected_at": "2026-09-15T03:35:06.260754+00:00"
+    },
+    "reddit_1wgoptw": {
+      "platform": "reddit",
+      "title": "Timelist: a simple task timer for your Mac menu bar",
+      "url": "https://reddit.com/r/SideProject/comments/1wgoptw/timelist_a_simple_task_timer_for_your_mac_menu_bar/",
+      "inspected_at": "2026-09-15T03:35:49.005855+00:00"
+    },
+    "reddit_1wgoorl": {
+      "platform": "reddit",
+      "title": "SmokeFreeAI",
+      "url": "https://reddit.com/r/SideProject/comments/1wgoorl/smokefreeai/",
+      "inspected_at": "2026-09-15T03:35:49.936127+00:00"
+    },
+    "reddit_1wgojf6": {
+      "platform": "reddit",
+      "title": "It always bothered me  that multi-airplay playback was easy on iOS but not Mac..so I built my own app for it",
+      "url": "https://reddit.com/r/SideProject/comments/1wgojf6/it_always_bothered_me_that_multiairplay_playback/",
+      "inspected_at": "2026-09-15T03:35:50.589260+00:00"
+    },
+    "reddit_1wgni8h": {
+      "platform": "reddit",
+      "title": "Lol, good luck explaining that to a lawyer. Also, 'Forjado' sounds like a medieval blacksmith shop, not a cutting-edge AI thing. You sure you didn't just pick that name because it sounds 'techy'?",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wgni8h/lol_good_luck_explaining_that_to_a_lawyer_also/",
+      "inspected_at": "2026-09-15T03:35:51.386184+00:00"
+    },
+    "reddit_1wgkqtd": {
+      "platform": "reddit",
+      "title": "Forjado — a spec-first AI software factory for web apps — Please roast!",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wgkqtd/forjado_a_specfirst_ai_software_factory_for_web/",
+      "inspected_at": "2026-09-15T03:35:52.156929+00:00"
     }
   },
   "pending_drafts": {
