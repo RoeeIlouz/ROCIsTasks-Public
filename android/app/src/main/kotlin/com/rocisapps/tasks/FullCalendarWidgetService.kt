@@ -170,25 +170,19 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
         try {
             val widgetData = HomeWidgetPlugin.getData(context)
             
-            showTasks = widgetData.getBoolean(FullCalendarWidgetProvider.PREF_SHOW_TASKS, true)
-            showGoogle = widgetData.getBoolean(FullCalendarWidgetProvider.PREF_SHOW_GOOGLE, true)
-            val showSchedule = widgetData.getBoolean(FullCalendarWidgetProvider.PREF_SHOW_SCHEDULE, true)
-            selectedDateStr = widgetData.getString("full_calendar_selected_date", "") ?: ""
-            widgetTheme = widgetData.getString("full_calendar_theme", "system") ?: "system"
-            showWeekNumbers = widgetData.getBoolean("full_calendar_show_week_numbers", true)
-            weekendHighlight = widgetData.getBoolean("full_calendar_weekend_highlight", true)
-            
-            val highlightColorStr = widgetData.getString("full_calendar_highlight_color", "#EF3842") ?: "#EF3842"
-            try {
-                highlightColor = Color.parseColor(highlightColorStr)
-            } catch (_: Exception) {
-                highlightColor = Color.parseColor("#EF3842")
-            }
+            showTasks = widgetData.getBoolean(FullCalendarWidgetUtils.PREF_SHOW_TASKS, true)
+            showGoogle = widgetData.getBoolean(FullCalendarWidgetUtils.PREF_SHOW_GOOGLE, true)
+            val showSchedule = widgetData.getBoolean(FullCalendarWidgetUtils.PREF_SHOW_SCHEDULE, true)
+            selectedDateStr = widgetData.getString(FullCalendarWidgetUtils.PREF_SELECTED_DATE, "") ?: ""
+            widgetTheme = widgetData.getString(FullCalendarWidgetUtils.PREF_THEME, FullCalendarWidgetUtils.DEFAULT_THEME) ?: FullCalendarWidgetUtils.DEFAULT_THEME
+            showWeekNumbers = widgetData.getBoolean(FullCalendarWidgetUtils.PREF_SHOW_WEEK_NUMBERS, true)
+            weekendHighlight = widgetData.getBoolean(FullCalendarWidgetUtils.PREF_WEEKEND_HIGHLIGHT, true)
+            highlightColor = FullCalendarWidgetUtils.parseHighlightColor(widgetData)
             
             // 1. Index existing summaries by date ("yyyy-MM-dd")
             val summariesByDate = HashMap<String, JSONArray>()
             try {
-                val gridDataJson = widgetData.getString("full_calendar_grid_data", "[]") ?: "[]"
+                val gridDataJson = widgetData.getString(FullCalendarWidgetUtils.PREF_GRID_DATA, "[]") ?: "[]"
                 val gridData = JSONArray(gridDataJson)
                 for (i in 0 until gridData.length()) {
                     val day = gridData.getJSONObject(i)
@@ -201,13 +195,7 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
                                 for (j in 0 until summaries.length()) {
                                     val summary = summaries.getJSONObject(j)
                                     val type = summary.optString("type", "")
-                                    val shouldInclude = when (type) {
-                                        "task" -> showTasks
-                                        "google" -> showGoogle
-                                        "schedule", "rocis" -> showSchedule
-                                        else -> true
-                                    }
-                                    if (shouldInclude) {
+                                    if (FullCalendarWidgetUtils.shouldIncludeSummary(type, showTasks, showGoogle, showSchedule)) {
                                         filteredSummaries.put(summary)
                                     }
                                 }
@@ -221,43 +209,11 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
             }
 
             // 2. Dynamically generate calendar grid for the target PREF_OFFSET
+            val offset = widgetData.getInt(FullCalendarWidgetUtils.PREF_OFFSET, 0)
+            val startOfWeek = widgetData.getInt(FullCalendarWidgetUtils.PREF_START_OF_WEEK, FullCalendarWidgetUtils.DEFAULT_START_OF_WEEK)
+
             days.clear()
-            val offset = widgetData.getInt(FullCalendarWidgetProvider.PREF_OFFSET, 0)
-            val startOfWeek = widgetData.getInt("full_calendar_start_of_week", 7) // 7 = Sun, 1 = Mon, 6 = Sat
-
-            val cal = Calendar.getInstance()
-            cal.set(Calendar.DAY_OF_MONTH, 1)
-            if (offset != 0) {
-                cal.add(Calendar.MONTH, offset)
-            }
-            val targetMonth = cal.get(Calendar.MONTH)
-
-            // Find difference for startOfWeek
-            val javaDayOfWeek = cal.get(Calendar.DAY_OF_WEEK) // 1=Sun, 2=Mon...
-            val dayOfWeekNormalized = if (javaDayOfWeek == Calendar.SUNDAY) 7 else javaDayOfWeek - 1 // 1=Mon, ..., 7=Sun
-            val diff = (dayOfWeekNormalized - startOfWeek + 7) % 7
-            cal.add(Calendar.DAY_OF_MONTH, -diff)
-
-            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
-            for (row in 0 until 6) {
-                val weekObj = JSONObject()
-                weekObj.put("isWeekNumber", true)
-                weekObj.put("weekNumber", cal.get(Calendar.WEEK_OF_YEAR))
-                days.add(weekObj)
-
-                for (col in 0 until 7) {
-                    val dateStr = dateFormat.format(cal.time)
-                    val dayObj = JSONObject()
-                    dayObj.put("isWeekNumber", false)
-                    dayObj.put("date", dateStr)
-                    dayObj.put("day", cal.get(Calendar.DAY_OF_MONTH))
-                    dayObj.put("isCurrentMonth", cal.get(Calendar.MONTH) == targetMonth)
-                    dayObj.put("summaries", summariesByDate[dateStr] ?: JSONArray())
-                    days.add(dayObj)
-
-                    cal.add(Calendar.DAY_OF_MONTH, 1)
-                }
-            }
+            days.addAll(FullCalendarWidgetUtils.buildCalendarGrid(offset, startOfWeek, summariesByDate))
         } catch (e: Exception) {
             android.util.Log.e("FullCalendarWidget", "Error updating widget dataset", e)
             if (days.isEmpty()) {
@@ -270,40 +226,10 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
     }
 
     private fun generateFallbackCalendar(widgetData: android.content.SharedPreferences) {
+        val offset = widgetData.getInt(FullCalendarWidgetUtils.PREF_OFFSET, 0)
+        val startOfWeek = widgetData.getInt(FullCalendarWidgetUtils.PREF_START_OF_WEEK, FullCalendarWidgetUtils.DEFAULT_START_OF_WEEK)
         days.clear()
-        val offset = widgetData.getInt(FullCalendarWidgetProvider.PREF_OFFSET, 0)
-        val startOfWeek = widgetData.getInt("full_calendar_start_of_week", 7) // 7 = Sun, 1 = Mon, 6 = Sat
-
-        val cal = Calendar.getInstance()
-        cal.set(Calendar.DAY_OF_MONTH, 1)
-        cal.add(Calendar.MONTH, offset)
-        val targetMonth = cal.get(Calendar.MONTH)
-
-        // Find difference for startOfWeek
-        val javaDayOfWeek = cal.get(Calendar.DAY_OF_WEEK) // 1=Sun, 2=Mon...
-        val dayOfWeekNormalized = if (javaDayOfWeek == Calendar.SUNDAY) 7 else javaDayOfWeek - 1 // 1=Mon, ..., 7=Sun
-        val diff = (dayOfWeekNormalized - startOfWeek + 7) % 7
-        cal.add(Calendar.DAY_OF_MONTH, -diff)
-
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
-        for (row in 0 until 6) {
-            val weekObj = JSONObject()
-            weekObj.put("isWeekNumber", true)
-            weekObj.put("weekNumber", cal.get(Calendar.WEEK_OF_YEAR))
-            days.add(weekObj)
-
-            for (col in 0 until 7) {
-                val dayObj = JSONObject()
-                dayObj.put("isWeekNumber", false)
-                dayObj.put("date", dateFormat.format(cal.time))
-                dayObj.put("day", cal.get(Calendar.DAY_OF_MONTH))
-                dayObj.put("isCurrentMonth", cal.get(Calendar.MONTH) == targetMonth)
-                dayObj.put("summaries", JSONArray())
-                days.add(dayObj)
-
-                cal.add(Calendar.DAY_OF_MONTH, 1)
-            }
-        }
+        days.addAll(FullCalendarWidgetUtils.buildCalendarGrid(offset, startOfWeek, emptyMap()))
     }
 
     override fun onDestroy() {
@@ -329,11 +255,7 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
                 if (showWeekNumbers) View.VISIBLE else View.GONE
             )
 
-            val weekColor = when (widgetTheme) {
-                "light" -> Color.parseColor("#8E8E93")
-                "dark", "glassmorphic" -> Color.parseColor("#AEAEB2")
-                else -> context.getColor(R.color.widget_secondary_text)
-            }
+            val weekColor = FullCalendarWidgetUtils.getSecondaryTextColor(widgetTheme, context)
             rowViews.setTextColor(R.id.widget_full_week_num_text, weekColor)
 
             // Current date calculation
@@ -400,19 +322,11 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
                     } else if (weekendHighlight && dayOfWeek == Calendar.SATURDAY) {
                         Color.parseColor("#3B82F6") // Electric blue
                     } else {
-                        when (widgetTheme) {
-                            "light" -> Color.parseColor("#1C1C1E")
-                            "dark", "glassmorphic" -> Color.parseColor("#FFFFFF")
-                            else -> context.getColor(R.color.widget_title_text)
-                        }
+                        FullCalendarWidgetUtils.getTextColor(widgetTheme, context)
                     }
                 } else {
                     // Outside current month (30% faded opacity)
-                    when (widgetTheme) {
-                        "light" -> Color.parseColor("#4D1C1C1E")
-                        "dark", "glassmorphic" -> Color.parseColor("#4DFFFFFF")
-                        else -> Color.parseColor("#4D8E8E93")
-                    }
+                    FullCalendarWidgetUtils.getFadedTextColor(widgetTheme)
                 }
                 rowViews.setTextColor(cell.textId, textColor)
 
