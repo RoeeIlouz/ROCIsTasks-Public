@@ -31,19 +31,19 @@ dependencies:
   provider: ^6.1.5+1
 
   # Local Storage
-  hive_ce: ^2.7.0
+  hive_ce: ^2.20.0
   hive_ce_flutter: ^2.3.0
   shared_preferences: ^2.5.4
   flutter_secure_storage: ^10.3.1
 
   # Firebase
-  firebase_core: ^4.10.0
-  cloud_firestore: ^6.5.0
-  firebase_auth: ^6.5.2
-  firebase_crashlytics: ^5.2.3
-  firebase_analytics: ^12.4.2
-  firebase_performance: ^0.11.4+2
-  firebase_remote_config: ^6.5.2
+  firebase_core: ^4.15.0
+  cloud_firestore: ^6.10.0
+  firebase_auth: ^6.7.0
+  firebase_crashlytics: ^5.4.0
+  firebase_analytics: ^12.6.0
+  firebase_performance: ^0.11.6
+  firebase_remote_config: ^6.7.0
 
   # Google Services
   google_sign_in: ^7.2.0
@@ -57,7 +57,7 @@ dependencies:
   rrule: ^0.2.18
 
   # Notifications
-  flutter_local_notifications: ^22.0.0
+  flutter_local_notifications: ^22.3.1
 
   # Networking & Connectivity
   http: ^1.2.1
@@ -68,8 +68,8 @@ dependencies:
   local_auth: ^3.0.1
 
   # Monetization
-  purchases_flutter: ^10.9.1
-  purchases_ui_flutter: ^10.9.1
+  purchases_flutter: ^10.12.0
+  purchases_ui_flutter: ^10.12.0
 
   # Utilities
   intl: ^0.20.2
@@ -83,7 +83,7 @@ dependencies:
 
   # Platform Features
   home_widget: ^0.8.1
-  quick_actions: ^1.0.9
+  quick_actions: ^1.1.1
 
 dependency_overrides:
   timezone: ^0.11.0
