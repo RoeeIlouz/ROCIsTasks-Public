@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-15T11:11:25.916476+00:00",
+  "last_run_timestamp": "2026-09-15T16:21:49.069514+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -2126,6 +2126,42 @@
       "title": "I just launched SUMMECA — roast my startup",
       "url": "https://reddit.com/r/roastmystartup/comments/1wgurz5/i_just_launched_summeca_roast_my_startup/",
       "inspected_at": "2026-09-15T11:11:14.957691+00:00"
+    },
+    "reddit_1wh4wzb": {
+      "platform": "reddit",
+      "title": "Got tired of SaaS prices, so I built a local GPU video clipper. Renders 1-hr podcasts for pennies",
+      "url": "https://reddit.com/r/SideProject/comments/1wh4wzb/got_tired_of_saas_prices_so_i_built_a_local_gpu/",
+      "inspected_at": "2026-09-15T16:21:31.939639+00:00"
+    },
+    "reddit_1wh4tn7": {
+      "platform": "reddit",
+      "title": "Made a Brick Breaker game from my GitHub contributions using Python",
+      "url": "https://reddit.com/r/SideProject/comments/1wh4tn7/made_a_brick_breaker_game_from_my_github/",
+      "inspected_at": "2026-09-15T16:21:36.876463+00:00"
+    },
+    "reddit_1wh4qk4": {
+      "platform": "reddit",
+      "title": "OpenTrade – An open-source trading harness for CC / Codex",
+      "url": "https://reddit.com/r/SideProject/comments/1wh4qk4/opentrade_an_opensource_trading_harness_for_cc/",
+      "inspected_at": "2026-09-15T16:21:38.242621+00:00"
+    },
+    "reddit_1wh2yv4": {
+      "platform": "reddit",
+      "title": "I built a food discovery app — would love honest feedback",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wh2yv4/i_built_a_food_discovery_app_would_love_honest/",
+      "inspected_at": "2026-09-15T16:21:39.067760+00:00"
+    },
+    "reddit_1wh2njp": {
+      "platform": "reddit",
+      "title": "Roast my pricing: voice journal app, $4.99/mo vs $34.99/yr vs $69.99 lifetime",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wh2njp/roast_my_pricing_voice_journal_app_499mo_vs/",
+      "inspected_at": "2026-09-15T16:21:39.857626+00:00"
+    },
+    "reddit_1wgyau2": {
+      "platform": "reddit",
+      "title": "Does the “blank cursor” moment before sending a prompt to ChatGPT/Claude actually bother you?",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wgyau2/does_the_blank_cursor_moment_before_sending_a/",
+      "inspected_at": "2026-09-15T16:21:40.797417+00:00"
     }
   },
   "pending_drafts": {
