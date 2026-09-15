@@ -13,26 +13,26 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
 
     companion object {
         // Filter toggle actions
-        const val ACTION_FILTER_TASKS = "com.rocisapps.tasks.ACTION_FILTER_TASKS"
-        const val ACTION_FILTER_GOOGLE = "com.rocisapps.tasks.ACTION_FILTER_GOOGLE"
-        const val ACTION_FILTER_ROCIS = "com.rocisapps.tasks.ACTION_FILTER_ROCIS"
-        const val ACTION_PREV_MONTH = "com.rocisapps.tasks.ACTION_PREV_MONTH"
-        const val ACTION_NEXT_MONTH = "com.rocisapps.tasks.ACTION_NEXT_MONTH"
-        const val ACTION_TODAY = "com.rocisapps.tasks.ACTION_TODAY"
+        const val ACTION_FILTER_TASKS = FullCalendarWidgetUtils.ACTION_FILTER_TASKS
+        const val ACTION_FILTER_GOOGLE = FullCalendarWidgetUtils.ACTION_FILTER_GOOGLE
+        const val ACTION_FILTER_ROCIS = FullCalendarWidgetUtils.ACTION_FILTER_ROCIS
+        const val ACTION_PREV_MONTH = FullCalendarWidgetUtils.ACTION_PREV_MONTH
+        const val ACTION_NEXT_MONTH = FullCalendarWidgetUtils.ACTION_NEXT_MONTH
+        const val ACTION_TODAY = FullCalendarWidgetUtils.ACTION_TODAY
         
         // Preference keys
-        const val PREF_SHOW_TASKS = "full_calendar_show_tasks"
-        const val PREF_SHOW_GOOGLE = "full_calendar_show_google"
-        const val PREF_SHOW_SCHEDULE = "full_calendar_show_schedule"
-        const val PREF_OFFSET = "full_calendar_offset"
+        const val PREF_SHOW_TASKS = FullCalendarWidgetUtils.PREF_SHOW_TASKS
+        const val PREF_SHOW_GOOGLE = FullCalendarWidgetUtils.PREF_SHOW_GOOGLE
+        const val PREF_SHOW_SCHEDULE = FullCalendarWidgetUtils.PREF_SHOW_SCHEDULE
+        const val PREF_OFFSET = FullCalendarWidgetUtils.PREF_OFFSET
         
         // Unique request codes
-        private const val REQUEST_CODE_FILTER_TASKS = 301
-        private const val REQUEST_CODE_FILTER_GOOGLE = 302
-        private const val REQUEST_CODE_FILTER_ROCIS = 303
-        private const val REQUEST_CODE_PREV_MONTH = 304
-        private const val REQUEST_CODE_NEXT_MONTH = 305
-        private const val REQUEST_CODE_TODAY = 306
+        private const val REQUEST_CODE_FILTER_TASKS = FullCalendarWidgetUtils.REQUEST_CODE_FILTER_TASKS
+        private const val REQUEST_CODE_FILTER_GOOGLE = FullCalendarWidgetUtils.REQUEST_CODE_FILTER_GOOGLE
+        private const val REQUEST_CODE_FILTER_ROCIS = FullCalendarWidgetUtils.REQUEST_CODE_FILTER_ROCIS
+        private const val REQUEST_CODE_PREV_MONTH = FullCalendarWidgetUtils.REQUEST_CODE_PREV_MONTH
+        private const val REQUEST_CODE_NEXT_MONTH = FullCalendarWidgetUtils.REQUEST_CODE_NEXT_MONTH
+        private const val REQUEST_CODE_TODAY = FullCalendarWidgetUtils.REQUEST_CODE_TODAY
     }
 
     override fun onUpdate(
@@ -47,30 +47,17 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
                 val views = RemoteViews(context.packageName, R.layout.widget_full_calendar_layout)
 
                 // Read theme and customization preferences
-                val theme = widgetData.getString("full_calendar_theme", "system") ?: "system"
-                val showWeekNumbers = widgetData.getBoolean("full_calendar_show_week_numbers", true)
-                val weekendHighlight = widgetData.getBoolean("full_calendar_weekend_highlight", true)
-                val highlightColorStr = widgetData.getString("full_calendar_highlight_color", "#EF3842") ?: "#EF3842"
-                var primaryColor = android.graphics.Color.parseColor("#EF3842")
-                try {
-                    primaryColor = android.graphics.Color.parseColor(highlightColorStr)
-                } catch (_: Exception) {}
+                val theme = widgetData.getString(FullCalendarWidgetUtils.PREF_THEME, FullCalendarWidgetUtils.DEFAULT_THEME) ?: FullCalendarWidgetUtils.DEFAULT_THEME
+                val showWeekNumbers = widgetData.getBoolean(FullCalendarWidgetUtils.PREF_SHOW_WEEK_NUMBERS, true)
+                val weekendHighlight = widgetData.getBoolean(FullCalendarWidgetUtils.PREF_WEEKEND_HIGHLIGHT, true)
+                val primaryColor = FullCalendarWidgetUtils.parseHighlightColor(widgetData)
 
                 // 1. Apply Widget Theme Background
-                val rootBgRes = when (theme) {
-                    "light" -> R.drawable.widget_background_light
-                    "dark" -> R.drawable.widget_background_dark
-                    "glassmorphic" -> R.drawable.widget_background_glass
-                    else -> R.drawable.widget_background
-                }
+                val rootBgRes = FullCalendarWidgetUtils.getThemeBackgroundRes(theme)
                 views.setInt(R.id.widget_full_calendar_root, "setBackgroundResource", rootBgRes)
 
                 // 2. Set Text Colors depending on Theme
-                val textColor = when (theme) {
-                    "light" -> android.graphics.Color.parseColor("#1C1C1E")
-                    "dark", "glassmorphic" -> android.graphics.Color.parseColor("#FFFFFF")
-                    else -> context.getColor(R.color.widget_title_text)
-                }
+                val textColor = FullCalendarWidgetUtils.getTextColor(theme, context)
                 views.setTextColor(R.id.widget_full_calendar_title, textColor)
                 views.setTextColor(R.id.widget_full_calendar_prev, textColor)
                 views.setTextColor(R.id.widget_full_calendar_next, textColor)
@@ -78,22 +65,14 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
                 views.setTextColor(R.id.widget_add_task_btn, primaryColor)
 
                 // Weekday headers text colors
-                val weekdayColor = when (theme) {
-                    "light" -> android.graphics.Color.parseColor("#2C2C2E")
-                    "dark", "glassmorphic" -> android.graphics.Color.parseColor("#E5E5EA")
-                    else -> context.getColor(R.color.widget_body_text)
-                }
-                val weekdaySecondaryColor = when (theme) {
-                    "light" -> android.graphics.Color.parseColor("#8E8E93")
-                    "dark", "glassmorphic" -> android.graphics.Color.parseColor("#AEAEB2")
-                    else -> context.getColor(R.color.widget_secondary_text)
-                }
+                val weekdayColor = FullCalendarWidgetUtils.getWeekdayColor(theme, context)
+                val weekdaySecondaryColor = FullCalendarWidgetUtils.getSecondaryTextColor(theme, context)
 
                 views.setTextColor(R.id.widget_weekday_num_header, weekdaySecondaryColor)
 
                 // Dynamic Weekday headers text and colors based on startOfWeek and app locale
                 val widgetLocale = WidgetLocaleHelper.getWidgetLocale(widgetData)
-                val startOfWeek = widgetData.getInt("full_calendar_start_of_week", 7) // 7 = Sunday, 1 = Monday, 6 = Saturday
+                val startOfWeek = widgetData.getInt(FullCalendarWidgetUtils.PREF_START_OF_WEEK, FullCalendarWidgetUtils.DEFAULT_START_OF_WEEK) // 7 = Sunday, 1 = Monday, 6 = Saturday
                 val daysOfWeekLetters = WidgetLocaleHelper.getWeekdayLetters(startOfWeek, widgetLocale)
                 val weekdayViewIds = listOf(
                     R.id.widget_weekday_sun_header,
@@ -240,7 +219,7 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
                 views.setPendingIntentTemplate(R.id.widget_full_calendar_list, appPendingIntent)
 
                 // 7. Finalize Update - Check Widget Allowance
-                val isPremium = widgetData.getBoolean("is_premium", false)
+                val isPremium = widgetData.getBoolean(FullCalendarWidgetUtils.PREF_IS_PREMIUM, false)
                 val isAllowed = WidgetLimitHelper.isWidgetAllowed(context, appWidgetId, isPremium)
                 if (!isAllowed) {
                     views.setViewVisibility(R.id.widget_premium_overlay, android.view.View.VISIBLE)
@@ -356,7 +335,7 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
                     val currentOffset = widgetData.getInt(PREF_OFFSET, 0)
                     val newOffset = currentOffset - 1
                     editor.putInt(PREF_OFFSET, newOffset)
-                        .putString("full_calendar_selected_date", "")
+                        .putString(FullCalendarWidgetUtils.PREF_SELECTED_DATE, "")
                         .apply()
                     
                     val backgroundIntent = es.antonborri.home_widget.HomeWidgetBackgroundIntent.getBroadcast(
@@ -370,7 +349,7 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
                     val currentOffset = widgetData.getInt(PREF_OFFSET, 0)
                     val newOffset = currentOffset + 1
                     editor.putInt(PREF_OFFSET, newOffset)
-                        .putString("full_calendar_selected_date", "")
+                        .putString(FullCalendarWidgetUtils.PREF_SELECTED_DATE, "")
                         .apply()
                     
                     val backgroundIntent = es.antonborri.home_widget.HomeWidgetBackgroundIntent.getBroadcast(
@@ -382,7 +361,7 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
                 }
                 ACTION_TODAY -> {
                     editor.putInt(PREF_OFFSET, 0)
-                        .putString("full_calendar_selected_date", "")
+                        .putString(FullCalendarWidgetUtils.PREF_SELECTED_DATE, "")
                         .apply()
                     
                     val backgroundIntent = es.antonborri.home_widget.HomeWidgetBackgroundIntent.getBroadcast(
