@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:rocis_tasks/core/services/auth_service.dart';
@@ -1206,8 +1205,7 @@ class SettingsScreen extends StatelessWidget {
             },
           ),
         ]),
-        if (themeService.enableScheduleIntegration &&
-            subscriptionService.isPremium) ...[
+        if (themeService.enableScheduleIntegration) ...[
           _buildSectionHeader(context, 'ROCIs Ecosystem'),
           _buildSectionCard(context, [
             ListTile(
@@ -1435,55 +1433,15 @@ class SettingsScreen extends StatelessWidget {
                                         const SizedBox(height: 8),
                                         SwitchListTile(
                                           contentPadding: EdgeInsets.zero,
-                                          title: Row(
-                                            children: [
-                                              const Text(
-                                                'ROCIs Schedule Synergy (Beta)',
-                                              ),
-                                              if (!subscriptionService
-                                                  .isPremium) ...[
-                                                const SizedBox(width: 8),
-                                                Container(
-                                                  padding:
-                                                      const EdgeInsets.symmetric(
-                                                        horizontal: 6,
-                                                        vertical: 2,
-                                                      ),
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.amber
-                                                        .withValues(alpha: 0.2),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          6,
-                                                        ),
-                                                  ),
-                                                  child: Text(
-                                                    'PRO',
-                                                    style: GoogleFonts.outfit(
-                                                      fontSize: 10,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: Colors.amber[800],
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ],
+                                          title: const Text(
+                                            'ROCIs Schedule Synergy (Beta)',
                                           ),
                                           subtitle: const Text(
                                             'Sync university timetable events and enable cross-app launcher',
                                           ),
-                                          value:
-                                              themeService
-                                                  .enableScheduleIntegration &&
-                                              subscriptionService.isPremium,
+                                          value: themeService
+                                              .enableScheduleIntegration,
                                           onChanged: (val) {
-                                            if (val &&
-                                                !subscriptionService
-                                                    .isPremium) {
-                                              subscriptionService.showPaywall();
-                                              return;
-                                            }
                                             themeService
                                                 .setEnableScheduleIntegration(
                                                   val,

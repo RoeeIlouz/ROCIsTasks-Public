@@ -2,7 +2,42 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
-## Version 0.2.14+103 Release & Multi-Channel Deployment Pipeline - 2026-09-12
+## FullCalendar Widget & Calendar Page ROCIs Schedule Integration Overhaul - 2026-09-13
+
+#### Problem & Root Causes
+* **ROCIs-Schedule Local-Only Events**: In `ROCIs-Schedule` (`CourseProvider.addEvent`), newly added lecture/timetable events were only stored in SQLite local DB and never uploaded to Firestore `users/{uid}/events`, leaving the cross-app Firestore subcollection empty (`{}`).
+* **Android FullCalendar Widget Easter Egg & Filter Default**:
+  - `FullCalendarWidgetProvider.kt` hid `R.id.widget_filter_rocis` with `View.GONE` behind a hidden 5-tap easter egg (`beta_schedule_integration`).
+  - `FullCalendarWidgetProvider.kt` and `FullCalendarWidgetService.kt` defaulted `PREF_SHOW_SCHEDULE` to `false`.
+  - In `FullCalendarWidgetProvider.kt onReceive()`, toggling filters (`ACTION_FILTER_ROCIS`, `ACTION_FILTER_TASKS`, `ACTION_FILTER_GOOGLE`) updated local preferences but never broadcast `HomeWidgetBackgroundIntent` to Dart (`rocistasks://full_calendar_filter_...`), so background recalculation of `full_calendar_grid_data` was never triggered.
+* **Paywall Block in Tasks App**:
+  - `CalendarProvider.dart` suppressed schedule events if `isPremium == false` (`if (_showRocisSchedule && isPremium)` and `getScheduleEventsForDay`).
+  - `CalendarFilterSheet.dart` showed a paywall dialog and blocked toggling `showRocisSchedule`.
+* **Background Isolate Auth & Email Resolution**:
+  - In background isolates, `FirebaseAuth.instance.currentUser` is null. `FullCalendarWidgetService` and `background_handler.dart` did not fall back to `SharedPreferences` saved email (`google_user_email`).
+  - In `ScheduleFirestoreService._resolveScheduleUserId()`, Gmail accounts with dot variations (`roee.ilouz@gmail.com` vs `roeeilouz@gmail.com`) failed exact string matching. Resolved user IDs were not cached in `SharedPreferences`.
+
+#### Solutions Applied
+1. **Component 1 (ROCIs-Schedule Timetable Upload)**:
+   - Added automatic Firestore synchronization (`_firestoreService.uploadEvents`) in `CourseProvider.dart` on `addEvent()`, `deleteEvent()`, and `loadData()`.
+2. **Component 2 (Native Android Widget Layer)**:
+   - In `FullCalendarWidgetProvider.kt`: made `widget_filter_rocis` visible (`View.VISIBLE`) by default without easter egg gating.
+   - Defaulted `showSchedule` to `true` in both `FullCalendarWidgetProvider.kt` and `FullCalendarWidgetService.kt`.
+   - In `onReceive()`: broadcast `HomeWidgetBackgroundIntent` to Dart for `ACTION_FILTER_TASKS`, `ACTION_FILTER_GOOGLE`, and `ACTION_FILTER_ROCIS` so Dart triggers `_handleFullCalendarFilterToggle` and updates widget grid data.
+3. **Component 3 (Dart Widget Service & Background Handler)**:
+   - Defaulted `showSchedule` to `prefs.getBool('full_calendar_show_schedule') ?? true` in `FullCalendarFilters` and `getFilters()`.
+   - Added fallback to `SharedPreferences` saved email (`GoogleOAuthManager.keyUserEmail` / `'google_user_email'`) in `FullCalendarWidgetService.fetchScheduleEvents()` and `background_handler.dart`.
+4. **Component 4 (Calendar Screen, Provider & Firestore Service)**:
+   - In `ScheduleFirestoreService`: added `cached_schedule_user_id` persistence via `SharedPreferences`, added dot-normalized Gmail matching, and client-side normalized fallback scanning.
+   - In `CalendarProvider`: defaulted `_showRocisSchedule = true;`, added `SharedPreferences` email fallback in `loadEvents()`, and removed strict `isPremium` gating for displaying university timetable events.
+   - In `CalendarFilterSheet`: unlocked toggling `showRocisSchedule` directly without paywall blocker.
+   - In `SettingsScreen`: removed PRO badge and subscription check, making ROCIs Schedule Synergy 100% free across both settings and calendar filters.
+5. **Verification**:
+   - `synced_schedule_event_test.dart`: 5/5 tests passed (100%).
+   - `test/features/calendar/`: 11/11 tests passed (100%).
+   - Full test suite: 338/338 tests passed (100%).
+   - `flutter analyze`: 0 errors, 0 warnings.
+
 
 #### Summary & Operations
 * **Version Bump & Sync**: Bumped `pubspec.yaml` to `0.2.14+103` and verified synchronization with `lib/core/config/app_config.dart`.

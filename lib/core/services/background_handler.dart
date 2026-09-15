@@ -231,13 +231,19 @@ class BackgroundHandler {
       // Initialize schedule service and set user email for ROCIs-Schedule integration
       await fullCalendarService.initScheduleService();
       final currentUser = FirebaseAuth.instance.currentUser;
-      if (currentUser != null) {
-        fullCalendarService.setUserEmail(currentUser.email);
+      final prefs = await SharedPreferences.getInstance();
+      final userEmail =
+          currentUser?.email ??
+          prefs.getString('google_user_email') ??
+          prefs.getString('user_email');
+      if (userEmail != null) {
+        fullCalendarService.setUserEmail(userEmail);
       }
 
       await fullCalendarService.updateFullCalendarWidget(
         monthOffset: offset,
         userId: currentUser?.uid,
+        userEmail: userEmail,
       );
 
       AppLogger.info(
@@ -275,17 +281,22 @@ class BackgroundHandler {
       // Initialize schedule service and set user email for ROCIs-Schedule integration
       await fullCalendarService.initScheduleService();
       final currentUser = FirebaseAuth.instance.currentUser;
-      if (currentUser != null) {
-        fullCalendarService.setUserEmail(currentUser.email);
+      final prefs = await SharedPreferences.getInstance();
+      final userEmail =
+          currentUser?.email ??
+          prefs.getString('google_user_email') ??
+          prefs.getString('user_email');
+      if (userEmail != null) {
+        fullCalendarService.setUserEmail(userEmail);
       }
 
       // Refresh the widget with current offset
-      final prefs = await SharedPreferences.getInstance();
       final offset = prefs.getInt('full_calendar_offset') ?? 0;
 
       await fullCalendarService.updateFullCalendarWidget(
         monthOffset: offset,
         userId: currentUser?.uid,
+        userEmail: userEmail,
       );
     } catch (e, stackTrace) {
       AppLogger.error(

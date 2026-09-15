@@ -13,6 +13,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:rocis_tasks/features/tasks/data/datasources/local_task_source.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
+import 'package:rocis_tasks/core/services/auth/google_oauth_manager.dart';
 
 /// Filter options for the full calendar widget
 class FullCalendarFilters {
@@ -24,7 +25,7 @@ class FullCalendarFilters {
   const FullCalendarFilters({
     this.showTasks = true,
     this.showGoogleCalendar = true,
-    this.showRocisSchedule = false,
+    this.showRocisSchedule = true,
     this.selectedCalendarIds = const [],
   });
 
@@ -39,7 +40,7 @@ class FullCalendarFilters {
     return FullCalendarFilters(
       showTasks: map['showTasks'] ?? true,
       showGoogleCalendar: map['showGoogleCalendar'] ?? true,
-      showRocisSchedule: map['showRocisSchedule'] ?? false,
+      showRocisSchedule: map['showRocisSchedule'] ?? true,
       selectedCalendarIds: List<String>.from(map['selectedCalendarIds'] ?? []),
     );
   }
@@ -110,7 +111,7 @@ class FullCalendarWidgetService {
     final prefs = await SharedPreferences.getInstance();
     final showTasks = prefs.getBool('full_calendar_show_tasks') ?? true;
     final showGoogle = prefs.getBool('full_calendar_show_google') ?? true;
-    final showSchedule = prefs.getBool('full_calendar_show_schedule') ?? false;
+    final showSchedule = prefs.getBool('full_calendar_show_schedule') ?? true;
     final selectedCalendarIds =
         prefs.getStringList('full_calendar_selected_ids') ?? [];
 
@@ -318,7 +319,9 @@ class FullCalendarWidgetService {
             userEmail ??
             (Firebase.apps.isNotEmpty
                 ? FirebaseAuth.instance.currentUser?.email
-                : null);
+                : null) ??
+            prefs.getString(GoogleOAuthManager.keyUserEmail) ??
+            prefs.getString('user_email');
         final scheduleKey = '${effectiveUid ?? ''}_${effectiveEmail ?? ''}';
 
         if (!forceRefresh &&

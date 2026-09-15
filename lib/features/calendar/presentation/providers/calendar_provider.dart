@@ -11,6 +11,7 @@ import 'package:rocis_tasks/features/home/services/full_calendar_widget_service.
 import 'package:rocis_tasks/core/services/logger_service.dart';
 
 import 'package:rocis_tasks/core/services/subscription_service.dart';
+import 'package:rocis_tasks/core/services/auth/google_oauth_manager.dart';
 
 class CalendarProvider extends ChangeNotifier {
   final CalendarService _calendarService;
@@ -25,7 +26,7 @@ class CalendarProvider extends ChangeNotifier {
   List<SyncedScheduleEvent> _scheduleEvents = [];
   bool _showTasks = true;
   bool _showGoogleCalendar = true;
-  bool _showRocisSchedule = false;
+  bool _showRocisSchedule = true;
   bool _isLoading = false;
   String? _userId;
   String? _userEmail;
@@ -130,7 +131,7 @@ class CalendarProvider extends ChangeNotifier {
     final nextShowGoogleCalendar =
         prefs.getBool('full_calendar_show_google') ?? true;
     final nextShowRocisSchedule =
-        prefs.getBool('full_calendar_show_schedule') ?? false;
+        prefs.getBool('full_calendar_show_schedule') ?? true;
     final savedCalendarIds = prefs.getStringList('full_calendar_selected_ids');
 
     final hasChanges =
@@ -282,6 +283,14 @@ class CalendarProvider extends ChangeNotifier {
       _processEventsToMap();
 
       // Load ROCIs Schedule events if user is logged in
+      String? savedEmail;
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        savedEmail =
+            prefs.getString(GoogleOAuthManager.keyUserEmail) ??
+            prefs.getString('user_email');
+      } catch (_) {}
+
       final effectiveUid =
           _userId ??
           _authService?.currentUser?.uid ??
@@ -293,7 +302,8 @@ class CalendarProvider extends ChangeNotifier {
           _authService?.currentUser?.email ??
           (Firebase.apps.isNotEmpty
               ? FirebaseAuth.instance.currentUser?.email
-              : null);
+              : null) ??
+          savedEmail;
 
       if ((effectiveUid != null && effectiveUid.isNotEmpty) ||
           (effectiveEmail != null && effectiveEmail.isNotEmpty)) {
@@ -426,15 +436,14 @@ class CalendarProvider extends ChangeNotifier {
     if (_showGoogleCalendar) {
       events.addAll(_eventsMap[normalizedDay] ?? []);
     }
-    if (_showRocisSchedule && isPremium) {
+    if (_showRocisSchedule) {
       events.addAll(_scheduleEventsMap[normalizedDay] ?? []);
     }
     return events;
   }
 
-  /// Get university schedule events for a specific day (Pro only)
+  /// Get university schedule events for a specific day
   List<SyncedScheduleEvent> getScheduleEventsForDay(DateTime day) {
-    if (!isPremium) return [];
     final normalizedDay = DateTime(day.year, day.month, day.day);
     return _scheduleEventsMap[normalizedDay] ?? [];
   }

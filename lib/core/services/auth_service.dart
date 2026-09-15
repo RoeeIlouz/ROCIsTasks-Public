@@ -110,17 +110,40 @@ class AuthService extends ChangeNotifier {
       await _oauthManager.ensureGoogleSignInInitialized();
 
       if (kIsWeb) {
-        // On Web, attempt non-intrusive lightweight authentication via browser cookies
-        final restored = await _oauthManager.googleSignIn
-            .attemptLightweightAuthentication();
-        if (restored != null) {
-          _oauthManager.setGoogleUser(restored);
-          await _oauthManager.saveGoogleUserIdentity(
-            email: restored.email,
-            id: restored.id,
+        // On Web: first check if we have a valid cached token (localStorage)
+        if (isTokenValid) {
+          setGoogleTasksTokenExpired(false);
+          AppLogger.info(
+            'Web startup: Valid cached Google token found.',
+            tag: 'Auth',
           );
-          AppLogger.info('Google user restored on web startup.', tag: 'Auth');
-          if (!isTokenValid) {
+          // Still try to restore GIS user for future silent refreshes
+          try {
+            final restored = await _oauthManager.googleSignIn
+                .attemptLightweightAuthentication();
+            if (restored != null) {
+              _oauthManager.setGoogleUser(restored);
+            }
+          } catch (_) {}
+          return;
+        }
+
+        // Cached token is missing or expired — try GIS silent restoration
+        try {
+          final restored = await _oauthManager.googleSignIn
+              .attemptLightweightAuthentication();
+          if (restored != null) {
+            _oauthManager.setGoogleUser(restored);
+            await _oauthManager.saveGoogleUserIdentity(
+              email: restored.email,
+              id: restored.id,
+            );
+            AppLogger.info(
+              'Web startup: GIS user restored: ${restored.email}',
+              tag: 'Auth',
+            );
+
+            // Try non-interactive scope authorization (succeeds if user previously granted)
             final clientAuth = await restored.authorizationClient
                 .authorizationForScopes(GoogleOAuthManager.googleTasksScopes);
             if (clientAuth != null && clientAuth.accessToken.isNotEmpty) {
@@ -128,9 +151,26 @@ class AuthService extends ChangeNotifier {
                 clientAuth.accessToken,
               );
               setGoogleTasksTokenExpired(false);
+              AppLogger.info(
+                'Web startup: Token silently refreshed via GIS.',
+                tag: 'Auth',
+              );
+              return;
             }
           }
+        } catch (e) {
+          AppLogger.info(
+            'Web startup: GIS silent auth/authorization failed: $e',
+            tag: 'Auth',
+          );
         }
+
+        // All silent methods failed — mark as expired so banner shows
+        setGoogleTasksTokenExpired(true);
+        AppLogger.info(
+          'Web startup: No valid token available. Reconnect banner will show.',
+          tag: 'Auth',
+        );
       } else {
         // On Mobile, NEVER call attemptLightweightAuthentication() on cold start,
         // because Credential Manager pops up an interactive account-selection bottom sheet.
@@ -170,40 +210,87 @@ class AuthService extends ChangeNotifier {
   Future<String?> _resolveWebGoogleAccessToken({String? popupToken}) async {
     if (!kIsWeb) return popupToken;
 
-    try {
-      await _oauthManager.ensureGoogleSignInInitialized();
-      final restored = await _oauthManager.googleSignIn
-          .attemptLightweightAuthentication();
-      if (restored != null) {
-        _oauthManager.setGoogleUser(restored);
-      }
-    } catch (e) {
-      AppLogger.warning(
-        'Could not resolve web token via GoogleSignIn after popup: $e',
+    // Step 1: If Firebase popup gave us a usable token, use it directly
+    if (popupToken != null && popupToken.isNotEmpty) {
+      AppLogger.info(
+        'Web: Using access token from Firebase popup.',
         tag: 'Auth',
       );
-    }
-
-    if (popupToken != null && popupToken.isNotEmpty) {
       return popupToken;
     }
 
-    if (_oauthManager.googleUser != null) {
+    // Step 2: Try to establish GIS user session via lightweight auth (One Tap)
+    if (_oauthManager.googleUser == null) {
       try {
-        final clientAuth =
-            await _oauthManager.googleUser!.authorizationClient
-                .authorizationForScopes(GoogleOAuthManager.googleTasksScopes) ??
-            await _oauthManager.googleUser!.authorizationClient.authorizeScopes(
-              GoogleOAuthManager.googleTasksScopes,
-            );
-
-        if (clientAuth.accessToken.isNotEmpty) {
-          return clientAuth.accessToken;
+        await _oauthManager.ensureGoogleSignInInitialized();
+        final restored = await _oauthManager.googleSignIn
+            .attemptLightweightAuthentication();
+        if (restored != null) {
+          _oauthManager.setGoogleUser(restored);
+          AppLogger.info(
+            'Web: GIS lightweight auth restored user: ${restored.email}',
+            tag: 'Auth',
+          );
+        } else {
+          AppLogger.info(
+            'Web: GIS lightweight auth returned null (no prior GIS session).',
+            tag: 'Auth',
+          );
         }
-      } catch (_) {}
+      } catch (e) {
+        AppLogger.warning('Web: GIS lightweight auth failed: $e', tag: 'Auth');
+      }
     }
 
-    return _oauthManager.getGoogleAccessToken();
+    // Step 3: If we have a GIS user, try non-interactive then interactive authorization
+    if (_oauthManager.googleUser != null) {
+      // 3a: Try non-interactive (silent) — succeeds if user previously granted scopes
+      try {
+        final clientAuth = await _oauthManager.googleUser!.authorizationClient
+            .authorizationForScopes(GoogleOAuthManager.googleTasksScopes);
+        if (clientAuth != null && clientAuth.accessToken.isNotEmpty) {
+          AppLogger.info(
+            'Web: Got token via GIS silent authorizationForScopes.',
+            tag: 'Auth',
+          );
+          return clientAuth.accessToken;
+        }
+      } catch (e) {
+        AppLogger.info(
+          'Web: GIS silent authorizationForScopes failed: $e',
+          tag: 'Auth',
+        );
+      }
+
+      // 3b: Interactive authorization (GIS consent popup)
+      try {
+        AppLogger.info(
+          'Web: Requesting interactive GIS authorizeScopes...',
+          tag: 'Auth',
+        );
+        final clientAuth = await _oauthManager.googleUser!.authorizationClient
+            .authorizeScopes(GoogleOAuthManager.googleTasksScopes);
+        if (clientAuth.accessToken.isNotEmpty) {
+          AppLogger.info(
+            'Web: Got token via GIS interactive authorizeScopes.',
+            tag: 'Auth',
+          );
+          return clientAuth.accessToken;
+        }
+      } catch (e) {
+        AppLogger.warning(
+          'Web: GIS interactive authorizeScopes failed: $e',
+          tag: 'Auth',
+        );
+      }
+    }
+
+    // Step 4: Last resort — check SharedPreferences cache
+    AppLogger.warning(
+      'Web: All token resolution attempts failed.',
+      tag: 'Auth',
+    );
+    return null;
   }
 
   @override
@@ -245,6 +332,24 @@ class AuthService extends ChangeNotifier {
         if (resolvedToken != null && resolvedToken.isNotEmpty) {
           await _oauthManager.cacheGoogleAccessToken(resolvedToken);
           setGoogleTasksTokenExpired(false);
+          AppLogger.info(
+            'Web sign-in: Google API access token acquired and cached.',
+            tag: 'Auth',
+          );
+        } else {
+          AppLogger.warning(
+            'Web sign-in: Could not acquire Google API access token. Calendar/Tasks will show disconnected.',
+            tag: 'Auth',
+          );
+          setGoogleTasksTokenExpired(true);
+        }
+
+        // Save identity for GIS restoration on future page loads
+        if (userCredential.user?.email != null) {
+          await _oauthManager.saveGoogleUserIdentity(
+            email: userCredential.user!.email!,
+            id: userCredential.user!.uid,
+          );
         }
 
         if (userCredential.user != null) {

@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:rocis_tasks/core/services/analytics_service.dart';
 
 class SyncedScheduleEvent {
   final String id;
@@ -163,6 +165,11 @@ class ScheduleFirestoreService {
       _cachedScheduleUserId = null;
       _cachedEvents = null;
       _lastFetchTime = null;
+      SharedPreferences.getInstance()
+          .then((prefs) {
+            prefs.remove('cached_schedule_user_id');
+          })
+          .catchError((_) {});
     }
   }
 
@@ -171,6 +178,18 @@ class ScheduleFirestoreService {
     _cachedScheduleUserId = null;
     _cachedEvents = null;
     _lastFetchTime = null;
+    SharedPreferences.getInstance()
+        .then((prefs) {
+          prefs.remove('cached_schedule_user_id');
+        })
+        .catchError((_) {});
+  }
+
+  Future<void> _saveCachedUserId(String userId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('cached_schedule_user_id', userId);
+    } catch (_) {}
   }
 
   Future<void> initialize() async {
@@ -205,11 +224,20 @@ class ScheduleFirestoreService {
     }
   }
 
-  /// Resolve ROCIs Schedule user ID. Checks secondary auth first, direct UID doc, then queries by email.
+  /// Resolve ROCIs Schedule user ID. Checks local cache, secondary auth, direct UID doc, then queries by email.
   Future<String?> _resolveScheduleUserId({String? uid, String? email}) async {
     if (_cachedScheduleUserId != null && _cachedScheduleUserId!.isNotEmpty) {
       return _cachedScheduleUserId;
     }
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final persistedUid = prefs.getString('cached_schedule_user_id');
+      if (persistedUid != null && persistedUid.isNotEmpty) {
+        _cachedScheduleUserId = persistedUid;
+        return _cachedScheduleUserId;
+      }
+    } catch (_) {}
 
     final db = _scheduleDb;
     if (db == null) return null;
@@ -221,6 +249,7 @@ class ScheduleFirestoreService {
       final secUid = scheduleAuth.currentUser?.uid;
       if (secUid != null && secUid.isNotEmpty) {
         _cachedScheduleUserId = secUid;
+        _saveCachedUserId(secUid);
         debugPrint(
           'ScheduleFirestoreService: Resolved user by secondary auth UID: $_cachedScheduleUserId',
         );
@@ -234,6 +263,7 @@ class ScheduleFirestoreService {
         final doc = await db.collection('users').doc(uid).get();
         if (doc.exists) {
           _cachedScheduleUserId = uid;
+          _saveCachedUserId(uid);
           debugPrint(
             'ScheduleFirestoreService: Resolved user by UID doc: $uid',
           );
@@ -244,41 +274,81 @@ class ScheduleFirestoreService {
       }
     }
 
-    // 2. Email lookup across users collection (standard + lowercase fallback)
+    // 2. Email lookup across users collection (standard + lowercase + Gmail dotless fallback)
     final targetEmail = email ?? _userEmail;
     if (targetEmail != null && targetEmail.isNotEmpty) {
-      try {
-        final query = await db
-            .collection('users')
-            .where('email', isEqualTo: targetEmail)
-            .limit(1)
-            .get();
-        if (query.docs.isNotEmpty) {
-          _cachedScheduleUserId = query.docs.first.id;
-          debugPrint(
-            'ScheduleFirestoreService: Resolved user by email ($targetEmail) -> $_cachedScheduleUserId',
-          );
-          return _cachedScheduleUserId;
-        }
+      final emailVariants = <String>{targetEmail, targetEmail.toLowerCase()};
+      if (targetEmail.contains('@gmail.com') ||
+          targetEmail.toLowerCase().contains('@gmail.com')) {
+        final parts = targetEmail.split('@');
+        final userPart = parts[0];
+        final domainPart = parts[1];
+        final dotless = '${userPart.replaceAll('.', '')}@$domainPart';
+        emailVariants.add(dotless);
+        emailVariants.add(dotless.toLowerCase());
+      }
 
-        final lowerEmail = targetEmail.toLowerCase();
-        if (lowerEmail != targetEmail) {
-          final queryLower = await db
+      for (final variant in emailVariants) {
+        try {
+          final query = await db
               .collection('users')
-              .where('email', isEqualTo: lowerEmail)
+              .where('email', isEqualTo: variant)
               .limit(1)
               .get();
-          if (queryLower.docs.isNotEmpty) {
-            _cachedScheduleUserId = queryLower.docs.first.id;
+          if (query.docs.isNotEmpty) {
+            _cachedScheduleUserId = query.docs.first.id;
+            _saveCachedUserId(_cachedScheduleUserId!);
+            if (variant != targetEmail) {
+              AnalyticsService().logEvent(
+                name: 'schedule_synergy_dot_fallback',
+                parameters: {'match_type': 'query_variant'},
+              );
+            }
             debugPrint(
-              'ScheduleFirestoreService: Resolved user by lowercase email ($lowerEmail) -> $_cachedScheduleUserId',
+              'ScheduleFirestoreService: Resolved user by email ($variant) -> $_cachedScheduleUserId',
             );
             return _cachedScheduleUserId;
+          }
+        } catch (e) {
+          debugPrint(
+            'ScheduleFirestoreService: Error querying user by email ($variant): $e',
+          );
+        }
+      }
+
+      // 3. Fallback: scan user docs with client-side normalized email comparison
+      try {
+        final usersSnap = await db.collection('users').limit(50).get();
+        final normTarget = targetEmail
+            .split('@')
+            .first
+            .replaceAll('.', '')
+            .toLowerCase();
+        for (final doc in usersSnap.docs) {
+          final docEmail = doc.data()['email']?.toString();
+          if (docEmail != null) {
+            final normDoc = docEmail
+                .split('@')
+                .first
+                .replaceAll('.', '')
+                .toLowerCase();
+            if (normDoc == normTarget) {
+              _cachedScheduleUserId = doc.id;
+              _saveCachedUserId(_cachedScheduleUserId!);
+              AnalyticsService().logEvent(
+                name: 'schedule_synergy_dot_fallback',
+                parameters: {'match_type': 'normalized_scan'},
+              );
+              debugPrint(
+                'ScheduleFirestoreService: Resolved user by normalized scan ($docEmail) -> $_cachedScheduleUserId',
+              );
+              return _cachedScheduleUserId;
+            }
           }
         }
       } catch (e) {
         debugPrint(
-          'ScheduleFirestoreService: Error querying user by email: $e',
+          'ScheduleFirestoreService: Error during user collection scan: $e',
         );
       }
     }
