@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:integration_test/integration_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/sub_task.dart';
@@ -8,7 +7,7 @@ import 'package:rocis_tasks/core/services/auth/google_oauth_manager.dart';
 import 'package:rocis_tasks/core/services/error_handling_service.dart';
 
 void main() {
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  TestWidgetsFlutterBinding.ensureInitialized();
 
   group('Auth & Token Lifecycle Integration', () {
     late GoogleOAuthManager oauthManager;
@@ -90,10 +89,7 @@ void main() {
         queueService.queue.first.payload?['title'],
         'Integration Test Task (Final)',
       );
-      expect(
-        queueService.queue.first.payload?['priority'],
-        'high',
-      );
+      expect(queueService.queue.first.payload?['priority'], 'high');
 
       // 3. Enqueue second entity
       await queueService.enqueue(
@@ -129,16 +125,18 @@ void main() {
         subTasks: [subA.copyWith(isCompleted: false), subC],
       );
 
-      final resolvedWithoutPendingWrite = TaskConflictResolver.resolveTaskConflict(
-        localTask: local,
-        remoteTask: remote,
-        hasPendingLocalWrite: false,
-      );
+      final resolvedWithoutPendingWrite =
+          TaskConflictResolver.resolveTaskConflict(
+            localTask: local,
+            remoteTask: remote,
+            hasPendingLocalWrite: false,
+          );
 
       // Subtasks should union to 3 items
       expect(resolvedWithoutPendingWrite.subTasks?.length, 3);
-      final subTaskIds =
-          resolvedWithoutPendingWrite.subTasks?.map((s) => s.id).toSet();
+      final subTaskIds = resolvedWithoutPendingWrite.subTasks
+          ?.map((s) => s.id)
+          .toSet();
       expect(subTaskIds, containsAll(['s_a', 's_b', 's_c']));
     });
   });
