@@ -350,13 +350,11 @@ void main() {
         final afterMaterializeTasks = verify(
           () => mockSource.addTask(captureAny()),
         ).captured;
-        // Print captured tasks for debugging
-        for (final t in afterMaterializeTasks) {
-          // ignore: avoid_print
-          print(
-            'Captured addTask in test: ${(t as Task).id}, title: ${t.title}',
-          );
-        }
+        expect(afterMaterializeTasks.length, 1);
+        final spawnedTask = afterMaterializeTasks.first as Task;
+        expect(spawnedTask.recurringParentId, 'rec-future');
+        expect(spawnedTask.title, 'Future Task');
+        expect(spawnedTask.isCompleted, isFalse);
       },
     );
 
