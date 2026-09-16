@@ -85,6 +85,9 @@ class Task extends HiveObject {
   @HiveField(21)
   List<TaskCustomField>? customFields;
 
+  @HiveField(22)
+  String? recurringParentId;
+
   Task({
     String? id,
     required this.title,
@@ -108,6 +111,7 @@ class Task extends HiveObject {
     this.skipReminders = false,
     this.isGroceryList = false,
     List<TaskCustomField>? customFields,
+    this.recurringParentId,
   }) : id = id ?? const Uuid().v4(),
        createdAt = createdAt ?? DateTime.now(),
        attachmentPaths = attachmentPaths ?? <String>[],
@@ -136,6 +140,7 @@ class Task extends HiveObject {
     bool? skipReminders,
     bool? isGroceryList,
     List<TaskCustomField>? customFields,
+    String? recurringParentId,
   }) {
     return Task(
       id: id,
@@ -154,14 +159,14 @@ class Task extends HiveObject {
       createdAt: createdAt ?? this.createdAt,
       requireSubTasksBeforeReminders:
           requireSubTasksBeforeReminders ?? this.requireSubTasksBeforeReminders,
-      syncWithGoogleTasks:
-          syncWithGoogleTasks ?? this.syncWithGoogleTasks,
+      syncWithGoogleTasks: syncWithGoogleTasks ?? this.syncWithGoogleTasks,
       googleTaskId: googleTaskId ?? this.googleTaskId,
       googleTaskListId: googleTaskListId ?? this.googleTaskListId,
       attachmentPaths: attachmentPaths ?? this.attachmentPaths,
       skipReminders: skipReminders ?? this.skipReminders,
       isGroceryList: isGroceryList ?? this.isGroceryList,
       customFields: customFields ?? this.customFields,
+      recurringParentId: recurringParentId ?? this.recurringParentId,
     );
   }
 
@@ -189,6 +194,7 @@ class Task extends HiveObject {
       'skipReminders': skipReminders,
       'isGroceryList': isGroceryList,
       'customFields': customFields?.map((cf) => cf.toMap()).toList(),
+      'recurringParentId': recurringParentId,
     };
   }
 
@@ -215,6 +221,7 @@ class Task extends HiveObject {
       'skipReminders': skipReminders,
       'isGroceryList': isGroceryList,
       'customFields': customFields?.map((cf) => cf.toMap()).toList(),
+      'recurringParentId': recurringParentId,
     };
   }
 
@@ -235,7 +242,8 @@ class Task extends HiveObject {
       dueDate: _parseDate(map['dueDate']),
       priority: TaskPriority.values[map['priority'] ?? 1],
       categoryId: map['categoryId'],
-      categoryIds: (map['categoryIds'] as List?)?.whereType<String>().toList() ?? 
+      categoryIds:
+          (map['categoryIds'] as List?)?.whereType<String>().toList() ??
           (map['categoryId'] != null ? [map['categoryId'] as String] : []),
       isDeleted: map['isDeleted'] ?? false,
       isPinned: map['isPinned'] ?? false,
@@ -247,16 +255,19 @@ class Task extends HiveObject {
       createdAt: _parseDate(map['createdAt']),
       requireSubTasksBeforeReminders:
           map['requireSubTasksBeforeReminders'] ?? false,
-      syncWithGoogleTasks: map['syncWithGoogleTasks'] ?? map['syncWithGoogleCalendar'] ?? false,
+      syncWithGoogleTasks:
+          map['syncWithGoogleTasks'] ?? map['syncWithGoogleCalendar'] ?? false,
       googleTaskId: map['googleTaskId'] ?? map['calendarEventId'],
       googleTaskListId: map['googleTaskListId'] ?? map['calendarId'],
-      attachmentPaths:
-          (map['attachmentPaths'] as List?)?.whereType<String>().toList(),
+      attachmentPaths: (map['attachmentPaths'] as List?)
+          ?.whereType<String>()
+          .toList(),
       skipReminders: map['skipReminders'] ?? false,
       isGroceryList: map['isGroceryList'] ?? false,
       customFields: (map['customFields'] as List?)
           ?.map((cf) => TaskCustomField.fromMap(cf as Map<String, dynamic>))
           .toList(),
+      recurringParentId: map['recurringParentId'] as String?,
     );
   }
 }

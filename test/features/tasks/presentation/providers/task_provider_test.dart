@@ -289,8 +289,106 @@ void main() {
       expect(nextTask.title, 'Daily Standup');
       expect(nextTask.isCompleted, isFalse);
       expect(nextTask.recurrenceRule, 'FREQ=DAILY;INTERVAL=1');
-      expect(nextTask.dueDate, DateTime(2026, 8, 16, 9, 0));
+      expect(nextTask.recurringParentId, 'rec-1');
+      expect(nextTask.dueDate!.isAfter(DateTime.now()), isTrue);
+      expect(nextTask.dueDate!.hour, 9);
+      expect(nextTask.dueDate!.minute, 0);
     });
+
+    test(
+      'spawns next recurring task advancing from future due date when completed early',
+      () async {
+        when(() => mockSubscriptionService.isPremium).thenReturn(true);
+        when(() => mockSource.addTask(any())).thenAnswer((_) async => {});
+        when(
+          () => mockFirestoreService.updateTask(any()),
+        ).thenAnswer((_) async => {});
+        when(
+          () => mockFirestoreService.addTask(any()),
+        ).thenAnswer((_) async => {});
+
+        await taskProvider.init();
+
+        final futureDue = DateTime.now().add(const Duration(days: 3));
+        final recurringTask = Task(
+          id: 'rec-future',
+          title: 'Future Task',
+          isCompleted: false,
+          dueDate: DateTime(
+            futureDue.year,
+            futureDue.month,
+            futureDue.day,
+            10,
+            0,
+          ),
+          recurrenceRule: 'FREQ=DAILY;INTERVAL=1',
+        );
+
+        await taskProvider.toggleTaskCompletion(recurringTask);
+
+        expect(recurringTask.isCompleted, isTrue);
+        final capturedTasks = verify(
+          () => mockSource.addTask(captureAny()),
+        ).captured;
+        expect(capturedTasks.length, 2);
+
+        final nextTask = capturedTasks[1] as Task;
+        expect(nextTask.recurringParentId, 'rec-future');
+        // Should advance one day past the future due date
+        expect(
+          nextTask.dueDate!.day,
+          (recurringTask.dueDate!.day % 31) + 1,
+        ); // next day
+        expect(nextTask.dueDate!.hour, 10);
+        expect(nextTask.dueDate!.minute, 0);
+      },
+    );
+
+    test(
+      'un-completing recurring task automatically deletes the spawned recurring child task',
+      () async {
+        when(() => mockSubscriptionService.isPremium).thenReturn(true);
+        when(() => mockSource.addTask(any())).thenAnswer((_) async => {});
+        when(() => mockSource.deleteTask(any())).thenAnswer((_) async => {});
+        when(
+          () => mockFirestoreService.updateTask(any()),
+        ).thenAnswer((_) async => {});
+        when(
+          () => mockFirestoreService.deleteTask(any()),
+        ).thenAnswer((_) async => {});
+        when(
+          () => mockAnalyticsService.logTaskDeleted(),
+        ).thenAnswer((_) async => {});
+
+        final parentTask = Task(
+          id: 'rec-parent',
+          title: 'Weekly Sync',
+          isCompleted: true,
+          recurrenceRule: 'FREQ=WEEKLY;INTERVAL=1',
+        );
+
+        final spawnedChild = Task(
+          id: 'rec-child',
+          title: 'Weekly Sync',
+          isCompleted: false,
+          recurrenceRule: 'FREQ=WEEKLY;INTERVAL=1',
+          recurringParentId: 'rec-parent',
+        );
+
+        when(
+          () => mockSource.getTasks(),
+        ).thenReturn([parentTask, spawnedChild]);
+
+        await taskProvider.init();
+
+        // Un-complete the parent task
+        await taskProvider.toggleTaskCompletion(parentTask);
+
+        expect(parentTask.isCompleted, isFalse);
+        verify(() => mockSource.deleteTask('rec-child')).called(1);
+        verify(() => mockFirestoreService.deleteTask('rec-child')).called(1);
+      },
+    );
 
     test(
       'does not spawn next recurring task when user is not premium',

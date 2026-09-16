@@ -23,7 +23,9 @@ void main() {
         RecurrencePreset.daily,
       );
       expect(
-        TaskRecurrenceService.getPresetFromRule('FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR'),
+        TaskRecurrenceService.getPresetFromRule(
+          'FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR',
+        ),
         RecurrencePreset.weekdays,
       );
       expect(
@@ -172,6 +174,90 @@ void main() {
       expect(nextTask.subTasks![0].isCompleted, isFalse);
       expect(nextTask.subTasks![1].title, 'Balcony');
       expect(nextTask.subTasks![1].isCompleted, isFalse);
+
+      // Parent ID linkage must be assigned
+      expect(nextTask.recurringParentId, original.id);
     });
+
+    test(
+      'Overdue recurrence advances strictly past after target and preserves time',
+      () {
+        // Due 10 days ago at 09:30 AM
+        final baseDate = DateTime(2026, 8, 1, 9, 30);
+        final currentMoment = DateTime(
+          2026,
+          8,
+          11,
+          14,
+          0,
+        ); // 2:00 PM on the 11th
+
+        // Daily recurrence: Since 9:30 AM on the 11th has passed, next should be 12th at 09:30 AM
+        final nextDaily = TaskRecurrenceService.getNextDueDate(
+          baseDate,
+          TaskRecurrenceService.rruleDaily,
+          after: currentMoment,
+        );
+        expect(nextDaily, isNotNull);
+        expect(nextDaily!.year, 2026);
+        expect(nextDaily.month, 8);
+        expect(nextDaily.day, 12);
+        expect(nextDaily.hour, 9);
+        expect(nextDaily.minute, 30);
+
+        // Weekly recurrence: next weekly instance after currentMoment
+        final nextWeekly = TaskRecurrenceService.getNextDueDate(
+          baseDate,
+          TaskRecurrenceService.rruleWeekly,
+          after: currentMoment,
+        );
+        expect(nextWeekly, isNotNull);
+        expect(nextWeekly!.year, 2026);
+        expect(nextWeekly.month, 8);
+        expect(nextWeekly.day, 15); // Aug 1 + 14 days
+        expect(nextWeekly.hour, 9);
+        expect(nextWeekly.minute, 30);
+      },
+    );
+
+    test('Overdue recurrence when target day time has not yet passed', () {
+      // Due 3 days ago at 18:00 (6:00 PM)
+      final baseDate = DateTime(2026, 8, 1, 18, 0);
+      final currentMoment = DateTime(2026, 8, 4, 10, 0); // 10:00 AM on the 4th
+
+      // Since 6:00 PM on the 4th has NOT passed yet, it should be today (Aug 4) at 18:00
+      final nextDaily = TaskRecurrenceService.getNextDueDate(
+        baseDate,
+        TaskRecurrenceService.rruleDaily,
+        after: currentMoment,
+      );
+      expect(nextDaily, isNotNull);
+      expect(nextDaily!.year, 2026);
+      expect(nextDaily.month, 8);
+      expect(nextDaily.day, 4);
+      expect(nextDaily.hour, 18);
+      expect(nextDaily.minute, 0);
+    });
+
+    test(
+      'Anchoring recurrence to createdAt preserves original creation time',
+      () {
+        final createdAt = DateTime(2026, 8, 10, 16, 45, 12);
+        final currentMoment = DateTime(2026, 8, 15, 10, 0);
+
+        final nextDate = TaskRecurrenceService.getNextDueDate(
+          createdAt,
+          TaskRecurrenceService.rruleDaily,
+          after: currentMoment,
+        );
+        expect(nextDate, isNotNull);
+        expect(nextDate!.year, 2026);
+        expect(nextDate.month, 8);
+        expect(nextDate.day, 15); // Aug 15 16:45 is after 10:00
+        expect(nextDate.hour, 16);
+        expect(nextDate.minute, 45);
+        expect(nextDate.second, 12);
+      },
+    );
   });
 }
