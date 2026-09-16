@@ -4,7 +4,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:rocis_tasks/core/services/auth/google_oauth_manager.dart';
 import 'package:rocis_tasks/core/services/encryption_service.dart';
@@ -17,6 +16,8 @@ export 'package:rocis_tasks/core/services/auth/google_oauth_manager.dart'
 class AuthService extends ChangeNotifier {
   final ErrorHandlingService _errorHandlingService;
   late final GoogleOAuthManager _oauthManager;
+
+  GoogleOAuthManager get oauthManager => _oauthManager;
 
   FirebaseAuth get _auth => FirebaseAuth.instance;
   final Completer<void> _initCompleter = Completer<void>();
@@ -79,28 +80,18 @@ class AuthService extends ChangeNotifier {
       final isGoogleUser = user.providerData.any(
         (p) => p.providerId == 'google.com',
       );
-      final prefs = await SharedPreferences.getInstance();
-      final hasCachedToken = prefs.containsKey(
-        GoogleOAuthManager.keyAccessToken,
-      );
-      final hasSavedEmail = prefs.containsKey(GoogleOAuthManager.keyUserEmail);
-      final token = prefs.getString(GoogleOAuthManager.keyAccessToken);
-      final expiresAtStr = prefs.getString(
-        GoogleOAuthManager.keyAccessTokenExpiresAt,
-      );
-      final isTokenValid =
-          token != null &&
-          expiresAtStr != null &&
-          DateTime.tryParse(expiresAtStr)?.isAfter(DateTime.now()) == true;
+      final hasCredentials = await _oauthManager.hasCachedGoogleCredentials();
+      final isTokenValid = await _oauthManager.isTokenValid();
 
       // Only attempt startup restoration if user signed in via Google
       // or has linked Google Tasks/Calendar, avoiding unwanted attempts for Email/Password users.
-      if (!isGoogleUser && !hasCachedToken && !hasSavedEmail) {
+      if (!isGoogleUser && !hasCredentials) {
         return;
       }
 
       // If email is not yet saved but Firebase user is a Google user, persist it
-      if (!hasSavedEmail && isGoogleUser && user.email != null) {
+      final savedEmail = await _oauthManager.getSavedGoogleUserEmail();
+      if (savedEmail == null && isGoogleUser && user.email != null) {
         await _oauthManager.saveGoogleUserIdentity(
           email: user.email!,
           id: user.uid,

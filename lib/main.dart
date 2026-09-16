@@ -69,7 +69,10 @@ class _AppRootState extends State<AppRoot> {
   final _errorHandlingService = ErrorHandlingService();
   late final _subscriptionService = SubscriptionService(_errorHandlingService);
   late final _authService = AuthService(_errorHandlingService);
-  final _calendarService = CalendarService();
+  late final _calendarService = CalendarService(
+    authService: _authService,
+    oauthManager: _authService.oauthManager,
+  );
   final _themeService = ThemeService();
   final _timezoneService = TimezoneService();
   final _calendarColorService = CalendarColorService();

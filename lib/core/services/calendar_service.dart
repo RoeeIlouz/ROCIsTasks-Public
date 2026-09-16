@@ -13,15 +13,26 @@ import 'package:rocis_tasks/core/services/error_handling_service.dart';
 class CalendarService {
   final DeviceCalendarPlugin _deviceCalendarPlugin = DeviceCalendarPlugin();
   AuthService? _authService;
+  GoogleOAuthManager? _oauthManager;
   static const String _keyCachedEvents = 'cached_calendar_events_v2';
   List<Calendar>? _cachedCalendars;
   DateTime? _cachedCalendarsTime;
   static const Duration _calendarCacheTtl = Duration(minutes: 5);
 
-  CalendarService({AuthService? authService}) : _authService = authService;
+  CalendarService({
+    AuthService? authService,
+    GoogleOAuthManager? oauthManager,
+  })  : _authService = authService,
+        _oauthManager = oauthManager ?? authService?.oauthManager;
+
+  GoogleOAuthManager get _effectiveOAuthManager =>
+      _oauthManager ??
+      _authService?.oauthManager ??
+      GoogleOAuthManager(ErrorHandlingService());
 
   void setAuthService(AuthService authService) {
     _authService = authService;
+    _oauthManager = authService.oauthManager;
   }
 
   void invalidateCalendarsCache() {
@@ -71,32 +82,18 @@ class CalendarService {
       }
     }
 
-    // Background isolate fallback: read directly from SharedPreferences or attempt silent refresh
+    // Direct token resolution via GoogleOAuthManager (with cache/proactive refresh support)
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('google_access_token');
-      final expiresAtStr = prefs.getString('google_access_token_expires_at');
-      if (token != null && token.isNotEmpty) {
-        if (expiresAtStr != null) {
-          final expiresAt = DateTime.tryParse(expiresAtStr);
-          if (expiresAt != null && DateTime.now().isBefore(expiresAt)) {
-            return token;
-          }
-        } else {
-          return token;
-        }
-      }
-
-      // Proactive silent refresh using GoogleOAuthManager
-      final oauthManager = GoogleOAuthManager(ErrorHandlingService());
-      final freshToken = await oauthManager.getGoogleAccessToken();
+      final freshToken = await _effectiveOAuthManager.getGoogleAccessToken();
       if (freshToken != null && freshToken.isNotEmpty) {
         return freshToken;
       }
 
       // If silent refresh failed (e.g. network cutoff in doze), fall back to cached token
-      if (token != null && token.isNotEmpty) {
-        return token;
+      final prefs = await SharedPreferences.getInstance();
+      final cachedToken = prefs.getString(GoogleOAuthManager.keyAccessToken);
+      if (cachedToken != null && cachedToken.isNotEmpty) {
+        return cachedToken;
       }
     } catch (e) {
       AppLogger.warning(
