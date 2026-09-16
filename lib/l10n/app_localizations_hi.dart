@@ -1403,6 +1403,14 @@ class AppLocalizationsHi extends AppLocalizations {
   }
 
   @override
+  String upcomingRecurringTasksHeader(int count) {
+    return 'आगामी आवर्ती ($count)';
+  }
+
+  @override
+  String get upcomingRecurringBadge => 'आगामी';
+
+  @override
   String get allCaughtUpToday => 'आज के लिए सब पूरा हो गया! 🎉';
 
   @override

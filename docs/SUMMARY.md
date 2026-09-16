@@ -2,6 +2,34 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## Deferred Recurring Tasks Materialization & Upcoming Projections - 2026-09-17
+
+#### Problem & Requirements
+* **Premature Task Spawning**: Previously, completing a recurring task immediately created and inserted the next pending instance into the database, instantly cluttering the active task list with tasks scheduled for tomorrow or future days.
+* **Deferred Requirement**: The next iteration must be created **only AT the next iteration date** (e.g., tomorrow/next scheduled day), not immediately upon completing today's iteration.
+* **Upcoming Visibility**: Users still need visibility into upcoming scheduled recurring tasks in both the task list and calendar without treating them as active, overdue, or pending tasks.
+* **Catch-Up Mechanism**: If days are missed (e.g. completed on Monday, app reopened Thursday), the materialized task due date must catch up to today while preserving the original hour/minute/second of day.
+
+#### Solutions Applied
+1. **Task Data Model (`task.dart` & `task.g.dart`)**:
+   - Added `@HiveField(23) DateTime? nextRecurrenceDate;` to `Task` model, Hive adapter, serialization (`toMap`, `toFirestoreMap`, `fromMap`), and `copyWith`.
+2. **Recurrence Engine Improvements (`TaskRecurrenceService`)**:
+   - Added `adjustDueDateForCatchUp(DateTime scheduledDate, DateTime now)`: strictly advances past scheduled dates to today's date if days were missed, preserving original time of day.
+   - Added `createUpcomingPreviewTask(Task completedTask, DateTime nextDueDate)`: generates lightweight preview tasks tagged with `preview_${completedTask.id}`.
+3. **Provider Lifecycle & Deferred Scheduling (`TaskProvider`)**:
+   - In `toggleTaskCompletion`: if the next recurrence date is on a future day (`nextDay.isAfter(today)`), records `task.nextRecurrenceDate = nextDueDate` and saves to local Hive and Firestore without creating a new pending task. Pre-schedules OS notification so reminders trigger on time.
+   - On uncompletion: clears `nextRecurrenceDate` and cancels the pre-scheduled preview notification.
+   - Implemented `checkAndMaterializeDueRecurringTasks()`: automatically checks for due deferred tasks on app start (`init()`) and app foregrounding (`didChangeAppLifecycleState(resumed)`). Materializes them into real pending tasks using `_materializeRecurringTask`.
+   - Exposed `upcomingRecurringTasks` and `getUpcomingRecurringTasksForDay(DateTime day)`.
+4. **UI & UX Projections**:
+   - **Task List View (`TaskListScreen`)**: Added an expandable `Upcoming Recurring` `GlassContainer` section displaying projected future iterations with custom badge styling.
+   - **Calendar View (`CalendarScreen`)**: Integrated `getUpcomingRecurringTasksForDay` into calendar event queries and rendered upcoming tasks with `GlassContainer` and localized `upcomingRecurringBadge`.
+   - **Localization**: Added `upcomingRecurringTasksHeader` and `upcomingRecurringBadge` across all 8 supported languages (`en`, `he`, `es`, `de`, `fr`, `ar`, `hi`, `sv`).
+5. **Quality & Verification**:
+   - `flutter analyze`: 0 issues found.
+   - `flutter test`: 346 / 346 tests passed (100%).
+   - Added comprehensive tests in `task_recurrence_service_test.dart` and `task_provider_test.dart`.
+
 ## Recurring Tasks Overhaul & Next Due Date Synchronization - 2026-09-16
 
 #### Problem & Root Causes

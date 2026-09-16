@@ -497,6 +497,15 @@
       }
     }
   },
+  "upcomingRecurringTasksHeader": "Próximas recurrentes ({count})",
+  "@upcomingRecurringTasksHeader": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "upcomingRecurringBadge": "Próxima",
   "allCaughtUpToday": "¡Todo listo por hoy! 🎉",
   "allCaughtUpSubtitle": "¡Gran trabajo! Tómate un descanso o añade una nueva tarea.",
   "resetFilters": "Restablecer todo",

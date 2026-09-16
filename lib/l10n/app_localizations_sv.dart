@@ -1408,6 +1408,14 @@ class AppLocalizationsSv extends AppLocalizations {
   }
 
   @override
+  String upcomingRecurringTasksHeader(int count) {
+    return 'Kommande återkommande ($count)';
+  }
+
+  @override
+  String get upcomingRecurringBadge => 'Kommande';
+
+  @override
   String get allCaughtUpToday => 'Allt klart för idag! 🎉';
 
   @override

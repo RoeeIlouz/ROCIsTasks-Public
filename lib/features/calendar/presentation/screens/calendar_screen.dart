@@ -63,9 +63,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
   List<dynamic> _getEventsForDay(
     DateTime day,
     List<Task> allTasks,
-    CalendarProvider
-    calendarProvider, // Changed to use provider directly for optimized lookup
-  ) {
+    CalendarProvider calendarProvider, {
+    TaskProvider? taskProvider,
+  }) {
     final tasks = calendarProvider.showTasks
         ? allTasks.where((task) {
             if (task.dueDate == null) return false;
@@ -73,9 +73,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
           }).toList()
         : <Task>[];
 
+    final upcomingTasks = (calendarProvider.showTasks && taskProvider != null)
+        ? taskProvider.getUpcomingRecurringTasksForDay(day)
+        : <Task>[];
+
     final events = calendarProvider.getEventsForDay(day);
 
-    return [...tasks, ...events];
+    return [...tasks, ...upcomingTasks, ...events];
   }
 
   Color _getEventColor(
@@ -183,6 +187,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
       selectedDay,
       tasks,
       calendarProvider,
+      taskProvider: taskProvider,
     );
 
     return Column(
@@ -338,7 +343,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     });
                   },
                   eventLoader: (day) {
-                    return _getEventsForDay(day, tasks, calendarProvider);
+                    return _getEventsForDay(
+                      day,
+                      tasks,
+                      calendarProvider,
+                      taskProvider: taskProvider,
+                    );
                   },
                   calendarBuilders: CalendarBuilders(
                     dowBuilder: (context, day) {
@@ -604,6 +614,84 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     final item = selectedItems[index];
 
                     if (item is Task) {
+                      final isPreview = item.id.startsWith('preview_');
+                      if (isPreview) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 4,
+                          ),
+                          child: GlassContainer(
+                            borderRadius: BorderRadius.circular(16),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 12,
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.update_rounded,
+                                  color: Theme.of(context).colorScheme.primary,
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        item.title,
+                                        style: GoogleFonts.outfit(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 15,
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.onSurface,
+                                        ),
+                                      ),
+                                      if (item.description.isNotEmpty) ...[
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          item.description,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: Theme.of(
+                                            context,
+                                          ).textTheme.bodySmall,
+                                        ),
+                                      ],
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(context).colorScheme.primary
+                                        .withValues(alpha: 0.15),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Text(
+                                    l10n.upcomingRecurringBadge,
+                                    style: TextStyle(
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.primary,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }
+
                       final List<String> categoryIds =
                           item.categoryIds.isNotEmpty
                           ? item.categoryIds

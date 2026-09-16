@@ -16,15 +16,25 @@ import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
 
 class MockTaskProvider extends Mock implements TaskProvider {}
+
 class MockCalendarProvider extends Mock implements CalendarProvider {}
+
 class MockThemeService extends Mock implements ThemeService {}
+
 class MockCalendarColorService extends Mock implements CalendarColorService {}
+
 class MockAuthService extends Mock implements AuthService {}
+
 class MockSubscriptionService extends Mock implements SubscriptionService {}
+
 class MockPrivateModeService extends Mock implements PrivateModeService {}
 
 void main() {
   GoogleFonts.config.allowRuntimeFetching = false;
+
+  setUpAll(() {
+    registerFallbackValue(DateTime(2026, 9, 17));
+  });
 
   late MockTaskProvider mockTaskProvider;
   late MockCalendarProvider mockCalendarProvider;
@@ -45,6 +55,9 @@ void main() {
 
     when(() => mockTaskProvider.tasks).thenReturn([]);
     when(() => mockTaskProvider.categories).thenReturn([]);
+    when(
+      () => mockTaskProvider.getUpcomingRecurringTasksForDay(any()),
+    ).thenReturn([]);
     when(() => mockCalendarProvider.selectedDate).thenReturn(DateTime.now());
     when(() => mockCalendarProvider.showTasks).thenReturn(true);
     when(() => mockCalendarProvider.showGoogleCalendar).thenReturn(false);
@@ -56,7 +69,9 @@ void main() {
     when(() => mockCalendarProvider.loadEvents()).thenAnswer((_) async {});
     when(() => mockCalendarProvider.events).thenReturn([]);
     when(() => mockCalendarProvider.availableCalendars).thenReturn([]);
-    when(() => mockCalendarProvider.isGoogleCalendarTokenExpired).thenReturn(false);
+    when(
+      () => mockCalendarProvider.isGoogleCalendarTokenExpired,
+    ).thenReturn(false);
     when(() => mockThemeService.use24HourFormat).thenReturn(true);
     when(() => mockThemeService.isDarkMode).thenReturn(false);
     when(() => mockThemeService.useGlassmorphism).thenReturn(false);
@@ -66,7 +81,9 @@ void main() {
     when(() => mockAuthService.currentUser).thenReturn(null);
     when(() => mockAuthService.isGoogleTasksTokenExpired).thenReturn(false);
     when(() => mockSubscriptionService.isPremium).thenReturn(true);
-    when(() => mockPrivateModeService.shouldHidePrivateContent).thenReturn(false);
+    when(
+      () => mockPrivateModeService.shouldHidePrivateContent,
+    ).thenReturn(false);
     when(() => mockPrivateModeService.hasPin).thenReturn(false);
   });
 
@@ -74,36 +91,54 @@ void main() {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider<TaskProvider>.value(value: mockTaskProvider),
-        ChangeNotifierProvider<CalendarProvider>.value(value: mockCalendarProvider),
+        ChangeNotifierProvider<CalendarProvider>.value(
+          value: mockCalendarProvider,
+        ),
         ChangeNotifierProvider<ThemeService>.value(value: mockThemeService),
-        ChangeNotifierProvider<CalendarColorService>.value(value: mockCalendarColorService),
+        ChangeNotifierProvider<CalendarColorService>.value(
+          value: mockCalendarColorService,
+        ),
         ChangeNotifierProvider<AuthService>.value(value: mockAuthService),
-        ChangeNotifierProvider<SubscriptionService>.value(value: mockSubscriptionService),
-        ChangeNotifierProvider<PrivateModeService>.value(value: mockPrivateModeService),
+        ChangeNotifierProvider<SubscriptionService>.value(
+          value: mockSubscriptionService,
+        ),
+        ChangeNotifierProvider<PrivateModeService>.value(
+          value: mockPrivateModeService,
+        ),
       ],
       child: MaterialApp(
         theme: AppTheme.lightTheme,
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        home: const Scaffold(
-          body: CalendarScreen(),
-        ),
+        home: const Scaffold(body: CalendarScreen()),
       ),
     );
   }
 
-  testWidgets('renders CalendarScreen properly with TableCalendar and header', (tester) async {
+  testWidgets('renders CalendarScreen properly with TableCalendar and header', (
+    tester,
+  ) async {
     await tester.pumpWidget(buildTestWidget());
     await tester.pumpAndSettle();
 
     expect(find.byType(CalendarScreen), findsOneWidget);
   });
 
-  testWidgets('renders dot indicators when multiple events exist on same day', (tester) async {
+  testWidgets('renders dot indicators when multiple events exist on same day', (
+    tester,
+  ) async {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    final task1 = Task(id: 't1', title: 'Task 1', dueDate: today.add(const Duration(hours: 10)));
-    final task2 = Task(id: 't2', title: 'Task 2', dueDate: today.add(const Duration(hours: 14)));
+    final task1 = Task(
+      id: 't1',
+      title: 'Task 1',
+      dueDate: today.add(const Duration(hours: 10)),
+    );
+    final task2 = Task(
+      id: 't2',
+      title: 'Task 2',
+      dueDate: today.add(const Duration(hours: 14)),
+    );
 
     when(() => mockTaskProvider.tasks).thenReturn([task1, task2]);
 

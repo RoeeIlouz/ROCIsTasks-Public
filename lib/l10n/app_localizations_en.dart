@@ -1396,6 +1396,14 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String upcomingRecurringTasksHeader(int count) {
+    return 'Upcoming Recurring ($count)';
+  }
+
+  @override
+  String get upcomingRecurringBadge => 'Upcoming';
+
+  @override
   String get allCaughtUpToday => 'All done for today! 🎉';
 
   @override

@@ -1388,6 +1388,14 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String upcomingRecurringTasksHeader(int count) {
+    return 'المهام المتكررة القادمة ($count)';
+  }
+
+  @override
+  String get upcomingRecurringBadge => 'قريباً';
+
+  @override
   String get allCaughtUpToday => 'تم إنجاز كل شيء لليوم! 🎉';
 
   @override
