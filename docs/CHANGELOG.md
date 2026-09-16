@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.15+105] - 2026-09-16
+
+### Fixed
+- Overhauled recurring tasks: next task is generated accurately when completing overdue or scheduled tasks.
+- Preserved original task due time across recurring iterations.
+- Automatically cleaned up newly spawned child tasks if a recurring task is unmarked.
+- Updated secure storage and core app dependencies.
+
 ## [0.2.14+104] - 2026-09-15
 
 ### Fixed
