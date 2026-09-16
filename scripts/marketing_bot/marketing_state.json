@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-16T10:55:55.762032+00:00",
+  "last_run_timestamp": "2026-09-16T16:14:15.925044+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -2270,6 +2270,42 @@
       "title": "I will tear your product site and redesign it",
       "url": "https://reddit.com/r/roastmystartup/comments/1whsbx2/i_will_tear_your_product_site_and_redesign_it/",
       "inspected_at": "2026-09-16T10:55:47.637164+00:00"
+    },
+    "reddit_1wi1kvu": {
+      "platform": "reddit",
+      "title": "I built a place where AI work gets properly looked at instead of scrolled past. You only get five amplifies a day.",
+      "url": "https://reddit.com/r/SideProject/comments/1wi1kvu/i_built_a_place_where_ai_work_gets_properly/",
+      "inspected_at": "2026-09-16T16:13:14.415832+00:00"
+    },
+    "reddit_1wi1jhp": {
+      "platform": "reddit",
+      "title": "I built a tiny pixel office that you upgrade by staying off your phone",
+      "url": "https://reddit.com/r/SideProject/comments/1wi1jhp/i_built_a_tiny_pixel_office_that_you_upgrade_by/",
+      "inspected_at": "2026-09-16T16:13:42.074075+00:00"
+    },
+    "reddit_1wi17t4": {
+      "platform": "reddit",
+      "title": "Built a tool that auto-clips VODs into Shorts. Curious if streamers would actually want this.",
+      "url": "https://reddit.com/r/SideProject/comments/1wi17t4/built_a_tool_that_autoclips_vods_into_shorts/",
+      "inspected_at": "2026-09-16T16:13:45.094851+00:00"
+    },
+    "reddit_1wi17j7": {
+      "platform": "reddit",
+      "title": "Cute little app for new parents",
+      "url": "https://reddit.com/r/SideProject/comments/1wi17j7/cute_little_app_for_new_parents/",
+      "inspected_at": "2026-09-16T16:14:02.530760+00:00"
+    },
+    "reddit_1wi0f2p": {
+      "platform": "reddit",
+      "title": "We beat a YC-backed company in a launch battle with a fraction of their audience. The product launches September 21.",
+      "url": "https://reddit.com/r/indiehackers/comments/1wi0f2p/we_beat_a_ycbacked_company_in_a_launch_battle/",
+      "inspected_at": "2026-09-16T16:14:03.517702+00:00"
+    },
+    "reddit_1whx8z6": {
+      "platform": "reddit",
+      "title": "After building stuff for VC demos… going back to distribution.. n found another design partner … probably !! ??:)",
+      "url": "https://reddit.com/r/indiehackers/comments/1whx8z6/after_building_stuff_for_vc_demos_going_back_to/",
+      "inspected_at": "2026-09-16T16:14:04.787551+00:00"
     }
   },
   "pending_drafts": {
@@ -2606,7 +2642,7 @@
     }
   },
   "recorded_feedback": [],
-  "last_organic_post_timestamp": "2026-09-16T03:31:19.478212+00:00",
+  "last_organic_post_timestamp": "2026-09-16T16:14:15.516597+00:00",
   "organic_posts": [
     {
       "text": "you either die a young enthusiastic builder or live long enough to realize that 90% of tech problems are solved by restarting the router.",
@@ -2751,6 +2787,15 @@
         "Bluesky"
       ],
       "posted_at": "2026-09-16T03:31:19.478212+00:00"
+    },
+    {
+      "text": "the transition from staring at an oscilloscope for 3 hours to sitting at 20 meters watching sea turtles drift by is the ultimate brain reboot.",
+      "topic": "focus_and_music_loops",
+      "platforms": [
+        "Twitter/X",
+        "Bluesky"
+      ],
+      "posted_at": "2026-09-16T16:14:15.516597+00:00"
     }
   ],
   "x_posts_timestamps": [
@@ -2761,7 +2806,8 @@
     "2026-09-11T10:42:24.100237+00:00",
     "2026-09-12T20:15:29.769250+00:00",
     "2026-09-14T03:34:01.052334+00:00",
-    "2026-09-15T11:11:24.658980+00:00"
+    "2026-09-15T11:11:24.658980+00:00",
+    "2026-09-16T16:14:14.756027+00:00"
   ],
   "posted_devlogs": {
     "devlog_0_2_2_60_2026_07_17_190f9f3082": {
