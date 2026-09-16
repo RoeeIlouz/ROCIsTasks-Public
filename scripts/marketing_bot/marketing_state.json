@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-15T20:55:03.126784+00:00",
+  "last_run_timestamp": "2026-09-16T03:31:20.015860+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -2198,6 +2198,42 @@
       "title": "Roast the UI of my Romanian flat-search site — backend dev, zero design skill, interface built with AI",
       "url": "https://reddit.com/r/roastmystartup/comments/1whao6h/roast_the_ui_of_my_romanian_flatsearch_site/",
       "inspected_at": "2026-09-15T20:54:54.898914+00:00"
+    },
+    "reddit_1whlt55": {
+      "platform": "reddit",
+      "title": "Zero coding experience, but I used AI to build a \"budgeting & maintenance log\" for cars. If you love spreadsheets or expense trackers, this might be for you!",
+      "url": "https://reddit.com/r/SideProject/comments/1whlt55/zero_coding_experience_but_i_used_ai_to_build_a/",
+      "inspected_at": "2026-09-16T03:30:56.898333+00:00"
+    },
+    "reddit_1whlrjz": {
+      "platform": "reddit",
+      "title": "Two of us spent 1.5 years building a \"Letterboxd for concerts\" we are live on iOS since January, looking for real feedback",
+      "url": "https://reddit.com/r/SideProject/comments/1whlrjz/two_of_us_spent_15_years_building_a_letterboxd/",
+      "inspected_at": "2026-09-16T03:31:01.785693+00:00"
+    },
+    "reddit_1whlr39": {
+      "platform": "reddit",
+      "title": "Website",
+      "url": "https://reddit.com/r/SideProject/comments/1whlr39/website/",
+      "inspected_at": "2026-09-16T03:31:06.770591+00:00"
+    },
+    "reddit_1whlab9": {
+      "platform": "reddit",
+      "title": "Nordik Lab - The best endurance training platform, free for everybody",
+      "url": "https://reddit.com/r/SideProject/comments/1whlab9/nordik_lab_the_best_endurance_training_platform/",
+      "inspected_at": "2026-09-16T03:31:07.755007+00:00"
+    },
+    "reddit_1whi8b3": {
+      "platform": "reddit",
+      "title": "Roast my AI reminder system that lives in your text messages",
+      "url": "https://reddit.com/r/roastmystartup/comments/1whi8b3/roast_my_ai_reminder_system_that_lives_in_your/",
+      "inspected_at": "2026-09-16T03:31:08.513698+00:00"
+    },
+    "reddit_1whgulr": {
+      "platform": "reddit",
+      "title": "Built OnlyMeows - a small social app for cat owners with no feed, no likes, no follower counts",
+      "url": "https://reddit.com/r/roastmystartup/comments/1whgulr/built_onlymeows_a_small_social_app_for_cat_owners/",
+      "inspected_at": "2026-09-16T03:31:09.527025+00:00"
     }
   },
   "pending_drafts": {
@@ -2534,7 +2570,7 @@
     }
   },
   "recorded_feedback": [],
-  "last_organic_post_timestamp": "2026-09-15T11:11:25.334324+00:00",
+  "last_organic_post_timestamp": "2026-09-16T03:31:19.478212+00:00",
   "organic_posts": [
     {
       "text": "you either die a young enthusiastic builder or live long enough to realize that 90% of tech problems are solved by restarting the router.",
@@ -2671,6 +2707,14 @@
         "Bluesky"
       ],
       "posted_at": "2026-09-15T11:11:25.334324+00:00"
+    },
+    {
+      "text": "the urge to play just one quick run of balatro on the steam deck before bed turning into a 3 hour strategic masterclass.",
+      "topic": "gaming_and_steam_deck",
+      "platforms": [
+        "Bluesky"
+      ],
+      "posted_at": "2026-09-16T03:31:19.478212+00:00"
     }
   ],
   "x_posts_timestamps": [
