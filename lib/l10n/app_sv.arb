@@ -498,6 +498,15 @@
       }
     }
   },
+  "upcomingRecurringTasksHeader": "Kommande återkommande ({count})",
+  "@upcomingRecurringTasksHeader": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "upcomingRecurringBadge": "Kommande",
   "allCaughtUpToday": "Allt klart för idag! 🎉",
   "allCaughtUpSubtitle": "Bra jobbat! Ta en paus eller lägg till en ny uppgift.",
   "resetFilters": "Återställ alla",

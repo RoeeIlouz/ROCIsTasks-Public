@@ -259,5 +259,52 @@ void main() {
         expect(nextDate.second, 12);
       },
     );
+
+    test(
+      'adjustDueDateForCatchUp catches up overdue scheduled date to today',
+      () {
+        final scheduledDate = DateTime(2026, 8, 10, 9, 30);
+        final today = DateTime(2026, 8, 15, 14, 0);
+
+        final adjusted = TaskRecurrenceService.adjustDueDateForCatchUp(
+          scheduledDate,
+          today,
+        );
+        expect(adjusted.year, 2026);
+        expect(adjusted.month, 8);
+        expect(adjusted.day, 15);
+        expect(adjusted.hour, 9);
+        expect(adjusted.minute, 30);
+
+        // When scheduledDate is today or future, it should not change
+        final futureDate = DateTime(2026, 8, 16, 9, 30);
+        final notAdjusted = TaskRecurrenceService.adjustDueDateForCatchUp(
+          futureDate,
+          today,
+        );
+        expect(notAdjusted, futureDate);
+      },
+    );
+
+    test('createUpcomingPreviewTask creates preview task with preview_ ID', () {
+      final completed = Task(
+        id: 'task-100',
+        title: 'Daily Standup',
+        isCompleted: true,
+        dueDate: DateTime(2026, 8, 15, 9, 0),
+        recurrenceRule: TaskRecurrenceService.rruleDaily,
+      );
+      final nextDue = DateTime(2026, 8, 16, 9, 0);
+      final preview = TaskRecurrenceService.createUpcomingPreviewTask(
+        completed,
+        nextDue,
+      );
+
+      expect(preview.id, 'preview_task-100');
+      expect(preview.title, 'Daily Standup');
+      expect(preview.dueDate, nextDue);
+      expect(preview.isCompleted, isFalse);
+      expect(preview.recurringParentId, 'task-100');
+    });
   });
 }

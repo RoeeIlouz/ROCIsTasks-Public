@@ -1418,6 +1418,14 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String upcomingRecurringTasksHeader(int count) {
+    return 'Próximas recurrentes ($count)';
+  }
+
+  @override
+  String get upcomingRecurringBadge => 'Próxima';
+
+  @override
   String get allCaughtUpToday => '¡Todo listo por hoy! 🎉';
 
   @override

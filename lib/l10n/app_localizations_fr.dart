@@ -1420,6 +1420,14 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String upcomingRecurringTasksHeader(int count) {
+    return 'Récurrentes à venir ($count)';
+  }
+
+  @override
+  String get upcomingRecurringBadge => 'À venir';
+
+  @override
   String get allCaughtUpToday => 'Tout est fait pour aujourd\'hui ! 🎉';
 
   @override

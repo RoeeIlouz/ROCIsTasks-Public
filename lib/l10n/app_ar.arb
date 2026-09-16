@@ -498,6 +498,15 @@
       }
     }
   },
+  "upcomingRecurringTasksHeader": "المهام المتكررة القادمة ({count})",
+  "@upcomingRecurringTasksHeader": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "upcomingRecurringBadge": "قريباً",
   "allCaughtUpToday": "تم إنجاز كل شيء لليوم! 🎉",
   "allCaughtUpSubtitle": "عمل رائع! خذ استراحة أو أضف مهمة جديدة.",
   "resetFilters": "إعادة تعيين الكل",

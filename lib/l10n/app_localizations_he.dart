@@ -1387,6 +1387,14 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String upcomingRecurringTasksHeader(int count) {
+    return 'משימות חוזרות קרובות ($count)';
+  }
+
+  @override
+  String get upcomingRecurringBadge => 'בקרוב';
+
+  @override
   String get allCaughtUpToday => 'הכל הושלם להיום! 🎉';
 
   @override

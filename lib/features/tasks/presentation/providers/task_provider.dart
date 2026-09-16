@@ -41,7 +41,7 @@ export 'package:rocis_tasks/features/tasks/presentation/providers/helpers/task_f
 ///
 /// This class handles local persistence via Hive, cloud synchronization via Firestore,
 /// and coordination between various services (notifications, widgets, etc.).
-class TaskProvider extends ChangeNotifier {
+class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
   AppLocalizations get _l10n {
     final currentLocale =
         _themeService.locale ?? PlatformDispatcher.instance.locale;
@@ -219,6 +219,8 @@ class TaskProvider extends ChangeNotifier {
           AppLogger.warning('Permission request warning: $e');
         }),
       );
+      WidgetsBinding.instance.addObserver(this);
+      await checkAndMaterializeDueRecurringTasks();
     } catch (e, s) {
       _errorHandlingService.logError(e, s, reason: 'Initialization failed');
       _setError(_l10n.initializationFailedError);
@@ -992,7 +994,7 @@ class TaskProvider extends ChangeNotifier {
     if (task.isCompleted) {
       await _cancelTaskNotifications(task);
 
-      // If this is a recurring task and user is Pro, spawn the next recurring instance
+      // If this is a recurring task and user is Pro, determine the next recurring instance
       if (task.recurrenceRule != null &&
           task.recurrenceRule!.trim().isNotEmpty &&
           _subscriptionService.isPremium) {
@@ -1004,40 +1006,71 @@ class TaskProvider extends ChangeNotifier {
         );
 
         if (nextDueDate != null) {
-          final nextTask = TaskRecurrenceService.createNextRecurringTask(
-            task,
-            nextDueDate,
+          final now = DateTime.now();
+          final today = DateTime(now.year, now.month, now.day);
+          final nextDay = DateTime(
+            nextDueDate.year,
+            nextDueDate.month,
+            nextDueDate.day,
           );
-          await _source.addTask(nextTask);
-          _firestoreService.addTask(nextTask).catchError((e, s) {
-            _errorHandlingService.logError(
-              e,
-              s,
-              reason:
-                  'Background cloud addTask for recurring next instance failed',
-            );
-          });
 
-          if (nextTask.dueDate != null &&
-              nextTask.dueDate!.isAfter(DateTime.now())) {
+          // If the next recurrence is on a future day, defer materialization
+          if (nextDay.isAfter(today)) {
+            task.nextRecurrenceDate = nextDueDate;
+            await _source.updateTask(task);
+            _firestoreService.updateTask(task).catchError((e, s) {
+              _errorHandlingService.logError(
+                e,
+                s,
+                reason:
+                    'Background cloud updateTask for deferred recurrence failed',
+              );
+            });
+
+            // Pre-schedule notification for the deferred iteration
+            final previewTask = TaskRecurrenceService.createUpcomingPreviewTask(
+              task,
+              nextDueDate,
+            );
             try {
-              await _scheduleTaskNotifications(nextTask);
+              await _scheduleTaskNotifications(previewTask);
             } catch (e, s) {
               _errorHandlingService.logError(
                 e,
                 s,
-                reason: 'Scheduling notification for next recurring task',
+                reason:
+                    'Scheduling pre-notification for deferred recurring task',
               );
             }
+          } else {
+            // Recurrence is due today, materialize immediately
+            await _materializeRecurringTask(task, nextDueDate);
           }
-
-          await _syncTaskGoogleTasksState(nextTask);
         }
       }
     } else {
-      // If task was un-completed and it had recurrence, clean up any uncompleted spawned next instances
+      // If task was un-completed and it had recurrence:
       if (task.recurrenceRule != null &&
           task.recurrenceRule!.trim().isNotEmpty) {
+        // 1. If it had a deferred recurrence scheduled, cancel its notification and clear date
+        if (task.nextRecurrenceDate != null) {
+          final previewTask = TaskRecurrenceService.createUpcomingPreviewTask(
+            task,
+            task.nextRecurrenceDate!,
+          );
+          await _cancelTaskNotifications(previewTask);
+          task.nextRecurrenceDate = null;
+          await _source.updateTask(task);
+          _firestoreService.updateTask(task).catchError((e, s) {
+            _errorHandlingService.logError(
+              e,
+              s,
+              reason: 'Background cloud clear nextRecurrenceDate failed',
+            );
+          });
+        }
+
+        // 2. Clean up any already materialized uncompleted spawned next instances
         try {
           final spawnedTasks = _source
               .getTasks()
@@ -1079,6 +1112,166 @@ class TaskProvider extends ChangeNotifier {
 
     if (task.isCompleted) {
       await _analyticsService.logTaskCompleted();
+    }
+  }
+
+  Future<Task?> _materializeRecurringTask(
+    Task parentTask,
+    DateTime scheduledDueDate,
+  ) async {
+    final finalDueDate = TaskRecurrenceService.adjustDueDateForCatchUp(
+      scheduledDueDate,
+      DateTime.now(),
+    );
+    final nextTask = TaskRecurrenceService.createNextRecurringTask(
+      parentTask,
+      finalDueDate,
+    );
+
+    // Cancel any pre-scheduled preview notifications before scheduling real task notifications
+    final previewTask = TaskRecurrenceService.createUpcomingPreviewTask(
+      parentTask,
+      scheduledDueDate,
+    );
+    await _cancelTaskNotifications(previewTask);
+
+    await _source.addTask(nextTask);
+    _firestoreService.addTask(nextTask).catchError((e, s) {
+      _errorHandlingService.logError(
+        e,
+        s,
+        reason: 'Background cloud addTask for recurring next instance failed',
+      );
+    });
+
+    if (nextTask.dueDate != null && nextTask.dueDate!.isAfter(DateTime.now())) {
+      try {
+        await _scheduleTaskNotifications(nextTask);
+      } catch (e, s) {
+        _errorHandlingService.logError(
+          e,
+          s,
+          reason: 'Scheduling notification for next recurring task',
+        );
+      }
+    }
+
+    await _syncTaskGoogleTasksState(nextTask);
+
+    // Clear nextRecurrenceDate on parent so it's not materialized again
+    parentTask.nextRecurrenceDate = null;
+    await _source.updateTask(parentTask);
+    _firestoreService.updateTask(parentTask).catchError((e, s) {
+      _errorHandlingService.logError(
+        e,
+        s,
+        reason:
+            'Background cloud updateTask clearing nextRecurrenceDate failed',
+      );
+    });
+
+    return nextTask;
+  }
+
+  Future<void> checkAndMaterializeDueRecurringTasks() async {
+    if (!_subscriptionService.isPremium) return;
+
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+
+    final dueDeferredTasks = _source
+        .getTasks()
+        .where(
+          (t) =>
+              t.isCompleted &&
+              t.nextRecurrenceDate != null &&
+              !(t.isDeleted ?? false),
+        )
+        .where((t) {
+          final targetDay = DateTime(
+            t.nextRecurrenceDate!.year,
+            t.nextRecurrenceDate!.month,
+            t.nextRecurrenceDate!.day,
+          );
+          return today.isAtSameMomentAs(targetDay) || today.isAfter(targetDay);
+        })
+        .toList();
+
+    if (dueDeferredTasks.isEmpty) return;
+
+    bool anyMaterialized = false;
+    for (final task in dueDeferredTasks) {
+      try {
+        await _materializeRecurringTask(task, task.nextRecurrenceDate!);
+        anyMaterialized = true;
+      } catch (e, s) {
+        _errorHandlingService.logError(
+          e,
+          s,
+          reason: 'Materializing deferred recurring task ${task.id}',
+        );
+      }
+    }
+
+    if (anyMaterialized) {
+      _refreshPagination();
+      notifyListeners();
+      unawaited(_updateTaskCounterNotification());
+      updateHomeWidgetWithNotification();
+    }
+  }
+
+  List<Task> get upcomingRecurringTasks {
+    if (!_subscriptionService.isPremium) return [];
+
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+
+    return _source
+        .getTasks()
+        .where(
+          (t) =>
+              t.isCompleted &&
+              t.nextRecurrenceDate != null &&
+              !(t.isDeleted ?? false),
+        )
+        .where((t) {
+          final targetDay = DateTime(
+            t.nextRecurrenceDate!.year,
+            t.nextRecurrenceDate!.month,
+            t.nextRecurrenceDate!.day,
+          );
+          return targetDay.isAfter(today);
+        })
+        .map(
+          (t) => TaskRecurrenceService.createUpcomingPreviewTask(
+            t,
+            t.nextRecurrenceDate!,
+          ),
+        )
+        .toList();
+  }
+
+  List<Task> getUpcomingRecurringTasksForDay(DateTime day) {
+    if (!_subscriptionService.isPremium) return [];
+
+    final targetDay = DateTime(day.year, day.month, day.day);
+
+    return upcomingRecurringTasks.where((task) {
+      if (task.dueDate == null) return false;
+      final taskDay = DateTime(
+        task.dueDate!.year,
+        task.dueDate!.month,
+        task.dueDate!.day,
+      );
+      return taskDay.isAtSameMomentAs(targetDay);
+    }).toList();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      unawaited(checkAndMaterializeDueRecurringTasks());
     }
   }
 

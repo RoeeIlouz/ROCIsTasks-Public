@@ -498,6 +498,15 @@
       }
     }
   },
+  "upcomingRecurringTasksHeader": "आगामी आवर्ती ({count})",
+  "@upcomingRecurringTasksHeader": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "upcomingRecurringBadge": "आगामी",
   "allCaughtUpToday": "आज के लिए सब पूरा हो गया! 🎉",
   "allCaughtUpSubtitle": "शानदार काम! थोड़ा विराम लें या कोई नया कार्य जोड़ें।",
   "resetFilters": "सभी रीसेट करें",

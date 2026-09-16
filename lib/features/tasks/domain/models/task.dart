@@ -88,6 +88,9 @@ class Task extends HiveObject {
   @HiveField(22)
   String? recurringParentId;
 
+  @HiveField(23)
+  DateTime? nextRecurrenceDate;
+
   Task({
     String? id,
     required this.title,
@@ -112,6 +115,7 @@ class Task extends HiveObject {
     this.isGroceryList = false,
     List<TaskCustomField>? customFields,
     this.recurringParentId,
+    this.nextRecurrenceDate,
   }) : id = id ?? const Uuid().v4(),
        createdAt = createdAt ?? DateTime.now(),
        attachmentPaths = attachmentPaths ?? <String>[],
@@ -119,6 +123,7 @@ class Task extends HiveObject {
        customFields = customFields ?? <TaskCustomField>[];
 
   Task copyWith({
+    String? id,
     String? title,
     String? description,
     bool? isCompleted,
@@ -141,9 +146,11 @@ class Task extends HiveObject {
     bool? isGroceryList,
     List<TaskCustomField>? customFields,
     String? recurringParentId,
+    DateTime? nextRecurrenceDate,
+    bool clearNextRecurrenceDate = false,
   }) {
     return Task(
-      id: id,
+      id: id ?? this.id,
       title: title ?? this.title,
       description: description ?? this.description,
       isCompleted: isCompleted ?? this.isCompleted,
@@ -167,6 +174,9 @@ class Task extends HiveObject {
       isGroceryList: isGroceryList ?? this.isGroceryList,
       customFields: customFields ?? this.customFields,
       recurringParentId: recurringParentId ?? this.recurringParentId,
+      nextRecurrenceDate: clearNextRecurrenceDate
+          ? null
+          : (nextRecurrenceDate ?? this.nextRecurrenceDate),
     );
   }
 
@@ -195,6 +205,7 @@ class Task extends HiveObject {
       'isGroceryList': isGroceryList,
       'customFields': customFields?.map((cf) => cf.toMap()).toList(),
       'recurringParentId': recurringParentId,
+      'nextRecurrenceDate': nextRecurrenceDate?.toIso8601String(),
     };
   }
 
@@ -222,6 +233,7 @@ class Task extends HiveObject {
       'isGroceryList': isGroceryList,
       'customFields': customFields?.map((cf) => cf.toMap()).toList(),
       'recurringParentId': recurringParentId,
+      'nextRecurrenceDate': nextRecurrenceDate,
     };
   }
 
@@ -268,6 +280,7 @@ class Task extends HiveObject {
           ?.map((cf) => TaskCustomField.fromMap(cf as Map<String, dynamic>))
           .toList(),
       recurringParentId: map['recurringParentId'] as String?,
+      nextRecurrenceDate: _parseDate(map['nextRecurrenceDate']),
     );
   }
 }

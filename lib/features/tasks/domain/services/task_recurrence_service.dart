@@ -297,4 +297,40 @@ class TaskRecurrenceService {
       recurringParentId: completedTask.id,
     );
   }
+
+  static DateTime adjustDueDateForCatchUp(
+    DateTime scheduledDate,
+    DateTime now,
+  ) {
+    final scheduledDay = DateTime(
+      scheduledDate.year,
+      scheduledDate.month,
+      scheduledDate.day,
+    );
+    final today = DateTime(now.year, now.month, now.day);
+
+    if (today.isAfter(scheduledDay)) {
+      return DateTime(
+        now.year,
+        now.month,
+        now.day,
+        scheduledDate.hour,
+        scheduledDate.minute,
+        scheduledDate.second,
+        scheduledDate.millisecond,
+      );
+    }
+    return scheduledDate;
+  }
+
+  static Task createUpcomingPreviewTask(
+    Task completedTask,
+    DateTime nextDueDate,
+  ) {
+    final preview = createNextRecurringTask(completedTask, nextDueDate);
+    return preview.copyWith(
+      // Tag preview task with an identifiable preview ID
+      id: 'preview_${completedTask.id}',
+    );
+  }
 }

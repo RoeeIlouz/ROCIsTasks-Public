@@ -498,6 +498,15 @@
       }
     }
   },
+  "upcomingRecurringTasksHeader": "Récurrentes à venir ({count})",
+  "@upcomingRecurringTasksHeader": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "upcomingRecurringBadge": "À venir",
   "allCaughtUpToday": "Tout est fait pour aujourd'hui ! 🎉",
   "allCaughtUpSubtitle": "Excellent travail ! Faites une pause ou ajoutez une nouvelle tâche.",
   "resetFilters": "Tout réinitialiser",

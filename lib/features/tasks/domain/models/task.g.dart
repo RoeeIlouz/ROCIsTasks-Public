@@ -44,13 +44,14 @@ class TaskAdapter extends TypeAdapter<Task> {
       isGroceryList: fields[20] == null ? false : fields[20] as bool,
       customFields: (fields[21] as List?)?.cast<TaskCustomField>(),
       recurringParentId: fields[22] as String?,
+      nextRecurrenceDate: fields[23] as DateTime?,
     );
   }
 
   @override
   void write(BinaryWriter writer, Task obj) {
     writer
-      ..writeByte(23)
+      ..writeByte(24)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -96,7 +97,9 @@ class TaskAdapter extends TypeAdapter<Task> {
       ..writeByte(21)
       ..write(obj.customFields)
       ..writeByte(22)
-      ..write(obj.recurringParentId);
+      ..write(obj.recurringParentId)
+      ..writeByte(23)
+      ..write(obj.nextRecurrenceDate);
   }
 
   @override
