@@ -3,22 +3,9 @@ import 'package:rocis_tasks/features/tasks/domain/models/sub_task.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
 
-enum RecurrencePreset {
-  none,
-  daily,
-  weekdays,
-  weekly,
-  monthly,
-  yearly,
-  custom,
-}
+enum RecurrencePreset { none, daily, weekdays, weekly, monthly, yearly, custom }
 
-enum RecurrenceFrequency {
-  daily,
-  weekly,
-  monthly,
-  yearly,
-}
+enum RecurrenceFrequency { daily, weekly, monthly, yearly }
 
 class TaskRecurrenceService {
   static const String rruleDaily = 'FREQ=DAILY;INTERVAL=1';
@@ -127,34 +114,44 @@ class TaskRecurrenceService {
     try {
       final normalized = _normalizeRule(recurrenceRule);
       final rrule = RecurrenceRule.fromString('RRULE:$normalized');
-      final targetAfter = after ?? currentDueDate;
+      final targetAfter = (after != null && after.isAfter(currentDueDate))
+          ? after
+          : currentDueDate;
 
       // Start evaluation from start date in UTC
       final startUtc = currentDueDate.toUtc();
-      final targetAfterUtc = targetAfter.toUtc();
 
-      // Retrieve instances
-      final instances = rrule.getInstances(start: startUtc);
+      // Retrieve instances (limit search depth to prevent infinite loops)
+      final instances = rrule.getInstances(start: startUtc).take(1000);
       for (final dt in instances) {
-        if (dt.isAfter(targetAfterUtc)) {
-          // Reconstruct in local time preserving original hour/minute/second
-          return DateTime(
-            dt.year,
-            dt.month,
-            dt.day,
-            currentDueDate.hour,
-            currentDueDate.minute,
-            currentDueDate.second,
-            currentDueDate.millisecond,
-          );
+        // Reconstruct in local time preserving original hour/minute/second
+        final candidate = DateTime(
+          dt.year,
+          dt.month,
+          dt.day,
+          currentDueDate.hour,
+          currentDueDate.minute,
+          currentDueDate.second,
+          currentDueDate.millisecond,
+        );
+        if (candidate.isAfter(targetAfter)) {
+          return candidate;
         }
       }
     } catch (_) {
       // Fallback manual recurrence calculation if RRULE parser encounters edge cases
-      return _calculateNextDateFallback(currentDueDate, recurrenceRule, after: after);
+      return _calculateNextDateFallback(
+        currentDueDate,
+        recurrenceRule,
+        after: after,
+      );
     }
 
-    return _calculateNextDateFallback(currentDueDate, recurrenceRule, after: after);
+    return _calculateNextDateFallback(
+      currentDueDate,
+      recurrenceRule,
+      after: after,
+    );
   }
 
   static DateTime _calculateNextDateFallback(
@@ -163,31 +160,73 @@ class TaskRecurrenceService {
     DateTime? after,
   }) {
     final (freq, interval) = parseCustomRule(recurrenceRule);
-    final target = after ?? currentDueDate;
+    final target = (after != null && after.isAfter(currentDueDate))
+        ? after
+        : currentDueDate;
     var next = currentDueDate;
 
     final normalized = _normalizeRule(recurrenceRule);
     final isWeekdays = normalized.contains('BYDAY=MO,TU,WE,TH,FR');
+    var iterations = 0;
 
-    while (!next.isAfter(target)) {
+    while (!next.isAfter(target) && iterations < 1000) {
+      iterations++;
       if (isWeekdays) {
-        next = next.add(const Duration(days: 1));
-        while (next.weekday == DateTime.saturday || next.weekday == DateTime.sunday) {
-          next = next.add(const Duration(days: 1));
+        var nextDay = next.day + 1;
+        next = DateTime(
+          next.year,
+          next.month,
+          nextDay,
+          currentDueDate.hour,
+          currentDueDate.minute,
+          currentDueDate.second,
+          currentDueDate.millisecond,
+        );
+        while (next.weekday == DateTime.saturday ||
+            next.weekday == DateTime.sunday) {
+          next = DateTime(
+            next.year,
+            next.month,
+            next.day + 1,
+            currentDueDate.hour,
+            currentDueDate.minute,
+            currentDueDate.second,
+            currentDueDate.millisecond,
+          );
         }
       } else {
         switch (freq) {
           case RecurrenceFrequency.daily:
-            next = next.add(Duration(days: interval));
+            next = DateTime(
+              next.year,
+              next.month,
+              next.day + interval,
+              currentDueDate.hour,
+              currentDueDate.minute,
+              currentDueDate.second,
+              currentDueDate.millisecond,
+            );
             break;
           case RecurrenceFrequency.weekly:
-            next = next.add(Duration(days: interval * 7));
+            next = DateTime(
+              next.year,
+              next.month,
+              next.day + (interval * 7),
+              currentDueDate.hour,
+              currentDueDate.minute,
+              currentDueDate.second,
+              currentDueDate.millisecond,
+            );
             break;
           case RecurrenceFrequency.monthly:
             final newMonth = next.month + interval;
             final targetYear = next.year + ((newMonth - 1) ~/ 12);
             final targetMonth = ((newMonth - 1) % 12) + 1;
-            final daysInTargetMonth = DateTime(targetYear, targetMonth + 1, 0).day;
+            final daysInTargetMonth = DateTime(
+              targetYear,
+              targetMonth + 1,
+              0,
+            ).day;
             final targetDay = currentDueDate.day > daysInTargetMonth
                 ? daysInTargetMonth
                 : currentDueDate.day;
@@ -198,11 +237,16 @@ class TaskRecurrenceService {
               currentDueDate.hour,
               currentDueDate.minute,
               currentDueDate.second,
+              currentDueDate.millisecond,
             );
             break;
           case RecurrenceFrequency.yearly:
             final targetYear = next.year + interval;
-            final daysInTargetMonth = DateTime(targetYear, currentDueDate.month + 1, 0).day;
+            final daysInTargetMonth = DateTime(
+              targetYear,
+              currentDueDate.month + 1,
+              0,
+            ).day;
             final targetDay = currentDueDate.day > daysInTargetMonth
                 ? daysInTargetMonth
                 : currentDueDate.day;
@@ -213,6 +257,7 @@ class TaskRecurrenceService {
               currentDueDate.hour,
               currentDueDate.minute,
               currentDueDate.second,
+              currentDueDate.millisecond,
             );
             break;
         }
@@ -222,7 +267,10 @@ class TaskRecurrenceService {
     return next;
   }
 
-  static Task createNextRecurringTask(Task completedTask, DateTime nextDueDate) {
+  static Task createNextRecurringTask(
+    Task completedTask,
+    DateTime nextDueDate,
+  ) {
     return Task(
       title: completedTask.title,
       description: completedTask.description,
@@ -234,13 +282,11 @@ class TaskRecurrenceService {
       isDeleted: false,
       isPinned: completedTask.isPinned ?? false,
       subTasks: completedTask.subTasks
-          ?.map((st) => SubTask(
-                title: st.title,
-                isCompleted: false,
-              ))
+          ?.map((st) => SubTask(title: st.title, isCompleted: false))
           .toList(),
       recurrenceRule: completedTask.recurrenceRule,
-      requireSubTasksBeforeReminders: completedTask.requireSubTasksBeforeReminders,
+      requireSubTasksBeforeReminders:
+          completedTask.requireSubTasksBeforeReminders,
       syncWithGoogleTasks: completedTask.syncWithGoogleTasks,
       attachmentPaths: List<String>.from(completedTask.attachmentPaths),
       skipReminders: completedTask.skipReminders,
@@ -248,6 +294,7 @@ class TaskRecurrenceService {
       customFields: completedTask.customFields
           ?.map((cf) => cf.copyWith())
           .toList(),
+      recurringParentId: completedTask.id,
     );
   }
 }

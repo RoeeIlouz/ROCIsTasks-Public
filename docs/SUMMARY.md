@@ -2,7 +2,29 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
-## FullCalendar Widget & Calendar Page ROCIs Schedule Integration Overhaul - 2026-09-13
+## Recurring Tasks Overhaul & Next Due Date Synchronization - 2026-09-16
+
+#### Problem & Root Causes
+* **Overdue Recurrence Date Math**: Completing an overdue recurring task evaluated `getNextDueDate(baseDate, rule)` without comparison against `DateTime.now()`, spawning instances still in the past.
+* **Missing Parent-Child Linkage**: Tasks had no reference to the parent task that spawned them, preventing automatic cleanup if a completed task was accidentally unchecked.
+* **Uncompletion Duplication**: Unchecking a completed recurring task did nothing to remove the newly spawned task, resulting in duplicate instances.
+* **Time Preservation & Anchoring**: Tasks without due dates needed deterministic recurrence anchored to their `createdAt` timestamp, preserving the exact hour/minute/second of day across occurrences.
+
+#### Solutions Applied
+1. **Task Model Linkage**:
+   - Added `@HiveField(22) String? recurringParentId;` to `Task` model, `copyWith`, serialization (`toMap`, `toFirestoreMap`, `fromMap`), and updated `TaskAdapter` in `task.g.dart`.
+2. **Recurrence Engine Improvements (`TaskRecurrenceService`)**:
+   - Updated `getNextDueDate` and fallback engine to compare against `targetAfter` (`(after != null && after.isAfter(currentDueDate)) ? after : currentDueDate`), ensuring overdue tasks advance to the next strictly future occurrence while early completions advance from their scheduled due date.
+   - Guaranteed preservation of original `hour`, `minute`, `second`, and `millisecond` across daily, weekdays, weekly, monthly, and yearly recurrences.
+   - Linked `recurringParentId: completedTask.id` in `createNextRecurringTask`.
+3. **Provider Orchestration (`TaskProvider`)**:
+   - In `toggleTaskCompletion`: passed `after: DateTime.now()` when completing recurring tasks for PRO users (`_subscriptionService.isPremium`).
+   - On un-completing (`!task.isCompleted`), automatically locate and permanently delete active spawned children (`deleteTaskPermanently`), removing duplicates, clearing notifications, and refreshing UI/widgets.
+4. **Verification**:
+   - Added unit tests in `task_recurrence_service_test.dart` and `task_provider_test.dart`.
+   - Full test suite: 343 / 343 tests passed (100%).
+   - `flutter analyze`: 0 issues found.
+   - Android Kotlin build (`gradlew.bat :app:compileReleaseKotlin`): BUILD SUCCESSFUL.
 
 #### Problem & Root Causes
 * **ROCIs-Schedule Local-Only Events**: In `ROCIs-Schedule` (`CourseProvider.addEvent`), newly added lecture/timetable events were only stored in SQLite local DB and never uploaded to Firestore `users/{uid}/events`, leaving the cross-app Firestore subcollection empty (`{}`).

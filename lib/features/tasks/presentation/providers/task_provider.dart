@@ -1000,6 +1000,7 @@ class TaskProvider extends ChangeNotifier {
         final nextDueDate = TaskRecurrenceService.getNextDueDate(
           baseDate,
           task.recurrenceRule!,
+          after: DateTime.now(),
         );
 
         if (nextDueDate != null) {
@@ -1033,15 +1034,42 @@ class TaskProvider extends ChangeNotifier {
           await _syncTaskGoogleTasksState(nextTask);
         }
       }
-    } else if (task.dueDate != null && task.dueDate!.isAfter(DateTime.now())) {
-      try {
-        await _scheduleTaskNotifications(task);
-      } catch (e, s) {
-        _errorHandlingService.logError(
-          e,
-          s,
-          reason: 'Rescheduling notification after un-completing task',
-        );
+    } else {
+      // If task was un-completed and it had recurrence, clean up any uncompleted spawned next instances
+      if (task.recurrenceRule != null &&
+          task.recurrenceRule!.trim().isNotEmpty) {
+        try {
+          final spawnedTasks = _source
+              .getTasks()
+              .where(
+                (t) =>
+                    t.recurringParentId == task.id &&
+                    !t.isCompleted &&
+                    (t.isDeleted != true),
+              )
+              .toList();
+          for (final spawnedTask in spawnedTasks) {
+            await deleteTaskPermanently(spawnedTask.id);
+          }
+        } catch (e, s) {
+          _errorHandlingService.logError(
+            e,
+            s,
+            reason: 'Cleaning up spawned recurring task after uncompletion',
+          );
+        }
+      }
+
+      if (task.dueDate != null && task.dueDate!.isAfter(DateTime.now())) {
+        try {
+          await _scheduleTaskNotifications(task);
+        } catch (e, s) {
+          _errorHandlingService.logError(
+            e,
+            s,
+            reason: 'Rescheduling notification after un-completing task',
+          );
+        }
       }
     }
     _refreshPagination();
