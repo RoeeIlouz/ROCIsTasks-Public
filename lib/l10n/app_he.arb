@@ -497,6 +497,15 @@
       }
     }
   },
+  "upcomingRecurringTasksHeader": "משימות חוזרות קרובות ({count})",
+  "@upcomingRecurringTasksHeader": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "upcomingRecurringBadge": "בקרוב",
   "allCaughtUpToday": "הכל הושלם להיום! 🎉",
   "allCaughtUpSubtitle": "עבודה מצוינת! קח הפסקה או הוסף משימה חדשה.",
   "resetFilters": "איפוס הכל",

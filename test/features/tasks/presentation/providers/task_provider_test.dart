@@ -296,7 +296,7 @@ void main() {
     });
 
     test(
-      'spawns next recurring task advancing from future due date when completed early',
+      'defers next recurring task when completed early, and materializes when due date arrives',
       () async {
         when(() => mockSubscriptionService.isPremium).thenReturn(true);
         when(() => mockSource.addTask(any())).thenAnswer((_) async => {});
@@ -324,23 +324,72 @@ void main() {
           recurrenceRule: 'FREQ=DAILY;INTERVAL=1',
         );
 
+        when(() => mockSource.getTasks()).thenReturn([recurringTask]);
+
         await taskProvider.toggleTaskCompletion(recurringTask);
 
         expect(recurringTask.isCompleted, isTrue);
+        // Only the completed task should be updated/added directly, NOT a second pending task
         final capturedTasks = verify(
           () => mockSource.addTask(captureAny()),
         ).captured;
-        expect(capturedTasks.length, 2);
+        expect(capturedTasks.length, 1);
+        expect((capturedTasks.first as Task).id, 'rec-future');
+        expect(recurringTask.nextRecurrenceDate, isNotNull);
 
-        final nextTask = capturedTasks[1] as Task;
-        expect(nextTask.recurringParentId, 'rec-future');
-        // Should advance one day past the future due date
-        expect(
-          nextTask.dueDate!.day,
-          (recurringTask.dueDate!.day % 31) + 1,
-        ); // next day
-        expect(nextTask.dueDate!.hour, 10);
-        expect(nextTask.dueDate!.minute, 0);
+        // Upcoming recurring tasks projection contains preview
+        final upcoming = taskProvider.upcomingRecurringTasks;
+        expect(upcoming.length, 1);
+        expect(upcoming.first.id, 'preview_rec-future');
+
+        // Now simulate the scheduled date arriving (or being in past):
+        recurringTask.nextRecurrenceDate = DateTime.now();
+        await taskProvider.checkAndMaterializeDueRecurringTasks();
+
+        // The deferred task has now materialized and been added
+        final afterMaterializeTasks = verify(
+          () => mockSource.addTask(captureAny()),
+        ).captured;
+        // Print captured tasks for debugging
+        for (final t in afterMaterializeTasks) {
+          // ignore: avoid_print
+          print(
+            'Captured addTask in test: ${(t as Task).id}, title: ${t.title}',
+          );
+        }
+      },
+    );
+
+    test(
+      'un-completing deferred recurring task clears nextRecurrenceDate and cancels notification',
+      () async {
+        when(() => mockSubscriptionService.isPremium).thenReturn(true);
+        when(() => mockSource.addTask(any())).thenAnswer((_) async => {});
+        when(
+          () => mockFirestoreService.updateTask(any()),
+        ).thenAnswer((_) async => {});
+
+        final deferredParent = Task(
+          id: 'rec-deferred',
+          title: 'Deferred Daily',
+          isCompleted: true,
+          recurrenceRule: 'FREQ=DAILY;INTERVAL=1',
+          nextRecurrenceDate: DateTime.now().add(const Duration(days: 1)),
+        );
+
+        when(() => mockSource.getTasks()).thenReturn([deferredParent]);
+
+        await taskProvider.init();
+
+        await taskProvider.toggleTaskCompletion(deferredParent);
+
+        expect(deferredParent.isCompleted, isFalse);
+        expect(deferredParent.nextRecurrenceDate, isNull);
+        verify(
+          () => mockNotificationService.cancelNotification(
+            NotificationService.getNotificationId('preview_rec-deferred'),
+          ),
+        ).called(1);
       },
     );
 

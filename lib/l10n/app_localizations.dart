@@ -2743,6 +2743,18 @@ abstract class AppLocalizations {
   /// **'Completed ({count})'**
   String completedTasksHeader(int count);
 
+  /// No description provided for @upcomingRecurringTasksHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming Recurring ({count})'**
+  String upcomingRecurringTasksHeader(int count);
+
+  /// No description provided for @upcomingRecurringBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming'**
+  String get upcomingRecurringBadge;
+
   /// No description provided for @allCaughtUpToday.
   ///
   /// In en, this message translates to:

@@ -15,6 +15,7 @@ import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:rocis_tasks/features/categories/domain/models/category.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/sub_task.dart';
+import 'package:intl/intl.dart';
 import 'package:rocis_tasks/shared/ui/ui_kit.dart';
 
 class TaskListView extends StatefulWidget {
@@ -26,6 +27,7 @@ class TaskListView extends StatefulWidget {
 
 class _TaskListViewState extends State<TaskListView> {
   bool _isCompletedExpanded = false;
+  bool _isUpcomingExpanded = false;
   bool _hasInitiallyAnimated = false;
 
   @override
@@ -575,14 +577,18 @@ class _TaskListViewState extends State<TaskListView> {
           final completedTasks = tasks
               .where((t) => t.isCompleted as bool)
               .toList();
+          final upcomingRecurringTasks = taskProvider.upcomingRecurringTasks;
           final isAllCaughtUp =
               activeTasks.isEmpty && completedTasks.isNotEmpty;
 
+          final showUpcomingTile = upcomingRecurringTasks.isNotEmpty;
           final showCompletedTile = completedTasks.isNotEmpty;
           final headerCount = isAllCaughtUp ? 1 : 0;
           final activeCount = activeTasks.length;
-          final footerCount = showCompletedTile ? 1 : 0;
-          final totalItems = headerCount + activeCount + footerCount;
+          final upcomingCount = showUpcomingTile ? 1 : 0;
+          final completedCount = showCompletedTile ? 1 : 0;
+          final totalItems =
+              headerCount + activeCount + upcomingCount + completedCount;
 
           mainContent = Expanded(
             child: ListView.builder(
@@ -605,6 +611,57 @@ class _TaskListViewState extends State<TaskListView> {
                     taskProvider,
                     animated: shouldAnimate,
                     index: taskIndex,
+                  );
+                }
+
+                final footerIndex = taskIndex - activeCount;
+                if (showUpcomingTile && footerIndex == 0) {
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: GlassContainer(
+                      borderRadius: BorderRadius.circular(16),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 4,
+                        vertical: 2,
+                      ),
+                      child: Theme(
+                        data: theme.copyWith(dividerColor: Colors.transparent),
+                        child: ExpansionTile(
+                          initiallyExpanded: _isUpcomingExpanded,
+                          onExpansionChanged: (expanded) {
+                            HapticFeedback.lightImpact();
+                            setState(() {
+                              _isUpcomingExpanded = expanded;
+                            });
+                          },
+                          leading: Icon(
+                            Icons.update_rounded,
+                            color: theme.colorScheme.primary,
+                            size: 20,
+                          ),
+                          title: Text(
+                            l10n.upcomingRecurringTasksHeader(
+                              upcomingRecurringTasks.length,
+                            ),
+                            style: GoogleFonts.outfit(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                              color: theme.colorScheme.onSurface,
+                            ),
+                          ),
+                          children: upcomingRecurringTasks
+                              .map(
+                                (t) => _buildUpcomingRecurringItem(
+                                  context,
+                                  t,
+                                  l10n,
+                                  theme,
+                                ),
+                              )
+                              .toList(),
+                        ),
+                      ),
+                    ),
                   );
                 }
 
@@ -740,6 +797,79 @@ class _TaskListViewState extends State<TaskListView> {
                 style: GoogleFonts.outfit(
                   fontWeight: FontWeight.bold,
                   fontSize: 13,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildUpcomingRecurringItem(
+    BuildContext context,
+    Task task,
+    AppLocalizations l10n,
+    ThemeData theme,
+  ) {
+    final dateFormat = DateFormat.yMMMd().add_jm();
+    final dueDateStr = task.dueDate != null
+        ? dateFormat.format(task.dueDate!)
+        : '';
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      child: GlassContainer(
+        borderRadius: BorderRadius.circular(12),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        child: Row(
+          children: [
+            Icon(
+              Icons.repeat_rounded,
+              color: theme.colorScheme.primary,
+              size: 18,
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    task.title,
+                    style: GoogleFonts.outfit(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                      color: theme.colorScheme.onSurface,
+                    ),
+                  ),
+                  if (dueDateStr.isNotEmpty) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      dueDateStr,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.65,
+                        ),
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.primary.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                l10n.upcomingRecurringBadge,
+                style: TextStyle(
+                  color: theme.colorScheme.primary,
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
