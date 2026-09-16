@@ -4,28 +4,28 @@
 
 import 'package:hive_ce/hive_ce.dart';
 import 'package:rocis_tasks/features/categories/domain/models/category.dart';
+import 'package:rocis_tasks/features/tasks/domain/models/custom_field.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/sub_task.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
-import 'package:rocis_tasks/features/tasks/domain/models/custom_field.dart';
 
 extension HiveRegistrar on HiveInterface {
   void registerAdapters() {
     registerAdapter(CategoryAdapter());
+    registerAdapter(CustomFieldTypeAdapter());
     registerAdapter(SubTaskAdapter());
     registerAdapter(TaskAdapter());
-    registerAdapter(TaskPriorityAdapter());
-    registerAdapter(CustomFieldTypeAdapter());
     registerAdapter(TaskCustomFieldAdapter());
+    registerAdapter(TaskPriorityAdapter());
   }
 }
 
 extension IsolatedHiveRegistrar on IsolatedHiveInterface {
   void registerAdapters() {
     registerAdapter(CategoryAdapter());
+    registerAdapter(CustomFieldTypeAdapter());
     registerAdapter(SubTaskAdapter());
     registerAdapter(TaskAdapter());
-    registerAdapter(TaskPriorityAdapter());
-    registerAdapter(CustomFieldTypeAdapter());
     registerAdapter(TaskCustomFieldAdapter());
+    registerAdapter(TaskPriorityAdapter());
   }
 }

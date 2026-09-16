@@ -6,58 +6,9 @@ part of 'custom_field.dart';
 // TypeAdapterGenerator
 // **************************************************************************
 
-class CustomFieldTypeAdapter extends TypeAdapter<CustomFieldType> {
-  @override
-  final int typeId = 4;
-
-  @override
-  CustomFieldType read(BinaryReader reader) {
-    switch (reader.readByte()) {
-      case 0:
-        return CustomFieldType.contact;
-      case 1:
-        return CustomFieldType.location;
-      case 2:
-        return CustomFieldType.url;
-      case 3:
-        return CustomFieldType.text;
-      default:
-        return CustomFieldType.text;
-    }
-  }
-
-  @override
-  void write(BinaryWriter writer, CustomFieldType obj) {
-    switch (obj) {
-      case CustomFieldType.contact:
-        writer.writeByte(0);
-        break;
-      case CustomFieldType.location:
-        writer.writeByte(1);
-        break;
-      case CustomFieldType.url:
-        writer.writeByte(2);
-        break;
-      case CustomFieldType.text:
-        writer.writeByte(3);
-        break;
-    }
-  }
-
-  @override
-  int get hashCode => typeId.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is CustomFieldTypeAdapter &&
-          runtimeType == other.runtimeType &&
-          typeId == other.typeId;
-}
-
 class TaskCustomFieldAdapter extends TypeAdapter<TaskCustomField> {
   @override
-  final int typeId = 5;
+  final typeId = 5;
 
   @override
   TaskCustomField read(BinaryReader reader) {
@@ -67,9 +18,9 @@ class TaskCustomFieldAdapter extends TypeAdapter<TaskCustomField> {
     };
     return TaskCustomField(
       id: fields[0] as String?,
-      type: fields[1] as CustomFieldType? ?? CustomFieldType.text,
-      label: (fields[2] as String?) ?? '',
-      value: (fields[3] as String?) ?? '',
+      type: fields[1] as CustomFieldType,
+      label: fields[2] as String,
+      value: fields[3] as String,
     );
   }
 
@@ -94,6 +45,51 @@ class TaskCustomFieldAdapter extends TypeAdapter<TaskCustomField> {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is TaskCustomFieldAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class CustomFieldTypeAdapter extends TypeAdapter<CustomFieldType> {
+  @override
+  final typeId = 4;
+
+  @override
+  CustomFieldType read(BinaryReader reader) {
+    switch (reader.readByte()) {
+      case 0:
+        return CustomFieldType.contact;
+      case 1:
+        return CustomFieldType.location;
+      case 2:
+        return CustomFieldType.url;
+      case 3:
+        return CustomFieldType.text;
+      default:
+        return CustomFieldType.contact;
+    }
+  }
+
+  @override
+  void write(BinaryWriter writer, CustomFieldType obj) {
+    switch (obj) {
+      case CustomFieldType.contact:
+        writer.writeByte(0);
+      case CustomFieldType.location:
+        writer.writeByte(1);
+      case CustomFieldType.url:
+        writer.writeByte(2);
+      case CustomFieldType.text:
+        writer.writeByte(3);
+    }
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is CustomFieldTypeAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
