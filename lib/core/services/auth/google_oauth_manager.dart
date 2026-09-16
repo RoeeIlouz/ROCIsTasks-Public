@@ -127,6 +127,32 @@ class GoogleOAuthManager {
     }
   }
 
+  /// Checks if any Google credentials (cached token or saved user email) exist in persistent storage.
+  Future<bool> hasCachedGoogleCredentials() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final hasCachedToken = prefs.containsKey(keyAccessToken);
+      final hasSavedEmail = prefs.containsKey(keyUserEmail);
+      return hasCachedToken || hasSavedEmail;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Checks if the currently cached Google access token is present and not expired.
+  Future<bool> isTokenValid() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString(keyAccessToken);
+      final expiresAtStr = prefs.getString(keyAccessTokenExpiresAt);
+      if (token == null || expiresAtStr == null) return false;
+      final expiresAt = DateTime.tryParse(expiresAtStr);
+      return expiresAt != null && DateTime.now().isBefore(expiresAt);
+    } catch (_) {
+      return false;
+    }
+  }
+
   Future<void> cacheGoogleAccessToken(String token) async {
     try {
       final prefs = await SharedPreferences.getInstance();
