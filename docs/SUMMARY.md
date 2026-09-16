@@ -25,6 +25,10 @@ This file summarizes errors encountered and changes made to the codebase, ensuri
    - Full test suite: 343 / 343 tests passed (100%).
    - `flutter analyze`: 0 issues found.
    - Android Kotlin build (`gradlew.bat :app:compileReleaseKotlin`): BUILD SUCCESSFUL.
+5. **Version Bump & Synchronization**:
+   - Bumped app version to `0.2.15+105` in `pubspec.yaml`.
+   - Synchronized `AppConfig.appVersion = '0.2.15'` in `lib/core/config/app_config.dart`.
+   - Updated `docs/CHANGELOG.md` with release notes for `0.2.15+105`.
 
 #### Problem & Root Causes
 * **ROCIs-Schedule Local-Only Events**: In `ROCIs-Schedule` (`CourseProvider.addEvent`), newly added lecture/timetable events were only stored in SQLite local DB and never uploaded to Firestore `users/{uid}/events`, leaving the cross-app Firestore subcollection empty (`{}`).
