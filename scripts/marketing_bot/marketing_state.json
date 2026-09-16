@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-16T03:31:20.015860+00:00",
+  "last_run_timestamp": "2026-09-16T10:55:55.762032+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -2234,6 +2234,42 @@
       "title": "Built OnlyMeows - a small social app for cat owners with no feed, no likes, no follower counts",
       "url": "https://reddit.com/r/roastmystartup/comments/1whgulr/built_onlymeows_a_small_social_app_for_cat_owners/",
       "inspected_at": "2026-09-16T03:31:09.527025+00:00"
+    },
+    "reddit_1whts4k": {
+      "platform": "reddit",
+      "title": "RoastMyPic.ai - AI scores your profile photo, then remakes it in 4 styles",
+      "url": "https://reddit.com/r/SideProject/comments/1whts4k/roastmypicai_ai_scores_your_profile_photo_then/",
+      "inspected_at": "2026-09-16T10:54:57.600700+00:00"
+    },
+    "reddit_1whtool": {
+      "platform": "reddit",
+      "title": "Replying to comments was killing my time so 1 built a tool to fix it",
+      "url": "https://reddit.com/r/SideProject/comments/1whtool/replying_to_comments_was_killing_my_time_so_1/",
+      "inspected_at": "2026-09-16T10:55:44.324731+00:00"
+    },
+    "reddit_1whtcw6": {
+      "platform": "reddit",
+      "title": "We built Watch’n’Roll because we could never decide what to watch together.",
+      "url": "https://reddit.com/r/SideProject/comments/1whtcw6/we_built_watchnroll_because_we_could_never_decide/",
+      "inspected_at": "2026-09-16T10:55:45.085729+00:00"
+    },
+    "reddit_1wht8mn": {
+      "platform": "reddit",
+      "title": "I built 3 custom GitHub bots so my repo's contributor graph would actually reflect AI-written commits",
+      "url": "https://reddit.com/r/SideProject/comments/1wht8mn/i_built_3_custom_github_bots_so_my_repos/",
+      "inspected_at": "2026-09-16T10:55:45.865074+00:00"
+    },
+    "reddit_1wht6dz": {
+      "platform": "reddit",
+      "title": "What should one coding Agent look like when it lives in all your work apps?",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wht6dz/what_should_one_coding_agent_look_like_when_it/",
+      "inspected_at": "2026-09-16T10:55:46.672757+00:00"
+    },
+    "reddit_1whsbx2": {
+      "platform": "reddit",
+      "title": "I will tear your product site and redesign it",
+      "url": "https://reddit.com/r/roastmystartup/comments/1whsbx2/i_will_tear_your_product_site_and_redesign_it/",
+      "inspected_at": "2026-09-16T10:55:47.637164+00:00"
     }
   },
   "pending_drafts": {
