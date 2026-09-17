@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-17T03:37:00.344953+00:00",
+  "last_run_timestamp": "2026-09-17T11:03:08.793322+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -2378,6 +2378,42 @@
       "title": "I built a local-first Chrome extension that roasts you back to work with custom slap sounds (6 months in, 16 weekly users)",
       "url": "https://reddit.com/r/roastmystartup/comments/1wifq3c/i_built_a_localfirst_chrome_extension_that_roasts/",
       "inspected_at": "2026-09-17T03:36:51.912532+00:00"
+    },
+    "reddit_1wiquqa": {
+      "platform": "reddit",
+      "title": "I launched Cake Club, a 3D cake-building game for iPhone and iPad",
+      "url": "https://reddit.com/r/SideProject/comments/1wiquqa/i_launched_cake_club_a_3d_cakebuilding_game_for/",
+      "inspected_at": "2026-09-17T11:02:42.715025+00:00"
+    },
+    "reddit_1wiqsk3": {
+      "platform": "reddit",
+      "title": "My self-hosted gym tracker just passed 900 stars, 9 weeks after the first commit. Here's what I'd tell myself on day one.",
+      "url": "https://reddit.com/r/SideProject/comments/1wiqsk3/my_selfhosted_gym_tracker_just_passed_900_stars_9/",
+      "inspected_at": "2026-09-17T11:02:50.159570+00:00"
+    },
+    "reddit_1wiqqrj": {
+      "platform": "reddit",
+      "title": "Made A Node Based Image Editor",
+      "url": "https://reddit.com/r/SideProject/comments/1wiqqrj/made_a_node_based_image_editor/",
+      "inspected_at": "2026-09-17T11:02:54.363202+00:00"
+    },
+    "reddit_1wiqm6a": {
+      "platform": "reddit",
+      "title": "I built an AI memory app because I got tired of scrolling through my camera roll",
+      "url": "https://reddit.com/r/SideProject/comments/1wiqm6a/i_built_an_ai_memory_app_because_i_got_tired_of/",
+      "inspected_at": "2026-09-17T11:02:55.418749+00:00"
+    },
+    "reddit_1wiqoe5": {
+      "platform": "reddit",
+      "title": "Receipt Scout - price history tracker",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wiqoe5/receipt_scout_price_history_tracker/",
+      "inspected_at": "2026-09-17T11:02:56.149580+00:00"
+    },
+    "reddit_1wio8wl": {
+      "platform": "reddit",
+      "title": "everyone keeps complaining that ai forgets everything, so we built the thing i wanted to exist",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wio8wl/everyone_keeps_complaining_that_ai_forgets/",
+      "inspected_at": "2026-09-17T11:02:57.585554+00:00"
     }
   },
   "pending_drafts": {
@@ -2714,7 +2750,7 @@
     }
   },
   "recorded_feedback": [],
-  "last_organic_post_timestamp": "2026-09-16T16:14:15.516597+00:00",
+  "last_organic_post_timestamp": "2026-09-17T11:03:08.247535+00:00",
   "organic_posts": [
     {
       "text": "you either die a young enthusiastic builder or live long enough to realize that 90% of tech problems are solved by restarting the router.",
@@ -2868,6 +2904,14 @@
         "Bluesky"
       ],
       "posted_at": "2026-09-16T16:14:15.516597+00:00"
+    },
+    {
+      "text": "buying an old used thinkpad to turn into a home server is basically the developer equivalent of adopting a stray cat.",
+      "topic": "student_and_study_grind",
+      "platforms": [
+        "Bluesky"
+      ],
+      "posted_at": "2026-09-17T11:03:08.247535+00:00"
     }
   ],
   "x_posts_timestamps": [
