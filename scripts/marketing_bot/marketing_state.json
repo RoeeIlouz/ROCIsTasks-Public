@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-16T20:55:44.505366+00:00",
+  "last_run_timestamp": "2026-09-17T03:37:00.344953+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -2342,6 +2342,42 @@
       "title": "built a tool that tells you if you should get a business loan or not, be honest",
       "url": "https://reddit.com/r/roastmystartup/comments/1wi9cvx/built_a_tool_that_tells_you_if_you_should_get_a/",
       "inspected_at": "2026-09-16T20:55:36.060630+00:00"
+    },
+    "reddit_1wiit8v": {
+      "platform": "reddit",
+      "title": "How many of your side projects has muse killed?",
+      "url": "https://reddit.com/r/SideProject/comments/1wiit8v/how_many_of_your_side_projects_has_muse_killed/",
+      "inspected_at": "2026-09-17T03:36:44.688762+00:00"
+    },
+    "reddit_1wiirde": {
+      "platform": "reddit",
+      "title": "Free website audits for r/SideProject - drop your URL and I'll send you what's broken",
+      "url": "https://reddit.com/r/SideProject/comments/1wiirde/free_website_audits_for_rsideproject_drop_your/",
+      "inspected_at": "2026-09-17T03:36:48.703490+00:00"
+    },
+    "reddit_1wiim2y": {
+      "platform": "reddit",
+      "title": "Stock screener - no freemium, no paid, no ads, completely free!",
+      "url": "https://reddit.com/r/SideProject/comments/1wiim2y/stock_screener_no_freemium_no_paid_no_ads/",
+      "inspected_at": "2026-09-17T03:36:49.561775+00:00"
+    },
+    "reddit_1wiiiqs": {
+      "platform": "reddit",
+      "title": "With Alia - an AI companion built around one continuing personality",
+      "url": "https://reddit.com/r/SideProject/comments/1wiiiqs/with_alia_an_ai_companion_built_around_one/",
+      "inspected_at": "2026-09-17T03:36:50.342971+00:00"
+    },
+    "reddit_1wigcyb": {
+      "platform": "reddit",
+      "title": "I built Agentwire to find shipped agent tooling without guessing what is real",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wigcyb/i_built_agentwire_to_find_shipped_agent_tooling/",
+      "inspected_at": "2026-09-17T03:36:51.067947+00:00"
+    },
+    "reddit_1wifq3c": {
+      "platform": "reddit",
+      "title": "I built a local-first Chrome extension that roasts you back to work with custom slap sounds (6 months in, 16 weekly users)",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wifq3c/i_built_a_localfirst_chrome_extension_that_roasts/",
+      "inspected_at": "2026-09-17T03:36:51.912532+00:00"
     }
   },
   "pending_drafts": {
