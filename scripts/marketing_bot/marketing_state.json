@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-17T16:20:43.198629+00:00",
+  "last_run_timestamp": "2026-09-17T20:59:45.800815+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -2450,6 +2450,42 @@
       "title": "Would you actually use Hubb to decide where to go?",
       "url": "https://reddit.com/r/roastmystartup/comments/1wixrqj/would_you_actually_use_hubb_to_decide_where_to_go/",
       "inspected_at": "2026-09-17T16:20:04.660909+00:00"
+    },
+    "reddit_1wj634x": {
+      "platform": "reddit",
+      "title": "Genie Photo 1.5 for iPad and Mac Catalyst",
+      "url": "https://reddit.com/r/SideProject/comments/1wj634x/genie_photo_15_for_ipad_and_mac_catalyst/",
+      "inspected_at": "2026-09-17T20:59:18.551310+00:00"
+    },
+    "reddit_1wj5ydj": {
+      "platform": "reddit",
+      "title": "Confused about which image format to use on your site? A tiny free tool to stop guessing on image formats.",
+      "url": "https://reddit.com/r/SideProject/comments/1wj5ydj/confused_about_which_image_format_to_use_on_your/",
+      "inspected_at": "2026-09-17T20:59:20.776589+00:00"
+    },
+    "reddit_1wj5wrz": {
+      "platform": "reddit",
+      "title": "Built an AI design tool that works directly in your React codebase",
+      "url": "https://reddit.com/r/SideProject/comments/1wj5wrz/built_an_ai_design_tool_that_works_directly_in/",
+      "inspected_at": "2026-09-17T20:59:25.816197+00:00"
+    },
+    "reddit_1wj5tg4": {
+      "platform": "reddit",
+      "title": "I'm building Portunio: a public AI address for opportunities beyond your network",
+      "url": "https://reddit.com/r/SideProject/comments/1wj5tg4/im_building_portunio_a_public_ai_address_for/",
+      "inspected_at": "2026-09-17T20:59:30.301669+00:00"
+    },
+    "reddit_1wj15uu": {
+      "platform": "reddit",
+      "title": "[Web app / Free alpha] Manual net worth + portfolio tracker, looking for testers to break it",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wj15uu/web_app_free_alpha_manual_net_worth_portfolio/",
+      "inspected_at": "2026-09-17T20:59:31.676425+00:00"
+    },
+    "reddit_1wj0v4k": {
+      "platform": "reddit",
+      "title": "Roast Panora: 500+ users, but are we solving a real problem or building another AI notetaker?",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wj0v4k/roast_panora_500_users_but_are_we_solving_a_real/",
+      "inspected_at": "2026-09-17T20:59:34.310216+00:00"
     }
   },
   "pending_drafts": {
