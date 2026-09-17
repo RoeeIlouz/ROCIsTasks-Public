@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-17T11:03:08.793322+00:00",
+  "last_run_timestamp": "2026-09-17T16:20:43.198629+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -2414,6 +2414,42 @@
       "title": "everyone keeps complaining that ai forgets everything, so we built the thing i wanted to exist",
       "url": "https://reddit.com/r/roastmystartup/comments/1wio8wl/everyone_keeps_complaining_that_ai_forgets/",
       "inspected_at": "2026-09-17T11:02:57.585554+00:00"
+    },
+    "reddit_1wiyfo6": {
+      "platform": "reddit",
+      "title": "We spent 14 months building an app because my friends took three weeks to decide on a weekend",
+      "url": "https://reddit.com/r/SideProject/comments/1wiyfo6/we_spent_14_months_building_an_app_because_my/",
+      "inspected_at": "2026-09-17T16:19:34.698724+00:00"
+    },
+    "reddit_1wiybqh": {
+      "platform": "reddit",
+      "title": "Woohoo 2 days after launching optimAIzr and already ~200downloads",
+      "url": "https://reddit.com/r/SideProject/comments/1wiybqh/woohoo_2_days_after_launching_optimaizr_and/",
+      "inspected_at": "2026-09-17T16:19:45.798427+00:00"
+    },
+    "reddit_1wiy9p7": {
+      "platform": "reddit",
+      "title": "[DEV] EQ Maximum - Lightweight Audio Equalizer & Volume Booster (Giving away free lifetime promo codes!)",
+      "url": "https://reddit.com/r/SideProject/comments/1wiy9p7/dev_eq_maximum_lightweight_audio_equalizer_volume/",
+      "inspected_at": "2026-09-17T16:20:02.169614+00:00"
+    },
+    "reddit_1wiy8r8": {
+      "platform": "reddit",
+      "title": "Hi ! I made Toplings, little pets that live on your windows (Mac + Windows)",
+      "url": "https://reddit.com/r/SideProject/comments/1wiy8r8/hi_i_made_toplings_little_pets_that_live_on_your/",
+      "inspected_at": "2026-09-17T16:20:02.959905+00:00"
+    },
+    "reddit_1wiuxio": {
+      "platform": "reddit",
+      "title": "PR reviews are taking longer than ever, are you actually catching agent-written bugs or just going through the motions?",
+      "url": "https://reddit.com/r/indiehackers/comments/1wiuxio/pr_reviews_are_taking_longer_than_ever_are_you/",
+      "inspected_at": "2026-09-17T16:20:03.731242+00:00"
+    },
+    "reddit_1wixrqj": {
+      "platform": "reddit",
+      "title": "Would you actually use Hubb to decide where to go?",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wixrqj/would_you_actually_use_hubb_to_decide_where_to_go/",
+      "inspected_at": "2026-09-17T16:20:04.660909+00:00"
     }
   },
   "pending_drafts": {
