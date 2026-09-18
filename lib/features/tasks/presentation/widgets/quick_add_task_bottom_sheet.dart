@@ -12,6 +12,7 @@ import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:rocis_tasks/shared/ui/widgets/glass_container.dart';
 import 'package:rocis_tasks/shared/ui/theme/theme_service.dart';
 import 'package:rocis_tasks/core/utils/icon_utils.dart';
+import 'package:rocis_tasks/core/utils/haptic_utils.dart';
 
 class QuickAddTaskBottomSheet extends StatefulWidget {
   final DateTime? initialDueDate;
@@ -210,7 +211,7 @@ class _QuickAddTaskBottomSheetState extends State<QuickAddTaskBottomSheet> {
           break;
       }
     });
-    HapticFeedback.lightImpact();
+    HapticUtils.throttledLightImpact();
   }
 
   void _showCategoryPicker(List<Category> categories, AppLocalizations l10n) {
@@ -422,7 +423,7 @@ class _QuickAddTaskBottomSheetState extends State<QuickAddTaskBottomSheet> {
                             0,
                           );
                         });
-                        HapticFeedback.lightImpact();
+                        HapticUtils.throttledLightImpact();
                       },
                       theme: theme,
                     ),
@@ -451,7 +452,7 @@ class _QuickAddTaskBottomSheetState extends State<QuickAddTaskBottomSheet> {
                             0,
                           );
                         });
-                        HapticFeedback.lightImpact();
+                        HapticUtils.throttledLightImpact();
                       },
                       theme: theme,
                     ),

@@ -17,6 +17,7 @@ import 'package:rocis_tasks/core/validation/validators.dart';
 import 'package:rocis_tasks/features/tasks/services/nlp_service.dart';
 import 'package:rocis_tasks/features/tasks/domain/services/task_recurrence_service.dart';
 import 'package:rocis_tasks/features/tasks/presentation/widgets/recurrence_picker_sheet.dart';
+import 'package:rocis_tasks/core/utils/haptic_utils.dart';
 
 import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:rocis_tasks/shared/ui/ui_kit.dart';
@@ -391,7 +392,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   }
 
   void _onQuickDateTap(DateTime targetDate) {
-    HapticFeedback.lightImpact();
+    HapticUtils.throttledLightImpact();
     setState(() {
       if (_selectedDate != null && _isSameDay(_selectedDate, targetDate)) {
         _selectedDate = null;
