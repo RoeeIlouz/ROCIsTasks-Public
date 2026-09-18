@@ -8,6 +8,7 @@ import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.
 import 'package:rocis_tasks/features/tasks/presentation/widgets/kanban/kanban_column.dart';
 import 'package:rocis_tasks/features/tasks/presentation/screens/add_task_screen.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 enum KanbanGrouping { status, priority, category }
 
@@ -20,6 +21,43 @@ class KanbanBoardView extends StatefulWidget {
 
 class _KanbanBoardViewState extends State<KanbanBoardView> {
   KanbanGrouping _grouping = KanbanGrouping.status;
+  final Set<String> _manualTodoTaskIds = {};
+  final Set<String> _manualInFocusTaskIds = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _loadManualOverrides();
+  }
+
+  Future<void> _loadManualOverrides() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final todoList = prefs.getStringList('kanban_manual_todo_ids') ?? [];
+      final inFocusList =
+          prefs.getStringList('kanban_manual_infocus_ids') ?? [];
+      if (mounted) {
+        setState(() {
+          _manualTodoTaskIds.addAll(todoList);
+          _manualInFocusTaskIds.addAll(inFocusList);
+        });
+      }
+    } catch (_) {}
+  }
+
+  Future<void> _saveManualOverrides() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setStringList(
+        'kanban_manual_todo_ids',
+        _manualTodoTaskIds.toList(),
+      );
+      await prefs.setStringList(
+        'kanban_manual_infocus_ids',
+        _manualInFocusTaskIds.toList(),
+      );
+    } catch (_) {}
+  }
 
   bool _isTodayOrOverdue(DateTime? date) {
     if (date == null) return false;
@@ -209,17 +247,21 @@ class _KanbanBoardViewState extends State<KanbanBoardView> {
     AppLocalizations l10n,
     ThemeData theme,
   ) {
-    // 1. To Do (Pending, dueDate is null or future)
+    // 1. To Do (Pending, dueDate is null or future, or explicitly placed in To Do)
     final todoTasks = tasks.where((t) {
       if (t.isCompleted) return false;
+      if (_manualTodoTaskIds.contains(t.id)) return true;
+      if (_manualInFocusTaskIds.contains(t.id)) return false;
       if (t.isPinned ?? false) return false;
       if (_isTodayOrOverdue(t.dueDate)) return false;
       return true;
     }).toList();
 
-    // 2. In Focus (Pending, dueDate is today or overdue or pinned)
+    // 2. In Focus (Pending, dueDate is today or overdue or pinned, unless explicitly placed in To Do)
     final inFocusTasks = tasks.where((t) {
       if (t.isCompleted) return false;
+      if (_manualTodoTaskIds.contains(t.id)) return false;
+      if (_manualInFocusTaskIds.contains(t.id)) return true;
       return (t.isPinned ?? false) || _isTodayOrOverdue(t.dueDate);
     }).toList();
 
@@ -247,9 +289,14 @@ class _KanbanBoardViewState extends State<KanbanBoardView> {
           if (task.isCompleted) {
             await taskProvider.toggleTaskCompletion(task);
           }
-          if (_isTodayOrOverdue(task.dueDate)) {
-            await taskProvider.updateTask(task, clearDueDate: true);
+          if (task.isPinned ?? false) {
+            await taskProvider.toggleTaskPin(task);
           }
+          setState(() {
+            _manualInFocusTaskIds.remove(task.id);
+            _manualTodoTaskIds.add(task.id);
+          });
+          _saveManualOverrides();
         },
       ),
       KanbanColumn(
@@ -274,9 +321,11 @@ class _KanbanBoardViewState extends State<KanbanBoardView> {
           if (task.isCompleted) {
             await taskProvider.toggleTaskCompletion(task);
           }
-          final now = DateTime.now();
-          final todayNoon = DateTime(now.year, now.month, now.day, 12, 0);
-          await taskProvider.updateTask(task, dueDate: todayNoon);
+          setState(() {
+            _manualTodoTaskIds.remove(task.id);
+            _manualInFocusTaskIds.add(task.id);
+          });
+          _saveManualOverrides();
         },
       ),
       KanbanColumn(
@@ -304,6 +353,11 @@ class _KanbanBoardViewState extends State<KanbanBoardView> {
           if (!task.isCompleted) {
             await taskProvider.toggleTaskCompletion(task);
           }
+          setState(() {
+            _manualTodoTaskIds.remove(task.id);
+            _manualInFocusTaskIds.remove(task.id);
+          });
+          _saveManualOverrides();
         },
       ),
     ];

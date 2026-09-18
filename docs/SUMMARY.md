@@ -1899,3 +1899,18 @@ On mobile (Android/iOS), users were being prompted multiple times to sign in wit
    * **Mobile**: `email`, `profile`, `auth/tasks` (removed calendar scope)
 5. **Unified Token Caching**: Enabled SharedPreferences access token caching on Mobile (previously only on Web), ensuring the token survives app restarts.
 6. **Sign-out Cleanup**: Updated `signOut()` to clean up the cached Google access token from SharedPreferences on all platforms.
+
+## [0.2.15+105] - 2026-09-18
+
+### Test Suite Alignment, Kanban Due-Date Preservation, and Web Responsive Polish
+
+#### Goals / Requirements
+* Synchronize legacy unit tests with the deferred recurring tasks materialization engine.
+* Resolve Kanban Board "In Focus" to "To Do" drag-and-drop snap-back while strictly preserving the task's due date per user instruction.
+* Resolve Web workspace `RenderFlex` layout overflow on compact browser viewports (< 768px).
+
+#### Changes/Fixes
+1. **Recurring Tasks Test Alignment**: Updated `task_provider_test.dart` to assert deferred recurrence completion state and verified materialization on arrival of the scheduled recurrence date. All 350 test suite cases are 100% green.
+2. **Kanban Due-Date Preservation (`BUG-02`)**: In `kanban_board_view.dart`, removed `clearDueDate: true` to prevent deleting the user's deadline, and added manual column placement tracking (`_manualTodoTaskIds`, `_manualInFocusTaskIds`) with `SharedPreferences` persistence. Unpins task if pinned when moved to "To Do". Added automated widget test coverage in `kanban_board_test.dart`.
+3. **Web Viewport Responsive Breakpoints (`BUG-03`)**: In `web_home_screen.dart`, raised single-column inspector view threshold from `< 600` to `< 768` and converted the dashboard stats row and greeting header to responsive `LayoutBuilder` widgets to prevent `RenderFlex` overflow errors on resize.
+
