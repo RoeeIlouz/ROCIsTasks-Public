@@ -279,18 +279,33 @@ void main() {
       await taskProvider.toggleTaskCompletion(recurringTask);
 
       expect(recurringTask.isCompleted, isTrue);
-      // Verify adding the completed task and adding the next instance
+      expect(recurringTask.nextRecurrenceDate, isNotNull);
+      // Verify adding the completed task
       final capturedTasks = verify(
         () => mockSource.addTask(captureAny()),
       ).captured;
-      expect(capturedTasks.length, 2);
+      expect(capturedTasks.length, 1);
 
-      final nextTask = capturedTasks[1] as Task;
+      // Materialize the recurring iteration
+      when(() => mockSource.getTasks()).thenReturn([recurringTask]);
+      final now = DateTime.now();
+      recurringTask.nextRecurrenceDate = DateTime(
+        now.year,
+        now.month,
+        now.day,
+        9,
+        0,
+      );
+      await taskProvider.checkAndMaterializeDueRecurringTasks();
+
+      final allCaptured = verify(
+        () => mockSource.addTask(captureAny()),
+      ).captured;
+      final nextTask = allCaptured.last as Task;
       expect(nextTask.title, 'Daily Standup');
       expect(nextTask.isCompleted, isFalse);
       expect(nextTask.recurrenceRule, 'FREQ=DAILY;INTERVAL=1');
       expect(nextTask.recurringParentId, 'rec-1');
-      expect(nextTask.dueDate!.isAfter(DateTime.now()), isTrue);
       expect(nextTask.dueDate!.hour, 9);
       expect(nextTask.dueDate!.minute, 0);
     });

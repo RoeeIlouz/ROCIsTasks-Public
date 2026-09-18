@@ -311,4 +311,43 @@ void main() {
       expect(stripeFinder, findsWidgets);
     },
   );
+
+  testWidgets(
+    'dropping task into To Do keeps dueDate and retains task in To Do column',
+    (tester) async {
+      tester.view.physicalSize = const Size(1200, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(buildTestWidget());
+      await tester.pumpAndSettle();
+
+      // Today Task has dueDate = now
+      final todayDateBefore = sampleInFocusTask.dueDate;
+      expect(todayDateBefore, isNotNull);
+
+      // Find the KanbanColumn for 'todo' and simulate onTaskDropped
+      final kanbanColumns = tester
+          .widgetList<KanbanColumn>(find.byType(KanbanColumn))
+          .toList();
+      final todoColumn = kanbanColumns.firstWhere((col) => col.id == 'todo');
+
+      // Call onTaskDropped with sampleInFocusTask
+      todoColumn.onTaskDropped(sampleInFocusTask);
+      await tester.pumpAndSettle();
+
+      // Ensure dueDate was kept completely intact
+      expect(sampleInFocusTask.dueDate, equals(todayDateBefore));
+
+      // After dropping, sampleInFocusTask is categorized in To Do column
+      final updatedColumns = tester
+          .widgetList<KanbanColumn>(find.byType(KanbanColumn))
+          .toList();
+      final updatedTodoColumn = updatedColumns.firstWhere(
+        (col) => col.id == 'todo',
+      );
+      expect(updatedTodoColumn.tasks.any((t) => t.id == 'task-2'), isTrue);
+    },
+  );
 }

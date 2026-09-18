@@ -489,7 +489,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
           body: LayoutBuilder(
             builder: (context, constraints) {
               final isCompact = constraints.maxWidth < 800;
-              final isUltraCompact = constraints.maxWidth < 600;
+              final isUltraCompact = constraints.maxWidth < 768;
               final showInspector = _selectedTask != null || _isCreatingTask;
               final double inspectorWidth = constraints.maxWidth < 950
                   ? (constraints.maxWidth * 0.45).clamp(280.0, 380.0)
@@ -1409,84 +1409,187 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Greeting & New Task Header
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Column(
+          LayoutBuilder(
+            builder: (context, headerConstraints) {
+              final isTight = headerConstraints.maxWidth < 540;
+              if (isTight) {
+                return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Hello, ${user?.displayName ?? 'Productive User'} 👋',
-                      style: GoogleFonts.outfit(
-                        fontSize: 26,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: -0.5,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Hello, ${user?.displayName ?? 'Productive User'} 👋',
+                          style: GoogleFonts.outfit(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: -0.5,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Organize your priorities and keep your sync healthy.',
+                          style: TextStyle(
+                            color: theme.disabledColor,
+                            fontSize: 13,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Organize your priorities and keep your sync healthy.',
-                      style: TextStyle(
-                        color: theme.disabledColor,
-                        fontSize: 13,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        const SyncStatusBadge(compact: false),
+                        const Spacer(),
+                        FilledButton.icon(
+                          onPressed: _initCreateTask,
+                          icon: const Icon(Icons.add, size: 18),
+                          label: Text(
+                            'New Task',
+                            style: GoogleFonts.outfit(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          style: FilledButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 12,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
-                ),
-              ),
-              const SizedBox(width: 16),
-              const SyncStatusBadge(compact: false),
-              const SizedBox(width: 12),
-              FilledButton.icon(
-                onPressed: _initCreateTask,
-                icon: const Icon(Icons.add, size: 18),
-                label: Text(
-                  'New Task',
-                  style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
-                ),
-                style: FilledButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 14,
+                );
+              }
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Hello, ${user?.displayName ?? 'Productive User'} 👋',
+                          style: GoogleFonts.outfit(
+                            fontSize: 26,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: -0.5,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Organize your priorities and keep your sync healthy.',
+                          style: TextStyle(
+                            color: theme.disabledColor,
+                            fontSize: 13,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
                   ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                  const SizedBox(width: 16),
+                  const SyncStatusBadge(compact: false),
+                  const SizedBox(width: 12),
+                  FilledButton.icon(
+                    onPressed: _initCreateTask,
+                    icon: const Icon(Icons.add, size: 18),
+                    label: Text(
+                      'New Task',
+                      style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
+                    ),
+                    style: FilledButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 14,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
                   ),
-                ),
-              ),
-            ],
+                ],
+              );
+            },
           ),
           const SizedBox(height: 28),
 
           // Stats Row
-          Row(
-            children: [
-              _buildStatCard(
-                context,
-                'Total Active',
-                '${activeTasks.length}',
-                Icons.assignment_turned_in_rounded,
-              ),
-              _buildStatCard(
-                context,
-                'Today & Overdue',
-                '${todayAndOverdue.length}',
-                Icons.today_rounded,
-                color: Colors.orangeAccent,
-              ),
-              _buildStatCard(
-                context,
-                'Upcoming',
-                '${inboxAndUpcoming.length}',
-                Icons.upcoming_rounded,
-                color: theme.colorScheme.primary,
-              ),
-            ],
+          LayoutBuilder(
+            builder: (context, statsConstraints) {
+              final isNarrow = statsConstraints.maxWidth < 560;
+              if (isNarrow) {
+                return Column(
+                  children: [
+                    Row(
+                      children: [
+                        _buildStatCard(
+                          context,
+                          'Total Active',
+                          '${activeTasks.length}',
+                          Icons.assignment_turned_in_rounded,
+                        ),
+                        _buildStatCard(
+                          context,
+                          'Today & Overdue',
+                          '${todayAndOverdue.length}',
+                          Icons.today_rounded,
+                          color: Colors.orangeAccent,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        _buildStatCard(
+                          context,
+                          'Upcoming',
+                          '${inboxAndUpcoming.length}',
+                          Icons.upcoming_rounded,
+                          color: theme.colorScheme.primary,
+                        ),
+                      ],
+                    ),
+                  ],
+                );
+              }
+              return Row(
+                children: [
+                  _buildStatCard(
+                    context,
+                    'Total Active',
+                    '${activeTasks.length}',
+                    Icons.assignment_turned_in_rounded,
+                  ),
+                  _buildStatCard(
+                    context,
+                    'Today & Overdue',
+                    '${todayAndOverdue.length}',
+                    Icons.today_rounded,
+                    color: Colors.orangeAccent,
+                  ),
+                  _buildStatCard(
+                    context,
+                    'Upcoming',
+                    '${inboxAndUpcoming.length}',
+                    Icons.upcoming_rounded,
+                    color: theme.colorScheme.primary,
+                  ),
+                ],
+              );
+            },
           ),
           const SizedBox(height: 28),
 
