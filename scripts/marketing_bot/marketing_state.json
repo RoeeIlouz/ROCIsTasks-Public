@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-18T10:39:13.657069+00:00",
+  "last_run_timestamp": "2026-09-18T15:55:47.045556+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -2558,6 +2558,42 @@
       "title": "OGCraft (Dynamic OpenGraph images via API)",
       "url": "https://reddit.com/r/roastmystartup/comments/1wjm3qq/ogcraft_dynamic_opengraph_images_via_api/",
       "inspected_at": "2026-09-18T10:39:05.626220+00:00"
+    },
+    "reddit_1wjtyus": {
+      "platform": "reddit",
+      "title": "I got tired of using separate apps for every part of my day, so I spent months building one place for all of it",
+      "url": "https://reddit.com/r/SideProject/comments/1wjtyus/i_got_tired_of_using_separate_apps_for_every_part/",
+      "inspected_at": "2026-09-18T15:54:45.619329+00:00"
+    },
+    "reddit_1wjtvpa": {
+      "platform": "reddit",
+      "title": "I built a Mac workspace to keep track of what Claude Code and Codex are changing",
+      "url": "https://reddit.com/r/SideProject/comments/1wjtvpa/i_built_a_mac_workspace_to_keep_track_of_what/",
+      "inspected_at": "2026-09-18T15:55:31.941132+00:00"
+    },
+    "reddit_1wjtr0b": {
+      "platform": "reddit",
+      "title": "I built a place for brands to die on ridiculous hills. Fun idea or a one-time joke?",
+      "url": "https://reddit.com/r/SideProject/comments/1wjtr0b/i_built_a_place_for_brands_to_die_on_ridiculous/",
+      "inspected_at": "2026-09-18T15:55:32.798286+00:00"
+    },
+    "reddit_1wjtopf": {
+      "platform": "reddit",
+      "title": "I built an AI voice agent that calls retail stores for me (1,000+ calls in, here are the crazy edge cases)",
+      "url": "https://reddit.com/r/SideProject/comments/1wjtopf/i_built_an_ai_voice_agent_that_calls_retail/",
+      "inspected_at": "2026-09-18T15:55:33.498502+00:00"
+    },
+    "reddit_1wjsym2": {
+      "platform": "reddit",
+      "title": "Roast my $2.99/month horoscope texting service",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wjsym2/roast_my_299month_horoscope_texting_service/",
+      "inspected_at": "2026-09-18T15:55:35.119013+00:00"
+    },
+    "reddit_1wjqzf5": {
+      "platform": "reddit",
+      "title": "Metryn — scores whether a website is actually readable by AI search crawlers. Tear it apart.",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wjqzf5/metryn_scores_whether_a_website_is_actually/",
+      "inspected_at": "2026-09-18T15:55:35.993872+00:00"
     }
   },
   "pending_drafts": {
@@ -2894,7 +2930,7 @@
     }
   },
   "recorded_feedback": [],
-  "last_organic_post_timestamp": "2026-09-18T03:27:34.184930+00:00",
+  "last_organic_post_timestamp": "2026-09-18T15:55:46.577173+00:00",
   "organic_posts": [
     {
       "text": "you either die a young enthusiastic builder or live long enough to realize that 90% of tech problems are solved by restarting the router.",
@@ -3065,6 +3101,14 @@
         "Bluesky"
       ],
       "posted_at": "2026-09-18T03:27:34.184930+00:00"
+    },
+    {
+      "text": "nobody talks about the emotional transition between 'today i will study for my exam' and 'today i will rewrite my entire dotfiles configuration from scratch'.",
+      "topic": "mobile_and_code_quirks",
+      "platforms": [
+        "Bluesky"
+      ],
+      "posted_at": "2026-09-18T15:55:46.577173+00:00"
     }
   ],
   "x_posts_timestamps": [
