@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-17T20:59:45.800815+00:00",
+  "last_run_timestamp": "2026-09-18T03:27:34.519633+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -2486,6 +2486,42 @@
       "title": "Roast Panora: 500+ users, but are we solving a real problem or building another AI notetaker?",
       "url": "https://reddit.com/r/roastmystartup/comments/1wj0v4k/roast_panora_500_users_but_are_we_solving_a_real/",
       "inspected_at": "2026-09-17T20:59:34.310216+00:00"
+    },
+    "reddit_1wje9hn": {
+      "platform": "reddit",
+      "title": "PGN Clipboard - A tiny Mac app that copies downloaded chess games and trashes the file",
+      "url": "https://reddit.com/r/SideProject/comments/1wje9hn/pgn_clipboard_a_tiny_mac_app_that_copies/",
+      "inspected_at": "2026-09-18T03:27:14.239585+00:00"
+    },
+    "reddit_1wje7y8": {
+      "platform": "reddit",
+      "title": "Smol - I was kind of bored, so I made a tiny coding agent",
+      "url": "https://reddit.com/r/SideProject/comments/1wje7y8/smol_i_was_kind_of_bored_so_i_made_a_tiny_coding/",
+      "inspected_at": "2026-09-18T03:27:20.062433+00:00"
+    },
+    "reddit_1wjdybc": {
+      "platform": "reddit",
+      "title": "My best friend and I built an iPhone app that tracks a batted ball at 240 FPS and calculates exit velo + launch angle from just the camera",
+      "url": "https://reddit.com/r/SideProject/comments/1wjdybc/my_best_friend_and_i_built_an_iphone_app_that/",
+      "inspected_at": "2026-09-18T03:27:21.849175+00:00"
+    },
+    "reddit_1wjdw9k": {
+      "platform": "reddit",
+      "title": "I built an iOS app that reorganizes your Apple Watch running history — my first app, just shipped",
+      "url": "https://reddit.com/r/SideProject/comments/1wjdw9k/i_built_an_ios_app_that_reorganizes_your_apple/",
+      "inspected_at": "2026-09-18T03:27:22.651917+00:00"
+    },
+    "reddit_1wje0p5": {
+      "platform": "reddit",
+      "title": "We couldn’t find something that worked the way we wanted",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wje0p5/we_couldnt_find_something_that_worked_the_way_we/",
+      "inspected_at": "2026-09-18T03:27:23.351035+00:00"
+    },
+    "reddit_1wjc3tp": {
+      "platform": "reddit",
+      "title": "Roast my chart-reading app. It's the thing I wish I'd had when the tutorial loop had me stuck.",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wjc3tp/roast_my_chartreading_app_its_the_thing_i_wish_id/",
+      "inspected_at": "2026-09-18T03:27:24.152983+00:00"
     }
   },
   "pending_drafts": {
@@ -2822,7 +2858,7 @@
     }
   },
   "recorded_feedback": [],
-  "last_organic_post_timestamp": "2026-09-17T11:03:08.247535+00:00",
+  "last_organic_post_timestamp": "2026-09-18T03:27:34.184930+00:00",
   "organic_posts": [
     {
       "text": "you either die a young enthusiastic builder or live long enough to realize that 90% of tech problems are solved by restarting the router.",
@@ -2984,6 +3020,15 @@
         "Bluesky"
       ],
       "posted_at": "2026-09-17T11:03:08.247535+00:00"
+    },
+    {
+      "text": "there is no silence on earth quite like being 20 meters underwater on a scuba dive. zero notifications, zero slack pings, just fish minding their business.",
+      "topic": "ee_engineering_struggles",
+      "platforms": [
+        "Twitter/X",
+        "Bluesky"
+      ],
+      "posted_at": "2026-09-18T03:27:34.184930+00:00"
     }
   ],
   "x_posts_timestamps": [
@@ -2995,7 +3040,8 @@
     "2026-09-12T20:15:29.769250+00:00",
     "2026-09-14T03:34:01.052334+00:00",
     "2026-09-15T11:11:24.658980+00:00",
-    "2026-09-16T16:14:14.756027+00:00"
+    "2026-09-16T16:14:14.756027+00:00",
+    "2026-09-18T03:27:33.829608+00:00"
   ],
   "posted_devlogs": {
     "devlog_0_2_2_60_2026_07_17_190f9f3082": {
