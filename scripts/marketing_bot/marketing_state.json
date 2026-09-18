@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-18T15:55:47.045556+00:00",
+  "last_run_timestamp": "2026-09-18T20:27:52.213576+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -2594,6 +2594,42 @@
       "title": "Metryn — scores whether a website is actually readable by AI search crawlers. Tear it apart.",
       "url": "https://reddit.com/r/roastmystartup/comments/1wjqzf5/metryn_scores_whether_a_website_is_actually/",
       "inspected_at": "2026-09-18T15:55:35.993872+00:00"
+    },
+    "reddit_1wk12vc": {
+      "platform": "reddit",
+      "title": "I shipped my first iOS game in eleven days. Here is how the days went and what I would tell myself on day one.",
+      "url": "https://reddit.com/r/SideProject/comments/1wk12vc/i_shipped_my_first_ios_game_in_eleven_days_here/",
+      "inspected_at": "2026-09-18T20:27:37.654113+00:00"
+    },
+    "reddit_1wk10bi": {
+      "platform": "reddit",
+      "title": "I think my side project compares iPhones better than Apple's own website",
+      "url": "https://reddit.com/r/SideProject/comments/1wk10bi/i_think_my_side_project_compares_iphones_better/",
+      "inspected_at": "2026-09-18T20:27:40.929129+00:00"
+    },
+    "reddit_1wk105n": {
+      "platform": "reddit",
+      "title": "[Update!!!] I built an iOS app to help me fall in love with NYC all over again. Looking for NYC TestFlight users. Travelers and visitors are welcome!",
+      "url": "https://reddit.com/r/SideProject/comments/1wk105n/update_i_built_an_ios_app_to_help_me_fall_in_love/",
+      "inspected_at": "2026-09-18T20:27:41.688265+00:00"
+    },
+    "reddit_1wk168o": {
+      "platform": "reddit",
+      "title": "munity post\" should be \"no community feed\" or \"no community posts\". The singular makes it sound like they only ever posted once.",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wk168o/munity_post_should_be_no_community_feed_or_no/",
+      "inspected_at": "2026-09-18T20:27:42.543713+00:00"
+    },
+    "reddit_1wjzcu6": {
+      "platform": "reddit",
+      "title": "A few things I didn't expect going into this 🔊",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wjzcu6/a_few_things_i_didnt_expect_going_into_this/",
+      "inspected_at": "2026-09-18T20:27:43.310061+00:00"
+    },
+    "reddit_1wjxxur": {
+      "platform": "reddit",
+      "title": "Every app uses the hook model to keep you hooked. Mine uses it to get you off your vape. Roast me.",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wjxxur/every_app_uses_the_hook_model_to_keep_you_hooked/",
+      "inspected_at": "2026-09-18T20:27:44.084755+00:00"
     }
   },
   "pending_drafts": {
