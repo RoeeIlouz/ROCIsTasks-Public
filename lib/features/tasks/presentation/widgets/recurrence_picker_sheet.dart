@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:rocis_tasks/core/utils/haptic_utils.dart';
 import 'package:rocis_tasks/features/tasks/domain/services/task_recurrence_service.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:rocis_tasks/shared/ui/widgets/glass_container.dart';
@@ -8,10 +9,7 @@ import 'package:rocis_tasks/shared/ui/widgets/glass_container.dart';
 class RecurrencePickerSheet extends StatefulWidget {
   final String? currentRule;
 
-  const RecurrencePickerSheet({
-    super.key,
-    this.currentRule,
-  });
+  const RecurrencePickerSheet({super.key, this.currentRule});
 
   static Future<String?> show(BuildContext context, {String? currentRule}) {
     return showModalBottomSheet<String?>(
@@ -35,10 +33,14 @@ class _RecurrencePickerSheetState extends State<RecurrencePickerSheet> {
   @override
   void initState() {
     super.initState();
-    _selectedPreset = TaskRecurrenceService.getPresetFromRule(widget.currentRule);
+    _selectedPreset = TaskRecurrenceService.getPresetFromRule(
+      widget.currentRule,
+    );
     if (_selectedPreset == RecurrencePreset.custom) {
       _isCustomMode = true;
-      final (freq, interval) = TaskRecurrenceService.parseCustomRule(widget.currentRule);
+      final (freq, interval) = TaskRecurrenceService.parseCustomRule(
+        widget.currentRule,
+      );
       _customFrequency = freq;
       _customInterval = interval;
     } else {
@@ -114,7 +116,9 @@ class _RecurrencePickerSheetState extends State<RecurrencePickerSheet> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    _isCustomMode ? l10n.customRecurrence : l10n.selectRecurrence,
+                    _isCustomMode
+                        ? l10n.customRecurrence
+                        : l10n.selectRecurrence,
                     style: GoogleFonts.outfit(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -218,7 +222,9 @@ class _RecurrencePickerSheetState extends State<RecurrencePickerSheet> {
               Icon(
                 icon,
                 size: 22,
-                color: isSelected ? primaryColor : theme.colorScheme.onSurfaceVariant,
+                color: isSelected
+                    ? primaryColor
+                    : theme.colorScheme.onSurfaceVariant,
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -227,16 +233,14 @@ class _RecurrencePickerSheetState extends State<RecurrencePickerSheet> {
                   style: GoogleFonts.outfit(
                     fontSize: 15,
                     fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                    color: isSelected ? primaryColor : theme.colorScheme.onSurface,
+                    color: isSelected
+                        ? primaryColor
+                        : theme.colorScheme.onSurface,
                   ),
                 ),
               ),
               if (isSelected)
-                Icon(
-                  Icons.check_circle_rounded,
-                  size: 20,
-                  color: primaryColor,
-                ),
+                Icon(Icons.check_circle_rounded, size: 20, color: primaryColor),
             ],
           ),
         ),
@@ -275,7 +279,7 @@ class _RecurrencePickerSheetState extends State<RecurrencePickerSheet> {
                         icon: const Icon(Icons.remove_rounded, size: 18),
                         onPressed: _customInterval > 1
                             ? () {
-                                HapticFeedback.lightImpact();
+                                HapticUtils.throttledLightImpact();
                                 setState(() => _customInterval--);
                               }
                             : null,
@@ -297,7 +301,7 @@ class _RecurrencePickerSheetState extends State<RecurrencePickerSheet> {
                         icon: const Icon(Icons.add_rounded, size: 18),
                         onPressed: _customInterval < 99
                             ? () {
-                                HapticFeedback.lightImpact();
+                                HapticUtils.throttledLightImpact();
                                 setState(() => _customInterval++);
                               }
                             : null,
@@ -319,28 +323,34 @@ class _RecurrencePickerSheetState extends State<RecurrencePickerSheet> {
                   ButtonSegment(
                     value: RecurrenceFrequency.weekly,
                     label: Text(
-                      _customInterval == 1 ? l10n.weekSingular : l10n.weeksPlural,
+                      _customInterval == 1
+                          ? l10n.weekSingular
+                          : l10n.weeksPlural,
                       style: GoogleFonts.outfit(fontSize: 12),
                     ),
                   ),
                   ButtonSegment(
                     value: RecurrenceFrequency.monthly,
                     label: Text(
-                      _customInterval == 1 ? l10n.monthSingular : l10n.monthsPlural,
+                      _customInterval == 1
+                          ? l10n.monthSingular
+                          : l10n.monthsPlural,
                       style: GoogleFonts.outfit(fontSize: 12),
                     ),
                   ),
                   ButtonSegment(
                     value: RecurrenceFrequency.yearly,
                     label: Text(
-                      _customInterval == 1 ? l10n.yearSingular : l10n.yearsPlural,
+                      _customInterval == 1
+                          ? l10n.yearSingular
+                          : l10n.yearsPlural,
                       style: GoogleFonts.outfit(fontSize: 12),
                     ),
                   ),
                 ],
                 selected: {_customFrequency},
                 onSelectionChanged: (newSelection) {
-                  HapticFeedback.lightImpact();
+                  HapticUtils.throttledLightImpact();
                   setState(() => _customFrequency = newSelection.first);
                 },
               ),
