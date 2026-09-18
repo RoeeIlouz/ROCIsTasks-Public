@@ -1915,4 +1915,15 @@ On mobile (Android/iOS), users were being prompted multiple times to sign in wit
 3. **Web Viewport Responsive Breakpoints (`BUG-03`)**: In `web_home_screen.dart`, raised single-column inspector view threshold from `< 600` to `< 768` and converted the dashboard stats row and greeting header to responsive `LayoutBuilder` widgets to prevent `RenderFlex` overflow errors on resize.
 4. **Micro-Haptic Feedback Throttling (`BUG-05`)**: Introduced `HapticUtils` with rate-limiting / throttle guards (100–120ms) in `lib/core/utils/haptic_utils.dart` to prevent motor buzzing and user haptic fatigue during rapid chip selections and stepper interactions across `AddTaskScreen`, `QuickAddTaskBottomSheet`, and `RecurrencePickerSheet`. Added unit test suite `test/core/utils/haptic_utils_test.dart` (3/3 passing).
 
+#### Deployment & Release Operations
+* **Shorebird Cloud Patch Deployment**:
+  - Configured Shorebird CLI (Flutter 3.47.2 engine) and authenticated.
+  - Cleared stale `.dart_tool\hooks_runner` artifacts.
+  - Successfully built and promoted **Shorebird Patch #2** (`Patch ID: 662713`) to the **`stable`** track targeting release `0.2.15+105`. All active devices will automatically receive the updates over-the-air.
+* **Git & Standalone Artifacts**:
+  - Rebased and pushed all commits to `origin/main`.
+  - Created and pushed Git release tag `v0.2.15+105`.
+  - Compiled standalone release APK at `build/app/outputs/flutter-apk/app-release.apk` (74.9 MB).
+
+
 
