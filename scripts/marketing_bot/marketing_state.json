@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-18T03:27:34.519633+00:00",
+  "last_run_timestamp": "2026-09-18T10:39:13.657069+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -2522,6 +2522,42 @@
       "title": "Roast my chart-reading app. It's the thing I wish I'd had when the tutorial loop had me stuck.",
       "url": "https://reddit.com/r/roastmystartup/comments/1wjc3tp/roast_my_chartreading_app_its_the_thing_i_wish_id/",
       "inspected_at": "2026-09-18T03:27:24.152983+00:00"
+    },
+    "reddit_1wjmjzb": {
+      "platform": "reddit",
+      "title": "Online vectorizer and svg editor.",
+      "url": "https://reddit.com/r/SideProject/comments/1wjmjzb/online_vectorizer_and_svg_editor/",
+      "inspected_at": "2026-09-18T10:38:58.294994+00:00"
+    },
+    "reddit_1wjmevx": {
+      "platform": "reddit",
+      "title": "I built a multipurpose white screen tool for lighting, tracing, screen testing and photography",
+      "url": "https://reddit.com/r/SideProject/comments/1wjmevx/i_built_a_multipurpose_white_screen_tool_for/",
+      "inspected_at": "2026-09-18T10:39:02.453120+00:00"
+    },
+    "reddit_1wjmba6": {
+      "platform": "reddit",
+      "title": "I built a free certificate maker after trying 10+ of them.",
+      "url": "https://reddit.com/r/SideProject/comments/1wjmba6/i_built_a_free_certificate_maker_after_trying_10/",
+      "inspected_at": "2026-09-18T10:39:03.293625+00:00"
+    },
+    "reddit_1wjm9ru": {
+      "platform": "reddit",
+      "title": "I recorded a real 5 minute run of the lead finder I'm building (New York marketing agencies)",
+      "url": "https://reddit.com/r/SideProject/comments/1wjm9ru/i_recorded_a_real_5_minute_run_of_the_lead_finder/",
+      "inspected_at": "2026-09-18T10:39:04.081173+00:00"
+    },
+    "reddit_1wjm5zp": {
+      "platform": "reddit",
+      "title": "I built PilotMyX because X/Twitter analytics still left me planning the next post by guesswork. Roast it.",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wjm5zp/i_built_pilotmyx_because_xtwitter_analytics_still/",
+      "inspected_at": "2026-09-18T10:39:04.774314+00:00"
+    },
+    "reddit_1wjm3qq": {
+      "platform": "reddit",
+      "title": "OGCraft (Dynamic OpenGraph images via API)",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wjm3qq/ogcraft_dynamic_opengraph_images_via_api/",
+      "inspected_at": "2026-09-18T10:39:05.626220+00:00"
     }
   },
   "pending_drafts": {
