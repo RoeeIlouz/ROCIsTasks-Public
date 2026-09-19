@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-19T03:19:00.662337+00:00",
+  "last_run_timestamp": "2026-09-19T10:23:53.314312+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -2666,6 +2666,42 @@
       "title": "Roast my portfolio-risk tool — built it, barely tested it on real strangers yet",
       "url": "https://reddit.com/r/roastmystartup/comments/1wk5np6/roast_my_portfoliorisk_tool_built_it_barely/",
       "inspected_at": "2026-09-19T03:18:45.730727+00:00"
+    },
+    "reddit_1wkik0w": {
+      "platform": "reddit",
+      "title": "Building an app has become easy. Deploying it properly is still painful. So I built something for that.",
+      "url": "https://reddit.com/r/SideProject/comments/1wkik0w/building_an_app_has_become_easy_deploying_it/",
+      "inspected_at": "2026-09-19T10:23:31.701582+00:00"
+    },
+    "reddit_1wkic2m": {
+      "platform": "reddit",
+      "title": "I built a free stock analysis tool after getting frustrated with Bloomberg's price tag — would love feedback from actual investors",
+      "url": "https://reddit.com/r/SideProject/comments/1wkic2m/i_built_a_free_stock_analysis_tool_after_getting/",
+      "inspected_at": "2026-09-19T10:23:39.907421+00:00"
+    },
+    "reddit_1wki9pb": {
+      "platform": "reddit",
+      "title": "anyone else hate managing shared subscriptions? I built a small app to fix it",
+      "url": "https://reddit.com/r/SideProject/comments/1wki9pb/anyone_else_hate_managing_shared_subscriptions_i/",
+      "inspected_at": "2026-09-19T10:23:40.703865+00:00"
+    },
+    "reddit_1wki7i3": {
+      "platform": "reddit",
+      "title": "Spent almost a year building a desk robot. It now beats me at chess and plays its own victory music.",
+      "url": "https://reddit.com/r/SideProject/comments/1wki7i3/spent_almost_a_year_building_a_desk_robot_it_now/",
+      "inspected_at": "2026-09-19T10:23:41.535400+00:00"
+    },
+    "reddit_1wjuis7": {
+      "platform": "reddit",
+      "title": "Roast my post-launch recipe costing SaaS, I think my trust signals are broken",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wjuis7/roast_my_postlaunch_recipe_costing_saas_i_think/",
+      "inspected_at": "2026-09-19T10:23:42.481036+00:00"
+    },
+    "reddit_1wjoi5k": {
+      "platform": "reddit",
+      "title": "Panic/anxiety relief app looking for beta testers to break the flow before I build it (Updated)",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wjoi5k/panicanxiety_relief_app_looking_for_beta_testers/",
+      "inspected_at": "2026-09-19T10:23:43.351093+00:00"
     }
   },
   "pending_drafts": {
@@ -3002,7 +3038,7 @@
     }
   },
   "recorded_feedback": [],
-  "last_organic_post_timestamp": "2026-09-18T15:55:46.577173+00:00",
+  "last_organic_post_timestamp": "2026-09-19T10:23:52.956421+00:00",
   "organic_posts": [
     {
       "text": "you either die a young enthusiastic builder or live long enough to realize that 90% of tech problems are solved by restarting the router.",
@@ -3181,6 +3217,15 @@
         "Bluesky"
       ],
       "posted_at": "2026-09-18T15:55:46.577173+00:00"
+    },
+    {
+      "text": "my home server has an uptime of 114 days and at this point i'm terrified to vacuum anywhere near the power strip.",
+      "topic": "scuba_diving_and_ocean",
+      "platforms": [
+        "Twitter/X",
+        "Bluesky"
+      ],
+      "posted_at": "2026-09-19T10:23:52.956421+00:00"
     }
   ],
   "x_posts_timestamps": [
@@ -3193,7 +3238,8 @@
     "2026-09-14T03:34:01.052334+00:00",
     "2026-09-15T11:11:24.658980+00:00",
     "2026-09-16T16:14:14.756027+00:00",
-    "2026-09-18T03:27:33.829608+00:00"
+    "2026-09-18T03:27:33.829608+00:00",
+    "2026-09-19T10:23:52.441479+00:00"
   ],
   "posted_devlogs": {
     "devlog_0_2_2_60_2026_07_17_190f9f3082": {
