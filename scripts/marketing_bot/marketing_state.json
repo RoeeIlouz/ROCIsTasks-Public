@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-19T10:23:53.314312+00:00",
+  "last_run_timestamp": "2026-09-19T15:26:21.367489+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -2702,6 +2702,42 @@
       "title": "Panic/anxiety relief app looking for beta testers to break the flow before I build it (Updated)",
       "url": "https://reddit.com/r/roastmystartup/comments/1wjoi5k/panicanxiety_relief_app_looking_for_beta_testers/",
       "inspected_at": "2026-09-19T10:23:43.351093+00:00"
+    },
+    "reddit_1wkp1ad": {
+      "platform": "reddit",
+      "title": "My mom called asking which insurance policy covers her roof, and I couldn't find the PDF. That's how Goffer started.",
+      "url": "https://reddit.com/r/SideProject/comments/1wkp1ad/my_mom_called_asking_which_insurance_policy/",
+      "inspected_at": "2026-09-19T15:26:05.299739+00:00"
+    },
+    "reddit_1wkozg5": {
+      "platform": "reddit",
+      "title": "I've watched hundreds of episodes of anime and learned maybe six words. So I built this.",
+      "url": "https://reddit.com/r/SideProject/comments/1wkozg5/ive_watched_hundreds_of_episodes_of_anime_and/",
+      "inspected_at": "2026-09-19T15:26:09.162416+00:00"
+    },
+    "reddit_1wkoxns": {
+      "platform": "reddit",
+      "title": "Gustave Eiffel didn't design the Eiffel Tower. Nothing on site tells you that, so I built this.",
+      "url": "https://reddit.com/r/SideProject/comments/1wkoxns/gustave_eiffel_didnt_design_the_eiffel_tower/",
+      "inspected_at": "2026-09-19T15:26:10.291957+00:00"
+    },
+    "reddit_1wkgkr2": {
+      "platform": "reddit",
+      "title": "[For Hire] Web & Mobile App Developer — Websites, Web Apps, Android & iOS",
+      "url": "https://reddit.com/r/indiehackers/comments/1wkgkr2/for_hire_web_mobile_app_developer_websites_web/",
+      "inspected_at": "2026-09-19T15:26:11.010047+00:00"
+    },
+    "reddit_1wjgy5t": {
+      "platform": "reddit",
+      "title": "Roast my email tool. I'm 17, no users, and I turned the paywall on anyway.",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wjgy5t/roast_my_email_tool_im_17_no_users_and_i_turned/",
+      "inspected_at": "2026-09-19T15:26:12.308868+00:00"
+    },
+    "reddit_1wkmw0p": {
+      "platform": "reddit",
+      "title": "Day 2 of building FocusFlow — making it feel like a real app 🎨",
+      "url": "https://reddit.com/r/FlutterDev/comments/1wkmw0p/day_2_of_building_focusflow_making_it_feel_like_a/",
+      "inspected_at": "2026-09-19T15:26:13.351217+00:00"
     }
   },
   "pending_drafts": {
