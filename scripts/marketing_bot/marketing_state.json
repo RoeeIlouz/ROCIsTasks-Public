@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-18T20:27:52.213576+00:00",
+  "last_run_timestamp": "2026-09-19T03:19:00.662337+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -2630,6 +2630,42 @@
       "title": "Every app uses the hook model to keep you hooked. Mine uses it to get you off your vape. Roast me.",
       "url": "https://reddit.com/r/roastmystartup/comments/1wjxxur/every_app_uses_the_hook_model_to_keep_you_hooked/",
       "inspected_at": "2026-09-18T20:27:44.084755+00:00"
+    },
+    "reddit_1wkau6u": {
+      "platform": "reddit",
+      "title": "I need my first paid user",
+      "url": "https://reddit.com/r/SideProject/comments/1wkau6u/i_need_my_first_paid_user/",
+      "inspected_at": "2026-09-19T03:18:19.008631+00:00"
+    },
+    "reddit_1wkas22": {
+      "platform": "reddit",
+      "title": "Launched: infinite graffiti wall (1usd/tile) — Stripe + Next.js + two Postgres tables",
+      "url": "https://reddit.com/r/SideProject/comments/1wkas22/launched_infinite_graffiti_wall_1usdtile_stripe/",
+      "inspected_at": "2026-09-19T03:18:25.584032+00:00"
+    },
+    "reddit_1wkaqlg": {
+      "platform": "reddit",
+      "title": "Dictivo: local dictation for Mac and Windows, with an optional cloud mode",
+      "url": "https://reddit.com/r/SideProject/comments/1wkaqlg/dictivo_local_dictation_for_mac_and_windows_with/",
+      "inspected_at": "2026-09-19T03:18:28.077682+00:00"
+    },
+    "reddit_1wkaopi": {
+      "platform": "reddit",
+      "title": "People running several projects at once, how do you manage it mentally?",
+      "url": "https://reddit.com/r/SideProject/comments/1wkaopi/people_running_several_projects_at_once_how_do/",
+      "inspected_at": "2026-09-19T03:18:39.437276+00:00"
+    },
+    "reddit_1wk9w80": {
+      "platform": "reddit",
+      "title": "Well, after a year of growing the courage to start, finding a CTO, and building, I am happy to say I launched today! Follow me on my path to get acquired by Reddit!",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wk9w80/well_after_a_year_of_growing_the_courage_to_start/",
+      "inspected_at": "2026-09-19T03:18:42.638658+00:00"
+    },
+    "reddit_1wk5np6": {
+      "platform": "reddit",
+      "title": "Roast my portfolio-risk tool — built it, barely tested it on real strangers yet",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wk5np6/roast_my_portfoliorisk_tool_built_it_barely/",
+      "inspected_at": "2026-09-19T03:18:45.730727+00:00"
     }
   },
   "pending_drafts": {
