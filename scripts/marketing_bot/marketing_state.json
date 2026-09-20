@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-20T15:32:54.050820+00:00",
+  "last_run_timestamp": "2026-09-20T20:23:41.939472+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -2882,6 +2882,42 @@
       "title": "Flutter in 2026: How AI, GenUI, Impeller and WebAssembly could change Flutter development",
       "url": "https://reddit.com/r/FlutterDev/comments/1wlhi2u/flutter_in_2026_how_ai_genui_impeller_and/",
       "inspected_at": "2026-09-20T15:32:45.711722+00:00"
+    },
+    "reddit_1wlrqz4": {
+      "platform": "reddit",
+      "title": "Monni - An iPad tester made me rethink my iPhone-first pitch",
+      "url": "https://reddit.com/r/SideProject/comments/1wlrqz4/monni_an_ipad_tester_made_me_rethink_my/",
+      "inspected_at": "2026-09-20T20:23:26.908077+00:00"
+    },
+    "reddit_1wlro2v": {
+      "platform": "reddit",
+      "title": "Ah, another RSS reader !",
+      "url": "https://reddit.com/r/SideProject/comments/1wlro2v/ah_another_rss_reader/",
+      "inspected_at": "2026-09-20T20:23:28.532322+00:00"
+    },
+    "reddit_1wlrlc7": {
+      "platform": "reddit",
+      "title": "I built a geopolitical conflict simulator, would you actually use something like this?",
+      "url": "https://reddit.com/r/SideProject/comments/1wlrlc7/i_built_a_geopolitical_conflict_simulator_would/",
+      "inspected_at": "2026-09-20T20:23:29.364881+00:00"
+    },
+    "reddit_1wlrkuc": {
+      "platform": "reddit",
+      "title": "i built a little Texas lease helper after listing rent and the real number didn’t match",
+      "url": "https://reddit.com/r/SideProject/comments/1wlrkuc/i_built_a_little_texas_lease_helper_after_listing/",
+      "inspected_at": "2026-09-20T20:23:30.198991+00:00"
+    },
+    "reddit_1wlgcrw": {
+      "platform": "reddit",
+      "title": "I built a private, algorithm-free social app solo and paid ₹8.7k for an Apple dev account despite not owning a Mac. Here are 6 months of real numbers.",
+      "url": "https://reddit.com/r/indiehackers/comments/1wlgcrw/i_built_a_private_algorithmfree_social_app_solo/",
+      "inspected_at": "2026-09-20T20:23:30.931873+00:00"
+    },
+    "reddit_1wkted6": {
+      "platform": "reddit",
+      "title": "I built a free app so beginners can practice investing without risking a dirham. Tear it apart.",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wkted6/i_built_a_free_app_so_beginners_can_practice/",
+      "inspected_at": "2026-09-20T20:23:31.843057+00:00"
     }
   },
   "pending_drafts": {
@@ -3218,7 +3254,7 @@
     }
   },
   "recorded_feedback": [],
-  "last_organic_post_timestamp": "2026-09-20T03:37:03.504800+00:00",
+  "last_organic_post_timestamp": "2026-09-20T20:23:41.509891+00:00",
   "organic_posts": [
     {
       "text": "you either die a young enthusiastic builder or live long enough to realize that 90% of tech problems are solved by restarting the router.",
@@ -3414,6 +3450,15 @@
         "Bluesky"
       ],
       "posted_at": "2026-09-20T03:37:03.504800+00:00"
+    },
+    {
+      "text": "nobody talks about the emotional transition between 'today i will study for my exam' and 'today i will rewrite my entire dotfiles configuration from scratch'.",
+      "topic": "coffee_and_sleep_delusions",
+      "platforms": [
+        "Twitter/X",
+        "Bluesky"
+      ],
+      "posted_at": "2026-09-20T20:23:41.509891+00:00"
     }
   ],
   "x_posts_timestamps": [
@@ -3427,7 +3472,8 @@
     "2026-09-15T11:11:24.658980+00:00",
     "2026-09-16T16:14:14.756027+00:00",
     "2026-09-18T03:27:33.829608+00:00",
-    "2026-09-19T10:23:52.441479+00:00"
+    "2026-09-19T10:23:52.441479+00:00",
+    "2026-09-20T20:23:41.196159+00:00"
   ],
   "posted_devlogs": {
     "devlog_0_2_2_60_2026_07_17_190f9f3082": {
