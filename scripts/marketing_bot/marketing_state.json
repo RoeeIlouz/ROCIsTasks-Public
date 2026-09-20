@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-20T10:42:55.715930+00:00",
+  "last_run_timestamp": "2026-09-20T13:30:15.221607+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -3427,16 +3427,16 @@
     ]
   },
   "analytics_snapshot": {
-    "timestamp": "2026-09-13T13:43:09.166228+00:00",
+    "timestamp": "2026-09-20T13:30:13.622927+00:00",
     "devto": {
-      "total_views": 124,
+      "total_views": 134,
       "total_reactions": 1,
       "total_comments": 0,
       "top_article": {
         "id": 4583434,
         "title": "Why Google Tasks Sync Was Silently Failing Every Hour (And How I Fixed It)",
         "url": "https://dev.to/rocisapps/why-google-tasks-sync-was-silently-failing-every-hour-and-how-i-fixed-it-1cao",
-        "page_views_count": 30,
+        "page_views_count": 40,
         "positive_reactions_count": 0,
         "comments_count": 0,
         "published": true
@@ -3448,12 +3448,12 @@
       "total_posts": 0
     },
     "bluesky": {
-      "followers": 4,
-      "posts": 5
+      "followers": 5,
+      "posts": 13
     },
     "mastodon": {
       "followers": 0,
-      "statuses": 5
+      "statuses": 12
     },
     "app_stats": {
       "total_devlogs_published": 3,
