@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-20T13:30:15.221607+00:00",
+  "last_run_timestamp": "2026-09-20T15:32:54.050820+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -2846,6 +2846,42 @@
       "title": "🚀 Flutter is changing — and so is the role of Flutter developers.",
       "url": "https://reddit.com/r/FlutterDev/comments/1wlcqmx/flutter_is_changing_and_so_is_the_role_of_flutter/",
       "inspected_at": "2026-09-20T10:42:47.645146+00:00"
+    },
+    "reddit_1wljzo8": {
+      "platform": "reddit",
+      "title": "Astro: Space Explorer",
+      "url": "https://reddit.com/r/SideProject/comments/1wljzo8/astro_space_explorer/",
+      "inspected_at": "2026-09-20T15:31:23.989266+00:00"
+    },
+    "reddit_1wljveu": {
+      "platform": "reddit",
+      "title": "Reaper Monitor - a native Mac process monitor with port search and process history",
+      "url": "https://reddit.com/r/SideProject/comments/1wljveu/reaper_monitor_a_native_mac_process_monitor_with/",
+      "inspected_at": "2026-09-20T15:31:29.288939+00:00"
+    },
+    "reddit_1wljtu9": {
+      "platform": "reddit",
+      "title": "I got tired of checking safe area insets in Simulator every time a new iPhone came out, so I built a website",
+      "url": "https://reddit.com/r/SideProject/comments/1wljtu9/i_got_tired_of_checking_safe_area_insets_in/",
+      "inspected_at": "2026-09-20T15:31:33.817896+00:00"
+    },
+    "reddit_1wlculm": {
+      "platform": "reddit",
+      "title": "We’re building GELAI — making AI cheaper, faster, and easier to operate.",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wlculm/were_building_gelai_making_ai_cheaper_faster_and/",
+      "inspected_at": "2026-09-20T15:31:34.680710+00:00"
+    },
+    "reddit_1wljmaf": {
+      "platform": "reddit",
+      "title": "First day developing with Flutter in 2026",
+      "url": "https://reddit.com/r/FlutterDev/comments/1wljmaf/first_day_developing_with_flutter_in_2026/",
+      "inspected_at": "2026-09-20T15:32:11.702756+00:00"
+    },
+    "reddit_1wlhi2u": {
+      "platform": "reddit",
+      "title": "Flutter in 2026: How AI, GenUI, Impeller and WebAssembly could change Flutter development",
+      "url": "https://reddit.com/r/FlutterDev/comments/1wlhi2u/flutter_in_2026_how_ai_genui_impeller_and/",
+      "inspected_at": "2026-09-20T15:32:45.711722+00:00"
     }
   },
   "pending_drafts": {
