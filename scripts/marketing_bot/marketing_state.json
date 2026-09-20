@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-20T03:37:03.841821+00:00",
+  "last_run_timestamp": "2026-09-20T10:42:55.715930+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -2810,6 +2810,42 @@
       "title": "Release - dev tools ported from React Native",
       "url": "https://reddit.com/r/FlutterDev/comments/1wl0cmf/release_dev_tools_ported_from_react_native/",
       "inspected_at": "2026-09-20T03:36:54.066219+00:00"
+    },
+    "reddit_1wldlp0": {
+      "platform": "reddit",
+      "title": "I built a shared family planner because my partner and I kept double-booking the same weekend. Three weeks on the App Store, zero reviews.",
+      "url": "https://reddit.com/r/SideProject/comments/1wldlp0/i_built_a_shared_family_planner_because_my/",
+      "inspected_at": "2026-09-20T10:42:34.509305+00:00"
+    },
+    "reddit_1wldlb3": {
+      "platform": "reddit",
+      "title": "Interest Check: CIAM system that doesn't suck",
+      "url": "https://reddit.com/r/SideProject/comments/1wldlb3/interest_check_ciam_system_that_doesnt_suck/",
+      "inspected_at": "2026-09-20T10:42:37.775937+00:00"
+    },
+    "reddit_1wldfvq": {
+      "platform": "reddit",
+      "title": "If you break your arm, maybe don’t keep coding",
+      "url": "https://reddit.com/r/SideProject/comments/1wldfvq/if_you_break_your_arm_maybe_dont_keep_coding/",
+      "inspected_at": "2026-09-20T10:42:40.042013+00:00"
+    },
+    "reddit_1wldec0": {
+      "platform": "reddit",
+      "title": "IDify: Create passport photos from your phone",
+      "url": "https://reddit.com/r/SideProject/comments/1wldec0/idify_create_passport_photos_from_your_phone/",
+      "inspected_at": "2026-09-20T10:42:46.303284+00:00"
+    },
+    "reddit_1wldmk7": {
+      "platform": "reddit",
+      "title": "$20,000 Flutter/Serverpod hackathon. Four weeks to build something real.",
+      "url": "https://reddit.com/r/FlutterDev/comments/1wldmk7/20000_flutterserverpod_hackathon_four_weeks_to/",
+      "inspected_at": "2026-09-20T10:42:46.917910+00:00"
+    },
+    "reddit_1wlcqmx": {
+      "platform": "reddit",
+      "title": "🚀 Flutter is changing — and so is the role of Flutter developers.",
+      "url": "https://reddit.com/r/FlutterDev/comments/1wlcqmx/flutter_is_changing_and_so_is_the_role_of_flutter/",
+      "inspected_at": "2026-09-20T10:42:47.645146+00:00"
     }
   },
   "pending_drafts": {
