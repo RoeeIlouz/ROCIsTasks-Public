@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-19T20:07:06.971013+00:00",
+  "last_run_timestamp": "2026-09-20T03:37:03.841821+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -2774,6 +2774,42 @@
       "title": "Why developers choose Flutter over React Native in 2026 (Performance, Hot Reload, UI)",
       "url": "https://reddit.com/r/FlutterDev/comments/1wksxy3/why_developers_choose_flutter_over_react_native/",
       "inspected_at": "2026-09-19T20:06:58.646211+00:00"
+    },
+    "reddit_1wl61nh": {
+      "platform": "reddit",
+      "title": "I'm write code to formalize Principia Mathematica",
+      "url": "https://reddit.com/r/SideProject/comments/1wl61nh/im_write_code_to_formalize_principia_mathematica/",
+      "inspected_at": "2026-09-20T03:36:05.152217+00:00"
+    },
+    "reddit_1wl6055": {
+      "platform": "reddit",
+      "title": "I built an API that aggregates 534+ government bid portals into one feed",
+      "url": "https://reddit.com/r/SideProject/comments/1wl6055/i_built_an_api_that_aggregates_534_government_bid/",
+      "inspected_at": "2026-09-20T03:36:51.078389+00:00"
+    },
+    "reddit_1wl5ya4": {
+      "platform": "reddit",
+      "title": "JEV plays minecraft in realtime (sort of)",
+      "url": "https://reddit.com/r/SideProject/comments/1wl5ya4/jev_plays_minecraft_in_realtime_sort_of/",
+      "inspected_at": "2026-09-20T03:36:51.830918+00:00"
+    },
+    "reddit_1wl5qap": {
+      "platform": "reddit",
+      "title": "A directory of curated use cases for Meta's Muse agent and Muse Code.",
+      "url": "https://reddit.com/r/SideProject/comments/1wl5qap/a_directory_of_curated_use_cases_for_metas_muse/",
+      "inspected_at": "2026-09-20T03:36:52.548861+00:00"
+    },
+    "reddit_1wl5a86": {
+      "platform": "reddit",
+      "title": "I built motion_number: a Flutter package for smooth, per-digit animated counters",
+      "url": "https://reddit.com/r/FlutterDev/comments/1wl5a86/i_built_motion_number_a_flutter_package_for/",
+      "inspected_at": "2026-09-20T03:36:53.235492+00:00"
+    },
+    "reddit_1wl0cmf": {
+      "platform": "reddit",
+      "title": "Release - dev tools ported from React Native",
+      "url": "https://reddit.com/r/FlutterDev/comments/1wl0cmf/release_dev_tools_ported_from_react_native/",
+      "inspected_at": "2026-09-20T03:36:54.066219+00:00"
     }
   },
   "pending_drafts": {
@@ -3110,7 +3146,7 @@
     }
   },
   "recorded_feedback": [],
-  "last_organic_post_timestamp": "2026-09-19T10:23:52.956421+00:00",
+  "last_organic_post_timestamp": "2026-09-20T03:37:03.504800+00:00",
   "organic_posts": [
     {
       "text": "you either die a young enthusiastic builder or live long enough to realize that 90% of tech problems are solved by restarting the router.",
@@ -3298,6 +3334,14 @@
         "Bluesky"
       ],
       "posted_at": "2026-09-19T10:23:52.956421+00:00"
+    },
+    {
+      "text": "spending 4 hours debugging an electrical engineering circuit lab only to discover a faulty breadboard jumper wire is peak character building.",
+      "topic": "ee_engineering_struggles",
+      "platforms": [
+        "Bluesky"
+      ],
+      "posted_at": "2026-09-20T03:37:03.504800+00:00"
     }
   ],
   "x_posts_timestamps": [
@@ -3337,13 +3381,13 @@
     }
   },
   "tuned_queries_cache": {
-    "timestamp": 1789269724.7735054,
+    "timestamp": 1789875323.8124912,
     "queries": [
-      "flutter offline task manager",
-      "calendar sync todo list",
-      "offline first productivity app",
-      "task manager with home widgets",
-      "university timetable task app"
+      "offline recurring task app",
+      "fast flutter todo list",
+      "calendar sync task manager",
+      "local first productivity app",
+      "todo list with home widget"
     ]
   },
   "analytics_snapshot": {
