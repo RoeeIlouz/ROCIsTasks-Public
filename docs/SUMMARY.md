@@ -2,6 +2,71 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## ROCIs-Schedule Cross-App Synergy & Android FullCalendar Widget Optimization - 2026-09-21
+
+#### Problem & Root Causes
+* **Missing ROCIs-Schedule Events in App & Widget**:
+  - Secondary Firebase configuration in `lib/firebase_schedule_options.dart` contained placeholder dummy values (`YOUR_SCHEDULE_API_KEY`), causing `[core/invalid-api-key]` crashes during boot.
+  - Secondary Firebase Auth was unauthenticated, resulting in Firestore `permission-denied` errors when querying the user's courses and schedule events.
+  - `SyncedScheduleEvent.occursOnDay` enforced `if (normalizedDay.isBefore(eventStartDay)) return false;`. Because `startTime` is often the creation timestamp or hour/minute placeholder, any day prior to creation was pruned, causing recurring classes to vanish from previous months or during month switches.
+  - No fallback cache existed when the user was offline or secondary auth was refreshing.
+* **FullCalendar Android Home Widget Lag & Month Drop**:
+  - `full_calendar_widget_service.dart` only queried events for the current 42-day window (`startDate` to `endDate`).
+  - When switching months, Kotlin updated `PREF_OFFSET` and read `PREF_GRID_DATA`, which contained zero data for the new month, rendering it completely blank.
+  - Kotlin sent an immediate background broadcast on every month tap, booting a heavy Flutter background engine on the CPU that dropped launcher frames and stuttered launcher animations.
+  - Consecutive rapid month clicks queued multiple Flutter engines in parallel, resulting in race conditions and lag.
+
+#### Solutions Applied
+1. **Firebase Configuration & Authentication Pipeline**:
+   - Configured production Firebase options for `rocis-schedule` project in `lib/firebase_schedule_options.dart` across Android, Web, and iOS.
+   - Sequenced secondary authentication in `AuthService` (`ensureSecondaryAuth()`), persisting `cached_schedule_user_id` to `SharedPreferences` and linking Google credentials silently via `attemptLightweightAuthentication()`.
+   - Added persistent SharedPreferences caching (`cached_schedule_events_json`) in `ScheduleFirestoreService` with offline fallback so schedule events are never wiped.
+2. **Calendar Provider & Recurrence Calculation (`calendar_provider.dart`)**:
+   - Removed artificial `isBefore(eventStartDay)` barrier in `SyncedScheduleEvent.occursOnDay`.
+   - Expanded recurring schedule mapping window to 5 years (`_selectedDate.year - 2` to `_selectedDate.year + 2`).
+   - Fixed daylight savings time (DST) hour-drifting bug by switching from `cur.add(Duration(days: 1))` to `DateTime(cur.year, cur.month, cur.day + 1)`.
+   - Ensured secondary authentication is established before fetching events and synced the home widget asynchronously on load.
+3. **Multi-Month Event Pre-Buffering (`full_calendar_widget_service.dart`)**:
+   - Expanded widget event buffer window from -3 months to +6 months relative to the target month.
+   - Pre-indexed all Google Calendar events, ROCIs Schedule classes, and tasks (including recurring instances via `TaskRecurrenceService`) into a unified `full_calendar_events_by_date` JSON map (`Map<String, List<Map<String, dynamic>>>`).
+   - Saved `full_calendar_events_by_date` alongside `full_calendar_grid_data` for seamless multi-month availability.
+4. **Android Native Zero-Lag Navigation (`FullCalendarWidgetUtils.kt`, `FullCalendarWidgetService.kt`, `FullCalendarWidgetProvider.kt`)**:
+   - Added `PREF_EVENTS_BY_DATE` constant in `FullCalendarWidgetUtils.kt`.
+   - Updated `FullCalendarWidgetFactory.onDataSetChanged()` to index summaries directly from `PREF_EVENTS_BY_DATE`, instantly populating past and future months upon navigation.
+   - Added debounced background sync (`scheduleBackgroundNav`) in `FullCalendarWidgetProvider.kt`: when navigating within the pre-buffered range (-2 to +5), Kotlin updates the UI instantly (16ms) without spawning a heavy Flutter background engine, debouncing the background sync by 1.2s. Immediate sync is reserved for distant months outside the cache.
+5. **Verification**:
+   - `flutter analyze lib/ test/`: 0 errors, 0 warnings (100% clean).
+   - `test/features/calendar/synced_schedule_event_test.dart`: 7/7 tests passed (100%).
+
+#### Deployment & Release: 0.2.16+106
+* **App Version Protocol**: Applied new version layout `xx.yy.zz` (`xx=0` prod, `yy=2` open beta, `zz=16` internal testing, build `106`).
+* **Version & Changelog Sync**: Synchronized `pubspec.yaml` (`0.2.16+106`) and `lib/core/config/app_config.dart` (`0.2.16`), added concise entry (< 500 chars) to `docs/CHANGELOG.md`.
+* **Shorebird Release**: Registered and published release `0.2.16+106` with Flutter 3.47.2 engine on Shorebird cloud.
+* **Google Play Console**: Uploaded release AAB bundle (`70.0 MB`, version code `106`) directly to the `internal` testing track using `scripts/upload_aab_internal.py`.
+
+## Recurring Tasks Immediate Reappearance Fix & Deferred Model Alignment - 2026-09-19
+
+#### Problem & Root Causes
+* **Immediate Reappearance on Completion**: When marking an overdue recurring task or same-day recurring task as completed, it immediately reappeared in the active task list with no changes.
+* **Flawed `targetAfter` Recurrence Math**: When completing an overdue task (e.g. daily task due at 18:00 completed at 13:00 today), `TaskRecurrenceService.getNextDueDate` evaluated the next occurrence strictly after 13:00 today. Because 18:00 today had not yet passed, it returned **today at 18:00** as the "next" occurrence.
+* **Immediate Materialization Fallback**: In `TaskProvider.toggleTaskCompletion`, if `nextDueDate` was calculated for today (`!nextDay.isAfter(today)`), the `else` branch ran `await _materializeRecurringTask(task, nextDueDate)`. This immediately spawned an uncompleted clone with today's due date back into the active list.
+* **Web Inspector Double-Toggle**: In `web_home_screen.dart`, clicking the inspector completion status button called `provider.toggleTaskCompletion(_selectedTask!)` (in-place mutation) and immediately followed with `setState(() { _selectedTask = _selectedTask!.copyWith(isCompleted: !_selectedTask!.isCompleted); })`, accidentally inverting the boolean twice and reverting completion.
+
+#### Solutions Applied
+1. **Recurrence Engine (`TaskRecurrenceService`)**:
+   - Updated `getNextDueDate` and `_calculateNextDateFallback`: when advancing recurrence from completion (`after != null`), `targetAfter` is evaluated against the end of the completion day (`DateTime(after.year, after.month, after.day, 23, 59, 59, 999)`) or `currentDueDate`, whichever is later.
+   - Guaranteed that completing an overdue or same-day recurring task always advances strictly to a future day ($D \ge \text{tomorrow}$), completely preventing same-day re-occurrence.
+   - Built `startUtc` using `DateTime.utc(currentDueDate.year, ...)` to ensure local calendar dates never suffer from UTC day-shifts across timezones.
+2. **Provider Orchestration (`TaskProvider`)**:
+   - In `toggleTaskCompletion`: strictly adhered to the deferred materialization model. Removed the immediate `_materializeRecurringTask` fallback branch. Next iterations are recorded in `task.nextRecurrenceDate` and projected in "Upcoming Recurring" until their scheduled date arrives.
+   - In `checkAndMaterializeDueRecurringTasks()`: tasks completed today are never materialized on the same day.
+3. **Web Home Screen (`web_home_screen.dart`)**:
+   - Fixed the task inspector completion button to avoid flipping `!_selectedTask!.isCompleted` again after `toggleTaskCompletion`.
+4. **Verification**:
+   - `flutter analyze`: 0 issues found.
+   - `flutter test`: 357 / 357 tests passed (100%).
+   - Added unit tests for completing overdue tasks, same-day early/late completions, and verifying strictly future deferred scheduling without duplicate task creation.
+
 ## Deferred Recurring Tasks Materialization & Upcoming Projections - 2026-09-17
 
 #### Problem & Requirements

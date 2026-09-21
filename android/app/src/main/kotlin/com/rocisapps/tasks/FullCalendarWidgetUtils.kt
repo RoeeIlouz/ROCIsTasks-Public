@@ -37,6 +37,7 @@ object FullCalendarWidgetUtils {
     const val PREF_START_OF_WEEK = "full_calendar_start_of_week"
     const val PREF_SELECTED_DATE = "full_calendar_selected_date"
     const val PREF_GRID_DATA = "full_calendar_grid_data"
+    const val PREF_EVENTS_BY_DATE = "full_calendar_events_by_date"
     const val PREF_IS_PREMIUM = "is_premium"
 
     // Defaults

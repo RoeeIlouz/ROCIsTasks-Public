@@ -11,6 +11,7 @@ import 'package:rocis_tasks/core/services/schedule_firestore_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:rocis_tasks/features/tasks/data/datasources/local_task_source.dart';
+import 'package:rocis_tasks/features/tasks/domain/services/task_recurrence_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:rocis_tasks/core/services/auth/google_oauth_manager.dart';
@@ -241,18 +242,32 @@ class FullCalendarWidgetService {
       final targetMonth = DateTime(now.year, now.month + offset, 1);
       final monthName = DateFormat('MMMM yyyy', localeCode).format(targetMonth);
 
+      // Multi-month buffer window: from 3 months before targetMonth to 6 months after
+      final bufferStartDate = DateTime(
+        targetMonth.year,
+        targetMonth.month - 3,
+        1,
+      );
+      final bufferEndDate = DateTime(
+        targetMonth.year,
+        targetMonth.month + 7,
+        0,
+        23,
+        59,
+        59,
+      );
+
       // Calculate calendar grid (6 weeks) based on startOfWeek preference (7=Sunday, 1=Monday, 6=Saturday)
       final startOfWeek = prefs.getInt('full_calendar_start_of_week') ?? 7;
       final firstDayOfMonth = targetMonth;
       final difference = (firstDayOfMonth.weekday - startOfWeek) % 7;
       final startDate = firstDayOfMonth.subtract(Duration(days: difference));
-      final endDate = startDate.add(const Duration(days: 41));
 
       // 1. Fetch Google Calendar events (if filter enabled)
       Future<List<dynamic>> fetchGoogleEvents() async {
         if (!filters.showGoogleCalendar) return [];
         final cacheKey =
-            '${startDate.toIso8601String()}_${endDate.toIso8601String()}_${filters.selectedCalendarIds.join(',')}';
+            '${bufferStartDate.toIso8601String()}_${bufferEndDate.toIso8601String()}_${filters.selectedCalendarIds.join(',')}';
         if (!forceRefresh &&
             _cachedEvents != null &&
             _cachedEventsKey == cacheKey &&
@@ -262,8 +277,8 @@ class FullCalendarWidgetService {
         }
         try {
           final res = await _calendarService.getEvents(
-            startDate: startDate,
-            endDate: endDate,
+            startDate: bufferStartDate,
+            endDate: bufferEndDate,
             calendarIds: filters.selectedCalendarIds,
           );
           _cachedEvents = res;
@@ -408,22 +423,22 @@ class FullCalendarWidgetService {
           }
           final key = DateFormat('yyyy-MM-dd').format(day);
           eventsByDate.putIfAbsent(key, () => []).add(event);
-          day = day.add(const Duration(days: 1));
+          day = DateTime(day.year, day.month, day.day + 1);
         }
       }
 
-      // Pre-index ROCIs Schedule events by date for O(1) lookup
+      // Pre-index ROCIs Schedule events by date for O(1) lookup across the multi-month buffer
       final scheduleEventsByDate = <String, List<SyncedScheduleEvent>>{};
       if (filters.showRocisSchedule) {
         for (final sEvent in scheduleEvents) {
           if (sEvent.recurring) {
-            DateTime day = startDate;
-            while (!day.isAfter(endDate)) {
+            DateTime day = bufferStartDate;
+            while (!day.isAfter(bufferEndDate)) {
               if (sEvent.occursOnDay(day)) {
                 final key = DateFormat('yyyy-MM-dd').format(day);
                 scheduleEventsByDate.putIfAbsent(key, () => []).add(sEvent);
               }
-              day = day.add(const Duration(days: 1));
+              day = DateTime(day.year, day.month, day.day + 1);
             }
           } else {
             final key = DateFormat('yyyy-MM-dd').format(sEvent.startTime);
@@ -432,37 +447,164 @@ class FullCalendarWidgetService {
         }
       }
 
-      // Pre-index tasks by date for O(1) lookup
+      // Pre-index tasks by date for O(1) lookup across the multi-month buffer
       final tasksByDate = <String, List<dynamic>>{};
-      List<dynamic> filteredTasks = [];
-      try {
-        final allTasks = _taskSource.getTasks();
-        if (filters.showTasks) {
-          filteredTasks = allTasks
-              .where(
-                (t) =>
-                    !(t.isDeleted ?? false) &&
-                    !t.isCompleted &&
-                    t.dueDate != null,
-              )
-              .toList();
-        }
-      } catch (e, stack) {
-        AppLogger.error(
-          'Failed to fetch tasks for widget',
-          error: e,
-          stack: stack,
-        );
-      }
+      if (filters.showTasks) {
+        try {
+          final allTasks = _taskSource.getTasks();
+          for (final t in allTasks) {
+            if ((t.isDeleted ?? false) || t.isCompleted) continue;
+            if (t.dueDate != null) {
+              final key = DateFormat('yyyy-MM-dd').format(t.dueDate!);
+              tasksByDate.putIfAbsent(key, () => []).add(t);
 
-      for (final t in filteredTasks) {
-        final key = DateFormat('yyyy-MM-dd').format(t.dueDate!);
-        tasksByDate.putIfAbsent(key, () => []).add(t);
+              // Support recurring task instances within the buffer window
+              if (t.recurrenceRule != null && t.recurrenceRule!.isNotEmpty) {
+                DateTime? nextDate = TaskRecurrenceService.getNextDueDate(
+                  t.dueDate!,
+                  t.recurrenceRule!,
+                  after: t.dueDate!,
+                );
+                int count = 0;
+                while (nextDate != null &&
+                    !nextDate.isAfter(bufferEndDate) &&
+                    count < 100) {
+                  if (!nextDate.isBefore(bufferStartDate)) {
+                    final nextKey = DateFormat('yyyy-MM-dd').format(nextDate);
+                    tasksByDate.putIfAbsent(nextKey, () => []).add(t);
+                  }
+                  nextDate = TaskRecurrenceService.getNextDueDate(
+                    t.dueDate!,
+                    t.recurrenceRule!,
+                    after: nextDate,
+                  );
+                  count++;
+                }
+              }
+            }
+          }
+        } catch (e, stack) {
+          AppLogger.error(
+            'Failed to fetch tasks for widget',
+            error: e,
+            stack: stack,
+          );
+        }
       }
 
       // Pre-load categories for color lookup
       final categories = _taskSource.getCategories();
 
+      // Master summary builder for any given date
+      List<Map<String, dynamic>> buildSummariesForDate(String dateKey) {
+        final dayEvents = eventsByDate[dateKey] ?? [];
+        final dayTasks = tasksByDate[dateKey] ?? [];
+        final daySchedule = scheduleEventsByDate[dateKey] ?? [];
+
+        final summaries = <Map<String, dynamic>>[];
+
+        // 1. Prioritize tasks
+        for (final t in dayTasks) {
+          if (summaries.length >= 4) break;
+          int? colorVal;
+          try {
+            final cat = categories.firstWhere(
+              (c) => t.categoryIds.isNotEmpty
+                  ? t.categoryIds.contains(c.id)
+                  : c.id == t.categoryId,
+            );
+            colorVal = cat.colorValue;
+          } catch (_) {}
+
+          final title = t.title.length > 25
+              ? '${t.title.substring(0, 22)}...'
+              : t.title;
+
+          summaries.add({
+            'text': title,
+            'priority': t.priority.toString().split('.').last,
+            'color': colorVal != null
+                ? '#${colorVal.toRadixString(16).padLeft(8, '0')}'
+                : taskColorHex,
+            'type': 'task',
+          });
+        }
+
+        // 2. Google Calendar events
+        for (final e in dayEvents) {
+          if (summaries.length >= 4) break;
+          final timeStr = e.start != null
+              ? _formatEventTime(e.start, e.end, l10n)
+              : '';
+
+          final displayTitle = e.title ?? l10n?.event ?? 'Event';
+          final title = displayTitle.length > 25
+              ? '${displayTitle.substring(0, 22)}...'
+              : displayTitle;
+          final location = (e.location ?? '').length > 20
+              ? '${(e.location ?? '').substring(0, 17)}...'
+              : (e.location ?? '');
+
+          final eventColor =
+              e.calendarId != null && calendarColors.containsKey(e.calendarId)
+              ? calendarColors[e.calendarId]
+              : googleColorHex;
+
+          summaries.add({
+            'text': title,
+            'time': timeStr,
+            'subtitle': location,
+            'color': eventColor,
+            'type': 'google',
+          });
+        }
+
+        // 3. ROCIs Schedule events
+        for (final s in daySchedule) {
+          if (summaries.length >= 4) break;
+          final timeStr = _formatEventTime(s.startTime, s.endTime, l10n);
+          final displayTitle = s.title.isNotEmpty
+              ? s.title
+              : (s.courseName.isNotEmpty
+                    ? s.courseName
+                    : (l10n?.event ?? 'Class'));
+          final title = displayTitle.length > 25
+              ? '${displayTitle.substring(0, 22)}...'
+              : displayTitle;
+          final location = s.location.length > 20
+              ? '${s.location.substring(0, 17)}...'
+              : s.location;
+          final eventColor =
+              '#${s.color.toARGB32().toRadixString(16).padLeft(8, '0')}';
+
+          summaries.add({
+            'text': title,
+            'time': timeStr,
+            'subtitle': location,
+            'color': eventColor,
+            'type': 'schedule',
+          });
+        }
+
+        return summaries;
+      }
+
+      // Build master multi-month summaries map for instantaneous native widget navigation
+      final allDateKeys = <String>{
+        ...tasksByDate.keys,
+        ...eventsByDate.keys,
+        ...scheduleEventsByDate.keys,
+      };
+      final masterSummariesByDate = <String, List<Map<String, dynamic>>>{};
+      for (final dateKey in allDateKeys) {
+        final list = buildSummariesForDate(dateKey);
+        if (list.isNotEmpty) {
+          masterSummariesByDate[dateKey] = list;
+        }
+      }
+      final eventsByDateJson = jsonEncode(masterSummariesByDate);
+
+      // Build 42-day calendar grid for targetMonth
       final gridData = <Map<String, dynamic>>[];
 
       for (int row = 0; row < 6; row++) {
@@ -474,92 +616,7 @@ class FullCalendarWidgetService {
         for (int col = 0; col < 7; col++) {
           final date = rowStartDate.add(Duration(days: col));
           final dateKey = DateFormat('yyyy-MM-dd').format(date);
-
-          // O(1) lookup instead of O(n) filter
-          final dayEvents = eventsByDate[dateKey] ?? [];
-          final dayTasks = tasksByDate[dateKey] ?? [];
-
-          // Create summaries (up to 4 items)
-          final summaries = <Map<String, dynamic>>[];
-
-          // 1. Prioritize tasks
-          for (final t in dayTasks) {
-            if (summaries.length >= 4) break;
-            int? colorVal;
-            try {
-              final cat = categories.firstWhere(
-                (c) => t.categoryIds.isNotEmpty
-                    ? t.categoryIds.contains(c.id)
-                    : c.id == t.categoryId,
-              );
-              colorVal = cat.colorValue;
-            } catch (_) {}
-
-            final title = t.title.length > 25
-                ? '${t.title.substring(0, 22)}...'
-                : t.title;
-
-            summaries.add({
-              'text': title,
-              'priority': t.priority.toString().split('.').last,
-              'color': colorVal != null
-                  ? '#${colorVal.toRadixString(16).padLeft(8, '0')}'
-                  : taskColorHex,
-              'type': 'task',
-            });
-          }
-
-          for (final e in dayEvents) {
-            if (summaries.length >= 4) break;
-            final timeStr = e.start != null
-                ? _formatEventTime(e.start, e.end, l10n)
-                : '';
-
-            final displayTitle = e.title ?? l10n?.event ?? 'Event';
-            final title = displayTitle.length > 25
-                ? '${displayTitle.substring(0, 22)}...'
-                : displayTitle;
-            final location = (e.location ?? '').length > 20
-                ? '${(e.location ?? '').substring(0, 17)}...'
-                : (e.location ?? '');
-
-            final eventColor =
-                e.calendarId != null && calendarColors.containsKey(e.calendarId)
-                ? calendarColors[e.calendarId]
-                : googleColorHex;
-
-            summaries.add({
-              'text': title,
-              'time': timeStr,
-              'subtitle': location,
-              'color': eventColor,
-              'type': 'google',
-            });
-          }
-
-          for (final s in (scheduleEventsByDate[dateKey] ?? [])) {
-            if (summaries.length >= 4) break;
-            final timeStr = _formatEventTime(s.startTime, s.endTime, l10n);
-            final displayTitle = s.title.isNotEmpty
-                ? s.title
-                : (l10n?.event ?? 'Class');
-            final title = displayTitle.length > 25
-                ? '${displayTitle.substring(0, 22)}...'
-                : displayTitle;
-            final location = s.location.length > 20
-                ? '${s.location.substring(0, 17)}...'
-                : s.location;
-            final eventColor =
-                '#${s.color.toARGB32().toRadixString(16).padLeft(8, '0')}';
-
-            summaries.add({
-              'text': title,
-              'time': timeStr,
-              'subtitle': location,
-              'color': eventColor,
-              'type': 'schedule',
-            });
-          }
+          final summaries = masterSummariesByDate[dateKey] ?? [];
 
           gridData.add({
             'isWeekNumber': false,
@@ -582,7 +639,7 @@ class FullCalendarWidgetService {
         0,
         (sum, day) => sum + ((day['summaries'] as List?)?.length ?? 0),
       );
-      if (totalSummaries == 0 && offset == 0) {
+      if (totalSummaries == 0 && offset == 0 && masterSummariesByDate.isEmpty) {
         final existingData = await HomeWidget.getWidgetData<String>(
           'full_calendar_grid_data',
         );
@@ -616,6 +673,10 @@ class FullCalendarWidgetService {
 
       // Batch all SharedPreferences writes before signaling the widget
       await Future.wait([
+        HomeWidget.saveWidgetData<String>(
+          'full_calendar_events_by_date',
+          eventsByDateJson,
+        ),
         HomeWidget.saveWidgetData<String>(
           'full_calendar_grid_data',
           gridDataJson,

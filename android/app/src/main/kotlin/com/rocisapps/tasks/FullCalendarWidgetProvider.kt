@@ -33,6 +33,35 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
         private const val REQUEST_CODE_PREV_MONTH = FullCalendarWidgetUtils.REQUEST_CODE_PREV_MONTH
         private const val REQUEST_CODE_NEXT_MONTH = FullCalendarWidgetUtils.REQUEST_CODE_NEXT_MONTH
         private const val REQUEST_CODE_TODAY = FullCalendarWidgetUtils.REQUEST_CODE_TODAY
+
+        private var pendingNavRunnable: Runnable? = null
+        private val navHandler by lazy { android.os.Handler(android.os.Looper.getMainLooper()) }
+
+        private fun scheduleBackgroundNav(context: Context, uriString: String, immediate: Boolean) {
+            val pending = pendingNavRunnable
+            if (pending != null) {
+                navHandler.removeCallbacks(pending)
+            }
+            if (immediate) {
+                try {
+                    val backgroundIntent = es.antonborri.home_widget.HomeWidgetBackgroundIntent.getBroadcast(
+                        context.applicationContext, Uri.parse(uriString)
+                    )
+                    backgroundIntent.send()
+                } catch (e: Exception) {}
+            } else {
+                val runnable = Runnable {
+                    try {
+                        val backgroundIntent = es.antonborri.home_widget.HomeWidgetBackgroundIntent.getBroadcast(
+                            context.applicationContext, Uri.parse(uriString)
+                        )
+                        backgroundIntent.send()
+                    } catch (e: Exception) {}
+                }
+                pendingNavRunnable = runnable
+                navHandler.postDelayed(runnable, 1200)
+            }
+        }
     }
 
     override fun onUpdate(
@@ -338,12 +367,10 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
                         .putString(FullCalendarWidgetUtils.PREF_SELECTED_DATE, "")
                         .apply()
                     
-                    val backgroundIntent = es.antonborri.home_widget.HomeWidgetBackgroundIntent.getBroadcast(
-                        context, Uri.parse("rocistasks://full_calendar_prev?offset=$newOffset")
-                    )
-                    try {
-                        backgroundIntent.send()
-                    } catch (e: Exception) {}
+                    // Pre-buffered range is -3 to +6. If within -2..5, debounce Flutter background engine boot
+                    // to prevent UI frame drops and launcher stutter during fast tapping.
+                    val isWithinBuffer = newOffset >= -2 && newOffset <= 5
+                    scheduleBackgroundNav(context, "rocistasks://full_calendar_prev?offset=$newOffset", immediate = !isWithinBuffer)
                 }
                 ACTION_NEXT_MONTH -> {
                     val currentOffset = widgetData.getInt(PREF_OFFSET, 0)
@@ -352,24 +379,15 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
                         .putString(FullCalendarWidgetUtils.PREF_SELECTED_DATE, "")
                         .apply()
                     
-                    val backgroundIntent = es.antonborri.home_widget.HomeWidgetBackgroundIntent.getBroadcast(
-                        context, Uri.parse("rocistasks://full_calendar_next?offset=$newOffset")
-                    )
-                    try {
-                        backgroundIntent.send()
-                    } catch (e: Exception) {}
+                    val isWithinBuffer = newOffset >= -2 && newOffset <= 5
+                    scheduleBackgroundNav(context, "rocistasks://full_calendar_next?offset=$newOffset", immediate = !isWithinBuffer)
                 }
                 ACTION_TODAY -> {
                     editor.putInt(PREF_OFFSET, 0)
                         .putString(FullCalendarWidgetUtils.PREF_SELECTED_DATE, "")
                         .apply()
                     
-                    val backgroundIntent = es.antonborri.home_widget.HomeWidgetBackgroundIntent.getBroadcast(
-                        context, Uri.parse("rocistasks://full_calendar_today?offset=0")
-                    )
-                    try {
-                        backgroundIntent.send()
-                    } catch (e: Exception) {}
+                    scheduleBackgroundNav(context, "rocistasks://full_calendar_today?offset=0", immediate = false)
                 }
             }
             

@@ -1015,7 +1015,7 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
             nextDueDate.day,
           );
 
-          // If the next recurrence is on a future day, defer materialization
+          // Under the deferred recurrence model, the next iteration is deferred until its scheduled date
           if (nextDay.isAfter(today)) {
             task.nextRecurrenceDate = nextDueDate;
             await _source.updateTask(task);
@@ -1043,9 +1043,6 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
                     'Scheduling pre-notification for deferred recurring task',
               );
             }
-          } else {
-            // Recurrence is due today, materialize immediately
-            await _materializeRecurringTask(task, nextDueDate);
           }
         }
       }

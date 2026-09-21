@@ -2260,12 +2260,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                                     provider.toggleTaskCompletion(
                                       _selectedTask!,
                                     );
-                                    setState(() {
-                                      _selectedTask = _selectedTask!.copyWith(
-                                        isCompleted:
-                                            !_selectedTask!.isCompleted,
-                                      );
-                                    });
+                                    setState(() {});
                                   },
                                   borderRadius: BorderRadius.circular(8),
                                   child: Container(

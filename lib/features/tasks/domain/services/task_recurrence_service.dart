@@ -114,12 +114,34 @@ class TaskRecurrenceService {
     try {
       final normalized = _normalizeRule(recurrenceRule);
       final rrule = RecurrenceRule.fromString('RRULE:$normalized');
-      final targetAfter = (after != null && after.isAfter(currentDueDate))
-          ? after
-          : currentDueDate;
+      final DateTime targetAfter;
+      if (after != null) {
+        final endOfAfterDay = DateTime(
+          after.year,
+          after.month,
+          after.day,
+          23,
+          59,
+          59,
+          999,
+        );
+        targetAfter = endOfAfterDay.isAfter(currentDueDate)
+            ? endOfAfterDay
+            : currentDueDate;
+      } else {
+        targetAfter = currentDueDate;
+      }
 
-      // Start evaluation from start date in UTC
-      final startUtc = currentDueDate.toUtc();
+      // Start evaluation from calendar date in UTC to prevent timezone offsets from shifting the day
+      final startUtc = DateTime.utc(
+        currentDueDate.year,
+        currentDueDate.month,
+        currentDueDate.day,
+        currentDueDate.hour,
+        currentDueDate.minute,
+        currentDueDate.second,
+        currentDueDate.millisecond,
+      );
 
       // Retrieve instances (limit search depth to prevent infinite loops)
       final instances = rrule.getInstances(start: startUtc).take(1000);
@@ -160,9 +182,23 @@ class TaskRecurrenceService {
     DateTime? after,
   }) {
     final (freq, interval) = parseCustomRule(recurrenceRule);
-    final target = (after != null && after.isAfter(currentDueDate))
-        ? after
-        : currentDueDate;
+    final DateTime target;
+    if (after != null) {
+      final endOfAfterDay = DateTime(
+        after.year,
+        after.month,
+        after.day,
+        23,
+        59,
+        59,
+        999,
+      );
+      target = endOfAfterDay.isAfter(currentDueDate)
+          ? endOfAfterDay
+          : currentDueDate;
+    } else {
+      target = currentDueDate;
+    }
     var next = currentDueDate;
 
     final normalized = _normalizeRule(recurrenceRule);

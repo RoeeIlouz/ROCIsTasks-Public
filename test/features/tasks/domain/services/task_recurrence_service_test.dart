@@ -220,12 +220,38 @@ void main() {
       },
     );
 
-    test('Overdue recurrence when target day time has not yet passed', () {
-      // Due 3 days ago at 18:00 (6:00 PM)
-      final baseDate = DateTime(2026, 8, 1, 18, 0);
-      final currentMoment = DateTime(2026, 8, 4, 10, 0); // 10:00 AM on the 4th
+    test(
+      'Overdue recurrence completed today advances strictly to next day (not today)',
+      () {
+        // Due 3 days ago at 18:00 (6:00 PM)
+        final baseDate = DateTime(2026, 8, 1, 18, 0);
+        final currentMoment = DateTime(
+          2026,
+          8,
+          4,
+          10,
+          0,
+        ); // 10:00 AM on the 4th
 
-      // Since 6:00 PM on the 4th has NOT passed yet, it should be today (Aug 4) at 18:00
+        // Since it is completed on Aug 4, next occurrence must be Aug 5 at 18:00 (never same-day)
+        final nextDaily = TaskRecurrenceService.getNextDueDate(
+          baseDate,
+          TaskRecurrenceService.rruleDaily,
+          after: currentMoment,
+        );
+        expect(nextDaily, isNotNull);
+        expect(nextDaily!.year, 2026);
+        expect(nextDaily.month, 8);
+        expect(nextDaily.day, 5);
+        expect(nextDaily.hour, 18);
+        expect(nextDaily.minute, 0);
+      },
+    );
+
+    test('Same-day early completion of daily task advances to tomorrow', () {
+      final baseDate = DateTime(2026, 8, 4, 18, 0);
+      final currentMoment = DateTime(2026, 8, 4, 10, 0);
+
       final nextDaily = TaskRecurrenceService.getNextDueDate(
         baseDate,
         TaskRecurrenceService.rruleDaily,
@@ -234,10 +260,49 @@ void main() {
       expect(nextDaily, isNotNull);
       expect(nextDaily!.year, 2026);
       expect(nextDaily.month, 8);
-      expect(nextDaily.day, 4);
+      expect(nextDaily.day, 5);
       expect(nextDaily.hour, 18);
       expect(nextDaily.minute, 0);
     });
+
+    test('Same-day late completion of daily task advances to tomorrow', () {
+      final baseDate = DateTime(2026, 8, 4, 18, 0);
+      final currentMoment = DateTime(2026, 8, 4, 19, 30);
+
+      final nextDaily = TaskRecurrenceService.getNextDueDate(
+        baseDate,
+        TaskRecurrenceService.rruleDaily,
+        after: currentMoment,
+      );
+      expect(nextDaily, isNotNull);
+      expect(nextDaily!.year, 2026);
+      expect(nextDaily.month, 8);
+      expect(nextDaily.day, 5);
+      expect(nextDaily.hour, 18);
+      expect(nextDaily.minute, 0);
+    });
+
+    test(
+      'Overdue weekly task advances to next valid weekday cycle strictly after completion',
+      () {
+        // Monday Aug 3 at 10:00 AM
+        final baseDate = DateTime(2026, 8, 3, 10, 0);
+        // Completed Thursday Aug 6 at 14:00
+        final currentMoment = DateTime(2026, 8, 6, 14, 0);
+
+        final nextWeekly = TaskRecurrenceService.getNextDueDate(
+          baseDate,
+          TaskRecurrenceService.rruleWeekly,
+          after: currentMoment,
+        );
+        expect(nextWeekly, isNotNull);
+        expect(nextWeekly!.year, 2026);
+        expect(nextWeekly.month, 8);
+        expect(nextWeekly.day, 10); // Next Monday Aug 10
+        expect(nextWeekly.hour, 10);
+        expect(nextWeekly.minute, 0);
+      },
+    );
 
     test(
       'Anchoring recurrence to createdAt preserves original creation time',
@@ -253,7 +318,10 @@ void main() {
         expect(nextDate, isNotNull);
         expect(nextDate!.year, 2026);
         expect(nextDate.month, 8);
-        expect(nextDate.day, 15); // Aug 15 16:45 is after 10:00
+        expect(
+          nextDate.day,
+          16,
+        ); // Completed on Aug 15 -> next occurrence Aug 16
         expect(nextDate.hour, 16);
         expect(nextDate.minute, 45);
         expect(nextDate.second, 12);

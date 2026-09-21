@@ -94,9 +94,9 @@ void main() {
         final tuesday = DateTime(2026, 9, 15);
         expect(event.occursOnDay(tuesday), isFalse);
 
-        // Sunday before start date (Sept 6) -> Should not occur
+        // Sunday before Sept 6 -> Recurring classes repeat on daysOfWeek across months
         final pastSunday = DateTime(2026, 8, 30);
-        expect(event.occursOnDay(pastSunday), isFalse);
+        expect(event.occursOnDay(pastSunday), isTrue);
       },
     );
 
@@ -121,6 +121,74 @@ void main() {
       expect(event.occursOnDay(DateTime(2026, 9, 12, 8, 0)), isTrue);
       expect(event.occursOnDay(DateTime(2026, 9, 13)), isFalse);
     });
+
+    test('serializes toMap and reconstructs via fromMap accurately', () {
+      final start = DateTime(2026, 9, 1, 10, 0);
+      final event = SyncedScheduleEvent(
+        id: 'roundtrip_1',
+        title: 'Data Structures',
+        courseId: 'CS201',
+        courseName: 'Data Structures',
+        courseCode: 'CS201',
+        location: 'Lab 4',
+        typeIndex: 1,
+        startTime: start,
+        endTime: start.add(const Duration(hours: 2)),
+        recurring: true,
+        daysOfWeek: const [1, 3], // Mon, Wed
+        color: const Color(0xFF4CAF50),
+        notes: 'Room key required',
+      );
+
+      final map = event.toMap();
+      final restored = SyncedScheduleEvent.fromMap(map);
+
+      expect(restored.id, event.id);
+      expect(restored.title, event.title);
+      expect(restored.courseId, event.courseId);
+      expect(restored.courseName, event.courseName);
+      expect(restored.location, event.location);
+      expect(restored.typeIndex, event.typeIndex);
+      expect(restored.recurring, isTrue);
+      expect(restored.daysOfWeek, [1, 3]);
+      expect(restored.color.toARGB32(), event.color.toARGB32());
+    });
+
+    test(
+      'recurring event recurs across upcoming and previous months without cutoff',
+      () {
+        final start = DateTime(2026, 9, 15, 10, 0); // Created mid-September
+        final event = SyncedScheduleEvent(
+          id: 'rec_months',
+          title: 'Operating Systems',
+          courseId: 'CS301',
+          courseName: 'OS',
+          courseCode: 'CS301',
+          location: 'Room 101',
+          typeIndex: 0,
+          startTime: start,
+          endTime: start.add(const Duration(hours: 2)),
+          recurring: true,
+          daysOfWeek: const [2], // Tuesday (2 in schedule format)
+          color: const Color(0xFF2196F3),
+          notes: '',
+        );
+
+        // Tuesday in previous month (August 25, 2026) -> should occur!
+        final augustTuesday = DateTime(2026, 8, 25);
+        expect(augustTuesday.weekday, DateTime.tuesday);
+        expect(event.occursOnDay(augustTuesday), isTrue);
+
+        // Tuesday in upcoming month (October 20, 2026) -> should occur!
+        final octoberTuesday = DateTime(2026, 10, 20);
+        expect(octoberTuesday.weekday, DateTime.tuesday);
+        expect(event.occursOnDay(octoberTuesday), isTrue);
+
+        // Wednesday in October -> should not occur
+        final octoberWednesday = DateTime(2026, 10, 21);
+        expect(event.occursOnDay(octoberWednesday), isFalse);
+      },
+    );
   });
 
   group('FullCalendarFilters', () {
