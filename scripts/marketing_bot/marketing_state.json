@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-21T12:06:25.831780+00:00",
+  "last_run_timestamp": "2026-09-21T21:45:00.200526+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -2990,6 +2990,42 @@
       "title": "I built an open-source VS Code security extension for Flutter — some things I learned building it",
       "url": "https://reddit.com/r/FlutterDev/comments/1wm1z4y/i_built_an_opensource_vs_code_security_extension/",
       "inspected_at": "2026-09-21T12:06:15.561206+00:00"
+    },
+    "reddit_1wmq7wf": {
+      "platform": "reddit",
+      "title": "I built a RPG-style lootbox that fills with my app’s actual sales because refreshing App Store Connect wasn’t giving me enough dopamine.",
+      "url": "https://reddit.com/r/SideProject/comments/1wmq7wf/i_built_a_rpgstyle_lootbox_that_fills_with_my/",
+      "inspected_at": "2026-09-21T21:44:29.995908+00:00"
+    },
+    "reddit_1wmpyz4": {
+      "platform": "reddit",
+      "title": "I built MoodFeed because I was tired of algorithms deciding what I should consume",
+      "url": "https://reddit.com/r/SideProject/comments/1wmpyz4/i_built_moodfeed_because_i_was_tired_of/",
+      "inspected_at": "2026-09-21T21:44:32.800057+00:00"
+    },
+    "reddit_1wmpyur": {
+      "platform": "reddit",
+      "title": "I made the world mood map talk:  you can now see what people around the world are actually feeling",
+      "url": "https://reddit.com/r/SideProject/comments/1wmpyur/i_made_the_world_mood_map_talk_you_can_now_see/",
+      "inspected_at": "2026-09-21T21:44:40.858751+00:00"
+    },
+    "reddit_1wmbmgp": {
+      "platform": "reddit",
+      "title": "Roast my landing page — posted this on r/SideProject last week, got views but zero comments. Not sure if it's the pitch or the product.",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wmbmgp/roast_my_landing_page_posted_this_on_rsideproject/",
+      "inspected_at": "2026-09-21T21:44:46.193127+00:00"
+    },
+    "reddit_1wmoebx": {
+      "platform": "reddit",
+      "title": "Native Dart 3 sealed class Result<S, E> vs fpdart (Either<L, R>) in 2026 – What are you using in production?",
+      "url": "https://reddit.com/r/FlutterDev/comments/1wmoebx/native_dart_3_sealed_class_results_e_vs_fpdart/",
+      "inspected_at": "2026-09-21T21:44:47.955325+00:00"
+    },
+    "reddit_1wmnzkd": {
+      "platform": "reddit",
+      "title": "Copy-Paste-Media Flutter Package",
+      "url": "https://reddit.com/r/FlutterDev/comments/1wmnzkd/copypastemedia_flutter_package/",
+      "inspected_at": "2026-09-21T21:44:52.189168+00:00"
     }
   },
   "pending_drafts": {
