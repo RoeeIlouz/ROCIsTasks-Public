@@ -374,6 +374,68 @@ void main() {
     );
 
     test(
+      'completing overdue recurring task defers next iteration to future and does not spawn active task today',
+      () async {
+        when(() => mockSubscriptionService.isPremium).thenReturn(true);
+        when(() => mockSource.addTask(any())).thenAnswer((_) async => {});
+        when(
+          () => mockFirestoreService.updateTask(any()),
+        ).thenAnswer((_) async => {});
+        when(
+          () => mockFirestoreService.addTask(any()),
+        ).thenAnswer((_) async => {});
+
+        await taskProvider.init();
+
+        // Due 3 days ago at 18:00
+        final overdueDate = DateTime.now().subtract(const Duration(days: 3));
+        final overdueTask = Task(
+          id: 'rec-overdue',
+          title: 'Overdue Daily Task',
+          isCompleted: false,
+          dueDate: DateTime(
+            overdueDate.year,
+            overdueDate.month,
+            overdueDate.day,
+            18,
+            0,
+          ),
+          recurrenceRule: 'FREQ=DAILY;INTERVAL=1',
+        );
+
+        when(() => mockSource.getTasks()).thenReturn([overdueTask]);
+
+        await taskProvider.toggleTaskCompletion(overdueTask);
+
+        expect(overdueTask.isCompleted, isTrue);
+        // Only the completed task should be updated, NOT a duplicate uncompleted task for today
+        final capturedTasks = verify(
+          () => mockSource.addTask(captureAny()),
+        ).captured;
+        expect(capturedTasks.length, 1);
+        expect((capturedTasks.first as Task).id, 'rec-overdue');
+        expect(overdueTask.nextRecurrenceDate, isNotNull);
+
+        // Next recurrence must strictly be tomorrow or later, never today
+        final now = DateTime.now();
+        final today = DateTime(now.year, now.month, now.day);
+        final nextDay = DateTime(
+          overdueTask.nextRecurrenceDate!.year,
+          overdueTask.nextRecurrenceDate!.month,
+          overdueTask.nextRecurrenceDate!.day,
+        );
+        expect(nextDay.isAfter(today), isTrue);
+        expect(overdueTask.nextRecurrenceDate!.hour, 18);
+        expect(overdueTask.nextRecurrenceDate!.minute, 0);
+
+        // Upcoming recurring tasks projection contains preview for tomorrow
+        final upcoming = taskProvider.upcomingRecurringTasks;
+        expect(upcoming.length, 1);
+        expect(upcoming.first.id, 'preview_rec-overdue');
+      },
+    );
+
+    test(
       'un-completing deferred recurring task clears nextRecurrenceDate and cancels notification',
       () async {
         when(() => mockSubscriptionService.isPremium).thenReturn(true);

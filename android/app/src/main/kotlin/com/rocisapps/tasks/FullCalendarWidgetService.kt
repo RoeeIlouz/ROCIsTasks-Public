@@ -179,28 +179,50 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
             weekendHighlight = widgetData.getBoolean(FullCalendarWidgetUtils.PREF_WEEKEND_HIGHLIGHT, true)
             highlightColor = FullCalendarWidgetUtils.parseHighlightColor(widgetData)
             
-            // 1. Index existing summaries by date ("yyyy-MM-dd")
+            // 1. Index summaries by date ("yyyy-MM-dd") from pre-buffered multi-month map or fallback grid
             val summariesByDate = HashMap<String, JSONArray>()
             try {
-                val gridDataJson = widgetData.getString(FullCalendarWidgetUtils.PREF_GRID_DATA, "[]") ?: "[]"
-                val gridData = JSONArray(gridDataJson)
-                for (i in 0 until gridData.length()) {
-                    val day = gridData.getJSONObject(i)
-                    if (!day.optBoolean("isWeekNumber", false)) {
-                        val dStr = day.optString("date", "")
-                        if (dStr.isNotEmpty()) {
-                            val summaries = day.optJSONArray("summaries")
+                val eventsByDateJson = widgetData.getString(FullCalendarWidgetUtils.PREF_EVENTS_BY_DATE, "") ?: ""
+                if (eventsByDateJson.isNotEmpty() && eventsByDateJson != "{}") {
+                    val eventsByDateObj = JSONObject(eventsByDateJson)
+                    val dateKeys = eventsByDateObj.keys()
+                    while (dateKeys.hasNext()) {
+                        val dStr = dateKeys.next()
+                        val summaries = eventsByDateObj.optJSONArray(dStr)
+                        if (summaries != null) {
                             val filteredSummaries = JSONArray()
-                            if (summaries != null) {
-                                for (j in 0 until summaries.length()) {
-                                    val summary = summaries.getJSONObject(j)
-                                    val type = summary.optString("type", "")
-                                    if (FullCalendarWidgetUtils.shouldIncludeSummary(type, showTasks, showGoogle, showSchedule)) {
-                                        filteredSummaries.put(summary)
-                                    }
+                            for (j in 0 until summaries.length()) {
+                                val summary = summaries.getJSONObject(j)
+                                val type = summary.optString("type", "")
+                                if (FullCalendarWidgetUtils.shouldIncludeSummary(type, showTasks, showGoogle, showSchedule)) {
+                                    filteredSummaries.put(summary)
                                 }
                             }
                             summariesByDate[dStr] = filteredSummaries
+                        }
+                    }
+                } else {
+                    // Fallback to legacy PREF_GRID_DATA
+                    val gridDataJson = widgetData.getString(FullCalendarWidgetUtils.PREF_GRID_DATA, "[]") ?: "[]"
+                    val gridData = JSONArray(gridDataJson)
+                    for (i in 0 until gridData.length()) {
+                        val day = gridData.getJSONObject(i)
+                        if (!day.optBoolean("isWeekNumber", false)) {
+                            val dStr = day.optString("date", "")
+                            if (dStr.isNotEmpty()) {
+                                val summaries = day.optJSONArray("summaries")
+                                val filteredSummaries = JSONArray()
+                                if (summaries != null) {
+                                    for (j in 0 until summaries.length()) {
+                                        val summary = summaries.getJSONObject(j)
+                                        val type = summary.optString("type", "")
+                                        if (FullCalendarWidgetUtils.shouldIncludeSummary(type, showTasks, showGoogle, showSchedule)) {
+                                            filteredSummaries.put(summary)
+                                        }
+                                    }
+                                }
+                                summariesByDate[dStr] = filteredSummaries
+                            }
                         }
                     }
                 }

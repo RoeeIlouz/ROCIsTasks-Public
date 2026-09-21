@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -39,14 +40,6 @@ class SyncedScheduleEvent {
 
   bool occursOnDay(DateTime day) {
     if (recurring) {
-      final normalizedDay = DateTime(day.year, day.month, day.day);
-      final eventStartDay = DateTime(
-        startTime.year,
-        startTime.month,
-        startTime.day,
-      );
-      if (normalizedDay.isBefore(eventStartDay)) return false;
-
       // Dart DateTime weekday: 1=Mon ... 7=Sun.
       // Schedule app convention: 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat.
       final int scheduleWeekday = day.weekday == DateTime.sunday
@@ -59,6 +52,22 @@ class SyncedScheduleEvent {
           startTime.day == day.day;
     }
   }
+
+  Map<String, dynamic> toMap() => {
+    'id': id,
+    'title': title,
+    'courseId': courseId,
+    'courseName': courseName,
+    'courseCode': courseCode,
+    'location': location,
+    'type': typeIndex,
+    'startTime': startTime.toIso8601String(),
+    'endTime': endTime.toIso8601String(),
+    'recurring': recurring ? 1 : 0,
+    'daysOfWeek': daysOfWeek,
+    'color': color.toARGB32(),
+    'notes': notes,
+  };
 
   /// Construct SyncedScheduleEvent from Firestore map with course lookup.
   factory SyncedScheduleEvent.fromMap(
@@ -105,6 +114,23 @@ class SyncedScheduleEvent {
         final parsed = int.tryParse(rawColor.toString());
         if (parsed != null) eventColor = Color(parsed);
       }
+    } else if (map['color'] != null) {
+      final rawColor = map['color'];
+      if (rawColor is int) {
+        eventColor = Color(rawColor);
+      } else if (rawColor is num) {
+        eventColor = Color(rawColor.toInt());
+      } else {
+        final parsed = int.tryParse(rawColor.toString());
+        if (parsed != null) eventColor = Color(parsed);
+      }
+    }
+
+    if (courseName.isEmpty && map['courseName'] != null) {
+      courseName = map['courseName'].toString();
+    }
+    if (courseCode.isEmpty && map['courseCode'] != null) {
+      courseCode = map['courseCode'].toString();
     }
 
     return SyncedScheduleEvent(
@@ -380,6 +406,35 @@ class ScheduleFirestoreService {
         });
   }
 
+  static const String _keyCachedEventsJson = 'cached_schedule_events_json';
+
+  Future<void> _saveCachedEvents(List<SyncedScheduleEvent> events) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final list = events.map((e) => e.toMap()).toList();
+      await prefs.setString(_keyCachedEventsJson, jsonEncode(list));
+    } catch (e) {
+      debugPrint('ScheduleFirestoreService: Failed to save cached events: $e');
+    }
+  }
+
+  Future<List<SyncedScheduleEvent>> _loadCachedEvents() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final jsonStr = prefs.getString(_keyCachedEventsJson);
+      if (jsonStr != null && jsonStr.isNotEmpty && jsonStr != '[]') {
+        final decoded = jsonDecode(jsonStr) as List<dynamic>;
+        return decoded
+            .whereType<Map<String, dynamic>>()
+            .map(SyncedScheduleEvent.fromMap)
+            .toList();
+      }
+    } catch (e) {
+      debugPrint('ScheduleFirestoreService: Failed to load cached events: $e');
+    }
+    return [];
+  }
+
   /// Fetch schedule events combined with course metadata.
   /// Supports optional email for cross-app project resolution.
   Future<List<SyncedScheduleEvent>> fetchEvents({
@@ -394,10 +449,17 @@ class ScheduleFirestoreService {
       return _cachedEvents!;
     }
 
+    if (_cachedEvents == null || _cachedEvents!.isEmpty) {
+      final local = await _loadCachedEvents();
+      if (local.isNotEmpty) {
+        _cachedEvents = local;
+      }
+    }
+
     if (!isReady) {
       await initialize();
     }
-    if (!isReady) return [];
+    if (!isReady) return _cachedEvents ?? [];
 
     final targetUserId = await _resolveScheduleUserId(
       uid: uid,
@@ -407,7 +469,7 @@ class ScheduleFirestoreService {
       debugPrint(
         'ScheduleFirestoreService: Could not resolve schedule user (uid: $uid, email: ${email ?? _userEmail})',
       );
-      return [];
+      return _cachedEvents ?? [];
     }
 
     try {
@@ -438,10 +500,11 @@ class ScheduleFirestoreService {
 
       _cachedEvents = events;
       _lastFetchTime = DateTime.now();
+      _saveCachedEvents(events);
       return events;
     } catch (e) {
       debugPrint('ScheduleFirestoreService: Error fetching events: $e');
-      return [];
+      return _cachedEvents ?? [];
     }
   }
 

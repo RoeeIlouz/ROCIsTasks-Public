@@ -112,7 +112,11 @@ class CalendarProvider extends ChangeNotifier {
   }
 
   void setSelectedDate(DateTime date) {
+    final oldYear = _selectedDate.year;
     _selectedDate = date;
+    if (oldYear != date.year && _scheduleEvents.isNotEmpty) {
+      _processScheduleEventsToMap();
+    }
     notifyListeners();
     _updateWidgetSelectedDate(date);
   }
@@ -308,6 +312,7 @@ class CalendarProvider extends ChangeNotifier {
       if ((effectiveUid != null && effectiveUid.isNotEmpty) ||
           (effectiveEmail != null && effectiveEmail.isNotEmpty)) {
         try {
+          await _authService?.ensureSecondaryAuth();
           _scheduleEvents = await _scheduleFirestoreService.fetchEvents(
             uid: effectiveUid,
             email: effectiveEmail,
@@ -321,6 +326,18 @@ class CalendarProvider extends ChangeNotifier {
           _scheduleEventsMap = {};
         }
       }
+
+      // Sync widget with latest events in background
+      _widgetService
+          .updateFullCalendarWidget(
+            userId: effectiveUid,
+            userEmail: effectiveEmail,
+          )
+          .catchError((e) {
+            AppLogger.warning(
+              'Error updating widget from calendar provider: $e',
+            );
+          });
     } on GoogleTokenExpiredException catch (e) {
       if (e.isServerRejection) {
         _isGoogleCalendarTokenExpired = true;
@@ -406,16 +423,16 @@ class CalendarProvider extends ChangeNotifier {
     _scheduleEventsMap = {};
     for (final event in _scheduleEvents) {
       if (event.recurring) {
-        // Map across upcoming weeks around selected date (+/- 1 full academic year)
-        final base = DateTime(_selectedDate.year - 1, 1, 1);
-        final end = DateTime(_selectedDate.year + 1, 12, 31);
+        // Map across upcoming weeks around selected date (+/- 2 full academic years)
+        final base = DateTime(_selectedDate.year - 2, 1, 1);
+        final end = DateTime(_selectedDate.year + 2, 12, 31);
         DateTime cur = base;
         while (!cur.isAfter(end)) {
           if (event.occursOnDay(cur)) {
             final norm = DateTime(cur.year, cur.month, cur.day);
             _scheduleEventsMap.putIfAbsent(norm, () => []).add(event);
           }
-          cur = cur.add(const Duration(days: 1));
+          cur = DateTime(cur.year, cur.month, cur.day + 1);
         }
       } else {
         final norm = DateTime(

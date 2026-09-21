@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:rocis_tasks/core/services/auth/google_oauth_manager.dart';
 import 'package:rocis_tasks/core/services/encryption_service.dart';
@@ -56,8 +57,7 @@ class AuthService extends ChangeNotifier {
     _authStateSubscription = _auth.authStateChanges().listen((User? user) {
       if (user != null) {
         unawaited(_syncEncryptionKey(user.uid));
-        unawaited(ensureSecondaryAuth());
-        unawaited(_restoreGoogleUser());
+        unawaited(_restoreGoogleUser().then((_) => ensureSecondaryAuth()));
       }
 
       if (!_initCompleter.isCompleted) {
@@ -522,6 +522,11 @@ class AuthService extends ChangeNotifier {
       _scheduleAuth = FirebaseAuth.instanceFor(app: scheduleApp);
 
       await _scheduleAuth!.signInWithCredential(credential);
+      final secUid = _scheduleAuth!.currentUser?.uid;
+      if (secUid != null && secUid.isNotEmpty) {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('cached_schedule_user_id', secUid);
+      }
       AppLogger.info(
         'Signed in to secondary Firebase (rocis-schedule) successfully',
         tag: 'Auth',
@@ -550,6 +555,11 @@ class AuthService extends ChangeNotifier {
         email: email,
         password: password,
       );
+      final secUid = _scheduleAuth!.currentUser?.uid;
+      if (secUid != null && secUid.isNotEmpty) {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('cached_schedule_user_id', secUid);
+      }
       AppLogger.info('Signed in to secondary Firebase with Email', tag: 'Auth');
     } catch (e) {
       AppLogger.warning(
@@ -575,6 +585,11 @@ class AuthService extends ChangeNotifier {
         email: email,
         password: password,
       );
+      final secUid = _scheduleAuth!.currentUser?.uid;
+      if (secUid != null && secUid.isNotEmpty) {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('cached_schedule_user_id', secUid);
+      }
       AppLogger.info('Signed up to secondary Firebase with Email', tag: 'Auth');
     } catch (e) {
       AppLogger.warning(
@@ -596,31 +611,49 @@ class AuthService extends ChangeNotifier {
 
     if (_scheduleAuth?.currentUser != null) {
       scheduleAuthError.value = null;
+      final secUid = _scheduleAuth!.currentUser?.uid;
+      if (secUid != null && secUid.isNotEmpty) {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('cached_schedule_user_id', secUid);
+      }
       return;
     }
 
-    if (_auth.currentUser != null && _oauthManager.googleUser != null) {
-      try {
-        final googleUser = _oauthManager.googleUser!;
-        final googleAuth = googleUser.authentication;
-        final clientAuth = await googleUser.authorizationClient
-            .authorizationForScopes(['email', 'profile']);
-        final credential = GoogleAuthProvider.credential(
-          accessToken: clientAuth?.accessToken,
-          idToken: googleAuth.idToken,
-        );
-        await _signInToSecondaryFirebase(credential);
-        if (_scheduleAuth?.currentUser != null) {
-          scheduleAuthError.value = null;
+    if (_auth.currentUser != null) {
+      if (_oauthManager.googleUser == null && !kIsWeb) {
+        try {
+          await _oauthManager.ensureGoogleSignInInitialized();
+          final silentUser = await _oauthManager.googleSignIn
+              .attemptLightweightAuthentication();
+          if (silentUser != null) {
+            _oauthManager.setGoogleUser(silentUser);
+          }
+        } catch (_) {}
+      }
+
+      if (_oauthManager.googleUser != null) {
+        try {
+          final googleUser = _oauthManager.googleUser!;
+          final googleAuth = googleUser.authentication;
+          final clientAuth = await googleUser.authorizationClient
+              .authorizationForScopes(['email', 'profile']);
+          final credential = GoogleAuthProvider.credential(
+            accessToken: clientAuth?.accessToken,
+            idToken: googleAuth.idToken,
+          );
+          await _signInToSecondaryFirebase(credential);
+          if (_scheduleAuth?.currentUser != null) {
+            scheduleAuthError.value = null;
+          }
+        } catch (e) {
+          AppLogger.warning(
+            'Failed to re-authenticate to secondary Firebase',
+            error: e,
+            tag: 'Auth',
+          );
+          scheduleAuthError.value =
+              'Schedule sync unavailable. Some features may be limited.';
         }
-      } catch (e) {
-        AppLogger.warning(
-          'Failed to re-authenticate to secondary Firebase',
-          error: e,
-          tag: 'Auth',
-        );
-        scheduleAuthError.value =
-            'Schedule sync unavailable. Some features may be limited.';
       }
     }
   }
