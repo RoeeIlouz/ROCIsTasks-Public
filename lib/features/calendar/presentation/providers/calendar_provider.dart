@@ -246,7 +246,7 @@ class CalendarProvider extends ChangeNotifier {
     );
   }
 
-  Future<void> loadEvents() async {
+  Future<void> loadEvents({bool forceRefreshSchedule = false}) async {
     _isLoading = true;
     _isGoogleCalendarTokenExpired = false;
     notifyListeners();
@@ -313,9 +313,13 @@ class CalendarProvider extends ChangeNotifier {
           (effectiveEmail != null && effectiveEmail.isNotEmpty)) {
         try {
           await _authService?.ensureSecondaryAuth();
+          if (forceRefreshSchedule) {
+            _scheduleFirestoreService.clearCache();
+          }
           _scheduleEvents = await _scheduleFirestoreService.fetchEvents(
             uid: effectiveUid,
             email: effectiveEmail,
+            forceRefresh: forceRefreshSchedule,
           );
           _processScheduleEventsToMap();
         } catch (e) {
