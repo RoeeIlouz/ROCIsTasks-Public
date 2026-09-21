@@ -413,6 +413,7 @@
   "tasksWidgetSubtitle": "Lista desplazable de tareas con completado en 1 toque y filtros inteligentes.",
   "googleTasksDisconnected": "Google Tasks Desconectado",
   "googleTasksDisconnectedSubtitle": "Toca para reconectar y reanudar la sincronización",
+  "rocisScheduleDisconnected": "ROCIs Schedule Desconectado",
   "reconnect": "Reconectar",
   "webPaywallTitle": "Desbloquea ROCIs Tasks Pro en la Web",
   "webPaywallSubtitle": "Actualiza a premium para acceder a todas las funciones avanzadas en cualquier plataforma.",

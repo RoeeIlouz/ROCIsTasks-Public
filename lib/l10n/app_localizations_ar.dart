@@ -1149,6 +1149,9 @@ class AppLocalizationsAr extends AppLocalizations {
       'انقر لإعادة الاتصال واستئناف المزامنة';
 
   @override
+  String get rocisScheduleDisconnected => 'تم قطع اتصال ROCIs Schedule';
+
+  @override
   String get reconnect => 'إعادة الاتصال';
 
   @override

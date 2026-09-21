@@ -414,6 +414,7 @@
   "tasksWidgetSubtitle": "Liste de tâches défilante avec validation en un clic et filtres intelligents.",
   "googleTasksDisconnected": "Google Tasks Déconnecté",
   "googleTasksDisconnectedSubtitle": "Appuyez pour vous reconnecter et reprendre la synchronisation",
+  "rocisScheduleDisconnected": "ROCIs Schedule Déconnecté",
   "reconnect": "Se reconnecter",
   "webPaywallTitle": "Débloquez ROCIs Tasks Pro sur le Web",
   "webPaywallSubtitle": "Passez à la version premium pour accéder à toutes les fonctionnalités avancées sur n'importe quelle plateforme.",

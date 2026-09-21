@@ -1167,6 +1167,9 @@ class AppLocalizationsSv extends AppLocalizations {
       'Tryck för att ansluta igen och återuppta synkroniseringen';
 
   @override
+  String get rocisScheduleDisconnected => 'ROCIs Schedule frånkopplad';
+
+  @override
   String get reconnect => 'Återanslut';
 
   @override

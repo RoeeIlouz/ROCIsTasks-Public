@@ -414,6 +414,7 @@
   "tasksWidgetSubtitle": "Scrollable task list with one-tap completion and smart filters.",
   "googleTasksDisconnected": "Google Tasks Disconnected",
   "googleTasksDisconnectedSubtitle": "Tap to reconnect and resume sync",
+  "rocisScheduleDisconnected": "ROCIs Schedule Disconnected",
   "reconnect": "Reconnect",
   "webPaywallTitle": "Unlock ROCIs Tasks Pro on Web",
   "webPaywallSubtitle": "Upgrade to premium to access all advanced features on any platform.",

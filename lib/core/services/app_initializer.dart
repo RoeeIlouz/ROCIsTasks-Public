@@ -209,10 +209,6 @@ class AppInitializer {
 
   /// Initialize secondary Firebase app for accessing ROCIs-Schedule Firestore
   static Future<void> _initSecondaryFirebase() async {
-    if (kIsWeb) {
-      AppLogger.info('ROCIs-Schedule integration skipped on web');
-      return;
-    }
     try {
       // Check if secondary app already exists
       try {

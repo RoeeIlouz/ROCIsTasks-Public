@@ -78,6 +78,53 @@ class CalendarFilterSheet extends StatelessWidget {
                           },
                           secondary: const Icon(Icons.school_rounded),
                         ),
+                        Consumer<AuthService>(
+                          builder: (context, authService, _) {
+                            if (!provider.showRocisSchedule ||
+                                authService.isAuthenticatedInSchedule) {
+                              return const SizedBox.shrink();
+                            }
+                            return Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Divider(height: 1),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16.0,
+                                    vertical: 10.0,
+                                  ),
+                                  color: Colors.amber.withValues(alpha: 0.1),
+                                  child: Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.warning_amber_rounded,
+                                        color: Colors.amber,
+                                        size: 20,
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: Text(
+                                          l10n.rocisScheduleDisconnected,
+                                          style: const TextStyle(fontSize: 13),
+                                        ),
+                                      ),
+                                      TextButton(
+                                        onPressed: () async {
+                                          final success = await authService
+                                              .connectRocisSchedule();
+                                          if (success) {
+                                            await provider.loadEvents();
+                                          }
+                                        },
+                                        child: Text(l10n.reconnect),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        ),
                         if (provider.isGoogleCalendarTokenExpired) ...[
                           const Divider(height: 1),
                           Container(

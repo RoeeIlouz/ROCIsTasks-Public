@@ -2281,6 +2281,12 @@ abstract class AppLocalizations {
   /// **'Tap to reconnect and resume sync'**
   String get googleTasksDisconnectedSubtitle;
 
+  /// No description provided for @rocisScheduleDisconnected.
+  ///
+  /// In en, this message translates to:
+  /// **'ROCIs Schedule Disconnected'**
+  String get rocisScheduleDisconnected;
+
   /// No description provided for @reconnect.
   ///
   /// In en, this message translates to:
