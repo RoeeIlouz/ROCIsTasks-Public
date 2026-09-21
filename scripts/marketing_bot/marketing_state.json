@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-20T20:23:41.939472+00:00",
+  "last_run_timestamp": "2026-09-21T03:30:42.012627+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -2918,6 +2918,42 @@
       "title": "I built a free app so beginners can practice investing without risking a dirham. Tear it apart.",
       "url": "https://reddit.com/r/roastmystartup/comments/1wkted6/i_built_a_free_app_so_beginners_can_practice/",
       "inspected_at": "2026-09-20T20:23:31.843057+00:00"
+    },
+    "reddit_1wm1a1p": {
+      "platform": "reddit",
+      "title": "Come visit my digital person.",
+      "url": "https://reddit.com/r/SideProject/comments/1wm1a1p/come_visit_my_digital_person/",
+      "inspected_at": "2026-09-21T03:30:27.734599+00:00"
+    },
+    "reddit_1wm15lu": {
+      "platform": "reddit",
+      "title": "I built a website to rank every hotel I’ve been to",
+      "url": "https://reddit.com/r/SideProject/comments/1wm15lu/i_built_a_website_to_rank_every_hotel_ive_been_to/",
+      "inspected_at": "2026-09-21T03:30:30.155421+00:00"
+    },
+    "reddit_1wm0xiw": {
+      "platform": "reddit",
+      "title": "We built a private meeting assistant that runs locally on desktop and iPhone",
+      "url": "https://reddit.com/r/SideProject/comments/1wm0xiw/we_built_a_private_meeting_assistant_that_runs/",
+      "inspected_at": "2026-09-21T03:30:31.024760+00:00"
+    },
+    "reddit_1wkia3p": {
+      "platform": "reddit",
+      "title": "I built a free app so beginners can practice investing without risking money. Tear it apart.",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wkia3p/i_built_a_free_app_so_beginners_can_practice/",
+      "inspected_at": "2026-09-21T03:30:31.958139+00:00"
+    },
+    "reddit_1wm13py": {
+      "platform": "reddit",
+      "title": "Are flutter leadership roles dead in India?",
+      "url": "https://reddit.com/r/FlutterDev/comments/1wm13py/are_flutter_leadership_roles_dead_in_india/",
+      "inspected_at": "2026-09-21T03:30:32.836789+00:00"
+    },
+    "reddit_1wm04n9": {
+      "platform": "reddit",
+      "title": "🚀 Flutter is changing — and so is the role of Flutter developers.",
+      "url": "https://reddit.com/r/FlutterDev/comments/1wm04n9/flutter_is_changing_and_so_is_the_role_of_flutter/",
+      "inspected_at": "2026-09-21T03:30:33.661087+00:00"
     }
   },
   "pending_drafts": {
