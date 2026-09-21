@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.18+108] - 2026-09-21
+
+### Fixed
+- Fixed ROCIs-Schedule calendar synchronization on Web with pure OAuth token flow.
+- Enhanced silent secondary authentication and force-refresh on calendar filter sheet reconnect.
+- Resolved cross-project Google sign-in audience rejection across Web and Android.
+
 ## [0.2.17+107] - 2026-09-21
 
 ### Fixed

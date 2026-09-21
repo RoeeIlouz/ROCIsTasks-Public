@@ -347,13 +347,13 @@ class AuthService extends ChangeNotifier {
           await _syncEncryptionKey(userCredential.user!.uid);
         }
 
-        if (oAuthCred != null) {
-          await _signInToSecondaryFirebase(oAuthCred);
-        } else if (resolvedToken != null && resolvedToken.isNotEmpty) {
+        if (resolvedToken != null && resolvedToken.isNotEmpty) {
           final tokenCred = GoogleAuthProvider.credential(
             accessToken: resolvedToken,
           );
           await _signInToSecondaryFirebase(tokenCred);
+        } else if (oAuthCred != null) {
+          await _signInToSecondaryFirebase(oAuthCred);
         }
 
         notifyListeners();
@@ -529,21 +529,35 @@ class AuthService extends ChangeNotifier {
       final scheduleApp = Firebase.app('rocis-schedule');
       _scheduleAuth = FirebaseAuth.instanceFor(app: scheduleApp);
 
+      // Prefer accessToken only if OAuthCredential has accessToken to avoid cross-project aud mismatch
+      AuthCredential effectiveCred = credential;
+      if (credential is OAuthCredential &&
+          credential.accessToken != null &&
+          credential.accessToken!.isNotEmpty) {
+        effectiveCred = GoogleAuthProvider.credential(
+          accessToken: credential.accessToken,
+        );
+      }
+
       try {
-        await _scheduleAuth!.signInWithCredential(credential);
-      } on FirebaseAuthException catch (authEx) {
-        // If ID token audience was rejected (e.g. minted for rocis-todo audience),
-        // and we have an accessToken, retry with accessToken only.
+        await _scheduleAuth!.signInWithCredential(effectiveCred);
+      } catch (authEx) {
+        AppLogger.info(
+          'Secondary Firebase sign-in with effective credential failed ($authEx), retrying with access-token fallback...',
+          tag: 'Auth',
+        );
+        String? tokenToTry;
         if (credential is OAuthCredential &&
             credential.accessToken != null &&
-            credential.accessToken!.isNotEmpty &&
-            credential.idToken != null) {
-          AppLogger.info(
-            'Secondary Firebase sign-in with full credential failed (${authEx.code}), retrying with accessToken only...',
-            tag: 'Auth',
-          );
+            credential.accessToken!.isNotEmpty) {
+          tokenToTry = credential.accessToken;
+        } else {
+          tokenToTry = await _oauthManager.getGoogleAccessToken();
+        }
+
+        if (tokenToTry != null && tokenToTry.isNotEmpty) {
           final tokenOnlyCred = GoogleAuthProvider.credential(
-            accessToken: credential.accessToken,
+            accessToken: tokenToTry,
           );
           await _scheduleAuth!.signInWithCredential(tokenOnlyCred);
         } else {
@@ -671,8 +685,8 @@ class AuthService extends ChangeNotifier {
         );
       }
 
-      // 2. On Mobile, if googleUser is not available, try lightweight auth
-      if (_oauthManager.googleUser == null && !kIsWeb) {
+      // 2. If googleUser is not available, try silent lightweight auth
+      if (_oauthManager.googleUser == null) {
         try {
           await _oauthManager.ensureGoogleSignInInitialized();
           final silentUser = await _oauthManager.googleSignIn
@@ -749,19 +763,21 @@ class AuthService extends ChangeNotifier {
         googleUser ??= await _oauthManager.googleSignIn.authenticate(
           scopeHint: GoogleOAuthManager.googleTasksScopes,
         );
-        _oauthManager.setGoogleUser(googleUser);
-        final clientAuth = await googleUser.authorizationClient
-            .authorizationForScopes(['email', 'profile']);
-        final token = clientAuth?.accessToken;
-        if (token != null && token.isNotEmpty) {
-          final credential = GoogleAuthProvider.credential(
-            accessToken: token,
-          );
-          await _signInToSecondaryFirebase(credential);
-          if (_scheduleAuth?.currentUser != null) {
-            scheduleAuthError.value = null;
-            notifyListeners();
-            return true;
+        if (googleUser != null) {
+          _oauthManager.setGoogleUser(googleUser);
+          final clientAuth = await googleUser.authorizationClient
+              .authorizationForScopes(['email', 'profile']);
+          final token = clientAuth?.accessToken;
+          if (token != null && token.isNotEmpty) {
+            final credential = GoogleAuthProvider.credential(
+              accessToken: token,
+            );
+            await _signInToSecondaryFirebase(credential);
+            if (_scheduleAuth?.currentUser != null) {
+              scheduleAuthError.value = null;
+              notifyListeners();
+              return true;
+            }
           }
         }
       }

@@ -113,7 +113,9 @@ class CalendarFilterSheet extends StatelessWidget {
                                           final success = await authService
                                               .connectRocisSchedule();
                                           if (success) {
-                                            await provider.loadEvents();
+                                            await provider.loadEvents(
+                                              forceRefreshSchedule: true,
+                                            );
                                           }
                                         },
                                         child: Text(l10n.reconnect),
