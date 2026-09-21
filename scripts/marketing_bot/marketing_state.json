@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-21T03:30:42.012627+00:00",
+  "last_run_timestamp": "2026-09-21T12:06:25.831780+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -2954,6 +2954,42 @@
       "title": "🚀 Flutter is changing — and so is the role of Flutter developers.",
       "url": "https://reddit.com/r/FlutterDev/comments/1wm04n9/flutter_is_changing_and_so_is_the_role_of_flutter/",
       "inspected_at": "2026-09-21T03:30:33.661087+00:00"
+    },
+    "reddit_1wmama8": {
+      "platform": "reddit",
+      "title": "I built an app that lets Norwegian tradespeople create quotes directly from the job site",
+      "url": "https://reddit.com/r/SideProject/comments/1wmama8/i_built_an_app_that_lets_norwegian_tradespeople/",
+      "inspected_at": "2026-09-21T12:06:07.919933+00:00"
+    },
+    "reddit_1wmal2u": {
+      "platform": "reddit",
+      "title": "I built an app to help coach me and my little brothers football team",
+      "url": "https://reddit.com/r/SideProject/comments/1wmal2u/i_built_an_app_to_help_coach_me_and_my_little/",
+      "inspected_at": "2026-09-21T12:06:12.660045+00:00"
+    },
+    "reddit_1wmairz": {
+      "platform": "reddit",
+      "title": "Click bait?",
+      "url": "https://reddit.com/r/SideProject/comments/1wmairz/click_bait/",
+      "inspected_at": "2026-09-21T12:06:13.346606+00:00"
+    },
+    "reddit_1wm8xbz": {
+      "platform": "reddit",
+      "title": "Built AdFindio AI – An AI-powered tool to discover and analyze ad campaigns. Would love your feedback! 🚀",
+      "url": "https://reddit.com/r/FlutterDev/comments/1wm8xbz/built_adfindio_ai_an_aipowered_tool_to_discover/",
+      "inspected_at": "2026-09-21T12:06:14.063517+00:00"
+    },
+    "reddit_1wm6udz": {
+      "platform": "reddit",
+      "title": "Develop and publish Flutter iOS apps from Windows or Linux without owning a Mac",
+      "url": "https://reddit.com/r/FlutterDev/comments/1wm6udz/develop_and_publish_flutter_ios_apps_from_windows/",
+      "inspected_at": "2026-09-21T12:06:14.764953+00:00"
+    },
+    "reddit_1wm1z4y": {
+      "platform": "reddit",
+      "title": "I built an open-source VS Code security extension for Flutter — some things I learned building it",
+      "url": "https://reddit.com/r/FlutterDev/comments/1wm1z4y/i_built_an_opensource_vs_code_security_extension/",
+      "inspected_at": "2026-09-21T12:06:15.561206+00:00"
     }
   },
   "pending_drafts": {
@@ -3290,7 +3326,7 @@
     }
   },
   "recorded_feedback": [],
-  "last_organic_post_timestamp": "2026-09-20T20:23:41.509891+00:00",
+  "last_organic_post_timestamp": "2026-09-21T12:06:25.373628+00:00",
   "organic_posts": [
     {
       "text": "you either die a young enthusiastic builder or live long enough to realize that 90% of tech problems are solved by restarting the router.",
@@ -3495,6 +3531,14 @@
         "Bluesky"
       ],
       "posted_at": "2026-09-20T20:23:41.509891+00:00"
+    },
+    {
+      "text": "you either die a young enthusiastic builder or live long enough to realize that 90% of tech problems are solved by restarting the router.",
+      "topic": "scuba_diving_and_ocean",
+      "platforms": [
+        "Bluesky"
+      ],
+      "posted_at": "2026-09-21T12:06:25.373628+00:00"
     }
   ],
   "x_posts_timestamps": [
