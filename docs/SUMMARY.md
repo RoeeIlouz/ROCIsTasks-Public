@@ -2,6 +2,36 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## ROCIs-Schedule Cross-Project Authentication & Web/Mobile Synchronization Fix - 2026-09-21
+
+#### Problem & Root Causes
+* **Web Secondary Firebase Omission**: `lib/core/services/app_initializer.dart` and `lib/core/services/auth_service.dart` had `if (kIsWeb) return;` guard clauses, preventing the `rocis-schedule` secondary Firebase app from initializing and authenticating on Web.
+* **Cross-Project OAuth Audience Mismatch**: Primary (`rocis-todo`) and secondary (`rocis-schedule`) are distinct Firebase projects. Passing an ID token issued for `rocis-todo` to `_scheduleAuth.signInWithCredential()` failed with `[firebase_auth/invalid-credential]` due to OAuth audience mismatch (`aud`).
+* **Silent Auth State Loss**: If secondary auth failed silently on startup, users with Google accounts were unauthenticated against the `rocis-schedule` project, triggering security rule rejections (`request.auth.uid == userId`) when querying courses or timetable events.
+
+#### Solutions Applied
+1. **Secondary App Initialization on Web (`app_initializer.dart`, `auth_service.dart`)**:
+   - Removed `kIsWeb` early-return guards from secondary Firebase initialization and authentication flows.
+   - Leveraged web-native IndexedDB credential persistence under the secondary app name.
+2. **Resilient Cross-Project Authentication (`auth_service.dart`)**:
+   - Added automatic fallback to `GoogleAuthProvider.credential(accessToken: credential.accessToken)` when full credential sign-in fails. Access tokens are validated against user identity without audience constraints.
+   - Enabled silent secondary sign-in during `ensureSecondaryAuth` via `_oauthManager.getGoogleAccessToken()`.
+   - Added `connectRocisSchedule()` for 1-tap interactive reconnection (using `signInWithPopup` on Web and `authenticate` on Mobile).
+3. **Calendar UI Integration (`calendar_filter_sheet.dart`, `l10n`)**:
+   - Added a reconnection prompt banner in the calendar filter sheet when schedule events are enabled but secondary auth is disconnected.
+   - Added localized string `rocisScheduleDisconnected` across all 8 supported languages (`en`, `he`, `ar`, `de`, `es`, `fr`, `hi`, `sv`).
+4. **Verification**:
+   - `flutter analyze lib/ test/`: 0 errors, 0 warnings (100% clean).
+   - `test/features/calendar/`: 13/13 tests passed.
+   - `test/features/calendar/synced_schedule_event_test.dart`: 7/7 tests passed.
+
+#### Deployment & Release: 0.2.17+107
+* **Web Deployment**: Built release with `flutter build web --release` and deployed to Firebase Hosting (`https://rocis-todo.web.app`).
+* **App Version Protocol**: Synchronized version `0.2.17+107` in `pubspec.yaml` and `lib/core/config/app_config.dart`.
+* **Changelog**: Added concise entry (< 500 chars) to `docs/CHANGELOG.md`.
+* **Shorebird Android Release**: Published release `0.2.17+107` via Shorebird with Flutter 3.47.2 engine.
+* **Google Play Console**: Uploaded release AAB bundle (`70.0 MB`, version code `107`) to the `internal` testing track via `scripts/upload_aab_internal.py`.
+
 ## ROCIs-Schedule Cross-App Synergy & Android FullCalendar Widget Optimization - 2026-09-21
 
 #### Problem & Root Causes
