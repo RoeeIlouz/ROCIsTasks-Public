@@ -2,6 +2,31 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## ROCIs-Schedule Pure OAuth Token Synchronization & Web/Mobile Release - 2026-09-21
+
+#### Problem & Root Causes
+* **Cross-Project Audience Bypass**: When signing into secondary Firebase with `OAuthCredential`, passing the ID token minted for primary project `rocis-todo` caused auth failures. Preferring `GoogleAuthProvider.credential(accessToken: credential.accessToken)` directly bypasses any audience check, providing seamless cross-project authentication.
+* **Web Token Preferencing**: On Web Google sign-in popup, `resolvedToken` was acquired via GIS but `oAuthCred` (with null accessToken) took precedence, falling back to a failed ID-token auth attempt.
+* **Reconnection Cache Stale**: Reconnecting via calendar filter sheet did not clear cache or force-refresh Firestore queries, leaving empty schedule lists cached until TTL expired.
+
+#### Solutions Applied
+1. **Pure Access Token Pipeline (`auth_service.dart`)**:
+   - Preferentially extract and use `accessToken` for secondary Firebase authentication across Web and Mobile.
+   - Fall back to `_oauthManager.getGoogleAccessToken()` and broader exception handling if initial credential sign-in fails.
+   - Enabled silent `attemptLightweightAuthentication` on Web.
+2. **Force-Refresh on Reconnect (`calendar_provider.dart`, `calendar_filter_sheet.dart`)**:
+   - Added `forceRefreshSchedule` parameter to `CalendarProvider.loadEvents()`, clearing `ScheduleFirestoreService` memory/preferences cache on reconnect.
+3. **Verification**:
+   - `flutter analyze lib/ test/`: 0 errors, 0 warnings (100% clean).
+   - `test/features/calendar/`: 13/13 unit tests passed.
+
+#### Deployment & Release: 0.2.18+108
+* **Web Deployment**: Built release and deployed to Firebase Hosting (`https://rocis-todo.web.app`).
+* **App Version Protocol**: Synchronized version `0.2.18+108` in `pubspec.yaml` and `lib/core/config/app_config.dart`.
+* **Changelog**: Added concise entry (< 500 chars) in `docs/CHANGELOG.md`.
+* **Shorebird Android Release**: Published release `0.2.18+108` via Shorebird with Flutter 3.47.2 engine.
+* **Google Play Console**: Uploaded release AAB bundle (`70.0 MB`, version code `108`) to the `internal` testing track via `scripts/upload_aab_internal.py`.
+
 ## ROCIs-Schedule Cross-Project Authentication & Web/Mobile Synchronization Fix - 2026-09-21
 
 #### Problem & Root Causes
