@@ -2,10 +2,10 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rocis_tasks/core/services/analytics_service.dart';
+import 'package:rocis_tasks/firebase_schedule_options.dart';
 
 class SyncedScheduleEvent {
   final String id;
@@ -152,28 +152,6 @@ class SyncedScheduleEvent {
 }
 
 class ScheduleFirestoreService {
-  static const FirebaseOptions _webOptions = FirebaseOptions(
-    apiKey: 'AIzaSyD2OHYo8F6h486p58HkL8VCFDSdu7HH67c',
-    appId: '1:318456267857:web:0d72df7ff505f88c53a470',
-    messagingSenderId: '318456267857',
-    projectId: 'rocis-schedule',
-    authDomain: 'rocis-schedule.firebaseapp.com',
-    storageBucket: 'rocis-schedule.firebasestorage.app',
-  );
-
-  static const FirebaseOptions _androidOptions = FirebaseOptions(
-    apiKey: 'AIzaSyDfHAfG-A3o0ZUyMtudxKkah6wsTKy9z10',
-    appId: '1:318456267857:android:4e12279b28b58c3353a470',
-    messagingSenderId: '318456267857',
-    projectId: 'rocis-schedule',
-    storageBucket: 'rocis-schedule.firebasestorage.app',
-  );
-
-  static FirebaseOptions get _platformOptions {
-    if (kIsWeb) return _webOptions;
-    return _androidOptions;
-  }
-
   FirebaseFirestore? _scheduleDb;
   bool _isInitialized = false;
   String? _userEmail;
@@ -234,7 +212,7 @@ class ScheduleFirestoreService {
       } catch (_) {
         scheduleApp = await Firebase.initializeApp(
           name: 'rocis-schedule',
-          options: _platformOptions,
+          options: ScheduleFirebaseOptions.currentPlatform,
         );
       }
 

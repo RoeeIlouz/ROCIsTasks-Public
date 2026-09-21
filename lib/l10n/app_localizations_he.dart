@@ -1148,6 +1148,9 @@ class AppLocalizationsHe extends AppLocalizations {
       'הקש כדי להתחבר מחדש ולחדש את הסנכרון';
 
   @override
+  String get rocisScheduleDisconnected => 'ROCIs Schedule מנותק';
+
+  @override
   String get reconnect => 'התחבר מחדש';
 
   @override

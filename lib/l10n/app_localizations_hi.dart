@@ -1164,6 +1164,9 @@ class AppLocalizationsHi extends AppLocalizations {
       'पुनः कनेक्ट करने और सिंक फिर से शुरू करने के लिए टैप करें';
 
   @override
+  String get rocisScheduleDisconnected => 'ROCIs Schedule डिस्कनेक्ट हो गया';
+
+  @override
   String get reconnect => 'पुनः कनेक्ट करें';
 
   @override

@@ -414,6 +414,7 @@
   "tasksWidgetSubtitle": "Rullbar uppgiftslista med slutförande med ett tryck och smarta filter.",
   "googleTasksDisconnected": "Google Tasks bortkopplad",
   "googleTasksDisconnectedSubtitle": "Tryck för att ansluta igen och återuppta synkroniseringen",
+  "rocisScheduleDisconnected": "ROCIs Schedule frånkopplad",
   "reconnect": "Återanslut",
   "webPaywallTitle": "Lås upp ROCIs Tasks Pro på webben",
   "webPaywallSubtitle": "Uppgradera till premium för att få tillgång till alla avancerade funktioner på valfri plattform.",

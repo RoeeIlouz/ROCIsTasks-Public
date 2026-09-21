@@ -414,6 +414,7 @@
   "tasksWidgetSubtitle": "Scrollbare Aufgabenliste mit Direktabschluss und intelligenten Filtern.",
   "googleTasksDisconnected": "Google Tasks getrennt",
   "googleTasksDisconnectedSubtitle": "Tippen Sie, um die Verbindung wiederherzustellen und die Synchronisierung fortzusetzen",
+  "rocisScheduleDisconnected": "ROCIs Schedule getrennt",
   "reconnect": "Verbinden",
   "webPaywallTitle": "ROCIs Tasks Pro im Web freischalten",
   "webPaywallSubtitle": "Upgrade auf Premium, um auf allen Plattformen auf alle erweiterten Funktionen zuzugreifen.",

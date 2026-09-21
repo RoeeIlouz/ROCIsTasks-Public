@@ -1179,6 +1179,9 @@ class AppLocalizationsFr extends AppLocalizations {
       'Appuyez pour vous reconnecter et reprendre la synchronisation';
 
   @override
+  String get rocisScheduleDisconnected => 'ROCIs Schedule Déconnecté';
+
+  @override
   String get reconnect => 'Se reconnecter';
 
   @override

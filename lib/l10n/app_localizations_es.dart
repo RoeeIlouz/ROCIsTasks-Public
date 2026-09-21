@@ -1178,6 +1178,9 @@ class AppLocalizationsEs extends AppLocalizations {
       'Toca para reconectar y reanudar la sincronización';
 
   @override
+  String get rocisScheduleDisconnected => 'ROCIs Schedule Desconectado';
+
+  @override
   String get reconnect => 'Reconectar';
 
   @override

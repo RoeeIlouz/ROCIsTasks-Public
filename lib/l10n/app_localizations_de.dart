@@ -1180,6 +1180,9 @@ class AppLocalizationsDe extends AppLocalizations {
       'Tippen Sie, um die Verbindung wiederherzustellen und die Synchronisierung fortzusetzen';
 
   @override
+  String get rocisScheduleDisconnected => 'ROCIs Schedule getrennt';
+
+  @override
   String get reconnect => 'Verbinden';
 
   @override

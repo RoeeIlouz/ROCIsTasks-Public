@@ -414,6 +414,7 @@
   "tasksWidgetSubtitle": "قائمة مهام قابلة للتمرير مع إكمال بنقرة واحدة وفلاتر ذكية.",
   "googleTasksDisconnected": "تم قطع اتصال Google Tasks",
   "googleTasksDisconnectedSubtitle": "انقر لإعادة الاتصال واستئناف المزامنة",
+  "rocisScheduleDisconnected": "تم قطع اتصال ROCIs Schedule",
   "reconnect": "إعادة الاتصال",
   "webPaywallTitle": "افتح ROCIs Tasks Pro على الويب",
   "webPaywallSubtitle": "قم بالترقية إلى بريميوم للوصول إلى جميع الميزات المتقدمة على أي منصة.",

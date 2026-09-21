@@ -2,7 +2,7 @@ name: rocis_tasks
 description: "ROCI's Tasks — A premium task management app with Google Tasks sync, calendar integration, and glassmorphism UI."
 publish_to: "none"
 
-version: 0.2.16+106
+version: 0.2.17+107
 
 environment:
   sdk: ^3.10.0
