@@ -3,8 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:rocis_tasks/core/services/analytics_service.dart';
 import 'package:rocis_tasks/core/services/auth/google_oauth_manager.dart';
 import 'package:rocis_tasks/firebase_schedule_options.dart';
 
@@ -91,6 +91,8 @@ class SyncedScheduleEvent {
           .map((e) => int.tryParse(e.toString()))
           .whereType<int>()
           .toList();
+    } else if (rawDays is num) {
+      parsedDays = [rawDays.toInt()];
     } else if (rawDays is String && rawDays.isNotEmpty) {
       parsedDays = rawDays
           .split(',')
@@ -134,6 +136,12 @@ class SyncedScheduleEvent {
       courseCode = map['courseCode'].toString();
     }
 
+    final isRecurring =
+        map['recurring'] == 1 ||
+        map['recurring'] == true ||
+        map['recurring'] == '1' ||
+        map['recurring'] == 'true';
+
     return SyncedScheduleEvent(
       id: map['id']?.toString() ?? '',
       title: map['title']?.toString() ?? '',
@@ -144,7 +152,7 @@ class SyncedScheduleEvent {
       typeIndex: (map['type'] is num) ? (map['type'] as num).toInt() : 0,
       startTime: start,
       endTime: end,
-      recurring: map['recurring'] == 1 || map['recurring'] == true,
+      recurring: isRecurring,
       daysOfWeek: parsedDays,
       color: eventColor,
       notes: map['notes']?.toString() ?? '',
@@ -229,6 +237,306 @@ class ScheduleFirestoreService {
     }
   }
 
+  Future<String?> _getStoredEmail() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      return prefs.getString(GoogleOAuthManager.keyUserEmail) ??
+          prefs.getString('user_email');
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Convert Firestore REST API document fields into dynamic map
+  static Map<String, dynamic> decodeFirestoreFields(
+    Map<String, dynamic> fields,
+  ) {
+    final result = <String, dynamic>{};
+    fields.forEach((key, val) {
+      if (val is Map<String, dynamic>) {
+        if (val.containsKey('stringValue')) {
+          result[key] = val['stringValue'];
+        } else if (val.containsKey('integerValue')) {
+          result[key] = int.tryParse(val['integerValue'].toString()) ?? 0;
+        } else if (val.containsKey('doubleValue')) {
+          result[key] = (val['doubleValue'] as num).toDouble();
+        } else if (val.containsKey('booleanValue')) {
+          result[key] = val['booleanValue'] == true;
+        } else if (val.containsKey('timestampValue')) {
+          result[key] = val['timestampValue'];
+        } else if (val.containsKey('nullValue')) {
+          result[key] = null;
+        } else if (val.containsKey('arrayValue')) {
+          final arr = val['arrayValue'] as Map<String, dynamic>;
+          final values = arr['values'] as List<dynamic>? ?? [];
+          result[key] = values.map((v) {
+            if (v is Map<String, dynamic>) {
+              return v['stringValue'] ??
+                  v['integerValue'] ??
+                  v['doubleValue'] ??
+                  v['booleanValue'];
+            }
+            return v;
+          }).toList();
+        } else if (val.containsKey('mapValue')) {
+          final mapVal = val['mapValue'] as Map<String, dynamic>;
+          result[key] = decodeFirestoreFields(
+            mapVal['fields'] as Map<String, dynamic>? ?? {},
+          );
+        }
+      } else {
+        result[key] = val;
+      }
+    });
+    return result;
+  }
+
+  /// Resolve ROCIs-Schedule UID via direct Firestore REST query (safe on Web & Isolates)
+  Future<String?> _resolveUserIdViaRest(String targetEmail) async {
+    try {
+      final apiKey = ScheduleFirebaseOptions.currentPlatform.apiKey;
+      final projectId = ScheduleFirebaseOptions.currentPlatform.projectId;
+      final url = Uri.parse(
+        'https://firestore.googleapis.com/v1/projects/$projectId/databases/(default)/documents:runQuery?key=$apiKey',
+      );
+
+      final emailVariants = <String>{targetEmail, targetEmail.toLowerCase()};
+      if (targetEmail.contains('@gmail.com') ||
+          targetEmail.toLowerCase().contains('@gmail.com')) {
+        final parts = targetEmail.split('@');
+        final userPart = parts[0];
+        final domainPart = parts[1];
+        final dotless = '${userPart.replaceAll('.', '')}@$domainPart';
+        emailVariants.add(dotless);
+        emailVariants.add(dotless.toLowerCase());
+      }
+
+      for (final variant in emailVariants) {
+        final body = jsonEncode({
+          'structuredQuery': {
+            'from': [
+              {'collectionId': 'users'},
+            ],
+            'where': {
+              'fieldFilter': {
+                'field': {'fieldPath': 'email'},
+                'op': 'EQUAL',
+                'value': {'stringValue': variant},
+              },
+            },
+            'limit': 1,
+          },
+        });
+
+        final resp = await http
+            .post(
+              url,
+              headers: {'Content-Type': 'application/json'},
+              body: body,
+            )
+            .timeout(const Duration(seconds: 4));
+
+        if (resp.statusCode == 200) {
+          final decoded = jsonDecode(resp.body);
+          if (decoded is List && decoded.isNotEmpty) {
+            final first = decoded.first as Map<String, dynamic>;
+            if (first.containsKey('document')) {
+              final doc = first['document'] as Map<String, dynamic>;
+              final docName = doc['name'] as String? ?? '';
+              final resolvedUid = docName.split('/').last;
+              if (resolvedUid.isNotEmpty) {
+                debugPrint(
+                  'ScheduleFirestoreService: Resolved user via REST ($variant) -> $resolvedUid',
+                );
+                return resolvedUid;
+              }
+            }
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('ScheduleFirestoreService: Error resolving user via REST: $e');
+    }
+    return null;
+  }
+
+  /// Direct REST fetch of courses and events with course metadata
+  Future<List<SyncedScheduleEvent>> _fetchViaRest(String targetUserId) async {
+    try {
+      final apiKey = ScheduleFirebaseOptions.currentPlatform.apiKey;
+      final projectId = ScheduleFirebaseOptions.currentPlatform.projectId;
+
+      final coursesUrl = Uri.parse(
+        'https://firestore.googleapis.com/v1/projects/$projectId/databases/(default)/documents/users/$targetUserId/courses?key=$apiKey',
+      );
+      final eventsUrl = Uri.parse(
+        'https://firestore.googleapis.com/v1/projects/$projectId/databases/(default)/documents/users/$targetUserId/events?key=$apiKey',
+      );
+
+      final responses = await Future.wait([
+        http.get(coursesUrl).timeout(const Duration(seconds: 4)),
+        http.get(eventsUrl).timeout(const Duration(seconds: 4)),
+      ]);
+
+      final coursesResp = responses[0];
+      final eventsResp = responses[1];
+
+      final coursesMap = <String, Map<String, dynamic>>{};
+      if (coursesResp.statusCode == 200) {
+        final coursesJson =
+            jsonDecode(coursesResp.body) as Map<String, dynamic>;
+        final courseDocs = coursesJson['documents'] as List<dynamic>? ?? [];
+        for (final doc in courseDocs) {
+          if (doc is Map<String, dynamic>) {
+            final docName = doc['name'] as String? ?? '';
+            final courseId = docName.split('/').last;
+            final fields = doc['fields'] as Map<String, dynamic>? ?? {};
+            coursesMap[courseId] = decodeFirestoreFields(fields);
+          }
+        }
+      }
+
+      if (eventsResp.statusCode == 200) {
+        final eventsJson = jsonDecode(eventsResp.body) as Map<String, dynamic>;
+        final eventDocs = eventsJson['documents'] as List<dynamic>? ?? [];
+        final events = <SyncedScheduleEvent>[];
+        for (final doc in eventDocs) {
+          if (doc is Map<String, dynamic>) {
+            final fields = doc['fields'] as Map<String, dynamic>? ?? {};
+            final decoded = decodeFirestoreFields(fields);
+            final courseId = decoded['courseId']?.toString() ?? '';
+            events.add(
+              SyncedScheduleEvent.fromMap(
+                decoded,
+                courseMap: coursesMap[courseId],
+              ),
+            );
+          }
+        }
+        debugPrint(
+          'ScheduleFirestoreService: Fetched ${events.length} events via REST for $targetUserId',
+        );
+        return events;
+      }
+    } catch (e) {
+      debugPrint('ScheduleFirestoreService: REST fetch error: $e');
+    }
+    return [];
+  }
+
+  /// Fetch events from Firestore SDK instance
+  Future<List<SyncedScheduleEvent>> _fetchFromFirestoreDb(
+    String targetUserId,
+  ) async {
+    if (!isReady) {
+      await initialize();
+    }
+    final db = _scheduleDb;
+    if (db == null) return [];
+
+    try {
+      final coursesSnap = await db
+          .collection('users')
+          .doc(targetUserId)
+          .collection('courses')
+          .get()
+          .timeout(const Duration(seconds: 4));
+      final coursesMap = <String, Map<String, dynamic>>{};
+      for (final doc in coursesSnap.docs) {
+        coursesMap[doc.id] = doc.data();
+      }
+
+      final eventsSnap = await db
+          .collection('users')
+          .doc(targetUserId)
+          .collection('events')
+          .get()
+          .timeout(const Duration(seconds: 4));
+
+      return eventsSnap.docs.map((doc) {
+        final data = doc.data();
+        final courseId = data['courseId']?.toString() ?? '';
+        return SyncedScheduleEvent.fromMap(
+          data,
+          courseMap: coursesMap[courseId],
+        );
+      }).toList();
+    } catch (e) {
+      debugPrint('ScheduleFirestoreService: Firestore SDK fetch error: $e');
+      return [];
+    }
+  }
+
+  /// Resolve user by email from Firestore SDK instance
+  Future<String?> _resolveByEmailFromDb(String targetEmail) async {
+    if (!isReady) {
+      await initialize();
+    }
+    final db = _scheduleDb;
+    if (db == null) return null;
+
+    final emailVariants = <String>{targetEmail, targetEmail.toLowerCase()};
+    if (targetEmail.contains('@gmail.com') ||
+        targetEmail.toLowerCase().contains('@gmail.com')) {
+      final parts = targetEmail.split('@');
+      final userPart = parts[0];
+      final domainPart = parts[1];
+      final dotless = '${userPart.replaceAll('.', '')}@$domainPart';
+      emailVariants.add(dotless);
+      emailVariants.add(dotless.toLowerCase());
+    }
+
+    for (final variant in emailVariants) {
+      try {
+        final query = await db
+            .collection('users')
+            .where('email', isEqualTo: variant)
+            .limit(1)
+            .get()
+            .timeout(const Duration(seconds: 4));
+        if (query.docs.isNotEmpty) {
+          return query.docs.first.id;
+        }
+      } catch (e) {
+        debugPrint(
+          'ScheduleFirestoreService: Error querying user by email ($variant): $e',
+        );
+      }
+    }
+
+    // Normalized scan fallback
+    try {
+      final usersSnap = await db
+          .collection('users')
+          .limit(50)
+          .get()
+          .timeout(const Duration(seconds: 4));
+      final normTarget = targetEmail
+          .split('@')
+          .first
+          .replaceAll('.', '')
+          .toLowerCase();
+      for (final doc in usersSnap.docs) {
+        final docEmail = doc.data()['email']?.toString();
+        if (docEmail != null) {
+          final normDoc = docEmail
+              .split('@')
+              .first
+              .replaceAll('.', '')
+              .toLowerCase();
+          if (normDoc == normTarget) {
+            return doc.id;
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint(
+        'ScheduleFirestoreService: Error during user collection scan: $e',
+      );
+    }
+    return null;
+  }
+
   /// Resolve ROCIs Schedule user ID. Checks local cache, secondary auth, direct UID doc, then queries by email.
   Future<String?> _resolveScheduleUserId({String? uid, String? email}) async {
     if (_cachedScheduleUserId != null && _cachedScheduleUserId!.isNotEmpty) {
@@ -244,8 +552,7 @@ class ScheduleFirestoreService {
       }
     } catch (_) {}
 
-    final db = _scheduleDb;
-    if (db == null) return null;
+    final targetEmail = email ?? _userEmail ?? await _getStoredEmail();
 
     // 0. Check secondary Firebase Auth currentUser first
     try {
@@ -262,108 +569,44 @@ class ScheduleFirestoreService {
       }
     } catch (_) {}
 
-    // 1. Direct UID document lookup
-    if (uid != null && uid.isNotEmpty) {
-      try {
-        final doc = await db.collection('users').doc(uid).get();
-        if (doc.exists) {
-          _cachedScheduleUserId = uid;
-          _saveCachedUserId(uid);
-          debugPrint(
-            'ScheduleFirestoreService: Resolved user by UID doc: $uid',
-          );
-          return _cachedScheduleUserId;
-        }
-      } catch (e) {
-        debugPrint('ScheduleFirestoreService: Error checking doc by uid: $e');
-      }
-    }
-
-    // 2. Email lookup across users collection (standard + lowercase + Gmail dotless fallback)
-    String? resolvedEmail = email ?? _userEmail;
-    if (resolvedEmail == null || resolvedEmail.isEmpty) {
-      try {
-        final prefs = await SharedPreferences.getInstance();
-        resolvedEmail =
-            prefs.getString(GoogleOAuthManager.keyUserEmail) ??
-            prefs.getString('user_email');
-      } catch (_) {}
-    }
-    final targetEmail = resolvedEmail;
+    // 1. Direct REST lookup by email (fastest, universally supported)
     if (targetEmail != null && targetEmail.isNotEmpty) {
-      final emailVariants = <String>{targetEmail, targetEmail.toLowerCase()};
-      if (targetEmail.contains('@gmail.com') ||
-          targetEmail.toLowerCase().contains('@gmail.com')) {
-        final parts = targetEmail.split('@');
-        final userPart = parts[0];
-        final domainPart = parts[1];
-        final dotless = '${userPart.replaceAll('.', '')}@$domainPart';
-        emailVariants.add(dotless);
-        emailVariants.add(dotless.toLowerCase());
+      final restUid = await _resolveUserIdViaRest(targetEmail);
+      if (restUid != null && restUid.isNotEmpty) {
+        _cachedScheduleUserId = restUid;
+        _saveCachedUserId(restUid);
+        return restUid;
       }
+    }
 
-      for (final variant in emailVariants) {
+    // 2. Direct UID document lookup via Firestore SDK
+    if (uid != null && uid.isNotEmpty) {
+      if (!isReady) await initialize();
+      final db = _scheduleDb;
+      if (db != null) {
         try {
-          final query = await db
-              .collection('users')
-              .where('email', isEqualTo: variant)
-              .limit(1)
-              .get();
-          if (query.docs.isNotEmpty) {
-            _cachedScheduleUserId = query.docs.first.id;
-            _saveCachedUserId(_cachedScheduleUserId!);
-            if (variant != targetEmail) {
-              AnalyticsService().logEvent(
-                name: 'schedule_synergy_dot_fallback',
-                parameters: {'match_type': 'query_variant'},
-              );
-            }
+          final doc = await db.collection('users').doc(uid).get();
+          if (doc.exists) {
+            _cachedScheduleUserId = uid;
+            _saveCachedUserId(uid);
             debugPrint(
-              'ScheduleFirestoreService: Resolved user by email ($variant) -> $_cachedScheduleUserId',
+              'ScheduleFirestoreService: Resolved user by UID doc: $uid',
             );
             return _cachedScheduleUserId;
           }
         } catch (e) {
-          debugPrint(
-            'ScheduleFirestoreService: Error querying user by email ($variant): $e',
-          );
+          debugPrint('ScheduleFirestoreService: Error checking doc by uid: $e');
         }
       }
+    }
 
-      // 3. Fallback: scan user docs with client-side normalized email comparison
-      try {
-        final usersSnap = await db.collection('users').limit(50).get();
-        final normTarget = targetEmail
-            .split('@')
-            .first
-            .replaceAll('.', '')
-            .toLowerCase();
-        for (final doc in usersSnap.docs) {
-          final docEmail = doc.data()['email']?.toString();
-          if (docEmail != null) {
-            final normDoc = docEmail
-                .split('@')
-                .first
-                .replaceAll('.', '')
-                .toLowerCase();
-            if (normDoc == normTarget) {
-              _cachedScheduleUserId = doc.id;
-              _saveCachedUserId(_cachedScheduleUserId!);
-              AnalyticsService().logEvent(
-                name: 'schedule_synergy_dot_fallback',
-                parameters: {'match_type': 'normalized_scan'},
-              );
-              debugPrint(
-                'ScheduleFirestoreService: Resolved user by normalized scan ($docEmail) -> $_cachedScheduleUserId',
-              );
-              return _cachedScheduleUserId;
-            }
-          }
-        }
-      } catch (e) {
-        debugPrint(
-          'ScheduleFirestoreService: Error during user collection scan: $e',
-        );
+    // 3. Email lookup via Firestore SDK
+    if (targetEmail != null && targetEmail.isNotEmpty) {
+      final dbUid = await _resolveByEmailFromDb(targetEmail);
+      if (dbUid != null && dbUid.isNotEmpty) {
+        _cachedScheduleUserId = dbUid;
+        _saveCachedUserId(dbUid);
+        return dbUid;
       }
     }
 
@@ -430,13 +673,20 @@ class ScheduleFirestoreService {
     String? email,
     bool forceRefresh = false,
   }) async {
+    // 1. In-memory TTL cache (never return empty list just because cached)
     if (!forceRefresh &&
         _cachedEvents != null &&
+        _cachedEvents!.isNotEmpty &&
         _lastFetchTime != null &&
         DateTime.now().difference(_lastFetchTime!) < _cacheTtl) {
       return _cachedEvents!;
     }
 
+    if (forceRefresh) {
+      clearCache();
+    }
+
+    // 2. Load local offline cache if in-memory is empty
     if (_cachedEvents == null || _cachedEvents!.isEmpty) {
       final local = await _loadCachedEvents();
       if (local.isNotEmpty) {
@@ -444,56 +694,80 @@ class ScheduleFirestoreService {
       }
     }
 
-    if (!isReady) {
-      await initialize();
-    }
-    if (!isReady) return _cachedEvents ?? [];
+    final targetEmail = email ?? _userEmail ?? await _getStoredEmail();
 
-    final targetUserId = await _resolveScheduleUserId(
+    // 3. Resolve schedule user ID
+    var targetUserId = await _resolveScheduleUserId(
       uid: uid,
-      email: email ?? _userEmail,
+      email: targetEmail,
     );
-    if (targetUserId == null || targetUserId.isEmpty) {
-      debugPrint(
-        'ScheduleFirestoreService: Could not resolve schedule user (uid: $uid, email: ${email ?? _userEmail})',
-      );
-      return _cachedEvents ?? [];
+
+    List<SyncedScheduleEvent> events = [];
+
+    // 4. Try Firestore SDK fetch first if user ID is known
+    if (targetUserId != null && targetUserId.isNotEmpty) {
+      events = await _fetchFromFirestoreDb(targetUserId);
     }
 
-    try {
-      final coursesSnap = await _scheduleDb!
-          .collection('users')
-          .doc(targetUserId)
-          .collection('courses')
-          .get();
-      final coursesMap = <String, Map<String, dynamic>>{};
-      for (final doc in coursesSnap.docs) {
-        coursesMap[doc.id] = doc.data();
-      }
+    // 5. If SDK returned empty, try direct REST fetch
+    if (events.isEmpty && targetUserId != null && targetUserId.isNotEmpty) {
+      events = await _fetchViaRest(targetUserId);
+    }
 
-      final eventsSnap = await _scheduleDb!
-          .collection('users')
-          .doc(targetUserId)
-          .collection('events')
-          .get();
+    // 6. SELF-HEALING: If events are STILL empty, targetUserId might be invalid or stale!
+    // Invalidate stale ID and re-resolve with user email via REST & SDK
+    if (events.isEmpty && targetEmail != null && targetEmail.isNotEmpty) {
+      debugPrint(
+        'ScheduleFirestoreService: No events for targetUserId ($targetUserId). Self-healing by email ($targetEmail)...',
+      );
+      _cachedScheduleUserId = null;
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.remove('cached_schedule_user_id');
+      } catch (_) {}
 
-      final events = eventsSnap.docs.map((doc) {
-        final data = doc.data();
-        final courseId = data['courseId']?.toString() ?? '';
-        return SyncedScheduleEvent.fromMap(
-          data,
-          courseMap: coursesMap[courseId],
+      // Try REST email lookup
+      var newUserId = await _resolveUserIdViaRest(targetEmail);
+      newUserId ??= await _resolveByEmailFromDb(targetEmail);
+
+      if (newUserId != null &&
+          newUserId.isNotEmpty &&
+          newUserId != targetUserId) {
+        targetUserId = newUserId;
+        debugPrint(
+          'ScheduleFirestoreService: Self-healed to targetUserId: $targetUserId',
         );
-      }).toList();
+        events = await _fetchViaRest(targetUserId);
+        if (events.isEmpty) {
+          events = await _fetchFromFirestoreDb(targetUserId);
+        }
+      }
+    }
 
+    // 7. If events found, update cache and persist
+    if (events.isNotEmpty) {
       _cachedEvents = events;
       _lastFetchTime = DateTime.now();
       _saveCachedEvents(events);
+      if (targetUserId != null && targetUserId.isNotEmpty) {
+        _cachedScheduleUserId = targetUserId;
+        _saveCachedUserId(targetUserId);
+      }
       return events;
-    } catch (e) {
-      debugPrint('ScheduleFirestoreService: Error fetching events: $e');
-      return _cachedEvents ?? [];
     }
+
+    // 8. If network returned empty, return previously cached events if available
+    if (_cachedEvents != null && _cachedEvents!.isNotEmpty) {
+      return _cachedEvents!;
+    }
+
+    final fallback = await _loadCachedEvents();
+    if (fallback.isNotEmpty) {
+      _cachedEvents = fallback;
+      return fallback;
+    }
+
+    return [];
   }
 
   /// Stream schedule events with course metadata

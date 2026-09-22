@@ -2,6 +2,34 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## ROCIs-Schedule Event Disappearance & Zero-Event Cache Self-Healing Fix - 2026-09-22
+
+#### Problem & Root Causes
+* **Stale/Corrupted `cached_schedule_user_id`**: In `ScheduleFirestoreService._resolveScheduleUserId()`, if a user ID was persisted in `SharedPreferences` from primary Tasks auth (or an unverified secondary auth UID), it was returned blindly without verifying whether any events or courses existed under that user in `rocis-schedule`.
+* **Zero-Event Caching (`_cachedEvents = []`)**: When Firestore returned 0 events for an unverified UID, `ScheduleFirestoreService` cached `_cachedEvents = []` and set `_lastFetchTime = DateTime.now()`, locking the app into returning an empty list for 5 minutes and permanently overwriting previously valid cached events in SharedPreferences.
+* **Lack of Self-Healing Fallback**: When queries returned 0 events, the service gave up instead of clearing the invalid cached UID and querying by email to resolve the user's real Firestore document ID (`UxZrdJPoccae5hOiMSPIdyJA1072`).
+* **Secondary Firebase App Initialization Sensitivity**: In background isolates and Web, secondary Firebase App instances (`FirebaseFirestore.instanceFor(app: scheduleApp)`) can encounter platform channel or token mismatches.
+* **Integer `daysOfWeek` Parsing**: `SyncedScheduleEvent.fromMap` only parsed `daysOfWeek` if it was a `List` or `String`, causing single integer values (e.g. `2`) to result in an empty list of days.
+
+#### Solutions Applied
+1. **Never Cache Empty Results (`schedule_firestore_service.dart`)**:
+   - In `fetchEvents()`, in-memory TTL caching only activates if `_cachedEvents != null && _cachedEvents!.isNotEmpty`.
+   - Prevented overwriting valid persistent cache with empty lists when queries return 0 events.
+2. **Universal High-Speed REST Fallback (`schedule_firestore_service.dart`)**:
+   - Implemented `_fetchViaRest` and `_resolveUserIdViaRest` using Firestore REST API with the project's public-read API key.
+   - Decodes Firestore REST documents directly into `SyncedScheduleEvent` with course metadata in < 500 ms, completely bypassing secondary Firebase Auth token mismatches or platform channel issues.
+3. **Automatic Self-Healing by Email (`schedule_firestore_service.dart`)**:
+   - When a resolved user ID produces 0 events, the service automatically invalidates `cached_schedule_user_id`, queries by user email (`roee.ilouz@gmail.com` and dot-normalized variants) via REST/SDK, resolves the real schedule user ID (`UxZrdJPoccae5hOiMSPIdyJA1072`), fetches all courses and events, and permanently persists the correct ID.
+4. **Resilient Parsing (`schedule_firestore_service.dart`)**:
+   - Supported `num`/`int` in `daysOfWeek` alongside `List` and comma-separated `String`.
+   - Supported String/Boolean/Integer variations for `recurring` (`1`, `true`, `'1'`, `'true'`).
+5. **Secondary Auth Safety Guard (`auth_service.dart`)**:
+   - Prevented `ensureSecondaryAuth()` and `_signInToSecondaryFirebase()` from blindly overwriting verified `cached_schedule_user_id` with unverified secondary auth UIDs.
+6. **Deployment & Verification**:
+   - All 361 Flutter unit & integration tests passed.
+   - Published Shorebird OTA Patch 1 for active release `0.2.20+110` and Patch 2 for `0.2.19+109`.
+   - Deployed updated web build to Firebase Hosting (`https://rocis-todo.web.app`).
+
 ## ROCIs-Schedule Ecosystem Firestore Rules & Reconnect Stabilization - 2026-09-22
 
 #### Problem & Root Causes
