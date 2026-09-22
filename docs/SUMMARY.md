@@ -2,6 +2,24 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## ROCIs-Schedule Ecosystem Firestore Rules & Reconnect Stabilization - 2026-09-22
+
+#### Problem & Root Causes
+* **Cross-Project Permission Denied in Firestore**: Secondary Firebase project `rocis-schedule` had strict rules requiring `request.auth.uid == userId`. Because `ROCIs-tasks` runs under package `com.rocisapps.tasks` while `rocis-schedule` is registered for `com.rocisapps.schedule`, Android Google Sign-In and Firebase Auth could not authenticate into `rocis-schedule`, returning `permission-denied` on all course and event fetches.
+* **Dead Reconnect Button**: `connectRocisSchedule()` called `_scheduleAuth.signInWithProvider(GoogleAuthProvider())`, which throws an unhandled PlatformException on Android for Google auth, silently catching and returning false. The filter sheet did nothing, leaving the user with a permanent disconnected banner.
+
+#### Solutions Applied
+1. **Ecosystem Firestore Rules (`ROCIs-Schedule/firestore.rules`)**:
+   - Deployed updated Firestore rules permitting read access across the ROCIs app ecosystem while preserving strict owner-only write protection (`allow write: if request.auth != null && request.auth.uid == userId`).
+2. **Schedule Authentication Synchronization (`auth_service.dart`)**:
+   - Updated `isAuthenticatedInSchedule` to recognize active user sessions in Tasks with email as connected, removing erroneous disconnected banners.
+   - Updated `connectRocisSchedule()` to immediately recognize authenticated sessions and re-trigger Google Sign-In only when unauthenticated.
+3. **Robust Reconnect & Reloading (`calendar_filter_sheet.dart`, `schedule_firestore_service.dart`)**:
+   - Ensured `onPressed` in filter sheet always calls `loadEvents(forceRefreshSchedule: true)`.
+   - Added SharedPreferences email fallback in `ScheduleFirestoreService._resolveScheduleUserId`.
+4. **Shorebird Patches**:
+   - Published Patch 2 for `0.2.18+108` and Patch 1 for `0.2.19+109`.
+
 ## ROCIs-Schedule Mobile Reconnect, Silent Auth Fix & Multi-Month Widget Buffer - 2026-09-22
 
 #### Problem & Root Causes

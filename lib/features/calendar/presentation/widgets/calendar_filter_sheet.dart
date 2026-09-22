@@ -110,9 +110,9 @@ class CalendarFilterSheet extends StatelessWidget {
                                       ),
                                       TextButton(
                                         onPressed: () async {
-                                          final success = await authService
+                                          await authService
                                               .connectRocisSchedule();
-                                          if (success) {
+                                          if (context.mounted) {
                                             await provider.loadEvents(
                                               forceRefreshSchedule: true,
                                             );
