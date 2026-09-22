@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-21T21:45:00.200526+00:00",
+  "last_run_timestamp": "2026-09-22T03:29:47.426067+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -3026,6 +3026,42 @@
       "title": "Copy-Paste-Media Flutter Package",
       "url": "https://reddit.com/r/FlutterDev/comments/1wmnzkd/copypastemedia_flutter_package/",
       "inspected_at": "2026-09-21T21:44:52.189168+00:00"
+    },
+    "reddit_1wmyarc": {
+      "platform": "reddit",
+      "title": "Built a pay-to-rank leaderboard for AI tools — curious what people think",
+      "url": "https://reddit.com/r/SideProject/comments/1wmyarc/built_a_paytorank_leaderboard_for_ai_tools/",
+      "inspected_at": "2026-09-22T03:29:28.987098+00:00"
+    },
+    "reddit_1wmy3of": {
+      "platform": "reddit",
+      "title": "Deviceknock",
+      "url": "https://reddit.com/r/SideProject/comments/1wmy3of/deviceknock/",
+      "inspected_at": "2026-09-22T03:29:33.760403+00:00"
+    },
+    "reddit_1wmxy8t": {
+      "platform": "reddit",
+      "title": "How are you guys handling promotion?",
+      "url": "https://reddit.com/r/SideProject/comments/1wmxy8t/how_are_you_guys_handling_promotion/",
+      "inspected_at": "2026-09-22T03:29:34.989552+00:00"
+    },
+    "reddit_1wmxweg": {
+      "platform": "reddit",
+      "title": "Any people here who are into tattoos?",
+      "url": "https://reddit.com/r/SideProject/comments/1wmxweg/any_people_here_who_are_into_tattoos/",
+      "inspected_at": "2026-09-22T03:29:35.857087+00:00"
+    },
+    "reddit_1wj81xz": {
+      "platform": "reddit",
+      "title": "Me and my girlfriend can never decide on a movie to watch",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wj81xz/me_and_my_girlfriend_can_never_decide_on_a_movie/",
+      "inspected_at": "2026-09-22T03:29:36.604234+00:00"
+    },
+    "reddit_1wmq2vh": {
+      "platform": "reddit",
+      "title": "GitHub - ClevesDev/horizontal_credit_card: A modern, customizable horizontal credit and debit card UI widget for Flutter fintech apps with 3D perspective tilt, holographic foil, rolling CVV, and zero dependencies.",
+      "url": "https://reddit.com/r/FlutterDev/comments/1wmq2vh/github_clevesdevhorizontal_credit_card_a_modern/",
+      "inspected_at": "2026-09-22T03:29:37.181809+00:00"
     }
   },
   "pending_drafts": {
@@ -3362,7 +3398,7 @@
     }
   },
   "recorded_feedback": [],
-  "last_organic_post_timestamp": "2026-09-21T12:06:25.373628+00:00",
+  "last_organic_post_timestamp": "2026-09-22T03:29:46.947899+00:00",
   "organic_posts": [
     {
       "text": "you either die a young enthusiastic builder or live long enough to realize that 90% of tech problems are solved by restarting the router.",
@@ -3575,6 +3611,15 @@
         "Bluesky"
       ],
       "posted_at": "2026-09-21T12:06:25.373628+00:00"
+    },
+    {
+      "text": "the biggest lie i tell myself is 'i don't need to write this down, i'll remember it tomorrow morning'.",
+      "topic": "scuba_diving_and_ocean",
+      "platforms": [
+        "Twitter/X",
+        "Bluesky"
+      ],
+      "posted_at": "2026-09-22T03:29:46.947899+00:00"
     }
   ],
   "x_posts_timestamps": [
@@ -3589,7 +3634,8 @@
     "2026-09-16T16:14:14.756027+00:00",
     "2026-09-18T03:27:33.829608+00:00",
     "2026-09-19T10:23:52.441479+00:00",
-    "2026-09-20T20:23:41.196159+00:00"
+    "2026-09-20T20:23:41.196159+00:00",
+    "2026-09-22T03:29:46.396502+00:00"
   ],
   "posted_devlogs": {
     "devlog_0_2_2_60_2026_07_17_190f9f3082": {
