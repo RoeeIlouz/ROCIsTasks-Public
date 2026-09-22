@@ -297,7 +297,11 @@ class AuthService extends ChangeNotifier {
 
   FirebaseAuth? get scheduleAuth => _scheduleAuth;
 
-  bool get isAuthenticatedInSchedule => _scheduleAuth?.currentUser != null;
+  bool get isAuthenticatedInSchedule {
+    if (_scheduleAuth?.currentUser != null) return true;
+    final user = currentUser;
+    return user != null && (user.email?.isNotEmpty ?? false);
+  }
 
   Future<UserCredential?> signInWithGoogle() async {
     if (kIsWeb) {
@@ -722,16 +726,24 @@ class AuthService extends ChangeNotifier {
         return true;
       }
 
-      // First attempt silent ensureSecondaryAuth
-      await ensureSecondaryAuth();
-      if (_scheduleAuth?.currentUser != null) {
+      // If already authenticated in Tasks with an email, schedule is connected
+      if (currentUser != null && (currentUser!.email?.isNotEmpty ?? false)) {
         scheduleAuthError.value = null;
         notifyListeners();
         return true;
       }
 
-      final GoogleAuthProvider googleProvider = GoogleAuthProvider();
+      // First attempt silent ensureSecondaryAuth
+      await ensureSecondaryAuth();
+      if (_scheduleAuth?.currentUser != null ||
+          (currentUser != null && (currentUser!.email?.isNotEmpty ?? false))) {
+        scheduleAuthError.value = null;
+        notifyListeners();
+        return true;
+      }
+
       if (kIsWeb) {
+        final GoogleAuthProvider googleProvider = GoogleAuthProvider();
         final userCred = await _scheduleAuth!.signInWithPopup(googleProvider);
         final secUid = userCred.user?.uid;
         if (secUid != null && secUid.isNotEmpty) {
@@ -742,18 +754,13 @@ class AuthService extends ChangeNotifier {
         notifyListeners();
         return true;
       } else {
-        // On Mobile: Use native federated signInWithProvider to authenticate directly against rocis-schedule
-        final userCred = await _scheduleAuth!.signInWithProvider(
-          googleProvider,
-        );
-        final secUid = userCred.user?.uid;
-        if (secUid != null && secUid.isNotEmpty) {
-          final prefs = await SharedPreferences.getInstance();
-          await prefs.setString('cached_schedule_user_id', secUid);
+        // On Mobile: trigger sign in with Google to link the user's account in Tasks
+        final userCred = await signInWithGoogle();
+        if (userCred?.user != null) {
+          scheduleAuthError.value = null;
+          notifyListeners();
+          return true;
         }
-        scheduleAuthError.value = null;
-        notifyListeners();
-        return true;
       }
     } catch (e) {
       AppLogger.warning('connectRocisSchedule failed', error: e, tag: 'Auth');

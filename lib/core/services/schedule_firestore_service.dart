@@ -5,6 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rocis_tasks/core/services/analytics_service.dart';
+import 'package:rocis_tasks/core/services/auth/google_oauth_manager.dart';
 import 'package:rocis_tasks/firebase_schedule_options.dart';
 
 class SyncedScheduleEvent {
@@ -279,7 +280,16 @@ class ScheduleFirestoreService {
     }
 
     // 2. Email lookup across users collection (standard + lowercase + Gmail dotless fallback)
-    final targetEmail = email ?? _userEmail;
+    String? resolvedEmail = email ?? _userEmail;
+    if (resolvedEmail == null || resolvedEmail.isEmpty) {
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        resolvedEmail =
+            prefs.getString(GoogleOAuthManager.keyUserEmail) ??
+            prefs.getString('user_email');
+      } catch (_) {}
+    }
+    final targetEmail = resolvedEmail;
     if (targetEmail != null && targetEmail.isNotEmpty) {
       final emailVariants = <String>{targetEmail, targetEmail.toLowerCase()};
       if (targetEmail.contains('@gmail.com') ||
