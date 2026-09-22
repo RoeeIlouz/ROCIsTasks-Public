@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-22T11:02:50.888400+00:00",
+  "last_run_timestamp": "2026-09-22T16:28:18.626297+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -3098,6 +3098,42 @@
       "title": "Angle Translator — Open source tool for rotation code across 10+ platforms",
       "url": "https://reddit.com/r/FlutterDev/comments/1wn0gqw/angle_translator_open_source_tool_for_rotation/",
       "inspected_at": "2026-09-22T11:02:32.871621+00:00"
+    },
+    "reddit_1wndw5m": {
+      "platform": "reddit",
+      "title": "I made this website and now I can’t tell if it looks good or I just stared at it too long",
+      "url": "https://reddit.com/r/SideProject/comments/1wndw5m/i_made_this_website_and_now_i_cant_tell_if_it/",
+      "inspected_at": "2026-09-22T16:21:32.349773+00:00"
+    },
+    "reddit_1wndsod": {
+      "platform": "reddit",
+      "title": "OnePin - a peptide and compound tracker that puts remaining supply beside the daily log",
+      "url": "https://reddit.com/r/SideProject/comments/1wndsod/onepin_a_peptide_and_compound_tracker_that_puts/",
+      "inspected_at": "2026-09-22T16:22:19.206540+00:00"
+    },
+    "reddit_1wndqvh": {
+      "platform": "reddit",
+      "title": "I built Dancy Ants because audio-visual software was too complicated and expensive",
+      "url": "https://reddit.com/r/SideProject/comments/1wndqvh/i_built_dancy_ants_because_audiovisual_software/",
+      "inspected_at": "2026-09-22T16:26:51.303493+00:00"
+    },
+    "reddit_1wndphh": {
+      "platform": "reddit",
+      "title": "Tracker/Reminder for Lab Sample QCs and Expiration Dates?",
+      "url": "https://reddit.com/r/SideProject/comments/1wndphh/trackerreminder_for_lab_sample_qcs_and_expiration/",
+      "inspected_at": "2026-09-22T16:27:12.729442+00:00"
+    },
+    "reddit_1wna417": {
+      "platform": "reddit",
+      "title": "🚀 Tired of installing the full Android Studio just to run an Android Emulator?",
+      "url": "https://reddit.com/r/FlutterDev/comments/1wna417/tired_of_installing_the_full_android_studio_just/",
+      "inspected_at": "2026-09-22T16:27:34.163577+00:00"
+    },
+    "reddit_1wn9x63": {
+      "platform": "reddit",
+      "title": "vertical_credit_card: Sleek vertical credit & debit card widget with 3D tilt physics, Apple Wallet stack, and 0 external dependencies",
+      "url": "https://reddit.com/r/FlutterDev/comments/1wn9x63/vertical_credit_card_sleek_vertical_credit_debit/",
+      "inspected_at": "2026-09-22T16:27:47.307540+00:00"
     }
   },
   "pending_drafts": {
@@ -3434,7 +3470,7 @@
     }
   },
   "recorded_feedback": [],
-  "last_organic_post_timestamp": "2026-09-22T03:29:46.947899+00:00",
+  "last_organic_post_timestamp": "2026-09-22T16:28:18.113467+00:00",
   "organic_posts": [
     {
       "text": "you either die a young enthusiastic builder or live long enough to realize that 90% of tech problems are solved by restarting the router.",
@@ -3656,6 +3692,14 @@
         "Bluesky"
       ],
       "posted_at": "2026-09-22T03:29:46.947899+00:00"
+    },
+    {
+      "text": "nobody talks about the emotional transition between 'today i will study for my exam' and 'today i will rewrite my entire dotfiles configuration from scratch'.",
+      "topic": "student_and_study_grind",
+      "platforms": [
+        "Bluesky"
+      ],
+      "posted_at": "2026-09-22T16:28:18.113467+00:00"
     }
   ],
   "x_posts_timestamps": [
