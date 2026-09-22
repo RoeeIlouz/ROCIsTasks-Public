@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-22T03:29:47.426067+00:00",
+  "last_run_timestamp": "2026-09-22T11:02:50.888400+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -3062,6 +3062,42 @@
       "title": "GitHub - ClevesDev/horizontal_credit_card: A modern, customizable horizontal credit and debit card UI widget for Flutter fintech apps with 3D perspective tilt, holographic foil, rolling CVV, and zero dependencies.",
       "url": "https://reddit.com/r/FlutterDev/comments/1wmq2vh/github_clevesdevhorizontal_credit_card_a_modern/",
       "inspected_at": "2026-09-22T03:29:37.181809+00:00"
+    },
+    "reddit_1wn6anq": {
+      "platform": "reddit",
+      "title": "Nova - Local AI harness that works with small models",
+      "url": "https://reddit.com/r/SideProject/comments/1wn6anq/nova_local_ai_harness_that_works_with_small_models/",
+      "inspected_at": "2026-09-22T11:01:54.674933+00:00"
+    },
+    "reddit_1wn67kr": {
+      "platform": "reddit",
+      "title": "Storewake - Connect your AI assistant to your app's rankings, revenue and Apple Ads data",
+      "url": "https://reddit.com/r/SideProject/comments/1wn67kr/storewake_connect_your_ai_assistant_to_your_apps/",
+      "inspected_at": "2026-09-22T11:01:57.193488+00:00"
+    },
+    "reddit_1wn64v8": {
+      "platform": "reddit",
+      "title": "You need customers (well, who doesn't?) and every channel wants either a big chunk of cash or your weekends. I built a  where one product gets the whole screen for an hour.",
+      "url": "https://reddit.com/r/SideProject/comments/1wn64v8/you_need_customers_well_who_doesnt_and_every/",
+      "inspected_at": "2026-09-22T11:02:00.355563+00:00"
+    },
+    "reddit_1wmxngr": {
+      "platform": "reddit",
+      "title": "Roast Peeka: one photo of your fridge turns into dinner. 10 testers in and almost nobody came back on day 2.",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wmxngr/roast_peeka_one_photo_of_your_fridge_turns_into/",
+      "inspected_at": "2026-09-22T11:02:07.423666+00:00"
+    },
+    "reddit_1wmw6nk": {
+      "platform": "reddit",
+      "title": "Roast this idea: a simulator that lets small businesses test decisions before making them",
+      "url": "https://reddit.com/r/roastmystartup/comments/1wmw6nk/roast_this_idea_a_simulator_that_lets_small/",
+      "inspected_at": "2026-09-22T11:02:31.428669+00:00"
+    },
+    "reddit_1wn0gqw": {
+      "platform": "reddit",
+      "title": "Angle Translator — Open source tool for rotation code across 10+ platforms",
+      "url": "https://reddit.com/r/FlutterDev/comments/1wn0gqw/angle_translator_open_source_tool_for_rotation/",
+      "inspected_at": "2026-09-22T11:02:32.871621+00:00"
     }
   },
   "pending_drafts": {
