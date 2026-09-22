@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-22T16:28:18.626297+00:00",
+  "last_run_timestamp": "2026-09-22T20:56:36.083354+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -3134,6 +3134,42 @@
       "title": "vertical_credit_card: Sleek vertical credit & debit card widget with 3D tilt physics, Apple Wallet stack, and 0 external dependencies",
       "url": "https://reddit.com/r/FlutterDev/comments/1wn9x63/vertical_credit_card_sleek_vertical_credit_debit/",
       "inspected_at": "2026-09-22T16:27:47.307540+00:00"
+    },
+    "reddit_1wnlpdg": {
+      "platform": "reddit",
+      "title": "I built a Notion clipper because every other one wanted an account first. 87 users, and the Chrome Web Store still won't show me.",
+      "url": "https://reddit.com/r/SideProject/comments/1wnlpdg/i_built_a_notion_clipper_because_every_other_one/",
+      "inspected_at": "2026-09-22T20:56:22.484996+00:00"
+    },
+    "reddit_1wnlm1z": {
+      "platform": "reddit",
+      "title": "I built one browser room for six board games so friends can skip installs and accounts",
+      "url": "https://reddit.com/r/SideProject/comments/1wnlm1z/i_built_one_browser_room_for_six_board_games_so/",
+      "inspected_at": "2026-09-22T20:56:24.420409+00:00"
+    },
+    "reddit_1wnllq4": {
+      "platform": "reddit",
+      "title": "I’m building Rondovo — party and board games for your next game night",
+      "url": "https://reddit.com/r/SideProject/comments/1wnllq4/im_building_rondovo_party_and_board_games_for/",
+      "inspected_at": "2026-09-22T20:56:25.328173+00:00"
+    },
+    "reddit_1wnll9h": {
+      "platform": "reddit",
+      "title": "I am tired of applying to jobs (2026 job market!!!), I don't know where my application goes to. Took me 2 months (I am dumb) to built an engine that only surfaces jobs where I am actually a top match.",
+      "url": "https://reddit.com/r/SideProject/comments/1wnll9h/i_am_tired_of_applying_to_jobs_2026_job_market_i/",
+      "inspected_at": "2026-09-22T20:56:26.200828+00:00"
+    },
+    "reddit_1wngz2z": {
+      "platform": "reddit",
+      "title": "How One Prompt Completely Transformed Our Product",
+      "url": "https://reddit.com/r/indiehackers/comments/1wngz2z/how_one_prompt_completely_transformed_our_product/",
+      "inspected_at": "2026-09-22T20:56:27.074854+00:00"
+    },
+    "reddit_1wnflog": {
+      "platform": "reddit",
+      "title": "4+ years of Flutter experience in Ethiopia — how do I make my experience transferable to the international market?",
+      "url": "https://reddit.com/r/FlutterDev/comments/1wnflog/4_years_of_flutter_experience_in_ethiopia_how_do/",
+      "inspected_at": "2026-09-22T20:56:27.909308+00:00"
     }
   },
   "pending_drafts": {
