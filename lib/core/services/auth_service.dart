@@ -529,21 +529,11 @@ class AuthService extends ChangeNotifier {
       final scheduleApp = Firebase.app('rocis-schedule');
       _scheduleAuth = FirebaseAuth.instanceFor(app: scheduleApp);
 
-      // Prefer accessToken only if OAuthCredential has accessToken to avoid cross-project aud mismatch
-      AuthCredential effectiveCred = credential;
-      if (credential is OAuthCredential &&
-          credential.accessToken != null &&
-          credential.accessToken!.isNotEmpty) {
-        effectiveCred = GoogleAuthProvider.credential(
-          accessToken: credential.accessToken,
-        );
-      }
-
       try {
-        await _scheduleAuth!.signInWithCredential(effectiveCred);
+        await _scheduleAuth!.signInWithCredential(credential);
       } catch (authEx) {
         AppLogger.info(
-          'Secondary Firebase sign-in with effective credential failed ($authEx), retrying with access-token fallback...',
+          'Secondary Firebase sign-in with initial credential failed ($authEx), attempting access token fallback...',
           tag: 'Auth',
         );
         String? tokenToTry;
@@ -576,16 +566,13 @@ class AuthService extends ChangeNotifier {
         tag: 'Auth',
       );
     } catch (e) {
-      AppLogger.warning(
-        'Failed to sign in to secondary Firebase',
-        error: e,
+      AppLogger.info(
+        'Secondary Firebase silent sign-in skipped: $e',
         tag: 'Auth',
       );
       if (_scheduleAuth?.currentUser == null) {
         _scheduleAuth = null;
       }
-      scheduleAuthError.value =
-          'Schedule sync unavailable. Some features may be limited.';
     }
   }
 
@@ -685,8 +672,8 @@ class AuthService extends ChangeNotifier {
         );
       }
 
-      // 2. If googleUser is not available, try silent lightweight auth
-      if (_oauthManager.googleUser == null) {
+      // 2. On Web only: If googleUser is not available, try silent lightweight auth
+      if (kIsWeb && _oauthManager.googleUser == null) {
         try {
           await _oauthManager.ensureGoogleSignInInitialized();
           final silentUser = await _oauthManager.googleSignIn
@@ -701,7 +688,7 @@ class AuthService extends ChangeNotifier {
         try {
           final googleUser = _oauthManager.googleUser!;
           final clientAuth = await googleUser.authorizationClient
-              .authorizationForScopes(['email', 'profile']);
+              .authorizationForScopes(GoogleOAuthManager.googleTasksScopes);
           final token = clientAuth?.accessToken;
           if (token != null && token.isNotEmpty) {
             final credential = GoogleAuthProvider.credential(
@@ -714,13 +701,10 @@ class AuthService extends ChangeNotifier {
             }
           }
         } catch (e) {
-          AppLogger.warning(
-            'Failed to re-authenticate to secondary Firebase with googleUser',
-            error: e,
+          AppLogger.info(
+            'Secondary Firebase silent sign-in with googleUser skipped: $e',
             tag: 'Auth',
           );
-          scheduleAuthError.value =
-              'Schedule sync unavailable. Some features may be limited.';
         }
       }
     }
@@ -746,8 +730,8 @@ class AuthService extends ChangeNotifier {
         return true;
       }
 
+      final GoogleAuthProvider googleProvider = GoogleAuthProvider();
       if (kIsWeb) {
-        final GoogleAuthProvider googleProvider = GoogleAuthProvider();
         final userCred = await _scheduleAuth!.signInWithPopup(googleProvider);
         final secUid = userCred.user?.uid;
         if (secUid != null && secUid.isNotEmpty) {
@@ -758,28 +742,16 @@ class AuthService extends ChangeNotifier {
         notifyListeners();
         return true;
       } else {
-        await _oauthManager.ensureGoogleSignInInitialized();
-        var googleUser = _oauthManager.googleUser;
-        googleUser ??= await _oauthManager.googleSignIn.authenticate(
-          scopeHint: GoogleOAuthManager.googleTasksScopes,
-        );
-        if (googleUser != null) {
-          _oauthManager.setGoogleUser(googleUser);
-          final clientAuth = await googleUser.authorizationClient
-              .authorizationForScopes(['email', 'profile']);
-          final token = clientAuth?.accessToken;
-          if (token != null && token.isNotEmpty) {
-            final credential = GoogleAuthProvider.credential(
-              accessToken: token,
-            );
-            await _signInToSecondaryFirebase(credential);
-            if (_scheduleAuth?.currentUser != null) {
-              scheduleAuthError.value = null;
-              notifyListeners();
-              return true;
-            }
-          }
+        // On Mobile: Use native federated signInWithProvider to authenticate directly against rocis-schedule
+        final userCred = await _scheduleAuth!.signInWithProvider(googleProvider);
+        final secUid = userCred.user?.uid;
+        if (secUid != null && secUid.isNotEmpty) {
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString('cached_schedule_user_id', secUid);
         }
+        scheduleAuthError.value = null;
+        notifyListeners();
+        return true;
       }
     } catch (e) {
       AppLogger.warning('connectRocisSchedule failed', error: e, tag: 'Auth');

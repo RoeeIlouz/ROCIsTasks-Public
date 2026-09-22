@@ -242,15 +242,15 @@ class FullCalendarWidgetService {
       final targetMonth = DateTime(now.year, now.month + offset, 1);
       final monthName = DateFormat('MMMM yyyy', localeCode).format(targetMonth);
 
-      // Multi-month buffer window: from 3 months before targetMonth to 6 months after
+      // Multi-month buffer window: from 6 months before targetMonth to 12 months after (18 months total)
       final bufferStartDate = DateTime(
         targetMonth.year,
-        targetMonth.month - 3,
+        targetMonth.month - 6,
         1,
       );
       final bufferEndDate = DateTime(
         targetMonth.year,
-        targetMonth.month + 7,
+        targetMonth.month + 13,
         0,
         23,
         59,
@@ -602,6 +602,31 @@ class FullCalendarWidgetService {
           masterSummariesByDate[dateKey] = list;
         }
       }
+
+      // Preserve existing eventsByDate entries if the newly fetched data is missing dates
+      // (e.g. background isolate without network/permissions or transient failures during month navigation)
+      try {
+        final existingEventsJson = await HomeWidget.getWidgetData<String>(
+          'full_calendar_events_by_date',
+        );
+        if (existingEventsJson != null &&
+            existingEventsJson.isNotEmpty &&
+            existingEventsJson != '{}') {
+          final existingMap =
+              jsonDecode(existingEventsJson) as Map<String, dynamic>;
+          for (final entry in existingMap.entries) {
+            if (!masterSummariesByDate.containsKey(entry.key) &&
+                entry.value is List &&
+                (entry.value as List).isNotEmpty) {
+              masterSummariesByDate[entry.key] =
+                  List<Map<String, dynamic>>.from(
+                    (entry.value as List).whereType<Map<String, dynamic>>(),
+                  );
+            }
+          }
+        }
+      } catch (_) {}
+
       final eventsByDateJson = jsonEncode(masterSummariesByDate);
 
       // Build 42-day calendar grid for targetMonth
@@ -634,12 +659,11 @@ class FullCalendarWidgetService {
 
       // If the newly generated grid has 0 summaries but previous grid was populated,
       // preserve previous grid to prevent empty-screen wipe during background sleep/offline
-      // ONLY for the current month (offset == 0). For navigated months (offset != 0), allow empty grids.
       final int totalSummaries = gridData.fold<int>(
         0,
         (sum, day) => sum + ((day['summaries'] as List?)?.length ?? 0),
       );
-      if (totalSummaries == 0 && offset == 0 && masterSummariesByDate.isEmpty) {
+      if (totalSummaries == 0 && masterSummariesByDate.isEmpty) {
         final existingData = await HomeWidget.getWidgetData<String>(
           'full_calendar_grid_data',
         );
@@ -654,7 +678,7 @@ class FullCalendarWidgetService {
             );
             if (existingSummaries > 0) {
               AppLogger.warning(
-                'Newly generated grid has 0 summaries while existing grid has $existingSummaries. Preserving existing grid for current month.',
+                'Newly generated grid has 0 summaries while existing grid has $existingSummaries. Preserving existing grid.',
               );
               return;
             }
