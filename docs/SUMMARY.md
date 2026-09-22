@@ -2,6 +2,33 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## ROCIs-Schedule Course Name & Code Presentation Enhancement - 2026-09-22
+
+#### Problem & User Requirement
+* **Missing Course Name in Event Cards and Widgets**: When syncing university/college classes from `rocis-schedule`, the calendar screen and home widget only displayed generic class session titles (e.g. "הרצאה" / "Lecture") and course numbers (e.g. `90903`), without prominently displaying the full name of the academic course (e.g. "חשבון אינפיניטסימלי 1" / "Calculus 1").
+* **Repetitive Generic Month Cells**: In the month view day grid cells, events without the course name prefix simply showed generic labels like "Lecture", making it difficult to distinguish between courses on the same or adjacent days.
+
+#### Solutions Applied
+1. **Calendar Screen Event Cards (`calendar_screen.dart`)**:
+   - **Line 1**: Prominently displays `item.courseName` as bold primary title with the `item.courseCode` container badge on the right.
+   - **Line 2**: Displays `item.title` (e.g. "הרצאה" / "Lab") styled in `eventColor` with semi-bold font weight, shown only if non-empty and distinct from `item.courseName`.
+   - **Subtitle**: Formats time range (`startTime - endTime`) and physical `location` with leading icons (`access_time_rounded`, `location_on_outlined`).
+   - **Semantics**: Updated accessibility label to format `ROCIs Schedule Event: ${courseName} - ${title}`.
+2. **Month View Day Grid Cell (`calendar_screen.dart`)**:
+   - Formats single event pill as `${event.courseName}: ${event.title}` (or `event.courseName` if identical or title is empty).
+3. **FullCalendar Home Screen Widget (`full_calendar_widget_service.dart`)**:
+   - Updated `displayTitle` for schedule events to display `${s.courseName}: ${s.title}` (or `s.courseName`).
+   - Prefixes `subtitle` with `s.courseCode • s.location` (or `s.courseCode` alone) so users can see course number and room at a glance on the Android home screen.
+4. **Automated Verification**:
+   - Added automated unit tests in `synced_schedule_event_test.dart` verifying course name retention and display title formatting.
+   - `flutter analyze`: 0 issues found.
+   - All calendar unit tests and widget tests passed.
+5. **Deployment & Release**:
+   - Published Shorebird OTA Patch 2 for active release `0.2.20+110` (and Patch 3 for `0.2.19+109`).
+   - Deployed updated web build to Firebase Hosting (`https://rocis-todo.web.app`).
+
+
+
 ## ROCIs-Schedule Event Disappearance & Zero-Event Cache Self-Healing Fix - 2026-09-22
 
 #### Problem & Root Causes

@@ -395,10 +395,16 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         } else if (event is Event) {
                           title = event.title ?? 'No Title';
                         } else if (event is SyncedScheduleEvent) {
-                          title = event.title.isNotEmpty
-                              ? event.title
-                              : (event.courseName.isNotEmpty
-                                    ? event.courseName
+                          title = event.courseName.isNotEmpty
+                              ? (event.title.isNotEmpty &&
+                                        event.title.toLowerCase().trim() !=
+                                            event.courseName
+                                                .toLowerCase()
+                                                .trim()
+                                    ? '${event.courseName}: ${event.title}'
+                                    : event.courseName)
+                              : (event.title.isNotEmpty
+                                    ? event.title
                                     : 'Class');
                         }
 
@@ -838,7 +844,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         isSelected: false,
                         tintColor: eventColor,
                         child: Semantics(
-                          label: 'ROCIs Schedule Event: ${item.title}',
+                          label:
+                              'ROCIs Schedule Event: ${item.courseName.isNotEmpty ? '${item.courseName} - ${item.title}' : item.title}',
                           child: ListTile(
                             contentPadding: const EdgeInsets.symmetric(
                               horizontal: 16,
@@ -856,45 +863,73 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                 size: 24,
                               ),
                             ),
-                            title: Row(
+                            title: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
                               children: [
-                                Expanded(
-                                  child: Text(
-                                    item.title.isNotEmpty
-                                        ? item.title
-                                        : (item.courseName.isNotEmpty
-                                              ? item.courseName
-                                              : 'Class'),
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleMedium
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        item.courseName.isNotEmpty
+                                            ? item.courseName
+                                            : (item.title.isNotEmpty
+                                                  ? item.title
+                                                  : 'Class'),
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium
+                                            ?.copyWith(
+                                              fontWeight: FontWeight.bold,
+                                              letterSpacing: -0.5,
+                                            ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    if (item.courseCode.isNotEmpty) ...[
+                                      const SizedBox(width: 6),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 6,
+                                          vertical: 2,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: eventColor.withValues(
+                                            alpha: 0.15,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            6,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          item.courseCode,
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.bold,
+                                            color: eventColor,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ],
+                                ),
+                                if (item.courseName.isNotEmpty &&
+                                    item.title.isNotEmpty &&
+                                    item.title.toLowerCase().trim() !=
+                                        item.courseName
+                                            .toLowerCase()
+                                            .trim()) ...[
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    item.title,
+                                    style: Theme.of(context).textTheme.bodySmall
                                         ?.copyWith(
-                                          fontWeight: FontWeight.bold,
-                                          letterSpacing: -0.5,
+                                          color: eventColor,
+                                          fontWeight: FontWeight.w600,
                                         ),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                                if (item.courseCode.isNotEmpty) ...[
-                                  const SizedBox(width: 6),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 6,
-                                      vertical: 2,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: eventColor.withValues(alpha: 0.15),
-                                      borderRadius: BorderRadius.circular(6),
-                                    ),
-                                    child: Text(
-                                      item.courseCode,
-                                      style: TextStyle(
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.bold,
-                                        color: eventColor,
-                                      ),
-                                    ),
                                   ),
                                 ],
                               ],

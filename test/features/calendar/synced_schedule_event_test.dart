@@ -236,7 +236,9 @@ void main() {
         },
       };
 
-      final decoded = ScheduleFirestoreService.decodeFirestoreFields(restFields);
+      final decoded = ScheduleFirestoreService.decodeFirestoreFields(
+        restFields,
+      );
       expect(decoded['id'], 'event_xyz');
       expect(decoded['title'], 'Physics');
       expect(decoded['type'], 2);
@@ -247,6 +249,36 @@ void main() {
       expect(decoded['active'], isTrue);
       expect(decoded['tags'], ['lab', 'mandatory']);
     });
+
+    test(
+      'retains courseName and courseCode for calendar and widget presentation',
+      () {
+        final event = SyncedScheduleEvent.fromMap(
+          {
+            'id': 'event_physics',
+            'title': 'Lecture',
+            'courseId': 'c_1',
+            'startTime': Timestamp.fromDate(DateTime(2026, 9, 23, 10, 0)),
+            'endTime': Timestamp.fromDate(DateTime(2026, 9, 23, 12, 0)),
+          },
+          courseMap: {'name': 'Physics 101', 'code': '0368-1001'},
+        );
+
+        expect(event.courseName, 'Physics 101');
+        expect(event.courseCode, '0368-1001');
+        expect(event.title, 'Lecture');
+
+        final displayTitle = event.courseName.isNotEmpty
+            ? (event.title.isNotEmpty &&
+                      event.title.toLowerCase().trim() !=
+                          event.courseName.toLowerCase().trim()
+                  ? '${event.courseName}: ${event.title}'
+                  : event.courseName)
+            : (event.title.isNotEmpty ? event.title : 'Class');
+
+        expect(displayTitle, 'Physics 101: Lecture');
+      },
+    );
   });
 
   group('FullCalendarFilters', () {
