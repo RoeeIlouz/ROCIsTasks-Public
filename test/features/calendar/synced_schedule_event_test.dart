@@ -189,6 +189,64 @@ void main() {
         expect(event.occursOnDay(octoberWednesday), isFalse);
       },
     );
+
+    test('parses single integer or num daysOfWeek and string recurring', () {
+      final event1 = SyncedScheduleEvent.fromMap({
+        'id': 'num_day',
+        'title': 'Single Day Course',
+        'daysOfWeek': 2, // Tuesday as int
+        'recurring': '1', // string recurring
+        'startTime': '2026-09-22T10:00:00.000',
+        'endTime': '2026-09-22T12:00:00.000',
+      });
+
+      expect(event1.recurring, isTrue);
+      expect(event1.daysOfWeek, [2]);
+
+      final event2 = SyncedScheduleEvent.fromMap({
+        'id': 'str_recurring_bool',
+        'title': 'True String Recurring',
+        'daysOfWeek': [1, 3],
+        'recurring': 'true',
+        'startTime': '2026-09-22T10:00:00.000',
+        'endTime': '2026-09-22T12:00:00.000',
+      });
+
+      expect(event2.recurring, isTrue);
+      expect(event2.daysOfWeek, [1, 3]);
+    });
+
+    test('decodeFirestoreFields decodes REST field maps accurately', () {
+      final restFields = {
+        'id': {'stringValue': 'event_xyz'},
+        'title': {'stringValue': 'Physics'},
+        'type': {'integerValue': '2'},
+        'recurring': {'integerValue': '1'},
+        'daysOfWeek': {'stringValue': '2'},
+        'color': {'nullValue': null},
+        'credits': {'doubleValue': 3.5},
+        'active': {'booleanValue': true},
+        'tags': {
+          'arrayValue': {
+            'values': [
+              {'stringValue': 'lab'},
+              {'stringValue': 'mandatory'},
+            ],
+          },
+        },
+      };
+
+      final decoded = ScheduleFirestoreService.decodeFirestoreFields(restFields);
+      expect(decoded['id'], 'event_xyz');
+      expect(decoded['title'], 'Physics');
+      expect(decoded['type'], 2);
+      expect(decoded['recurring'], 1);
+      expect(decoded['daysOfWeek'], '2');
+      expect(decoded['color'], isNull);
+      expect(decoded['credits'], 3.5);
+      expect(decoded['active'], isTrue);
+      expect(decoded['tags'], ['lab', 'mandatory']);
+    });
   });
 
   group('FullCalendarFilters', () {

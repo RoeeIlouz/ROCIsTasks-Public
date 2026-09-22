@@ -562,7 +562,9 @@ class AuthService extends ChangeNotifier {
       final secUid = _scheduleAuth!.currentUser?.uid;
       if (secUid != null && secUid.isNotEmpty) {
         final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('cached_schedule_user_id', secUid);
+        if (prefs.getString('cached_schedule_user_id') == null) {
+          await prefs.setString('cached_schedule_user_id', secUid);
+        }
       }
       scheduleAuthError.value = null;
       AppLogger.info(
@@ -650,7 +652,9 @@ class AuthService extends ChangeNotifier {
       final secUid = _scheduleAuth!.currentUser?.uid;
       if (secUid != null && secUid.isNotEmpty) {
         final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('cached_schedule_user_id', secUid);
+        if (prefs.getString('cached_schedule_user_id') == null) {
+          await prefs.setString('cached_schedule_user_id', secUid);
+        }
       }
       return;
     }
