@@ -2,6 +2,28 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## ROCIs-Schedule Mobile Reconnect, Silent Auth Fix & Multi-Month Widget Buffer - 2026-09-22
+
+#### Problem & Root Causes
+* **Recurring Google Sign-In Prompts**: Calling `attemptLightweightAuthentication()` in `ensureSecondaryAuth()` triggered native Android Credential Manager account pickers on startup and calendar visits.
+* **Mobile Schedule Reconnect Failure**: Using cross-project tokens on Mobile caused audience mismatches or credential rejections when calling `_scheduleAuth.signInWithCredential()`.
+* **FullCalendar Widget Missing Events on Month Navigation**: Background isolates or transient failures during month changes would overwrite pre-buffered events with empty maps. In addition, device calendar permission checks called `requestPermissions()` which crashed in background isolates.
+
+#### Solutions Applied
+1. **Silent Auth Isolation (`auth_service.dart`)**:
+   - Confined `attemptLightweightAuthentication()` strictly to `kIsWeb`, completely eliminating intrusive account prompts on Mobile.
+   - Updated Mobile `connectRocisSchedule()` to authenticate directly against `rocis-schedule` using `_scheduleAuth.signInWithProvider(GoogleAuthProvider())`.
+2. **Calendar Service Permission Guard (`calendar_service.dart`)**:
+   - Replaced `requestPermissions()` with `hasPermissions()` check in `getEvents()` to ensure background isolate safety.
+3. **Multi-Month FullCalendar Widget Caching (`full_calendar_widget_service.dart`)**:
+   - Expanded pre-buffer window to 18 months (-6 to +12 months).
+   - Merged cached `full_calendar_events_by_date` from SharedPreferences before saving to avoid overwriting populated event maps with empty arrays.
+   - Removed offset restriction from empty grid check to protect all navigated months.
+4. **Deployment & Release: 0.2.19+109**:
+   - Published Shorebird patch for existing `0.2.18+108` users.
+   - Bumped version to `0.2.19+109` in `pubspec.yaml` and `app_config.dart`.
+   - Deployed Web to Firebase Hosting and uploaded Android release AAB to Google Play Console `internal` testing track.
+
 ## ROCIs-Schedule Pure OAuth Token Synchronization & Web/Mobile Release - 2026-09-21
 
 #### Problem & Root Causes

@@ -426,8 +426,8 @@ class CalendarService {
 
     // 1. On Mobile, retrieve events via native device_calendar first
     if (!kIsWeb) {
-      final hasPermission = await requestPermissions();
-      if (hasPermission) {
+      final permResult = await _deviceCalendarPlugin.hasPermissions();
+      if (permResult.isSuccess && permResult.data == true) {
         for (final calendarId in targetCalendarIds) {
           if (calendarId == 'primary' || calendarId.contains('@')) continue;
           try {
