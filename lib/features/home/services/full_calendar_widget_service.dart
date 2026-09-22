@@ -563,17 +563,24 @@ class FullCalendarWidgetService {
         for (final s in daySchedule) {
           if (summaries.length >= 4) break;
           final timeStr = _formatEventTime(s.startTime, s.endTime, l10n);
-          final displayTitle = s.title.isNotEmpty
-              ? s.title
-              : (s.courseName.isNotEmpty
-                    ? s.courseName
-                    : (l10n?.event ?? 'Class'));
-          final title = displayTitle.length > 25
-              ? '${displayTitle.substring(0, 22)}...'
+          final displayTitle = s.courseName.isNotEmpty
+              ? (s.title.isNotEmpty &&
+                        s.title.toLowerCase().trim() !=
+                            s.courseName.toLowerCase().trim()
+                    ? '${s.courseName}: ${s.title}'
+                    : s.courseName)
+              : (s.title.isNotEmpty ? s.title : (l10n?.event ?? 'Class'));
+          final title = displayTitle.length > 28
+              ? '${displayTitle.substring(0, 25)}...'
               : displayTitle;
-          final location = s.location.length > 20
-              ? '${s.location.substring(0, 17)}...'
-              : s.location;
+          final rawSubtitle = s.location.isNotEmpty
+              ? (s.courseCode.isNotEmpty
+                    ? '${s.courseCode} • ${s.location}'
+                    : s.location)
+              : s.courseCode;
+          final location = rawSubtitle.length > 25
+              ? '${rawSubtitle.substring(0, 22)}...'
+              : rawSubtitle;
           final eventColor =
               '#${s.color.toARGB32().toRadixString(16).padLeft(8, '0')}';
 
