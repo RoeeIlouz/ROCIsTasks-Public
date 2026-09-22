@@ -743,7 +743,9 @@ class AuthService extends ChangeNotifier {
         return true;
       } else {
         // On Mobile: Use native federated signInWithProvider to authenticate directly against rocis-schedule
-        final userCred = await _scheduleAuth!.signInWithProvider(googleProvider);
+        final userCred = await _scheduleAuth!.signInWithProvider(
+          googleProvider,
+        );
         final secUid = userCred.user?.uid;
         if (secUid != null && secUid.isNotEmpty) {
           final prefs = await SharedPreferences.getInstance();

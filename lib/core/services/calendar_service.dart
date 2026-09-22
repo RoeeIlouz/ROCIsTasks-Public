@@ -19,11 +19,9 @@ class CalendarService {
   DateTime? _cachedCalendarsTime;
   static const Duration _calendarCacheTtl = Duration(minutes: 5);
 
-  CalendarService({
-    AuthService? authService,
-    GoogleOAuthManager? oauthManager,
-  })  : _authService = authService,
-        _oauthManager = oauthManager ?? authService?.oauthManager;
+  CalendarService({AuthService? authService, GoogleOAuthManager? oauthManager})
+    : _authService = authService,
+      _oauthManager = oauthManager ?? authService?.oauthManager;
 
   GoogleOAuthManager get _effectiveOAuthManager =>
       _oauthManager ??
