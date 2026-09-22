@@ -84,6 +84,7 @@ dependencies:
   # Platform Features
   home_widget: ^0.9.4
   quick_actions: ^1.1.1
+  web: ^1.1.1
 
 dependency_overrides:
   timezone: ^0.11.0

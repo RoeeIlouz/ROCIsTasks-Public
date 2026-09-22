@@ -22,8 +22,10 @@ import 'package:rocis_tasks/features/auth/presentation/screens/login_screen.dart
 import 'package:rocis_tasks/features/tasks/presentation/widgets/kanban/kanban_board_view.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:rocis_tasks/shared/ui/widgets/sync_status_badge.dart';
 import 'package:rocis_tasks/features/home/presentation/widgets/command_palette_dialog.dart';
+import 'package:rocis_tasks/features/home/presentation/widgets/cookie_consent_banner.dart';
 import 'package:rocis_tasks/shared/ui/theme/theme_service.dart';
 
 class WebHomeScreen extends StatefulWidget {
@@ -62,6 +64,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
   bool _compactDensity = false;
   Timer? _autoSaveDebounce;
   String _saveStatus = 'saved'; // 'saved', 'saving', 'idle'
+  bool _showCookieConsent = false;
 
   @override
   void initState() {
@@ -70,7 +73,18 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
     _descController = TextEditingController();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkAndLoadUrlDraft();
+      _checkCookieConsent();
     });
+  }
+
+  Future<void> _checkCookieConsent() async {
+    if (!kIsWeb) return;
+    final consented = await CookieConsentBanner.hasUserConsented();
+    if (!consented && mounted) {
+      setState(() {
+        _showCookieConsent = true;
+      });
+    }
   }
 
   void _checkAndLoadUrlDraft() {
@@ -486,101 +500,123 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
         autofocus: true,
         child: Scaffold(
           backgroundColor: theme.scaffoldBackgroundColor,
-          body: LayoutBuilder(
-            builder: (context, constraints) {
-              final isCompact = constraints.maxWidth < 800;
-              final isUltraCompact = constraints.maxWidth < 768;
-              final showInspector = _selectedTask != null || _isCreatingTask;
-              final double inspectorWidth = constraints.maxWidth < 950
-                  ? (constraints.maxWidth * 0.45).clamp(280.0, 380.0)
-                  : 380.0;
+          body: Stack(
+            children: [
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final isCompact = constraints.maxWidth < 800;
+                  final isUltraCompact = constraints.maxWidth < 768;
+                  final showInspector =
+                      _selectedTask != null || _isCreatingTask;
+                  final double inspectorWidth = constraints.maxWidth < 950
+                      ? (constraints.maxWidth * 0.45).clamp(280.0, 380.0)
+                      : 380.0;
 
-              if (isUltraCompact && showInspector) {
-                return Container(
-                  color: isDark
-                      ? theme.colorScheme.surface.withValues(alpha: 0.5)
-                      : Colors.grey[50],
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 8,
-                        ),
-                        child: Row(
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.arrow_back_rounded),
-                              onPressed: () => _selectTask(null),
-                              tooltip: 'Back to tasks',
-                            ),
-                            Text(
-                              _isCreatingTask ? l10n.newTask : l10n.editTask,
-                              style: GoogleFonts.outfit(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const Divider(height: 1),
-                      Expanded(
-                        child: _buildInspector(context, taskProvider, l10n),
-                      ),
-                    ],
-                  ),
-                );
-              }
-
-              return Row(
-                children: [
-                  // 1. Sidebar Panel (Left)
-                  _buildSidebar(
-                    context,
-                    user,
-                    calendarProvider,
-                    authService,
-                    taskProvider,
-                    l10n,
-                    isCompact: isCompact,
-                  ),
-
-                  // Divider
-                  VerticalDivider(
-                    width: 1,
-                    color: isDark ? Colors.white12 : Colors.black12,
-                  ),
-
-                  // 2. Middle Content Workspace
-                  Expanded(
-                    child: _buildMainWorkspace(
-                      context,
-                      taskProvider,
-                      calendarProvider,
-                      l10n,
-                    ),
-                  ),
-
-                  if (showInspector) ...[
-                    // Divider
-                    VerticalDivider(
-                      width: 1,
-                      color: isDark ? Colors.white12 : Colors.black12,
-                    ),
-
-                    // 3. Right Task Inspector
-                    Container(
-                      width: inspectorWidth,
+                  if (isUltraCompact && showInspector) {
+                    return Container(
                       color: isDark
                           ? theme.colorScheme.surface.withValues(alpha: 0.5)
                           : Colors.grey[50],
-                      child: _buildInspector(context, taskProvider, l10n),
-                    ),
-                  ],
-                ],
-              );
-            },
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
+                            child: Row(
+                              children: [
+                                IconButton(
+                                  icon: const Icon(Icons.arrow_back_rounded),
+                                  onPressed: () => _selectTask(null),
+                                  tooltip: 'Back to tasks',
+                                ),
+                                Text(
+                                  _isCreatingTask
+                                      ? l10n.newTask
+                                      : l10n.editTask,
+                                  style: GoogleFonts.outfit(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Divider(height: 1),
+                          Expanded(
+                            child: _buildInspector(context, taskProvider, l10n),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  return Row(
+                    children: [
+                      // 1. Sidebar Panel (Left)
+                      _buildSidebar(
+                        context,
+                        user,
+                        calendarProvider,
+                        authService,
+                        taskProvider,
+                        l10n,
+                        isCompact: isCompact,
+                      ),
+
+                      // Divider
+                      VerticalDivider(
+                        width: 1,
+                        color: isDark ? Colors.white12 : Colors.black12,
+                      ),
+
+                      // 2. Middle Content Workspace
+                      Expanded(
+                        child: _buildMainWorkspace(
+                          context,
+                          taskProvider,
+                          calendarProvider,
+                          l10n,
+                        ),
+                      ),
+
+                      if (showInspector) ...[
+                        // Divider
+                        VerticalDivider(
+                          width: 1,
+                          color: isDark ? Colors.white12 : Colors.black12,
+                        ),
+
+                        // 3. Right Task Inspector
+                        Container(
+                          width: inspectorWidth,
+                          color: isDark
+                              ? theme.colorScheme.surface.withValues(alpha: 0.5)
+                              : Colors.grey[50],
+                          child: _buildInspector(context, taskProvider, l10n),
+                        ),
+                      ],
+                    ],
+                  );
+                },
+              ),
+              if (_showCookieConsent && kIsWeb)
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  child: CookieConsentBanner(
+                    onConsentGiven: () {
+                      if (mounted) {
+                        setState(() {
+                          _showCookieConsent = false;
+                        });
+                      }
+                    },
+                  ),
+                ),
+            ],
           ),
         ),
       ),

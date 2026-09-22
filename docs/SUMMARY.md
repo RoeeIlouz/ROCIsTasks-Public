@@ -2,6 +2,35 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## Persistent Google Sign-In, Web Cookie Session & Consent Architecture - 2026-09-22
+
+#### Problem & User Requirement
+* **Repetitive Google Sign-In Prompts on Launch**: Users had to repeatedly sign in with Google or re-link Google Tasks & Calendar integrations across app launches and browser refreshes.
+* **Android Google Play Services Scope Loss**: On Android, `google_sign_in: 7.2.0` uses `Identity.getAuthorizationClient(context)`. When initialized without `serverClientId: webClientId`, AuthorizationClient returned unauthorized on background silent token retrieval (`promptIfUnauthorized: false`).
+* **Web Token Eviction on Local Storage Clear**: Browser privacy features and clearing `localStorage` erased OAuth session tokens, requiring interactive re-login.
+* **Aggressive Disconnection Banner on Startup / Offline**: When network startup delays occurred, `_isGoogleTasksTokenExpired` was aggressively set to `true`, showing a "ROCIs Schedule Disconnected" banner prematurely even though cached credentials were valid.
+
+#### Solutions Applied
+1. **Google OAuth Manager Server Client ID Linking (`google_oauth_manager.dart`)**:
+   - Initialized `GoogleSignIn` with `serverClientId: webClientId` on mobile platforms (`await _googleSignIn.initialize(serverClientId: webClientId)`), enabling Google Play Services Credential Manager / AuthorizationClient to bind to the OAuth client ID for background silent authorization.
+2. **Web Cookie Storage Abstraction (`cookie_service.dart`, `cookie_service_web.dart`, `cookie_service_stub.dart`)**:
+   - Created a cross-platform `CookieService` abstraction that uses `package:web` (`web.document.cookie`) on Web to persist session tokens (`keyAccessToken`, `keyAccessTokenExpiresAt`, `keyUserEmail`) with `SameSite=Lax; Secure` and `max-age` up to 365 days.
+   - Preserves authentication session and Google token across browser restarts, even if `localStorage` is purged.
+3. **Extended Offline Grace Period (`google_oauth_manager.dart` & `auth_service.dart`)**:
+   - On both mobile and web startup, if background silent refresh encounters a network delay or offline state, but previously cached Google credentials exist (`hasCachedGoogleCredentials()`), the system reuses the cached session under grace and does NOT flag the integration as expired (`setGoogleTasksTokenExpired(false)`).
+   - Only an actual HTTP 401 unrecoverable response from Google APIs flags the integration as disconnected.
+4. **GDPR-Compliant Cookie Consent Banner (`cookie_consent_banner.dart` & `web_home_screen.dart`)**:
+   - Created a floating glassmorphic cookie consent banner for the Web application with "Accept All" and "Essential Only" options, and links to Privacy Policy and Terms of Service.
+   - Mounted seamlessly as an overlay at the bottom of the Web home screen, persisting user choice across sessions.
+5. **Legal & Governance Documentation (`PRIVACY_POLICY.md` & `TERMS_OF_SERVICE.md`)**:
+   - Updated `PRIVACY_POLICY.md` with explicit disclosures for Cookies, Local Storage, and Google API session tokens.
+   - Authored complete `TERMS_OF_SERVICE.md` covering user accounts, Google integrations, subscriptions, cookies, and data retention.
+6. **Automated Verification & Deployment**:
+   - Static analysis: `flutter analyze` passed with 0 issues.
+   - Test suite: `flutter test` executed all 362 unit & widget tests with 100% pass rate.
+   - Android OTA Patch: Published Shorebird OTA Patch 3 for active release `0.2.20+110` and Patch 4 for release `0.2.19+109`.
+   - Web Deployment: Compiled `flutter build web --release` and deployed to Firebase Hosting (`https://rocis-todo.web.app` / `https://tasks.rocisapps.com`).
+
 ## ROCIs-Schedule Course Name & Code Presentation Enhancement - 2026-09-22
 
 #### Problem & User Requirement
