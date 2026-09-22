@@ -156,12 +156,21 @@ class AuthService extends ChangeNotifier {
           );
         }
 
-        // All silent methods failed — mark as expired so banner shows
-        setGoogleTasksTokenExpired(true);
-        AppLogger.info(
-          'Web startup: No valid token available. Reconnect banner will show.',
-          tag: 'Auth',
-        );
+        // Extended Offline Grace on Web: if user previously had credentials, preserve session
+        if (hasCredentials) {
+          setGoogleTasksTokenExpired(false);
+          AppLogger.info(
+            'Web startup: Preserving Google session under offline grace; reconnect banner suppressed.',
+            tag: 'Auth',
+          );
+        } else {
+          // All silent methods failed and no cached credentials — mark as expired so banner shows
+          setGoogleTasksTokenExpired(true);
+          AppLogger.info(
+            'Web startup: No valid token available. Reconnect banner will show.',
+            tag: 'Auth',
+          );
+        }
       } else {
         // On Mobile, NEVER call attemptLightweightAuthentication() on cold start,
         // because Credential Manager pops up an interactive account-selection bottom sheet.
@@ -182,11 +191,20 @@ class AuthService extends ChangeNotifier {
               tag: 'Auth',
             );
           } else {
-            setGoogleTasksTokenExpired(true);
-            AppLogger.info(
-              'Google token expired on startup; reconnect banner active.',
-              tag: 'Auth',
-            );
+            // Extended Offline Grace on Mobile:
+            if (hasCredentials) {
+              setGoogleTasksTokenExpired(false);
+              AppLogger.info(
+                'Extended Offline Grace: Preserving Google session on startup; reconnect banner suppressed.',
+                tag: 'Auth',
+              );
+            } else {
+              setGoogleTasksTokenExpired(true);
+              AppLogger.info(
+                'Google token expired on startup; reconnect banner active.',
+                tag: 'Auth',
+              );
+            }
           }
         }
       }

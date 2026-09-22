@@ -6,6 +6,7 @@ import 'package:rocis_tasks/core/services/error_handling_service.dart';
 import 'package:rocis_tasks/core/services/logger_service.dart';
 
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:rocis_tasks/core/services/web/cookie_service.dart';
 
 class GoogleTokenExpiredException implements Exception {
   final String message;
@@ -70,7 +71,9 @@ class GoogleOAuthManager {
         if (kIsWeb) {
           await _googleSignIn.initialize(clientId: webClientId);
         } else {
-          await _googleSignIn.initialize();
+          // Provide serverClientId on mobile so Google Play Services / Credential Manager
+          // associates authorization with the OAuth backend client and permits silent background refreshes.
+          await _googleSignIn.initialize(serverClientId: webClientId);
         }
         _googleSignInInitialized = true;
       } catch (e) {
@@ -100,6 +103,13 @@ class GoogleOAuthManager {
       if (id != null && id.isNotEmpty) {
         await prefs.setString(keyUserId, id);
       }
+      if (kIsWeb) {
+        CookieService.instance.setCookie(
+          keyUserEmail,
+          email,
+          maxAge: const Duration(days: 365),
+        );
+      }
       AppLogger.info(
         'Saved Google user identity for background auth: $email',
         tag: 'Auth',
@@ -112,7 +122,12 @@ class GoogleOAuthManager {
   Future<String?> getSavedGoogleUserEmail() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      return prefs.getString(keyUserEmail);
+      final email = prefs.getString(keyUserEmail);
+      if (email != null && email.isNotEmpty) return email;
+      if (kIsWeb) {
+        return CookieService.instance.getCookie(keyUserEmail);
+      }
+      return null;
     } catch (_) {
       return null;
     }
@@ -133,7 +148,12 @@ class GoogleOAuthManager {
       final prefs = await SharedPreferences.getInstance();
       final hasCachedToken = prefs.containsKey(keyAccessToken);
       final hasSavedEmail = prefs.containsKey(keyUserEmail);
-      return hasCachedToken || hasSavedEmail;
+      if (hasCachedToken || hasSavedEmail) return true;
+      if (kIsWeb) {
+        return CookieService.instance.getCookie(keyAccessToken) != null ||
+            CookieService.instance.getCookie(keyUserEmail) != null;
+      }
+      return false;
     } catch (_) {
       return false;
     }
@@ -143,8 +163,20 @@ class GoogleOAuthManager {
   Future<bool> isTokenValid() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString(keyAccessToken);
-      final expiresAtStr = prefs.getString(keyAccessTokenExpiresAt);
+      var token = prefs.getString(keyAccessToken);
+      var expiresAtStr = prefs.getString(keyAccessTokenExpiresAt);
+
+      if (token == null && kIsWeb) {
+        token = CookieService.instance.getCookie(keyAccessToken);
+        expiresAtStr = CookieService.instance.getCookie(
+          keyAccessTokenExpiresAt,
+        );
+        if (token != null && expiresAtStr != null) {
+          await prefs.setString(keyAccessToken, token);
+          await prefs.setString(keyAccessTokenExpiresAt, expiresAtStr);
+        }
+      }
+
       if (token == null || expiresAtStr == null) return false;
       final expiresAt = DateTime.tryParse(expiresAtStr);
       return expiresAt != null && DateTime.now().isBefore(expiresAt);
@@ -159,10 +191,22 @@ class GoogleOAuthManager {
       await prefs.setString(keyAccessToken, token);
       // Proactive refresh window: refresh after 50 minutes (5 minutes ahead of 55m Google token expiry)
       final expiresAt = DateTime.now().add(const Duration(minutes: 50));
-      await prefs.setString(
-        keyAccessTokenExpiresAt,
-        expiresAt.toIso8601String(),
-      );
+      final expiresAtStr = expiresAt.toIso8601String();
+      await prefs.setString(keyAccessTokenExpiresAt, expiresAtStr);
+
+      if (kIsWeb) {
+        CookieService.instance.setCookie(
+          keyAccessToken,
+          token,
+          maxAge: const Duration(days: 30),
+        );
+        CookieService.instance.setCookie(
+          keyAccessTokenExpiresAt,
+          expiresAtStr,
+          maxAge: const Duration(days: 30),
+        );
+      }
+
       _isGoogleTasksTokenExpired = false;
       AppLogger.info(
         'Google access token cached successfully (proactive refresh in 50m).',
@@ -182,6 +226,10 @@ class GoogleOAuthManager {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove(keyAccessToken);
       await prefs.remove(keyAccessTokenExpiresAt);
+      if (kIsWeb) {
+        CookieService.instance.deleteCookie(keyAccessToken);
+        CookieService.instance.deleteCookie(keyAccessTokenExpiresAt);
+      }
       _isGoogleTasksTokenExpired = true;
       AppLogger.info('Cached Google access token invalidated.', tag: 'Auth');
     } catch (e) {
@@ -195,8 +243,22 @@ class GoogleOAuthManager {
   Future<String?> getGoogleAccessToken() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString(keyAccessToken);
-      final expiresAtStr = prefs.getString(keyAccessTokenExpiresAt);
+      var token = prefs.getString(keyAccessToken);
+      var expiresAtStr = prefs.getString(keyAccessTokenExpiresAt);
+
+      // Web cookie backup restoration
+      if (token == null && kIsWeb) {
+        token = CookieService.instance.getCookie(keyAccessToken);
+        expiresAtStr = CookieService.instance.getCookie(
+          keyAccessTokenExpiresAt,
+        );
+        if (token != null && token.isNotEmpty) {
+          await prefs.setString(keyAccessToken, token);
+          if (expiresAtStr != null) {
+            await prefs.setString(keyAccessTokenExpiresAt, expiresAtStr);
+          }
+        }
+      }
 
       if (token != null && expiresAtStr != null) {
         final expiresAt = DateTime.tryParse(expiresAtStr);
@@ -213,17 +275,44 @@ class GoogleOAuthManager {
       _tokenRefreshCompleter = Completer<String?>();
       try {
         final freshToken = await _performSilentTokenRefresh();
+        if (freshToken != null && freshToken.isNotEmpty) {
+          _isGoogleTasksTokenExpired = false;
+          _tokenRefreshCompleter!.complete(freshToken);
+          return freshToken;
+        }
 
-        _tokenRefreshCompleter!.complete(freshToken);
-        return freshToken;
+        // Extended Offline Grace Period:
+        // If an offline launch or network interruption prevented background refresh,
+        // but the user previously had a valid session token, reuse it with grace.
+        // DO NOT show a disconnected banner. Only actual HTTP 401 rejections from
+        // the server should flag disconnected.
+        if (token != null && token.isNotEmpty) {
+          AppLogger.info(
+            'Extended Offline Grace: Preserving cached Google token without showing disconnected.',
+            tag: 'Auth',
+          );
+          _isGoogleTasksTokenExpired = false;
+          _tokenRefreshCompleter!.complete(token);
+          return token;
+        }
+
+        _isGoogleTasksTokenExpired = true;
+        _tokenRefreshCompleter!.complete(null);
+        return null;
       } catch (e, s) {
-        _tokenRefreshCompleter!.completeError(e, s);
         _errorHandlingService.logError(
           e,
           s,
           reason: 'getGoogleAccessToken refresh',
         );
+        // Fallback to cached token under grace if available
+        if (token != null && token.isNotEmpty) {
+          _isGoogleTasksTokenExpired = false;
+          _tokenRefreshCompleter?.complete(token);
+          return token;
+        }
         _isGoogleTasksTokenExpired = true;
+        _tokenRefreshCompleter?.complete(null);
         return null;
       } finally {
         _tokenRefreshCompleter = null;
@@ -316,17 +405,15 @@ class GoogleOAuthManager {
         }
       }
 
-      // 4. Background refresh failed (e.g. offline, connection lost, or permission revoked).
-      // Mark disconnected and never trigger interactive dialogs during background operations.
+      // 4. Background refresh failed (offline, timeout, etc.)
+      // Return null so caller can decide on offline grace fallback.
       AppLogger.info(
-        'Silent refresh could not acquire token. Marking disconnected without interactive prompts.',
+        'Silent refresh could not acquire fresh token without prompt.',
         tag: 'Auth',
       );
-      _isGoogleTasksTokenExpired = true;
       return null;
     } catch (e) {
       AppLogger.warning('Silent Google token refresh failed: $e', tag: 'Auth');
-      _isGoogleTasksTokenExpired = true;
       return null;
     }
   }
@@ -368,5 +455,12 @@ class GoogleOAuthManager {
     await prefs.remove(keyAccessTokenExpiresAt);
     await prefs.remove(keyUserEmail);
     await prefs.remove(keyUserId);
+
+    if (kIsWeb) {
+      CookieService.instance.deleteCookie(keyAccessToken);
+      CookieService.instance.deleteCookie(keyAccessTokenExpiresAt);
+      CookieService.instance.deleteCookie(keyUserEmail);
+      CookieService.instance.deleteCookie(keyUserId);
+    }
   }
 }
