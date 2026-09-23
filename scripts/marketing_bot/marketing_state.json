@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-23T03:30:29.689932+00:00",
+  "last_run_timestamp": "2026-09-23T10:51:34.592934+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -3206,6 +3206,42 @@
       "title": "Ok, I still need a task app to replace google keep\n\nProblem is I have yet to fin...",
       "url": "https://bsky.app/profile/rachel.transitory.social.ap.brid.gy/post/3lzhitzbxdd22",
       "inspected_at": "2026-09-23T03:30:21.229751+00:00"
+    },
+    "reddit_1wo2ku1": {
+      "platform": "reddit",
+      "title": "I built AskQlive — live event Q&A without forcing the audience to sign up first",
+      "url": "https://reddit.com/r/SideProject/comments/1wo2ku1/i_built_askqlive_live_event_qa_without_forcing/",
+      "inspected_at": "2026-09-23T10:50:53.466731+00:00"
+    },
+    "reddit_1wo2fdq": {
+      "platform": "reddit",
+      "title": "I built Find Something Vintage – photograph an item, research it and create a real eBay listing in minutes",
+      "url": "https://reddit.com/r/SideProject/comments/1wo2fdq/i_built_find_something_vintage_photograph_an_item/",
+      "inspected_at": "2026-09-23T10:51:13.187205+00:00"
+    },
+    "reddit_1wo2efu": {
+      "platform": "reddit",
+      "title": "I built Arcaded, a free browser game site where you can play instantly with no downloads",
+      "url": "https://reddit.com/r/SideProject/comments/1wo2efu/i_built_arcaded_a_free_browser_game_site_where/",
+      "inspected_at": "2026-09-23T10:51:21.558707+00:00"
+    },
+    "reddit_1wo2052": {
+      "platform": "reddit",
+      "title": "Beginner surfer in Turkey. Apps kept sending me to flat water, so I built my own forecast",
+      "url": "https://reddit.com/r/SideProject/comments/1wo2052/beginner_surfer_in_turkey_apps_kept_sending_me_to/",
+      "inspected_at": "2026-09-23T10:51:22.501261+00:00"
+    },
+    "reddit_1wo2ilu": {
+      "platform": "reddit",
+      "title": "Are coding agents creating a review wall, or am I inventing a problem?",
+      "url": "https://reddit.com/r/indiehackers/comments/1wo2ilu/are_coding_agents_creating_a_review_wall_or_am_i/",
+      "inspected_at": "2026-09-23T10:51:23.554186+00:00"
+    },
+    "reddit_1wnzrzl": {
+      "platform": "reddit",
+      "title": "How do you validate your ideas?",
+      "url": "https://reddit.com/r/indiehackers/comments/1wnzrzl/how_do_you_validate_your_ideas/",
+      "inspected_at": "2026-09-23T10:51:24.230087+00:00"
     }
   },
   "pending_drafts": {
@@ -3542,7 +3578,7 @@
     }
   },
   "recorded_feedback": [],
-  "last_organic_post_timestamp": "2026-09-22T16:28:18.113467+00:00",
+  "last_organic_post_timestamp": "2026-09-23T10:51:34.056009+00:00",
   "organic_posts": [
     {
       "text": "you either die a young enthusiastic builder or live long enough to realize that 90% of tech problems are solved by restarting the router.",
@@ -3772,6 +3808,15 @@
         "Bluesky"
       ],
       "posted_at": "2026-09-22T16:28:18.113467+00:00"
+    },
+    {
+      "text": "there is no feeling quite like watching your local test build pass on the first try and immediately getting suspicious of what went wrong.",
+      "topic": "ee_engineering_struggles",
+      "platforms": [
+        "Twitter/X",
+        "Bluesky"
+      ],
+      "posted_at": "2026-09-23T10:51:34.056009+00:00"
     }
   ],
   "x_posts_timestamps": [
@@ -3787,7 +3832,8 @@
     "2026-09-18T03:27:33.829608+00:00",
     "2026-09-19T10:23:52.441479+00:00",
     "2026-09-20T20:23:41.196159+00:00",
-    "2026-09-22T03:29:46.396502+00:00"
+    "2026-09-22T03:29:46.396502+00:00",
+    "2026-09-23T10:51:33.511360+00:00"
   ],
   "posted_devlogs": {
     "devlog_0_2_2_60_2026_07_17_190f9f3082": {
