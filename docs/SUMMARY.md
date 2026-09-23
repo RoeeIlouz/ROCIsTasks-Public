@@ -2,7 +2,36 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
-## Persistent Google Sign-In, Web Cookie Session & Consent Architecture - 2026-09-22
+## Academic Semester Boundaries, Resilient Mobile Schedule Sync & Universal Web Cookie Consent - 2026-09-23
+
+#### Problem & User Requirement
+* **Premature Event Population in Calendar**: University classes from ROCIs-Schedule were appearing on weekdays in September 2026 before the academic year began (late October 2026), because recurring events lacked semester date constraints.
+* **Invisible Cookie Consent Banner on Web**: On browser viewports under 950px, `HomeScreen` rendered `_buildMobileHomeScreen`, omitting the cookie consent banner completely. Furthermore, the banner did not self-manage its visibility, and users had no way to reset or re-open cookie preferences from settings.
+* **Recurring Schedule Disconnection on Mobile**: On mobile, signing into the secondary Firebase project created a secondary auth UID (`secUid`) differing from the user's schedule document UID (`UxZrdJPoccae5hOiMSPIdyJA1072`). Blind caching of `secUid` prevented email-based resolution from ever running. In addition, 4-second timeouts caused dropped calls over cellular networks.
+
+#### Solutions Applied
+1. **Academic Semester Date Boundaries (`schedule_firestore_service.dart`)**:
+   - Added `semesterStartDate` and `semesterEndDate` to `SyncedScheduleEvent`.
+   - Updated `occursOnDay(DateTime day)` to strictly enforce semester date boundaries.
+   - Added parallel subcollection query for `/users/$userId/semesters` across REST and Firestore SDK endpoints.
+   - Added fallback standard academic dates for Israeli university semesters (`semester_1`: Oct 25, 2026 – Feb 5, 2027; `semester_2`: Mar 14, 2027 – Jun 30, 2027; `semester_summer`: Aug 8, 2027 – Sep 30, 2027).
+   - Updated ROCIs-Schedule (`course_provider.dart`) to auto-upload semesters to Firestore on `loadData()`.
+2. **Universal Web Cookie Consent Banner (`cookie_consent_banner.dart`, `home_screen.dart`, `settings_screen.dart`)**:
+   - Made `CookieConsentBanner` self-managing: checks consent on initialization and manages its own visibility.
+   - Mounted `CookieConsentBanner` in `HomeScreen.build()` within a top-level `Stack`, ensuring universal coverage across all viewport dimensions on Web.
+   - Removed duplicate banner from `WebHomeScreen`.
+   - Added a "Cookie Preferences" tile in `SettingsScreen` (under Privacy & GDPR on Web) that resets consent and brings the banner back up on demand.
+3. **Resilient Email-First Mobile Schedule Sync (`schedule_firestore_service.dart`, `auth_service.dart`)**:
+   - Reordered `_resolveScheduleUserId` to prioritize email matching via REST (`runQuery`) and Firestore SDK before secondary auth UIDs or cached UIDs.
+   - Increased all network timeouts from 4s to 10s.
+   - Removed unconditional writes of `secUid` to `cached_schedule_user_id` from `auth_service.dart`.
+   - Added self-healing in `fetchEvents`: if zero events are returned, the cached user ID is purged from memory and `SharedPreferences` to re-resolve by email.
+4. **Verification & Deployment**:
+   - Static analysis: `flutter analyze` passed with 0 issues.
+   - Test suite: `flutter test` ran with 362/362 tests passing (100%).
+   - Web Deployment: Built and deployed to Firebase Hosting (`https://rocis-todo.web.app`).
+   - Android OTA Patch: Published Shorebird OTA Patch 4 to active release `0.2.20+110`.
+   - Git: Pushed to `main` across both `ROCIs-tasks` and `ROCIs-Schedule`.
 
 #### Problem & User Requirement
 * **Repetitive Google Sign-In Prompts on Launch**: Users had to repeatedly sign in with Google or re-link Google Tasks & Calendar integrations across app launches and browser refreshes.
