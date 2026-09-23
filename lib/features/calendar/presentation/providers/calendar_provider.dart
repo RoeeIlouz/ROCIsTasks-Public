@@ -251,6 +251,7 @@ class CalendarProvider extends ChangeNotifier {
     _isGoogleCalendarTokenExpired = false;
     notifyListeners();
 
+    // 1. Load device/Google calendar events
     try {
       // Fetch available calendars first to populate the list
       _availableCalendars = await _calendarService.getAvailableCalendars();
@@ -285,63 +286,6 @@ class CalendarProvider extends ChangeNotifier {
       );
 
       _processEventsToMap();
-
-      // Load ROCIs Schedule events if user is logged in
-      String? savedEmail;
-      try {
-        final prefs = await SharedPreferences.getInstance();
-        savedEmail =
-            prefs.getString(GoogleOAuthManager.keyUserEmail) ??
-            prefs.getString('user_email');
-      } catch (_) {}
-
-      final effectiveUid =
-          _userId ??
-          _authService?.currentUser?.uid ??
-          (Firebase.apps.isNotEmpty
-              ? FirebaseAuth.instance.currentUser?.uid
-              : null);
-      final effectiveEmail =
-          _userEmail ??
-          _authService?.currentUser?.email ??
-          (Firebase.apps.isNotEmpty
-              ? FirebaseAuth.instance.currentUser?.email
-              : null) ??
-          savedEmail;
-
-      if ((effectiveUid != null && effectiveUid.isNotEmpty) ||
-          (effectiveEmail != null && effectiveEmail.isNotEmpty)) {
-        try {
-          await _authService?.ensureSecondaryAuth();
-          if (forceRefreshSchedule) {
-            _scheduleFirestoreService.clearCache();
-          }
-          _scheduleEvents = await _scheduleFirestoreService.fetchEvents(
-            uid: effectiveUid,
-            email: effectiveEmail,
-            forceRefresh: forceRefreshSchedule,
-          );
-          _processScheduleEventsToMap();
-        } catch (e) {
-          AppLogger.warning(
-            'CalendarProvider: Could not fetch schedule events: $e',
-          );
-          _scheduleEvents = [];
-          _scheduleEventsMap = {};
-        }
-      }
-
-      // Sync widget with latest events in background
-      _widgetService
-          .updateFullCalendarWidget(
-            userId: effectiveUid,
-            userEmail: effectiveEmail,
-          )
-          .catchError((e) {
-            AppLogger.warning(
-              'Error updating widget from calendar provider: $e',
-            );
-          });
     } on GoogleTokenExpiredException catch (e) {
       if (e.isServerRejection) {
         _isGoogleCalendarTokenExpired = true;
@@ -365,10 +309,72 @@ class CalendarProvider extends ChangeNotifier {
         _events = [];
         _eventsMap = {};
       }
-    } finally {
-      _isLoading = false;
-      notifyListeners();
     }
+
+    // 2. Load ROCIs Schedule events independently
+    String? savedEmail;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      savedEmail =
+          prefs.getString(GoogleOAuthManager.keyUserEmail) ??
+          prefs.getString('user_email');
+    } catch (_) {}
+
+    final effectiveUid =
+        _userId ??
+        _authService?.currentUser?.uid ??
+        (Firebase.apps.isNotEmpty
+            ? FirebaseAuth.instance.currentUser?.uid
+            : null);
+    final effectiveEmail =
+        _userEmail ??
+        _authService?.currentUser?.email ??
+        (Firebase.apps.isNotEmpty
+            ? FirebaseAuth.instance.currentUser?.email
+            : null) ??
+        savedEmail;
+
+    if ((effectiveUid != null && effectiveUid.isNotEmpty) ||
+        (effectiveEmail != null && effectiveEmail.isNotEmpty)) {
+      try {
+        await _authService?.ensureSecondaryAuth();
+      } catch (e) {
+        AppLogger.warning(
+          'CalendarProvider: ensureSecondaryAuth non-fatal error: $e',
+        );
+      }
+
+      try {
+        if (forceRefreshSchedule) {
+          _scheduleFirestoreService.clearCache();
+        }
+        _scheduleEvents = await _scheduleFirestoreService.fetchEvents(
+          uid: effectiveUid,
+          email: effectiveEmail,
+          forceRefresh: forceRefreshSchedule,
+        );
+        _processScheduleEventsToMap();
+      } catch (e) {
+        AppLogger.warning(
+          'CalendarProvider: Could not fetch schedule events: $e',
+        );
+        _scheduleEvents = [];
+        _scheduleEventsMap = {};
+      }
+    }
+
+    // 3. Sync widget with latest events in background
+    _widgetService
+        .updateFullCalendarWidget(
+          userId: effectiveUid,
+          userEmail: effectiveEmail,
+        )
+        .catchError((e) {
+          AppLogger.warning('Error updating widget from calendar provider: $e');
+        });
+
+    _isLoading = false;
+    notifyListeners();
   }
 
   void _processEventsToMap() {

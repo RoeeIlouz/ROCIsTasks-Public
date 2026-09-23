@@ -2,6 +2,34 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## Fix Mobile ROCIs Schedule Events Visibility & Decouple Calendar Loading - 2026-09-24
+
+#### Problem & Root Causes Discovered
+* **Artificial Fallback Semester Cutoff (`schedule_firestore_service.dart`)**:
+  When a user's account lacked an explicit `semesters` subcollection in Firestore, an artificial fallback assumed Israeli universities start `semester_1` on **October 25, 2026**. Because the user's classes actually started on **September 20, 2026**, `occursOnDay` returned `false` for every day in September, rendering the calendar and home widget completely blank!
+* **Sequential Blocking in `CalendarProvider.loadEvents()`**:
+  ROCIs Schedule fetching was positioned *after* device and Google Calendar queries within the *same* `try` block. If `_calendarService.getAvailableCalendars()` or `getEvents()` threw an exception (such as `GoogleTokenExpiredException` on mobile or missing calendar permissions), execution jumped directly to `catch`, aborting ROCIs Schedule loading before it ever started.
+* **Secondary SDK Auth Delay on Mobile**:
+  `ScheduleFirestoreService.fetchEvents()` attempted Firestore SDK queries before REST. On mobile, secondary app auth and cold-start SDK connections introduce latency or drop calls, while the direct REST API with project API key resolves documents in ~300ms.
+* **DotEnv Unhandled Exception**:
+  In `firebase_schedule_options.dart`, `_cleanEnv` accessed `dotenv.env` without checking `dotenv.isInitialized`, throwing `NotInitializedError` in test and widget isolate environments.
+
+#### Solutions Applied
+1. **Removed Semester Date Cutoff (`schedule_firestore_service.dart`)**:
+   - In `SyncedScheduleEvent.occursOnDay`: Calculated `effectiveStart` as the earlier of `semesterStartDate` and `eventStartDay`, guaranteeing classes starting prior to official semester dates are never cut off.
+   - In `SyncedScheduleEvent.fromMap`: Removed the hardcoded `October 25, 2026` semester cutoff. Set `semEnd ??= start.add(const Duration(days: 160))` (~5 months) to safely bound recurring events.
+2. **Decoupled Calendar & Schedule Loading (`calendar_provider.dart`)**:
+   - Split `CalendarProvider.loadEvents()` into independent execution blocks. Device/Google Calendar errors and token expirations are caught independently and will never block or cancel ROCIs Schedule event fetching.
+3. **Prioritized REST Sync (`schedule_firestore_service.dart`)**:
+   - Reordered `fetchEvents` to execute `_fetchViaRest` first, falling back to Firestore SDK only if REST returns empty.
+4. **Added Unit Tests (`synced_schedule_event_test.dart`)**:
+   - Added unit test verifying that September recurring classes without semester subcollections are properly populated on their recurring days (Sept 20, 22) and excluded prior to their class start date.
+5. **Deployment & Verification**:
+   - `flutter analyze`: 0 issues found across all files.
+   - `flutter test`: 363/363 unit and widget tests passing (100%).
+   - Published Shorebird OTA Patch 7 to Android release `0.2.20+110`.
+   - Deployed updated web application to Firebase Hosting (`https://rocis-todo.web.app`).
+
 ## Streamlined Web OAuth, Silent 401 Re-Auth & Dismissible Warnings - 2026-09-23
 
 #### Problem & User Requirement

@@ -279,6 +279,45 @@ void main() {
         expect(displayTitle, 'Physics 101: Lecture');
       },
     );
+
+    test(
+      'September recurring classes without semester subcollection are not cut off',
+      () {
+        final classStart = DateTime(2026, 9, 20, 8, 30);
+        final event = SyncedScheduleEvent.fromMap(
+          {
+            'id': 'real_event_1',
+            'title': 'תרגול',
+            'courseId': 'course_algo',
+            'startTime': Timestamp.fromDate(classStart),
+            'endTime': Timestamp.fromDate(
+              classStart.add(const Duration(hours: 2)),
+            ),
+            'recurring': true,
+            'daysOfWeek': [0, 2], // Sunday, Tuesday
+            'semesterId': 'semester_1',
+          },
+          courseMap: {'name': 'אלגוריתמים', 'semester': 'semester_1'},
+          semesterMap: null, // User has no explicit semester doc
+        );
+
+        // Sunday Sept 20, 2026: class start date -> should occur!
+        final sept20 = DateTime(2026, 9, 20);
+        expect(event.occursOnDay(sept20), isTrue);
+
+        // Tuesday Sept 22, 2026: recurring day -> should occur!
+        final sept22 = DateTime(2026, 9, 22);
+        expect(event.occursOnDay(sept22), isTrue);
+
+        // Sunday before Sept 20 (e.g. Sept 13, 2026): before class start -> should NOT occur
+        final sept13 = DateTime(2026, 9, 13);
+        expect(event.occursOnDay(sept13), isFalse);
+
+        // Sunday in October (e.g. Oct 11, 2026): within semester window -> should occur
+        final oct11 = DateTime(2026, 10, 11);
+        expect(event.occursOnDay(oct11), isTrue);
+      },
+    );
   });
 
   group('FullCalendarFilters', () {
