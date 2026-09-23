@@ -5,11 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.2.20+110] - 2026-09-22
+## [0.2.20+110] - 2026-09-23 (Patch 4)
 
 ### Fixed
-- Enabled seamless ROCIs Schedule ecosystem read access across Tasks and widgets.
-- Resolved disconnected banner and dead reconnect button on Mobile.
+- Fixed future ROCIs Schedule events appearing ahead of academic semester dates.
+- Restored schedule events visibility on Mobile with resilient email-first sync.
+- Made Cookie Consent banner accessible across all Web screen sizes with a Settings reset option.
 
 ## [0.2.19+109] - 2026-09-22
 

@@ -22,6 +22,8 @@ class SyncedScheduleEvent {
   final List<int> daysOfWeek;
   final Color color;
   final String notes;
+  final DateTime? semesterStartDate;
+  final DateTime? semesterEndDate;
 
   const SyncedScheduleEvent({
     required this.id,
@@ -37,10 +39,43 @@ class SyncedScheduleEvent {
     required this.daysOfWeek,
     required this.color,
     required this.notes,
+    this.semesterStartDate,
+    this.semesterEndDate,
   });
 
   bool occursOnDay(DateTime day) {
     if (recurring) {
+      final targetDay = DateTime(day.year, day.month, day.day);
+
+      // 1. Strict semester date boundaries if available
+      if (semesterStartDate != null) {
+        final start = DateTime(
+          semesterStartDate!.year,
+          semesterStartDate!.month,
+          semesterStartDate!.day,
+        );
+        if (targetDay.isBefore(start)) return false;
+      }
+      if (semesterEndDate != null) {
+        final end = DateTime(
+          semesterEndDate!.year,
+          semesterEndDate!.month,
+          semesterEndDate!.day,
+        );
+        if (targetDay.isAfter(end)) return false;
+      }
+
+      // 2. Prevent recurring event from occurring before its scheduled startTime date
+      final eventStartDay = DateTime(
+        startTime.year,
+        startTime.month,
+        startTime.day,
+      );
+      if (targetDay.isBefore(eventStartDay)) {
+        return false;
+      }
+
+      // 3. Day of week matching
       // Dart DateTime weekday: 1=Mon ... 7=Sun.
       // Schedule app convention: 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat.
       final int scheduleWeekday = day.weekday == DateTime.sunday
@@ -68,17 +103,26 @@ class SyncedScheduleEvent {
     'daysOfWeek': daysOfWeek,
     'color': color.toARGB32(),
     'notes': notes,
+    'semesterStartDate': semesterStartDate?.toIso8601String(),
+    'semesterEndDate': semesterEndDate?.toIso8601String(),
   };
 
-  /// Construct SyncedScheduleEvent from Firestore map with course lookup.
+  /// Construct SyncedScheduleEvent from Firestore map with course & semester lookup.
   factory SyncedScheduleEvent.fromMap(
     Map<String, dynamic> map, {
     Map<String, dynamic>? courseMap,
+    Map<String, dynamic>? semesterMap,
   }) {
     DateTime parseDate(dynamic val, DateTime fallback) {
       if (val is Timestamp) return val.toDate();
       if (val is String) return DateTime.tryParse(val) ?? fallback;
       return fallback;
+    }
+
+    DateTime? parseOptionalDate(dynamic val) {
+      if (val is Timestamp) return val.toDate();
+      if (val is String && val.isNotEmpty) return DateTime.tryParse(val);
+      return null;
     }
 
     final start = parseDate(map['startTime'], DateTime(2020, 1, 1));
@@ -142,6 +186,30 @@ class SyncedScheduleEvent {
         map['recurring'] == '1' ||
         map['recurring'] == 'true';
 
+    DateTime? semStart =
+        parseOptionalDate(semesterMap?['startDate']) ??
+        parseOptionalDate(map['semesterStartDate']);
+    DateTime? semEnd =
+        parseOptionalDate(semesterMap?['endDate']) ??
+        parseOptionalDate(map['semesterEndDate']);
+
+    // Fallback for standard academic semesters if dates not yet explicitly configured
+    final semesterId =
+        courseMap?['semester']?.toString() ??
+        map['semesterId']?.toString() ??
+        '';
+    if (semStart == null && semesterId == 'semester_1') {
+      // Semester 1 (Fall / תשפ"ז) standard academic start at Afeka / Israeli universities: late October
+      semStart = DateTime(2026, 10, 25);
+      semEnd ??= DateTime(2027, 2, 5);
+    } else if (semStart == null && semesterId == 'semester_2') {
+      semStart = DateTime(2027, 3, 14);
+      semEnd ??= DateTime(2027, 6, 30);
+    } else if (semStart == null && semesterId == 'semester_summer') {
+      semStart = DateTime(2027, 8, 8);
+      semEnd ??= DateTime(2027, 9, 30);
+    }
+
     return SyncedScheduleEvent(
       id: map['id']?.toString() ?? '',
       title: map['title']?.toString() ?? '',
@@ -156,6 +224,8 @@ class SyncedScheduleEvent {
       daysOfWeek: parsedDays,
       color: eventColor,
       notes: map['notes']?.toString() ?? '',
+      semesterStartDate: semStart,
+      semesterEndDate: semEnd,
     );
   }
 }
@@ -334,7 +404,7 @@ class ScheduleFirestoreService {
               headers: {'Content-Type': 'application/json'},
               body: body,
             )
-            .timeout(const Duration(seconds: 4));
+            .timeout(const Duration(seconds: 10));
 
         if (resp.statusCode == 200) {
           final decoded = jsonDecode(resp.body);
@@ -360,7 +430,7 @@ class ScheduleFirestoreService {
     return null;
   }
 
-  /// Direct REST fetch of courses and events with course metadata
+  /// Direct REST fetch of courses, events, and semesters with metadata
   Future<List<SyncedScheduleEvent>> _fetchViaRest(String targetUserId) async {
     try {
       final apiKey = ScheduleFirebaseOptions.currentPlatform.apiKey;
@@ -372,15 +442,21 @@ class ScheduleFirestoreService {
       final eventsUrl = Uri.parse(
         'https://firestore.googleapis.com/v1/projects/$projectId/databases/(default)/documents/users/$targetUserId/events?key=$apiKey',
       );
+      final semestersUrl = Uri.parse(
+        'https://firestore.googleapis.com/v1/projects/$projectId/databases/(default)/documents/users/$targetUserId/semesters?key=$apiKey',
+      );
 
       final responses = await Future.wait([
-        http.get(coursesUrl).timeout(const Duration(seconds: 4)),
-        http.get(eventsUrl).timeout(const Duration(seconds: 4)),
+        http.get(coursesUrl).timeout(const Duration(seconds: 10)),
+        http.get(eventsUrl).timeout(const Duration(seconds: 10)),
+        http.get(semestersUrl).timeout(const Duration(seconds: 10)),
       ]);
 
       final coursesResp = responses[0];
       final eventsResp = responses[1];
+      final semestersResp = responses[2];
 
+      // Parse courses
       final coursesMap = <String, Map<String, dynamic>>{};
       if (coursesResp.statusCode == 200) {
         final coursesJson =
@@ -396,6 +472,22 @@ class ScheduleFirestoreService {
         }
       }
 
+      // Parse semesters
+      final semesterMap = <String, Map<String, dynamic>>{};
+      if (semestersResp.statusCode == 200) {
+        final semJson = jsonDecode(semestersResp.body) as Map<String, dynamic>;
+        final semDocs = semJson['documents'] as List<dynamic>? ?? [];
+        for (final doc in semDocs) {
+          if (doc is Map<String, dynamic>) {
+            final docName = doc['name'] as String? ?? '';
+            final semId = docName.split('/').last;
+            final fields = doc['fields'] as Map<String, dynamic>? ?? {};
+            semesterMap[semId] = decodeFirestoreFields(fields);
+          }
+        }
+      }
+
+      // Parse events with course + semester metadata
       if (eventsResp.statusCode == 200) {
         final eventsJson = jsonDecode(eventsResp.body) as Map<String, dynamic>;
         final eventDocs = eventsJson['documents'] as List<dynamic>? ?? [];
@@ -405,10 +497,16 @@ class ScheduleFirestoreService {
             final fields = doc['fields'] as Map<String, dynamic>? ?? {};
             final decoded = decodeFirestoreFields(fields);
             final courseId = decoded['courseId']?.toString() ?? '';
+            final course = coursesMap[courseId];
+            final semId =
+                course?['semester']?.toString() ??
+                decoded['semesterId']?.toString() ??
+                '';
             events.add(
               SyncedScheduleEvent.fromMap(
                 decoded,
-                courseMap: coursesMap[courseId],
+                courseMap: course,
+                semesterMap: semesterMap[semId],
               ),
             );
           }
@@ -435,30 +533,54 @@ class ScheduleFirestoreService {
     if (db == null) return [];
 
     try {
-      final coursesSnap = await db
-          .collection('users')
-          .doc(targetUserId)
-          .collection('courses')
-          .get()
-          .timeout(const Duration(seconds: 4));
+      // Fetch courses, events, and semesters in parallel
+      final results = await Future.wait([
+        db
+            .collection('users')
+            .doc(targetUserId)
+            .collection('courses')
+            .get()
+            .timeout(const Duration(seconds: 10)),
+        db
+            .collection('users')
+            .doc(targetUserId)
+            .collection('events')
+            .get()
+            .timeout(const Duration(seconds: 10)),
+        db
+            .collection('users')
+            .doc(targetUserId)
+            .collection('semesters')
+            .get()
+            .timeout(const Duration(seconds: 10)),
+      ]);
+
+      final coursesSnap = results[0];
+      final eventsSnap = results[1];
+      final semestersSnap = results[2];
+
       final coursesMap = <String, Map<String, dynamic>>{};
       for (final doc in coursesSnap.docs) {
         coursesMap[doc.id] = doc.data();
       }
 
-      final eventsSnap = await db
-          .collection('users')
-          .doc(targetUserId)
-          .collection('events')
-          .get()
-          .timeout(const Duration(seconds: 4));
+      final semesterMap = <String, Map<String, dynamic>>{};
+      for (final doc in semestersSnap.docs) {
+        semesterMap[doc.id] = doc.data();
+      }
 
       return eventsSnap.docs.map((doc) {
         final data = doc.data();
         final courseId = data['courseId']?.toString() ?? '';
+        final course = coursesMap[courseId];
+        final semId =
+            course?['semester']?.toString() ??
+            data['semesterId']?.toString() ??
+            '';
         return SyncedScheduleEvent.fromMap(
           data,
-          courseMap: coursesMap[courseId],
+          courseMap: course,
+          semesterMap: semesterMap[semId],
         );
       }).toList();
     } catch (e) {
@@ -493,7 +615,7 @@ class ScheduleFirestoreService {
             .where('email', isEqualTo: variant)
             .limit(1)
             .get()
-            .timeout(const Duration(seconds: 4));
+            .timeout(const Duration(seconds: 10));
         if (query.docs.isNotEmpty) {
           return query.docs.first.id;
         }
@@ -510,7 +632,7 @@ class ScheduleFirestoreService {
           .collection('users')
           .limit(50)
           .get()
-          .timeout(const Duration(seconds: 4));
+          .timeout(const Duration(seconds: 10));
       final normTarget = targetEmail
           .split('@')
           .first
@@ -537,39 +659,18 @@ class ScheduleFirestoreService {
     return null;
   }
 
-  /// Resolve ROCIs Schedule user ID. Checks local cache, secondary auth, direct UID doc, then queries by email.
+  /// Resolve ROCIs Schedule user ID. Email-first resolution for reliability.
+  /// The secondary Firebase Auth UID may not match the schedule user document
+  /// UID, so we prioritise email-based lookups which are universally correct.
   Future<String?> _resolveScheduleUserId({String? uid, String? email}) async {
+    // 0. Fast path: in-memory cache (cleared on email change or self-healing)
     if (_cachedScheduleUserId != null && _cachedScheduleUserId!.isNotEmpty) {
       return _cachedScheduleUserId;
     }
 
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final persistedUid = prefs.getString('cached_schedule_user_id');
-      if (persistedUid != null && persistedUid.isNotEmpty) {
-        _cachedScheduleUserId = persistedUid;
-        return _cachedScheduleUserId;
-      }
-    } catch (_) {}
-
     final targetEmail = email ?? _userEmail ?? await _getStoredEmail();
 
-    // 0. Check secondary Firebase Auth currentUser first
-    try {
-      final scheduleApp = Firebase.app('rocis-schedule');
-      final scheduleAuth = FirebaseAuth.instanceFor(app: scheduleApp);
-      final secUid = scheduleAuth.currentUser?.uid;
-      if (secUid != null && secUid.isNotEmpty) {
-        _cachedScheduleUserId = secUid;
-        _saveCachedUserId(secUid);
-        debugPrint(
-          'ScheduleFirestoreService: Resolved user by secondary auth UID: $_cachedScheduleUserId',
-        );
-        return _cachedScheduleUserId;
-      }
-    } catch (_) {}
-
-    // 1. Direct REST lookup by email (fastest, universally supported)
+    // 1. Email-first: REST lookup (most reliable, works on Web + Mobile)
     if (targetEmail != null && targetEmail.isNotEmpty) {
       final restUid = await _resolveUserIdViaRest(targetEmail);
       if (restUid != null && restUid.isNotEmpty) {
@@ -579,7 +680,27 @@ class ScheduleFirestoreService {
       }
     }
 
-    // 2. Direct UID document lookup via Firestore SDK
+    // 2. Email-first: Firestore SDK lookup
+    if (targetEmail != null && targetEmail.isNotEmpty) {
+      final dbUid = await _resolveByEmailFromDb(targetEmail);
+      if (dbUid != null && dbUid.isNotEmpty) {
+        _cachedScheduleUserId = dbUid;
+        _saveCachedUserId(dbUid);
+        return dbUid;
+      }
+    }
+
+    // 3. SharedPreferences cached UID (set by a previous successful resolution)
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final persistedUid = prefs.getString('cached_schedule_user_id');
+      if (persistedUid != null && persistedUid.isNotEmpty) {
+        _cachedScheduleUserId = persistedUid;
+        return _cachedScheduleUserId;
+      }
+    } catch (_) {}
+
+    // 4. Direct UID document lookup via Firestore SDK
     if (uid != null && uid.isNotEmpty) {
       if (!isReady) await initialize();
       final db = _scheduleDb;
@@ -600,15 +721,21 @@ class ScheduleFirestoreService {
       }
     }
 
-    // 3. Email lookup via Firestore SDK
-    if (targetEmail != null && targetEmail.isNotEmpty) {
-      final dbUid = await _resolveByEmailFromDb(targetEmail);
-      if (dbUid != null && dbUid.isNotEmpty) {
-        _cachedScheduleUserId = dbUid;
-        _saveCachedUserId(dbUid);
-        return dbUid;
+    // 5. Secondary Firebase Auth UID (last resort — may produce mismatched UID)
+    try {
+      final scheduleApp = Firebase.app('rocis-schedule');
+      final scheduleAuth = FirebaseAuth.instanceFor(app: scheduleApp);
+      final secUid = scheduleAuth.currentUser?.uid;
+      if (secUid != null && secUid.isNotEmpty) {
+        _cachedScheduleUserId = secUid;
+        // Do NOT persist secUid — it may not match the schedule user document.
+        // Let fetchEvents' self-healing validate and persist on success.
+        debugPrint(
+          'ScheduleFirestoreService: Resolved user by secondary auth UID (not persisted): $_cachedScheduleUserId',
+        );
+        return _cachedScheduleUserId;
       }
-    }
+    } catch (_) {}
 
     return null;
   }
@@ -770,7 +897,7 @@ class ScheduleFirestoreService {
     return [];
   }
 
-  /// Stream schedule events with course metadata
+  /// Stream schedule events with course and semester metadata
   Stream<List<SyncedScheduleEvent>> streamEvents(String uid) {
     if (!isReady || uid.isEmpty) {
       return Stream.value([]);
@@ -783,22 +910,43 @@ class ScheduleFirestoreService {
         .snapshots()
         .asyncMap((eventSnap) async {
           try {
-            final coursesSnap = await _scheduleDb!
-                .collection('users')
-                .doc(uid)
-                .collection('courses')
-                .get();
+            final results = await Future.wait([
+              _scheduleDb!
+                  .collection('users')
+                  .doc(uid)
+                  .collection('courses')
+                  .get(),
+              _scheduleDb!
+                  .collection('users')
+                  .doc(uid)
+                  .collection('semesters')
+                  .get(),
+            ]);
+            final coursesSnap = results[0];
+            final semestersSnap = results[1];
+
             final coursesMap = <String, Map<String, dynamic>>{};
             for (final doc in coursesSnap.docs) {
               coursesMap[doc.id] = doc.data();
             }
 
+            final semesterMap = <String, Map<String, dynamic>>{};
+            for (final doc in semestersSnap.docs) {
+              semesterMap[doc.id] = doc.data();
+            }
+
             return eventSnap.docs.map((doc) {
               final data = doc.data();
               final courseId = data['courseId']?.toString() ?? '';
+              final course = coursesMap[courseId];
+              final semId =
+                  course?['semester']?.toString() ??
+                  data['semesterId']?.toString() ??
+                  '';
               return SyncedScheduleEvent.fromMap(
                 data,
-                courseMap: coursesMap[courseId],
+                courseMap: course,
+                semesterMap: semesterMap[semId],
               );
             }).toList();
           } catch (e) {

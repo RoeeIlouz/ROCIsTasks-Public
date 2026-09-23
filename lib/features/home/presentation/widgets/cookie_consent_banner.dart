@@ -9,12 +9,17 @@ import 'package:rocis_tasks/core/services/web/cookie_service.dart';
 /// Floating Glassmorphic Cookie & Storage Consent Banner for Web.
 /// Provides GDPR-compliant 'Accept All' and 'Essential Only' choices
 /// and persists the decision in both SharedPreferences and secure cookies.
+///
+/// Self-managing: checks consent status on mount and hides if already consented.
 class CookieConsentBanner extends StatefulWidget {
   final VoidCallback? onConsentGiven;
 
   const CookieConsentBanner({super.key, this.onConsentGiven});
 
   static const String keyConsentChoice = 'cookie_consent_choice';
+
+  /// Notifier that external code (e.g. Settings) can toggle to re-show the banner.
+  static final ValueNotifier<bool> showBannerNotifier = ValueNotifier(false);
 
   /// Utility to check whether the user has already made a consent choice.
   static Future<bool> hasUserConsented() async {
@@ -30,12 +35,51 @@ class CookieConsentBanner extends StatefulWidget {
     }
   }
 
+  /// Reset cookie consent so the banner re-appears on next build.
+  static Future<void> resetConsent() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(keyConsentChoice);
+      if (kIsWeb) {
+        CookieService.instance.deleteCookie(keyConsentChoice);
+      }
+    } catch (_) {}
+    showBannerNotifier.value = true;
+  }
+
   @override
   State<CookieConsentBanner> createState() => _CookieConsentBannerState();
 }
 
 class _CookieConsentBannerState extends State<CookieConsentBanner> {
-  bool _isVisible = true;
+  bool _isVisible = false; // Start hidden; show after consent check
+
+  @override
+  void initState() {
+    super.initState();
+    _checkConsent();
+    CookieConsentBanner.showBannerNotifier.addListener(_onShowBannerChanged);
+  }
+
+  @override
+  void dispose() {
+    CookieConsentBanner.showBannerNotifier.removeListener(_onShowBannerChanged);
+    super.dispose();
+  }
+
+  void _onShowBannerChanged() {
+    if (CookieConsentBanner.showBannerNotifier.value && mounted) {
+      setState(() => _isVisible = true);
+      CookieConsentBanner.showBannerNotifier.value = false;
+    }
+  }
+
+  Future<void> _checkConsent() async {
+    final consented = await CookieConsentBanner.hasUserConsented();
+    if (!consented && mounted) {
+      setState(() => _isVisible = true);
+    }
+  }
 
   Future<void> _handleConsent(String choice) async {
     try {

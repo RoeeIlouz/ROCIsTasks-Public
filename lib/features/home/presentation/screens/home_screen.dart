@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/services.dart';
 import 'package:rocis_tasks/features/home/presentation/screens/web_home_screen.dart';
 import 'package:rocis_tasks/features/calendar/presentation/screens/calendar_screen.dart';
@@ -28,6 +28,7 @@ import 'package:rocis_tasks/shared/ui/theme/theme_service.dart';
 import 'package:rocis_tasks/shared/ui/widgets/easter_egg_spinner.dart';
 import 'package:rocis_tasks/features/tasks/presentation/widgets/kanban/kanban_board_view.dart';
 import 'package:rocis_tasks/core/services/subscription_service.dart';
+import 'package:rocis_tasks/features/home/presentation/widgets/cookie_consent_banner.dart';
 import 'package:rocis_tasks/shared/ui/widgets/sync_status_badge.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -263,18 +264,30 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     debugPrint('HomeScreen: build called');
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        debugPrint(
-          'HomeScreen LayoutBuilder: maxWidth = ${constraints.maxWidth}',
-        );
-        if (constraints.maxWidth >= 950) {
-          debugPrint('HomeScreen: rendering WebHomeScreen');
-          return const WebHomeScreen();
-        }
-        debugPrint('HomeScreen: rendering MobileHomeScreen');
-        return _buildMobileHomeScreen(context);
-      },
+    return Stack(
+      children: [
+        LayoutBuilder(
+          builder: (context, constraints) {
+            debugPrint(
+              'HomeScreen LayoutBuilder: maxWidth = ${constraints.maxWidth}',
+            );
+            if (constraints.maxWidth >= 950) {
+              debugPrint('HomeScreen: rendering WebHomeScreen');
+              return const WebHomeScreen();
+            }
+            debugPrint('HomeScreen: rendering MobileHomeScreen');
+            return _buildMobileHomeScreen(context);
+          },
+        ),
+        // Cookie consent banner on Web — self-managing visibility
+        if (kIsWeb)
+          const Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: CookieConsentBanner(),
+          ),
+      ],
     );
   }
 

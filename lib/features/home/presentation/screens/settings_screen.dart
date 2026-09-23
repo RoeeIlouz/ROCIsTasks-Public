@@ -16,6 +16,7 @@ import 'package:rocis_tasks/core/services/backup_service.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:rocis_tasks/core/config/app_config.dart';
+import 'package:rocis_tasks/features/home/presentation/widgets/cookie_consent_banner.dart';
 import 'package:rocis_tasks/shared/ui/widgets/snackbars.dart';
 import 'package:rocis_tasks/features/home/presentation/screens/app_guide_screen.dart';
 import 'package:rocis_tasks/shared/ui/widgets/easter_egg_spinner.dart';
@@ -1110,6 +1111,24 @@ class SettingsScreen extends StatelessWidget {
               }
             },
           ),
+          if (kIsWeb)
+            ListTile(
+              leading: _buildLeadingIcon(
+                context,
+                Icons.cookie_outlined,
+                Colors.orange,
+              ),
+              title: const Text('Cookie Preferences'),
+              subtitle: const Text('Reset cookie & storage consent'),
+              trailing: const Icon(Icons.refresh, size: 16),
+              onTap: () {
+                CookieConsentBanner.resetConsent();
+                showSuccessSnackBar(
+                  context,
+                  'Cookie preferences reset. The consent banner will appear shortly.',
+                );
+              },
+            ),
           ListTile(
             leading: _buildLeadingIcon(
               context,
