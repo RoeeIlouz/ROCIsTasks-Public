@@ -2,6 +2,31 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## Streamlined Web OAuth, Silent 401 Re-Auth & Dismissible Warnings - 2026-09-23
+
+#### Problem & User Requirement
+* **Repeated Consent Screens on Web**: Google OAuth 2.0 Access Tokens expire strictly after 3600 seconds (1 hour). When re-authorizing on Web, the app passed `prompt: 'consent'`, forcing users to re-approve permissions repeatedly instead of reusing existing grant consent.
+* **Artificial Web Restrictions in OAuth Manager**: `GoogleSignInPlatform.instance.clientAuthorizationTokensForScopes` was guarded by `!kIsWeb`, preventing GIS client authorization from running on Web.
+* **Premature 401 Disconnections**: The first HTTP 401 error from Google Calendar or Tasks immediately raised a fatal `GoogleTokenExpiredException` and surfaced full-screen red warning banners, even when a silent background refresh would have succeeded.
+* **Persistent Undismissible Warning Banners**: Warning banners for Google Tasks and Calendar disconnections could not be dismissed, cluttering the UI when users chose to ignore them.
+
+#### Solutions Applied
+1. **Removed Forced Consent & Added Login Hint (`auth_service.dart`)**:
+   - Removed `prompt: 'consent'` parameter from `GoogleAuthProvider` in both `signInWithGoogle` and `linkGoogleTasks`.
+   - Injected `login_hint` using the user's active email so Google reuses the prior authorization grant without prompting the user.
+2. **Web GIS Client Authorization (`google_oauth_manager.dart`)**:
+   - Removed the `!kIsWeb` check on `GoogleSignInPlatform.instance.clientAuthorizationTokensForScopes`, enabling Google Identity Services to retrieve fresh access tokens seamlessly on Web.
+3. **Silent HTTP 401 Retry Interceptor (`calendar_service.dart`)**:
+   - Added automatic silent token refresh and single-request retry on HTTP 401 in `getAvailableCalendars` and `getEvents`.
+   - Only raises `GoogleTokenExpiredException` if the retry also fails with 401.
+4. **Dismissible Warning Banners (`task_list_screen.dart`, `web_home_screen.dart`)**:
+   - Added state-tracked close buttons (`Icons.close`) to Google Tasks and Google Calendar warning banners, allowing users to dismiss warnings for the current session.
+5. **Deployment & Verification**:
+   - Analyzed 5 files with 0 lint/syntax errors (`flutter analyze`).
+   - Ran 362/362 unit and widget tests passing (100%).
+   - Deployed updated web application to Firebase Hosting (`https://rocis-todo.web.app`).
+   - Published Shorebird OTA Patch 6 to Android release `0.2.20+110`.
+
 ## Academic Semester Boundaries, Resilient Mobile Schedule Sync & Universal Web Cookie Consent - 2026-09-23
 
 #### Problem & User Requirement

@@ -163,9 +163,21 @@ class CalendarService {
           '/calendar/v3/users/me/calendarList',
         );
 
-        final response = await http
-            .get(uri, headers: {'Authorization': 'Bearer $token'})
+        var activeToken = token;
+        var response = await http
+            .get(uri, headers: {'Authorization': 'Bearer $activeToken'})
             .timeout(const Duration(seconds: 5));
+
+        // If rejected with 401, attempt one silent refresh before throwing
+        if (response.statusCode == 401) {
+          final refreshed = await _effectiveOAuthManager.getGoogleAccessToken();
+          if (refreshed != null && refreshed.isNotEmpty && refreshed != activeToken) {
+            activeToken = refreshed;
+            response = await http
+                .get(uri, headers: {'Authorization': 'Bearer $activeToken'})
+                .timeout(const Duration(seconds: 5));
+          }
+        }
 
         if (response.statusCode == 401 || response.statusCode == 403) {
           AppLogger.warning(
@@ -479,9 +491,21 @@ class CalendarService {
               queryParams,
             );
 
-            final response = await http
-                .get(uri, headers: {'Authorization': 'Bearer $token'})
+            var activeToken = token;
+            var response = await http
+                .get(uri, headers: {'Authorization': 'Bearer $activeToken'})
                 .timeout(const Duration(seconds: 5));
+
+            // If rejected with 401, attempt one silent refresh before throwing
+            if (response.statusCode == 401) {
+              final refreshed = await _effectiveOAuthManager.getGoogleAccessToken();
+              if (refreshed != null && refreshed.isNotEmpty && refreshed != activeToken) {
+                activeToken = refreshed;
+                response = await http
+                    .get(uri, headers: {'Authorization': 'Bearer $activeToken'})
+                    .timeout(const Duration(seconds: 5));
+              }
+            }
 
             if (response.statusCode == 401 || response.statusCode == 403) {
               AppLogger.warning(
