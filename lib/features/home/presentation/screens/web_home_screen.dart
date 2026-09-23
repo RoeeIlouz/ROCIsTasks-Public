@@ -22,10 +22,8 @@ import 'package:rocis_tasks/features/auth/presentation/screens/login_screen.dart
 import 'package:rocis_tasks/features/tasks/presentation/widgets/kanban/kanban_board_view.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:rocis_tasks/shared/ui/widgets/sync_status_badge.dart';
 import 'package:rocis_tasks/features/home/presentation/widgets/command_palette_dialog.dart';
-import 'package:rocis_tasks/features/home/presentation/widgets/cookie_consent_banner.dart';
 import 'package:rocis_tasks/shared/ui/theme/theme_service.dart';
 
 class WebHomeScreen extends StatefulWidget {
@@ -64,7 +62,6 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
   bool _compactDensity = false;
   Timer? _autoSaveDebounce;
   String _saveStatus = 'saved'; // 'saved', 'saving', 'idle'
-  bool _showCookieConsent = false;
 
   @override
   void initState() {
@@ -73,18 +70,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
     _descController = TextEditingController();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkAndLoadUrlDraft();
-      _checkCookieConsent();
     });
-  }
-
-  Future<void> _checkCookieConsent() async {
-    if (!kIsWeb) return;
-    final consented = await CookieConsentBanner.hasUserConsented();
-    if (!consented && mounted) {
-      setState(() {
-        _showCookieConsent = true;
-      });
-    }
   }
 
   void _checkAndLoadUrlDraft() {
@@ -601,21 +587,6 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                   );
                 },
               ),
-              if (_showCookieConsent && kIsWeb)
-                Positioned(
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  child: CookieConsentBanner(
-                    onConsentGiven: () {
-                      if (mounted) {
-                        setState(() {
-                          _showCookieConsent = false;
-                        });
-                      }
-                    },
-                  ),
-                ),
             ],
           ),
         ),

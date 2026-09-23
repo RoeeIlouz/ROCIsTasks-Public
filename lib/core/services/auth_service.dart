@@ -578,12 +578,9 @@ class AuthService extends ChangeNotifier {
       }
 
       final secUid = _scheduleAuth!.currentUser?.uid;
-      if (secUid != null && secUid.isNotEmpty) {
-        final prefs = await SharedPreferences.getInstance();
-        if (prefs.getString('cached_schedule_user_id') == null) {
-          await prefs.setString('cached_schedule_user_id', secUid);
-        }
-      }
+      // Do NOT persist secUid to cached_schedule_user_id — it may not match
+      // the actual schedule user document UID. ScheduleFirestoreService
+      // performs email-first resolution and caches the correct UID.
       scheduleAuthError.value = null;
       AppLogger.info(
         'Signed in to secondary Firebase (rocis-schedule) successfully (uid: $secUid)',
@@ -611,11 +608,7 @@ class AuthService extends ChangeNotifier {
         email: email,
         password: password,
       );
-      final secUid = _scheduleAuth!.currentUser?.uid;
-      if (secUid != null && secUid.isNotEmpty) {
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('cached_schedule_user_id', secUid);
-      }
+      // Do NOT persist secUid — ScheduleFirestoreService handles this.
       scheduleAuthError.value = null;
       AppLogger.info('Signed in to secondary Firebase with Email', tag: 'Auth');
     } catch (e) {
@@ -641,11 +634,7 @@ class AuthService extends ChangeNotifier {
         email: email,
         password: password,
       );
-      final secUid = _scheduleAuth!.currentUser?.uid;
-      if (secUid != null && secUid.isNotEmpty) {
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('cached_schedule_user_id', secUid);
-      }
+      // Do NOT persist secUid — ScheduleFirestoreService handles this.
       scheduleAuthError.value = null;
       AppLogger.info('Signed up to secondary Firebase with Email', tag: 'Auth');
     } catch (e) {
@@ -667,13 +656,7 @@ class AuthService extends ChangeNotifier {
 
     if (_scheduleAuth?.currentUser != null) {
       scheduleAuthError.value = null;
-      final secUid = _scheduleAuth!.currentUser?.uid;
-      if (secUid != null && secUid.isNotEmpty) {
-        final prefs = await SharedPreferences.getInstance();
-        if (prefs.getString('cached_schedule_user_id') == null) {
-          await prefs.setString('cached_schedule_user_id', secUid);
-        }
-      }
+      // Do NOT persist secUid — ScheduleFirestoreService handles this.
       return;
     }
 
