@@ -330,8 +330,11 @@ class AuthService extends ChangeNotifier {
             googleProvider.addScope(scope);
           }
         }
-        // Force consent so Google issues access tokens with all required scopes.
-        googleProvider.setCustomParameters({'prompt': 'consent'});
+        // Avoid forcing consent on every login; provide login_hint if identity is known
+        final savedEmail = await _oauthManager.getSavedGoogleUserEmail();
+        if (savedEmail != null && savedEmail.isNotEmpty) {
+          googleProvider.setCustomParameters({'login_hint': savedEmail});
+        }
 
         final UserCredential userCredential = await _auth.signInWithPopup(
           googleProvider,
@@ -783,8 +786,12 @@ class AuthService extends ChangeNotifier {
             googleProvider.addScope(scope);
           }
         }
-        // Force consent so reconnect flow can recover missing calendar/task scopes.
-        googleProvider.setCustomParameters({'prompt': 'consent'});
+        // Avoid forcing consent screen on reconnect; pass login_hint to streamline account matching
+        final String? effectiveEmail =
+            user?.email ?? await _oauthManager.getSavedGoogleUserEmail();
+        if (effectiveEmail != null && effectiveEmail.isNotEmpty) {
+          googleProvider.setCustomParameters({'login_hint': effectiveEmail});
+        }
 
         AppLogger.info(
           'Opening Google popup to refresh access token on Web...',

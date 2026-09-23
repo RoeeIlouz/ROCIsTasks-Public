@@ -62,6 +62,8 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
   bool _compactDensity = false;
   Timer? _autoSaveDebounce;
   String _saveStatus = 'saved'; // 'saved', 'saving', 'idle'
+  bool _dismissedCalendarWarning = false;
+  bool _dismissedTasksWarning = false;
 
   @override
   void initState() {
@@ -727,7 +729,8 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
           const Spacer(),
 
           // Google Calendar Connection Status banner
-          if (calendarProvider.isGoogleCalendarTokenExpired)
+          if (calendarProvider.isGoogleCalendarTokenExpired &&
+              !_dismissedCalendarWarning)
             isCompact
                 ? Padding(
                     padding: const EdgeInsets.only(bottom: 12),
@@ -783,6 +786,19 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                                 ),
                               ),
                             ),
+                            InkWell(
+                              onTap: () {
+                                setState(() {
+                                  _dismissedCalendarWarning = true;
+                                });
+                              },
+                              child: Icon(
+                                Icons.close,
+                                size: 14,
+                                color: theme.colorScheme.onErrorContainer
+                                    .withValues(alpha: 0.7),
+                              ),
+                            ),
                           ],
                         ),
                         const SizedBox(height: 8),
@@ -812,7 +828,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                   ),
 
           // Google Tasks Connection Status banner
-          if (authService.isGoogleTasksTokenExpired)
+          if (authService.isGoogleTasksTokenExpired && !_dismissedTasksWarning)
             isCompact
                 ? Padding(
                     padding: const EdgeInsets.only(bottom: 12),
@@ -867,6 +883,19 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                                   fontWeight: FontWeight.bold,
                                   color: theme.colorScheme.onErrorContainer,
                                 ),
+                              ),
+                            ),
+                            InkWell(
+                              onTap: () {
+                                setState(() {
+                                  _dismissedTasksWarning = true;
+                                });
+                              },
+                              child: Icon(
+                                Icons.close,
+                                size: 14,
+                                color: theme.colorScheme.onErrorContainer
+                                    .withValues(alpha: 0.7),
                               ),
                             ),
                           ],

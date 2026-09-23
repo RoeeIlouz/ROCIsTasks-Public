@@ -29,6 +29,7 @@ class _TaskListViewState extends State<TaskListView> {
   bool _isCompletedExpanded = false;
   bool _isUpcomingExpanded = false;
   bool _hasInitiallyAnimated = false;
+  bool _dismissedGoogleTasksWarning = false;
 
   @override
   void initState() {
@@ -375,7 +376,8 @@ class _TaskListViewState extends State<TaskListView> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final authService = Provider.of<AuthService>(context);
-    final isGoogleTasksExpired = authService.isGoogleTasksTokenExpired;
+    final isGoogleTasksExpired =
+        authService.isGoogleTasksTokenExpired && !_dismissedGoogleTasksWarning;
     final theme = Theme.of(context);
 
     return Selector<TaskProvider, ({List tasks, bool isLoading})>(
@@ -799,6 +801,19 @@ class _TaskListViewState extends State<TaskListView> {
                   fontSize: 13,
                 ),
               ),
+            ),
+            IconButton(
+              icon: Icon(
+                Icons.close,
+                size: 18,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+              tooltip: 'Dismiss',
+              onPressed: () {
+                setState(() {
+                  _dismissedGoogleTasksWarning = true;
+                });
+              },
             ),
           ],
         ),

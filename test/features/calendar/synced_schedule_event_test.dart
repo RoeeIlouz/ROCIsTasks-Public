@@ -94,9 +94,9 @@ void main() {
         final tuesday = DateTime(2026, 9, 15);
         expect(event.occursOnDay(tuesday), isFalse);
 
-        // Sunday before Sept 6 -> Recurring classes repeat on daysOfWeek across months
+        // Sunday before Sept 6 -> Recurring classes do NOT occur before their start date
         final pastSunday = DateTime(2026, 8, 30);
-        expect(event.occursOnDay(pastSunday), isTrue);
+        expect(event.occursOnDay(pastSunday), isFalse);
       },
     );
 
@@ -155,7 +155,7 @@ void main() {
     });
 
     test(
-      'recurring event recurs across upcoming and previous months without cutoff',
+      'recurring event recurs across upcoming months and respects start date boundary',
       () {
         final start = DateTime(2026, 9, 15, 10, 0); // Created mid-September
         final event = SyncedScheduleEvent(
@@ -174,10 +174,10 @@ void main() {
           notes: '',
         );
 
-        // Tuesday in previous month (August 25, 2026) -> should occur!
+        // Tuesday in previous month (August 25, 2026) -> should NOT occur before start date!
         final augustTuesday = DateTime(2026, 8, 25);
         expect(augustTuesday.weekday, DateTime.tuesday);
-        expect(event.occursOnDay(augustTuesday), isTrue);
+        expect(event.occursOnDay(augustTuesday), isFalse);
 
         // Tuesday in upcoming month (October 20, 2026) -> should occur!
         final octoberTuesday = DateTime(2026, 10, 20);

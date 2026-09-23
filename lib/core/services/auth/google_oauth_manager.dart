@@ -372,9 +372,8 @@ class GoogleOAuthManager {
         }
       }
 
-      // 3. On Mobile only: attempt platform authorization directly using saved email
-      // (clientAuthorizationTokensForScopes is not supported on web)
-      if (!kIsWeb && savedEmail != null && savedEmail.isNotEmpty) {
+      // 3. Attempt platform authorization directly using saved identity (supported across Mobile & Web in google_sign_in 7.x)
+      if (savedEmail != null && savedEmail.isNotEmpty) {
         try {
           final tokens = await GoogleSignInPlatform.instance
               .clientAuthorizationTokensForScopes(
