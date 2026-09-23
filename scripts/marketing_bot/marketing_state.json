@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-22T20:56:36.083354+00:00",
+  "last_run_timestamp": "2026-09-23T03:30:29.689932+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -3170,6 +3170,42 @@
       "title": "4+ years of Flutter experience in Ethiopia — how do I make my experience transferable to the international market?",
       "url": "https://reddit.com/r/FlutterDev/comments/1wnflog/4_years_of_flutter_experience_in_ethiopia_how_do/",
       "inspected_at": "2026-09-22T20:56:27.909308+00:00"
+    },
+    "reddit_1wnuq9n": {
+      "platform": "reddit",
+      "title": "Built a tool to stop bidding on bots looking for a few alpha testers (free, full access)",
+      "url": "https://reddit.com/r/SideProject/comments/1wnuq9n/built_a_tool_to_stop_bidding_on_bots_looking_for/",
+      "inspected_at": "2026-09-23T03:30:15.221724+00:00"
+    },
+    "reddit_1wnum1u": {
+      "platform": "reddit",
+      "title": "I built my first web app because I needed it myself. Looking for people to break it.",
+      "url": "https://reddit.com/r/SideProject/comments/1wnum1u/i_built_my_first_web_app_because_i_needed_it/",
+      "inspected_at": "2026-09-23T03:30:17.680409+00:00"
+    },
+    "reddit_1wnuh1l": {
+      "platform": "reddit",
+      "title": "My ADHD inspired Quizmark, a free chrome extension that embeds short quizzes in YouTube videos",
+      "url": "https://reddit.com/r/SideProject/comments/1wnuh1l/my_adhd_inspired_quizmark_a_free_chrome_extension/",
+      "inspected_at": "2026-09-23T03:30:18.477632+00:00"
+    },
+    "reddit_1wnub5m": {
+      "platform": "reddit",
+      "title": "built an open-source visual workflow builder for browser automation, you describe the task in English and watch a real browser do it",
+      "url": "https://reddit.com/r/SideProject/comments/1wnub5m/built_an_opensource_visual_workflow_builder_for/",
+      "inspected_at": "2026-09-23T03:30:19.432632+00:00"
+    },
+    "reddit_1wnueka": {
+      "platform": "reddit",
+      "title": "For any flutter devs who switched over to native mobile dev, what was your reason behind the decision?",
+      "url": "https://reddit.com/r/FlutterDev/comments/1wnueka/for_any_flutter_devs_who_switched_over_to_native/",
+      "inspected_at": "2026-09-23T03:30:20.227399+00:00"
+    },
+    "bsky_bafyreied5pn": {
+      "platform": "bluesky",
+      "title": "Ok, I still need a task app to replace google keep\n\nProblem is I have yet to fin...",
+      "url": "https://bsky.app/profile/rachel.transitory.social.ap.brid.gy/post/3lzhitzbxdd22",
+      "inspected_at": "2026-09-23T03:30:21.229751+00:00"
     }
   },
   "pending_drafts": {
