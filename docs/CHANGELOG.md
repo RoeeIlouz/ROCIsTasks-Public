@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.20+110] - 2026-09-24 (Patch 7)
+
+### Fixed
+- Fixed ROCIs Schedule events visibility on Mobile: removed semester start cutoff preventing September classes from showing.
+- Decoupled ROCIs Schedule fetching from device calendar errors to prevent silent loading aborts.
+- Prioritized high-speed REST sync to eliminate secondary SDK auth delays on Mobile.
+
 ## [0.2.20+110] - 2026-09-23 (Patch 6)
 
 ### Fixed

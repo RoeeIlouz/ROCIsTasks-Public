@@ -47,15 +47,23 @@ class SyncedScheduleEvent {
     if (recurring) {
       final targetDay = DateTime(day.year, day.month, day.day);
 
-      // 1. Strict semester date boundaries if available
-      if (semesterStartDate != null) {
-        final start = DateTime(
-          semesterStartDate!.year,
-          semesterStartDate!.month,
-          semesterStartDate!.day,
-        );
-        if (targetDay.isBefore(start)) return false;
-      }
+      final eventStartDay = DateTime(
+        startTime.year,
+        startTime.month,
+        startTime.day,
+      );
+
+      // 1. Start boundary: Do not occur before the class start date.
+      // If an explicit semester start date exists, use the earlier of the two
+      // to never cut off classes that start prior to official semester dates.
+      final effectiveStart =
+          (semesterStartDate != null &&
+              semesterStartDate!.isBefore(eventStartDay))
+          ? semesterStartDate!
+          : eventStartDay;
+      if (targetDay.isBefore(effectiveStart)) return false;
+
+      // 2. End boundary: Do not occur after semester end date
       if (semesterEndDate != null) {
         final end = DateTime(
           semesterEndDate!.year,
@@ -63,16 +71,6 @@ class SyncedScheduleEvent {
           semesterEndDate!.day,
         );
         if (targetDay.isAfter(end)) return false;
-      }
-
-      // 2. Prevent recurring event from occurring before its scheduled startTime date
-      final eventStartDay = DateTime(
-        startTime.year,
-        startTime.month,
-        startTime.day,
-      );
-      if (targetDay.isBefore(eventStartDay)) {
-        return false;
       }
 
       // 3. Day of week matching
@@ -193,22 +191,12 @@ class SyncedScheduleEvent {
         parseOptionalDate(semesterMap?['endDate']) ??
         parseOptionalDate(map['semesterEndDate']);
 
-    // Fallback for standard academic semesters if dates not yet explicitly configured
-    final semesterId =
-        courseMap?['semester']?.toString() ??
-        map['semesterId']?.toString() ??
-        '';
-    if (semStart == null && semesterId == 'semester_1') {
-      // Semester 1 (Fall / תשפ"ז) standard academic start at Afeka / Israeli universities: late October
-      semStart = DateTime(2026, 10, 25);
-      semEnd ??= DateTime(2027, 2, 5);
-    } else if (semStart == null && semesterId == 'semester_2') {
-      semStart = DateTime(2027, 3, 14);
-      semEnd ??= DateTime(2027, 6, 30);
-    } else if (semStart == null && semesterId == 'semester_summer') {
-      semStart = DateTime(2027, 8, 8);
-      semEnd ??= DateTime(2027, 9, 30);
+    // If an explicit semester start date was provided, ensure it never cuts off classes that start earlier
+    if (semStart != null && start.isBefore(semStart)) {
+      semStart = DateTime(start.year, start.month, start.day);
     }
+    // Default semester end date to ~5 months (160 days) after start if not explicitly set
+    semEnd ??= start.add(const Duration(days: 160));
 
     return SyncedScheduleEvent(
       id: map['id']?.toString() ?? '',
@@ -831,14 +819,12 @@ class ScheduleFirestoreService {
 
     List<SyncedScheduleEvent> events = [];
 
-    // 4. Try Firestore SDK fetch first if user ID is known
+    // 4. Try direct REST fetch first (fast ~300ms, immune to secondary SDK auth race conditions on mobile)
     if (targetUserId != null && targetUserId.isNotEmpty) {
-      events = await _fetchFromFirestoreDb(targetUserId);
-    }
-
-    // 5. If SDK returned empty, try direct REST fetch
-    if (events.isEmpty && targetUserId != null && targetUserId.isNotEmpty) {
       events = await _fetchViaRest(targetUserId);
+      if (events.isEmpty) {
+        events = await _fetchFromFirestoreDb(targetUserId);
+      }
     }
 
     // 6. SELF-HEALING: If events are STILL empty, targetUserId might be invalid or stale!

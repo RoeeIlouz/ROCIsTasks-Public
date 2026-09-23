@@ -171,7 +171,9 @@ class CalendarService {
         // If rejected with 401, attempt one silent refresh before throwing
         if (response.statusCode == 401) {
           final refreshed = await _effectiveOAuthManager.getGoogleAccessToken();
-          if (refreshed != null && refreshed.isNotEmpty && refreshed != activeToken) {
+          if (refreshed != null &&
+              refreshed.isNotEmpty &&
+              refreshed != activeToken) {
             activeToken = refreshed;
             response = await http
                 .get(uri, headers: {'Authorization': 'Bearer $activeToken'})
@@ -498,8 +500,11 @@ class CalendarService {
 
             // If rejected with 401, attempt one silent refresh before throwing
             if (response.statusCode == 401) {
-              final refreshed = await _effectiveOAuthManager.getGoogleAccessToken();
-              if (refreshed != null && refreshed.isNotEmpty && refreshed != activeToken) {
+              final refreshed = await _effectiveOAuthManager
+                  .getGoogleAccessToken();
+              if (refreshed != null &&
+                  refreshed.isNotEmpty &&
+                  refreshed != activeToken) {
                 activeToken = refreshed;
                 response = await http
                     .get(uri, headers: {'Authorization': 'Bearer $activeToken'})
