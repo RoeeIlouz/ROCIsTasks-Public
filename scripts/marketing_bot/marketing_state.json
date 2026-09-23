@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-23T16:13:24.357983+00:00",
+  "last_run_timestamp": "2026-09-23T21:09:06.379075+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -3278,6 +3278,42 @@
       "title": "i built an experimental web3 social network / news aggregator",
       "url": "https://reddit.com/r/roastmystartup/comments/1wns1i4/i_built_an_experimental_web3_social_network_news/",
       "inspected_at": "2026-09-23T16:13:12.975728+00:00"
+    },
+    "reddit_1woi7cf": {
+      "platform": "reddit",
+      "title": "Your next customer is probably an AI agent",
+      "url": "https://reddit.com/r/SideProject/comments/1woi7cf/your_next_customer_is_probably_an_ai_agent/",
+      "inspected_at": "2026-09-23T21:08:49.514492+00:00"
+    },
+    "reddit_1woi6v5": {
+      "platform": "reddit",
+      "title": "Monney",
+      "url": "https://reddit.com/r/SideProject/comments/1woi6v5/monney/",
+      "inspected_at": "2026-09-23T21:08:52.090006+00:00"
+    },
+    "reddit_1woi3ka": {
+      "platform": "reddit",
+      "title": "When I don't know that to watch on TV, I watch dunno.tv",
+      "url": "https://reddit.com/r/SideProject/comments/1woi3ka/when_i_dont_know_that_to_watch_on_tv_i_watch/",
+      "inspected_at": "2026-09-23T21:08:54.722290+00:00"
+    },
+    "reddit_1woi0jh": {
+      "platform": "reddit",
+      "title": "I am building a tool that finds cars for sale along your road trip route",
+      "url": "https://reddit.com/r/SideProject/comments/1woi0jh/i_am_building_a_tool_that_finds_cars_for_sale/",
+      "inspected_at": "2026-09-23T21:08:55.511867+00:00"
+    },
+    "reddit_1wof50z": {
+      "platform": "reddit",
+      "title": "6 months ago I started building my tool, it just crossed 6k visitors",
+      "url": "https://reddit.com/r/indiehackers/comments/1wof50z/6_months_ago_i_started_building_my_tool_it_just/",
+      "inspected_at": "2026-09-23T21:08:56.337920+00:00"
+    },
+    "reddit_1woh8pr": {
+      "platform": "reddit",
+      "title": "Flutter theme transitions: package or DIY? Looking for feedback",
+      "url": "https://reddit.com/r/FlutterDev/comments/1woh8pr/flutter_theme_transitions_package_or_diy_looking/",
+      "inspected_at": "2026-09-23T21:08:57.147650+00:00"
     }
   },
   "pending_drafts": {
@@ -3544,6 +3580,18 @@
       "created_at": "2026-09-05T20:59:02.799000+00:00",
       "status": "pending",
       "telegram_message_id": 57
+    },
+    "draft_8bdbfc96": {
+      "thread_id": "reddit_1woh8pr",
+      "platform": "reddit",
+      "thread_title": "Flutter theme transitions: package or DIY? Looking for feedback",
+      "thread_url": "https://reddit.com/r/FlutterDev/comments/1woh8pr/flutter_theme_transitions_package_or_diy_looking/",
+      "relevance_score": 95,
+      "reasoning": "The user is asking a direct technical question about Flutter theme transitions, which aligns with building a high-performance Flutter app (ROCIs Tasks). As a Flutter solo dev who implemented smooth glassmorphism and pitch-black themes, I can share a genuine technical tip.",
+      "draft_text": "As a solo dev who went down this exact rabbit hole for my Flutter task app, I'd say it depends on how complex your custom painters or glassmorphism layers are. If you're just swapping standard Material colors, `AnimatedTheme` usually handles the heavy lifting smoothly, but for custom canvas stuff or heavy blur widgets, rolling a lightweight manual ValueNotifier approach gives you way better frame rates without package bloat.",
+      "telegram_message_id": 354,
+      "created_at": "2026-09-23T21:08:59.136120+00:00",
+      "status": "pending"
     }
   },
   "posted_threads": {
