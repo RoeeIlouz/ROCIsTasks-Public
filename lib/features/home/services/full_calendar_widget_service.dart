@@ -12,6 +12,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:rocis_tasks/features/tasks/data/datasources/local_task_source.dart';
 import 'package:rocis_tasks/features/tasks/domain/services/task_recurrence_service.dart';
+import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
+import 'package:rocis_tasks/features/tasks/presentation/providers/helpers/task_filter_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:rocis_tasks/core/services/auth/google_oauth_manager.dart';
@@ -306,8 +308,21 @@ class FullCalendarWidgetService {
       // 1. Fetch Google Calendar events (if filter enabled)
       Future<List<dynamic>> fetchGoogleEvents() async {
         if (!filters.showGoogleCalendar) return [];
+        // Same calendar selection as the in-app calendar: saved ids that still
+        // exist, or every available calendar when none of them do.
+        var calendarIds = filters.selectedCalendarIds;
+        try {
+          final available = (await _calendarService.getAvailableCalendars())
+              .map((c) => c.id)
+              .whereType<String>()
+              .toSet();
+          if (available.isNotEmpty) {
+            final valid = calendarIds.toSet().intersection(available);
+            calendarIds = (valid.isEmpty ? available : valid).toList();
+          }
+        } catch (_) {}
         final cacheKey =
-            '${bufferStartDate.toIso8601String()}_${bufferEndDate.toIso8601String()}_${filters.selectedCalendarIds.join(',')}';
+            '${bufferStartDate.toIso8601String()}_${bufferEndDate.toIso8601String()}_${calendarIds.join(',')}';
         if (!forceRefresh &&
             _cachedEvents != null &&
             _cachedEventsKey == cacheKey &&
@@ -319,7 +334,7 @@ class FullCalendarWidgetService {
           final res = await _calendarService.getEvents(
             startDate: bufferStartDate,
             endDate: bufferEndDate,
-            calendarIds: filters.selectedCalendarIds,
+            calendarIds: calendarIds,
           );
           _cachedEvents = res;
           _cachedEventsKey = cacheKey;
@@ -446,20 +461,21 @@ class FullCalendarWidgetService {
       final eventsByDate = <String, List<dynamic>>{};
       for (final event in events) {
         if (event.start == null) continue;
-        final eventStart = DateTime(
-          event.start!.year,
-          event.start!.month,
-          event.start!.day,
-        );
-        final end = event.end ?? event.start!.add(const Duration(hours: 1));
+        // Same rule as the in-app calendar: local time, and an end at midnight
+        // is exclusive (all-day events end at the next day's midnight, so they
+        // must not spill into that day).
+        final start = (event.start as DateTime).toLocal();
+        final end =
+            ((event.end as DateTime?) ?? start.add(const Duration(hours: 1)))
+                .toLocal();
+        final eventStart = DateTime(start.year, start.month, start.day);
         final endDay = DateTime(end.year, end.month, end.day);
 
         // Add event to every day it spans
         var day = eventStart;
         while (!day.isAfter(endDay)) {
-          // Skip the end day for non-all-day events ending at midnight
           if (day == endDay &&
-              event.allDay != true &&
+              day != eventStart &&
               end.hour == 0 &&
               end.minute == 0 &&
               end.second == 0 &&
@@ -494,40 +510,69 @@ class FullCalendarWidgetService {
         }
       }
 
-      // Pre-index tasks by date for O(1) lookup across the multi-month buffer
+      // Pre-load categories for color lookup and privacy
+      final categories = _taskSource.getCategories();
+
+      // Tasks: exactly the ones the in-app calendar shows — the task list after
+      // the user's saved list filters, each on its due date (recurring tasks
+      // are not expanded), plus premium previews of the next recurrence.
       final tasksByDate = <String, List<dynamic>>{};
       if (filters.showTasks) {
         try {
-          final allTasks = _taskSource.getTasks();
-          for (final t in allTasks) {
-            if ((t.isDeleted ?? false) || t.isCompleted) continue;
-            if (t.dueDate != null) {
-              final key = DateFormat('yyyy-MM-dd').format(t.dueDate!);
-              tasksByDate.putIfAbsent(key, () => []).add(t);
+          final isPremium =
+              await HomeWidget.getWidgetData<bool>('is_premium') ?? false;
+          final categoryById = {for (final c in categories) c.id: c};
+          bool isPrivateTask(Task t) => [
+            ...t.categoryIds,
+            if (t.categoryId != null) t.categoryId!,
+          ].any((id) => categoryById[id]?.isPrivate == true);
+          // A home-screen widget is never "unlocked": hide private tasks
+          // whenever private mode is on, like the other widgets.
+          final hidePrivate =
+              isPremium && (prefs.getBool('private_mode_enabled_v1') ?? false);
 
-              // Support recurring task instances within the buffer window
-              if (t.recurrenceRule != null && t.recurrenceRule!.isNotEmpty) {
-                DateTime? nextDate = TaskRecurrenceService.getNextDueDate(
-                  t.dueDate!,
-                  t.recurrenceRule!,
-                  after: t.dueDate!,
-                );
-                int count = 0;
-                while (nextDate != null &&
-                    !nextDate.isAfter(bufferEndDate) &&
-                    count < 100) {
-                  if (!nextDate.isBefore(bufferStartDate)) {
-                    final nextKey = DateFormat('yyyy-MM-dd').format(nextDate);
-                    tasksByDate.putIfAbsent(nextKey, () => []).add(t);
-                  }
-                  nextDate = TaskRecurrenceService.getNextDueDate(
-                    t.dueDate!,
-                    t.recurrenceRule!,
-                    after: nextDate,
-                  );
-                  count++;
-                }
+          final dateFilterIndex = prefs.getInt('date_filter');
+          final filterService = TaskFilterService()
+            ..showCompleted = prefs.getBool('show_completed') ?? true
+            ..selectedCategoryIds =
+                prefs.getStringList('category_filters') ?? []
+            ..currentDateFilter =
+                dateFilterIndex != null &&
+                    dateFilterIndex < DateTimeFilterOption.values.length
+                ? DateTimeFilterOption.values[dateFilterIndex]
+                : DateTimeFilterOption.all;
+          final visibleTasks = filterService.filterAndSortTasks(
+            allTasks: _taskSource.getTasks(),
+            getCategoryById: (id) => id == null ? null : categoryById[id],
+            isPrivateTask: isPrivateTask,
+            shouldMaskPrivateContent: hidePrivate,
+          );
+          for (final t in visibleTasks) {
+            if (t.dueDate == null || (hidePrivate && isPrivateTask(t))) {
+              continue;
+            }
+            final key = DateFormat('yyyy-MM-dd').format(t.dueDate!);
+            tasksByDate.putIfAbsent(key, () => []).add(t);
+          }
+
+          if (isPremium) {
+            final now = DateTime.now();
+            final today = DateTime(now.year, now.month, now.day);
+            for (final t in _taskSource.getTasks()) {
+              final next = t.nextRecurrenceDate;
+              if (!t.isCompleted || next == null || (t.isDeleted ?? false)) {
+                continue;
               }
+              if (hidePrivate && isPrivateTask(t)) continue;
+              if (!DateTime(next.year, next.month, next.day).isAfter(today)) {
+                continue;
+              }
+              final key = DateFormat('yyyy-MM-dd').format(next);
+              tasksByDate
+                  .putIfAbsent(key, () => [])
+                  .add(
+                    TaskRecurrenceService.createUpcomingPreviewTask(t, next),
+                  );
             }
           }
         } catch (e, stack) {
@@ -538,9 +583,6 @@ class FullCalendarWidgetService {
           );
         }
       }
-
-      // Pre-load categories for color lookup
-      final categories = _taskSource.getCategories();
 
       // Master summary builder for any given date
       List<Map<String, dynamic>> buildSummariesForDate(String dateKey) {
