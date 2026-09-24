@@ -2,6 +2,21 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## FullCalendar Widget Redesign & v0.2.21+111 Internal Release - 2026-09-24
+
+#### Goals
+* Make the FullCalendar home widget look like the in-app Calendar page; tapping a day opens that date; up to 2 event pills per day, colored dots for more; locales/languages correct.
+
+#### Changes
+* **Look** (`FullCalendarWidgetProvider/Service/Utils.kt`, layouts): localized short weekday names (`EEE`, = intl `DateFormat.E`; German period stripped), app weekend colors (#FF5252 / #448AFF), accent = user highlight if set else the app's primary per light/dark theme (synced from `MyApp` as `app_primary_color_light/dark`; native default was red while settings said indigo), today 10% tint + bold, selected outline + bold, 13sp day numbers, week numbers off by default, pills 15% fill / 35% border, 3+ events = three 6dp dots + "+N" (Dart summary cap raised from 4 to 30 so N is real).
+* **Behavior**: day tap → `rocistasks://calendar?date=yyyy-MM-dd`; `HomeScreen` selects it and `CalendarScreen` follows externally selected dates across months.
+* **Locales**: explicit RTL layout direction for Hebrew/Arabic (app language can differ from system), arrows mirrored, localized premium overlay; Hindi now auto-detected (`ThemeService` used a hard-coded list without it). Verified weekday/month labels for all 8 languages against intl (JVM).
+* `bump_version.py` now writes single-quoted `appVersion` (lint `prefer_single_quotes`).
+
+#### Deployment
+* `flutter analyze` 0 issues; 381/381 tests; debug APK builds. Not visually verified on a device (none available).
+* Native changes → internal release `0.2.21+111` built with `shorebird release android`, uploaded to Google Play Internal Testing; web deployed.
+
 ## FullCalendar Widget Stale Data & Filter Fixes - 2026-09-24 (Patch 14)
 
 #### Problem & Root Causes
