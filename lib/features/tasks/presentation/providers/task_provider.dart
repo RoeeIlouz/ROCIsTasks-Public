@@ -200,14 +200,9 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
 
     // Initialize widget schedule integration asynchronously
     unawaited(
-      Future.wait([
-        _widgetDataService.initScheduleService().catchError((e, s) {
-          AppLogger.warning('Widget schedule init warning: $e');
-        }),
-        _fullCalendarWidgetService.initScheduleService().catchError((e, s) {
-          AppLogger.warning('FullCalendar schedule init warning: $e');
-        }),
-      ]),
+      _fullCalendarWidgetService.initScheduleService().catchError((e, s) {
+        AppLogger.warning('FullCalendar schedule init warning: $e');
+      }),
     );
 
     try {
@@ -850,21 +845,12 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
           final userId = _authService.currentUser?.uid;
           final userEmail = _authService.currentUser?.email;
 
-          _widgetDataService.setUserEmail(userEmail);
           _fullCalendarWidgetService.setUserEmail(userEmail);
 
           await Future.wait([
             _widgetDataService.updateAllWidgets(
               tasksForPublicSurfaces,
               getCategoryById,
-              userId: userId,
-            ),
-            _widgetDataService.updateMonthEventsMap(
-              tasksForPublicSurfaces,
-              userId: userId,
-            ),
-            _widgetDataService.updateCalendarListWidget(
-              tasksForPublicSurfaces,
               userId: userId,
             ),
             _monthWidgetService.updateMonthWidget(),
