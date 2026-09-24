@@ -161,6 +161,72 @@ void main() {
     );
 
     test(
+      'FullCalendar drops stale saved events once its sources refresh',
+      () async {
+        final mockCalendar = MockCalendarService();
+        final mockTaskSource = MockLocalTaskSource();
+        when(
+          () => mockCalendar.getEvents(
+            startDate: any(named: 'startDate'),
+            endDate: any(named: 'endDate'),
+            calendarIds: any(named: 'calendarIds'),
+          ),
+        ).thenAnswer((_) async => []);
+        when(
+          () => mockCalendar.getCalendarColors(
+            forceRefresh: any(named: 'forceRefresh'),
+          ),
+        ).thenAnswer((_) async => <String, String>{});
+        when(mockTaskSource.getTasks).thenReturn([]);
+        when(mockTaskSource.getCategories).thenReturn([]);
+
+        // An event deleted since the last run, left over in saved data.
+        final today = DateTime.now();
+        final key =
+            '${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
+        savedWidgetData['full_calendar_events_by_date'] = jsonEncode({
+          key: [
+            {'text': 'Deleted meeting', 'type': 'google'},
+          ],
+        });
+
+        await FullCalendarWidgetService(
+          mockCalendar,
+          mockTaskSource,
+        ).updateFullCalendarWidget(forceRefresh: true);
+
+        final stored =
+            savedWidgetData['full_calendar_events_by_date'] as String? ?? '';
+        expect(stored, isNot(contains('Deleted meeting')));
+      },
+    );
+
+    test('mergeStaleSummaries keeps only sources that failed to refresh', () {
+      final fresh = <String, List<Map<String, dynamic>>>{
+        '2026-10-25': [
+          {'text': 'Fresh task', 'type': 'task'},
+        ],
+      };
+      final saved = <String, dynamic>{
+        '2026-10-25': [
+          {'text': 'Old class', 'type': 'schedule'},
+          {'text': 'Old meeting', 'type': 'google'},
+        ],
+        '2026-10-13': [
+          {'text': 'Wrongly dated class', 'type': 'schedule'},
+        ],
+      };
+
+      FullCalendarWidgetService.mergeStaleSummaries(fresh, saved, {'google'});
+
+      expect(fresh['2026-10-25']!.map((s) => s['text']), [
+        'Fresh task',
+        'Old meeting',
+      ]);
+      expect(fresh.containsKey('2026-10-13'), isFalse);
+    });
+
+    test(
       'CalendarService restores cached events when live query produces 0 events',
       () async {
         // Pre-seed cached_calendar_events_v2 in SharedPreferences

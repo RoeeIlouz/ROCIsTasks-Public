@@ -263,6 +263,11 @@ class FullCalendarWidgetService {
       final difference = (firstDayOfMonth.weekday - startOfWeek) % 7;
       final startDate = firstDayOfMonth.subtract(Duration(days: difference));
 
+      // Sources that could not be refreshed this run; only their previously
+      // saved entries are carried forward (see mergeStaleSummaries).
+      var googleRefreshFailed = false;
+      var scheduleRefreshFailed = false;
+
       // 1. Fetch Google Calendar events (if filter enabled)
       Future<List<dynamic>> fetchGoogleEvents() async {
         if (!filters.showGoogleCalendar) return [];
@@ -291,6 +296,7 @@ class FullCalendarWidgetService {
             error: e,
             stack: stack,
           );
+          googleRefreshFailed = true;
           return _cachedEvents ?? [];
         }
       }
@@ -352,6 +358,9 @@ class FullCalendarWidgetService {
             email: effectiveEmail,
             forceRefresh: forceRefresh,
           );
+          // fetchEvents returns [] both for "no classes" and "offline with no
+          // cache"; treat empty as not refreshed so offline runs don't wipe.
+          if (res.isEmpty) scheduleRefreshFailed = true;
           _cachedScheduleEvents = res;
           _cachedScheduleKey = scheduleKey;
           _cachedScheduleTime = DateTime.now();
@@ -362,6 +371,7 @@ class FullCalendarWidgetService {
             error: e,
             stack: stack,
           );
+          scheduleRefreshFailed = true;
           return _cachedScheduleEvents ?? [];
         }
       }
@@ -612,29 +622,28 @@ class FullCalendarWidgetService {
         }
       }
 
-      // Preserve existing eventsByDate entries if the newly fetched data is missing dates
-      // (e.g. background isolate without network/permissions or transient failures during month navigation)
-      try {
-        final existingEventsJson = await HomeWidget.getWidgetData<String>(
-          'full_calendar_events_by_date',
-        );
-        if (existingEventsJson != null &&
-            existingEventsJson.isNotEmpty &&
-            existingEventsJson != '{}') {
-          final existingMap =
-              jsonDecode(existingEventsJson) as Map<String, dynamic>;
-          for (final entry in existingMap.entries) {
-            if (!masterSummariesByDate.containsKey(entry.key) &&
-                entry.value is List &&
-                (entry.value as List).isNotEmpty) {
-              masterSummariesByDate[entry.key] =
-                  List<Map<String, dynamic>>.from(
-                    (entry.value as List).whereType<Map<String, dynamic>>(),
-                  );
-            }
+      // Carry forward previously saved entries only for sources that could
+      // not be refreshed this run. Merging every old date back in made the
+      // saved data append-only, so deleted events and wrong dates from older
+      // versions lingered in the widget forever.
+      final staleTypes = <String>{
+        if (filters.showGoogleCalendar && googleRefreshFailed) 'google',
+        if (filters.showRocisSchedule && scheduleRefreshFailed) 'schedule',
+      };
+      if (staleTypes.isNotEmpty) {
+        try {
+          final existingEventsJson = await HomeWidget.getWidgetData<String>(
+            'full_calendar_events_by_date',
+          );
+          if (existingEventsJson != null && existingEventsJson.isNotEmpty) {
+            mergeStaleSummaries(
+              masterSummariesByDate,
+              jsonDecode(existingEventsJson) as Map<String, dynamic>,
+              staleTypes,
+            );
           }
-        }
-      } catch (_) {}
+        } catch (_) {}
+      }
 
       final eventsByDateJson = jsonEncode(masterSummariesByDate);
 
@@ -755,6 +764,29 @@ class FullCalendarWidgetService {
           existingData.isEmpty ||
           existingData == '[]') {
         await _generateFallbackGrid(monthOffset, userId);
+      }
+    }
+  }
+
+  /// Adds saved summaries of [staleTypes] (sources that failed to refresh)
+  /// back into [fresh], keeping at most 4 summaries per day.
+  @visibleForTesting
+  static void mergeStaleSummaries(
+    Map<String, List<Map<String, dynamic>>> fresh,
+    Map<String, dynamic> saved,
+    Set<String> staleTypes,
+  ) {
+    for (final entry in saved.entries) {
+      if (entry.value is! List) continue;
+      final kept = (entry.value as List)
+          .whereType<Map<String, dynamic>>()
+          .where((summary) => staleTypes.contains(summary['type']))
+          .toList();
+      if (kept.isEmpty) continue;
+      final day = fresh.putIfAbsent(entry.key, () => []);
+      for (final summary in kept) {
+        if (day.length >= 4) break;
+        day.add(summary);
       }
     }
   }
