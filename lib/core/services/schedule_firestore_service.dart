@@ -377,6 +377,31 @@ class ScheduleFirestoreService {
     return result;
   }
 
+  /// The user signed in to the ROCIs Schedule project, if any.
+  User? get _scheduleUser {
+    try {
+      return FirebaseAuth.instanceFor(
+        app: Firebase.app('rocis-schedule'),
+      ).currentUser;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Auth header for REST calls. Required once the Schedule project's rules
+  /// allow reads only by the data's owner; harmless while they are open.
+  Future<Map<String, String>> _restAuthHeaders() async {
+    try {
+      final token = await _scheduleUser?.getIdToken();
+      if (token != null && token.isNotEmpty) {
+        return {'Authorization': 'Bearer $token'};
+      }
+    } catch (e) {
+      debugPrint('ScheduleFirestoreService: could not get ID token: $e');
+    }
+    return const {};
+  }
+
   /// Resolve ROCIs-Schedule UID via direct Firestore REST query (safe on Web & Isolates)
   Future<String?> _resolveUserIdViaRest(String targetEmail) async {
     try {
@@ -417,7 +442,10 @@ class ScheduleFirestoreService {
         final resp = await http
             .post(
               url,
-              headers: {'Content-Type': 'application/json'},
+              headers: {
+                'Content-Type': 'application/json',
+                ...await _restAuthHeaders(),
+              },
               body: body,
             )
             .timeout(const Duration(seconds: 10));
@@ -462,10 +490,17 @@ class ScheduleFirestoreService {
         'https://firestore.googleapis.com/v1/projects/$projectId/databases/(default)/documents/users/$targetUserId/semesters?key=$apiKey',
       );
 
+      final headers = await _restAuthHeaders();
       final responses = await Future.wait([
-        http.get(coursesUrl).timeout(const Duration(seconds: 10)),
-        http.get(eventsUrl).timeout(const Duration(seconds: 10)),
-        http.get(semestersUrl).timeout(const Duration(seconds: 10)),
+        http
+            .get(coursesUrl, headers: headers)
+            .timeout(const Duration(seconds: 10)),
+        http
+            .get(eventsUrl, headers: headers)
+            .timeout(const Duration(seconds: 10)),
+        http
+            .get(semestersUrl, headers: headers)
+            .timeout(const Duration(seconds: 10)),
       ]);
 
       final coursesResp = responses[0];
@@ -684,9 +719,18 @@ class ScheduleFirestoreService {
       return _cachedScheduleUserId;
     }
 
+    // 1. Signed in to the Schedule project: that uid owns the data and is the
+    // only account the (owner-only) rules let us read. If it turns out to
+    // have no events, fetchEvents self-heals via the email lookup below.
+    final signedInUid = _scheduleUser?.uid;
+    if (signedInUid != null && signedInUid.isNotEmpty) {
+      _cachedScheduleUserId = signedInUid;
+      return signedInUid;
+    }
+
     final targetEmail = email ?? _userEmail ?? await _getStoredEmail();
 
-    // 1. Email-first: REST lookup (most reliable, works on Web + Mobile)
+    // 2. Email lookup via REST (works only while user docs are publicly readable)
     if (targetEmail != null && targetEmail.isNotEmpty) {
       final restUid = await _resolveUserIdViaRest(targetEmail);
       if (restUid != null && restUid.isNotEmpty) {

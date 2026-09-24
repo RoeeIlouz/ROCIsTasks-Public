@@ -72,11 +72,10 @@ class AppInitializer {
             (_) => _initEncryption(),
           ), // Encryption needs Hive for key gen fallback
           _initTimezone(isBackground: isBackground),
-          if (!isBackground) ...[
-            _initSecondaryFirebase(),
-            _initPerformance(),
-            _initRemoteConfig(),
-          ],
+          // Widgets read ROCIs Schedule data in the background too, and that
+          // needs the Schedule project's (persisted) sign-in.
+          _initSecondaryFirebase(),
+          if (!isBackground) ...[_initPerformance(), _initRemoteConfig()],
         ]).timeout(
           Duration(seconds: AppConfig.syncTimeoutSeconds),
           onTimeout: () {
