@@ -2,6 +2,22 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## FullCalendar Widget Stale Data & Filter Fixes - 2026-09-24 (Patch 14)
+
+#### Problem & Root Causes
+* **Wrongly dated/extra events on the FullCalendar widget** (e.g. classes from Oct 13 while the app correctly starts them Oct 25): `updateFullCalendarWidget` merged every previously saved date back into `full_calendar_events_by_date` on each refresh, so the widget's data was append-only — deleted events and dates produced by older versions never left.
+* **Filter buttons could revert themselves**: Kotlin flips `full_calendar_show_*` in the HomeWidget store, then Dart's background handler toggled its separate app-prefs copy; once the copies drifted, each tap was undone.
+
+#### Solutions Applied
+* Saved entries are carried forward only for a source that failed to refresh this run (Google fetch error; schedule fetch returning nothing), and only that source's entries (`mergeStaleSummaries`).
+* Background filter taps call `adoptWidgetFilter`, adopting the widget's already-flipped value (single source of truth).
+
+#### Deferred to the widget redesign (native changes need a full release)
+* Tapping a day opens the calendar tab but not that date; days with 3+ events show only dots.
+
+#### Deployment
+* `flutter analyze` 0 issues; 381/381 tests (3 new). Shorebird Android Patch 14 (`0.2.20+110`).
+
 ## Authenticated ROCIs Schedule Reads - 2026-09-24 (Patch 13)
 
 #### Problem

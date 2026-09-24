@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.20+110] - 2026-09-24 (Patch 14)
+
+### Fixed
+- Full calendar widget no longer shows deleted events or classes on wrong dates left over from earlier versions.
+- Full calendar widget filter buttons no longer flip back after being tapped.
+
 ## [0.2.20+110] - 2026-09-24 (Patch 13)
 
 ### Security
