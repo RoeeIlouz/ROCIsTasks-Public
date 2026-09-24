@@ -2,6 +2,25 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## Strict Semester Boundaries for University Schedule Events - 2026-09-24 (Patch 8)
+
+#### Problem & User Requirement
+* **Premature Event Display**: In Patch 7, removing the semester start cutoff caused recurring university classes to appear in the calendar and widget immediately in September 2026, even though the academic semester (Semester 1) does not begin until late October 2026.
+* **Lack of Strict Semester Respect**: `occursOnDay` evaluated recurring events against the event template's creation date (`startTime`) instead of strictly requiring that recurring classes only occur on or after `semesterStartDate`.
+
+#### Solutions Applied
+1. **Strict Semester Date Boundaries (`schedule_firestore_service.dart`)**:
+   - In `SyncedScheduleEvent.occursOnDay`: Implemented strict `startBoundary` checking. If `semesterStartDate` is specified, recurring classes strictly do not occur before that date (`targetDay.isBefore(startBoundary)` returns `false`).
+   - In `SyncedScheduleEvent.fromMap`: Restored standard academic semester date fallbacks (`semester_1`: Oct 25, 2026 – Feb 5, 2027; `semester_2`: Mar 14, 2027 – Jun 30, 2027; `semester_summer`: Aug 8, 2027 – Sep 30, 2027) when explicit user semester documents are not yet configured in ROCIs-Schedule.
+   - Removed overwrite of `semStart` with the event template creation date `start` (`2026-09-20`).
+2. **Automated Unit Tests (`synced_schedule_event_test.dart`)**:
+   - Updated tests to assert that recurring semester classes do NOT occur before the semester starts (e.g., September 20, 22, 24, October 11, 20 are all false), and strictly start appearing on the semester start date (October 25, 2026).
+3. **Deployment & Verification**:
+   - `flutter test`: 363/363 tests passed (100%).
+   - `flutter analyze`: 0 issues found across all files.
+   - Published Shorebird OTA Patch 8 to Android release `0.2.20+110`.
+   - Deployed updated web build to Firebase Hosting.
+
 ## Fix Mobile ROCIs Schedule Events Visibility & Decouple Calendar Loading - 2026-09-24
 
 #### Problem & Root Causes Discovered
