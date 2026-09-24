@@ -69,7 +69,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="1"
-                android:textSize="11.5sp"
+                android:textSize="13sp"
                 android:fontFamily="sans-serif"
                 android:textColor="@color/widget_title_text" />
 
@@ -168,38 +168,48 @@
 
                 <ImageView
                     android:id="@+id/widget_full_dot_0_1"
-                    android:layout_width="4.5dp"
-                    android:layout_height="4.5dp"
-                    android:layout_marginStart="1dp"
-                    android:layout_marginEnd="1dp"
+                    android:layout_width="6dp"
+                    android:layout_height="6dp"
+                    android:layout_marginStart="1.5dp"
+                    android:layout_marginEnd="1.5dp"
                     android:src="@drawable/widget_event_dot"
                     android:visibility="gone" />
 
                 <ImageView
                     android:id="@+id/widget_full_dot_0_2"
-                    android:layout_width="4.5dp"
-                    android:layout_height="4.5dp"
-                    android:layout_marginStart="1dp"
-                    android:layout_marginEnd="1dp"
+                    android:layout_width="6dp"
+                    android:layout_height="6dp"
+                    android:layout_marginStart="1.5dp"
+                    android:layout_marginEnd="1.5dp"
                     android:src="@drawable/widget_event_dot"
                     android:visibility="gone" />
 
                 <ImageView
                     android:id="@+id/widget_full_dot_0_3"
-                    android:layout_width="4.5dp"
-                    android:layout_height="4.5dp"
-                    android:layout_marginStart="1dp"
-                    android:layout_marginEnd="1dp"
+                    android:layout_width="6dp"
+                    android:layout_height="6dp"
+                    android:layout_marginStart="1.5dp"
+                    android:layout_marginEnd="1.5dp"
                     android:src="@drawable/widget_event_dot"
                     android:visibility="gone" />
 
                 <ImageView
                     android:id="@+id/widget_full_dot_0_4"
-                    android:layout_width="4.5dp"
-                    android:layout_height="4.5dp"
-                    android:layout_marginStart="1dp"
-                    android:layout_marginEnd="1dp"
+                    android:layout_width="6dp"
+                    android:layout_height="6dp"
+                    android:layout_marginStart="1.5dp"
+                    android:layout_marginEnd="1.5dp"
                     android:src="@drawable/widget_event_dot"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/widget_full_more_0"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="2dp"
+                    android:textSize="8sp"
+                    android:textStyle="bold"
+                    android:includeFontPadding="false"
                     android:visibility="gone" />
             </LinearLayout>
         </LinearLayout>
@@ -249,7 +259,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="2"
-                android:textSize="11.5sp"
+                android:textSize="13sp"
                 android:fontFamily="sans-serif"
                 android:textColor="@color/widget_title_text" />
 
@@ -348,38 +358,48 @@
 
                 <ImageView
                     android:id="@+id/widget_full_dot_1_1"
-                    android:layout_width="4.5dp"
-                    android:layout_height="4.5dp"
-                    android:layout_marginStart="1dp"
-                    android:layout_marginEnd="1dp"
+                    android:layout_width="6dp"
+                    android:layout_height="6dp"
+                    android:layout_marginStart="1.5dp"
+                    android:layout_marginEnd="1.5dp"
                     android:src="@drawable/widget_event_dot"
                     android:visibility="gone" />
 
                 <ImageView
                     android:id="@+id/widget_full_dot_1_2"
-                    android:layout_width="4.5dp"
-                    android:layout_height="4.5dp"
-                    android:layout_marginStart="1dp"
-                    android:layout_marginEnd="1dp"
+                    android:layout_width="6dp"
+                    android:layout_height="6dp"
+                    android:layout_marginStart="1.5dp"
+                    android:layout_marginEnd="1.5dp"
                     android:src="@drawable/widget_event_dot"
                     android:visibility="gone" />
 
                 <ImageView
                     android:id="@+id/widget_full_dot_1_3"
-                    android:layout_width="4.5dp"
-                    android:layout_height="4.5dp"
-                    android:layout_marginStart="1dp"
-                    android:layout_marginEnd="1dp"
+                    android:layout_width="6dp"
+                    android:layout_height="6dp"
+                    android:layout_marginStart="1.5dp"
+                    android:layout_marginEnd="1.5dp"
                     android:src="@drawable/widget_event_dot"
                     android:visibility="gone" />
 
                 <ImageView
                     android:id="@+id/widget_full_dot_1_4"
-                    android:layout_width="4.5dp"
-                    android:layout_height="4.5dp"
-                    android:layout_marginStart="1dp"
-                    android:layout_marginEnd="1dp"
+                    android:layout_width="6dp"
+                    android:layout_height="6dp"
+                    android:layout_marginStart="1.5dp"
+                    android:layout_marginEnd="1.5dp"
                     android:src="@drawable/widget_event_dot"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/widget_full_more_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="2dp"
+                    android:textSize="8sp"
+                    android:textStyle="bold"
+                    android:includeFontPadding="false"
                     android:visibility="gone" />
             </LinearLayout>
         </LinearLayout>
@@ -429,7 +449,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="3"
-                android:textSize="11.5sp"
+                android:textSize="13sp"
                 android:fontFamily="sans-serif"
                 android:textColor="@color/widget_title_text" />
 
@@ -528,38 +548,48 @@
 
                 <ImageView
                     android:id="@+id/widget_full_dot_2_1"
-                    android:layout_width="4.5dp"
-                    android:layout_height="4.5dp"
-                    android:layout_marginStart="1dp"
-                    android:layout_marginEnd="1dp"
+                    android:layout_width="6dp"
+                    android:layout_height="6dp"
+                    android:layout_marginStart="1.5dp"
+                    android:layout_marginEnd="1.5dp"
                     android:src="@drawable/widget_event_dot"
                     android:visibility="gone" />
 
                 <ImageView
                     android:id="@+id/widget_full_dot_2_2"
-                    android:layout_width="4.5dp"
-                    android:layout_height="4.5dp"
-                    android:layout_marginStart="1dp"
-                    android:layout_marginEnd="1dp"
+                    android:layout_width="6dp"
+                    android:layout_height="6dp"
+                    android:layout_marginStart="1.5dp"
+                    android:layout_marginEnd="1.5dp"
                     android:src="@drawable/widget_event_dot"
                     android:visibility="gone" />
 
                 <ImageView
                     android:id="@+id/widget_full_dot_2_3"
-                    android:layout_width="4.5dp"
-                    android:layout_height="4.5dp"
-                    android:layout_marginStart="1dp"
-                    android:layout_marginEnd="1dp"
+                    android:layout_width="6dp"
+                    android:layout_height="6dp"
+                    android:layout_marginStart="1.5dp"
+                    android:layout_marginEnd="1.5dp"
                     android:src="@drawable/widget_event_dot"
                     android:visibility="gone" />
 
                 <ImageView
                     android:id="@+id/widget_full_dot_2_4"
-                    android:layout_width="4.5dp"
-                    android:layout_height="4.5dp"
-                    android:layout_marginStart="1dp"
-                    android:layout_marginEnd="1dp"
+                    android:layout_width="6dp"
+                    android:layout_height="6dp"
+                    android:layout_marginStart="1.5dp"
+                    android:layout_marginEnd="1.5dp"
                     android:src="@drawable/widget_event_dot"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/widget_full_more_2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="2dp"
+                    android:textSize="8sp"
+                    android:textStyle="bold"
+                    android:includeFontPadding="false"
                     android:visibility="gone" />
             </LinearLayout>
         </LinearLayout>
@@ -609,7 +639,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="4"
-                android:textSize="11.5sp"
+                android:textSize="13sp"
                 android:fontFamily="sans-serif"
                 android:textColor="@color/widget_title_text" />
 
@@ -708,38 +738,48 @@
 
                 <ImageView
                     android:id="@+id/widget_full_dot_3_1"
-                    android:layout_width="4.5dp"
-                    android:layout_height="4.5dp"
-                    android:layout_marginStart="1dp"
-                    android:layout_marginEnd="1dp"
+                    android:layout_width="6dp"
+                    android:layout_height="6dp"
+                    android:layout_marginStart="1.5dp"
+                    android:layout_marginEnd="1.5dp"
                     android:src="@drawable/widget_event_dot"
                     android:visibility="gone" />
 
                 <ImageView
                     android:id="@+id/widget_full_dot_3_2"
-                    android:layout_width="4.5dp"
-                    android:layout_height="4.5dp"
-                    android:layout_marginStart="1dp"
-                    android:layout_marginEnd="1dp"
+                    android:layout_width="6dp"
+                    android:layout_height="6dp"
+                    android:layout_marginStart="1.5dp"
+                    android:layout_marginEnd="1.5dp"
                     android:src="@drawable/widget_event_dot"
                     android:visibility="gone" />
 
                 <ImageView
                     android:id="@+id/widget_full_dot_3_3"
-                    android:layout_width="4.5dp"
-                    android:layout_height="4.5dp"
-                    android:layout_marginStart="1dp"
-                    android:layout_marginEnd="1dp"
+                    android:layout_width="6dp"
+                    android:layout_height="6dp"
+                    android:layout_marginStart="1.5dp"
+                    android:layout_marginEnd="1.5dp"
                     android:src="@drawable/widget_event_dot"
                     android:visibility="gone" />
 
                 <ImageView
                     android:id="@+id/widget_full_dot_3_4"
-                    android:layout_width="4.5dp"
-                    android:layout_height="4.5dp"
-                    android:layout_marginStart="1dp"
-                    android:layout_marginEnd="1dp"
+                    android:layout_width="6dp"
+                    android:layout_height="6dp"
+                    android:layout_marginStart="1.5dp"
+                    android:layout_marginEnd="1.5dp"
                     android:src="@drawable/widget_event_dot"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/widget_full_more_3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="2dp"
+                    android:textSize="8sp"
+                    android:textStyle="bold"
+                    android:includeFontPadding="false"
                     android:visibility="gone" />
             </LinearLayout>
         </LinearLayout>
@@ -789,7 +829,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="5"
-                android:textSize="11.5sp"
+                android:textSize="13sp"
                 android:fontFamily="sans-serif"
                 android:textColor="@color/widget_title_text" />
 
@@ -888,38 +928,48 @@
 
                 <ImageView
                     android:id="@+id/widget_full_dot_4_1"
-                    android:layout_width="4.5dp"
-                    android:layout_height="4.5dp"
-                    android:layout_marginStart="1dp"
-                    android:layout_marginEnd="1dp"
+                    android:layout_width="6dp"
+                    android:layout_height="6dp"
+                    android:layout_marginStart="1.5dp"
+                    android:layout_marginEnd="1.5dp"
                     android:src="@drawable/widget_event_dot"
                     android:visibility="gone" />
 
                 <ImageView
                     android:id="@+id/widget_full_dot_4_2"
-                    android:layout_width="4.5dp"
-                    android:layout_height="4.5dp"
-                    android:layout_marginStart="1dp"
-                    android:layout_marginEnd="1dp"
+                    android:layout_width="6dp"
+                    android:layout_height="6dp"
+                    android:layout_marginStart="1.5dp"
+                    android:layout_marginEnd="1.5dp"
                     android:src="@drawable/widget_event_dot"
                     android:visibility="gone" />
 
                 <ImageView
                     android:id="@+id/widget_full_dot_4_3"
-                    android:layout_width="4.5dp"
-                    android:layout_height="4.5dp"
-                    android:layout_marginStart="1dp"
-                    android:layout_marginEnd="1dp"
+                    android:layout_width="6dp"
+                    android:layout_height="6dp"
+                    android:layout_marginStart="1.5dp"
+                    android:layout_marginEnd="1.5dp"
                     android:src="@drawable/widget_event_dot"
                     android:visibility="gone" />
 
                 <ImageView
                     android:id="@+id/widget_full_dot_4_4"
-                    android:layout_width="4.5dp"
-                    android:layout_height="4.5dp"
-                    android:layout_marginStart="1dp"
-                    android:layout_marginEnd="1dp"
+                    android:layout_width="6dp"
+                    android:layout_height="6dp"
+                    android:layout_marginStart="1.5dp"
+                    android:layout_marginEnd="1.5dp"
                     android:src="@drawable/widget_event_dot"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/widget_full_more_4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="2dp"
+                    android:textSize="8sp"
+                    android:textStyle="bold"
+                    android:includeFontPadding="false"
                     android:visibility="gone" />
             </LinearLayout>
         </LinearLayout>
@@ -969,7 +1019,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="6"
-                android:textSize="11.5sp"
+                android:textSize="13sp"
                 android:fontFamily="sans-serif"
                 android:textColor="@color/widget_title_text" />
 
@@ -1068,38 +1118,48 @@
 
                 <ImageView
                     android:id="@+id/widget_full_dot_5_1"
-                    android:layout_width="4.5dp"
-                    android:layout_height="4.5dp"
-                    android:layout_marginStart="1dp"
-                    android:layout_marginEnd="1dp"
+                    android:layout_width="6dp"
+                    android:layout_height="6dp"
+                    android:layout_marginStart="1.5dp"
+                    android:layout_marginEnd="1.5dp"
                     android:src="@drawable/widget_event_dot"
                     android:visibility="gone" />
 
                 <ImageView
                     android:id="@+id/widget_full_dot_5_2"
-                    android:layout_width="4.5dp"
-                    android:layout_height="4.5dp"
-                    android:layout_marginStart="1dp"
-                    android:layout_marginEnd="1dp"
+                    android:layout_width="6dp"
+                    android:layout_height="6dp"
+                    android:layout_marginStart="1.5dp"
+                    android:layout_marginEnd="1.5dp"
                     android:src="@drawable/widget_event_dot"
                     android:visibility="gone" />
 
                 <ImageView
                     android:id="@+id/widget_full_dot_5_3"
-                    android:layout_width="4.5dp"
-                    android:layout_height="4.5dp"
-                    android:layout_marginStart="1dp"
-                    android:layout_marginEnd="1dp"
+                    android:layout_width="6dp"
+                    android:layout_height="6dp"
+                    android:layout_marginStart="1.5dp"
+                    android:layout_marginEnd="1.5dp"
                     android:src="@drawable/widget_event_dot"
                     android:visibility="gone" />
 
                 <ImageView
                     android:id="@+id/widget_full_dot_5_4"
-                    android:layout_width="4.5dp"
-                    android:layout_height="4.5dp"
-                    android:layout_marginStart="1dp"
-                    android:layout_marginEnd="1dp"
+                    android:layout_width="6dp"
+                    android:layout_height="6dp"
+                    android:layout_marginStart="1.5dp"
+                    android:layout_marginEnd="1.5dp"
                     android:src="@drawable/widget_event_dot"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/widget_full_more_5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="2dp"
+                    android:textSize="8sp"
+                    android:textStyle="bold"
+                    android:includeFontPadding="false"
                     android:visibility="gone" />
             </LinearLayout>
         </LinearLayout>
@@ -1149,7 +1209,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="7"
-                android:textSize="11.5sp"
+                android:textSize="13sp"
                 android:fontFamily="sans-serif"
                 android:textColor="@color/widget_title_text" />
 
@@ -1248,38 +1308,48 @@
 
                 <ImageView
                     android:id="@+id/widget_full_dot_6_1"
-                    android:layout_width="4.5dp"
-                    android:layout_height="4.5dp"
-                    android:layout_marginStart="1dp"
-                    android:layout_marginEnd="1dp"
+                    android:layout_width="6dp"
+                    android:layout_height="6dp"
+                    android:layout_marginStart="1.5dp"
+                    android:layout_marginEnd="1.5dp"
                     android:src="@drawable/widget_event_dot"
                     android:visibility="gone" />
 
                 <ImageView
                     android:id="@+id/widget_full_dot_6_2"
-                    android:layout_width="4.5dp"
-                    android:layout_height="4.5dp"
-                    android:layout_marginStart="1dp"
-                    android:layout_marginEnd="1dp"
+                    android:layout_width="6dp"
+                    android:layout_height="6dp"
+                    android:layout_marginStart="1.5dp"
+                    android:layout_marginEnd="1.5dp"
                     android:src="@drawable/widget_event_dot"
                     android:visibility="gone" />
 
                 <ImageView
                     android:id="@+id/widget_full_dot_6_3"
-                    android:layout_width="4.5dp"
-                    android:layout_height="4.5dp"
-                    android:layout_marginStart="1dp"
-                    android:layout_marginEnd="1dp"
+                    android:layout_width="6dp"
+                    android:layout_height="6dp"
+                    android:layout_marginStart="1.5dp"
+                    android:layout_marginEnd="1.5dp"
                     android:src="@drawable/widget_event_dot"
                     android:visibility="gone" />
 
                 <ImageView
                     android:id="@+id/widget_full_dot_6_4"
-                    android:layout_width="4.5dp"
-                    android:layout_height="4.5dp"
-                    android:layout_marginStart="1dp"
-                    android:layout_marginEnd="1dp"
+                    android:layout_width="6dp"
+                    android:layout_height="6dp"
+                    android:layout_marginStart="1.5dp"
+                    android:layout_marginEnd="1.5dp"
                     android:src="@drawable/widget_event_dot"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/widget_full_more_6"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="2dp"
+                    android:textSize="8sp"
+                    android:textStyle="bold"
+                    android:includeFontPadding="false"
                     android:visibility="gone" />
             </LinearLayout>
         </LinearLayout>

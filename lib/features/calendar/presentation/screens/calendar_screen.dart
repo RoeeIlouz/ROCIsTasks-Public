@@ -32,6 +32,7 @@ class CalendarScreen extends StatefulWidget {
 class _CalendarScreenState extends State<CalendarScreen> {
   CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
+  DateTime? _lastSelectedDay;
 
   @override
   void initState() {
@@ -195,6 +196,15 @@ class _CalendarScreenState extends State<CalendarScreen> {
     final upcomingByDay = _indexTasksByDay(taskProvider.upcomingRecurringTasks);
     // events list not needed here as we query provider by day
     final selectedDay = calendarProvider.selectedDate;
+    // Follow selections made elsewhere (e.g. tapping a day on the home widget)
+    // by showing that date's month.
+    if (_lastSelectedDay != null &&
+        !isSameDay(_lastSelectedDay, selectedDay) &&
+        (selectedDay.year != _focusedDay.year ||
+            selectedDay.month != _focusedDay.month)) {
+      _focusedDay = selectedDay;
+    }
+    _lastSelectedDay = selectedDay;
 
     final selectedItems = _getEventsForDay(
       selectedDay,

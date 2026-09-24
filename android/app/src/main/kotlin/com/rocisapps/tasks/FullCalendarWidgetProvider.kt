@@ -77,9 +77,9 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
 
                 // Read theme and customization preferences
                 val theme = widgetData.getString(FullCalendarWidgetUtils.PREF_THEME, FullCalendarWidgetUtils.DEFAULT_THEME) ?: FullCalendarWidgetUtils.DEFAULT_THEME
-                val showWeekNumbers = widgetData.getBoolean(FullCalendarWidgetUtils.PREF_SHOW_WEEK_NUMBERS, true)
+                val showWeekNumbers = widgetData.getBoolean(FullCalendarWidgetUtils.PREF_SHOW_WEEK_NUMBERS, FullCalendarWidgetUtils.DEFAULT_SHOW_WEEK_NUMBERS)
                 val weekendHighlight = widgetData.getBoolean(FullCalendarWidgetUtils.PREF_WEEKEND_HIGHLIGHT, true)
-                val primaryColor = FullCalendarWidgetUtils.parseHighlightColor(widgetData)
+                val primaryColor = FullCalendarWidgetUtils.resolveHighlightColor(widgetData, theme, context)
 
                 // 1. Apply Widget Theme Background
                 val rootBgRes = FullCalendarWidgetUtils.getThemeBackgroundRes(theme)
@@ -102,7 +102,20 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
                 // Dynamic Weekday headers text and colors based on startOfWeek and app locale
                 val widgetLocale = WidgetLocaleHelper.getWidgetLocale(widgetData)
                 val startOfWeek = widgetData.getInt(FullCalendarWidgetUtils.PREF_START_OF_WEEK, FullCalendarWidgetUtils.DEFAULT_START_OF_WEEK) // 7 = Sunday, 1 = Monday, 6 = Saturday
-                val daysOfWeekLetters = WidgetLocaleHelper.getWeekdayLetters(startOfWeek, widgetLocale)
+                val daysOfWeekLetters = WidgetLocaleHelper.getWeekdayShortNames(startOfWeek, widgetLocale)
+
+                // Mirror the whole widget for right-to-left languages, like the app does.
+                // The app's language can differ from the system's, so set it explicitly.
+                val isRtl = WidgetLocaleHelper.isRtl(widgetLocale)
+                views.setInt(
+                    R.id.widget_full_calendar_root,
+                    "setLayoutDirection",
+                    if (isRtl) android.view.View.LAYOUT_DIRECTION_RTL else android.view.View.LAYOUT_DIRECTION_LTR
+                )
+                // Arrows point in the reading direction (prev = back).
+                views.setTextViewText(R.id.widget_full_calendar_prev, if (isRtl) "›" else "‹")
+                views.setTextViewText(R.id.widget_full_calendar_next, if (isRtl) "‹" else "›")
+                views.setTextViewText(R.id.widget_premium_overlay_text, WidgetLocaleHelper.getPremiumFeatureText(widgetLocale))
                 val weekdayViewIds = listOf(
                     R.id.widget_weekday_sun_header,
                     R.id.widget_weekday_mon_header,
@@ -121,9 +134,9 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
 
                     val color = if (weekendHighlight) {
                         if (dayOfWeek == 7) {
-                            android.graphics.Color.parseColor("#EF4444") // Red/Coral for Sunday (matches in-app calendar)
+                            FullCalendarWidgetUtils.SUNDAY_COLOR
                         } else if (dayOfWeek == 6) {
-                            android.graphics.Color.parseColor("#3B82F6") // Blue/Cyan for Saturday (matches in-app calendar)
+                            FullCalendarWidgetUtils.SATURDAY_COLOR
                         } else {
                             weekdayColor
                         }

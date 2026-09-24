@@ -45,7 +45,15 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
     private var widgetTheme = "system"
     private var showWeekNumbers = true
     private var weekendHighlight = true
-    private var highlightColor = Color.parseColor("#EF3842")
+    private var highlightColor = Color.parseColor(FullCalendarWidgetUtils.DEFAULT_HIGHLIGHT_COLOR)
+    private var isRtl = false
+
+    // "+N" labels shown after three dots when a day has more than three events.
+    private val moreTextIds = listOf(
+        R.id.widget_full_more_0, R.id.widget_full_more_1, R.id.widget_full_more_2,
+        R.id.widget_full_more_3, R.id.widget_full_more_4, R.id.widget_full_more_5,
+        R.id.widget_full_more_6
+    )
 
     private val dayCells = listOf(
         FullCalendarCellIds(
@@ -175,9 +183,10 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
             val showSchedule = widgetData.getBoolean(FullCalendarWidgetUtils.PREF_SHOW_SCHEDULE, true)
             selectedDateStr = widgetData.getString(FullCalendarWidgetUtils.PREF_SELECTED_DATE, "") ?: ""
             widgetTheme = widgetData.getString(FullCalendarWidgetUtils.PREF_THEME, FullCalendarWidgetUtils.DEFAULT_THEME) ?: FullCalendarWidgetUtils.DEFAULT_THEME
-            showWeekNumbers = widgetData.getBoolean(FullCalendarWidgetUtils.PREF_SHOW_WEEK_NUMBERS, true)
+            showWeekNumbers = widgetData.getBoolean(FullCalendarWidgetUtils.PREF_SHOW_WEEK_NUMBERS, FullCalendarWidgetUtils.DEFAULT_SHOW_WEEK_NUMBERS)
             weekendHighlight = widgetData.getBoolean(FullCalendarWidgetUtils.PREF_WEEKEND_HIGHLIGHT, true)
-            highlightColor = FullCalendarWidgetUtils.parseHighlightColor(widgetData)
+            highlightColor = FullCalendarWidgetUtils.resolveHighlightColor(widgetData, widgetTheme, context)
+            isRtl = WidgetLocaleHelper.isRtl(WidgetLocaleHelper.getWidgetLocale(widgetData))
             
             // 1. Index summaries by date ("yyyy-MM-dd") from pre-buffered multi-month map or fallback grid
             val summariesByDate = HashMap<String, JSONArray>()
@@ -265,6 +274,11 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
     override fun getViewAt(position: Int): RemoteViews {
         val rowViews = RemoteViews(context.packageName, R.layout.widget_full_calendar_row)
         try {
+            rowViews.setInt(
+                R.id.widget_full_calendar_row_root,
+                "setLayoutDirection",
+                if (isRtl) View.LAYOUT_DIRECTION_RTL else View.LAYOUT_DIRECTION_LTR
+            )
             val startIndex = position * 8
             if (startIndex >= days.size) return rowViews
 
@@ -316,14 +330,22 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
                     }
                 } catch (_: Exception) {}
 
-                rowViews.setTextViewText(cell.textId, dayNum.toString())
+                // Today and the selected day are bold, as in the in-app calendar.
+                val dayLabel = android.text.SpannableString(dayNum.toString())
+                if (isToday || isSelected) {
+                    dayLabel.setSpan(
+                        android.text.style.StyleSpan(android.graphics.Typeface.BOLD),
+                        0, dayLabel.length, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                    )
+                }
+                rowViews.setTextViewText(cell.textId, dayLabel)
 
                 // Background & Stroke highlights
                 if (isToday) {
                     val fillColor = (highlightColor and 0x00FFFFFF) or (0xFF shl 24)
                     rowViews.setViewVisibility(cell.fillId, View.VISIBLE)
                     rowViews.setInt(cell.fillId, "setColorFilter", fillColor)
-                    rowViews.setInt(cell.fillId, "setImageAlpha", 0x33) // 20% opacity for today
+                    rowViews.setInt(cell.fillId, "setImageAlpha", 0x1A) // 10% tint, as in the app
                     rowViews.setViewVisibility(cell.strokeId, View.GONE)
                 } else if (isSelected) {
                     val strokeColor = (highlightColor and 0x00FFFFFF) or (0xFF shl 24)
@@ -340,9 +362,9 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
                     highlightColor
                 } else if (isCurrentMonth) {
                     if (weekendHighlight && dayOfWeek == Calendar.SUNDAY) {
-                        Color.parseColor("#EF4444") // Coral red
+                        FullCalendarWidgetUtils.SUNDAY_COLOR
                     } else if (weekendHighlight && dayOfWeek == Calendar.SATURDAY) {
-                        Color.parseColor("#3B82F6") // Electric blue
+                        FullCalendarWidgetUtils.SATURDAY_COLOR
                     } else {
                         FullCalendarWidgetUtils.getTextColor(widgetTheme, context)
                     }
@@ -370,7 +392,7 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
                     rowViews.setInt(cell.eventFill1Id, "setImageAlpha", 0x26) // 15% opacity tint fill
 
                     rowViews.setInt(cell.eventStroke1Id, "setColorFilter", alphaColor1)
-                    rowViews.setInt(cell.eventStroke1Id, "setImageAlpha", 0x80) // 50% opacity colored border
+                    rowViews.setInt(cell.eventStroke1Id, "setImageAlpha", 0x59) // 35% colored border, as in the app
 
                     rowViews.setTextViewText(cell.eventText1Id, title1)
                     rowViews.setTextColor(cell.eventText1Id, alphaColor1)
@@ -378,6 +400,7 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
                     rowViews.setViewVisibility(cell.eventBox1Id, View.VISIBLE)
                     rowViews.setViewVisibility(cell.eventBox2Id, View.GONE)
                     rowViews.setViewVisibility(cell.dotsContainerId, View.GONE)
+                    rowViews.setViewVisibility(moreTextIds[d], View.GONE)
                     for (k in 0 until 4) {
                         rowViews.setViewVisibility(cell.dotIds[k], View.GONE)
                     }
@@ -394,7 +417,7 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
                     rowViews.setInt(cell.eventFill1Id, "setColorFilter", alphaColor1)
                     rowViews.setInt(cell.eventFill1Id, "setImageAlpha", 0x26)
                     rowViews.setInt(cell.eventStroke1Id, "setColorFilter", alphaColor1)
-                    rowViews.setInt(cell.eventStroke1Id, "setImageAlpha", 0x80)
+                    rowViews.setInt(cell.eventStroke1Id, "setImageAlpha", 0x59)
                     rowViews.setTextViewText(cell.eventText1Id, title1)
                     rowViews.setTextColor(cell.eventText1Id, alphaColor1)
                     rowViews.setViewVisibility(cell.eventBox1Id, View.VISIBLE)
@@ -410,12 +433,13 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
                     rowViews.setInt(cell.eventFill2Id, "setColorFilter", alphaColor2)
                     rowViews.setInt(cell.eventFill2Id, "setImageAlpha", 0x26)
                     rowViews.setInt(cell.eventStroke2Id, "setColorFilter", alphaColor2)
-                    rowViews.setInt(cell.eventStroke2Id, "setImageAlpha", 0x80)
+                    rowViews.setInt(cell.eventStroke2Id, "setImageAlpha", 0x59)
                     rowViews.setTextViewText(cell.eventText2Id, title2)
                     rowViews.setTextColor(cell.eventText2Id, alphaColor2)
                     rowViews.setViewVisibility(cell.eventBox2Id, View.VISIBLE)
 
                     rowViews.setViewVisibility(cell.dotsContainerId, View.GONE)
+                    rowViews.setViewVisibility(moreTextIds[d], View.GONE)
                     for (k in 0 until 4) {
                         rowViews.setViewVisibility(cell.dotIds[k], View.GONE)
                     }
@@ -424,7 +448,16 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
                     rowViews.setViewVisibility(cell.eventBox1Id, View.GONE)
                     rowViews.setViewVisibility(cell.eventBox2Id, View.GONE)
                     rowViews.setViewVisibility(cell.dotsContainerId, View.VISIBLE)
-                    val maxDots = minOf(4, count)
+                    // Three dots, then "+N" for the rest (as in the in-app calendar).
+                    val maxDots = minOf(3, count)
+                    if (count > 3) {
+                        val moreColor = (FullCalendarWidgetUtils.getTextColor(widgetTheme, context) and 0x00FFFFFF) or (0xB3 shl 24)
+                        rowViews.setTextViewText(moreTextIds[d], "+${count - 3}")
+                        rowViews.setTextColor(moreTextIds[d], moreColor)
+                        rowViews.setViewVisibility(moreTextIds[d], View.VISIBLE)
+                    } else {
+                        rowViews.setViewVisibility(moreTextIds[d], View.GONE)
+                    }
                     for (k in 0 until 4) {
                         val dotViewId = cell.dotIds[k]
                         if (k < maxDots) {
@@ -451,6 +484,7 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
                     rowViews.setViewVisibility(cell.eventBox1Id, View.GONE)
                     rowViews.setViewVisibility(cell.eventBox2Id, View.GONE)
                     rowViews.setViewVisibility(cell.dotsContainerId, View.GONE)
+                    rowViews.setViewVisibility(moreTextIds[d], View.GONE)
                     for (k in 0 until 4) {
                         rowViews.setViewVisibility(cell.dotIds[k], View.GONE)
                     }
@@ -460,7 +494,8 @@ class FullCalendarWidgetFactory(private val context: Context) : RemoteViewsServi
                 if (dateStr.isNotEmpty()) {
                     val fillInIntent = Intent().apply {
                         action = Intent.ACTION_VIEW
-                        data = Uri.parse("rocistasks://calendar")
+                        // Opens the calendar on the tapped date.
+                        data = Uri.parse("rocistasks://calendar?date=$dateStr")
                     }
                     rowViews.setOnClickFillInIntent(cell.rootId, fillInIntent)
                 }

@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart' show kIsWeb, PlatformDispatcher;
 import 'package:home_widget/home_widget.dart';
 import 'package:rocis_tasks/l10n/l10n_helper.dart';
+import 'package:rocis_tasks/l10n/app_localizations.dart';
 
 class ThemeService extends ChangeNotifier {
   ThemeMode _themeMode = ThemeMode.system;
@@ -61,7 +62,9 @@ class ThemeService extends ChangeNotifier {
       _locale = Locale(languageCode);
     } else {
       final deviceLocale = WidgetsBinding.instance.platformDispatcher.locale;
-      const supportedLanguageCodes = {'ar', 'en', 'es', 'he', 'sv', 'de', 'fr'};
+      final supportedLanguageCodes = AppLocalizations.supportedLocales
+          .map((l) => l.languageCode)
+          .toSet();
       if (supportedLanguageCodes.contains(deviceLocale.languageCode)) {
         _locale = Locale(deviceLocale.languageCode);
       } else {

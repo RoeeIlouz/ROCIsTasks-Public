@@ -85,6 +85,37 @@ object WidgetLocaleHelper {
     /**
      * Formats Month and Year using the best ICU pattern for [locale].
      */
+    /**
+     * Short weekday names for columns 0..6 starting at [startOfWeek] (1 = Mon .. 7 = Sun),
+     * matching the in-app calendar's `DateFormat.E()` header (e.g. "Sun", "יום א׳").
+     */
+    fun getWeekdayShortNames(startOfWeek: Int, locale: Locale): List<String> {
+        val format = SimpleDateFormat("EEE", locale)
+        val cal = Calendar.getInstance()
+        return (0..6).map { col ->
+            val isoDay = (startOfWeek + col - 1) % 7 + 1 // 1=Mon .. 7=Sun
+            cal.set(Calendar.DAY_OF_WEEK, if (isoDay == 7) Calendar.SUNDAY else isoDay + 1)
+            format.format(cal.time)
+        }
+    }
+
+    /** Whether the widget should be laid out right-to-left (Hebrew, Arabic, ...). */
+    fun isRtl(locale: Locale): Boolean =
+        android.text.TextUtils.getLayoutDirectionFromLocale(locale) == android.view.View.LAYOUT_DIRECTION_RTL
+
+    fun getPremiumFeatureText(locale: Locale): String {
+        return when (getNormalizedLanguage(locale)) {
+            "he" -> "פיצ׳ר פרימיום"
+            "es" -> "Función premium"
+            "de" -> "Premium-Funktion"
+            "fr" -> "Fonctionnalité premium"
+            "ar" -> "ميزة مميزة"
+            "sv" -> "Premiumfunktion"
+            "hi" -> "प्रीमियम सुविधा"
+            else -> "Premium Feature"
+        }
+    }
+
     fun getMonthYearTitle(cal: Calendar, locale: Locale): String {
         return try {
             val pattern = android.text.format.DateFormat.getBestDateTimePattern(locale, "yyyyMMMM")
