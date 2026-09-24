@@ -77,6 +77,23 @@ void main() {
       expect(ops.length, 1);
       expect(ops.first.type, OfflineOperationType.deleteTask);
     });
+
+    test('create then delete still writes the deletion tombstone', () async {
+      await queueService.enqueue(
+        type: OfflineOperationType.createTask,
+        entityId: 'doc_3',
+        payload: {'title': 'Created offline'},
+      );
+
+      await queueService.enqueue(
+        type: OfflineOperationType.deleteTask,
+        entityId: 'doc_3',
+      );
+
+      final ops = queueService.queue;
+      expect(ops.length, 1);
+      expect(ops.first.type, OfflineOperationType.deleteTask);
+    });
   });
 
   group('TaskConflictResolver field and subtask merging', () {

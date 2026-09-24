@@ -147,14 +147,9 @@ class OfflineWriteQueueService extends ChangeNotifier {
     if (existingIndex != -1) {
       final existing = _queue[existingIndex];
 
-      // If existing was createTask and new is deleteTask, remove without ever hitting server
-      if (existing.type == OfflineOperationType.createTask &&
-          type == OfflineOperationType.deleteTask) {
-        _queue.removeAt(existingIndex);
-        await _persistToDisk();
-        notifyListeners();
-        return;
-      }
+      // A create followed by a delete still needs its tombstone written: the
+      // create may already have reached the server through the SDK's own
+      // offline cache, so it falls through to the delete-replaces branch.
 
       // If new is updateTask and existing is updateTask/createTask, merge payload
       if (type == OfflineOperationType.updateTask &&

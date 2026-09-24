@@ -2,6 +2,27 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## Permanent-Delete Tombstones & Web Deploy - 2026-09-24 (Web)
+
+#### Problem & Root Causes
+* **Deleted-forever tasks came back**: "Delete forever" / empty trash called `doc.delete()`. The document vanished, so (a) any device still holding the task recreated it (startup upload saw it as "missing from cloud"; `updateTask` merge-writes and `addTask` sets recreate absent docs), and (b) a device offline during the delete never received a `removed` event and kept showing it forever.
+* `OfflineWriteQueueService` dropped a queued create+delete pair entirely, but the SDK's own persistence could still deliver the original create -> resurrected with no tombstone.
+
+#### Solutions Applied
+* **Tombstones** (`firestore_service.dart`): `deleteTask` (and the offline-queue replay) now `set()`s a content-free tombstone (`isPurged: true`, `isDeleted: true`, placeholder title so `firestore.rules` accepts it) instead of deleting. Task writes (`addTask`, `uploadAll`) now use `SetOptions(merge: true)` so no write can clear `isPurged`.
+* **Readers treat purged as gone**: `fetchTaskById` returns missing; active stream flags `TaskSyncEvent.isPurged` (listener deletes the local copy before any other rule); completed-task batches skip purged docs; `fetchTaskStates` reports purge state and the startup upload never re-uploads a purged task.
+* **Offline devices catch up**: `TaskSyncManager` subscribes to `getPurgedTaskIdsStream()` (`isPurged == true`) and deletes stale local copies + their notifications on (re)connect.
+* Offline queue: create+delete now keeps the delete (tombstone) instead of dropping both.
+
+#### Notes / Lessons
+* Hard-deleting a document is not a delete signal in an offline-first multi-device app; keep a tombstone.
+* Android clients on Patch 11 still hard-delete and will show a received tombstone as a trashed task titled "deleted" until they get the next Shorebird patch.
+* Basemode (`base` 0.15.2) installed by the user; workspace scaffolded (`.base/`, local, not committed).
+
+#### Deployment
+* `flutter analyze` 0 issues; 378/378 tests passing (new: tombstone schema, purge listener, purged upload skip, create+delete queue).
+* Web built and deployed to Firebase Hosting (https://rocis-todo.web.app).
+
 ## Last-Write-Wins Task Sync, Performance & Correctness Pass - 2026-09-24 (Patch 11)
 
 #### Problem & Root Causes

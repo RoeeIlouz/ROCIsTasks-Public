@@ -24,6 +24,7 @@ class TaskSyncManager {
 
   StreamSubscription? _tasksSubscription;
   StreamSubscription? _categoriesSubscription;
+  StreamSubscription? _purgedSubscription;
   String? _completedPrefetchUserId;
   bool _completedPrefetchInFlight = false;
 
@@ -57,8 +58,10 @@ class TaskSyncManager {
   Future<void> cancelSubscriptions() async {
     await _tasksSubscription?.cancel();
     await _categoriesSubscription?.cancel();
+    await _purgedSubscription?.cancel();
     _tasksSubscription = null;
     _categoriesSubscription = null;
+    _purgedSubscription = null;
   }
 
   static String uploadWatermarkKey(String uid) => 'tasks_upload_watermark_$uid';
@@ -90,12 +93,16 @@ class TaskSyncManager {
 
       var toUpload = <Task>[];
       if (candidates.isNotEmpty) {
-        final cloudEditTimes = await _firestoreService.fetchTaskEditTimes(
+        final cloudStates = await _firestoreService.fetchTaskStates(
           candidates.map((t) => t.id).toList(),
         );
         toUpload = candidates.where((t) {
-          if (!cloudEditTimes.containsKey(t.id)) return true;
-          final cloudEdit = cloudEditTimes[t.id];
+          final cloud = cloudStates[t.id];
+          if (cloud == null) return true;
+          // Deleted forever elsewhere: never resurrect it. The purge listener
+          // removes the local copy.
+          if (cloud.isPurged) return false;
+          final cloudEdit = cloud.editedAt;
           return cloudEdit == null || t.lastModified.isAfter(cloudEdit);
         }).toList();
       }
@@ -170,6 +177,15 @@ class TaskSyncManager {
           for (final event in events) {
             final cloudTask = event.task;
             final localTask = getTaskById(cloudTask.id);
+
+            if (event.isPurged) {
+              if (localTask != null) {
+                await _source.deleteTask(cloudTask.id);
+                await cancelNotificationsById(cloudTask.id);
+                needsUpdate = true;
+              }
+              continue;
+            }
 
             // Keep a local completion unless the cloud copy is a newer edit
             // (e.g. the task was un-completed on another device afterwards).
@@ -261,6 +277,26 @@ class TaskSyncManager {
             error,
             stackTrace,
             reason: 'Tasks stream error',
+          );
+        },
+      );
+
+      _purgedSubscription = _firestoreService.getPurgedTaskIdsStream().listen(
+        (purgedIds) async {
+          var removedAny = false;
+          for (final id in purgedIds) {
+            if (getTaskById(id) == null) continue;
+            await _source.deleteTask(id);
+            await cancelNotificationsById(id);
+            removedAny = true;
+          }
+          if (removedAny) onDataChanged();
+        },
+        onError: (error, stackTrace) {
+          _errorHandlingService.logError(
+            error,
+            stackTrace,
+            reason: 'Purged tasks stream error',
           );
         },
       );

@@ -12,8 +12,14 @@ enum SyncEventType { added, modified, removed }
 class TaskSyncEvent {
   final SyncEventType type;
   final Task task;
-  TaskSyncEvent(this.type, this.task);
+
+  /// The task was permanently deleted (tombstoned) in the cloud.
+  final bool isPurged;
+  TaskSyncEvent(this.type, this.task, {this.isPurged = false});
 }
+
+/// Cloud-side state of a task used to decide whether to upload a local copy.
+typedef CloudTaskState = ({DateTime? editedAt, bool isPurged});
 
 class FirestoreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -216,7 +222,8 @@ class FirestoreService {
       await RetryService.retryFirestoreOperation(() async {
         final data = task.toFirestoreMap();
         data['updatedAt'] = FieldValue.serverTimestamp();
-        await collection.doc(task.id).set(data);
+        // Merge (not overwrite) so a write can never clear `isPurged`.
+        await collection.doc(task.id).set(data, SetOptions(merge: true));
       });
       _syncStatus.setSuccess();
     } catch (e) {
@@ -268,10 +275,10 @@ class FirestoreService {
 
   static const _maxWhereInIds = 30;
 
-  /// Reads the edit time of each of [taskIds] that exists in the cloud,
-  /// straight from the server (never the local cache). Missing ids are absent
-  /// from the result. Throws when the server is unreachable.
-  Future<Map<String, DateTime?>> fetchTaskEditTimes(
+  /// Reads the edit time and purge state of each of [taskIds] that exists in
+  /// the cloud, straight from the server (never the local cache). Missing ids
+  /// are absent from the result. Throws when the server is unreachable.
+  Future<Map<String, CloudTaskState>> fetchTaskStates(
     List<String> taskIds,
   ) async {
     final collection = _tasksCollection;
@@ -291,7 +298,10 @@ class FirestoreService {
     return {
       for (final snapshot in snapshots)
         for (final doc in snapshot.docs)
-          doc.id: Task.cloudModifiedAt(doc.data()),
+          doc.id: (
+            editedAt: Task.cloudModifiedAt(doc.data()),
+            isPurged: isPurgedData(doc.data()),
+          ),
     };
   }
 
@@ -321,7 +331,7 @@ class FirestoreService {
         (batch) => batch.set(tasksCol.doc(task.id), {
           ...task.toFirestoreMap(),
           'updatedAt': FieldValue.serverTimestamp(),
-        }),
+        }, SetOptions(merge: true)),
     ];
 
     _syncStatus.setSyncing();
@@ -344,6 +354,27 @@ class FirestoreService {
     }
   }
 
+  static bool isPurgedData(Map<String, dynamic>? data) =>
+      data?['isPurged'] == true;
+
+  /// A permanently deleted task. Stripped of content, but kept (rather than
+  /// deleting the document) so devices that were offline or still hold a copy
+  /// learn about the deletion and can't recreate the task by writing it back.
+  /// Satisfies the task schema in firestore.rules.
+  static Map<String, dynamic> tombstoneData(String id) => {
+    'id': id,
+    'title': 'deleted',
+    'description': '',
+    'priority': TaskPriority.medium.index,
+    'isCompleted': true,
+    'isDeleted': true,
+    'isPinned': false,
+    'isPurged': true,
+    'modifiedAt': DateTime.now(),
+    'updatedAt': FieldValue.serverTimestamp(),
+  };
+
+  /// Permanently deletes a task by replacing it with a tombstone.
   Future<void> deleteTask(String id) async {
     final collection = _tasksCollection;
     if (collection == null || !_shouldSync) return;
@@ -355,7 +386,7 @@ class FirestoreService {
     );
     await trace.start();
     try {
-      await collection.doc(id).delete();
+      await collection.doc(id).set(tombstoneData(id));
       _syncStatus.setSuccess();
     } catch (e) {
       AppLogger.error(
@@ -394,7 +425,7 @@ class FirestoreService {
 
           case OfflineOperationType.deleteTask:
             if (tasksCol == null) return false;
-            await tasksCol.doc(op.entityId).delete();
+            await tasksCol.doc(op.entityId).set(tombstoneData(op.entityId));
             return true;
 
           case OfflineOperationType.createCategory:
@@ -421,7 +452,7 @@ class FirestoreService {
     try {
       final doc = await collection.doc(id).get();
       final data = doc.data();
-      if (!doc.exists || data == null) {
+      if (!doc.exists || data == null || isPurgedData(data)) {
         return (null, true);
       }
       return (Task.fromMap(data), false);
@@ -459,7 +490,8 @@ class FirestoreService {
           }
 
           return snapshot.docChanges.map((change) {
-            final task = Task.fromMap(change.doc.data()!);
+            final data = change.doc.data()!;
+            final task = Task.fromMap(data);
             SyncEventType type;
             switch (change.type) {
               case DocumentChangeType.added:
@@ -472,9 +504,20 @@ class FirestoreService {
                 type = SyncEventType.removed;
                 break;
             }
-            return TaskSyncEvent(type, task);
+            return TaskSyncEvent(type, task, isPurged: isPurgedData(data));
           }).toList();
         });
+  }
+
+  /// Ids of permanently deleted tasks, so a device that was offline when a
+  /// task was deleted elsewhere drops its stale local copy on reconnect.
+  Stream<List<String>> getPurgedTaskIdsStream() {
+    final collection = _tasksCollection;
+    if (collection == null) return const Stream.empty();
+    return collection
+        .where('isPurged', isEqualTo: true)
+        .snapshots()
+        .map((snapshot) => snapshot.docs.map((doc) => doc.id).toList());
   }
 
   DocumentSnapshot? _lastCompletedTaskDoc;
@@ -516,7 +559,10 @@ class FirestoreService {
       }
 
       _lastCompletedTaskDoc = snapshot.docs.last;
-      return snapshot.docs.map((doc) => Task.fromMap(doc.data())).toList();
+      return snapshot.docs
+          .where((doc) => !isPurgedData(doc.data()))
+          .map((doc) => Task.fromMap(doc.data()))
+          .toList();
     } catch (e) {
       AppLogger.error(
         'Failed to fetch completed tasks',
