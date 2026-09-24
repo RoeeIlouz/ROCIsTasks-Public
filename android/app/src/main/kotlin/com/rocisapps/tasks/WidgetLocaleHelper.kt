@@ -95,7 +95,9 @@ object WidgetLocaleHelper {
         return (0..6).map { col ->
             val isoDay = (startOfWeek + col - 1) % 7 + 1 // 1=Mon .. 7=Sun
             cal.set(Calendar.DAY_OF_WEEK, if (isoDay == 7) Calendar.SUNDAY else isoDay + 1)
-            format.format(cal.time)
+            val name = format.format(cal.time)
+            // Java/ICU abbreviate German with a period ("So."); the app's intl shows "So".
+            if (getNormalizedLanguage(locale) == "de") name.removeSuffix(".") else name
         }
     }
 
