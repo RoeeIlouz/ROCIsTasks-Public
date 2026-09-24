@@ -44,41 +44,21 @@ class TodayAgendaWidgetProvider : HomeWidgetProvider() {
                 val isAllowed = WidgetLimitHelper.isWidgetAllowed(context, appWidgetId, isPremium)
                 val views = RemoteViews(context.packageName, R.layout.widget_today_agenda_layout)
 
-                // 1. Read Theme Settings
-                val theme = widgetData.getString("full_calendar_theme", "system") ?: "system"
-                val rootBgRes = when (theme) {
-                    "light" -> R.drawable.widget_background_light
-                    "dark" -> R.drawable.widget_background_dark
-                    "glassmorphic" -> R.drawable.widget_background_glass
-                    else -> R.drawable.widget_background
-                }
-                views.setInt(R.id.widget_today_root, "setBackgroundResource", rootBgRes)
-
-                val highlightColorHex = widgetData.getString("full_calendar_highlight_color", "#6366F1") ?: "#6366F1"
-                val highlightColor = try {
-                    android.graphics.Color.parseColor(highlightColorHex)
-                } catch (_: Exception) {
-                    android.graphics.Color.parseColor("#6366F1")
-                }
-
-                val textColor = when (theme) {
-                    "light" -> android.graphics.Color.parseColor("#0F172A")
-                    else -> android.graphics.Color.parseColor("#FFFFFF")
-                }
-                val secondaryColor = when (theme) {
-                    "light" -> android.graphics.Color.parseColor("#64748B")
-                    else -> android.graphics.Color.parseColor("#94A3B8")
-                }
-
-                views.setTextColor(R.id.widget_today_date_title, textColor)
-                views.setTextColor(R.id.widget_today_date_subtitle, secondaryColor)
-                views.setTextColor(R.id.widget_today_prev, textColor)
-                views.setTextColor(R.id.widget_today_next, textColor)
-                views.setTextColor(R.id.widget_today_jump_btn, highlightColor)
-                views.setTextColor(R.id.widget_today_add_btn, highlightColor)
+                // 1. The app's card, tinted icons, RTL.
+                val palette = WidgetStyle.palette(context, widgetData)
+                val widgetLocale = WidgetLocaleHelper.getWidgetLocale(widgetData)
+                WidgetStyle.applyCard(views, palette, R.id.widget_today_card_fill, R.id.widget_today_card_stroke)
+                WidgetStyle.applyDirection(views, R.id.widget_today_root, widgetLocale)
+                WidgetStyle.tint(
+                    views, palette.onSurface,
+                    R.id.widget_today_prev, R.id.widget_today_next, R.id.widget_today_jump_btn, R.id.widget_today_add_btn
+                )
+                views.setTextColor(R.id.widget_today_date_title, palette.onSurface)
+                views.setTextColor(R.id.widget_today_empty_title, palette.onSurface)
+                views.setTextColor(R.id.widget_today_empty_subtitle, palette.onSurfaceMuted)
+                WidgetStyle.tint(views, palette.primary, R.id.widget_today_empty_icon)
 
                 // 2. Calculate and Render Date Headers
-                val widgetLocale = WidgetLocaleHelper.getWidgetLocale(widgetData)
                 val offset = widgetData.getInt(PREF_TODAY_OFFSET, 0)
                 val cal = Calendar.getInstance()
                 if (offset != 0) {
@@ -91,11 +71,20 @@ class TodayAgendaWidgetProvider : HomeWidgetProvider() {
                     0 -> WidgetLocaleHelper.getTodayText(widgetLocale)
                     1 -> WidgetLocaleHelper.getTomorrowText(widgetLocale)
                     -1 -> WidgetLocaleHelper.getYesterdayText(widgetLocale)
-                    else -> WidgetLocaleHelper.getDateTitle(cal, widgetLocale, false)
+                    else -> WidgetLocaleHelper.getMonthYearTitle(cal, widgetLocale)
                 }
 
                 views.setTextViewText(R.id.widget_today_date_title, titleStr)
                 views.setTextViewText(R.id.widget_today_date_subtitle, subtitleStr)
+                // "Today" reads in the accent, other days muted (like the app's day header).
+                views.setTextColor(R.id.widget_today_date_subtitle, if (offset == 0) palette.primary else palette.onSurfaceMuted)
+                val dateKey = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(cal.time)
+                views.setOnClickPendingIntent(
+                    R.id.widget_today_title_container,
+                    HomeWidgetLaunchIntent.getActivity(
+                        context, MainActivity::class.java, Uri.parse("rocistasks://calendar?date=$dateKey")
+                    )
+                )
 
                 // 3. Navigation Pending Intents
                 val prevIntent = Intent(context, TodayAgendaWidgetProvider::class.java).apply {
@@ -172,7 +161,7 @@ class TodayAgendaWidgetProvider : HomeWidgetProvider() {
                 views.setPendingIntentTemplate(R.id.widget_today_list, itemPendingIntent)
 
                 // Apply limit overlay
-                WidgetLimitHelper.setupProOverlay(context, views, isAllowed)
+                WidgetStyle.setupProOverlay(context, views, isAllowed, palette, widgetLocale)
 
                 appWidgetManager.updateAppWidget(appWidgetId, views)
                 appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_today_list)
