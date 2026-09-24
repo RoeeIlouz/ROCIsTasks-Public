@@ -3,21 +3,49 @@ import 'package:flutter/foundation.dart' hide Category;
 import 'package:home_widget/home_widget.dart';
 import 'package:intl/intl.dart';
 import 'package:rocis_tasks/core/services/calendar_service.dart';
-import 'package:rocis_tasks/core/services/schedule_firestore_service.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/features/categories/domain/models/category.dart';
-import 'package:rocis_tasks/features/tasks/services/task_widget_service.dart';
 import 'package:rocis_tasks/core/services/logger_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:device_calendar/device_calendar.dart';
 
 class WidgetDataService {
   final CalendarService _calendarService;
-  final ScheduleFirestoreService _scheduleService;
-  bool _scheduleServiceInitialized = false;
 
-  WidgetDataService(this._calendarService)
-    : _scheduleService = ScheduleFirestoreService();
+  WidgetDataService(this._calendarService);
+
+  /// Local days an event occupies. Same rule as the in-app calendar: an end at
+  /// midnight is exclusive, so all-day events don't spill into the next day.
+  @visibleForTesting
+  static List<DateTime> eventDays(DateTime start, DateTime? end) {
+    final s = start.toLocal();
+    final e = (end ?? s.add(const Duration(hours: 1))).toLocal();
+    final first = DateTime(s.year, s.month, s.day);
+    final last = DateTime(e.year, e.month, e.day);
+    final endsAtMidnight =
+        e.hour == 0 && e.minute == 0 && e.second == 0 && e.millisecond == 0;
+    final days = <DateTime>[];
+    for (
+      var day = first;
+      !day.isAfter(last);
+      day = DateTime(day.year, day.month, day.day + 1)
+    ) {
+      if (day == last && day != first && endsAtMidnight) break;
+      days.add(day);
+    }
+    return days;
+  }
+
+  /// Minutes after midnight used to order a day's items; all-day items first.
+  static int _sortMinutes(DateTime? time, {required bool allDay}) =>
+      allDay || time == null ? -1 : time.hour * 60 + time.minute;
+
+  /// Orders widget items by day, then all-day first, then by start time.
+  static int _compareItems(Map<String, dynamic> a, Map<String, dynamic> b) {
+    final byDay = (a['dateOnly'] as String).compareTo(b['dateOnly'] as String);
+    if (byDay != 0) return byDay;
+    return (a['sortMinutes'] as int).compareTo(b['sortMinutes'] as int);
+  }
 
   /// Fetch only events from calendars that are turned ON by the user
   Future<List<Event>> _getFilteredCalendarEvents({
@@ -41,18 +69,6 @@ class WidgetDataService {
       );
       return [];
     }
-  }
-
-  /// Initialize the schedule service (call once after Firebase is ready)
-  Future<void> initScheduleService() async {
-    if (_scheduleServiceInitialized) return;
-    await _scheduleService.initialize();
-    _scheduleServiceInitialized = true;
-  }
-
-  /// Set the user email for cross-app schedule data lookup
-  void setUserEmail(String? email) {
-    _scheduleService.setUserEmail(email);
   }
 
   /// Helper to get active app language
@@ -266,7 +282,6 @@ class WidgetDataService {
         updateTimelineAgendaWidget(allTasks, getCategoryById, userId: userId),
         updateQuickActionWidget(allTasks, userId: userId),
         updateUpNextWidget(allTasks, getCategoryById, userId: userId),
-        updateScheduleWidget(allTasks, getCategoryById, userId: userId),
         updateKanbanWidget(allTasks, getCategoryById, userId: userId),
       ]);
     } catch (e, stack) {
@@ -313,11 +328,13 @@ class WidgetDataService {
             ? '#${cat.colorValue.toRadixString(16).padLeft(8, '0')}'
             : '#6366F1',
         'date': taskDate.toIso8601String(),
+        'dateOnly': dateOnlyFormatted,
         'dateDisplay': dateOnlyFormatted,
         'timeDisplay': isAllDay
             ? allDayLabel
             : DateFormat('HH:mm').format(taskDate),
         'isAllDay': isAllDay,
+        'sortMinutes': _sortMinutes(t.dueDate, allDay: isAllDay),
         'isCompleted': false,
         'priority': t.priority.name,
       });
@@ -335,49 +352,41 @@ class WidgetDataService {
         endDate: rangeEnd,
       );
       for (final event in calendarEvents) {
-        if (event.start != null) {
-          final isAllDay = event.allDay ?? false;
-          final timeDisplay = isAllDay
-              ? allDayLabel
-              : (event.end != null
-                    ? '${DateFormat('HH:mm').format(event.start!)}-${DateFormat('HH:mm').format(event.end!)}'
-                    : DateFormat('HH:mm').format(event.start!));
+        if (event.start == null) continue;
+        final isAllDay = event.allDay ?? false;
+        final start = event.start!.toLocal();
+        final end = event.end?.toLocal();
+        final timeDisplay = isAllDay
+            ? allDayLabel
+            : (end != null
+                  ? '${DateFormat('HH:mm').format(start)}-${DateFormat('HH:mm').format(end)}'
+                  : DateFormat('HH:mm').format(start));
+        final calColor = calendarColors[event.calendarId] ?? '#4285F4';
+        final days = eventDays(start, end);
 
-          final eventStart = DateTime(
-            event.start!.year,
-            event.start!.month,
-            event.start!.day,
-          );
-          final end = event.end ?? event.start!.add(const Duration(hours: 1));
-          final endDay = DateTime(end.year, end.month, end.day);
-          final calColor = calendarColors[event.calendarId] ?? '#4285F4';
-
-          var day = eventStart;
-          while (!day.isAfter(endDay)) {
-            if (day == endDay &&
-                !isAllDay &&
-                end.hour == 0 &&
-                end.minute == 0 &&
-                end.second == 0) {
-              break;
-            }
-            final dayFormatted = DateFormat('yyyy-MM-dd').format(day);
-            agendaItems.add({
-              'type': 'event',
-              'id': event.eventId ?? '',
-              'title': event.title ?? noTitleLabel,
-              'subtitle':
-                  event.location ?? (isAllDay ? allDayLabel : timeDisplay),
-              'date': day.toIso8601String(),
-              'dateDisplay': dayFormatted,
-              'timeDisplay': timeDisplay,
-              'isAllDay': isAllDay,
-              'isCompleted': false,
-              'category_color': calColor,
-              'priority': '',
-            });
-            day = day.add(const Duration(days: 1));
-          }
+        for (final day in days) {
+          final dayFormatted = DateFormat('yyyy-MM-dd').format(day);
+          // Later days of a multi-day event continue from midnight.
+          final isFirstDay = day == days.first;
+          agendaItems.add({
+            'type': 'event',
+            'id': event.eventId ?? '',
+            'title': event.title ?? noTitleLabel,
+            'subtitle':
+                event.location ?? (isAllDay ? allDayLabel : timeDisplay),
+            'date': (isFirstDay ? start : day).toIso8601String(),
+            'dateOnly': dayFormatted,
+            'dateDisplay': dayFormatted,
+            'timeDisplay': timeDisplay,
+            'isAllDay': isAllDay,
+            'sortMinutes': _sortMinutes(
+              isFirstDay ? start : day,
+              allDay: isAllDay,
+            ),
+            'isCompleted': false,
+            'category_color': calColor,
+            'priority': '',
+          });
         }
       }
     } catch (e) {
@@ -386,11 +395,11 @@ class WidgetDataService {
       );
     }
 
-    agendaItems.sort(
-      (a, b) => DateTime.parse(a['date']).compareTo(DateTime.parse(b['date'])),
-    );
+    agendaItems.sort(_compareItems);
 
-    if (agendaItems.isEmpty) {
+    // An empty result only means "no data yet" when no tasks are loaded;
+    // otherwise it must replace the old list (e.g. the last task was done).
+    if (agendaItems.isEmpty && allTasks.isEmpty) {
       final existing = await HomeWidget.getWidgetData<String>(
         'today_agenda_data',
       );
@@ -435,8 +444,18 @@ class WidgetDataService {
       final startOfWeek = prefs.getInt('full_calendar_start_of_week') ?? 7;
       final firstDayOfMonth = targetMonth;
       final difference = (firstDayOfMonth.weekday - startOfWeek) % 7;
-      final startDate = firstDayOfMonth.subtract(Duration(days: difference));
-      final endDate = startDate.add(const Duration(days: 41)); // 6 weeks
+      // Calendar-day arithmetic (not 24h durations) so DST changes don't
+      // shift the grid.
+      final startDate = DateTime(
+        firstDayOfMonth.year,
+        firstDayOfMonth.month,
+        firstDayOfMonth.day - difference,
+      );
+      final endDate = DateTime(
+        startDate.year,
+        startDate.month,
+        startDate.day + 41,
+      ); // 6 weeks
 
       var events = <dynamic>[];
       try {
@@ -448,27 +467,9 @@ class WidgetDataService {
 
       final eventsByDate = <String, bool>{};
       for (final event in events) {
-        if (event.start != null) {
-          final eventStart = DateTime(
-            event.start!.year,
-            event.start!.month,
-            event.start!.day,
-          );
-          final end = event.end ?? event.start!.add(const Duration(hours: 1));
-          final endDay = DateTime(end.year, end.month, end.day);
-          var day = eventStart;
-          while (!day.isAfter(endDay)) {
-            if (day == endDay &&
-                event.allDay != true &&
-                end.hour == 0 &&
-                end.minute == 0 &&
-                end.second == 0) {
-              break;
-            }
-            final key = DateFormat('yyyy-MM-dd').format(day);
-            eventsByDate[key] = true;
-            day = day.add(const Duration(days: 1));
-          }
+        if (event.start == null) continue;
+        for (final day in eventDays(event.start!, event.end)) {
+          eventsByDate[DateFormat('yyyy-MM-dd').format(day)] = true;
         }
       }
 
@@ -482,9 +483,12 @@ class WidgetDataService {
 
       final gridData = <Map<String, dynamic>>[];
       for (int row = 0; row < 6; row++) {
-        final rowStartDate = startDate.add(Duration(days: row * 7));
         for (int col = 0; col < 7; col++) {
-          final date = rowStartDate.add(Duration(days: col));
+          final date = DateTime(
+            startDate.year,
+            startDate.month,
+            startDate.day + row * 7 + col,
+          );
           final dateKey = DateFormat('yyyy-MM-dd').format(date);
           final isToday =
               date.year == now.year &&
@@ -571,6 +575,8 @@ class WidgetDataService {
           'timeDisplay': t.dueDate != null
               ? DateFormat('HH:mm').format(t.dueDate!)
               : allDayLabel,
+          'isAllDay': t.dueDate == null,
+          'sortMinutes': _sortMinutes(t.dueDate, allDay: t.dueDate == null),
           'isCompleted': false,
           'priority': t.priority.name,
         });
@@ -589,54 +595,46 @@ class WidgetDataService {
         endDate: rangeEnd,
       );
       for (final event in calendarEvents) {
-        if (event.start != null) {
-          final isAllDay = event.allDay ?? false;
-          final timeDisplay = isAllDay
-              ? allDayLabel
-              : (event.end != null
-                    ? '${DateFormat('HH:mm').format(event.start!)}-${DateFormat('HH:mm').format(event.end!)}'
-                    : DateFormat('HH:mm').format(event.start!));
+        if (event.start == null) continue;
+        final isAllDay = event.allDay ?? false;
+        final start = event.start!.toLocal();
+        final end = event.end?.toLocal();
+        final timeDisplay = isAllDay
+            ? allDayLabel
+            : (end != null
+                  ? '${DateFormat('HH:mm').format(start)}-${DateFormat('HH:mm').format(end)}'
+                  : DateFormat('HH:mm').format(start));
+        final calColor = calendarColors[event.calendarId] ?? '#4285F4';
+        final days = eventDays(start, end);
 
-          final eventStart = DateTime(
-            event.start!.year,
-            event.start!.month,
-            event.start!.day,
-          );
-          final end = event.end ?? event.start!.add(const Duration(hours: 1));
-          final endDay = DateTime(end.year, end.month, end.day);
-          final calColor = calendarColors[event.calendarId] ?? '#4285F4';
-
-          var day = eventStart;
-          while (!day.isAfter(endDay)) {
-            if (day == endDay &&
-                !isAllDay &&
-                end.hour == 0 &&
-                end.minute == 0 &&
-                end.second == 0) {
-              break;
-            }
-            rawItems.add({
-              'type': 'event',
-              'id': event.eventId ?? '',
-              'title': event.title ?? noTitleLabel,
-              'subtitle':
-                  event.location ?? (isAllDay ? allDayLabel : timeDisplay),
-              'date': day.toIso8601String(),
-              'dateOnly': DateFormat('yyyy-MM-dd').format(day),
-              'timeDisplay': timeDisplay,
-              'isCompleted': false,
-              'category_color': calColor,
-              'priority': '',
-            });
-            day = day.add(const Duration(days: 1));
-          }
+        for (final day in days) {
+          // Only days inside the timeline window (rangeStart is exclusive).
+          if (!day.isAfter(rangeStart) || !day.isBefore(rangeEnd)) continue;
+          final isFirstDay = day == days.first;
+          rawItems.add({
+            'type': 'event',
+            'id': event.eventId ?? '',
+            'title': event.title ?? noTitleLabel,
+            'subtitle':
+                event.location ?? (isAllDay ? allDayLabel : timeDisplay),
+            'date': (isFirstDay ? start : day).toIso8601String(),
+            'dateOnly': DateFormat('yyyy-MM-dd').format(day),
+            'timeDisplay': timeDisplay,
+            'isAllDay': isAllDay,
+            'sortMinutes': _sortMinutes(
+              isFirstDay ? start : day,
+              allDay: isAllDay,
+            ),
+            'isCompleted': false,
+            'category_color': calColor,
+            'priority': '',
+          });
         }
       }
     } catch (_) {}
 
-    rawItems.sort(
-      (a, b) => DateTime.parse(a['date']).compareTo(DateTime.parse(b['date'])),
-    );
+    rawItems.sort(_compareItems);
+    final tomorrow = DateTime(today.year, today.month, today.day + 1);
 
     // Group with Section Headers
     final timelineData = <Map<String, dynamic>>[];
@@ -647,14 +645,8 @@ class WidgetDataService {
       if (dateOnly != currentGroupKey) {
         currentGroupKey = dateOnly;
         final parsedDate = DateTime.parse(dateOnly);
-        final isToday =
-            parsedDate.year == now.year &&
-            parsedDate.month == now.month &&
-            parsedDate.day == now.day;
-        final isTomorrow =
-            parsedDate.year == now.year &&
-            parsedDate.month == now.month &&
-            parsedDate.day == now.day + 1;
+        final isToday = parsedDate == today;
+        final isTomorrow = parsedDate == tomorrow;
 
         final dayLabel = isToday
             ? todayLabel
@@ -677,7 +669,7 @@ class WidgetDataService {
       timelineData.add(item);
     }
 
-    if (timelineData.isEmpty) {
+    if (timelineData.isEmpty && allTasks.isEmpty) {
       final existing = await HomeWidget.getWidgetData<String>(
         'timeline_agenda_data',
       );
@@ -761,72 +753,76 @@ class WidgetDataService {
     final now = DateTime.now();
     final upcomingList = <Map<String, dynamic>>[];
 
-    // 1. Pending Tasks
+    // 1. Pending tasks. Undated tasks rank after anything due in the next
+    // 24 hours, so a meeting in 10 minutes isn't hidden behind them.
     final categoryTasks = await _filterTasksByCategory(allTasks);
     for (final t in categoryTasks.where(
       (t) => !t.isCompleted && !(t.isDeleted ?? false),
     )) {
-      final taskDate = t.dueDate ?? now;
-      if (t.dueDate == null ||
-          taskDate.isAfter(now.subtract(const Duration(hours: 1)))) {
-        final cat = getCategoryById(t.categoryId);
-        upcomingList.add({
-          'type': 'task',
-          'id': t.id,
-          'title': t.title,
-          'subtitle': cat?.name ?? 'Task',
-          'category_color': cat != null
-              ? '#${cat.colorValue.toRadixString(16).padLeft(8, '0')}'
-              : '#6366F1',
-          'date': taskDate,
-          'timeDisplay': t.dueDate != null
-              ? DateFormat('HH:mm').format(t.dueDate!)
-              : 'Today',
-        });
+      final due = t.dueDate?.toLocal();
+      if (due != null && !due.isAfter(now.subtract(const Duration(hours: 1)))) {
+        continue;
       }
+      final cat = getCategoryById(t.categoryId);
+      upcomingList.add({
+        'type': 'task',
+        'id': t.id,
+        'title': t.title,
+        'subtitle': cat?.name ?? '',
+        'category_color': cat != null
+            ? '#${cat.colorValue.toRadixString(16).padLeft(8, '0')}'
+            : '#6366F1',
+        'rank': due ?? now.add(const Duration(hours: 24)),
+        'start': due,
+        'priority': t.priority.name,
+      });
     }
 
-    // 2. Calendar Events
+    // 2. Timed calendar events (all-day events aren't "up next").
     try {
+      Map<String, String> calendarColors = {};
+      try {
+        calendarColors = await _calendarService.getCalendarColors();
+      } catch (_) {}
+      final noTitleLabel = await _getNoTitleLabel();
       final calendarEvents = await _getFilteredCalendarEvents(
         startDate: now,
         endDate: now.add(const Duration(days: 3)),
       );
       for (final e in calendarEvents) {
-        if (e.start != null &&
-            e.start!.isAfter(now.subtract(const Duration(minutes: 15)))) {
-          upcomingList.add({
-            'type': 'event',
-            'id': e.eventId ?? '',
-            'title': e.title ?? 'Meeting',
-            'subtitle': e.location ?? 'Calendar',
-            'category_color': '#4285F4',
-            'date': e.start!,
-            'timeDisplay': DateFormat('HH:mm').format(e.start!),
-          });
+        if (e.start == null || (e.allDay ?? false)) continue;
+        final start = e.start!.toLocal();
+        if (!start.isAfter(now.subtract(const Duration(minutes: 15)))) {
+          continue;
         }
+        upcomingList.add({
+          'type': 'event',
+          'id': e.eventId ?? '',
+          'title': e.title ?? noTitleLabel,
+          'subtitle': e.location ?? '',
+          'category_color': calendarColors[e.calendarId] ?? '#4285F4',
+          'rank': start,
+          'start': start,
+          'priority': '',
+        });
       }
     } catch (_) {}
 
     upcomingList.sort(
-      (a, b) => (a['date'] as DateTime).compareTo(b['date'] as DateTime),
+      (a, b) => (a['rank'] as DateTime).compareTo(b['rank'] as DateTime),
     );
 
     if (upcomingList.isNotEmpty) {
       final nextItem = upcomingList.first;
-      final itemDate = nextItem['date'] as DateTime;
-      final diffMin = itemDate.difference(now).inMinutes;
-
-      final String relativeTime;
-      if (diffMin <= 0) {
-        relativeTime = 'Now';
-      } else if (diffMin < 60) {
-        relativeTime = 'In ${diffMin}m';
-      } else if (diffMin < 1440) {
-        relativeTime = DateFormat('HH:mm').format(itemDate);
-      } else {
-        relativeTime = DateFormat('MMM d').format(itemDate);
-      }
+      final start = nextItem['start'] as DateTime?;
+      final lang = await _getAppLanguage();
+      // Fallback text for older widget builds; the widget formats the
+      // relative time itself from up_next_start_millis at render time.
+      final timeDisplay = start == null
+          ? await _getTodayLabel()
+          : _isSameDay(start, now)
+          ? DateFormat('HH:mm').format(start)
+          : _formatDatePattern('MMM d', start, lang);
 
       await Future.wait([
         HomeWidget.saveWidgetData<String>('up_next_type', nextItem['type']),
@@ -836,7 +832,15 @@ class WidgetDataService {
           'up_next_subtitle',
           nextItem['subtitle'],
         ),
-        HomeWidget.saveWidgetData<String>('up_next_time_display', relativeTime),
+        HomeWidget.saveWidgetData<String>('up_next_time_display', timeDisplay),
+        HomeWidget.saveWidgetData<int>(
+          'up_next_start_millis',
+          start?.millisecondsSinceEpoch ?? -1,
+        ),
+        HomeWidget.saveWidgetData<String>(
+          'up_next_priority',
+          nextItem['priority'],
+        ),
         HomeWidget.saveWidgetData<String>(
           'up_next_color',
           nextItem['category_color'],
@@ -851,6 +855,8 @@ class WidgetDataService {
         HomeWidget.saveWidgetData<String>('up_next_title', completedTitle),
         HomeWidget.saveWidgetData<String>('up_next_subtitle', ''),
         HomeWidget.saveWidgetData<String>('up_next_time_display', clearBadge),
+        HomeWidget.saveWidgetData<int>('up_next_start_millis', -1),
+        HomeWidget.saveWidgetData<String>('up_next_priority', ''),
         HomeWidget.saveWidgetData<String>('up_next_color', '#10B981'),
       ]);
     }
@@ -865,268 +871,6 @@ class WidgetDataService {
     }
   }
 
-  Future<void> updateScheduleWidget(
-    List<Task> allTasks,
-    Category? Function(String?) getCategoryById, {
-    String? userId,
-  }) async {
-    if (kIsWeb) return;
-    final scheduleStart = DateTime.now().subtract(const Duration(days: 1));
-    final scheduleEnd = DateTime.now().add(const Duration(days: 30));
-    final scheduleItems = <Map<String, dynamic>>[];
-
-    final categoryTasks = await _filterTasksByCategory(allTasks);
-    final scheduleTasks = categoryTasks.where((t) {
-      if (t.isCompleted || (t.isDeleted ?? false) || t.dueDate == null) {
-        return false;
-      }
-      return t.dueDate!.isAfter(scheduleStart) &&
-          t.dueDate!.isBefore(scheduleEnd);
-    });
-
-    for (final t in scheduleTasks) {
-      final cat = getCategoryById(t.categoryId);
-      scheduleItems.add({
-        'type': 'task',
-        'id': t.id,
-        'title': t.title,
-        'description': t.description,
-        'category_color': cat != null
-            ? '#${cat.colorValue.toRadixString(16).padLeft(8, '0')}'
-            : '',
-        'date': t.dueDate!.toIso8601String(),
-        'dateDisplay': TaskWidgetService.formatDateForDisplay(t.dueDate!),
-        'timeDisplay': DateFormat('HH:mm').format(t.dueDate!),
-        'isAllDay': false,
-        'location': '',
-        'priority': t.priority.name,
-      });
-    }
-
-    // Fetch device calendar events
-    try {
-      final calendarEvents = await _getFilteredCalendarEvents(
-        startDate: scheduleStart,
-        endDate: scheduleEnd,
-      );
-      for (final event in calendarEvents) {
-        if (event.start != null) {
-          scheduleItems.add({
-            'type': 'event',
-            'id': event.eventId ?? '',
-            'title': event.title ?? 'No Title',
-            'description': event.description ?? '',
-            'date': event.start!.toIso8601String(),
-            'dateDisplay': TaskWidgetService.formatDateForDisplay(event.start!),
-            'timeDisplay': event.allDay == true
-                ? 'All Day'
-                : DateFormat('HH:mm').format(event.start!),
-            'isAllDay': event.allDay ?? false,
-            'location': event.location ?? '',
-            'category_color': '#4285F4',
-            'priority': '',
-          });
-        }
-      }
-    } catch (e, s) {
-      AppLogger.error(
-        'Error fetching calendar events for schedule widget',
-        error: e,
-        stack: s,
-      );
-    }
-
-    scheduleItems.sort(
-      (a, b) => DateTime.parse(a['date']).compareTo(DateTime.parse(b['date'])),
-    );
-
-    if (scheduleItems.isEmpty) {
-      final existing = await HomeWidget.getWidgetData<String>('schedule_list');
-      if (existing != null && existing.isNotEmpty && existing != '[]') {
-        return;
-      }
-    }
-
-    try {
-      await HomeWidget.saveWidgetData<String>(
-        'schedule_list',
-        jsonEncode(scheduleItems),
-      );
-    } catch (e) {
-      AppLogger.debug('Failed to save schedule_list: $e');
-    }
-
-    try {
-      await HomeWidget.updateWidget(
-        name: 'TimelineAgendaWidgetProvider',
-        iOSName: 'ScheduleWidget',
-      );
-    } catch (e) {
-      AppLogger.debug('Failed to update schedule widget: $e');
-    }
-  }
-
-  Future<void> updateCalendarListWidget(
-    List<Task> allTasks, {
-    String? userId,
-  }) async {
-    if (kIsWeb) return;
-    final listStart = DateTime.now();
-    final listEnd = listStart.add(const Duration(days: 7));
-    final calendarListEvents = <Map<String, dynamic>>[];
-
-    try {
-      final events = await _calendarService.getEvents(
-        startDate: listStart,
-        endDate: listEnd,
-      );
-      for (final event in events) {
-        if (event.start != null) {
-          calendarListEvents.add({
-            'type': 'event',
-            'id': event.eventId ?? '',
-            'title': event.title ?? 'No Title',
-            'start': event.start!.toIso8601String(),
-            'startDisplay': event.allDay == true
-                ? 'All Day'
-                : DateFormat('HH:mm').format(event.start!),
-            'dateDisplay': TaskWidgetService.formatDateForDisplay(event.start!),
-            'category_color': '#4285F4',
-          });
-        }
-      }
-
-      final listTasks = allTasks.where((t) {
-        if (t.isCompleted || (t.isDeleted ?? false) || t.dueDate == null) {
-          return false;
-        }
-        return t.dueDate!.isAfter(listStart) && t.dueDate!.isBefore(listEnd);
-      });
-
-      for (final t in listTasks) {
-        calendarListEvents.add({
-          'type': 'task',
-          'id': t.id,
-          'title': t.title,
-          'start': t.dueDate!.toIso8601String(),
-          'startDisplay': DateFormat('HH:mm').format(t.dueDate!),
-          'dateDisplay': TaskWidgetService.formatDateForDisplay(t.dueDate!),
-          'category_color': '',
-        });
-      }
-
-      calendarListEvents.sort(
-        (a, b) =>
-            DateTime.parse(a['start']).compareTo(DateTime.parse(b['start'])),
-      );
-
-      await HomeWidget.saveWidgetData<String>(
-        'calendar_list_data',
-        jsonEncode(calendarListEvents),
-      );
-      try {
-        await HomeWidget.updateWidget(
-          name: 'FullCalendarWidgetProvider',
-          iOSName: 'CalendarListWidget',
-        );
-      } catch (e) {
-        AppLogger.debug('Failed to update calendar list widget: $e');
-      }
-    } catch (e, s) {
-      AppLogger.error(
-        'Error updating calendar list widget',
-        error: e,
-        stack: s,
-      );
-    }
-  }
-
-  Future<void> updateMonthEventsMap(
-    List<Task> allTasks, {
-    String? userId,
-  }) async {
-    if (kIsWeb) return;
-    final now = DateTime.now();
-    final start = DateTime(now.year, now.month - 1, 1);
-    final end = DateTime(now.year, now.month + 2, 0);
-    final eventsByDay = <String, bool>{};
-
-    for (final task in allTasks.where((t) => !(t.isDeleted ?? false))) {
-      if (task.dueDate != null) {
-        final dateKey = DateFormat('yyyy-MM-dd').format(task.dueDate!);
-        eventsByDay[dateKey] = true;
-      }
-    }
-
-    try {
-      final calendarEvents = await _calendarService.getEvents(
-        startDate: start,
-        endDate: end,
-      );
-      for (final event in calendarEvents) {
-        if (event.start != null) {
-          final eventStart = DateTime(
-            event.start!.year,
-            event.start!.month,
-            event.start!.day,
-          );
-          final end = event.end ?? event.start!.add(const Duration(hours: 1));
-          final eventEnd = DateTime(end.year, end.month, end.day);
-
-          var current = eventStart;
-          while (current.isBefore(eventEnd) || _isSameDay(current, eventEnd)) {
-            if (current == eventEnd &&
-                event.allDay != true &&
-                end.hour == 0 &&
-                end.minute == 0 &&
-                end.second == 0 &&
-                end.millisecond == 0 &&
-                current != eventStart) {
-              break;
-            }
-
-            final dateKey = DateFormat('yyyy-MM-dd').format(current);
-            eventsByDay[dateKey] = true;
-            current = current.add(const Duration(days: 1));
-          }
-        }
-      }
-    } catch (e, s) {
-      AppLogger.error(
-        'Error fetching calendar events for month map',
-        error: e,
-        stack: s,
-      );
-    }
-
-    if (eventsByDay.isEmpty) {
-      final existing = await HomeWidget.getWidgetData<String>(
-        'month_events_map',
-      );
-      if (existing != null && existing.isNotEmpty && existing != '{}') {
-        return;
-      }
-    }
-
-    try {
-      await HomeWidget.saveWidgetData<String>(
-        'month_events_map',
-        jsonEncode(eventsByDay),
-      );
-    } catch (e) {
-      AppLogger.debug('Failed to save month_events_map: $e');
-    }
-
-    try {
-      await HomeWidget.updateWidget(
-        name: 'FullCalendarWidgetProvider',
-        iOSName: 'CalendarWidget',
-      );
-    } catch (e) {
-      AppLogger.debug('Failed to update month events map: $e');
-    }
-  }
-
   /// Update Kanban Board Widget
   Future<void> updateKanbanWidget(
     List<Task> allTasks,
@@ -1136,7 +880,7 @@ class WidgetDataService {
     if (kIsWeb) return;
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    final tomorrow = today.add(const Duration(days: 1));
+    final tomorrow = DateTime(today.year, today.month, today.day + 1);
 
     final lang = await _getAppLanguage();
     final todayLabel = await _getTodayLabel();
@@ -1204,7 +948,7 @@ class WidgetDataService {
 
     final bool isKanbanEmpty =
         todoTasks.isEmpty && inFocusTasks.isEmpty && doneTasks.isEmpty;
-    if (isKanbanEmpty) {
+    if (isKanbanEmpty && allTasks.isEmpty) {
       final existing = await HomeWidget.getWidgetData<String>('kanban_data');
       if (existing != null && existing.isNotEmpty && existing != '{}') {
         return;
@@ -1228,10 +972,6 @@ class WidgetDataService {
     } catch (e) {
       AppLogger.debug('Failed to update KanbanWidget: $e');
     }
-  }
-
-  void clearScheduleCache() {
-    _scheduleService.clearCache();
   }
 
   bool _isSameDay(DateTime a, DateTime b) {
