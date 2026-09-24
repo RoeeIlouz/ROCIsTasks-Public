@@ -201,6 +201,28 @@ void main() {
       },
     );
 
+    test(
+      'filter taps adopt the widget value even when stores drifted',
+      () async {
+        // App-side copy says Google is shown; the native widget just hid it.
+        SharedPreferences.setMockInitialValues({
+          'full_calendar_show_google': true,
+        });
+        savedWidgetData['full_calendar_show_google'] = false;
+
+        final service = FullCalendarWidgetService(
+          MockCalendarService(),
+          MockLocalTaskSource(),
+        );
+        final filters = await service.adoptWidgetFilter('google');
+
+        expect(filters.showGoogleCalendar, isFalse);
+        expect(savedWidgetData['full_calendar_show_google'], isFalse);
+        final prefs = await SharedPreferences.getInstance();
+        expect(prefs.getBool('full_calendar_show_google'), isFalse);
+      },
+    );
+
     test('mergeStaleSummaries keeps only sources that failed to refresh', () {
       final fresh = <String, List<Map<String, dynamic>>>{
         '2026-10-25': [
