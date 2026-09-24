@@ -147,12 +147,19 @@ void main() {
       final missing = Task(id: 'missing', title: 'm', modifiedAt: at(1));
       final newerHere = Task(id: 'newer', title: 'n', modifiedAt: at(9));
       final newerInCloud = Task(id: 'stale', title: 's', modifiedAt: at(1));
+      // Deleted forever on another device: must not be resurrected even
+      // though the local copy was edited later.
+      final purged = Task(id: 'purged', title: 'p', modifiedAt: at(9));
       when(
         () => source.getTasks(),
-      ).thenReturn([missing, newerHere, newerInCloud]);
-      when(
-        () => firestore.fetchTaskEditTimes(any()),
-      ).thenAnswer((_) async => {'newer': at(5), 'stale': at(5)});
+      ).thenReturn([missing, newerHere, newerInCloud, purged]);
+      when(() => firestore.fetchTaskStates(any())).thenAnswer(
+        (_) async => {
+          'newer': (editedAt: at(5), isPurged: false),
+          'stale': (editedAt: at(5), isPurged: false),
+          'purged': (editedAt: at(5), isPurged: true),
+        },
+      );
 
       await manager.uploadLocalDataToCloud();
 
@@ -164,7 +171,7 @@ void main() {
         () => source.getTasks(),
       ).thenReturn([Task(id: 'a', title: 'a', modifiedAt: at(1))]);
       when(
-        () => firestore.fetchTaskEditTimes(any()),
+        () => firestore.fetchTaskStates(any()),
       ).thenThrow(Exception('unavailable'));
 
       await manager.uploadLocalDataToCloud();
@@ -183,9 +190,7 @@ void main() {
       final untouched = Task(id: 'old', title: 'o', modifiedAt: at(1));
       final edited = Task(id: 'edited', title: 'e', modifiedAt: at(1));
       when(() => source.getTasks()).thenReturn([untouched, edited]);
-      when(
-        () => firestore.fetchTaskEditTimes(any()),
-      ).thenAnswer((_) async => {});
+      when(() => firestore.fetchTaskStates(any())).thenAnswer((_) async => {});
 
       await manager.uploadLocalDataToCloud();
       edited.touch();
@@ -194,11 +199,70 @@ void main() {
       await manager.uploadLocalDataToCloud();
 
       final checkedIds =
-          verify(
-                () => firestore.fetchTaskEditTimes(captureAny()),
-              ).captured.single
+          verify(() => firestore.fetchTaskStates(captureAny())).captured.single
               as List<String>;
       expect(checkedIds, ['edited']);
+    });
+  });
+
+  group('Permanent deletion tombstones', () {
+    test('tombstone carries no task content and satisfies the task schema', () {
+      final data = FirestoreService.tombstoneData('gone');
+      expect(FirestoreService.isPurgedData(data), isTrue);
+      expect(data['isDeleted'], isTrue);
+      expect(data['description'], '');
+      // firestore.rules requires these on every task write.
+      expect(data['title'], isA<String>());
+      expect((data['title'] as String).isNotEmpty, isTrue);
+      expect(data['priority'], isA<int>());
+      expect(data['isCompleted'], isA<bool>());
+      expect(data['isPinned'], isA<bool>());
+    });
+
+    test('purge listener removes a stale local copy', () async {
+      SharedPreferences.setMockInitialValues({});
+      final auth = MockAuthService();
+      final firestore = MockFirestoreService();
+      final source = MockLocalTaskSource();
+      final user = MockUser();
+      when(() => user.uid).thenReturn('u1');
+      when(() => auth.currentUser).thenReturn(user);
+      when(auth.getGoogleAccessToken).thenAnswer((_) async => null);
+      when(firestore.processOfflineQueue).thenAnswer((_) async {});
+      when(
+        firestore.getActiveTasksStream,
+      ).thenAnswer((_) => const Stream.empty());
+      when(
+        firestore.getCategoriesStream,
+      ).thenAnswer((_) => const Stream.empty());
+      when(
+        firestore.getPurgedTaskIdsStream,
+      ).thenAnswer((_) => Stream.value(['stale-copy', 'never-had-it']));
+      when(() => source.deleteTask(any())).thenAnswer((_) async {});
+
+      final local = {'stale-copy': Task(id: 'stale-copy', title: 's')};
+      final cancelled = <String>[];
+      var changed = 0;
+
+      await TaskSyncManager(
+        authService: auth,
+        firestoreService: firestore,
+        googleTasksService: MockGoogleTasksService(),
+        calendarService: MockCalendarService(),
+        source: source,
+        errorHandlingService: MockErrorHandlingService(),
+      ).startCloudSync(
+        getTaskById: (id) => local[id],
+        scheduleTaskNotifications: (_) async {},
+        cancelNotificationsById: (id) async => cancelled.add(id),
+        onDataChanged: () => changed++,
+      );
+      await pumpEventQueue();
+
+      verify(() => source.deleteTask('stale-copy')).called(1);
+      verifyNever(() => source.deleteTask('never-had-it'));
+      expect(cancelled, ['stale-copy']);
+      expect(changed, 1);
     });
   });
 }
