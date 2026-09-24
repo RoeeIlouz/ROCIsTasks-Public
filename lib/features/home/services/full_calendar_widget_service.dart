@@ -189,6 +189,37 @@ class FullCalendarWidgetService {
     return updated;
   }
 
+  /// Adopts a filter value the native widget already flipped.
+  ///
+  /// The widget's filter buttons toggle the flag natively (for an instant
+  /// redraw) before waking Dart; toggling again here would flip it back
+  /// whenever the two stores had drifted apart. The widget's value wins.
+  Future<FullCalendarFilters> adoptWidgetFilter(String filterName) async {
+    final current = await getFilters();
+    Future<bool?> widgetValue(String key) =>
+        HomeWidget.getWidgetData<bool>(key);
+
+    final updated = switch (filterName) {
+      'tasks' => current.copyWith(
+        showTasks:
+            await widgetValue('full_calendar_show_tasks') ?? current.showTasks,
+      ),
+      'google' => current.copyWith(
+        showGoogleCalendar:
+            await widgetValue('full_calendar_show_google') ??
+            current.showGoogleCalendar,
+      ),
+      'schedule' || 'rocis' => current.copyWith(
+        showRocisSchedule:
+            await widgetValue('full_calendar_show_schedule') ??
+            current.showRocisSchedule,
+      ),
+      _ => current,
+    };
+    await saveFilters(updated);
+    return updated;
+  }
+
   Future<void> updateFullCalendarWidget({
     int? monthOffset,
     String? userId,

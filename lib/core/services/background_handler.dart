@@ -275,8 +275,8 @@ class BackgroundHandler {
         taskSource,
       );
 
-      // Toggle the filter
-      await fullCalendarService.toggleFilter(filterName);
+      // The native widget already flipped the flag; adopt it (don't toggle).
+      await fullCalendarService.adoptWidgetFilter(filterName);
 
       // Initialize schedule service and set user email for ROCIs-Schedule integration
       await fullCalendarService.initScheduleService();
