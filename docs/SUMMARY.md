@@ -2,6 +2,29 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## Fix Stale Schedule Events Cache & Web Google Token Persistence - 2026-09-24 (Patch 9)
+
+#### Problem & Root Causes
+1. **Premature Schedule Events (Mobile & Web)**:
+   - Prior cached events in SharedPreferences (`cached_schedule_events_json`) lacked semester bounds or were saved during Patch 7 with `semesterStartDate: null`, causing them to show starting on the event creation date (September 20).
+   - In `SyncedScheduleEvent.toMap`, `semesterId` was omitted, causing deserialization from cache without `courseMap` to lose semester context.
+   - On Web, Firebase Hosting had no `Cache-Control` header for scripts, causing browsers to serve stale cached `main.dart.js` (from Patch 7) for up to 1 hour.
+2. **Web Google Access Token Disconnection & Persistence**:
+   - `saveGoogleUserIdentity` stored Firebase `user.uid` instead of Google's numeric subject ID (`providerData.uid`), causing Google Identity Services (GIS) platform authorization to fail matching the user on silent refresh.
+   - `_initAuth` ran `_restoreGoogleUser` asynchronously in an unawaited future while completing `_initCompleter` immediately, causing downstream services to query Google APIs before token restoration completed.
+   - `cookie_service_web.dart` set the `Secure` flag unconditionally, causing failure on non-HTTPS origins.
+
+#### Solutions Applied
+1. **Schedule Boundaries & Cache Self-Healing (`schedule_firestore_service.dart`)**:
+   - Stored `semesterId` inside `SyncedScheduleEvent` and serialized it in `toMap()`.
+   - Updated `fromMap` to strictly default recurring courses without custom semester bounds to October 25, 2026 (Semester 1 start).
+   - Updated `_loadCachedEvents()` to purge stale cached events that lack semester boundaries or start before Oct 25, 2026.
+2. **Web Token Persistence & Auth Startup (`auth_service.dart`, `google_oauth_manager.dart`, `cookie_service_web.dart`)**:
+   - Extracted numeric Google Subject ID from `providerData` for Google Identity Services.
+   - Awaited `_restoreGoogleUser` in `_initAuth` before completing initialization.
+   - Made `Secure` cookie flag conditional on HTTPS protocol.
+   - Configured `no-cache, no-store, must-revalidate` headers in `firebase.json` for all JS/HTML/JSON assets.
+
 ## Strict Semester Boundaries for University Schedule Events - 2026-09-24 (Patch 8)
 
 #### Problem & User Requirement

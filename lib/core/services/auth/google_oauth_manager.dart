@@ -102,6 +102,8 @@ class GoogleOAuthManager {
       await prefs.setString(keyUserEmail, email);
       if (id != null && id.isNotEmpty) {
         await prefs.setString(keyUserId, id);
+      } else {
+        await prefs.remove(keyUserId);
       }
       if (kIsWeb) {
         CookieService.instance.setCookie(
@@ -109,6 +111,15 @@ class GoogleOAuthManager {
           email,
           maxAge: const Duration(days: 365),
         );
+        if (id != null && id.isNotEmpty) {
+          CookieService.instance.setCookie(
+            keyUserId,
+            id,
+            maxAge: const Duration(days: 365),
+          );
+        } else {
+          CookieService.instance.deleteCookie(keyUserId);
+        }
       }
       AppLogger.info(
         'Saved Google user identity for background auth: $email',
@@ -136,7 +147,12 @@ class GoogleOAuthManager {
   Future<String?> getSavedGoogleUserId() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      return prefs.getString(keyUserId);
+      final id = prefs.getString(keyUserId);
+      if (id != null && id.isNotEmpty) return id;
+      if (kIsWeb) {
+        return CookieService.instance.getCookie(keyUserId);
+      }
+      return null;
     } catch (_) {
       return null;
     }
@@ -380,7 +396,12 @@ class GoogleOAuthManager {
                 ClientAuthorizationTokensForScopesParameters(
                   request: AuthorizationRequestDetails(
                     scopes: googleTasksScopes,
-                    userId: savedUserId,
+                    userId:
+                        (kIsWeb &&
+                                savedUserId != null &&
+                                !RegExp(r'^\d+$').hasMatch(savedUserId))
+                            ? null
+                            : savedUserId,
                     email: savedEmail,
                     promptIfUnauthorized: false,
                   ),

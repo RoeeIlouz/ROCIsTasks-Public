@@ -24,6 +24,7 @@ class SyncedScheduleEvent {
   final String notes;
   final DateTime? semesterStartDate;
   final DateTime? semesterEndDate;
+  final String semesterId;
 
   const SyncedScheduleEvent({
     required this.id,
@@ -41,6 +42,7 @@ class SyncedScheduleEvent {
     required this.notes,
     this.semesterStartDate,
     this.semesterEndDate,
+    this.semesterId = 'semester_1',
   });
 
   bool occursOnDay(DateTime day) {
@@ -99,6 +101,7 @@ class SyncedScheduleEvent {
     'notes': notes,
     'semesterStartDate': semesterStartDate?.toIso8601String(),
     'semesterEndDate': semesterEndDate?.toIso8601String(),
+    'semesterId': semesterId,
   };
 
   /// Construct SyncedScheduleEvent from Firestore map with course & semester lookup.
@@ -191,26 +194,23 @@ class SyncedScheduleEvent {
     final semesterId =
         courseMap?['semester']?.toString() ??
         map['semesterId']?.toString() ??
-        '';
-    if (semStart == null &&
-        (semesterId == 'semester_1' || semesterId.isEmpty)) {
-      // Semester 1 (Fall / תשפ"ז) standard academic start at Afeka / Israeli universities: late October
-      semStart = DateTime(2026, 10, 25);
-      semEnd ??= DateTime(2027, 2, 5);
-    } else if (semStart == null && semesterId == 'semester_2') {
-      semStart = DateTime(2027, 3, 14);
-      semEnd ??= DateTime(2027, 6, 30);
-    } else if (semStart == null && semesterId == 'semester_summer') {
-      semStart = DateTime(2027, 8, 8);
-      semEnd ??= DateTime(2027, 9, 30);
+        'semester_1';
+    if (semStart == null) {
+      if (semesterId == 'semester_2') {
+        semStart = DateTime(2027, 3, 14);
+        semEnd ??= DateTime(2027, 6, 30);
+      } else if (semesterId == 'semester_summer') {
+        semStart = DateTime(2027, 8, 8);
+        semEnd ??= DateTime(2027, 9, 30);
+      } else {
+        // Semester 1 (Fall / תשפ"ז) standard academic start at Afeka / Israeli universities: late October
+        semStart = DateTime(2026, 10, 25);
+        semEnd ??= DateTime(2027, 2, 5);
+      }
     }
 
     // Default semester end date if not explicitly set
-    if (semStart != null) {
-      semEnd ??= semStart.add(const Duration(days: 160));
-    } else {
-      semEnd ??= start.add(const Duration(days: 160));
-    }
+    semEnd ??= semStart.add(const Duration(days: 160));
 
     return SyncedScheduleEvent(
       id: map['id']?.toString() ?? '',
@@ -228,6 +228,7 @@ class SyncedScheduleEvent {
       notes: map['notes']?.toString() ?? '',
       semesterStartDate: semStart,
       semesterEndDate: semEnd,
+      semesterId: semesterId,
     );
   }
 }
@@ -784,10 +785,25 @@ class ScheduleFirestoreService {
       final jsonStr = prefs.getString(_keyCachedEventsJson);
       if (jsonStr != null && jsonStr.isNotEmpty && jsonStr != '[]') {
         final decoded = jsonDecode(jsonStr) as List<dynamic>;
-        return decoded
+        final events = decoded
             .whereType<Map<String, dynamic>>()
             .map(SyncedScheduleEvent.fromMap)
             .toList();
+
+        // Self-heal: If any cached recurring event lacks semester boundaries or occurs prior to Oct 25 2026,
+        // purge the stale cache so fresh data with strict semester boundaries is loaded.
+        if (events.any((e) =>
+            e.recurring &&
+            (e.semesterStartDate == null ||
+                e.semesterStartDate!.isBefore(DateTime(2026, 10, 25))))) {
+          debugPrint(
+            'ScheduleFirestoreService: Purged stale cached schedule events lacking proper semester bounds.',
+          );
+          await prefs.remove(_keyCachedEventsJson);
+          return [];
+        }
+
+        return events;
       }
     } catch (e) {
       debugPrint('ScheduleFirestoreService: Failed to load cached events: $e');
