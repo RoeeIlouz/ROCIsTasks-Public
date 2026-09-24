@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.20+110] - 2026-09-24 (Patch 9)
+
+### Fixed
+- Fixed premature schedule events: recurring classes strictly start Oct 25, 2026; purged pre-semester cached items.
+- Fixed Web Google token persistence: resolved GIS Subject ID mismatch, awaited startup restoration, and added no-cache headers.
+
 ## [0.2.20+110] - 2026-09-24 (Patch 8)
 
 ### Fixed

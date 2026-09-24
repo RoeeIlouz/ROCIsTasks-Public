@@ -54,10 +54,15 @@ class AuthService extends ChangeNotifier {
   }
 
   Future<void> _initAuth() async {
-    _authStateSubscription = _auth.authStateChanges().listen((User? user) {
+    _authStateSubscription = _auth.authStateChanges().listen((User? user) async {
       if (user != null) {
         unawaited(_syncEncryptionKey(user.uid));
-        unawaited(_restoreGoogleUser().then((_) => ensureSecondaryAuth()));
+        try {
+          await _restoreGoogleUser();
+          unawaited(ensureSecondaryAuth());
+        } catch (e) {
+          AppLogger.warning('Error restoring Google user on auth change: $e', tag: 'Auth');
+        }
       }
 
       if (!_initCompleter.isCompleted) {
@@ -92,9 +97,16 @@ class AuthService extends ChangeNotifier {
       // If email is not yet saved but Firebase user is a Google user, persist it
       final savedEmail = await _oauthManager.getSavedGoogleUserEmail();
       if (savedEmail == null && isGoogleUser && user.email != null) {
+        String? googleSubId;
+        for (final p in user.providerData) {
+          if (p.providerId == 'google.com' && p.uid != null && p.uid!.isNotEmpty) {
+            googleSubId = p.uid;
+            break;
+          }
+        }
         await _oauthManager.saveGoogleUserIdentity(
           email: user.email!,
-          id: user.uid,
+          id: googleSubId,
         );
       }
 
@@ -362,9 +374,16 @@ class AuthService extends ChangeNotifier {
 
         // Save identity for GIS restoration on future page loads
         if (userCredential.user?.email != null) {
+          String? googleSubId;
+          for (final p in (userCredential.user?.providerData ?? [])) {
+            if (p.providerId == 'google.com' && p.uid != null && p.uid!.isNotEmpty) {
+              googleSubId = p.uid;
+              break;
+            }
+          }
           await _oauthManager.saveGoogleUserIdentity(
             email: userCredential.user!.email!,
-            id: userCredential.user!.uid,
+            id: googleSubId,
           );
         }
 

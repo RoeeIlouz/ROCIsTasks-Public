@@ -11,8 +11,10 @@ class PlatformCookieService implements CookieService {
     try {
       final seconds = maxAge.inSeconds;
       final encodedVal = Uri.encodeComponent(value);
+      final isHttps = web.window.location.protocol == 'https:';
+      final secureFlag = isHttps ? '; Secure' : '';
       web.document.cookie =
-          '$name=$encodedVal; max-age=$seconds; path=/; SameSite=Lax; Secure';
+          '$name=$encodedVal; max-age=$seconds; path=/; SameSite=Lax$secureFlag';
     } catch (_) {}
   }
 
