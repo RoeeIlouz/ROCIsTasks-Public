@@ -1279,6 +1279,8 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
                   _highlightColor = c['hex'] as String;
                 });
                 _saveSetting('full_calendar_highlight_color', c['hex']);
+                // An explicit pick overrides the app's accent on the widget.
+                _saveSetting('full_calendar_highlight_custom', true);
               },
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
@@ -1323,6 +1325,7 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
                     _highlightColor = hex;
                   });
                   _saveSetting('full_calendar_highlight_color', hex);
+                  _saveSetting('full_calendar_highlight_custom', true);
                 },
               );
             },

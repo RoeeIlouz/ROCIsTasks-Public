@@ -421,26 +421,30 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  static String? _syncedAccent;
+  static String? _syncedWidgetTheme;
 
-  /// Shares the app's primary colors with the home widgets so they use the same
-  /// accent as the in-app calendar (Material You / custom seed included).
-  void _syncWidgetAccent(Color light, Color dark) {
+  /// Shares the app's calendar-card colors with the home widgets so they look
+  /// like the in-app calendar (Material You / custom seed / AMOLED included):
+  /// primary accent, surfaceContainerLow card and onSurface text.
+  void _syncWidgetTheme(ColorScheme light, ColorScheme dark) {
     if (kIsWeb) return;
     String hex(Color c) => '#${c.toARGB32().toRadixString(16).padLeft(8, '0')}';
-    final accent = '${hex(light)}|${hex(dark)}';
-    if (accent == _syncedAccent) return;
-    _syncedAccent = accent;
+    final colors = {
+      'app_primary_color_light': hex(light.primary),
+      'app_primary_color_dark': hex(dark.primary),
+      'app_surface_color_light': hex(light.surfaceContainerLow),
+      'app_surface_color_dark': hex(dark.surfaceContainerLow),
+      'app_on_surface_color_light': hex(light.onSurface),
+      'app_on_surface_color_dark': hex(dark.onSurface),
+    };
+    final signature = colors.values.join('|');
+    if (signature == _syncedWidgetTheme) return;
+    _syncedWidgetTheme = signature;
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
-        await HomeWidget.saveWidgetData<String>(
-          'app_primary_color_light',
-          hex(light),
-        );
-        await HomeWidget.saveWidgetData<String>(
-          'app_primary_color_dark',
-          hex(dark),
-        );
+        for (final entry in colors.entries) {
+          await HomeWidget.saveWidgetData<String>(entry.key, entry.value);
+        }
         await HomeWidget.updateWidget(name: 'FullCalendarWidgetProvider');
       } catch (_) {}
     });
@@ -487,10 +491,7 @@ class _MyAppState extends State<MyApp> {
           darkScheme,
           isAmoled: themeService.useAmoledTheme,
         );
-        _syncWidgetAccent(
-          lightTheme.colorScheme.primary,
-          darkTheme.colorScheme.primary,
-        );
+        _syncWidgetTheme(lightTheme.colorScheme, darkTheme.colorScheme);
 
         return MaterialApp.router(
           title: "ROCI's Tasks",

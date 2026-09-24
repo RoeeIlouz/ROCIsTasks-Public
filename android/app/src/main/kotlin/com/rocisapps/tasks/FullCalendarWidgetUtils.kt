@@ -34,6 +34,7 @@ object FullCalendarWidgetUtils {
     const val PREF_SHOW_WEEK_NUMBERS = "full_calendar_show_week_numbers"
     const val PREF_WEEKEND_HIGHLIGHT = "full_calendar_weekend_highlight"
     const val PREF_HIGHLIGHT_COLOR = "full_calendar_highlight_color"
+    const val PREF_HIGHLIGHT_CUSTOM = "full_calendar_highlight_custom"
     const val PREF_START_OF_WEEK = "full_calendar_start_of_week"
     const val PREF_SELECTED_DATE = "full_calendar_selected_date"
     const val PREF_GRID_DATA = "full_calendar_grid_data"
@@ -42,6 +43,10 @@ object FullCalendarWidgetUtils {
     // App theme primary colors, synced from Flutter so the widget matches the app.
     const val PREF_APP_PRIMARY_LIGHT = "app_primary_color_light"
     const val PREF_APP_PRIMARY_DARK = "app_primary_color_dark"
+    const val PREF_APP_SURFACE_LIGHT = "app_surface_color_light"
+    const val PREF_APP_SURFACE_DARK = "app_surface_color_dark"
+    const val PREF_APP_ON_SURFACE_LIGHT = "app_on_surface_color_light"
+    const val PREF_APP_ON_SURFACE_DARK = "app_on_surface_color_dark"
 
     // Defaults
     const val DEFAULT_HIGHLIGHT_COLOR = "#6366F1" // App primary (indigo)
@@ -74,6 +79,39 @@ object FullCalendarWidgetUtils {
         }
     }
 
+    /**
+     * Colors of the in-app calendar card (GlassContainer): surfaceContainerLow fill,
+     * onSurface text, primary accent and a 12% primary border.
+     */
+    data class Palette(
+        val surface: Int,
+        val onSurface: Int,
+        val primary: Int,
+        val isDark: Boolean,
+        val translucent: Boolean
+    ) {
+        val onSurfaceFaded: Int get() = (onSurface and 0x00FFFFFF) or (0x4D shl 24) // 30%
+        val onSurfaceMuted: Int get() = (onSurface and 0x00FFFFFF) or (0xB3 shl 24) // 70%
+    }
+
+    fun resolvePalette(widgetData: SharedPreferences, theme: String, context: Context): Palette {
+        val dark = isDarkTheme(theme, context)
+        fun synced(key: String, fallback: String): Int {
+            val hex = widgetData.getString(key, null) ?: fallback
+            return try { Color.parseColor(hex) } catch (_: Exception) { Color.parseColor(fallback) }
+        }
+        // Fallbacks: the app's default indigo Material 3 scheme.
+        val surface = if (dark) synced(PREF_APP_SURFACE_DARK, "#FF1B1B21") else synced(PREF_APP_SURFACE_LIGHT, "#FFF5F2FA")
+        val onSurface = if (dark) synced(PREF_APP_ON_SURFACE_DARK, "#FFE4E1E9") else synced(PREF_APP_ON_SURFACE_LIGHT, "#FF1B1B21")
+        return Palette(
+            surface = surface,
+            onSurface = onSurface,
+            primary = resolveHighlightColor(widgetData, theme, context),
+            isDark = dark,
+            translucent = theme == "glassmorphic"
+        )
+    }
+
     /** Whether the widget renders dark, following the system for the "system" theme. */
     fun isDarkTheme(theme: String, context: Context): Boolean = when (theme) {
         "dark", "glassmorphic" -> true
@@ -89,7 +127,11 @@ object FullCalendarWidgetUtils {
      * matches the in-app calendar.
      */
     fun resolveHighlightColor(widgetData: SharedPreferences, theme: String, context: Context): Int {
-        if (widgetData.contains(PREF_HIGHLIGHT_COLOR)) return parseHighlightColor(widgetData)
+        // Only an explicit pick in widget settings overrides the app's accent; older
+        // versions stored a highlight value without the user choosing one.
+        if (widgetData.getBoolean(PREF_HIGHLIGHT_CUSTOM, false) && widgetData.contains(PREF_HIGHLIGHT_COLOR)) {
+            return parseHighlightColor(widgetData)
+        }
         val key = if (isDarkTheme(theme, context)) PREF_APP_PRIMARY_DARK else PREF_APP_PRIMARY_LIGHT
         val hex = widgetData.getString(key, null) ?: return Color.parseColor(DEFAULT_HIGHLIGHT_COLOR)
         return try { Color.parseColor(hex) } catch (_: Exception) { Color.parseColor(DEFAULT_HIGHLIGHT_COLOR) }

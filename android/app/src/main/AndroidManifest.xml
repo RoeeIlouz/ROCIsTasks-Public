@@ -57,9 +57,6 @@
                 android:resource="@xml/full_calendar_widget_info" />
         </receiver>
 
-        <service android:name=".FullCalendarWidgetService"
-            android:permission="android.permission.BIND_REMOTEVIEWS" />
-
         <!-- Today & Day-by-Day Agenda Widget -->
         <receiver android:name=".TodayAgendaWidgetProvider" android:exported="true" android:label="Day Agenda">
             <intent-filter>

@@ -70,233 +70,138 @@ class FullCalendarWidgetProvider : HomeWidgetProvider() {
         appWidgetIds: IntArray,
         widgetData: SharedPreferences
     ) {
-        
         appWidgetIds.forEach { appWidgetId ->
             try {
-                val views = RemoteViews(context.packageName, R.layout.widget_full_calendar_layout)
-
-                // Read theme and customization preferences
-                val theme = widgetData.getString(FullCalendarWidgetUtils.PREF_THEME, FullCalendarWidgetUtils.DEFAULT_THEME) ?: FullCalendarWidgetUtils.DEFAULT_THEME
-                val showWeekNumbers = widgetData.getBoolean(FullCalendarWidgetUtils.PREF_SHOW_WEEK_NUMBERS, FullCalendarWidgetUtils.DEFAULT_SHOW_WEEK_NUMBERS)
-                val weekendHighlight = widgetData.getBoolean(FullCalendarWidgetUtils.PREF_WEEKEND_HIGHLIGHT, true)
-                val primaryColor = FullCalendarWidgetUtils.resolveHighlightColor(widgetData, theme, context)
-
-                // 1. Apply Widget Theme Background
-                val rootBgRes = FullCalendarWidgetUtils.getThemeBackgroundRes(theme)
-                views.setInt(R.id.widget_full_calendar_root, "setBackgroundResource", rootBgRes)
-
-                // 2. Set Text Colors depending on Theme
-                val textColor = FullCalendarWidgetUtils.getTextColor(theme, context)
-                views.setTextColor(R.id.widget_full_calendar_title, textColor)
-                views.setTextColor(R.id.widget_full_calendar_prev, textColor)
-                views.setTextColor(R.id.widget_full_calendar_next, textColor)
-                views.setTextColor(R.id.widget_full_calendar_today, primaryColor)
-                views.setTextColor(R.id.widget_add_task_btn, primaryColor)
-
-                // Weekday headers text colors
-                val weekdayColor = FullCalendarWidgetUtils.getWeekdayColor(theme, context)
-                val weekdaySecondaryColor = FullCalendarWidgetUtils.getSecondaryTextColor(theme, context)
-
-                views.setTextColor(R.id.widget_weekday_num_header, weekdaySecondaryColor)
-
-                // Dynamic Weekday headers text and colors based on startOfWeek and app locale
-                val widgetLocale = WidgetLocaleHelper.getWidgetLocale(widgetData)
-                val startOfWeek = widgetData.getInt(FullCalendarWidgetUtils.PREF_START_OF_WEEK, FullCalendarWidgetUtils.DEFAULT_START_OF_WEEK) // 7 = Sunday, 1 = Monday, 6 = Saturday
-                val daysOfWeekLetters = WidgetLocaleHelper.getWeekdayShortNames(startOfWeek, widgetLocale)
-
-                // Mirror the whole widget for right-to-left languages, like the app does.
-                // The app's language can differ from the system's, so set it explicitly.
-                val isRtl = WidgetLocaleHelper.isRtl(widgetLocale)
-                views.setInt(
-                    R.id.widget_full_calendar_root,
-                    "setLayoutDirection",
-                    if (isRtl) android.view.View.LAYOUT_DIRECTION_RTL else android.view.View.LAYOUT_DIRECTION_LTR
-                )
-                // Arrows point in the reading direction (prev = back).
-                views.setTextViewText(R.id.widget_full_calendar_prev, if (isRtl) "›" else "‹")
-                views.setTextViewText(R.id.widget_full_calendar_next, if (isRtl) "‹" else "›")
-                views.setTextViewText(R.id.widget_premium_overlay_text, WidgetLocaleHelper.getPremiumFeatureText(widgetLocale))
-                val weekdayViewIds = listOf(
-                    R.id.widget_weekday_sun_header,
-                    R.id.widget_weekday_mon_header,
-                    R.id.widget_weekday_tue_header,
-                    R.id.widget_weekday_wed_header,
-                    R.id.widget_weekday_thu_header,
-                    R.id.widget_weekday_fri_header,
-                    R.id.widget_weekday_sat_header
-                )
-
-                for (col in 0..6) {
-                    val dayOfWeek = (startOfWeek + col - 1) % 7 + 1
-                    val letter = daysOfWeekLetters[col]
-                    val viewId = weekdayViewIds[col]
-                    views.setTextViewText(viewId, letter)
-
-                    val color = if (weekendHighlight) {
-                        if (dayOfWeek == 7) {
-                            FullCalendarWidgetUtils.SUNDAY_COLOR
-                        } else if (dayOfWeek == 6) {
-                            FullCalendarWidgetUtils.SATURDAY_COLOR
-                        } else {
-                            weekdayColor
-                        }
-                    } else {
-                        weekdayColor
-                    }
-                    views.setTextColor(viewId, color)
-                }
-
-                // Show / Hide Week Numbers column header
-                views.setViewVisibility(R.id.widget_weekday_num_header, if (showWeekNumbers) android.view.View.VISIBLE else android.view.View.GONE)
-
-                // 3. Title Update
-                val cal = java.util.Calendar.getInstance()
-                val offset = widgetData.getInt(PREF_OFFSET, 0)
-                if (offset != 0) {
-                    cal.add(java.util.Calendar.MONTH, offset)
-                }
-                val monthName = WidgetLocaleHelper.getMonthYearTitle(cal, widgetLocale)
-                views.setTextViewText(R.id.widget_full_calendar_title, monthName)
-
-                // 4. Header Navigation Buttons
-                val prevIntent = Intent(context, FullCalendarWidgetProvider::class.java).apply {
-                    action = ACTION_PREV_MONTH
-                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-                }
-                val prevPendingIntent = android.app.PendingIntent.getBroadcast(
-                    context, REQUEST_CODE_PREV_MONTH, prevIntent,
-                    android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE
-                )
-                views.setOnClickPendingIntent(R.id.widget_full_calendar_prev, prevPendingIntent)
-                
-                val nextIntent = Intent(context, FullCalendarWidgetProvider::class.java).apply {
-                    action = ACTION_NEXT_MONTH
-                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-                }
-                val nextPendingIntent = android.app.PendingIntent.getBroadcast(
-                    context, REQUEST_CODE_NEXT_MONTH, nextIntent,
-                    android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE
-                )
-                views.setOnClickPendingIntent(R.id.widget_full_calendar_next, nextPendingIntent)
-                
-                val todayIntent = Intent(context, FullCalendarWidgetProvider::class.java).apply {
-                    action = ACTION_TODAY
-                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-                }
-                val todayPendingIntent = android.app.PendingIntent.getBroadcast(
-                    context, REQUEST_CODE_TODAY, todayIntent,
-                    android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE
-                )
-                views.setOnClickPendingIntent(R.id.widget_full_calendar_today, todayPendingIntent)
-
-                // Open calendar tab when tapping the month title
-                val calendarTabIntent = HomeWidgetLaunchIntent.getActivity(
-                    context,
-                    MainActivity::class.java,
-                    Uri.parse("rocistasks://calendar")
-                )
-                views.setOnClickPendingIntent(R.id.widget_full_calendar_title, calendarTabIntent)
-
-                // Add Task Button
-                val addTaskPendingIntent = HomeWidgetLaunchIntent.getActivity(
-                    context,
-                    MainActivity::class.java,
-                    Uri.parse("rocistasks://add_task")
-                )
-                views.setOnClickPendingIntent(R.id.widget_add_task_btn, addTaskPendingIntent)
-
-                // 5. Filter Buttons - Pill toggle design
-                val showTasks = widgetData.getBoolean(PREF_SHOW_TASKS, true)
-                val showGoogle = widgetData.getBoolean(PREF_SHOW_GOOGLE, true)
-                val showSchedule = widgetData.getBoolean(PREF_SHOW_SCHEDULE, true)
-
-                // Background pills
-                views.setInt(
-                    R.id.widget_filter_tasks,
-                    "setBackgroundResource",
-                    if (showTasks) R.drawable.widget_filter_button_active_bg else R.drawable.widget_filter_button_bg
-                )
-                views.setInt(
-                    R.id.widget_filter_google,
-                    "setBackgroundResource",
-                    if (showGoogle) R.drawable.widget_filter_button_active_bg else R.drawable.widget_filter_button_bg
-                )
-                views.setViewVisibility(R.id.widget_filter_rocis, android.view.View.VISIBLE)
-                views.setInt(
-                    R.id.widget_filter_rocis,
-                    "setBackgroundResource",
-                    if (showSchedule) R.drawable.widget_filter_button_active_bg else R.drawable.widget_filter_button_bg
-                )
-                views.setTextColor(R.id.widget_filter_rocis, if (showSchedule) primaryColor else weekdaySecondaryColor)
-
-                // Text colors and localized labels
-                views.setTextViewText(R.id.widget_filter_tasks, WidgetLocaleHelper.getTasksFilterText(widgetLocale))
-                views.setTextViewText(R.id.widget_filter_google, WidgetLocaleHelper.getGoogleFilterText(widgetLocale))
-                views.setTextViewText(R.id.widget_filter_rocis, WidgetLocaleHelper.getScheduleFilterText(widgetLocale))
-                views.setTextViewText(R.id.empty_full_calendar_view, WidgetLocaleHelper.getNoDataAvailableText(widgetLocale))
-                views.setTextColor(R.id.widget_filter_tasks, if (showTasks) primaryColor else weekdaySecondaryColor)
-                views.setTextColor(R.id.widget_filter_google, if (showGoogle) primaryColor else weekdaySecondaryColor)
-
-                // Filter button click handlers
-                setupFilterButtonIntents(context, views, appWidgetId)
-
-                // 6. List Adapter
-                val serviceIntent = Intent(context, FullCalendarWidgetService::class.java).apply {
-                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-                    data = Uri.parse("widget://rocis/full_calendar/$appWidgetId")
-                }
-                views.setRemoteAdapter(R.id.widget_full_calendar_list, serviceIntent)
-                views.setEmptyView(R.id.widget_full_calendar_list, R.id.empty_full_calendar_view)
-
-                val appIntent = Intent(context, MainActivity::class.java).apply {
-                    action = Intent.ACTION_VIEW
-                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                }
-                val appPendingIntent = android.app.PendingIntent.getActivity(
-                    context,
-                    100 + appWidgetId,
-                    appIntent,
-                    android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_MUTABLE
-                )
-                views.setPendingIntentTemplate(R.id.widget_full_calendar_list, appPendingIntent)
-
-                // 7. Finalize Update - Check Widget Allowance
-                val isPremium = widgetData.getBoolean(FullCalendarWidgetUtils.PREF_IS_PREMIUM, false)
-                val isAllowed = WidgetLimitHelper.isWidgetAllowed(context, appWidgetId, isPremium)
-                if (!isAllowed) {
-                    views.setViewVisibility(R.id.widget_premium_overlay, android.view.View.VISIBLE)
-                    views.setViewVisibility(R.id.widget_full_calendar_list, android.view.View.GONE)
-                    views.setViewVisibility(R.id.widget_full_calendar_header, android.view.View.GONE)
-                    views.setViewVisibility(R.id.widget_full_calendar_filters, android.view.View.GONE)
-                    views.setViewVisibility(R.id.widget_full_calendar_weekdays, android.view.View.GONE)
-
-                    val paywallIntent = HomeWidgetLaunchIntent.getActivity(
-                        context,
-                        MainActivity::class.java,
-                        Uri.parse("rocistasks://paywall")
-                    )
-                    views.setOnClickPendingIntent(R.id.widget_premium_overlay, paywallIntent)
-                } else {
-                    views.setViewVisibility(R.id.widget_premium_overlay, android.view.View.GONE)
-                    views.setViewVisibility(R.id.widget_full_calendar_list, android.view.View.VISIBLE)
-                    views.setViewVisibility(R.id.widget_full_calendar_header, android.view.View.VISIBLE)
-                    views.setViewVisibility(R.id.widget_full_calendar_filters, android.view.View.VISIBLE)
-                    views.setViewVisibility(R.id.widget_full_calendar_weekdays, android.view.View.VISIBLE)
-                }
-
-                appWidgetManager.updateAppWidget(appWidgetId, views)
-                try {
-                    appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_full_calendar_list)
-                } catch (_: Exception) {}
-
-                android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
-                    try {
-                        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_full_calendar_list)
-                    } catch (_: Exception) {}
-                }, 200)
+                appWidgetManager.updateAppWidget(appWidgetId, buildViews(context, appWidgetId, widgetData))
             } catch (e: Exception) {
+                android.util.Log.e("FullCalendarWidget", "Failed to update widget $appWidgetId", e)
             }
         }
+    }
+
+    private fun buildViews(context: Context, appWidgetId: Int, widgetData: SharedPreferences): RemoteViews {
+        val views = RemoteViews(context.packageName, R.layout.widget_full_calendar_layout)
+        val theme = widgetData.getString(FullCalendarWidgetUtils.PREF_THEME, FullCalendarWidgetUtils.DEFAULT_THEME)
+            ?: FullCalendarWidgetUtils.DEFAULT_THEME
+        val palette = FullCalendarWidgetUtils.resolvePalette(widgetData, theme, context)
+        val widgetLocale = WidgetLocaleHelper.getWidgetLocale(widgetData)
+        val isRtl = WidgetLocaleHelper.isRtl(widgetLocale)
+
+        // 1. Card: the app's calendar card (surfaceContainerLow + 12% accent border).
+        views.setInt(R.id.widget_fc_card_fill, "setColorFilter", palette.surface)
+        views.setInt(R.id.widget_fc_card_fill, "setImageAlpha", if (palette.translucent) 0xCC else 0xFF)
+        views.setInt(R.id.widget_fc_card_stroke, "setColorFilter", palette.primary)
+        views.setInt(R.id.widget_fc_card_stroke, "setImageAlpha", 0x1F)
+        views.setInt(
+            R.id.widget_full_calendar_root, "setLayoutDirection",
+            if (isRtl) android.view.View.LAYOUT_DIRECTION_RTL else android.view.View.LAYOUT_DIRECTION_LTR
+        )
+
+        // 2. Header: localized month title and actions tinted like the app's icons.
+        val cal = java.util.Calendar.getInstance()
+        val offset = widgetData.getInt(PREF_OFFSET, 0)
+        if (offset != 0) cal.add(java.util.Calendar.MONTH, offset)
+        views.setTextViewText(R.id.widget_full_calendar_title, WidgetLocaleHelper.getMonthYearTitle(cal, widgetLocale))
+        views.setTextColor(R.id.widget_full_calendar_title, palette.onSurface)
+        listOf(
+            R.id.widget_full_calendar_prev, R.id.widget_full_calendar_next,
+            R.id.widget_full_calendar_today, R.id.widget_add_task_btn
+        ).forEach { views.setInt(it, "setColorFilter", palette.onSurface) }
+
+        views.setOnClickPendingIntent(R.id.widget_full_calendar_prev, broadcast(context, ACTION_PREV_MONTH, REQUEST_CODE_PREV_MONTH, appWidgetId))
+        views.setOnClickPendingIntent(R.id.widget_full_calendar_next, broadcast(context, ACTION_NEXT_MONTH, REQUEST_CODE_NEXT_MONTH, appWidgetId))
+        views.setOnClickPendingIntent(R.id.widget_full_calendar_today, broadcast(context, ACTION_TODAY, REQUEST_CODE_TODAY, appWidgetId))
+        views.setOnClickPendingIntent(
+            R.id.widget_full_calendar_title,
+            HomeWidgetLaunchIntent.getActivity(context, MainActivity::class.java, Uri.parse("rocistasks://calendar"))
+        )
+        views.setOnClickPendingIntent(
+            R.id.widget_add_task_btn,
+            HomeWidgetLaunchIntent.getActivity(context, MainActivity::class.java, Uri.parse("rocistasks://add_task"))
+        )
+
+        // 3. Source filter chips (widget-only): active = 15% accent fill + accent text.
+        val chips = listOf(
+            ChipSpec(R.id.widget_filter_tasks_fill, R.id.widget_filter_tasks_stroke, R.id.widget_filter_tasks_text,
+                widgetData.getBoolean(PREF_SHOW_TASKS, true), WidgetLocaleHelper.getTasksFilterText(widgetLocale)),
+            ChipSpec(R.id.widget_filter_google_fill, R.id.widget_filter_google_stroke, R.id.widget_filter_google_text,
+                widgetData.getBoolean(PREF_SHOW_GOOGLE, true), WidgetLocaleHelper.getGoogleFilterText(widgetLocale)),
+            ChipSpec(R.id.widget_filter_rocis_fill, R.id.widget_filter_rocis_stroke, R.id.widget_filter_rocis_text,
+                widgetData.getBoolean(PREF_SHOW_SCHEDULE, true), WidgetLocaleHelper.getScheduleFilterText(widgetLocale))
+        )
+        for (chip in chips) {
+            views.setTextViewText(chip.text, chip.label)
+            views.setTextColor(chip.text, if (chip.active) palette.primary else palette.onSurfaceMuted)
+            views.setInt(chip.fill, "setColorFilter", palette.primary)
+            views.setInt(chip.fill, "setImageAlpha", if (chip.active) 0x26 else 0x00)
+            views.setInt(chip.stroke, "setColorFilter", if (chip.active) palette.primary else palette.onSurface)
+            views.setInt(chip.stroke, "setImageAlpha", if (chip.active) 0x59 else 0x33)
+        }
+        setupFilterButtonIntents(context, views, appWidgetId)
+
+        // 4. Weekday header: localized short names, weekend colors like the app.
+        val startOfWeek = widgetData.getInt(FullCalendarWidgetUtils.PREF_START_OF_WEEK, FullCalendarWidgetUtils.DEFAULT_START_OF_WEEK)
+        val weekendHighlight = widgetData.getBoolean(FullCalendarWidgetUtils.PREF_WEEKEND_HIGHLIGHT, true)
+        val showWeekNumbers = widgetData.getBoolean(
+            FullCalendarWidgetUtils.PREF_SHOW_WEEK_NUMBERS, FullCalendarWidgetUtils.DEFAULT_SHOW_WEEK_NUMBERS
+        )
+        val names = WidgetLocaleHelper.getWeekdayShortNames(startOfWeek, widgetLocale)
+        val weekdayViewIds = listOf(
+            R.id.widget_weekday_sun_header, R.id.widget_weekday_mon_header, R.id.widget_weekday_tue_header,
+            R.id.widget_weekday_wed_header, R.id.widget_weekday_thu_header, R.id.widget_weekday_fri_header,
+            R.id.widget_weekday_sat_header
+        )
+        for (col in 0..6) {
+            val dayOfWeek = (startOfWeek + col - 1) % 7 + 1 // 1=Mon .. 7=Sun
+            views.setTextViewText(weekdayViewIds[col], names[col])
+            views.setTextColor(
+                weekdayViewIds[col],
+                when {
+                    weekendHighlight && dayOfWeek == 7 -> FullCalendarWidgetUtils.SUNDAY_COLOR
+                    weekendHighlight && dayOfWeek == 6 -> FullCalendarWidgetUtils.SATURDAY_COLOR
+                    else -> palette.onSurface
+                }
+            )
+        }
+        views.setViewVisibility(R.id.widget_weekday_num_header, if (showWeekNumbers) android.view.View.VISIBLE else android.view.View.GONE)
+        views.setTextColor(R.id.widget_weekday_num_header, palette.onSurfaceFaded)
+
+        // 5. Weeks of the month.
+        views.removeAllViews(R.id.widget_full_calendar_grid)
+        FullCalendarGridRenderer.buildRows(context, widgetData, palette, isRtl).forEach {
+            views.addView(R.id.widget_full_calendar_grid, it)
+        }
+
+        // 6. Premium gate.
+        views.setTextViewText(R.id.widget_premium_overlay_text, WidgetLocaleHelper.getPremiumFeatureText(widgetLocale))
+        val isPremium = widgetData.getBoolean(FullCalendarWidgetUtils.PREF_IS_PREMIUM, false)
+        val isAllowed = WidgetLimitHelper.isWidgetAllowed(context, appWidgetId, isPremium)
+        val contentVisibility = if (isAllowed) android.view.View.VISIBLE else android.view.View.GONE
+        listOf(
+            R.id.widget_full_calendar_grid, R.id.widget_full_calendar_header,
+            R.id.widget_full_calendar_filters, R.id.widget_full_calendar_weekdays
+        ).forEach { views.setViewVisibility(it, contentVisibility) }
+        views.setViewVisibility(R.id.widget_premium_overlay, if (isAllowed) android.view.View.GONE else android.view.View.VISIBLE)
+        if (!isAllowed) {
+            views.setOnClickPendingIntent(
+                R.id.widget_premium_overlay,
+                HomeWidgetLaunchIntent.getActivity(context, MainActivity::class.java, Uri.parse("rocistasks://paywall"))
+            )
+        }
+        return views
+    }
+
+    private data class ChipSpec(val fill: Int, val stroke: Int, val text: Int, val active: Boolean, val label: String)
+
+    private fun broadcast(context: Context, action: String, requestCode: Int, appWidgetId: Int): android.app.PendingIntent {
+        val intent = Intent(context, FullCalendarWidgetProvider::class.java).apply {
+            this.action = action
+            putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+        }
+        return android.app.PendingIntent.getBroadcast(
+            context, requestCode, intent,
+            android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE
+        )
     }
 
     private fun setupFilterButtonIntents(context: Context, views: RemoteViews, appWidgetId: Int) {

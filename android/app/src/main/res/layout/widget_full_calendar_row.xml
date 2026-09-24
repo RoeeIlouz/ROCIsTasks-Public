@@ -1,39 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- One week of the FullCalendar widget; rows share the grid height equally. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/widget_full_calendar_row_root"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:gravity="center_vertical"
-    android:paddingTop="2dp"
-    android:paddingBottom="2dp">
+    android:layout_height="0dp"
+    android:layout_weight="1"
+    android:orientation="horizontal">
 
-    <!-- Week Number Column -->
     <FrameLayout
         android:id="@+id/widget_full_week_num_root"
         android:layout_width="0dp"
-        android:layout_height="62dp"
+        android:layout_height="match_parent"
         android:layout_weight="0.6"
-        android:gravity="center">
+        android:visibility="gone">
         <TextView
             android:id="@+id/widget_full_week_num_text"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:fontFamily="@font/outfit_regular"
             android:gravity="center"
-            android:text="34"
-            android:textSize="10sp"
-            android:textColor="@color/widget_secondary_text"
-            android:textStyle="italic" />
+            android:textSize="10sp" />
     </FrameLayout>
-    <!-- Day 0 (Col 0) -->
+
+    <!-- Day column 0 -->
     <FrameLayout
         android:id="@+id/widget_full_day_0"
         android:layout_width="0dp"
-        android:layout_height="62dp"
+        android:layout_height="match_parent"
         android:layout_weight="1"
-        android:layout_marginStart="1dp"
-        android:layout_marginEnd="1dp"
-        android:padding="1dp"
+        android:layout_margin="3dp"
         android:clickable="true"
         android:focusable="true">
 
@@ -41,129 +36,116 @@
             android:id="@+id/widget_full_day_fill_0"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:src="@drawable/widget_day_fill"
             android:scaleType="fitXY"
+            android:src="@drawable/widget_day_fill"
             android:visibility="gone" />
 
         <ImageView
             android:id="@+id/widget_full_day_stroke_0"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:src="@drawable/widget_day_stroke"
             android:scaleType="fitXY"
+            android:src="@drawable/widget_day_stroke"
             android:visibility="gone" />
 
+        <TextView
+            android:id="@+id/widget_full_day_text_0"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|center_horizontal"
+            android:layout_marginTop="5dp"
+            android:fontFamily="@font/outfit_regular"
+            android:includeFontPadding="false"
+            android:text="1"
+            android:textSize="13sp" />
+
+        <!-- Markers sit at the bottom of the cell, like the app -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="4dp"
             android:orientation="vertical"
-            android:gravity="center_horizontal"
-            android:paddingTop="2dp"
-            android:paddingBottom="2dp"
-            android:paddingStart="1dp"
-            android:paddingEnd="1dp">
+            android:paddingStart="2dp"
+            android:paddingEnd="2dp">
 
-            <TextView
-                android:id="@+id/widget_full_day_text_0"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="1"
-                android:textSize="13sp"
-                android:fontFamily="sans-serif"
-                android:textColor="@color/widget_title_text" />
-
-            <!-- Event 1 Box with soft tint background + colored border + title text -->
             <FrameLayout
                 android:id="@+id/widget_full_event_box_0_1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="1.5dp"
                 android:visibility="gone">
-
                 <ImageView
                     android:id="@+id/widget_full_event_fill_0_1"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:src="@drawable/widget_event_badge_fill"
-                    android:scaleType="fitXY" />
-
+                    android:scaleType="fitXY"
+                    android:src="@drawable/widget_event_badge_fill" />
                 <ImageView
                     android:id="@+id/widget_full_event_stroke_0_1"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:src="@drawable/widget_event_badge_stroke"
-                    android:scaleType="fitXY" />
-
+                    android:scaleType="fitXY"
+                    android:src="@drawable/widget_event_badge_stroke" />
                 <TextView
                     android:id="@+id/widget_full_event_text_0_1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:maxLines="1"
-                    android:singleLine="true"
                     android:ellipsize="end"
-                    android:textSize="8sp"
-                    android:textStyle="bold"
+                    android:fontFamily="@font/outfit_semibold"
                     android:gravity="center"
-                    android:paddingStart="2dp"
-                    android:paddingEnd="2dp"
-                    android:paddingTop="0.5dp"
-                    android:paddingBottom="0.5dp" />
+                    android:includeFontPadding="false"
+                    android:maxLines="1"
+                    android:paddingStart="4dp"
+                    android:paddingEnd="4dp"
+                    android:paddingTop="1.5dp"
+                    android:paddingBottom="1.5dp"
+                    android:singleLine="true"
+                    android:textSize="8sp" />
             </FrameLayout>
 
-            <!-- Event 2 Box with soft tint background + colored border + title text -->
             <FrameLayout
                 android:id="@+id/widget_full_event_box_0_2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="1.5dp"
+                android:layout_marginTop="2dp"
                 android:visibility="gone">
-
                 <ImageView
                     android:id="@+id/widget_full_event_fill_0_2"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:src="@drawable/widget_event_badge_fill"
-                    android:scaleType="fitXY" />
-
+                    android:scaleType="fitXY"
+                    android:src="@drawable/widget_event_badge_fill" />
                 <ImageView
                     android:id="@+id/widget_full_event_stroke_0_2"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:src="@drawable/widget_event_badge_stroke"
-                    android:scaleType="fitXY" />
-
+                    android:scaleType="fitXY"
+                    android:src="@drawable/widget_event_badge_stroke" />
                 <TextView
                     android:id="@+id/widget_full_event_text_0_2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:maxLines="1"
-                    android:singleLine="true"
                     android:ellipsize="end"
-                    android:textSize="8sp"
-                    android:textStyle="bold"
+                    android:fontFamily="@font/outfit_semibold"
                     android:gravity="center"
-                    android:paddingStart="2dp"
-                    android:paddingEnd="2dp"
-                    android:paddingTop="0.5dp"
-                    android:paddingBottom="0.5dp" />
+                    android:includeFontPadding="false"
+                    android:maxLines="1"
+                    android:paddingStart="4dp"
+                    android:paddingEnd="4dp"
+                    android:paddingTop="1.5dp"
+                    android:paddingBottom="1.5dp"
+                    android:singleLine="true"
+                    android:textSize="8sp" />
             </FrameLayout>
 
-            <!-- Spacer for dots -->
-            <FrameLayout
-                android:layout_width="1dp"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
-
-            <!-- Micro-dots row (When > 2 events) -->
             <LinearLayout
                 android:id="@+id/widget_full_dots_0"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="1dp"
+                android:layout_marginBottom="2dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
                 android:visibility="gone">
 
                 <ImageView
@@ -193,37 +175,26 @@
                     android:src="@drawable/widget_event_dot"
                     android:visibility="gone" />
 
-                <ImageView
-                    android:id="@+id/widget_full_dot_0_4"
-                    android:layout_width="6dp"
-                    android:layout_height="6dp"
-                    android:layout_marginStart="1.5dp"
-                    android:layout_marginEnd="1.5dp"
-                    android:src="@drawable/widget_event_dot"
-                    android:visibility="gone" />
-
                 <TextView
                     android:id="@+id/widget_full_more_0"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="2dp"
-                    android:textSize="8sp"
-                    android:textStyle="bold"
+                    android:fontFamily="@font/outfit_bold"
                     android:includeFontPadding="false"
+                    android:textSize="8sp"
                     android:visibility="gone" />
             </LinearLayout>
         </LinearLayout>
     </FrameLayout>
 
-    <!-- Day 1 (Col 1) -->
+    <!-- Day column 1 -->
     <FrameLayout
         android:id="@+id/widget_full_day_1"
         android:layout_width="0dp"
-        android:layout_height="62dp"
+        android:layout_height="match_parent"
         android:layout_weight="1"
-        android:layout_marginStart="1dp"
-        android:layout_marginEnd="1dp"
-        android:padding="1dp"
+        android:layout_margin="3dp"
         android:clickable="true"
         android:focusable="true">
 
@@ -231,129 +202,116 @@
             android:id="@+id/widget_full_day_fill_1"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:src="@drawable/widget_day_fill"
             android:scaleType="fitXY"
+            android:src="@drawable/widget_day_fill"
             android:visibility="gone" />
 
         <ImageView
             android:id="@+id/widget_full_day_stroke_1"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:src="@drawable/widget_day_stroke"
             android:scaleType="fitXY"
+            android:src="@drawable/widget_day_stroke"
             android:visibility="gone" />
 
+        <TextView
+            android:id="@+id/widget_full_day_text_1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|center_horizontal"
+            android:layout_marginTop="5dp"
+            android:fontFamily="@font/outfit_regular"
+            android:includeFontPadding="false"
+            android:text="1"
+            android:textSize="13sp" />
+
+        <!-- Markers sit at the bottom of the cell, like the app -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="4dp"
             android:orientation="vertical"
-            android:gravity="center_horizontal"
-            android:paddingTop="2dp"
-            android:paddingBottom="2dp"
-            android:paddingStart="1dp"
-            android:paddingEnd="1dp">
+            android:paddingStart="2dp"
+            android:paddingEnd="2dp">
 
-            <TextView
-                android:id="@+id/widget_full_day_text_1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="2"
-                android:textSize="13sp"
-                android:fontFamily="sans-serif"
-                android:textColor="@color/widget_title_text" />
-
-            <!-- Event 1 Box with soft tint background + colored border + title text -->
             <FrameLayout
                 android:id="@+id/widget_full_event_box_1_1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="1.5dp"
                 android:visibility="gone">
-
                 <ImageView
                     android:id="@+id/widget_full_event_fill_1_1"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:src="@drawable/widget_event_badge_fill"
-                    android:scaleType="fitXY" />
-
+                    android:scaleType="fitXY"
+                    android:src="@drawable/widget_event_badge_fill" />
                 <ImageView
                     android:id="@+id/widget_full_event_stroke_1_1"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:src="@drawable/widget_event_badge_stroke"
-                    android:scaleType="fitXY" />
-
+                    android:scaleType="fitXY"
+                    android:src="@drawable/widget_event_badge_stroke" />
                 <TextView
                     android:id="@+id/widget_full_event_text_1_1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:maxLines="1"
-                    android:singleLine="true"
                     android:ellipsize="end"
-                    android:textSize="8sp"
-                    android:textStyle="bold"
+                    android:fontFamily="@font/outfit_semibold"
                     android:gravity="center"
-                    android:paddingStart="2dp"
-                    android:paddingEnd="2dp"
-                    android:paddingTop="0.5dp"
-                    android:paddingBottom="0.5dp" />
+                    android:includeFontPadding="false"
+                    android:maxLines="1"
+                    android:paddingStart="4dp"
+                    android:paddingEnd="4dp"
+                    android:paddingTop="1.5dp"
+                    android:paddingBottom="1.5dp"
+                    android:singleLine="true"
+                    android:textSize="8sp" />
             </FrameLayout>
 
-            <!-- Event 2 Box with soft tint background + colored border + title text -->
             <FrameLayout
                 android:id="@+id/widget_full_event_box_1_2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="1.5dp"
+                android:layout_marginTop="2dp"
                 android:visibility="gone">
-
                 <ImageView
                     android:id="@+id/widget_full_event_fill_1_2"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:src="@drawable/widget_event_badge_fill"
-                    android:scaleType="fitXY" />
-
+                    android:scaleType="fitXY"
+                    android:src="@drawable/widget_event_badge_fill" />
                 <ImageView
                     android:id="@+id/widget_full_event_stroke_1_2"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:src="@drawable/widget_event_badge_stroke"
-                    android:scaleType="fitXY" />
-
+                    android:scaleType="fitXY"
+                    android:src="@drawable/widget_event_badge_stroke" />
                 <TextView
                     android:id="@+id/widget_full_event_text_1_2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:maxLines="1"
-                    android:singleLine="true"
                     android:ellipsize="end"
-                    android:textSize="8sp"
-                    android:textStyle="bold"
+                    android:fontFamily="@font/outfit_semibold"
                     android:gravity="center"
-                    android:paddingStart="2dp"
-                    android:paddingEnd="2dp"
-                    android:paddingTop="0.5dp"
-                    android:paddingBottom="0.5dp" />
+                    android:includeFontPadding="false"
+                    android:maxLines="1"
+                    android:paddingStart="4dp"
+                    android:paddingEnd="4dp"
+                    android:paddingTop="1.5dp"
+                    android:paddingBottom="1.5dp"
+                    android:singleLine="true"
+                    android:textSize="8sp" />
             </FrameLayout>
 
-            <!-- Spacer for dots -->
-            <FrameLayout
-                android:layout_width="1dp"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
-
-            <!-- Micro-dots row (When > 2 events) -->
             <LinearLayout
                 android:id="@+id/widget_full_dots_1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="1dp"
+                android:layout_marginBottom="2dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
                 android:visibility="gone">
 
                 <ImageView
@@ -383,37 +341,26 @@
                     android:src="@drawable/widget_event_dot"
                     android:visibility="gone" />
 
-                <ImageView
-                    android:id="@+id/widget_full_dot_1_4"
-                    android:layout_width="6dp"
-                    android:layout_height="6dp"
-                    android:layout_marginStart="1.5dp"
-                    android:layout_marginEnd="1.5dp"
-                    android:src="@drawable/widget_event_dot"
-                    android:visibility="gone" />
-
                 <TextView
                     android:id="@+id/widget_full_more_1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="2dp"
-                    android:textSize="8sp"
-                    android:textStyle="bold"
+                    android:fontFamily="@font/outfit_bold"
                     android:includeFontPadding="false"
+                    android:textSize="8sp"
                     android:visibility="gone" />
             </LinearLayout>
         </LinearLayout>
     </FrameLayout>
 
-    <!-- Day 2 (Col 2) -->
+    <!-- Day column 2 -->
     <FrameLayout
         android:id="@+id/widget_full_day_2"
         android:layout_width="0dp"
-        android:layout_height="62dp"
+        android:layout_height="match_parent"
         android:layout_weight="1"
-        android:layout_marginStart="1dp"
-        android:layout_marginEnd="1dp"
-        android:padding="1dp"
+        android:layout_margin="3dp"
         android:clickable="true"
         android:focusable="true">
 
@@ -421,129 +368,116 @@
             android:id="@+id/widget_full_day_fill_2"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:src="@drawable/widget_day_fill"
             android:scaleType="fitXY"
+            android:src="@drawable/widget_day_fill"
             android:visibility="gone" />
 
         <ImageView
             android:id="@+id/widget_full_day_stroke_2"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:src="@drawable/widget_day_stroke"
             android:scaleType="fitXY"
+            android:src="@drawable/widget_day_stroke"
             android:visibility="gone" />
 
+        <TextView
+            android:id="@+id/widget_full_day_text_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|center_horizontal"
+            android:layout_marginTop="5dp"
+            android:fontFamily="@font/outfit_regular"
+            android:includeFontPadding="false"
+            android:text="1"
+            android:textSize="13sp" />
+
+        <!-- Markers sit at the bottom of the cell, like the app -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="4dp"
             android:orientation="vertical"
-            android:gravity="center_horizontal"
-            android:paddingTop="2dp"
-            android:paddingBottom="2dp"
-            android:paddingStart="1dp"
-            android:paddingEnd="1dp">
+            android:paddingStart="2dp"
+            android:paddingEnd="2dp">
 
-            <TextView
-                android:id="@+id/widget_full_day_text_2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="3"
-                android:textSize="13sp"
-                android:fontFamily="sans-serif"
-                android:textColor="@color/widget_title_text" />
-
-            <!-- Event 1 Box with soft tint background + colored border + title text -->
             <FrameLayout
                 android:id="@+id/widget_full_event_box_2_1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="1.5dp"
                 android:visibility="gone">
-
                 <ImageView
                     android:id="@+id/widget_full_event_fill_2_1"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:src="@drawable/widget_event_badge_fill"
-                    android:scaleType="fitXY" />
-
+                    android:scaleType="fitXY"
+                    android:src="@drawable/widget_event_badge_fill" />
                 <ImageView
                     android:id="@+id/widget_full_event_stroke_2_1"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:src="@drawable/widget_event_badge_stroke"
-                    android:scaleType="fitXY" />
-
+                    android:scaleType="fitXY"
+                    android:src="@drawable/widget_event_badge_stroke" />
                 <TextView
                     android:id="@+id/widget_full_event_text_2_1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:maxLines="1"
-                    android:singleLine="true"
                     android:ellipsize="end"
-                    android:textSize="8sp"
-                    android:textStyle="bold"
+                    android:fontFamily="@font/outfit_semibold"
                     android:gravity="center"
-                    android:paddingStart="2dp"
-                    android:paddingEnd="2dp"
-                    android:paddingTop="0.5dp"
-                    android:paddingBottom="0.5dp" />
+                    android:includeFontPadding="false"
+                    android:maxLines="1"
+                    android:paddingStart="4dp"
+                    android:paddingEnd="4dp"
+                    android:paddingTop="1.5dp"
+                    android:paddingBottom="1.5dp"
+                    android:singleLine="true"
+                    android:textSize="8sp" />
             </FrameLayout>
 
-            <!-- Event 2 Box with soft tint background + colored border + title text -->
             <FrameLayout
                 android:id="@+id/widget_full_event_box_2_2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="1.5dp"
+                android:layout_marginTop="2dp"
                 android:visibility="gone">
-
                 <ImageView
                     android:id="@+id/widget_full_event_fill_2_2"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:src="@drawable/widget_event_badge_fill"
-                    android:scaleType="fitXY" />
-
+                    android:scaleType="fitXY"
+                    android:src="@drawable/widget_event_badge_fill" />
                 <ImageView
                     android:id="@+id/widget_full_event_stroke_2_2"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:src="@drawable/widget_event_badge_stroke"
-                    android:scaleType="fitXY" />
-
+                    android:scaleType="fitXY"
+                    android:src="@drawable/widget_event_badge_stroke" />
                 <TextView
                     android:id="@+id/widget_full_event_text_2_2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:maxLines="1"
-                    android:singleLine="true"
                     android:ellipsize="end"
-                    android:textSize="8sp"
-                    android:textStyle="bold"
+                    android:fontFamily="@font/outfit_semibold"
                     android:gravity="center"
-                    android:paddingStart="2dp"
-                    android:paddingEnd="2dp"
-                    android:paddingTop="0.5dp"
-                    android:paddingBottom="0.5dp" />
+                    android:includeFontPadding="false"
+                    android:maxLines="1"
+                    android:paddingStart="4dp"
+                    android:paddingEnd="4dp"
+                    android:paddingTop="1.5dp"
+                    android:paddingBottom="1.5dp"
+                    android:singleLine="true"
+                    android:textSize="8sp" />
             </FrameLayout>
 
-            <!-- Spacer for dots -->
-            <FrameLayout
-                android:layout_width="1dp"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
-
-            <!-- Micro-dots row (When > 2 events) -->
             <LinearLayout
                 android:id="@+id/widget_full_dots_2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="1dp"
+                android:layout_marginBottom="2dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
                 android:visibility="gone">
 
                 <ImageView
@@ -573,37 +507,26 @@
                     android:src="@drawable/widget_event_dot"
                     android:visibility="gone" />
 
-                <ImageView
-                    android:id="@+id/widget_full_dot_2_4"
-                    android:layout_width="6dp"
-                    android:layout_height="6dp"
-                    android:layout_marginStart="1.5dp"
-                    android:layout_marginEnd="1.5dp"
-                    android:src="@drawable/widget_event_dot"
-                    android:visibility="gone" />
-
                 <TextView
                     android:id="@+id/widget_full_more_2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="2dp"
-                    android:textSize="8sp"
-                    android:textStyle="bold"
+                    android:fontFamily="@font/outfit_bold"
                     android:includeFontPadding="false"
+                    android:textSize="8sp"
                     android:visibility="gone" />
             </LinearLayout>
         </LinearLayout>
     </FrameLayout>
 
-    <!-- Day 3 (Col 3) -->
+    <!-- Day column 3 -->
     <FrameLayout
         android:id="@+id/widget_full_day_3"
         android:layout_width="0dp"
-        android:layout_height="62dp"
+        android:layout_height="match_parent"
         android:layout_weight="1"
-        android:layout_marginStart="1dp"
-        android:layout_marginEnd="1dp"
-        android:padding="1dp"
+        android:layout_margin="3dp"
         android:clickable="true"
         android:focusable="true">
 
@@ -611,129 +534,116 @@
             android:id="@+id/widget_full_day_fill_3"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:src="@drawable/widget_day_fill"
             android:scaleType="fitXY"
+            android:src="@drawable/widget_day_fill"
             android:visibility="gone" />
 
         <ImageView
             android:id="@+id/widget_full_day_stroke_3"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:src="@drawable/widget_day_stroke"
             android:scaleType="fitXY"
+            android:src="@drawable/widget_day_stroke"
             android:visibility="gone" />
 
+        <TextView
+            android:id="@+id/widget_full_day_text_3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|center_horizontal"
+            android:layout_marginTop="5dp"
+            android:fontFamily="@font/outfit_regular"
+            android:includeFontPadding="false"
+            android:text="1"
+            android:textSize="13sp" />
+
+        <!-- Markers sit at the bottom of the cell, like the app -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="4dp"
             android:orientation="vertical"
-            android:gravity="center_horizontal"
-            android:paddingTop="2dp"
-            android:paddingBottom="2dp"
-            android:paddingStart="1dp"
-            android:paddingEnd="1dp">
+            android:paddingStart="2dp"
+            android:paddingEnd="2dp">
 
-            <TextView
-                android:id="@+id/widget_full_day_text_3"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="4"
-                android:textSize="13sp"
-                android:fontFamily="sans-serif"
-                android:textColor="@color/widget_title_text" />
-
-            <!-- Event 1 Box with soft tint background + colored border + title text -->
             <FrameLayout
                 android:id="@+id/widget_full_event_box_3_1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="1.5dp"
                 android:visibility="gone">
-
                 <ImageView
                     android:id="@+id/widget_full_event_fill_3_1"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:src="@drawable/widget_event_badge_fill"
-                    android:scaleType="fitXY" />
-
+                    android:scaleType="fitXY"
+                    android:src="@drawable/widget_event_badge_fill" />
                 <ImageView
                     android:id="@+id/widget_full_event_stroke_3_1"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:src="@drawable/widget_event_badge_stroke"
-                    android:scaleType="fitXY" />
-
+                    android:scaleType="fitXY"
+                    android:src="@drawable/widget_event_badge_stroke" />
                 <TextView
                     android:id="@+id/widget_full_event_text_3_1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:maxLines="1"
-                    android:singleLine="true"
                     android:ellipsize="end"
-                    android:textSize="8sp"
-                    android:textStyle="bold"
+                    android:fontFamily="@font/outfit_semibold"
                     android:gravity="center"
-                    android:paddingStart="2dp"
-                    android:paddingEnd="2dp"
-                    android:paddingTop="0.5dp"
-                    android:paddingBottom="0.5dp" />
+                    android:includeFontPadding="false"
+                    android:maxLines="1"
+                    android:paddingStart="4dp"
+                    android:paddingEnd="4dp"
+                    android:paddingTop="1.5dp"
+                    android:paddingBottom="1.5dp"
+                    android:singleLine="true"
+                    android:textSize="8sp" />
             </FrameLayout>
 
-            <!-- Event 2 Box with soft tint background + colored border + title text -->
             <FrameLayout
                 android:id="@+id/widget_full_event_box_3_2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="1.5dp"
+                android:layout_marginTop="2dp"
                 android:visibility="gone">
-
                 <ImageView
                     android:id="@+id/widget_full_event_fill_3_2"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:src="@drawable/widget_event_badge_fill"
-                    android:scaleType="fitXY" />
-
+                    android:scaleType="fitXY"
+                    android:src="@drawable/widget_event_badge_fill" />
                 <ImageView
                     android:id="@+id/widget_full_event_stroke_3_2"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:src="@drawable/widget_event_badge_stroke"
-                    android:scaleType="fitXY" />
-
+                    android:scaleType="fitXY"
+                    android:src="@drawable/widget_event_badge_stroke" />
                 <TextView
                     android:id="@+id/widget_full_event_text_3_2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:maxLines="1"
-                    android:singleLine="true"
                     android:ellipsize="end"
-                    android:textSize="8sp"
-                    android:textStyle="bold"
+                    android:fontFamily="@font/outfit_semibold"
                     android:gravity="center"
-                    android:paddingStart="2dp"
-                    android:paddingEnd="2dp"
-                    android:paddingTop="0.5dp"
-                    android:paddingBottom="0.5dp" />
+                    android:includeFontPadding="false"
+                    android:maxLines="1"
+                    android:paddingStart="4dp"
+                    android:paddingEnd="4dp"
+                    android:paddingTop="1.5dp"
+                    android:paddingBottom="1.5dp"
+                    android:singleLine="true"
+                    android:textSize="8sp" />
             </FrameLayout>
 
-            <!-- Spacer for dots -->
-            <FrameLayout
-                android:layout_width="1dp"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
-
-            <!-- Micro-dots row (When > 2 events) -->
             <LinearLayout
                 android:id="@+id/widget_full_dots_3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="1dp"
+                android:layout_marginBottom="2dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
                 android:visibility="gone">
 
                 <ImageView
@@ -763,37 +673,26 @@
                     android:src="@drawable/widget_event_dot"
                     android:visibility="gone" />
 
-                <ImageView
-                    android:id="@+id/widget_full_dot_3_4"
-                    android:layout_width="6dp"
-                    android:layout_height="6dp"
-                    android:layout_marginStart="1.5dp"
-                    android:layout_marginEnd="1.5dp"
-                    android:src="@drawable/widget_event_dot"
-                    android:visibility="gone" />
-
                 <TextView
                     android:id="@+id/widget_full_more_3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="2dp"
-                    android:textSize="8sp"
-                    android:textStyle="bold"
+                    android:fontFamily="@font/outfit_bold"
                     android:includeFontPadding="false"
+                    android:textSize="8sp"
                     android:visibility="gone" />
             </LinearLayout>
         </LinearLayout>
     </FrameLayout>
 
-    <!-- Day 4 (Col 4) -->
+    <!-- Day column 4 -->
     <FrameLayout
         android:id="@+id/widget_full_day_4"
         android:layout_width="0dp"
-        android:layout_height="62dp"
+        android:layout_height="match_parent"
         android:layout_weight="1"
-        android:layout_marginStart="1dp"
-        android:layout_marginEnd="1dp"
-        android:padding="1dp"
+        android:layout_margin="3dp"
         android:clickable="true"
         android:focusable="true">
 
@@ -801,129 +700,116 @@
             android:id="@+id/widget_full_day_fill_4"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:src="@drawable/widget_day_fill"
             android:scaleType="fitXY"
+            android:src="@drawable/widget_day_fill"
             android:visibility="gone" />
 
         <ImageView
             android:id="@+id/widget_full_day_stroke_4"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:src="@drawable/widget_day_stroke"
             android:scaleType="fitXY"
+            android:src="@drawable/widget_day_stroke"
             android:visibility="gone" />
 
+        <TextView
+            android:id="@+id/widget_full_day_text_4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|center_horizontal"
+            android:layout_marginTop="5dp"
+            android:fontFamily="@font/outfit_regular"
+            android:includeFontPadding="false"
+            android:text="1"
+            android:textSize="13sp" />
+
+        <!-- Markers sit at the bottom of the cell, like the app -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="4dp"
             android:orientation="vertical"
-            android:gravity="center_horizontal"
-            android:paddingTop="2dp"
-            android:paddingBottom="2dp"
-            android:paddingStart="1dp"
-            android:paddingEnd="1dp">
+            android:paddingStart="2dp"
+            android:paddingEnd="2dp">
 
-            <TextView
-                android:id="@+id/widget_full_day_text_4"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="5"
-                android:textSize="13sp"
-                android:fontFamily="sans-serif"
-                android:textColor="@color/widget_title_text" />
-
-            <!-- Event 1 Box with soft tint background + colored border + title text -->
             <FrameLayout
                 android:id="@+id/widget_full_event_box_4_1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="1.5dp"
                 android:visibility="gone">
-
                 <ImageView
                     android:id="@+id/widget_full_event_fill_4_1"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:src="@drawable/widget_event_badge_fill"
-                    android:scaleType="fitXY" />
-
+                    android:scaleType="fitXY"
+                    android:src="@drawable/widget_event_badge_fill" />
                 <ImageView
                     android:id="@+id/widget_full_event_stroke_4_1"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:src="@drawable/widget_event_badge_stroke"
-                    android:scaleType="fitXY" />
-
+                    android:scaleType="fitXY"
+                    android:src="@drawable/widget_event_badge_stroke" />
                 <TextView
                     android:id="@+id/widget_full_event_text_4_1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:maxLines="1"
-                    android:singleLine="true"
                     android:ellipsize="end"
-                    android:textSize="8sp"
-                    android:textStyle="bold"
+                    android:fontFamily="@font/outfit_semibold"
                     android:gravity="center"
-                    android:paddingStart="2dp"
-                    android:paddingEnd="2dp"
-                    android:paddingTop="0.5dp"
-                    android:paddingBottom="0.5dp" />
+                    android:includeFontPadding="false"
+                    android:maxLines="1"
+                    android:paddingStart="4dp"
+                    android:paddingEnd="4dp"
+                    android:paddingTop="1.5dp"
+                    android:paddingBottom="1.5dp"
+                    android:singleLine="true"
+                    android:textSize="8sp" />
             </FrameLayout>
 
-            <!-- Event 2 Box with soft tint background + colored border + title text -->
             <FrameLayout
                 android:id="@+id/widget_full_event_box_4_2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="1.5dp"
+                android:layout_marginTop="2dp"
                 android:visibility="gone">
-
                 <ImageView
                     android:id="@+id/widget_full_event_fill_4_2"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:src="@drawable/widget_event_badge_fill"
-                    android:scaleType="fitXY" />
-
+                    android:scaleType="fitXY"
+                    android:src="@drawable/widget_event_badge_fill" />
                 <ImageView
                     android:id="@+id/widget_full_event_stroke_4_2"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:src="@drawable/widget_event_badge_stroke"
-                    android:scaleType="fitXY" />
-
+                    android:scaleType="fitXY"
+                    android:src="@drawable/widget_event_badge_stroke" />
                 <TextView
                     android:id="@+id/widget_full_event_text_4_2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:maxLines="1"
-                    android:singleLine="true"
                     android:ellipsize="end"
-                    android:textSize="8sp"
-                    android:textStyle="bold"
+                    android:fontFamily="@font/outfit_semibold"
                     android:gravity="center"
-                    android:paddingStart="2dp"
-                    android:paddingEnd="2dp"
-                    android:paddingTop="0.5dp"
-                    android:paddingBottom="0.5dp" />
+                    android:includeFontPadding="false"
+                    android:maxLines="1"
+                    android:paddingStart="4dp"
+                    android:paddingEnd="4dp"
+                    android:paddingTop="1.5dp"
+                    android:paddingBottom="1.5dp"
+                    android:singleLine="true"
+                    android:textSize="8sp" />
             </FrameLayout>
 
-            <!-- Spacer for dots -->
-            <FrameLayout
-                android:layout_width="1dp"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
-
-            <!-- Micro-dots row (When > 2 events) -->
             <LinearLayout
                 android:id="@+id/widget_full_dots_4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="1dp"
+                android:layout_marginBottom="2dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
                 android:visibility="gone">
 
                 <ImageView
@@ -953,37 +839,26 @@
                     android:src="@drawable/widget_event_dot"
                     android:visibility="gone" />
 
-                <ImageView
-                    android:id="@+id/widget_full_dot_4_4"
-                    android:layout_width="6dp"
-                    android:layout_height="6dp"
-                    android:layout_marginStart="1.5dp"
-                    android:layout_marginEnd="1.5dp"
-                    android:src="@drawable/widget_event_dot"
-                    android:visibility="gone" />
-
                 <TextView
                     android:id="@+id/widget_full_more_4"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="2dp"
-                    android:textSize="8sp"
-                    android:textStyle="bold"
+                    android:fontFamily="@font/outfit_bold"
                     android:includeFontPadding="false"
+                    android:textSize="8sp"
                     android:visibility="gone" />
             </LinearLayout>
         </LinearLayout>
     </FrameLayout>
 
-    <!-- Day 5 (Col 5) -->
+    <!-- Day column 5 -->
     <FrameLayout
         android:id="@+id/widget_full_day_5"
         android:layout_width="0dp"
-        android:layout_height="62dp"
+        android:layout_height="match_parent"
         android:layout_weight="1"
-        android:layout_marginStart="1dp"
-        android:layout_marginEnd="1dp"
-        android:padding="1dp"
+        android:layout_margin="3dp"
         android:clickable="true"
         android:focusable="true">
 
@@ -991,129 +866,116 @@
             android:id="@+id/widget_full_day_fill_5"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:src="@drawable/widget_day_fill"
             android:scaleType="fitXY"
+            android:src="@drawable/widget_day_fill"
             android:visibility="gone" />
 
         <ImageView
             android:id="@+id/widget_full_day_stroke_5"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:src="@drawable/widget_day_stroke"
             android:scaleType="fitXY"
+            android:src="@drawable/widget_day_stroke"
             android:visibility="gone" />
 
+        <TextView
+            android:id="@+id/widget_full_day_text_5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|center_horizontal"
+            android:layout_marginTop="5dp"
+            android:fontFamily="@font/outfit_regular"
+            android:includeFontPadding="false"
+            android:text="1"
+            android:textSize="13sp" />
+
+        <!-- Markers sit at the bottom of the cell, like the app -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="4dp"
             android:orientation="vertical"
-            android:gravity="center_horizontal"
-            android:paddingTop="2dp"
-            android:paddingBottom="2dp"
-            android:paddingStart="1dp"
-            android:paddingEnd="1dp">
+            android:paddingStart="2dp"
+            android:paddingEnd="2dp">
 
-            <TextView
-                android:id="@+id/widget_full_day_text_5"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="6"
-                android:textSize="13sp"
-                android:fontFamily="sans-serif"
-                android:textColor="@color/widget_title_text" />
-
-            <!-- Event 1 Box with soft tint background + colored border + title text -->
             <FrameLayout
                 android:id="@+id/widget_full_event_box_5_1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="1.5dp"
                 android:visibility="gone">
-
                 <ImageView
                     android:id="@+id/widget_full_event_fill_5_1"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:src="@drawable/widget_event_badge_fill"
-                    android:scaleType="fitXY" />
-
+                    android:scaleType="fitXY"
+                    android:src="@drawable/widget_event_badge_fill" />
                 <ImageView
                     android:id="@+id/widget_full_event_stroke_5_1"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:src="@drawable/widget_event_badge_stroke"
-                    android:scaleType="fitXY" />
-
+                    android:scaleType="fitXY"
+                    android:src="@drawable/widget_event_badge_stroke" />
                 <TextView
                     android:id="@+id/widget_full_event_text_5_1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:maxLines="1"
-                    android:singleLine="true"
                     android:ellipsize="end"
-                    android:textSize="8sp"
-                    android:textStyle="bold"
+                    android:fontFamily="@font/outfit_semibold"
                     android:gravity="center"
-                    android:paddingStart="2dp"
-                    android:paddingEnd="2dp"
-                    android:paddingTop="0.5dp"
-                    android:paddingBottom="0.5dp" />
+                    android:includeFontPadding="false"
+                    android:maxLines="1"
+                    android:paddingStart="4dp"
+                    android:paddingEnd="4dp"
+                    android:paddingTop="1.5dp"
+                    android:paddingBottom="1.5dp"
+                    android:singleLine="true"
+                    android:textSize="8sp" />
             </FrameLayout>
 
-            <!-- Event 2 Box with soft tint background + colored border + title text -->
             <FrameLayout
                 android:id="@+id/widget_full_event_box_5_2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="1.5dp"
+                android:layout_marginTop="2dp"
                 android:visibility="gone">
-
                 <ImageView
                     android:id="@+id/widget_full_event_fill_5_2"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:src="@drawable/widget_event_badge_fill"
-                    android:scaleType="fitXY" />
-
+                    android:scaleType="fitXY"
+                    android:src="@drawable/widget_event_badge_fill" />
                 <ImageView
                     android:id="@+id/widget_full_event_stroke_5_2"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:src="@drawable/widget_event_badge_stroke"
-                    android:scaleType="fitXY" />
-
+                    android:scaleType="fitXY"
+                    android:src="@drawable/widget_event_badge_stroke" />
                 <TextView
                     android:id="@+id/widget_full_event_text_5_2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:maxLines="1"
-                    android:singleLine="true"
                     android:ellipsize="end"
-                    android:textSize="8sp"
-                    android:textStyle="bold"
+                    android:fontFamily="@font/outfit_semibold"
                     android:gravity="center"
-                    android:paddingStart="2dp"
-                    android:paddingEnd="2dp"
-                    android:paddingTop="0.5dp"
-                    android:paddingBottom="0.5dp" />
+                    android:includeFontPadding="false"
+                    android:maxLines="1"
+                    android:paddingStart="4dp"
+                    android:paddingEnd="4dp"
+                    android:paddingTop="1.5dp"
+                    android:paddingBottom="1.5dp"
+                    android:singleLine="true"
+                    android:textSize="8sp" />
             </FrameLayout>
 
-            <!-- Spacer for dots -->
-            <FrameLayout
-                android:layout_width="1dp"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
-
-            <!-- Micro-dots row (When > 2 events) -->
             <LinearLayout
                 android:id="@+id/widget_full_dots_5"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="1dp"
+                android:layout_marginBottom="2dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
                 android:visibility="gone">
 
                 <ImageView
@@ -1143,37 +1005,26 @@
                     android:src="@drawable/widget_event_dot"
                     android:visibility="gone" />
 
-                <ImageView
-                    android:id="@+id/widget_full_dot_5_4"
-                    android:layout_width="6dp"
-                    android:layout_height="6dp"
-                    android:layout_marginStart="1.5dp"
-                    android:layout_marginEnd="1.5dp"
-                    android:src="@drawable/widget_event_dot"
-                    android:visibility="gone" />
-
                 <TextView
                     android:id="@+id/widget_full_more_5"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="2dp"
-                    android:textSize="8sp"
-                    android:textStyle="bold"
+                    android:fontFamily="@font/outfit_bold"
                     android:includeFontPadding="false"
+                    android:textSize="8sp"
                     android:visibility="gone" />
             </LinearLayout>
         </LinearLayout>
     </FrameLayout>
 
-    <!-- Day 6 (Col 6) -->
+    <!-- Day column 6 -->
     <FrameLayout
         android:id="@+id/widget_full_day_6"
         android:layout_width="0dp"
-        android:layout_height="62dp"
+        android:layout_height="match_parent"
         android:layout_weight="1"
-        android:layout_marginStart="1dp"
-        android:layout_marginEnd="1dp"
-        android:padding="1dp"
+        android:layout_margin="3dp"
         android:clickable="true"
         android:focusable="true">
 
@@ -1181,129 +1032,116 @@
             android:id="@+id/widget_full_day_fill_6"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:src="@drawable/widget_day_fill"
             android:scaleType="fitXY"
+            android:src="@drawable/widget_day_fill"
             android:visibility="gone" />
 
         <ImageView
             android:id="@+id/widget_full_day_stroke_6"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:src="@drawable/widget_day_stroke"
             android:scaleType="fitXY"
+            android:src="@drawable/widget_day_stroke"
             android:visibility="gone" />
 
+        <TextView
+            android:id="@+id/widget_full_day_text_6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|center_horizontal"
+            android:layout_marginTop="5dp"
+            android:fontFamily="@font/outfit_regular"
+            android:includeFontPadding="false"
+            android:text="1"
+            android:textSize="13sp" />
+
+        <!-- Markers sit at the bottom of the cell, like the app -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="4dp"
             android:orientation="vertical"
-            android:gravity="center_horizontal"
-            android:paddingTop="2dp"
-            android:paddingBottom="2dp"
-            android:paddingStart="1dp"
-            android:paddingEnd="1dp">
+            android:paddingStart="2dp"
+            android:paddingEnd="2dp">
 
-            <TextView
-                android:id="@+id/widget_full_day_text_6"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="7"
-                android:textSize="13sp"
-                android:fontFamily="sans-serif"
-                android:textColor="@color/widget_title_text" />
-
-            <!-- Event 1 Box with soft tint background + colored border + title text -->
             <FrameLayout
                 android:id="@+id/widget_full_event_box_6_1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="1.5dp"
                 android:visibility="gone">
-
                 <ImageView
                     android:id="@+id/widget_full_event_fill_6_1"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:src="@drawable/widget_event_badge_fill"
-                    android:scaleType="fitXY" />
-
+                    android:scaleType="fitXY"
+                    android:src="@drawable/widget_event_badge_fill" />
                 <ImageView
                     android:id="@+id/widget_full_event_stroke_6_1"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:src="@drawable/widget_event_badge_stroke"
-                    android:scaleType="fitXY" />
-
+                    android:scaleType="fitXY"
+                    android:src="@drawable/widget_event_badge_stroke" />
                 <TextView
                     android:id="@+id/widget_full_event_text_6_1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:maxLines="1"
-                    android:singleLine="true"
                     android:ellipsize="end"
-                    android:textSize="8sp"
-                    android:textStyle="bold"
+                    android:fontFamily="@font/outfit_semibold"
                     android:gravity="center"
-                    android:paddingStart="2dp"
-                    android:paddingEnd="2dp"
-                    android:paddingTop="0.5dp"
-                    android:paddingBottom="0.5dp" />
+                    android:includeFontPadding="false"
+                    android:maxLines="1"
+                    android:paddingStart="4dp"
+                    android:paddingEnd="4dp"
+                    android:paddingTop="1.5dp"
+                    android:paddingBottom="1.5dp"
+                    android:singleLine="true"
+                    android:textSize="8sp" />
             </FrameLayout>
 
-            <!-- Event 2 Box with soft tint background + colored border + title text -->
             <FrameLayout
                 android:id="@+id/widget_full_event_box_6_2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="1.5dp"
+                android:layout_marginTop="2dp"
                 android:visibility="gone">
-
                 <ImageView
                     android:id="@+id/widget_full_event_fill_6_2"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:src="@drawable/widget_event_badge_fill"
-                    android:scaleType="fitXY" />
-
+                    android:scaleType="fitXY"
+                    android:src="@drawable/widget_event_badge_fill" />
                 <ImageView
                     android:id="@+id/widget_full_event_stroke_6_2"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:src="@drawable/widget_event_badge_stroke"
-                    android:scaleType="fitXY" />
-
+                    android:scaleType="fitXY"
+                    android:src="@drawable/widget_event_badge_stroke" />
                 <TextView
                     android:id="@+id/widget_full_event_text_6_2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:maxLines="1"
-                    android:singleLine="true"
                     android:ellipsize="end"
-                    android:textSize="8sp"
-                    android:textStyle="bold"
+                    android:fontFamily="@font/outfit_semibold"
                     android:gravity="center"
-                    android:paddingStart="2dp"
-                    android:paddingEnd="2dp"
-                    android:paddingTop="0.5dp"
-                    android:paddingBottom="0.5dp" />
+                    android:includeFontPadding="false"
+                    android:maxLines="1"
+                    android:paddingStart="4dp"
+                    android:paddingEnd="4dp"
+                    android:paddingTop="1.5dp"
+                    android:paddingBottom="1.5dp"
+                    android:singleLine="true"
+                    android:textSize="8sp" />
             </FrameLayout>
 
-            <!-- Spacer for dots -->
-            <FrameLayout
-                android:layout_width="1dp"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
-
-            <!-- Micro-dots row (When > 2 events) -->
             <LinearLayout
                 android:id="@+id/widget_full_dots_6"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="1dp"
+                android:layout_marginBottom="2dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
                 android:visibility="gone">
 
                 <ImageView
@@ -1333,23 +1171,14 @@
                     android:src="@drawable/widget_event_dot"
                     android:visibility="gone" />
 
-                <ImageView
-                    android:id="@+id/widget_full_dot_6_4"
-                    android:layout_width="6dp"
-                    android:layout_height="6dp"
-                    android:layout_marginStart="1.5dp"
-                    android:layout_marginEnd="1.5dp"
-                    android:src="@drawable/widget_event_dot"
-                    android:visibility="gone" />
-
                 <TextView
                     android:id="@+id/widget_full_more_6"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="2dp"
-                    android:textSize="8sp"
-                    android:textStyle="bold"
+                    android:fontFamily="@font/outfit_bold"
                     android:includeFontPadding="false"
+                    android:textSize="8sp"
                     android:visibility="gone" />
             </LinearLayout>
         </LinearLayout>
