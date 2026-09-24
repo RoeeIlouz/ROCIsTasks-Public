@@ -426,6 +426,17 @@ class _MyAppState extends State<MyApp> {
   /// Shares the app's calendar-card colors with the home widgets so they look
   /// like the in-app calendar (Material You / custom seed / AMOLED included):
   /// primary accent, surfaceContainerLow card and onSurface text.
+  static const _widgetProviders = [
+    'FullCalendarWidgetProvider',
+    'TodayAgendaWidgetProvider',
+    'MonthAgendaWidgetProvider',
+    'TimelineAgendaWidgetProvider',
+    'TaskWidgetProvider',
+    'UpNextWidgetProvider',
+    'QuickActionWidgetProvider',
+    'KanbanWidgetProvider',
+  ];
+
   void _syncWidgetTheme(ColorScheme light, ColorScheme dark) {
     if (kIsWeb) return;
     String hex(Color c) => '#${c.toARGB32().toRadixString(16).padLeft(8, '0')}';
@@ -445,7 +456,10 @@ class _MyAppState extends State<MyApp> {
         for (final entry in colors.entries) {
           await HomeWidget.saveWidgetData<String>(entry.key, entry.value);
         }
-        await HomeWidget.updateWidget(name: 'FullCalendarWidgetProvider');
+        // Every widget colors itself from these, so redraw them all.
+        await Future.wait(
+          _widgetProviders.map((name) => HomeWidget.updateWidget(name: name)),
+        );
       } catch (_) {}
     });
   }
