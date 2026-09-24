@@ -1,6 +1,7 @@
 package com.rocisapps.tasks
 
 import android.os.Build
+import es.antonborri.home_widget.HomeWidgetBackgroundIntent
 import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
@@ -79,6 +80,18 @@ class MainActivity : FlutterFragmentActivity() {
         
         // Handle widget deep links
         val data = intent?.data
+        if (data != null && data.scheme == "rocistasks" && data.host == "complete") {
+            // Widget checkboxes: complete in the background handler (the same path
+            // Up Next uses) and return to the home screen instead of opening the app.
+            try {
+                HomeWidgetBackgroundIntent.getBroadcast(this, data).send()
+            } catch (e: Exception) {
+                android.util.Log.e("MainActivity", "Failed to forward $data", e)
+            }
+            intent.data = null
+            moveTaskToBack(true)
+            return
+        }
         if (data != null && data.scheme == "rocistasks") {
             // Send the URI to Flutter via the widget channel
             if (widgetChannel != null) {

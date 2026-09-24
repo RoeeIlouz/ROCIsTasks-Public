@@ -2,8 +2,6 @@ package com.rocisapps.tasks
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
-import android.graphics.Paint
 import android.net.Uri
 import android.view.View
 import android.widget.RemoteViews
@@ -11,6 +9,7 @@ import android.widget.RemoteViewsService
 import es.antonborri.home_widget.HomeWidgetPlugin
 import org.json.JSONArray
 import org.json.JSONObject
+import java.util.Locale
 
 class KanbanWidgetService : RemoteViewsService() {
     override fun onGetViewFactory(intent: Intent): RemoteViewsFactory {
@@ -20,8 +19,8 @@ class KanbanWidgetService : RemoteViewsService() {
 
 class KanbanWidgetFactory(private val context: Context) : RemoteViewsService.RemoteViewsFactory {
     private val items = ArrayList<JSONObject>()
-    private var widgetTheme = "system"
-    private var highlightColor = Color.parseColor("#6366F1")
+    private var palette: FullCalendarWidgetUtils.Palette? = null
+    private var locale: Locale = Locale.getDefault()
 
     override fun onCreate() {
         onDataSetChanged()
@@ -30,13 +29,8 @@ class KanbanWidgetFactory(private val context: Context) : RemoteViewsService.Rem
     override fun onDataSetChanged() {
         try {
             val widgetData = HomeWidgetPlugin.getData(context)
-            widgetTheme = widgetData.getString("full_calendar_theme", "system") ?: "system"
-            val colorHex = widgetData.getString("full_calendar_highlight_color", "#6366F1") ?: "#6366F1"
-            highlightColor = try {
-                Color.parseColor(colorHex)
-            } catch (_: Exception) {
-                Color.parseColor("#6366F1")
-            }
+            palette = WidgetStyle.palette(context, widgetData)
+            locale = WidgetLocaleHelper.getWidgetLocale(widgetData)
 
             val columnIndex = (widgetData.getInt(KanbanWidgetProvider.PREF_KANBAN_COLUMN, 0) % 3 + 3) % 3
 
@@ -71,91 +65,84 @@ class KanbanWidgetFactory(private val context: Context) : RemoteViewsService.Rem
     override fun getViewAt(position: Int): RemoteViews {
         val views = RemoteViews(context.packageName, R.layout.widget_kanban_item)
         if (position < 0 || position >= items.size) return views
+        val palette = palette ?: return views
 
         try {
             val item = items[position]
             val id = item.optString("id", "")
-            val title = item.optString("title", "Untitled")
             val isCompleted = item.optBoolean("isCompleted", false)
             val isOverdue = item.optBoolean("isOverdue", false)
             val dateDisplay = item.optString("dateDisplay", "")
             val category = item.optString("category", "")
             val priority = item.optString("priority", "")
-            val categoryColorHex = item.optString("category_color", "#6366F1")
+            val accent = WidgetStyle.parseColor(item.optString("category_color", ""), palette.primary)
 
-            val titleColor = when (widgetTheme) {
-                "light" -> if (isCompleted) Color.parseColor("#94A3B8") else Color.parseColor("#0F172A")
-                else -> if (isCompleted) Color.parseColor("#64748B") else Color.parseColor("#F8FAFC")
-            }
+            // Tile: a faint onSurface wash on the card, like the app's list tiles.
+            WidgetStyle.applyTile(views, R.id.widget_kanban_item_fill, palette.onSurface, if (palette.isDark) 0x14 else 0x0D)
+            views.setInt(R.id.widget_kanban_color_strip, "setColorFilter", accent)
+            views.setInt(R.id.widget_kanban_color_strip, "setImageAlpha", if (isCompleted) 0x66 else 0xFF)
 
-            val secondaryColor = when (widgetTheme) {
-                "light" -> Color.parseColor("#64748B")
-                else -> Color.parseColor("#94A3B8")
-            }
+            // Title: done cards are muted and struck through, like the app's completed tasks.
+            // setPaintFlags isn't allowed on RemoteViews; strike through with a span.
+            val title = item.optString("title", "")
+            views.setTextViewText(
+                R.id.widget_kanban_item_title,
+                if (isCompleted) {
+                    android.text.SpannableString(title).apply {
+                        setSpan(android.text.style.StrikethroughSpan(), 0, length, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    }
+                } else title
+            )
+            views.setTextColor(R.id.widget_kanban_item_title, if (isCompleted) palette.onSurfaceMuted else palette.onSurface)
 
-            views.setTextViewText(R.id.widget_kanban_item_title, title)
-            views.setTextColor(R.id.widget_kanban_item_title, titleColor)
-
-            // Category accent strip
-            val catColor = try {
-                Color.parseColor(categoryColorHex)
-            } catch (_: Exception) {
-                highlightColor
-            }
-            views.setInt(R.id.widget_kanban_color_strip, "setBackgroundColor", catColor)
-
-            // Category Subtitle
-            if (category.isNotEmpty()) {
-                views.setViewVisibility(R.id.widget_kanban_item_category, View.VISIBLE)
-                views.setTextViewText(R.id.widget_kanban_item_category, category)
-                views.setTextColor(R.id.widget_kanban_item_category, secondaryColor)
-            } else {
-                views.setViewVisibility(R.id.widget_kanban_item_category, View.GONE)
-            }
-
-            // Due Date / Status Chip
+            // Due date (localized by the app; overdue in red) and category.
             if (dateDisplay.isNotEmpty()) {
                 views.setViewVisibility(R.id.widget_kanban_item_date, View.VISIBLE)
                 views.setTextViewText(R.id.widget_kanban_item_date, dateDisplay)
-                val dateColor = if (isOverdue && !isCompleted) Color.parseColor("#EF4444") else secondaryColor
-                views.setTextColor(R.id.widget_kanban_item_date, dateColor)
+                views.setTextColor(
+                    R.id.widget_kanban_item_date,
+                    if (isOverdue && !isCompleted) WidgetStyle.PRIORITY_HIGH else palette.onSurfaceMuted
+                )
             } else {
                 views.setViewVisibility(R.id.widget_kanban_item_date, View.GONE)
             }
+            views.setTextViewText(R.id.widget_kanban_item_category, category)
+            views.setTextColor(R.id.widget_kanban_item_category, palette.onSurfaceMuted)
+            views.setViewVisibility(R.id.widget_kanban_item_category, if (category.isEmpty()) View.GONE else View.VISIBLE)
+            views.setViewVisibility(
+                R.id.widget_kanban_item_meta,
+                if (dateDisplay.isEmpty() && category.isEmpty()) View.GONE else View.VISIBLE
+            )
 
-            // Priority Badge
-            if (priority.isNotEmpty() && priority.uppercase() != "NONE") {
-                views.setViewVisibility(R.id.widget_kanban_item_priority, View.VISIBLE)
-                views.setTextViewText(R.id.widget_kanban_item_priority, priority.uppercase())
-                val priorityColor = when (priority.lowercase()) {
-                    "high" -> Color.parseColor("#EF4444")
-                    "medium" -> Color.parseColor("#F59E0B")
-                    "low" -> Color.parseColor("#3B82F6")
-                    else -> highlightColor
-                }
+            // Priority chip: low is the default, only flag medium and high like the app.
+            val priorityColor = WidgetStyle.priorityColor(priority)
+            if (!isCompleted && priorityColor != null && !priority.equals("low", ignoreCase = true)) {
+                views.setViewVisibility(R.id.widget_kanban_badge_box, View.VISIBLE)
+                views.setTextViewText(R.id.widget_kanban_item_priority, WidgetStyle.priorityLabel(priority, locale))
                 views.setTextColor(R.id.widget_kanban_item_priority, priorityColor)
+                WidgetStyle.applyTile(views, R.id.widget_kanban_badge_fill, priorityColor, 0x26)
             } else {
-                views.setViewVisibility(R.id.widget_kanban_item_priority, View.GONE)
+                views.setViewVisibility(R.id.widget_kanban_badge_box, View.GONE)
             }
 
-            // Checkbox Icon & Tint
-            val checkIcon = if (isCompleted) R.drawable.ic_check_circle_filled else R.drawable.ic_circle_outline
-            views.setImageViewResource(R.id.widget_kanban_check, checkIcon)
-            val checkTint = if (isCompleted) highlightColor else secondaryColor
-            views.setInt(R.id.widget_kanban_check, "setColorFilter", checkTint)
+            // Checkbox
+            views.setImageViewResource(
+                R.id.widget_kanban_check,
+                if (isCompleted) R.drawable.ic_widget_check_on else R.drawable.ic_widget_check_off
+            )
+            views.setInt(R.id.widget_kanban_check, "setColorFilter", if (isCompleted) palette.primary else palette.onSurfaceMuted)
 
-            // Fill-in Intent for whole row click -> Open task detail
-            val rowFillInIntent = Intent().apply {
-                data = Uri.parse("rocistasks://task_detail?id=$id")
+            if (id.isNotEmpty()) {
+                // Row -> task detail; checkbox -> complete / toggle.
+                views.setOnClickFillInIntent(
+                    R.id.widget_kanban_item_root,
+                    Intent().apply { data = Uri.parse("rocistasks://task_detail?id=$id") }
+                )
+                views.setOnClickFillInIntent(
+                    R.id.widget_kanban_check,
+                    Intent().apply { data = Uri.parse("rocistasks://complete?id=$id") }
+                )
             }
-            views.setOnClickFillInIntent(R.id.widget_kanban_item_root, rowFillInIntent)
-
-            // Fill-in Intent for checkmark click -> Complete / Toggle task
-            val checkFillInIntent = Intent().apply {
-                data = Uri.parse("rocistasks://complete?id=$id")
-            }
-            views.setOnClickFillInIntent(R.id.widget_kanban_check, checkFillInIntent)
-
         } catch (e: Exception) {
             android.util.Log.e("KanbanWidgetService", "Error binding view at $position", e)
         }

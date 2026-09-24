@@ -1,154 +1,159 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Up Next: the app's card with the single next task/event (color bar, checkbox or
+     event glyph, title, meta line and a relative-time chip). Colors are applied at runtime. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/widget_up_next_root"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/widget_background"
-    android:padding="8dp">
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/widget_up_next_card_fill"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitXY"
+        android:src="@drawable/widget_card_fill" />
+
+    <ImageView
+        android:id="@+id/widget_up_next_card_stroke"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitXY"
+        android:src="@drawable/widget_card_stroke" />
 
     <LinearLayout
         android:id="@+id/widget_up_next_main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:gravity="center_vertical">
+        android:paddingStart="12dp"
+        android:paddingEnd="10dp"
+        android:paddingTop="6dp"
+        android:paddingBottom="6dp">
 
-        <!-- Color Accent Strip -->
-        <FrameLayout
+        <ImageView
             android:id="@+id/widget_up_next_color_strip"
-            android:layout_width="3.5dp"
-            android:layout_height="match_parent"
-            android:background="@color/widget_primary"
-            android:layout_marginEnd="8dp" />
+            android:layout_width="4dp"
+            android:layout_height="32dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/widget_accent_bar" />
 
-        <!-- Checkbox / Action (for tasks) -->
         <ImageView
             android:id="@+id/widget_up_next_check"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_circle_outline"
-            android:layout_marginEnd="8dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:clickable="true"
+            android:contentDescription="Complete task"
             android:focusable="true"
-            android:contentDescription="Complete Task" />
+            android:padding="9dp"
+            android:src="@drawable/ic_widget_check_off" />
 
-        <!-- Event Icon (for events) -->
         <ImageView
             android:id="@+id/widget_up_next_event_icon"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:src="@drawable/ic_calendar_event"
-            android:layout_marginEnd="8dp"
-            android:visibility="gone"
-            android:contentDescription="Calendar Event" />
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:contentDescription="Event"
+            android:padding="10dp"
+            android:src="@drawable/ic_widget_event"
+            android:visibility="gone" />
 
-        <!-- Title & Subtitle -->
+        <ImageView
+            android:id="@+id/widget_up_next_done_icon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:contentDescription="All caught up"
+            android:padding="8dp"
+            android:src="@drawable/ic_widget_check_on"
+            android:visibility="gone" />
+
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingStart="2dp">
 
             <TextView
                 android:id="@+id/widget_up_next_header_label"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:fontFamily="@font/outfit_semibold"
+                android:includeFontPadding="false"
+                android:letterSpacing="0.06"
+                android:maxLines="1"
                 android:text="UP NEXT"
-                android:textColor="@color/widget_primary"
-                android:textSize="9sp"
-                android:fontFamily="sans-serif"
-                android:textStyle="bold" />
+                android:textAlignment="viewStart"
+                android:textSize="10sp" />
 
             <TextView
                 android:id="@+id/widget_up_next_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Next Task or Meeting"
-                android:textColor="@color/widget_title_text"
-                android:textSize="13.5sp"
-                android:fontFamily="sans-serif"
-                android:textStyle="bold"
+                android:layout_marginTop="2dp"
+                android:ellipsize="end"
+                android:fontFamily="@font/outfit_semibold"
+                android:includeFontPadding="false"
                 android:maxLines="1"
-                android:ellipsize="end" />
+                android:text="Next task or meeting"
+                android:textAlignment="viewStart"
+                android:textSize="15sp" />
 
             <TextView
                 android:id="@+id/widget_up_next_subtitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Work • Office"
-                android:textColor="@color/widget_secondary_text"
-                android:textSize="11sp"
+                android:layout_marginTop="2dp"
+                android:ellipsize="end"
+                android:fontFamily="@font/outfit_regular"
+                android:includeFontPadding="false"
                 android:maxLines="1"
-                android:ellipsize="end" />
+                android:text="Work"
+                android:textAlignment="viewStart"
+                android:textSize="12sp" />
         </LinearLayout>
 
-        <!-- Time Badge -->
-        <TextView
-            android:id="@+id/widget_up_next_time_badge"
+        <FrameLayout
+            android:id="@+id/widget_up_next_time_box"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="In 25m"
-            android:textColor="@color/widget_primary"
-            android:textSize="11sp"
-            android:fontFamily="sans-serif"
-            android:textStyle="bold"
-            android:background="@drawable/widget_pill_bg"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp"
-            android:paddingTop="4dp"
-            android:paddingBottom="4dp"
-            android:layout_marginStart="6dp" />
-    </LinearLayout>
-
-    <!-- Pro Limit Overlay -->
-    <RelativeLayout
-        android:id="@+id/widget_pro_overlay"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#E6121212"
-        android:padding="8dp"
-        android:gravity="center"
-        android:visibility="gone"
-        android:clickable="true"
-        android:focusable="true">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:layout_height="26dp"
+            android:layout_marginStart="8dp">
 
             <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_lock_pro"
-                android:layout_marginEnd="6dp" />
+                android:id="@+id/widget_up_next_time_fill"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="fitXY"
+                android:src="@drawable/widget_chip_fill" />
 
             <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="1-Widget Free Limit"
-                android:textColor="#FFFFFF"
-                android:textSize="12sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/widget_pro_overlay_btn"
+                android:id="@+id/widget_up_next_time_badge"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Unlock Pro"
-                android:textColor="#FFFFFF"
-                android:textSize="10sp"
-                android:textStyle="bold"
-                android:background="@drawable/widget_pill_bg"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"
-                android:paddingTop="4dp"
-                android:paddingBottom="4dp"
-                android:clickable="true"
-                android:focusable="true" />
-        </LinearLayout>
-    </RelativeLayout>
+                android:layout_height="match_parent"
+                android:fontFamily="@font/outfit_semibold"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:maxLines="1"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:text="in 25 min"
+                android:textSize="12sp" />
+        </FrameLayout>
 
-</RelativeLayout>
+        <ImageView
+            android:id="@+id/widget_up_next_add_btn"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="4dp"
+            android:clickable="true"
+            android:contentDescription="Add task"
+            android:focusable="true"
+            android:padding="6dp"
+            android:src="@drawable/ic_add"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <include layout="@layout/widget_pro_overlay" />
+</FrameLayout>

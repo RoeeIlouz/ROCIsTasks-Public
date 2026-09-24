@@ -45,38 +45,17 @@ class KanbanWidgetProvider : HomeWidgetProvider() {
                 val isAllowed = WidgetLimitHelper.isWidgetAllowed(context, appWidgetId, isPremium)
                 val views = RemoteViews(context.packageName, R.layout.widget_kanban_layout)
 
-                // 1. Read Theme Settings
-                val theme = widgetData.getString("full_calendar_theme", "system") ?: "system"
-                val rootBgRes = when (theme) {
-                    "light" -> R.drawable.widget_background_light
-                    "dark" -> R.drawable.widget_background_dark
-                    "glassmorphic" -> R.drawable.widget_background_glass
-                    else -> R.drawable.widget_background
-                }
-                views.setInt(R.id.widget_kanban_root, "setBackgroundResource", rootBgRes)
-
-                val highlightColorHex = widgetData.getString("full_calendar_highlight_color", "#6366F1") ?: "#6366F1"
-                val highlightColor = try {
-                    android.graphics.Color.parseColor(highlightColorHex)
-                } catch (_: Exception) {
-                    android.graphics.Color.parseColor("#6366F1")
-                }
-
-                val textColor = when (theme) {
-                    "light" -> android.graphics.Color.parseColor("#0F172A")
-                    else -> android.graphics.Color.parseColor("#FFFFFF")
-                }
-                val secondaryColor = when (theme) {
-                    "light" -> android.graphics.Color.parseColor("#64748B")
-                    else -> android.graphics.Color.parseColor("#94A3B8")
-                }
-
-                views.setTextColor(R.id.widget_kanban_title, textColor)
-                views.setTextColor(R.id.widget_kanban_subtitle, secondaryColor)
-                views.setTextColor(R.id.widget_kanban_prev, textColor)
-                views.setTextColor(R.id.widget_kanban_next, textColor)
-                views.setTextColor(R.id.widget_kanban_add_btn, highlightColor)
-                views.setTextColor(R.id.widget_kanban_empty, secondaryColor)
+                // 1. The app's card, tinted icons, RTL.
+                val palette = WidgetStyle.palette(context, widgetData)
+                val widgetLocale = WidgetLocaleHelper.getWidgetLocale(widgetData)
+                WidgetStyle.applyCard(views, palette, R.id.widget_kanban_card_fill, R.id.widget_kanban_card_stroke)
+                WidgetStyle.applyDirection(views, R.id.widget_kanban_root, widgetLocale)
+                WidgetStyle.tint(views, palette.onSurface, R.id.widget_kanban_prev, R.id.widget_kanban_next, R.id.widget_kanban_add_btn)
+                views.setTextColor(R.id.widget_kanban_title, palette.onSurface)
+                views.setTextColor(R.id.widget_kanban_subtitle, palette.onSurfaceMuted)
+                views.setTextColor(R.id.widget_kanban_empty_title, palette.onSurface)
+                views.setTextColor(R.id.widget_kanban_empty_subtitle, palette.onSurfaceMuted)
+                WidgetStyle.tint(views, palette.primary, R.id.widget_kanban_empty_icon)
 
                 // 2. Parse Kanban Data & Counts
                 val rawJson = widgetData.getString("kanban_data", "{}") ?: "{}"
@@ -86,18 +65,11 @@ class KanbanWidgetProvider : HomeWidgetProvider() {
                     JSONObject()
                 }
 
-                val todoList = kanbanJson.optJSONArray("column_todo")
-                val focusList = kanbanJson.optJSONArray("column_infocus")
-                val doneList = kanbanJson.optJSONArray("column_done")
-
-                val todoCount = todoList?.length() ?: 0
-                val focusCount = focusList?.length() ?: 0
-                val doneCount = doneList?.length() ?: 0
+                val todoCount = kanbanJson.optJSONArray("column_todo")?.length() ?: 0
+                val focusCount = kanbanJson.optJSONArray("column_infocus")?.length() ?: 0
+                val doneCount = kanbanJson.optJSONArray("column_done")?.length() ?: 0
 
                 val columnIndex = (widgetData.getInt(PREF_KANBAN_COLUMN, 0) % 3 + 3) % 3
-
-                val widgetLocale = WidgetLocaleHelper.getWidgetLocale(widgetData)
-                val columnTitle = WidgetLocaleHelper.getKanbanColumnTitle(columnIndex, widgetLocale)
 
                 val currentCount = when (columnIndex) {
                     1 -> focusCount
@@ -105,40 +77,32 @@ class KanbanWidgetProvider : HomeWidgetProvider() {
                     else -> todoCount
                 }
 
-                views.setTextViewText(R.id.widget_kanban_title, columnTitle)
+                views.setTextViewText(R.id.widget_kanban_title, WidgetLocaleHelper.getKanbanColumnTitle(columnIndex, widgetLocale))
                 views.setTextViewText(R.id.widget_kanban_subtitle, WidgetLocaleHelper.getKanbanSubtitle(currentCount, widgetLocale))
 
-                // Update Segment Tab Titles with counts
-                views.setTextViewText(R.id.widget_kanban_tab_todo, "${WidgetLocaleHelper.getKanbanTodoTitle(widgetLocale)} ($todoCount)")
-                views.setTextViewText(R.id.widget_kanban_tab_focus, "${WidgetLocaleHelper.getKanbanFocusTitle(widgetLocale)} ($focusCount)")
-                views.setTextViewText(R.id.widget_kanban_tab_done, "${WidgetLocaleHelper.getKanbanDoneTitle(widgetLocale)} ($doneCount)")
-
-                // Active tab pill highlighting
-                when (columnIndex) {
-                    0 -> {
-                        views.setInt(R.id.widget_kanban_tab_todo, "setBackgroundResource", R.drawable.widget_pill_bg)
-                        views.setInt(R.id.widget_kanban_tab_focus, "setBackgroundResource", 0)
-                        views.setInt(R.id.widget_kanban_tab_done, "setBackgroundResource", 0)
-                        views.setTextColor(R.id.widget_kanban_tab_todo, textColor)
-                        views.setTextColor(R.id.widget_kanban_tab_focus, secondaryColor)
-                        views.setTextColor(R.id.widget_kanban_tab_done, secondaryColor)
-                    }
-                    1 -> {
-                        views.setInt(R.id.widget_kanban_tab_todo, "setBackgroundResource", 0)
-                        views.setInt(R.id.widget_kanban_tab_focus, "setBackgroundResource", R.drawable.widget_pill_bg)
-                        views.setInt(R.id.widget_kanban_tab_done, "setBackgroundResource", 0)
-                        views.setTextColor(R.id.widget_kanban_tab_todo, secondaryColor)
-                        views.setTextColor(R.id.widget_kanban_tab_focus, textColor)
-                        views.setTextColor(R.id.widget_kanban_tab_done, secondaryColor)
-                    }
-                    2 -> {
-                        views.setInt(R.id.widget_kanban_tab_todo, "setBackgroundResource", 0)
-                        views.setInt(R.id.widget_kanban_tab_focus, "setBackgroundResource", 0)
-                        views.setInt(R.id.widget_kanban_tab_done, "setBackgroundResource", R.drawable.widget_pill_bg)
-                        views.setTextColor(R.id.widget_kanban_tab_todo, secondaryColor)
-                        views.setTextColor(R.id.widget_kanban_tab_focus, secondaryColor)
-                        views.setTextColor(R.id.widget_kanban_tab_done, textColor)
-                    }
+                // Column chips (like the Full Calendar filters): active = 15% accent fill,
+                // 35% accent border and accent text; others an outlined muted chip.
+                val chips = listOf(
+                    ColumnChip(R.id.widget_kanban_tab_todo_fill, R.id.widget_kanban_tab_todo_stroke,
+                        R.id.widget_kanban_tab_todo_text, R.id.widget_kanban_tab_todo_count,
+                        WidgetLocaleHelper.getKanbanTodoTitle(widgetLocale), todoCount, columnIndex == 0),
+                    ColumnChip(R.id.widget_kanban_tab_focus_fill, R.id.widget_kanban_tab_focus_stroke,
+                        R.id.widget_kanban_tab_focus_text, R.id.widget_kanban_tab_focus_count,
+                        WidgetLocaleHelper.getKanbanFocusTitle(widgetLocale), focusCount, columnIndex == 1),
+                    ColumnChip(R.id.widget_kanban_tab_done_fill, R.id.widget_kanban_tab_done_stroke,
+                        R.id.widget_kanban_tab_done_text, R.id.widget_kanban_tab_done_count,
+                        WidgetLocaleHelper.getKanbanDoneTitle(widgetLocale), doneCount, columnIndex == 2)
+                )
+                for (chip in chips) {
+                    val textColor = if (chip.active) palette.primary else palette.onSurfaceMuted
+                    views.setTextViewText(chip.text, chip.label)
+                    views.setTextColor(chip.text, textColor)
+                    views.setTextViewText(chip.countView, if (chip.count > 99) "99+" else "${chip.count}")
+                    views.setTextColor(chip.countView, textColor)
+                    views.setInt(chip.fill, "setColorFilter", palette.primary)
+                    views.setInt(chip.fill, "setImageAlpha", if (chip.active) 0x26 else 0x00)
+                    views.setInt(chip.stroke, "setColorFilter", if (chip.active) palette.primary else palette.onSurface)
+                    views.setInt(chip.stroke, "setImageAlpha", if (chip.active) 0x59 else 0x33)
                 }
 
                 // 3. Navigation Pending Intents
@@ -233,7 +197,8 @@ class KanbanWidgetProvider : HomeWidgetProvider() {
                     data = Uri.parse("widget://rocis/kanban/$appWidgetId/$columnIndex")
                 }
                 views.setRemoteAdapter(R.id.widget_kanban_list, serviceIntent)
-                views.setTextViewText(R.id.widget_kanban_empty, WidgetLocaleHelper.getNoTasksInColumnText(widgetLocale))
+                views.setTextViewText(R.id.widget_kanban_empty_title, WidgetLocaleHelper.getNoTasksInColumnText(widgetLocale))
+                views.setTextViewText(R.id.widget_kanban_empty_subtitle, WidgetLocaleHelper.getTapPlusToAddText(widgetLocale))
                 views.setEmptyView(R.id.widget_kanban_list, R.id.widget_kanban_empty)
 
                 // 6. Template PendingIntent for list item actions
@@ -250,7 +215,7 @@ class KanbanWidgetProvider : HomeWidgetProvider() {
                 views.setPendingIntentTemplate(R.id.widget_kanban_list, itemPendingIntent)
 
                 // Apply limit overlay
-                WidgetLimitHelper.setupProOverlay(context, views, isAllowed)
+                WidgetStyle.setupProOverlay(context, views, isAllowed, palette, widgetLocale)
 
                 appWidgetManager.updateAppWidget(appWidgetId, views)
                 appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_kanban_list)
@@ -264,6 +229,16 @@ class KanbanWidgetProvider : HomeWidgetProvider() {
             }
         }
     }
+
+    private data class ColumnChip(
+        val fill: Int,
+        val stroke: Int,
+        val text: Int,
+        val countView: Int,
+        val label: String,
+        val count: Int,
+        val active: Boolean
+    )
 
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)

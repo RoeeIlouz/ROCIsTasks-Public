@@ -1,240 +1,258 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Month Agenda: the app's card with a compact month grid (like the FullCalendar widget)
+     beside the selected day's tasks/events (like Today Agenda). Colors are applied at runtime. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/widget_month_agenda_root"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/widget_background"
-    android:padding="6dp">
+    android:layout_height="match_parent">
 
-    <!-- Top Unified Header -->
-    <LinearLayout
-        android:id="@+id/widget_month_agenda_header"
+    <ImageView
+        android:id="@+id/widget_month_agenda_card_fill"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:paddingBottom="4dp">
+        android:layout_height="match_parent"
+        android:scaleType="fitXY"
+        android:src="@drawable/widget_card_fill" />
 
-        <TextView
-            android:id="@+id/widget_month_agenda_prev"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:gravity="center"
-            android:text="❮"
-            android:textColor="@color/widget_title_text"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            android:background="@drawable/widget_nav_icon_bg"
-            android:clickable="true"
-            android:focusable="true" />
+    <ImageView
+        android:id="@+id/widget_month_agenda_card_stroke"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitXY"
+        android:src="@drawable/widget_card_stroke" />
 
-        <TextView
-            android:id="@+id/widget_month_agenda_month_title"
-            android:layout_width="0dp"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingStart="12dp"
+        android:paddingEnd="8dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="8dp">
+
+        <!-- Header: month title + actions -->
+        <LinearLayout
+            android:id="@+id/widget_month_agenda_header"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="August 2026"
-            android:textColor="@color/widget_title_text"
-            android:textSize="14.5sp"
-            android:fontFamily="sans-serif"
-            android:textStyle="bold" />
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingBottom="4dp">
 
-        <TextView
-            android:id="@+id/widget_month_agenda_next"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:gravity="center"
-            android:text="❯"
-            android:textColor="@color/widget_title_text"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            android:background="@drawable/widget_nav_icon_bg"
-            android:clickable="true"
-            android:focusable="true" />
-
-        <TextView
-            android:id="@+id/widget_month_agenda_today_btn"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:layout_marginStart="3dp"
-            android:gravity="center"
-            android:text="⦿"
-            android:textColor="@color/widget_primary"
-            android:textSize="13sp"
-            android:background="@drawable/widget_nav_icon_bg"
-            android:clickable="true"
-            android:focusable="true" />
-
-        <TextView
-            android:id="@+id/widget_month_agenda_add_btn"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:layout_marginStart="3dp"
-            android:gravity="center"
-            android:text="+"
-            android:textColor="@color/widget_primary"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:background="@drawable/widget_nav_icon_bg"
-            android:clickable="true"
-            android:focusable="true" />
-    </LinearLayout>
-
-    <!-- Split Main Container -->
-    <LinearLayout
-        android:id="@+id/widget_month_agenda_content"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/widget_month_agenda_header"
-        android:orientation="horizontal"
-        android:baselineAligned="false">
-
-        <!-- Left Half: Month Grid -->
-        <LinearLayout
-            android:id="@+id/widget_month_grid_container"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:paddingEnd="4dp">
-
-            <!-- Weekday Header Letters -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingBottom="2dp"
-                android:background="#15FFFFFF">
-                <TextView android:id="@+id/widget_day_h0" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="S" android:textSize="10sp" android:textColor="@color/widget_primary" android:textStyle="bold"/>
-                <TextView android:id="@+id/widget_day_h1" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="M" android:textSize="10sp" android:textColor="@color/widget_body_text" android:textStyle="bold"/>
-                <TextView android:id="@+id/widget_day_h2" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="T" android:textSize="10sp" android:textColor="@color/widget_body_text" android:textStyle="bold"/>
-                <TextView android:id="@+id/widget_day_h3" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="W" android:textSize="10sp" android:textColor="@color/widget_body_text" android:textStyle="bold"/>
-                <TextView android:id="@+id/widget_day_h4" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="T" android:textSize="10sp" android:textColor="@color/widget_body_text" android:textStyle="bold"/>
-                <TextView android:id="@+id/widget_day_h5" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="F" android:textSize="10sp" android:textColor="@color/widget_body_text" android:textStyle="bold"/>
-                <TextView android:id="@+id/widget_day_h6" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="S" android:textSize="10sp" android:textColor="@color/widget_body_text" android:textStyle="bold"/>
-            </LinearLayout>
-
-            <ListView
-                android:id="@+id/widget_month_grid_list"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:divider="@null"
-                android:dividerHeight="0dp" />
-        </LinearLayout>
-
-        <!-- Vertical Divider -->
-        <FrameLayout
-            android:layout_width="1dp"
-            android:layout_height="match_parent"
-            android:background="#20FFFFFF"
-            android:layout_marginStart="2dp"
-            android:layout_marginEnd="4dp" />
-
-        <!-- Right Half: Day Agenda List -->
-        <LinearLayout
-            android:id="@+id/widget_day_agenda_container"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1.2"
-            android:orientation="vertical">
-
-            <!-- Selected Date Header -->
             <TextView
-                android:id="@+id/widget_month_agenda_selected_title"
-                android:layout_width="match_parent"
+                android:id="@+id/widget_month_agenda_month_title"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Today"
-                android:textColor="@color/widget_title_text"
-                android:textSize="12sp"
-                android:fontFamily="sans-serif"
-                android:textStyle="bold"
-                android:paddingBottom="4dp" />
+                android:layout_weight="1"
+                android:clickable="true"
+                android:ellipsize="end"
+                android:focusable="true"
+                android:fontFamily="@font/outfit_bold"
+                android:includeFontPadding="false"
+                android:letterSpacing="-0.03"
+                android:maxLines="1"
+                android:paddingStart="4dp"
+                android:text="September 2026"
+                android:textAlignment="viewStart"
+                android:textSize="18sp" />
 
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1">
+            <ImageView
+                android:id="@+id/widget_month_agenda_prev"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="6dp"
+                android:src="@drawable/ic_chevron_left_24" />
 
-                <ListView
-                    android:id="@+id/widget_month_agenda_list"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:divider="@null"
-                    android:dividerHeight="3dp" />
+            <ImageView
+                android:id="@+id/widget_month_agenda_next"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="6dp"
+                android:src="@drawable/ic_chevron_right_24" />
 
-                <TextView
-                    android:id="@+id/widget_month_agenda_empty"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:text="No events or tasks"
-                    android:textColor="@color/widget_secondary_text"
-                    android:textSize="11sp"
-                    android:visibility="gone" />
-            </FrameLayout>
+            <ImageView
+                android:id="@+id/widget_month_agenda_today_btn"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="7dp"
+                android:src="@drawable/ic_today_24" />
+
+            <ImageView
+                android:id="@+id/widget_month_agenda_add_btn"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="6dp"
+                android:src="@drawable/ic_add" />
         </LinearLayout>
-    </LinearLayout>
-
-    <!-- Pro Limit Overlay -->
-    <RelativeLayout
-        android:id="@+id/widget_pro_overlay"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#E6121212"
-        android:padding="16dp"
-        android:gravity="center"
-        android:visibility="gone"
-        android:clickable="true"
-        android:focusable="true">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center">
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:baselineAligned="false"
+            android:orientation="horizontal">
+
+            <!-- Month grid -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/widget_month_agenda_weekdays"
+                    android:layout_width="match_parent"
+                    android:layout_height="20dp"
+                    android:orientation="horizontal">
+
+                    <TextView android:id="@+id/widget_month_agenda_wd_0" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:ellipsize="end" android:fontFamily="@font/outfit_bold" android:gravity="center" android:maxLines="1" android:text="S" android:textSize="11sp" />
+                    <TextView android:id="@+id/widget_month_agenda_wd_1" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:ellipsize="end" android:fontFamily="@font/outfit_bold" android:gravity="center" android:maxLines="1" android:text="M" android:textSize="11sp" />
+                    <TextView android:id="@+id/widget_month_agenda_wd_2" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:ellipsize="end" android:fontFamily="@font/outfit_bold" android:gravity="center" android:maxLines="1" android:text="T" android:textSize="11sp" />
+                    <TextView android:id="@+id/widget_month_agenda_wd_3" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:ellipsize="end" android:fontFamily="@font/outfit_bold" android:gravity="center" android:maxLines="1" android:text="W" android:textSize="11sp" />
+                    <TextView android:id="@+id/widget_month_agenda_wd_4" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:ellipsize="end" android:fontFamily="@font/outfit_bold" android:gravity="center" android:maxLines="1" android:text="T" android:textSize="11sp" />
+                    <TextView android:id="@+id/widget_month_agenda_wd_5" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:ellipsize="end" android:fontFamily="@font/outfit_bold" android:gravity="center" android:maxLines="1" android:text="F" android:textSize="11sp" />
+                    <TextView android:id="@+id/widget_month_agenda_wd_6" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:ellipsize="end" android:fontFamily="@font/outfit_bold" android:gravity="center" android:maxLines="1" android:text="S" android:textSize="11sp" />
+                </LinearLayout>
+
+                <!-- Week rows are added at runtime (4-6, like the app) and share the height -->
+                <LinearLayout
+                    android:id="@+id/widget_month_agenda_grid"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical" />
+            </LinearLayout>
 
             <ImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:src="@drawable/ic_lock_pro"
-                android:layout_marginBottom="8dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Free 1-Widget Limit"
-                android:textColor="#FFFFFF"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:gravity="center" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Free tier includes 1 active widget. Upgrade to Pro for unlimited home screen widgets!"
-                android:textColor="#CCCCCC"
-                android:textSize="12sp"
-                android:gravity="center"
+                android:id="@+id/widget_month_agenda_divider"
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="6dp"
+                android:layout_marginEnd="8dp"
                 android:layout_marginTop="4dp"
-                android:layout_marginBottom="12dp" />
+                android:layout_marginBottom="4dp"
+                android:scaleType="fitXY"
+                android:src="@drawable/widget_accent_bar" />
 
-            <TextView
-                android:id="@+id/widget_pro_overlay_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Unlock Unlimited Widgets"
-                android:textColor="#FFFFFF"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:background="@drawable/widget_pill_bg"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp"
-                android:clickable="true"
-                android:focusable="true" />
+            <!-- Selected day agenda -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/widget_month_agenda_day_header"
+                    android:layout_width="match_parent"
+                    android:layout_height="20dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/widget_month_agenda_selected_title"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:ellipsize="end"
+                        android:fontFamily="@font/outfit_semibold"
+                        android:includeFontPadding="false"
+                        android:maxLines="1"
+                        android:text="Thu, Sep 24"
+                        android:textAlignment="viewStart"
+                        android:textSize="13sp" />
+
+                    <FrameLayout
+                        android:id="@+id/widget_month_agenda_selected_chip"
+                        android:layout_width="wrap_content"
+                        android:layout_height="18dp"
+                        android:layout_marginStart="4dp"
+                        android:visibility="gone">
+
+                        <ImageView
+                            android:id="@+id/widget_month_agenda_selected_chip_fill"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:scaleType="fitXY"
+                            android:src="@drawable/widget_chip_fill" />
+
+                        <TextView
+                            android:id="@+id/widget_month_agenda_selected_subtitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:fontFamily="@font/outfit_semibold"
+                            android:gravity="center"
+                            android:includeFontPadding="false"
+                            android:maxLines="1"
+                            android:paddingStart="7dp"
+                            android:paddingEnd="7dp"
+                            android:text="Today"
+                            android:textSize="10sp" />
+                    </FrameLayout>
+                </LinearLayout>
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:layout_marginTop="4dp">
+
+                    <ListView
+                        android:id="@+id/widget_month_agenda_list"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:clipToPadding="false"
+                        android:divider="@null"
+                        android:dividerHeight="5dp"
+                        android:scrollbars="none" />
+
+                    <LinearLayout
+                        android:id="@+id/widget_month_agenda_empty"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="8dp"
+                        android:visibility="gone">
+
+                        <ImageView
+                            android:id="@+id/widget_month_agenda_empty_icon"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_marginBottom="6dp"
+                            android:src="@drawable/ic_widget_check_on" />
+
+                        <TextView
+                            android:id="@+id/widget_month_agenda_empty_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/outfit_semibold"
+                            android:gravity="center"
+                            android:text="No events or tasks"
+                            android:textSize="13sp" />
+
+                        <TextView
+                            android:id="@+id/widget_month_agenda_empty_subtitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:fontFamily="@font/outfit_regular"
+                            android:gravity="center"
+                            android:text="Tap + to add a task"
+                            android:textSize="11sp" />
+                    </LinearLayout>
+                </FrameLayout>
+            </LinearLayout>
         </LinearLayout>
-    </RelativeLayout>
+    </LinearLayout>
 
-</RelativeLayout>
+    <include layout="@layout/widget_pro_overlay" />
+</FrameLayout>

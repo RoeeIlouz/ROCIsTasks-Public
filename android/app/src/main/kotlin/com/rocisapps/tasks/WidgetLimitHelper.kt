@@ -3,10 +3,6 @@ package com.rocisapps.tasks
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Context
-import android.net.Uri
-import android.view.View
-import android.widget.RemoteViews
-import es.antonborri.home_widget.HomeWidgetLaunchIntent
 import es.antonborri.home_widget.HomeWidgetPlugin
 
 object WidgetLimitHelper {
@@ -54,25 +50,5 @@ object WidgetLimitHelper {
         } catch (e: Exception) {
             return true
         }
-    }
-
-    /**
-     * Helper to show or hide the Pro Upgrade overlay on the widget.
-     */
-    fun setupProOverlay(context: Context, views: RemoteViews, isAllowed: Boolean) {
-        try {
-            if (isAllowed) {
-                views.setViewVisibility(R.id.widget_pro_overlay, View.GONE)
-            } else {
-                views.setViewVisibility(R.id.widget_pro_overlay, View.VISIBLE)
-                val paywallIntent = HomeWidgetLaunchIntent.getActivity(
-                    context,
-                    MainActivity::class.java,
-                    Uri.parse("rocistasks://paywall")
-                )
-                views.setOnClickPendingIntent(R.id.widget_pro_overlay_btn, paywallIntent)
-                views.setOnClickPendingIntent(R.id.widget_pro_overlay, paywallIntent)
-            }
-        } catch (_: Exception) {}
     }
 }

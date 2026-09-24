@@ -1,36 +1,108 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- One row of the selected day's agenda: tinted tile, category/calendar color bar,
+     checkbox (tasks) or event glyph, title and time/meta line. Colored by the factory. -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/widget_month_day_root"
-    android:layout_width="0dp"
-    android:layout_height="32dp"
-    android:layout_weight="1"
-    android:padding="1dp">
+    android:id="@+id/widget_month_item_root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
     <ImageView
-        android:id="@+id/widget_month_day_bg"
-        android:layout_width="26dp"
-        android:layout_height="26dp"
-        android:layout_gravity="center"
-        android:src="@drawable/widget_today_circle"
-        android:scaleType="fitCenter"
-        android:visibility="gone" />
-
-    <TextView
-        android:id="@+id/widget_month_day_text"
+        android:id="@+id/widget_month_item_fill"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center"
-        android:text="1"
-        android:textSize="11sp"
-        android:textColor="@color/widget_title_text" />
+        android:scaleType="fitXY"
+        android:src="@drawable/widget_item_fill" />
 
-    <ImageView
-        android:id="@+id/widget_month_day_dot"
-        android:layout_width="4dp"
-        android:layout_height="4dp"
-        android:layout_gravity="bottom|center_horizontal"
-        android:layout_marginBottom="2dp"
-        android:src="@drawable/dot_indicator"
-        android:visibility="gone" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:minHeight="44dp"
+        android:orientation="horizontal"
+        android:paddingStart="6dp"
+        android:paddingEnd="8dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp">
 
+        <ImageView
+            android:id="@+id/widget_month_item_bar"
+            android:layout_width="3dp"
+            android:layout_height="26dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/widget_accent_bar" />
+
+        <ImageView
+            android:id="@+id/widget_month_item_check"
+            android:layout_width="34dp"
+            android:layout_height="36dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingStart="6dp"
+            android:paddingEnd="6dp"
+            android:paddingTop="7dp"
+            android:paddingBottom="7dp"
+            android:src="@drawable/ic_widget_check_off" />
+
+        <ImageView
+            android:id="@+id/widget_month_item_event_icon"
+            android:layout_width="34dp"
+            android:layout_height="36dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:paddingTop="9dp"
+            android:paddingBottom="9dp"
+            android:src="@drawable/ic_widget_event"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/widget_month_item_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:fontFamily="@font/outfit_semibold"
+                android:includeFontPadding="false"
+                android:maxLines="1"
+                android:text="Task or event title"
+                android:textAlignment="viewStart"
+                android:textSize="14sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/widget_month_item_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="6dp"
+                    android:fontFamily="@font/outfit_semibold"
+                    android:includeFontPadding="false"
+                    android:maxLines="1"
+                    android:text="09:00"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/widget_month_item_meta"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:fontFamily="@font/outfit_regular"
+                    android:includeFontPadding="false"
+                    android:maxLines="1"
+                    android:text="Work"
+                    android:textAlignment="viewStart"
+                    android:textSize="12sp" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
 </FrameLayout>

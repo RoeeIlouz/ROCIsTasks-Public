@@ -9,6 +9,9 @@ import android.net.Uri
 import android.widget.RemoteViews
 import es.antonborri.home_widget.HomeWidgetLaunchIntent
 import es.antonborri.home_widget.HomeWidgetProvider
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 class TimelineAgendaWidgetProvider : HomeWidgetProvider() {
 
@@ -25,41 +28,39 @@ class TimelineAgendaWidgetProvider : HomeWidgetProvider() {
                 val isAllowed = WidgetLimitHelper.isWidgetAllowed(context, appWidgetId, isPremium)
                 val views = RemoteViews(context.packageName, R.layout.widget_timeline_agenda_layout)
 
-                val theme = widgetData.getString("full_calendar_theme", "system") ?: "system"
-                val rootBgRes = when (theme) {
-                    "light" -> R.drawable.widget_background_light
-                    "dark" -> R.drawable.widget_background_dark
-                    "glassmorphic" -> R.drawable.widget_background_glass
-                    else -> R.drawable.widget_background
-                }
-                views.setInt(R.id.widget_timeline_root, "setBackgroundResource", rootBgRes)
-
-                val textColor = when (theme) {
-                    "light" -> android.graphics.Color.parseColor("#1C1C1E")
-                    "dark", "glassmorphic" -> android.graphics.Color.parseColor("#FFFFFF")
-                    else -> context.getColor(R.color.widget_title_text)
-                }
+                // 1. The app's card, tinted icons, RTL.
+                val palette = WidgetStyle.palette(context, widgetData)
                 val widgetLocale = WidgetLocaleHelper.getWidgetLocale(widgetData)
-                views.setTextColor(R.id.widget_timeline_title, textColor)
-                views.setTextViewText(R.id.widget_timeline_title, WidgetLocaleHelper.getScheduleTimelineText(widgetLocale))
+                WidgetStyle.applyCard(views, palette, R.id.widget_timeline_card_fill, R.id.widget_timeline_card_stroke)
+                WidgetStyle.applyDirection(views, R.id.widget_timeline_root, widgetLocale)
+                WidgetStyle.tint(views, palette.onSurface, R.id.widget_timeline_today_btn, R.id.widget_timeline_add_btn)
+                WidgetStyle.tint(views, palette.primary, R.id.widget_timeline_empty_icon)
+                views.setTextColor(R.id.widget_timeline_header_title, palette.onSurface)
+                views.setTextColor(R.id.widget_timeline_empty_title, palette.onSurface)
+                views.setTextColor(R.id.widget_timeline_empty_subtitle, palette.onSurfaceMuted)
 
-                // Add Task Button
-                val addIntent = HomeWidgetLaunchIntent.getActivity(
-                    context,
-                    MainActivity::class.java,
-                    Uri.parse("rocistasks://add_task")
+                // 2. Header: title opens the calendar, "today" opens it on today, + adds a task.
+                views.setTextViewText(R.id.widget_timeline_header_title, WidgetLocaleHelper.getScheduleTimelineText(widgetLocale))
+                views.setContentDescription(R.id.widget_timeline_today_btn, WidgetLocaleHelper.getTodayText(widgetLocale))
+                views.setContentDescription(R.id.widget_timeline_add_btn, WidgetLocaleHelper.getNewTaskText(widgetLocale))
+
+                val todayKey = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Calendar.getInstance().time)
+                views.setOnClickPendingIntent(
+                    R.id.widget_timeline_header_title,
+                    HomeWidgetLaunchIntent.getActivity(context, MainActivity::class.java, Uri.parse("rocistasks://calendar"))
                 )
-                views.setOnClickPendingIntent(R.id.widget_timeline_add_btn, addIntent)
-
-                // Open Calendar Button
-                val calIntent = HomeWidgetLaunchIntent.getActivity(
-                    context,
-                    MainActivity::class.java,
-                    Uri.parse("rocistasks://calendar")
+                views.setOnClickPendingIntent(
+                    R.id.widget_timeline_today_btn,
+                    HomeWidgetLaunchIntent.getActivity(
+                        context, MainActivity::class.java, Uri.parse("rocistasks://calendar?date=$todayKey")
+                    )
                 )
-                views.setOnClickPendingIntent(R.id.widget_timeline_today_btn, calIntent)
+                views.setOnClickPendingIntent(
+                    R.id.widget_timeline_add_btn,
+                    HomeWidgetLaunchIntent.getActivity(context, MainActivity::class.java, Uri.parse("rocistasks://add_task"))
+                )
 
-                // ListView Adapter - Always configure adapter
+                // 3. RemoteViewsService for the ListView (always configured).
                 val serviceIntent = Intent(context, TimelineAgendaWidgetService::class.java).apply {
                     putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
                     data = Uri.parse("widget://rocis/timeline_agenda/$appWidgetId")
@@ -69,7 +70,7 @@ class TimelineAgendaWidgetProvider : HomeWidgetProvider() {
                 views.setTextViewText(R.id.widget_timeline_empty_subtitle, WidgetLocaleHelper.getTapPlusToAddText(widgetLocale))
                 views.setEmptyView(R.id.widget_timeline_list, R.id.widget_timeline_empty)
 
-                // Item Click Template
+                // 4. Template PendingIntent for list rows and day sections.
                 val itemAppIntent = Intent(context, MainActivity::class.java).apply {
                     action = Intent.ACTION_VIEW
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
@@ -82,7 +83,8 @@ class TimelineAgendaWidgetProvider : HomeWidgetProvider() {
                 )
                 views.setPendingIntentTemplate(R.id.widget_timeline_list, itemPendingIntent)
 
-                WidgetLimitHelper.setupProOverlay(context, views, isAllowed)
+                // Apply limit overlay
+                WidgetStyle.setupProOverlay(context, views, isAllowed, palette, widgetLocale)
 
                 appWidgetManager.updateAppWidget(appWidgetId, views)
                 appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_timeline_list)
