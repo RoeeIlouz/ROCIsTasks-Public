@@ -175,7 +175,8 @@ class _HomeScreenState extends State<HomeScreen> {
       return;
     }
 
-    if (uri.host == 'task_detail') {
+    // task_item is what the agenda widgets send for a row tap.
+    if (uri.host == 'task_detail' || uri.host == 'task_item') {
       final taskId = uri.queryParameters['id'];
       if (taskId != null) {
         final taskProvider = Provider.of<TaskProvider>(context, listen: false);

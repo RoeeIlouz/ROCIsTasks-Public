@@ -3,14 +3,15 @@ package com.rocisapps.tasks
 import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.SharedPreferences
-import android.graphics.BitmapFactory
-import android.graphics.Color
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.RectF
 import android.net.Uri
-import android.view.View
 import android.widget.RemoteViews
 import es.antonborri.home_widget.HomeWidgetLaunchIntent
 import es.antonborri.home_widget.HomeWidgetProvider
-import java.io.File
+import java.util.Locale
 
 class QuickActionWidgetProvider : HomeWidgetProvider() {
 
@@ -27,91 +28,101 @@ class QuickActionWidgetProvider : HomeWidgetProvider() {
                 val isAllowed = WidgetLimitHelper.isWidgetAllowed(context, appWidgetId, isPremium)
                 val views = RemoteViews(context.packageName, R.layout.widget_quick_action_layout)
 
-                val theme = widgetData.getString("full_calendar_theme", "system") ?: "system"
-                val rootBgRes = when (theme) {
-                    "light" -> R.drawable.widget_background_light
-                    "dark" -> R.drawable.widget_background_dark
-                    "glassmorphic" -> R.drawable.widget_background_glass
-                    else -> R.drawable.widget_background
-                }
-                views.setInt(R.id.widget_quick_action_root, "setBackgroundResource", rootBgRes)
-
-                val highlightColorHex = widgetData.getString("full_calendar_highlight_color", "#6366F1") ?: "#6366F1"
-                val highlightColor = try {
-                    Color.parseColor(highlightColorHex)
-                } catch (_: Exception) {
-                    Color.parseColor("#6366F1")
-                }
-
-                val textColor = when (theme) {
-                    "light" -> Color.parseColor("#0F172A")
-                    else -> Color.parseColor("#FFFFFF")
-                }
-                val secondaryColor = when (theme) {
-                    "light" -> Color.parseColor("#64748B")
-                    else -> Color.parseColor("#94A3B8")
-                }
-
+                // 1. The app's card, tinted tiles, RTL.
+                val palette = WidgetStyle.palette(context, widgetData)
                 val widgetLocale = WidgetLocaleHelper.getWidgetLocale(widgetData)
-                views.setTextViewText(R.id.widget_quick_stat_label, WidgetLocaleHelper.getPendingLeftText(widgetLocale))
+                WidgetStyle.applyCard(views, palette, R.id.widget_quick_card_fill, R.id.widget_quick_card_stroke)
+                WidgetStyle.applyDirection(views, R.id.widget_quick_action_root, widgetLocale)
+
+                // Primary action: accent-tinted tile; secondary: faint onSurface wash (like list tiles).
+                WidgetStyle.applyTile(views, R.id.widget_quick_btn_add_fill, palette.primary, 0x1F)
+                WidgetStyle.applyTile(views, R.id.widget_quick_btn_cal_fill, palette.onSurface, if (palette.isDark) 0x14 else 0x0D)
+                WidgetStyle.tint(views, palette.primary, R.id.widget_quick_btn_add_icon, R.id.widget_quick_calendar_icon)
                 views.setTextViewText(R.id.widget_quick_btn_add_text, WidgetLocaleHelper.getNewTaskText(widgetLocale))
                 views.setTextViewText(R.id.widget_quick_btn_cal_text, WidgetLocaleHelper.getCalendarText(widgetLocale))
-                views.setTextColor(R.id.widget_quick_stat_number, textColor)
-                views.setTextColor(R.id.widget_quick_stat_label, secondaryColor)
-                views.setTextColor(R.id.widget_quick_btn_add_icon, highlightColor)
-                views.setTextColor(R.id.widget_quick_btn_add_text, textColor)
-                views.setTextColor(R.id.widget_quick_btn_cal_text, textColor)
-                views.setInt(R.id.widget_quick_calendar_icon, "setColorFilter", highlightColor)
+                views.setTextColor(R.id.widget_quick_btn_add_text, palette.onSurface)
+                views.setTextColor(R.id.widget_quick_btn_cal_text, palette.onSurface)
 
-                // Load Circular Chart if available, otherwise show number fallback
-                val chartPath = widgetData.getString("chart_image_path", null)
-                var hasChart = false
-                if (chartPath != null && File(chartPath).exists()) {
-                    val bitmap = BitmapFactory.decodeFile(chartPath)
-                    if (bitmap != null) {
-                        views.setImageViewBitmap(R.id.widget_quick_chart_img, bitmap)
-                        views.setViewVisibility(R.id.widget_quick_chart_img, View.VISIBLE)
-                        views.setViewVisibility(R.id.widget_quick_stat_container, View.GONE)
-                        hasChart = true
-                    }
-                }
+                // 2. Today's progress (pending / completed today, written by updateQuickActionWidget).
+                val pendingCount = readCount(widgetData, "quick_action_pending_count")
+                val completedCount = readCount(widgetData, "quick_action_completed_count")
+                views.setTextViewText(R.id.widget_quick_stat_number, if (pendingCount > 99) "99+" else "$pendingCount")
+                views.setTextColor(R.id.widget_quick_stat_number, palette.onSurface)
+                views.setTextViewText(R.id.widget_quick_stat_label, WidgetLocaleHelper.getPendingLeftText(widgetLocale))
+                views.setTextColor(R.id.widget_quick_stat_label, palette.onSurfaceMuted)
+                views.setTextViewText(R.id.widget_quick_done_label, doneText(completedCount, widgetLocale))
+                views.setTextColor(R.id.widget_quick_done_label, palette.primary)
 
-                if (!hasChart) {
-                    views.setViewVisibility(R.id.widget_quick_chart_img, View.GONE)
-                    views.setViewVisibility(R.id.widget_quick_stat_container, View.VISIBLE)
-                    val pendingCount = widgetData.getInt("quick_action_pending_count", 0)
-                    views.setTextViewText(R.id.widget_quick_stat_number, if (pendingCount > 99) "99+" else "$pendingCount")
-                }
-
-                // Button actions
-                val addTaskIntent = HomeWidgetLaunchIntent.getActivity(
-                    context,
-                    MainActivity::class.java,
-                    Uri.parse("rocistasks://add_task")
+                val total = pendingCount + completedCount
+                val progress = if (total == 0) 0f else completedCount.toFloat() / total
+                val ring = drawRing(
+                    context, progress, palette.primary,
+                    WidgetStyle.withAlpha(palette.onSurface, if (palette.isDark) 0x26 else 0x1A),
+                    WidgetLocaleHelper.isRtl(widgetLocale)
                 )
-                views.setOnClickPendingIntent(R.id.widget_quick_btn_add_task, addTaskIntent)
+                if (ring != null) views.setImageViewBitmap(R.id.widget_quick_ring, ring)
 
-                val calIntent = HomeWidgetLaunchIntent.getActivity(
-                    context,
-                    MainActivity::class.java,
-                    Uri.parse("rocistasks://calendar")
+                // 3. Actions
+                views.setOnClickPendingIntent(
+                    R.id.widget_quick_btn_add_task,
+                    HomeWidgetLaunchIntent.getActivity(context, MainActivity::class.java, Uri.parse("rocistasks://add_task"))
                 )
-                views.setOnClickPendingIntent(R.id.widget_quick_btn_calendar, calIntent)
-
-                val homeIntent = HomeWidgetLaunchIntent.getActivity(
-                    context,
-                    MainActivity::class.java,
-                    Uri.parse("rocistasks://home")
+                views.setOnClickPendingIntent(
+                    R.id.widget_quick_btn_calendar,
+                    HomeWidgetLaunchIntent.getActivity(context, MainActivity::class.java, Uri.parse("rocistasks://calendar"))
                 )
-                views.setOnClickPendingIntent(R.id.widget_quick_progress_container, homeIntent)
+                views.setOnClickPendingIntent(
+                    R.id.widget_quick_progress_container,
+                    HomeWidgetLaunchIntent.getActivity(context, MainActivity::class.java, Uri.parse("rocistasks://home"))
+                )
 
-                // Pro limit overlay
-                WidgetLimitHelper.setupProOverlay(context, views, isAllowed)
+                WidgetStyle.setupProOverlay(context, views, isAllowed, palette, widgetLocale)
 
                 appWidgetManager.updateAppWidget(appWidgetId, views)
             } catch (e: Exception) {
                 android.util.Log.e("QuickActionWidget", "Error updating widget $appWidgetId", e)
             }
         }
+    }
+
+    /** HomeWidget stores Dart ints as Int or Long depending on the platform channel. */
+    private fun readCount(widgetData: SharedPreferences, key: String): Int =
+        when (val raw = widgetData.all[key]) {
+            is Number -> raw.toInt()
+            is String -> raw.toIntOrNull() ?: 0
+            else -> 0
+        }.coerceAtLeast(0)
+
+    /** Today's completion ring: faint track plus an accent arc with round caps (mirrored in RTL). */
+    private fun drawRing(context: Context, progress: Float, accent: Int, track: Int, rtl: Boolean): Bitmap? {
+        return try {
+            val density = context.resources.displayMetrics.density
+            val size = (60 * density).toInt().coerceAtLeast(1)
+            val stroke = 5 * density
+            val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+            val canvas = Canvas(bitmap)
+            val inset = stroke / 2 + density
+            val oval = RectF(inset, inset, size - inset, size - inset)
+            val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                style = Paint.Style.STROKE
+                strokeWidth = stroke
+                strokeCap = Paint.Cap.ROUND
+            }
+            paint.color = track
+            canvas.drawOval(oval, paint)
+            if (progress > 0f) {
+                paint.color = accent
+                val sweep = 360f * progress.coerceIn(0f, 1f)
+                canvas.drawArc(oval, -90f, if (rtl) -sweep else sweep, false, paint)
+            }
+            bitmap
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    private fun doneText(count: Int, locale: Locale): String = when (WidgetLocaleHelper.getNormalizedLanguage(locale)) {
+        "he" -> "$count הושלמו"; "es" -> "$count hechas"; "de" -> "$count erledigt"; "fr" -> "$count faites"
+        "ar" -> "$count مكتملة"; "sv" -> "$count klara"; "hi" -> "$count पूर्ण"; else -> "$count done"
     }
 }

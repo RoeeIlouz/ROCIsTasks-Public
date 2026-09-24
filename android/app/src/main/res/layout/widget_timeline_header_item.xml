@@ -1,39 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Timeline day section: day label ("Today" in the accent), a hairline and the date on
+     the end side. Tapping it opens the in-app calendar on that day. Colored by the factory. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/widget_timeline_header_root"
+    android:id="@+id/widget_timeline_section_root"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
     android:gravity="center_vertical"
-    android:paddingTop="8dp"
-    android:paddingBottom="4dp"
+    android:orientation="horizontal"
     android:paddingStart="4dp"
-    android:paddingEnd="4dp">
+    android:paddingEnd="4dp"
+    android:paddingTop="10dp"
+    android:paddingBottom="4dp">
 
     <TextView
-        android:id="@+id/widget_timeline_header_day"
+        android:id="@+id/widget_timeline_section_day"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="TODAY"
-        android:textSize="11sp"
-        android:fontFamily="sans-serif"
-        android:textStyle="bold"
-        android:textColor="@color/widget_primary"
-        android:layout_marginEnd="6dp" />
-
-    <TextView
-        android:id="@+id/widget_timeline_header_date"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="Thursday, August 20"
-        android:textSize="11sp"
-        android:textColor="@color/widget_secondary_text" />
+        android:ellipsize="end"
+        android:fontFamily="@font/outfit_bold"
+        android:includeFontPadding="false"
+        android:maxLines="1"
+        android:text="Today"
+        android:textAlignment="viewStart"
+        android:textSize="13sp" />
 
     <FrameLayout
+        android:id="@+id/widget_timeline_section_line"
         android:layout_width="0dp"
         android:layout_height="1dp"
-        android:layout_weight="0.5"
-        android:background="#20888888" />
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_weight="1" />
 
+    <TextView
+        android:id="@+id/widget_timeline_section_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/outfit_medium"
+        android:includeFontPadding="false"
+        android:maxLines="1"
+        android:text="Sep 24"
+        android:textSize="12sp" />
 </LinearLayout>

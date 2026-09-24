@@ -1,187 +1,201 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Quick Actions: the app's card with today's progress ring (pending count inside,
+     completed count below) and action tiles. Colors are applied at runtime. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/widget_quick_action_root"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/widget_background"
-    android:padding="12dp">
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/widget_quick_card_fill"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitXY"
+        android:src="@drawable/widget_card_fill" />
+
+    <ImageView
+        android:id="@+id/widget_quick_card_stroke"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitXY"
+        android:src="@drawable/widget_card_stroke" />
 
     <LinearLayout
         android:id="@+id/widget_quick_action_main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:gravity="center_vertical">
+        android:padding="10dp">
 
-        <!-- Left: Circular Progress Summary -->
-        <FrameLayout
+        <!-- Progress: ring with today's pending count, completed count below. -->
+        <LinearLayout
             android:id="@+id/widget_quick_progress_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="4dp">
-
-            <ImageView
-                android:id="@+id/widget_quick_chart_img"
-                android:layout_width="64dp"
-                android:layout_height="64dp"
-                android:layout_gravity="center"
-                android:scaleType="fitCenter" />
-
-            <LinearLayout
-                android:id="@+id/widget_quick_stat_container"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:orientation="vertical"
-                android:gravity="center">
-
-                <TextView
-                    android:id="@+id/widget_quick_stat_number"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="3"
-                    android:textColor="@color/widget_title_text"
-                    android:textSize="18sp"
-                    android:fontFamily="sans-serif"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/widget_quick_stat_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Left"
-                    android:textColor="@color/widget_secondary_text"
-                    android:textSize="9sp" />
-            </LinearLayout>
-        </FrameLayout>
-
-        <!-- Right: Action Buttons -->
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_horizontal"
             android:orientation="vertical"
-            android:gravity="center_vertical"
-            android:paddingStart="12dp">
+            android:paddingStart="2dp"
+            android:paddingEnd="2dp">
 
-            <!-- Quick Add Task -->
-            <LinearLayout
-                android:id="@+id/widget_quick_btn_add_task"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:background="@drawable/widget_card_bg"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
-                android:paddingTop="6dp"
-                android:paddingBottom="6dp"
-                android:layout_marginBottom="6dp">
-
-                <TextView
-                    android:id="@+id/widget_quick_btn_add_icon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="+"
-                    android:textColor="@color/widget_primary"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:layout_marginEnd="6dp" />
-
-                <TextView
-                    android:id="@+id/widget_quick_btn_add_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="New Task"
-                    android:textColor="@color/widget_title_text"
-                    android:textSize="12sp"
-                    android:fontFamily="sans-serif"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-            <!-- Calendar Shortcut -->
-            <LinearLayout
-                android:id="@+id/widget_quick_btn_calendar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:background="@drawable/widget_card_bg"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
-                android:paddingTop="6dp"
-                android:paddingBottom="6dp">
+            <FrameLayout
+                android:layout_width="60dp"
+                android:layout_height="60dp">
 
                 <ImageView
-                    android:id="@+id/widget_quick_calendar_icon"
-                    android:layout_width="14dp"
-                    android:layout_height="14dp"
-                    android:src="@drawable/ic_calendar_event"
-                    android:layout_marginEnd="6dp" />
+                    android:id="@+id/widget_quick_ring"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="fitCenter" />
 
-                <TextView
-                    android:id="@+id/widget_quick_btn_cal_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Calendar"
-                    android:textColor="@color/widget_title_text"
-                    android:textSize="12sp"
-                    android:fontFamily="sans-serif"
-                    android:textStyle="bold" />
-            </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/widget_quick_stat_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/widget_quick_stat_number"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/outfit_bold"
+                        android:includeFontPadding="false"
+                        android:letterSpacing="-0.03"
+                        android:maxLines="1"
+                        android:text="3"
+                        android:textSize="20sp" />
+
+                    <TextView
+                        android:id="@+id/widget_quick_stat_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="1dp"
+                        android:ellipsize="end"
+                        android:fontFamily="@font/outfit_medium"
+                        android:includeFontPadding="false"
+                        android:maxLines="1"
+                        android:maxWidth="46dp"
+                        android:text="Left"
+                        android:textSize="10sp" />
+                </LinearLayout>
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/widget_quick_done_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:ellipsize="end"
+                android:fontFamily="@font/outfit_medium"
+                android:includeFontPadding="false"
+                android:maxLines="1"
+                android:maxWidth="72dp"
+                android:text="2 done"
+                android:textSize="11sp" />
+        </LinearLayout>
+
+        <!-- Action tiles -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="10dp"
+            android:orientation="vertical">
+
+            <FrameLayout
+                android:id="@+id/widget_quick_btn_add_task"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:id="@+id/widget_quick_btn_add_fill"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/widget_item_fill" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="10dp">
+
+                    <ImageView
+                        android:id="@+id/widget_quick_btn_add_icon"
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@drawable/ic_add" />
+
+                    <TextView
+                        android:id="@+id/widget_quick_btn_add_text"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_weight="1"
+                        android:ellipsize="end"
+                        android:fontFamily="@font/outfit_semibold"
+                        android:includeFontPadding="false"
+                        android:maxLines="1"
+                        android:text="New Task"
+                        android:textAlignment="viewStart"
+                        android:textSize="13sp" />
+                </LinearLayout>
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/widget_quick_btn_calendar"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginTop="6dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:id="@+id/widget_quick_btn_cal_fill"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/widget_item_fill" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="10dp">
+
+                    <ImageView
+                        android:id="@+id/widget_quick_calendar_icon"
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:padding="1dp"
+                        android:src="@drawable/ic_today_24" />
+
+                    <TextView
+                        android:id="@+id/widget_quick_btn_cal_text"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_weight="1"
+                        android:ellipsize="end"
+                        android:fontFamily="@font/outfit_semibold"
+                        android:includeFontPadding="false"
+                        android:maxLines="1"
+                        android:text="Calendar"
+                        android:textAlignment="viewStart"
+                        android:textSize="13sp" />
+                </LinearLayout>
+            </FrameLayout>
         </LinearLayout>
     </LinearLayout>
 
-    <!-- Pro Limit Overlay -->
-    <RelativeLayout
-        android:id="@+id/widget_pro_overlay"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#E6121212"
-        android:padding="8dp"
-        android:gravity="center"
-        android:visibility="gone"
-        android:clickable="true"
-        android:focusable="true">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center">
-
-            <ImageView
-                android:layout_width="28dp"
-                android:layout_height="28dp"
-                android:src="@drawable/ic_lock_pro"
-                android:layout_marginBottom="4dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Free 1-Widget Limit"
-                android:textColor="#FFFFFF"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                android:gravity="center" />
-
-            <TextView
-                android:id="@+id/widget_pro_overlay_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Unlock Pro"
-                android:textColor="#FFFFFF"
-                android:textSize="10sp"
-                android:textStyle="bold"
-                android:background="@drawable/widget_pill_bg"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
-                android:paddingTop="4dp"
-                android:paddingBottom="4dp"
-                android:layout_marginTop="6dp"
-                android:clickable="true"
-                android:focusable="true" />
-        </LinearLayout>
-    </RelativeLayout>
-
-</RelativeLayout>
+    <include layout="@layout/widget_pro_overlay" />
+</FrameLayout>

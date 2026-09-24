@@ -1,184 +1,347 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Kanban Board: the app's card with a column header, column chips (active = accent
+     chip, like the Full Calendar filters) and the column's task cards. Colors are
+     applied at runtime. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/widget_kanban_root"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/widget_background"
-    android:padding="8dp">
+    android:layout_height="match_parent">
 
-    <!-- Header Section -->
-    <LinearLayout
-        android:id="@+id/widget_kanban_header"
+    <ImageView
+        android:id="@+id/widget_kanban_card_fill"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:paddingBottom="4dp">
+        android:layout_height="match_parent"
+        android:scaleType="fitXY"
+        android:src="@drawable/widget_card_fill" />
 
-        <TextView
-            android:id="@+id/widget_kanban_prev"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:gravity="center"
-            android:text="‹"
-            android:textColor="@color/widget_title_text"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:background="@drawable/widget_nav_icon_bg"
-            android:layout_marginEnd="4dp"
-            android:clickable="true"
-            android:focusable="true" />
+    <ImageView
+        android:id="@+id/widget_kanban_card_stroke"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitXY"
+        android:src="@drawable/widget_card_stroke" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingStart="12dp"
+        android:paddingEnd="8dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="8dp">
 
         <LinearLayout
-            android:id="@+id/widget_kanban_title_container"
-            android:layout_width="0dp"
+            android:id="@+id/widget_kanban_header"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:paddingStart="4dp"
-            android:paddingEnd="4dp"
-            android:clickable="true"
-            android:focusable="true">
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/widget_kanban_title"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/widget_kanban_title_container"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="To Do"
-                android:textColor="@color/widget_title_text"
-                android:textSize="15sp"
-                android:fontFamily="sans-serif"
-                android:textStyle="bold"
-                android:maxLines="1"
-                android:ellipsize="end" />
+                android:layout_weight="1"
+                android:clickable="true"
+                android:focusable="true"
+                android:orientation="vertical"
+                android:paddingStart="4dp">
 
-            <TextView
-                android:id="@+id/widget_kanban_subtitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Kanban Board • 3 tasks"
-                android:textColor="@color/widget_secondary_text"
-                android:textSize="11sp"
-                android:maxLines="1"
-                android:ellipsize="end" />
+                <TextView
+                    android:id="@+id/widget_kanban_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:fontFamily="@font/outfit_bold"
+                    android:includeFontPadding="false"
+                    android:letterSpacing="-0.03"
+                    android:maxLines="1"
+                    android:text="To Do"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/widget_kanban_subtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:ellipsize="end"
+                    android:fontFamily="@font/outfit_medium"
+                    android:includeFontPadding="false"
+                    android:maxLines="1"
+                    android:text="Kanban Board"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/widget_kanban_prev"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:clickable="true"
+                android:contentDescription="Previous column"
+                android:focusable="true"
+                android:padding="6dp"
+                android:src="@drawable/ic_chevron_left_24" />
+
+            <ImageView
+                android:id="@+id/widget_kanban_next"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:clickable="true"
+                android:contentDescription="Next column"
+                android:focusable="true"
+                android:padding="6dp"
+                android:src="@drawable/ic_chevron_right_24" />
+
+            <ImageView
+                android:id="@+id/widget_kanban_add_btn"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:clickable="true"
+                android:contentDescription="Add task"
+                android:focusable="true"
+                android:padding="6dp"
+                android:src="@drawable/ic_add" />
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/widget_kanban_next"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:gravity="center"
-            android:text="›"
-            android:textColor="@color/widget_title_text"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:background="@drawable/widget_nav_icon_bg"
-            android:layout_marginStart="4dp"
-            android:layout_marginEnd="4dp"
-            android:clickable="true"
-            android:focusable="true" />
+        <!-- Column chips: label + count; the active column reads in the accent. -->
+        <LinearLayout
+            android:id="@+id/widget_kanban_tabs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="4dp"
+            android:orientation="horizontal"
+            android:paddingEnd="4dp">
 
-        <TextView
-            android:id="@+id/widget_kanban_add_btn"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:gravity="center"
-            android:text="+"
-            android:textColor="@color/widget_primary"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:background="@drawable/widget_nav_icon_bg"
-            android:clickable="true"
-            android:focusable="true" />
+            <FrameLayout
+                android:id="@+id/widget_kanban_tab_todo"
+                android:layout_width="0dp"
+                android:layout_height="36dp"
+                android:layout_marginEnd="6dp"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:focusable="true"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp">
+
+                <ImageView
+                    android:id="@+id/widget_kanban_tab_todo_fill"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/widget_chip_fill" />
+
+                <ImageView
+                    android:id="@+id/widget_kanban_tab_todo_stroke"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/widget_chip_stroke" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp">
+
+                    <TextView
+                        android:id="@+id/widget_kanban_tab_todo_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:ellipsize="end"
+                        android:fontFamily="@font/outfit_medium"
+                        android:includeFontPadding="false"
+                        android:maxLines="1"
+                        android:text="To Do"
+                        android:textSize="11sp" />
+
+                    <TextView
+                        android:id="@+id/widget_kanban_tab_todo_count"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:fontFamily="@font/outfit_bold"
+                        android:includeFontPadding="false"
+                        android:maxLines="1"
+                        android:text="0"
+                        android:textSize="11sp" />
+                </LinearLayout>
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/widget_kanban_tab_focus"
+                android:layout_width="0dp"
+                android:layout_height="36dp"
+                android:layout_marginEnd="6dp"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:focusable="true"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp">
+
+                <ImageView
+                    android:id="@+id/widget_kanban_tab_focus_fill"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/widget_chip_fill" />
+
+                <ImageView
+                    android:id="@+id/widget_kanban_tab_focus_stroke"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/widget_chip_stroke" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp">
+
+                    <TextView
+                        android:id="@+id/widget_kanban_tab_focus_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:ellipsize="end"
+                        android:fontFamily="@font/outfit_medium"
+                        android:includeFontPadding="false"
+                        android:maxLines="1"
+                        android:text="In Focus"
+                        android:textSize="11sp" />
+
+                    <TextView
+                        android:id="@+id/widget_kanban_tab_focus_count"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:fontFamily="@font/outfit_bold"
+                        android:includeFontPadding="false"
+                        android:maxLines="1"
+                        android:text="0"
+                        android:textSize="11sp" />
+                </LinearLayout>
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/widget_kanban_tab_done"
+                android:layout_width="0dp"
+                android:layout_height="36dp"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:focusable="true"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp">
+
+                <ImageView
+                    android:id="@+id/widget_kanban_tab_done_fill"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/widget_chip_fill" />
+
+                <ImageView
+                    android:id="@+id/widget_kanban_tab_done_stroke"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/widget_chip_stroke" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp">
+
+                    <TextView
+                        android:id="@+id/widget_kanban_tab_done_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:ellipsize="end"
+                        android:fontFamily="@font/outfit_medium"
+                        android:includeFontPadding="false"
+                        android:maxLines="1"
+                        android:text="Done"
+                        android:textSize="11sp" />
+
+                    <TextView
+                        android:id="@+id/widget_kanban_tab_done_count"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:fontFamily="@font/outfit_bold"
+                        android:includeFontPadding="false"
+                        android:maxLines="1"
+                        android:text="0"
+                        android:textSize="11sp" />
+                </LinearLayout>
+            </FrameLayout>
+        </LinearLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <ListView
+                android:id="@+id/widget_kanban_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:divider="@null"
+                android:dividerHeight="6dp"
+                android:paddingEnd="4dp"
+                android:scrollbars="none" />
+
+            <LinearLayout
+                android:id="@+id/widget_kanban_empty"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="12dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/widget_kanban_empty_icon"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:layout_marginBottom="6dp"
+                    android:src="@drawable/ic_widget_check_on" />
+
+                <TextView
+                    android:id="@+id/widget_kanban_empty_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/outfit_semibold"
+                    android:gravity="center"
+                    android:text="No tasks in this column"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/widget_kanban_empty_subtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:fontFamily="@font/outfit_regular"
+                    android:gravity="center"
+                    android:text="Tap + to add a task"
+                    android:textSize="12sp" />
+            </LinearLayout>
+        </FrameLayout>
     </LinearLayout>
 
-    <!-- Column Segment Tabs -->
-    <LinearLayout
-        android:id="@+id/widget_kanban_tabs"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/widget_kanban_header"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:paddingBottom="6dp">
-
-        <TextView
-            android:id="@+id/widget_kanban_tab_todo"
-            android:layout_width="0dp"
-            android:layout_height="28dp"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="To Do"
-            android:textColor="@color/widget_title_text"
-            android:textSize="11sp"
-            android:fontFamily="sans-serif-medium"
-            android:textStyle="bold"
-            android:background="@drawable/widget_pill_bg"
-            android:layout_marginEnd="4dp"
-            android:clickable="true"
-            android:focusable="true" />
-
-        <TextView
-            android:id="@+id/widget_kanban_tab_focus"
-            android:layout_width="0dp"
-            android:layout_height="28dp"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="In Focus"
-            android:textColor="@color/widget_secondary_text"
-            android:textSize="11sp"
-            android:fontFamily="sans-serif-medium"
-            android:textStyle="bold"
-            android:layout_marginEnd="4dp"
-            android:clickable="true"
-            android:focusable="true" />
-
-        <TextView
-            android:id="@+id/widget_kanban_tab_done"
-            android:layout_width="0dp"
-            android:layout_height="28dp"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="Done"
-            android:textColor="@color/widget_secondary_text"
-            android:textSize="11sp"
-            android:fontFamily="sans-serif-medium"
-            android:textStyle="bold"
-            android:clickable="true"
-            android:focusable="true" />
-    </LinearLayout>
-
-    <!-- Divider Line -->
-    <FrameLayout
-        android:id="@+id/widget_kanban_divider"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_below="@id/widget_kanban_tabs"
-        android:background="#20FFFFFF"
-        android:layout_marginBottom="4dp" />
-
-    <!-- Empty State -->
-    <TextView
-        android:id="@+id/widget_kanban_empty"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/widget_kanban_divider"
-        android:gravity="center"
-        android:text="No tasks in this column"
-        android:textColor="@color/widget_secondary_text"
-        android:textSize="13sp"
-        android:fontFamily="sans-serif"
-        android:visibility="gone" />
-
-    <!-- Scrollable Tasks List -->
-    <ListView
-        android:id="@+id/widget_kanban_list"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/widget_kanban_divider"
-        android:divider="@android:color/transparent"
-        android:dividerHeight="4dp"
-        android:scrollbars="vertical" />
-
-</RelativeLayout>
+    <include layout="@layout/widget_pro_overlay" />
+</FrameLayout>

@@ -1,164 +1,131 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Schedule Timeline: the app's card (GlassContainer colors synced from MyApp) with a
+     header and a continuous, day-grouped list of upcoming tasks and events.
+     Colors are applied at runtime. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/widget_timeline_root"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/widget_background"
-    android:padding="8dp">
+    android:layout_height="match_parent">
 
-    <!-- Header Section -->
-    <LinearLayout
-        android:id="@+id/widget_timeline_header"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:paddingBottom="6dp">
-
-        <TextView
-            android:id="@+id/widget_timeline_title"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Schedule Timeline"
-            android:textColor="@color/widget_title_text"
-            android:textSize="16sp"
-            android:fontFamily="sans-serif"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/widget_timeline_today_btn"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:gravity="center"
-            android:text="⦿"
-            android:textColor="@color/widget_primary"
-            android:textSize="13sp"
-            android:background="@drawable/widget_nav_icon_bg"
-            android:clickable="true"
-            android:focusable="true" />
-
-        <TextView
-            android:id="@+id/widget_timeline_add_btn"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_marginStart="4dp"
-            android:gravity="center"
-            android:text="+"
-            android:textColor="@color/widget_primary"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:background="@drawable/widget_nav_icon_bg"
-            android:clickable="true"
-            android:focusable="true" />
-    </LinearLayout>
-
-    <FrameLayout
-        android:id="@+id/widget_timeline_divider"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_below="@id/widget_timeline_header"
-        android:background="#20FFFFFF"
-        android:layout_marginBottom="4dp" />
-
-    <!-- Continuous Scrollable List -->
-    <ListView
-        android:id="@+id/widget_timeline_list"
+    <ImageView
+        android:id="@+id/widget_timeline_card_fill"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/widget_timeline_divider"
-        android:divider="@null"
-        android:dividerHeight="0dp" />
+        android:scaleType="fitXY"
+        android:src="@drawable/widget_card_fill" />
 
-    <!-- Empty State -->
-    <LinearLayout
-        android:id="@+id/widget_timeline_empty"
+    <ImageView
+        android:id="@+id/widget_timeline_card_stroke"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/widget_timeline_divider"
+        android:scaleType="fitXY"
+        android:src="@drawable/widget_card_stroke" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:orientation="vertical"
-        android:gravity="center"
-        android:padding="16dp"
-        android:visibility="gone">
-
-        <TextView
-            android:id="@+id/widget_timeline_empty_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="No upcoming tasks or events"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:textColor="@color/widget_secondary_text" />
-
-        <TextView
-            android:id="@+id/widget_timeline_empty_subtitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Tap + to add your next task"
-            android:textSize="12sp"
-            android:textColor="@color/widget_secondary_text"
-            android:layout_marginTop="4dp" />
-    </LinearLayout>
-
-    <!-- Pro Limit Overlay -->
-    <RelativeLayout
-        android:id="@+id/widget_pro_overlay"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#E6121212"
-        android:padding="16dp"
-        android:gravity="center"
-        android:visibility="gone"
-        android:clickable="true"
-        android:focusable="true">
+        android:paddingStart="12dp"
+        android:paddingEnd="8dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="8dp">
 
         <LinearLayout
+            android:id="@+id/widget_timeline_header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center">
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingBottom="2dp">
+
+            <TextView
+                android:id="@+id/widget_timeline_header_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:ellipsize="end"
+                android:focusable="true"
+                android:fontFamily="@font/outfit_bold"
+                android:includeFontPadding="false"
+                android:letterSpacing="-0.03"
+                android:maxLines="1"
+                android:paddingStart="4dp"
+                android:text="Schedule Timeline"
+                android:textAlignment="viewStart"
+                android:textSize="18sp" />
 
             <ImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:src="@drawable/ic_lock_pro"
-                android:layout_marginBottom="8dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Free 1-Widget Limit"
-                android:textColor="#FFFFFF"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:gravity="center" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Free tier includes 1 active widget. Upgrade to Pro for unlimited home screen widgets!"
-                android:textColor="#CCCCCC"
-                android:textSize="12sp"
-                android:gravity="center"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="12dp" />
-
-            <TextView
-                android:id="@+id/widget_pro_overlay_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Unlock Unlimited Widgets"
-                android:textColor="#FFFFFF"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:background="@drawable/widget_pill_bg"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp"
+                android:id="@+id/widget_timeline_today_btn"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
                 android:clickable="true"
-                android:focusable="true" />
-        </LinearLayout>
-    </RelativeLayout>
+                android:focusable="true"
+                android:padding="7dp"
+                android:src="@drawable/ic_today_24" />
 
-</RelativeLayout>
+            <ImageView
+                android:id="@+id/widget_timeline_add_btn"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="6dp"
+                android:src="@drawable/ic_add" />
+        </LinearLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <ListView
+                android:id="@+id/widget_timeline_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:divider="@null"
+                android:dividerHeight="0dp"
+                android:paddingEnd="4dp"
+                android:scrollbars="none" />
+
+            <LinearLayout
+                android:id="@+id/widget_timeline_empty"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="12dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/widget_timeline_empty_icon"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:layout_marginBottom="6dp"
+                    android:src="@drawable/ic_widget_event" />
+
+                <TextView
+                    android:id="@+id/widget_timeline_empty_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/outfit_semibold"
+                    android:gravity="center"
+                    android:text="No tasks or events"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/widget_timeline_empty_subtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:fontFamily="@font/outfit_regular"
+                    android:gravity="center"
+                    android:text="Tap + to add a task"
+                    android:textSize="12sp" />
+            </LinearLayout>
+        </FrameLayout>
+    </LinearLayout>
+
+    <include layout="@layout/widget_pro_overlay" />
+</FrameLayout>
