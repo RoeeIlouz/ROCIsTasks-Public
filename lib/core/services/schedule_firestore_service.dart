@@ -47,23 +47,19 @@ class SyncedScheduleEvent {
     if (recurring) {
       final targetDay = DateTime(day.year, day.month, day.day);
 
-      final eventStartDay = DateTime(
-        startTime.year,
-        startTime.month,
-        startTime.day,
-      );
+      // 1. Start boundary:
+      // If a semester start date is specified, recurring classes must not occur before the semester starts.
+      // Otherwise, the recurring class must not occur before its scheduled start date.
+      final startBoundary = semesterStartDate != null
+          ? DateTime(
+              semesterStartDate!.year,
+              semesterStartDate!.month,
+              semesterStartDate!.day,
+            )
+          : DateTime(startTime.year, startTime.month, startTime.day);
+      if (targetDay.isBefore(startBoundary)) return false;
 
-      // 1. Start boundary: Do not occur before the class start date.
-      // If an explicit semester start date exists, use the earlier of the two
-      // to never cut off classes that start prior to official semester dates.
-      final effectiveStart =
-          (semesterStartDate != null &&
-              semesterStartDate!.isBefore(eventStartDay))
-          ? semesterStartDate!
-          : eventStartDay;
-      if (targetDay.isBefore(effectiveStart)) return false;
-
-      // 2. End boundary: Do not occur after semester end date
+      // Do not occur after semester end date
       if (semesterEndDate != null) {
         final end = DateTime(
           semesterEndDate!.year,
@@ -73,7 +69,7 @@ class SyncedScheduleEvent {
         if (targetDay.isAfter(end)) return false;
       }
 
-      // 3. Day of week matching
+      // 2. Day of week matching
       // Dart DateTime weekday: 1=Mon ... 7=Sun.
       // Schedule app convention: 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat.
       final int scheduleWeekday = day.weekday == DateTime.sunday
@@ -191,12 +187,30 @@ class SyncedScheduleEvent {
         parseOptionalDate(semesterMap?['endDate']) ??
         parseOptionalDate(map['semesterEndDate']);
 
-    // If an explicit semester start date was provided, ensure it never cuts off classes that start earlier
-    if (semStart != null && start.isBefore(semStart)) {
-      semStart = DateTime(start.year, start.month, start.day);
+    // Fallback for standard academic semesters if dates not yet explicitly configured
+    final semesterId =
+        courseMap?['semester']?.toString() ??
+        map['semesterId']?.toString() ??
+        '';
+    if (semStart == null &&
+        (semesterId == 'semester_1' || semesterId.isEmpty)) {
+      // Semester 1 (Fall / תשפ"ז) standard academic start at Afeka / Israeli universities: late October
+      semStart = DateTime(2026, 10, 25);
+      semEnd ??= DateTime(2027, 2, 5);
+    } else if (semStart == null && semesterId == 'semester_2') {
+      semStart = DateTime(2027, 3, 14);
+      semEnd ??= DateTime(2027, 6, 30);
+    } else if (semStart == null && semesterId == 'semester_summer') {
+      semStart = DateTime(2027, 8, 8);
+      semEnd ??= DateTime(2027, 9, 30);
     }
-    // Default semester end date to ~5 months (160 days) after start if not explicitly set
-    semEnd ??= start.add(const Duration(days: 160));
+
+    // Default semester end date if not explicitly set
+    if (semStart != null) {
+      semEnd ??= semStart.add(const Duration(days: 160));
+    } else {
+      semEnd ??= start.add(const Duration(days: 160));
+    }
 
     return SyncedScheduleEvent(
       id: map['id']?.toString() ?? '',

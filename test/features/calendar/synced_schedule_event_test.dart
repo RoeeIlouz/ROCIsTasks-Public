@@ -281,7 +281,7 @@ void main() {
     );
 
     test(
-      'September recurring classes without semester subcollection are not cut off',
+      'recurring semester classes strictly respect semester start and end dates',
       () {
         final classStart = DateTime(2026, 9, 20, 8, 30);
         final event = SyncedScheduleEvent.fromMap(
@@ -298,24 +298,45 @@ void main() {
             'semesterId': 'semester_1',
           },
           courseMap: {'name': 'אלגוריתמים', 'semester': 'semester_1'},
-          semesterMap: null, // User has no explicit semester doc
+          semesterMap:
+              null, // Fallback to semester_1 default (Oct 25, 2026 - Feb 5, 2027)
         );
 
-        // Sunday Sept 20, 2026: class start date -> should occur!
+        expect(event.semesterStartDate, DateTime(2026, 10, 25));
+        expect(event.semesterEndDate, DateTime(2027, 2, 5));
+
+        // September 2026: before semester starts -> MUST NOT occur!
         final sept20 = DateTime(2026, 9, 20);
-        expect(event.occursOnDay(sept20), isTrue);
+        expect(event.occursOnDay(sept20), isFalse);
 
-        // Tuesday Sept 22, 2026: recurring day -> should occur!
         final sept22 = DateTime(2026, 9, 22);
-        expect(event.occursOnDay(sept22), isTrue);
+        expect(event.occursOnDay(sept22), isFalse);
 
-        // Sunday before Sept 20 (e.g. Sept 13, 2026): before class start -> should NOT occur
-        final sept13 = DateTime(2026, 9, 13);
-        expect(event.occursOnDay(sept13), isFalse);
+        final sept24 = DateTime(2026, 9, 24);
+        expect(event.occursOnDay(sept24), isFalse);
 
-        // Sunday in October (e.g. Oct 11, 2026): within semester window -> should occur
+        // Early October: before semester starts -> MUST NOT occur!
         final oct11 = DateTime(2026, 10, 11);
-        expect(event.occursOnDay(oct11), isTrue);
+        expect(event.occursOnDay(oct11), isFalse);
+
+        final oct20 = DateTime(2026, 10, 20);
+        expect(event.occursOnDay(oct20), isFalse);
+
+        // Sunday Oct 25, 2026: Semester 1 begins -> MUST occur!
+        final oct25 = DateTime(2026, 10, 25);
+        expect(event.occursOnDay(oct25), isTrue);
+
+        // Tuesday Oct 27, 2026: recurring day in semester -> MUST occur!
+        final oct27 = DateTime(2026, 10, 27);
+        expect(event.occursOnDay(oct27), isTrue);
+
+        // Sunday in November: within semester -> MUST occur!
+        final nov1 = DateTime(2026, 11, 1);
+        expect(event.occursOnDay(nov1), isTrue);
+
+        // After semester end (e.g. Feb 8, 2027) -> MUST NOT occur!
+        final feb8 = DateTime(2027, 2, 8);
+        expect(event.occursOnDay(feb8), isFalse);
       },
     );
   });
