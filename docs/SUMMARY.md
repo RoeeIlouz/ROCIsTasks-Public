@@ -2,6 +2,22 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## Authenticated ROCIs Schedule Reads - 2026-09-24 (Patch 13)
+
+#### Problem
+* The ROCIs Schedule project's Firestore rules allow public reads of every user's profile, courses, events, assignments and semesters (so ROCIs Tasks could read schedules via unauthenticated REST). Closing that requires ROCIs Tasks to read as the data's owner.
+* ROCIs Tasks' web secondary sign-in to rocis-schedule (`signInWithIdp`) returned 400 — the rocis-todo OAuth client IDs are likely not safelisted under the rocis-schedule Google provider ("Safelist client IDs from external projects"); the user is adding all six (1 web + 5 Android).
+
+#### Solutions Applied
+* `schedule_firestore_service.dart`: REST reads/queries send the Schedule-project user's ID token; account resolution prefers the uid signed in to the Schedule project (the only account owner-only rules allow); the email lookup remains a fallback while user docs are public.
+* `app_initializer.dart`: the background (home widget) isolate now initializes the rocis-schedule Firebase app so its persisted sign-in is available.
+
+#### Next
+* Verify web sign-in no longer returns 400, then deploy owner-only rules to rocis-schedule. Email/password-only Schedule accounts will not be readable by ROCIs Tasks after the lock.
+
+#### Deployment
+* `flutter analyze` 0 issues; 378/378 tests. Debug APK and web builds succeed. Web deployed; Shorebird Android Patch 13 (`0.2.20+110`).
+
 ## Permanent-Delete Tombstones & Web Deploy - 2026-09-24 (Patch 12)
 
 #### Problem & Root Causes
