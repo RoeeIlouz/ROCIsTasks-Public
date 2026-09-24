@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Shared free-tier limit overlay. Include it last inside a widget's root FrameLayout;
+     WidgetStyle.setupProOverlay colors, localizes and wires it. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_pro_overlay"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clickable="true"
+    android:focusable="true"
+    android:visibility="gone">
+
+    <ImageView
+        android:id="@+id/widget_pro_overlay_scrim"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitXY"
+        android:src="@drawable/widget_card_fill" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <ImageView
+            android:id="@+id/widget_pro_overlay_icon"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_marginBottom="8dp"
+            android:src="@drawable/ic_widget_lock" />
+
+        <TextView
+            android:id="@+id/widget_pro_overlay_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/outfit_bold"
+            android:gravity="center"
+            android:text="Free 1-Widget Limit"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/widget_pro_overlay_desc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="12dp"
+            android:fontFamily="@font/outfit_regular"
+            android:gravity="center"
+            android:maxLines="3"
+            android:ellipsize="end"
+            android:text="Upgrade to Pro for unlimited widgets."
+            android:textSize="12sp" />
+
+        <FrameLayout
+            android:id="@+id/widget_pro_overlay_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:id="@+id/widget_pro_overlay_btn_fill"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="fitXY"
+                android:src="@drawable/widget_chip_fill" />
+
+            <TextView
+                android:id="@+id/widget_pro_overlay_btn_text"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:fontFamily="@font/outfit_semibold"
+                android:gravity="center"
+                android:paddingStart="18dp"
+                android:paddingEnd="18dp"
+                android:text="Upgrade"
+                android:textSize="13sp" />
+        </FrameLayout>
+    </LinearLayout>
+</FrameLayout>

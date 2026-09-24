@@ -1,216 +1,166 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Today Agenda: the app's card (GlassContainer colors synced from MyApp) with a
+     day header and the day's tasks/events. Colors are applied at runtime. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/widget_today_root"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/widget_background"
-    android:padding="8dp">
+    android:layout_height="match_parent">
 
-    <!-- Header Section -->
-    <LinearLayout
-        android:id="@+id/widget_today_header"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:paddingBottom="6dp">
-
-        <TextView
-            android:id="@+id/widget_today_prev"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:gravity="center"
-            android:text="❮"
-            android:textColor="@color/widget_title_text"
-            android:textSize="13sp"
-            android:textStyle="bold"
-            android:background="@drawable/widget_nav_icon_bg"
-            android:clickable="true"
-            android:focusable="true" />
-
-        <LinearLayout
-            android:id="@+id/widget_today_title_container"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:paddingStart="4dp"
-            android:paddingEnd="4dp">
-
-            <TextView
-                android:id="@+id/widget_today_date_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Thursday, Aug 20"
-                android:textColor="@color/widget_title_text"
-                android:textSize="14.5sp"
-                android:fontFamily="sans-serif"
-                android:textStyle="bold"
-                android:maxLines="1"
-                android:ellipsize="end" />
-
-            <TextView
-                android:id="@+id/widget_today_date_subtitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Today • 3 tasks, 2 events"
-                android:textColor="@color/widget_secondary_text"
-                android:textSize="11sp"
-                android:maxLines="1"
-                android:ellipsize="end" />
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/widget_today_next"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:gravity="center"
-            android:text="❯"
-            android:textColor="@color/widget_title_text"
-            android:textSize="13sp"
-            android:textStyle="bold"
-            android:background="@drawable/widget_nav_icon_bg"
-            android:clickable="true"
-            android:focusable="true" />
-
-        <TextView
-            android:id="@+id/widget_today_jump_btn"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_marginStart="4dp"
-            android:gravity="center"
-            android:text="⦿"
-            android:textColor="@color/widget_primary"
-            android:textSize="13sp"
-            android:background="@drawable/widget_nav_icon_bg"
-            android:clickable="true"
-            android:focusable="true" />
-
-        <TextView
-            android:id="@+id/widget_today_add_btn"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_marginStart="4dp"
-            android:gravity="center"
-            android:text="+"
-            android:textColor="@color/widget_primary"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:background="@drawable/widget_nav_icon_bg"
-            android:clickable="true"
-            android:focusable="true" />
-    </LinearLayout>
-
-    <!-- Divider Line -->
-    <FrameLayout
-        android:id="@+id/widget_today_divider"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_below="@id/widget_today_header"
-        android:background="#20FFFFFF"
-        android:layout_marginBottom="4dp" />
-
-    <!-- List View -->
-    <ListView
-        android:id="@+id/widget_today_list"
+    <ImageView
+        android:id="@+id/widget_today_card_fill"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/widget_today_divider"
-        android:divider="@null"
-        android:dividerHeight="4dp" />
+        android:scaleType="fitXY"
+        android:src="@drawable/widget_card_fill" />
 
-    <!-- Empty State -->
-    <LinearLayout
-        android:id="@+id/widget_today_empty"
+    <ImageView
+        android:id="@+id/widget_today_card_stroke"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/widget_today_divider"
+        android:scaleType="fitXY"
+        android:src="@drawable/widget_card_stroke" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:orientation="vertical"
-        android:gravity="center"
-        android:padding="16dp"
-        android:visibility="gone">
-
-        <TextView
-            android:id="@+id/widget_today_empty_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="No tasks or events"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:textColor="@color/widget_secondary_text" />
-
-        <TextView
-            android:id="@+id/widget_today_empty_subtitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Tap + to add a task"
-            android:textSize="12sp"
-            android:textColor="@color/widget_secondary_text"
-            android:layout_marginTop="4dp" />
-    </LinearLayout>
-
-    <!-- Pro Limit / Upgrade Overlay -->
-    <RelativeLayout
-        android:id="@+id/widget_pro_overlay"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#E6121212"
-        android:padding="16dp"
-        android:gravity="center"
-        android:visibility="gone"
-        android:clickable="true"
-        android:focusable="true">
+        android:paddingStart="12dp"
+        android:paddingEnd="8dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="8dp">
 
         <LinearLayout
+            android:id="@+id/widget_today_header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center">
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingBottom="6dp">
+
+            <LinearLayout
+                android:id="@+id/widget_today_title_container"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:focusable="true"
+                android:orientation="vertical"
+                android:paddingStart="4dp">
+
+                <TextView
+                    android:id="@+id/widget_today_date_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:fontFamily="@font/outfit_bold"
+                    android:includeFontPadding="false"
+                    android:letterSpacing="-0.03"
+                    android:maxLines="1"
+                    android:text="Thursday, Sep 24"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/widget_today_date_subtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:ellipsize="end"
+                    android:fontFamily="@font/outfit_medium"
+                    android:includeFontPadding="false"
+                    android:maxLines="1"
+                    android:text="Today"
+                    android:textSize="12sp" />
+            </LinearLayout>
 
             <ImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:src="@drawable/ic_lock_pro"
-                android:layout_marginBottom="8dp" />
-
-            <TextView
-                android:id="@+id/widget_pro_overlay_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Free 1-Widget Limit"
-                android:textColor="#FFFFFF"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:gravity="center" />
-
-            <TextView
-                android:id="@+id/widget_pro_overlay_desc"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Free tier includes 1 active widget. Upgrade to Pro for unlimited home screen widgets!"
-                android:textColor="#CCCCCC"
-                android:textSize="12sp"
-                android:gravity="center"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="12dp" />
-
-            <TextView
-                android:id="@+id/widget_pro_overlay_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Unlock Unlimited Widgets"
-                android:textColor="#FFFFFF"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:background="@drawable/widget_pill_bg"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp"
+                android:id="@+id/widget_today_prev"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
                 android:clickable="true"
-                android:focusable="true" />
-        </LinearLayout>
-    </RelativeLayout>
+                android:focusable="true"
+                android:padding="6dp"
+                android:src="@drawable/ic_chevron_left_24" />
 
-</RelativeLayout>
+            <ImageView
+                android:id="@+id/widget_today_next"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="6dp"
+                android:src="@drawable/ic_chevron_right_24" />
+
+            <ImageView
+                android:id="@+id/widget_today_jump_btn"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="7dp"
+                android:src="@drawable/ic_today_24" />
+
+            <ImageView
+                android:id="@+id/widget_today_add_btn"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="6dp"
+                android:src="@drawable/ic_add" />
+        </LinearLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <ListView
+                android:id="@+id/widget_today_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:divider="@null"
+                android:dividerHeight="6dp"
+                android:paddingEnd="4dp"
+                android:scrollbars="none" />
+
+            <LinearLayout
+                android:id="@+id/widget_today_empty"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="12dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/widget_today_empty_icon"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:layout_marginBottom="6dp"
+                    android:src="@drawable/ic_widget_check_on" />
+
+                <TextView
+                    android:id="@+id/widget_today_empty_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/outfit_semibold"
+                    android:gravity="center"
+                    android:text="No tasks or events"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/widget_today_empty_subtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:fontFamily="@font/outfit_regular"
+                    android:gravity="center"
+                    android:text="Tap + to add a task"
+                    android:textSize="12sp" />
+            </LinearLayout>
+        </FrameLayout>
+    </LinearLayout>
+
+    <include layout="@layout/widget_pro_overlay" />
+</FrameLayout>
