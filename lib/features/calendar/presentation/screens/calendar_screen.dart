@@ -56,7 +56,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
       );
       await provider.loadFilters();
       if (!mounted) return;
-      await provider.loadEvents();
+      await provider.loadEvents(forceRefreshSchedule: true);
     });
   }
 

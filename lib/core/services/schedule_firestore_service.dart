@@ -46,43 +46,56 @@ class SyncedScheduleEvent {
   });
 
   bool occursOnDay(DateTime day) {
-    if (recurring) {
-      final targetDay = DateTime(day.year, day.month, day.day);
-
-      // 1. Start boundary:
-      // If a semester start date is specified, recurring classes must not occur before the semester starts.
-      // Otherwise, the recurring class must not occur before its scheduled start date.
-      final startBoundary = semesterStartDate != null
-          ? DateTime(
-              semesterStartDate!.year,
-              semesterStartDate!.month,
-              semesterStartDate!.day,
-            )
-          : DateTime(startTime.year, startTime.month, startTime.day);
-      if (targetDay.isBefore(startBoundary)) return false;
-
-      // Do not occur after semester end date
-      if (semesterEndDate != null) {
-        final end = DateTime(
-          semesterEndDate!.year,
-          semesterEndDate!.month,
-          semesterEndDate!.day,
-        );
-        if (targetDay.isAfter(end)) return false;
-      }
-
-      // 2. Day of week matching
-      // Dart DateTime weekday: 1=Mon ... 7=Sun.
-      // Schedule app convention: 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat.
-      final int scheduleWeekday = day.weekday == DateTime.sunday
-          ? 0
-          : day.weekday;
-      return daysOfWeek.contains(scheduleWeekday);
-    } else {
+    if (!recurring) {
       return startTime.year == day.year &&
           startTime.month == day.month &&
           startTime.day == day.day;
     }
+
+    final targetDay = DateTime(day.year, day.month, day.day);
+
+    // Start boundary:
+    // If a semester start date is specified, recurring classes must not occur before that date.
+    // Otherwise, fallback to official Israeli academic calendar start boundaries (Afeka / Israeli universities):
+    // Semester 1 (Fall / תשפ"ז): October 25, 2026.
+    // Semester 2: March 14, 2027.
+    // Summer Semester: August 8, 2027.
+    final DateTime startBoundary;
+    if (semesterStartDate != null) {
+      startBoundary = DateTime(
+        semesterStartDate!.year,
+        semesterStartDate!.month,
+        semesterStartDate!.day,
+      );
+    } else {
+      if (semesterId == 'semester_2') {
+        startBoundary = DateTime(2027, 3, 14);
+      } else if (semesterId == 'semester_summer') {
+        startBoundary = DateTime(2027, 8, 8);
+      } else {
+        startBoundary = DateTime(2026, 10, 25);
+      }
+    }
+
+    if (targetDay.isBefore(startBoundary)) return false;
+
+    // Do not occur after semester end date
+    if (semesterEndDate != null) {
+      final end = DateTime(
+        semesterEndDate!.year,
+        semesterEndDate!.month,
+        semesterEndDate!.day,
+      );
+      if (targetDay.isAfter(end)) return false;
+    }
+
+    // Day of week matching
+    // Dart DateTime weekday: 1=Mon ... 7=Sun.
+    // Schedule app convention: 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat.
+    final int scheduleWeekday = day.weekday == DateTime.sunday
+        ? 0
+        : day.weekday;
+    return daysOfWeek.contains(scheduleWeekday);
   }
 
   Map<String, dynamic> toMap() => {
@@ -790,12 +803,14 @@ class ScheduleFirestoreService {
             .map(SyncedScheduleEvent.fromMap)
             .toList();
 
-        // Self-heal: If any cached recurring event lacks semester boundaries or occurs prior to Oct 25 2026,
+        // Self-heal: If any cached event lacks proper semester boundaries or occurs prior to Oct 25 2026 (e.g. Sep 20),
         // purge the stale cache so fresh data with strict semester boundaries is loaded.
-        if (events.any((e) =>
-            e.recurring &&
-            (e.semesterStartDate == null ||
-                e.semesterStartDate!.isBefore(DateTime(2026, 10, 25))))) {
+        if (events.any(
+          (e) =>
+              e.semesterStartDate == null ||
+              e.semesterStartDate!.isBefore(DateTime(2026, 10, 25)) ||
+              e.occursOnDay(DateTime(2026, 9, 20)),
+        )) {
           debugPrint(
             'ScheduleFirestoreService: Purged stale cached schedule events lacking proper semester bounds.',
           );
@@ -818,6 +833,12 @@ class ScheduleFirestoreService {
     String? email,
     bool forceRefresh = false,
   }) async {
+    // 0. If in-memory cache has any event occurring before semester start (e.g. Sep 20), purge it
+    if (_cachedEvents != null &&
+        _cachedEvents!.any((e) => e.occursOnDay(DateTime(2026, 9, 20)))) {
+      clearCache();
+    }
+
     // 1. In-memory TTL cache (never return empty list just because cached)
     if (!forceRefresh &&
         _cachedEvents != null &&

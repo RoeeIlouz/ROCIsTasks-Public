@@ -1,4 +1,6 @@
 import 'cookie_service_stub.dart'
+    if (dart.library.js) 'cookie_service_web.dart'
+    if (dart.library.html) 'cookie_service_web.dart'
     if (dart.library.js_interop) 'cookie_service_web.dart';
 
 abstract class CookieService {

@@ -79,6 +79,7 @@ void main() {
           daysOfWeek: const [0, 1], // Sunday (0) and Monday (1)
           color: const Color(0xFF3F51B5),
           notes: '',
+          semesterStartDate: start,
         );
 
         // Sunday Sept 13, 2026 (weekday is Sunday -> 0 in schedule convention)
@@ -172,6 +173,7 @@ void main() {
           daysOfWeek: const [2], // Tuesday (2 in schedule format)
           color: const Color(0xFF2196F3),
           notes: '',
+          semesterStartDate: start,
         );
 
         // Tuesday in previous month (August 25, 2026) -> should NOT occur before start date!

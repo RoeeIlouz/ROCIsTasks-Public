@@ -54,14 +54,19 @@ class AuthService extends ChangeNotifier {
   }
 
   Future<void> _initAuth() async {
-    _authStateSubscription = _auth.authStateChanges().listen((User? user) async {
+    _authStateSubscription = _auth.authStateChanges().listen((
+      User? user,
+    ) async {
       if (user != null) {
         unawaited(_syncEncryptionKey(user.uid));
         try {
           await _restoreGoogleUser();
           unawaited(ensureSecondaryAuth());
         } catch (e) {
-          AppLogger.warning('Error restoring Google user on auth change: $e', tag: 'Auth');
+          AppLogger.warning(
+            'Error restoring Google user on auth change: $e',
+            tag: 'Auth',
+          );
         }
       }
 
@@ -99,7 +104,9 @@ class AuthService extends ChangeNotifier {
       if (savedEmail == null && isGoogleUser && user.email != null) {
         String? googleSubId;
         for (final p in user.providerData) {
-          if (p.providerId == 'google.com' && p.uid != null && p.uid!.isNotEmpty) {
+          if (p.providerId == 'google.com' &&
+              p.uid != null &&
+              p.uid!.isNotEmpty) {
             googleSubId = p.uid;
             break;
           }
@@ -376,7 +383,9 @@ class AuthService extends ChangeNotifier {
         if (userCredential.user?.email != null) {
           String? googleSubId;
           for (final p in (userCredential.user?.providerData ?? [])) {
-            if (p.providerId == 'google.com' && p.uid != null && p.uid!.isNotEmpty) {
+            if (p.providerId == 'google.com' &&
+                p.uid != null &&
+                p.uid!.isNotEmpty) {
               googleSubId = p.uid;
               break;
             }

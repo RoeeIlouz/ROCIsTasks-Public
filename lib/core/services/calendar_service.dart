@@ -251,17 +251,7 @@ class CalendarService {
         );
       }
     } else if (kIsWeb) {
-      final isGoogle =
-          _authService?.currentUser?.providerData.any(
-            (p) => p.providerId == 'google.com',
-          ) ??
-          false;
-      if (isGoogle) {
-        throw GoogleTokenExpiredException(
-          'No Web Google access token available.',
-          true,
-        );
-      }
+      AppLogger.info('Web: No Google access token available for calendar fetch; returning empty list without throwing.');
     }
 
     final List<Calendar> combined = [];
