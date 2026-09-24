@@ -66,7 +66,11 @@ void main() {
     when(() => mockCalendarProvider.getEventsForDay(any())).thenReturn([]);
     when(() => mockCalendarProvider.setUserId(any())).thenReturn(null);
     when(() => mockCalendarProvider.loadFilters()).thenAnswer((_) async {});
-    when(() => mockCalendarProvider.loadEvents()).thenAnswer((_) async {});
+    when(
+      () => mockCalendarProvider.loadEvents(
+        forceRefreshSchedule: any(named: 'forceRefreshSchedule'),
+      ),
+    ).thenAnswer((_) async {});
     when(() => mockCalendarProvider.events).thenReturn([]);
     when(() => mockCalendarProvider.availableCalendars).thenReturn([]);
     when(

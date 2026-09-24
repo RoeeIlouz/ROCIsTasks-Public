@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.20+110] - 2026-09-24 (Patch 10)
+
+### Fixed
+- Enforced strict semester start boundaries (Oct 25, 2026) for recurring schedule events, eliminating occurrences prior to semester start.
+- Fixed Web Google auth persistence using dual-layer cookie and localStorage caching with extended token grace.
+
 ## [0.2.20+110] - 2026-09-24 (Patch 9)
 
 ### Fixed

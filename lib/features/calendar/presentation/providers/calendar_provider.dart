@@ -445,12 +445,14 @@ class CalendarProvider extends ChangeNotifier {
           cur = DateTime(cur.year, cur.month, cur.day + 1);
         }
       } else {
-        final norm = DateTime(
-          event.startTime.year,
-          event.startTime.month,
-          event.startTime.day,
-        );
-        _scheduleEventsMap.putIfAbsent(norm, () => []).add(event);
+        if (event.occursOnDay(event.startTime)) {
+          final norm = DateTime(
+            event.startTime.year,
+            event.startTime.month,
+            event.startTime.day,
+          );
+          _scheduleEventsMap.putIfAbsent(norm, () => []).add(event);
+        }
       }
     }
   }

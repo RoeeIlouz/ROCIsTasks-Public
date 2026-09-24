@@ -441,8 +441,10 @@ class FullCalendarWidgetService {
               day = DateTime(day.year, day.month, day.day + 1);
             }
           } else {
-            final key = DateFormat('yyyy-MM-dd').format(sEvent.startTime);
-            scheduleEventsByDate.putIfAbsent(key, () => []).add(sEvent);
+            if (sEvent.occursOnDay(sEvent.startTime)) {
+              final key = DateFormat('yyyy-MM-dd').format(sEvent.startTime);
+              scheduleEventsByDate.putIfAbsent(key, () => []).add(sEvent);
+            }
           }
         }
       }

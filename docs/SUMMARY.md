@@ -2,6 +2,32 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## Fix Semester Scope Bounds & Web Token Grace - 2026-09-24 (Patch 10)
+
+#### Problem & Root Causes
+1. **Recurring Schedule Events Appearing in September**:
+   - `SyncedScheduleEvent.occursOnDay` evaluated recurring events against `effectiveStart`, which previously fell back to `startTime` (September 20) if `semesterStartDate` was null.
+   - When events were restored from raw caches or loaded without explicit semester data, the start boundary slipped to the course creation date (`2026-09-20`), displaying classes a month before the semester began.
+2. **Web Auth Token Reconnect Prompts**:
+   - In `GoogleOAuthManager`, when tokens were in grace or refreshing, setting `_isGoogleTasksTokenExpired = true` on null silent refresh falsely triggered yellow reconnect banners on Web.
+   - In `CalendarService`, null web tokens triggered explicit `GoogleTokenExpiredException`, prompting reconnects even when sessions were active.
+   - Conditional dart2js compilation had incomplete directives for `CookieService`.
+
+#### Solutions Applied
+1. **Strict Semester Boundary Enforcement (`schedule_firestore_service.dart`, `calendar_provider.dart`)**:
+   - Enforced strict semester start boundaries (`startBoundary` defaults to October 25, 2026 for Semester 1) in `occursOnDay`.
+   - Separated non-recurring events (`!recurring`) from recurring semester classes so single-instance events check exact date match (`startTime.year == day.year ...`).
+   - Added cache purging in `_loadCachedEvents` and `fetchEvents` for any event occurring before October 25, 2026 (or specifically on September 20).
+2. **Dual-Layer Persistence & Extended Grace (`cookie_service_web.dart`, `google_oauth_manager.dart`, `calendar_service.dart`)**:
+   - Implemented dual-layer persistence (Cookies + localStorage fallback) in `cookie_service_web.dart` ensuring survive page reloads and cross-origin isolation.
+   - Protected Web tokens with extended grace period: cached tokens are preserved and `_isGoogleTasksTokenExpired` is set to `!kIsWeb` on empty refresh so Web never shows premature reconnect banners.
+   - Removed premature `GoogleTokenExpiredException` throw in `CalendarService` line 260.
+3. **Deployment**:
+   - 363/363 unit and widget tests passing (100%).
+   - `flutter analyze` 0 issues.
+   - Deployed Web to Firebase Hosting (https://rocis-todo.web.app).
+   - Published Shorebird Android Patch 10 (`0.2.20+110`).
+
 ## Fix Stale Schedule Events Cache & Web Google Token Persistence - 2026-09-24 (Patch 9)
 
 #### Problem & Root Causes

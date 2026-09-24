@@ -263,27 +263,63 @@ class GoogleOAuthManager {
       var expiresAtStr = prefs.getString(keyAccessTokenExpiresAt);
 
       // Web cookie backup restoration
-      if (token == null && kIsWeb) {
-        token = CookieService.instance.getCookie(keyAccessToken);
-        expiresAtStr = CookieService.instance.getCookie(
+      if (kIsWeb) {
+        final cookieToken = CookieService.instance.getCookie(keyAccessToken);
+        final cookieExpires = CookieService.instance.getCookie(
           keyAccessTokenExpiresAt,
         );
-        if (token != null && token.isNotEmpty) {
-          await prefs.setString(keyAccessToken, token);
-          if (expiresAtStr != null) {
-            await prefs.setString(keyAccessTokenExpiresAt, expiresAtStr);
+        if (cookieToken != null && cookieToken.isNotEmpty) {
+          token ??= cookieToken;
+          expiresAtStr ??= cookieExpires;
+          await prefs.setString(keyAccessToken, cookieToken);
+          if (cookieExpires != null) {
+            await prefs.setString(keyAccessTokenExpiresAt, cookieExpires);
           }
         }
       }
 
-      if (token != null && expiresAtStr != null) {
-        final expiresAt = DateTime.tryParse(expiresAtStr);
-        if (expiresAt != null && DateTime.now().isBefore(expiresAt)) {
+      if (token != null && token.isNotEmpty) {
+        if (expiresAtStr != null) {
+          final expiresAt = DateTime.tryParse(expiresAtStr);
+          if (expiresAt != null && DateTime.now().isBefore(expiresAt)) {
+            return token;
+          }
+        }
+
+        // Token may be near or past 50m expiry — attempt silent background refresh
+        if (_tokenRefreshCompleter != null) {
+          return await _tokenRefreshCompleter!.future;
+        }
+
+        _tokenRefreshCompleter = Completer<String?>();
+        try {
+          final freshToken = await _performSilentTokenRefresh();
+          if (freshToken != null && freshToken.isNotEmpty) {
+            _isGoogleTasksTokenExpired = false;
+            _tokenRefreshCompleter!.complete(freshToken);
+            return freshToken;
+          }
+
+          // On Web & Mobile: Preserve cached token from cookie/storage under grace.
+          // NEVER mark as expired or show reconnect prompt while a cached token exists.
+          _isGoogleTasksTokenExpired = false;
+          _tokenRefreshCompleter!.complete(token);
           return token;
+        } catch (e, s) {
+          _errorHandlingService.logError(
+            e,
+            s,
+            reason: 'getGoogleAccessToken refresh',
+          );
+          _isGoogleTasksTokenExpired = false;
+          _tokenRefreshCompleter?.complete(token);
+          return token;
+        } finally {
+          _tokenRefreshCompleter = null;
         }
       }
 
-      // Token is expired, missing, or within the 50-minute proactive refresh window
+      // No token in prefs or cookies — attempt silent refresh using saved identity
       if (_tokenRefreshCompleter != null) {
         return await _tokenRefreshCompleter!.future;
       }
@@ -297,37 +333,16 @@ class GoogleOAuthManager {
           return freshToken;
         }
 
-        // Extended Offline Grace Period:
-        // If an offline launch or network interruption prevented background refresh,
-        // but the user previously had a valid session token, reuse it with grace.
-        // DO NOT show a disconnected banner. Only actual HTTP 401 rejections from
-        // the server should flag disconnected.
-        if (token != null && token.isNotEmpty) {
-          AppLogger.info(
-            'Extended Offline Grace: Preserving cached Google token without showing disconnected.',
-            tag: 'Auth',
-          );
-          _isGoogleTasksTokenExpired = false;
-          _tokenRefreshCompleter!.complete(token);
-          return token;
-        }
-
-        _isGoogleTasksTokenExpired = true;
+        _isGoogleTasksTokenExpired = !kIsWeb;
         _tokenRefreshCompleter!.complete(null);
         return null;
       } catch (e, s) {
         _errorHandlingService.logError(
           e,
           s,
-          reason: 'getGoogleAccessToken refresh',
+          reason: 'getGoogleAccessToken no-token refresh',
         );
-        // Fallback to cached token under grace if available
-        if (token != null && token.isNotEmpty) {
-          _isGoogleTasksTokenExpired = false;
-          _tokenRefreshCompleter?.complete(token);
-          return token;
-        }
-        _isGoogleTasksTokenExpired = true;
+        _isGoogleTasksTokenExpired = !kIsWeb;
         _tokenRefreshCompleter?.complete(null);
         return null;
       } finally {
@@ -335,7 +350,7 @@ class GoogleOAuthManager {
       }
     } catch (e, s) {
       _errorHandlingService.logError(e, s, reason: 'getGoogleAccessToken');
-      _isGoogleTasksTokenExpired = true;
+      _isGoogleTasksTokenExpired = !kIsWeb;
       return null;
     }
   }
@@ -344,9 +359,8 @@ class GoogleOAuthManager {
     try {
       await ensureGoogleSignInInitialized();
 
-      final prefs = await SharedPreferences.getInstance();
-      final savedEmail = prefs.getString(keyUserEmail) ?? _googleUser?.email;
-      final savedUserId = prefs.getString(keyUserId) ?? _googleUser?.id;
+      final savedEmail = await getSavedGoogleUserEmail() ?? _googleUser?.email;
+      final savedUserId = await getSavedGoogleUserId() ?? _googleUser?.id;
 
       // 1. If in-memory Google user is active, attempt silent authorization without user prompt
       if (_googleUser != null) {
@@ -398,10 +412,10 @@ class GoogleOAuthManager {
                     scopes: googleTasksScopes,
                     userId:
                         (kIsWeb &&
-                                savedUserId != null &&
-                                !RegExp(r'^\d+$').hasMatch(savedUserId))
-                            ? null
-                            : savedUserId,
+                            savedUserId != null &&
+                            !RegExp(r'^\d+$').hasMatch(savedUserId))
+                        ? null
+                        : savedUserId,
                     email: savedEmail,
                     promptIfUnauthorized: false,
                   ),
