@@ -266,6 +266,84 @@ class FirestoreService {
     }
   }
 
+  static const _maxWhereInIds = 30;
+
+  /// Reads the edit time of each of [taskIds] that exists in the cloud,
+  /// straight from the server (never the local cache). Missing ids are absent
+  /// from the result. Throws when the server is unreachable.
+  Future<Map<String, DateTime?>> fetchTaskEditTimes(
+    List<String> taskIds,
+  ) async {
+    final collection = _tasksCollection;
+    if (collection == null || !_shouldSync || taskIds.isEmpty) return {};
+
+    final chunks = [
+      for (var i = 0; i < taskIds.length; i += _maxWhereInIds)
+        taskIds.sublist(i, (i + _maxWhereInIds).clamp(0, taskIds.length)),
+    ];
+    final snapshots = await Future.wait(
+      chunks.map(
+        (ids) => collection
+            .where(FieldPath.documentId, whereIn: ids)
+            .get(const GetOptions(source: Source.server)),
+      ),
+    );
+    return {
+      for (final snapshot in snapshots)
+        for (final doc in snapshot.docs)
+          doc.id: Task.cloudModifiedAt(doc.data()),
+    };
+  }
+
+  static const _maxBatchWrites = 500;
+
+  /// Uploads every local category and task using chunked write batches:
+  /// one round trip per 500 documents instead of one throttled write each.
+  Future<void> uploadAll({
+    required List<Category> categories,
+    required List<Task> tasks,
+  }) async {
+    final tasksCol = _tasksCollection;
+    final catsCol = _categoriesCollection;
+    if (tasksCol == null || catsCol == null || !_shouldSync) return;
+    if (categories.isEmpty && tasks.isEmpty) return;
+
+    final writes = <void Function(WriteBatch)>[
+      for (final category in categories)
+        (batch) => batch.set(catsCol.doc(category.id), {
+          'id': category.id,
+          'name': category.name,
+          'colorValue': category.colorValue,
+          'iconCode': category.iconCode,
+          'isPrivate': category.isPrivate,
+        }),
+      for (final task in tasks)
+        (batch) => batch.set(tasksCol.doc(task.id), {
+          ...task.toFirestoreMap(),
+          'updatedAt': FieldValue.serverTimestamp(),
+        }),
+    ];
+
+    _syncStatus.setSyncing();
+    try {
+      final commits = <Future<void>>[];
+      for (var i = 0; i < writes.length; i += _maxBatchWrites) {
+        final batch = _firestore.batch();
+        final end = (i + _maxBatchWrites).clamp(0, writes.length);
+        for (final write in writes.sublist(i, end)) {
+          write(batch);
+        }
+        commits.add(batch.commit());
+      }
+      await Future.wait(commits);
+      _syncStatus.setSuccess();
+    } catch (e) {
+      AppLogger.error('Firestore uploadAll failed', error: e, tag: 'Firestore');
+      _syncStatus.setError('Failed to sync tasks. Changes saved locally.');
+      rethrow;
+    }
+  }
+
   Future<void> deleteTask(String id) async {
     final collection = _tasksCollection;
     if (collection == null || !_shouldSync) return;

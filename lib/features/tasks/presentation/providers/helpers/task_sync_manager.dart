@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rocis_tasks/core/services/auth_service.dart';
 import 'package:rocis_tasks/core/services/calendar_service.dart';
 import 'package:rocis_tasks/core/services/error_handling_service.dart';
@@ -60,18 +61,51 @@ class TaskSyncManager {
     _categoriesSubscription = null;
   }
 
+  static String uploadWatermarkKey(String uid) => 'tasks_upload_watermark_$uid';
+
+  /// Pushes local tasks the cloud is missing or holds an older version of.
+  ///
+  /// Only tasks edited since the last successful run are considered, and each
+  /// is compared against its cloud copy so a stale device never overwrites a
+  /// newer edit made elsewhere. If the server can't be reached nothing is
+  /// uploaded and the same tasks are re-checked next time.
   Future<void> uploadLocalDataToCloud() async {
-    if (_authService.currentUser == null) return;
+    final uid = _authService.currentUser?.uid;
+    if (uid == null) return;
 
     try {
-      final tasks = _source.getTasks();
-      final categories = _source.getCategories();
-      for (final category in categories) {
-        await _firestoreService.addCategory(category);
+      final prefs = await SharedPreferences.getInstance();
+      final watermarkKey = uploadWatermarkKey(uid);
+      final watermark = prefs.getInt(watermarkKey);
+      final runStartedAt = DateTime.now();
+
+      final candidates = _source
+          .getTasks()
+          .where(
+            (t) =>
+                watermark == null ||
+                t.lastModified.millisecondsSinceEpoch >= watermark,
+          )
+          .toList();
+
+      var toUpload = <Task>[];
+      if (candidates.isNotEmpty) {
+        final cloudEditTimes = await _firestoreService.fetchTaskEditTimes(
+          candidates.map((t) => t.id).toList(),
+        );
+        toUpload = candidates.where((t) {
+          if (!cloudEditTimes.containsKey(t.id)) return true;
+          final cloudEdit = cloudEditTimes[t.id];
+          return cloudEdit == null || t.lastModified.isAfter(cloudEdit);
+        }).toList();
       }
-      for (final task in tasks) {
-        await _firestoreService.addTask(task);
-      }
+
+      // One batched commit instead of N throttled, sequential round trips.
+      await _firestoreService.uploadAll(
+        categories: _source.getCategories(),
+        tasks: toUpload,
+      );
+      await prefs.setInt(watermarkKey, runStartedAt.millisecondsSinceEpoch);
     } catch (e, s) {
       _errorHandlingService.logError(
         e,
@@ -137,9 +171,12 @@ class TaskSyncManager {
             final cloudTask = event.task;
             final localTask = getTaskById(cloudTask.id);
 
+            // Keep a local completion unless the cloud copy is a newer edit
+            // (e.g. the task was un-completed on another device afterwards).
             if (localTask != null &&
                 localTask.isCompleted &&
-                !cloudTask.isCompleted) {
+                !cloudTask.isCompleted &&
+                !cloudTask.lastModified.isAfter(localTask.lastModified)) {
               await cancelNotificationsById(cloudTask.id);
               needsUpdate = true;
               continue;
@@ -178,7 +215,8 @@ class TaskSyncManager {
               if (latestTask != null) {
                 if (localTask != null &&
                     localTask.isCompleted &&
-                    !latestTask.isCompleted) {
+                    !latestTask.isCompleted &&
+                    !latestTask.lastModified.isAfter(localTask.lastModified)) {
                   latestTask.isCompleted = true;
                   latestTask.completedAt =
                       localTask.completedAt ?? DateTime.now();
@@ -259,6 +297,16 @@ class TaskSyncManager {
     final taskId = task.googleTaskId;
     if (taskId == null) return;
 
+    await removeGoogleTaskById(taskId);
+
+    task.googleTaskId = null;
+    task.googleTaskListId = null;
+    task.touch();
+    await _source.addTask(task);
+  }
+
+  /// Deletes the remote Google Task only, without touching local storage.
+  Future<void> removeGoogleTaskById(String taskId) async {
     try {
       await _googleTasksService.deleteTask(taskId: taskId);
     } catch (e, s) {
@@ -271,10 +319,6 @@ class TaskSyncManager {
         reason: 'Failed to delete Google task',
       );
     }
-
-    task.googleTaskId = null;
-    task.googleTaskListId = null;
-    await _source.addTask(task);
   }
 
   Future<void> syncTaskGoogleTasksState(
@@ -310,6 +354,7 @@ class TaskSyncManager {
         if (taskId != null) {
           task.googleTaskId = taskId;
           task.googleTaskListId = 'ROCIs Tasks';
+          task.touch();
           await _source.addTask(task);
         }
       } else {
@@ -325,6 +370,7 @@ class TaskSyncManager {
         if (!success) {
           task.googleTaskId = null;
           task.googleTaskListId = null;
+          task.touch();
           await _source.addTask(task);
           await syncTaskGoogleTasksState(
             task,
@@ -357,6 +403,13 @@ class TaskSyncManager {
       if (googleTasks == null) return;
 
       final allLocalTasks = _source.getTasks();
+      final activeLocalTasksWithGoogleId = allLocalTasks
+          .where((t) => t.googleTaskId != null && !(t.isDeleted ?? false))
+          .toList();
+      final localByGoogleId = <String, Task>{};
+      for (final t in activeLocalTasksWithGoogleId) {
+        localByGoogleId.putIfAbsent(t.googleTaskId!, () => t);
+      }
       final googleTaskIds = googleTasks
           .map((t) => t['id'] as String?)
           .where((id) => id != null)
@@ -369,12 +422,9 @@ class TaskSyncManager {
         final gTaskId = gTask['id'] as String?;
         if (gTaskId == null) continue;
 
-        final localTask = allLocalTasks.firstWhere(
-          (t) => t.googleTaskId == gTaskId && !(t.isDeleted ?? false),
-          orElse: () => Task(id: '', title: '', createdAt: DateTime.now()),
-        );
+        final localTask = localByGoogleId[gTaskId];
 
-        if (localTask.id.isNotEmpty) {
+        if (localTask != null) {
           if (_pendingLocalWrites.containsKey(localTask.id)) {
             continue;
           }
@@ -385,6 +435,7 @@ class TaskSyncManager {
             final parsedDue = DateTime.tryParse(dueStr)?.toLocal();
             if (parsedDue != null && localTask.dueDate != parsedDue) {
               localTask.dueDate = parsedDue;
+              localTask.touch();
               await _source.addTask(localTask);
               await _firestoreService.updateTask(localTask);
               needsUpdate = true;
@@ -396,6 +447,7 @@ class TaskSyncManager {
             localTask.completedAt = DateTime.now();
 
             _pendingLocalWrites[localTask.id] = true;
+            localTask.touch();
             await _source.addTask(localTask);
             await _firestoreService.updateTask(localTask);
             await cancelTaskNotifications(localTask.id);
@@ -410,6 +462,7 @@ class TaskSyncManager {
             localTask.completedAt = null;
 
             _pendingLocalWrites[localTask.id] = false;
+            localTask.touch();
             await _source.addTask(localTask);
             await _firestoreService.updateTask(localTask);
             if (localTask.dueDate != null &&
@@ -426,13 +479,10 @@ class TaskSyncManager {
         }
       }
 
-      final activeLocalTasksWithGoogleId = allLocalTasks
-          .where((t) => t.googleTaskId != null && !(t.isDeleted ?? false))
-          .toList();
-
       for (final localTask in activeLocalTasksWithGoogleId) {
         if (!googleTaskIds.contains(localTask.googleTaskId)) {
           localTask.isDeleted = true;
+          localTask.touch();
           await _source.addTask(localTask);
           await _firestoreService.updateTask(localTask);
           await cancelTaskNotifications(localTask.id);

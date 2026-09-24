@@ -275,7 +275,7 @@ class OfflineWriteQueueService extends ChangeNotifier {
 class TaskConflictResolver {
   /// Resolves conflicts between local and remote task states.
   /// Strategy:
-  /// 1. Field-level timestamp comparison: later updatedAt wins.
+  /// 1. Last-write-wins on each task's edit time ([Task.lastModified]).
   /// 2. Completion preservation: if locally completed recently, honor completion.
   /// 3. Subtask merge: merges subtasks by subtask ID instead of blind overwrites.
   static Task resolveTaskConflict({
@@ -288,8 +288,8 @@ class TaskConflictResolver {
       return localTask;
     }
 
-    final localUpdated = localTask.completedAt ?? localTask.createdAt;
-    final remoteUpdated = remoteTask.completedAt ?? remoteTask.createdAt;
+    final localUpdated = localTask.lastModified;
+    final remoteUpdated = remoteTask.lastModified;
 
     final baseTask = remoteUpdated.isAfter(localUpdated)
         ? remoteTask

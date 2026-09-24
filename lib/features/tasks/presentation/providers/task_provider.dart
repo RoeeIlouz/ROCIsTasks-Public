@@ -14,7 +14,6 @@ import 'package:rocis_tasks/core/services/firestore_service.dart';
 import 'package:rocis_tasks/core/services/google_tasks_service.dart';
 import 'package:rocis_tasks/core/services/logger_service.dart';
 import 'package:rocis_tasks/core/services/notification_service.dart';
-import 'package:rocis_tasks/core/services/pagination_service.dart';
 import 'package:rocis_tasks/core/services/security_service.dart';
 import 'package:rocis_tasks/core/services/subscription_service.dart';
 import 'package:rocis_tasks/core/services/validation_service.dart';
@@ -65,7 +64,7 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
   late final MonthWidgetService _monthWidgetService;
   late final FullCalendarWidgetService _fullCalendarWidgetService;
   late final WidgetDataService _widgetDataService;
-  late final PaginationService<Task> _taskPagination;
+  List<Task> _visibleTasks = const [];
 
   late final TaskFilterService _filterService;
   late final TaskNotificationManager _notificationManager;
@@ -73,7 +72,9 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
 
   bool _isLoading = true;
   StreamSubscription? _authSubscription;
-  StreamSubscription? _connectivitySubscription;
+  VoidCallback? _connectivityListener;
+  bool _materializingRecurring = false;
+  bool _lastKnownPremium = false;
   StreamSubscription? _notificationSubscription;
   String? _lastUserId;
 
@@ -131,6 +132,7 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
   Timer? _widgetDebounce;
   bool _widgetUpdateInProgress = false;
   bool _pendingWidgetUpdate = false;
+  bool _pendingWidgetNotification = false;
   bool get isLoading => _isLoading;
 
   bool _showSecurityPrompt = false;
@@ -208,11 +210,8 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
       ]),
     );
 
-    _taskPagination = PaginationService<Task>(_getFilteredAndSortedTasks);
-
     try {
       await _source.init();
-      _taskPagination.initialize();
       // Ensure notification service is initialized without blocking UI on permission prompt
       await _notificationService.init();
       unawaited(
@@ -229,7 +228,8 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
 
     _refreshPagination();
 
-    _subscriptionService.addListener(notifyListeners);
+    _lastKnownPremium = _subscriptionService.isPremium;
+    _subscriptionService.addListener(_onSubscriptionChanged);
     _privateModeService.addListener(_onPrivateModeChanged);
 
     // Populate all home screen widgets with initial data and restore task counter notification
@@ -250,16 +250,16 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
       }
     });
 
-    await _connectivityService.init();
+    // Connectivity probing can take several seconds offline (DNS fallbacks),
+    // so never hold the first frame on it; the listener catches the result.
+    unawaited(_connectivityService.init());
 
-    _connectivitySubscription =
-        _connectivityService.addListener(() {
-              if (_connectivityService.isOnline &&
-                  _authService.currentUser != null) {
-                syncWithCloud();
-              }
-            })
-            as StreamSubscription?;
+    _connectivityListener = () {
+      if (_connectivityService.isOnline && _authService.currentUser != null) {
+        syncWithCloud();
+      }
+    };
+    _connectivityService.addListener(_connectivityListener!);
 
     _lastUserId = _authService.currentUser?.uid;
     _authSubscription = _authService.authStateChanges.listen((
@@ -300,12 +300,12 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
       _firestoreService.setUserId(_authService.currentUser!.uid);
       _refreshPagination();
 
-      uploadLocalDataToCloud()
-          .then((_) => syncWithCloud())
-          .then((_) => updateHomeWidget())
-          .catchError((e, s) {
-            _errorHandlingService.logError(e, s, reason: 'Initial sync');
-          });
+      uploadLocalDataToCloud().catchError((e, s) {
+        _errorHandlingService.logError(e, s, reason: 'Initial upload');
+      });
+      syncWithCloud().then((_) => updateHomeWidget()).catchError((e, s) {
+        _errorHandlingService.logError(e, s, reason: 'Initial sync');
+      });
       unawaited(_prefetchCompletedTasksIfNeeded());
     }
 
@@ -330,7 +330,8 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
 
   void _navigateToTask(String taskId) {
     try {
-      final task = _source.getTasks().firstWhere((t) => t.id == taskId);
+      final task = getTaskById(taskId);
+      if (task == null) return;
       _taskToEdit = task;
       notifyListeners();
     } catch (e, s) {
@@ -340,8 +341,8 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
 
   Future<void> _snoozeTask(String taskId, String? actionId) async {
     try {
-      final task = _source.getTasks().firstWhere((t) => t.id == taskId);
-      if (task.dueDate != null) {
+      final task = getTaskById(taskId);
+      if (task != null && task.dueDate != null) {
         final newDate = _notificationManager.getSnoozedDate(
           task.dueDate!,
           actionId,
@@ -355,8 +356,8 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
 
   Future<void> _completeTaskFromNotification(String taskId) async {
     try {
-      final task = _source.getTasks().firstWhere((t) => t.id == taskId);
-      if (!task.isCompleted) {
+      final task = getTaskById(taskId);
+      if (task != null && !task.isCompleted) {
         await toggleTaskCompletion(task);
       }
     } catch (e, s) {
@@ -393,6 +394,18 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
     );
   }
 
+  void _onSubscriptionChanged() {
+    final isPremium = _subscriptionService.isPremium;
+    final becamePremium = isPremium && !_lastKnownPremium;
+    _lastKnownPremium = isPremium;
+    notifyListeners();
+    // Premium status is resolved after startup, so deferred recurring tasks
+    // that came due while the app was closed are materialized here.
+    if (becamePremium) {
+      unawaited(checkAndMaterializeDueRecurringTasks());
+    }
+  }
+
   void _onPrivateModeChanged() {
     _refreshPagination();
     notifyListeners();
@@ -402,7 +415,10 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
   @override
   void dispose() {
     _authSubscription?.cancel();
-    _connectivitySubscription?.cancel();
+    if (_connectivityListener != null) {
+      _connectivityService.removeListener(_connectivityListener!);
+    }
+    _subscriptionService.removeListener(_onSubscriptionChanged);
     _notificationSubscription?.cancel();
     _widgetDebounce?.cancel();
     _privateModeService.removeListener(_onPrivateModeChanged);
@@ -667,9 +683,12 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
         });
   }
 
+  /// The filtered + sorted task list shown in the UI. Recomputed only when
+  /// data or filters change (see [_refreshPagination]); a new list instance is
+  /// produced on each refresh so `Selector`s rebuild correctly.
   List<Task> get tasks {
     if (_isLoading) return [];
-    return _taskPagination.items;
+    return _visibleTasks;
   }
 
   List<Task> get allTasks {
@@ -703,36 +722,10 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
     return _source.getCategories();
   }
 
-  bool get hasMoreTasks => _taskPagination.hasMoreItems;
-  bool get isLoadingMoreTasks => _taskPagination.isLoading;
-  int get currentTaskPage => _taskPagination.currentPage;
-  int get totalTaskPages => _taskPagination.totalPages;
-  int get totalTaskCount => _taskPagination.totalItems;
-
-  Future<void> loadMoreTasks() async {
-    await _taskPagination.loadNextPage();
-
-    if (!_taskPagination.hasMoreItems &&
-        _filterService.showCompleted &&
-        _authService.currentUser != null) {
-      final moreTasks = await _firestoreService.getNextCompletedTasksBatch();
-      if (moreTasks.isNotEmpty) {
-        for (final task in moreTasks) {
-          await _source.addTask(task);
-        }
-        _refreshPagination();
-      }
-    }
-
-    notifyListeners();
-  }
-
-  bool shouldLoadMoreTasks(int index) {
-    return _taskPagination.shouldLoadMore(index);
-  }
+  int get totalTaskCount => _visibleTasks.length;
 
   void _refreshPagination() {
-    _taskPagination.refresh();
+    _visibleTasks = List.unmodifiable(_getFilteredAndSortedTasks());
   }
 
   List<Task> _getTasksForPublicSurfaces() {
@@ -813,6 +806,7 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
     if (kIsWeb) return;
     if (_widgetUpdateInProgress) {
       _pendingWidgetUpdate = true;
+      _pendingWidgetNotification |= showNotification;
       return;
     }
 
@@ -822,6 +816,7 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
       () async {
         if (_widgetUpdateInProgress) {
           _pendingWidgetUpdate = true;
+          _pendingWidgetNotification |= showNotification;
           return;
         }
 
@@ -880,8 +875,10 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
         } finally {
           _widgetUpdateInProgress = false;
           if (_pendingWidgetUpdate) {
+            final withNotification = _pendingWidgetNotification;
             _pendingWidgetUpdate = false;
-            _updateWidgets(showNotification: false);
+            _pendingWidgetNotification = false;
+            _updateWidgets(showNotification: withNotification);
           }
         }
       },
@@ -920,7 +917,11 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
       recurrenceRule: recurrenceRule,
       customFields: customFields,
     );
+    task.touch();
     await _source.addTask(task);
+    // Show the task immediately; reminders and Google Tasks sync follow.
+    _refreshPagination();
+    notifyListeners();
 
     _firestoreService.addTask(task).catchError((e, s) {
       _errorHandlingService.logError(
@@ -944,8 +945,6 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
 
     await _syncTaskGoogleTasksState(task);
 
-    _refreshPagination();
-    notifyListeners();
     updateHomeWidgetWithNotification();
     _updateTaskCounterNotification();
 
@@ -972,8 +971,10 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
 
     _syncManager.recordPendingWrite(task.id, task.isCompleted);
 
-    notifyListeners();
+    task.touch();
     await _source.addTask(task);
+    _refreshPagination();
+    notifyListeners();
     _firestoreService
         .updateTask(task)
         .catchError((e, s) {
@@ -1018,6 +1019,7 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
           // Under the deferred recurrence model, the next iteration is deferred until its scheduled date
           if (nextDay.isAfter(today)) {
             task.nextRecurrenceDate = nextDueDate;
+            task.touch();
             await _source.updateTask(task);
             _firestoreService.updateTask(task).catchError((e, s) {
               _errorHandlingService.logError(
@@ -1058,6 +1060,7 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
           );
           await _cancelTaskNotifications(previewTask);
           task.nextRecurrenceDate = null;
+          task.touch();
           await _source.updateTask(task);
           _firestoreService.updateTask(task).catchError((e, s) {
             _errorHandlingService.logError(
@@ -1133,6 +1136,7 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
     );
     await _cancelTaskNotifications(previewTask);
 
+    nextTask.touch();
     await _source.addTask(nextTask);
     _firestoreService.addTask(nextTask).catchError((e, s) {
       _errorHandlingService.logError(
@@ -1158,6 +1162,7 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
 
     // Clear nextRecurrenceDate on parent so it's not materialized again
     parentTask.nextRecurrenceDate = null;
+    parentTask.touch();
     await _source.updateTask(parentTask);
     _firestoreService.updateTask(parentTask).catchError((e, s) {
       _errorHandlingService.logError(
@@ -1173,7 +1178,18 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
 
   Future<void> checkAndMaterializeDueRecurringTasks() async {
     if (!_subscriptionService.isPremium) return;
+    // Resume + premium-resolved can fire together; running twice would spawn
+    // duplicate instances before nextRecurrenceDate is cleared.
+    if (_materializingRecurring) return;
+    _materializingRecurring = true;
+    try {
+      await _materializeDueRecurringTasks();
+    } finally {
+      _materializingRecurring = false;
+    }
+  }
 
+  Future<void> _materializeDueRecurringTasks() async {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
 
@@ -1342,7 +1358,10 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
       }
     }
 
+    task.touch();
     await _source.addTask(task);
+    _refreshPagination();
+    notifyListeners();
     final taskId = task.id;
     _firestoreService
         .updateTask(task)
@@ -1377,8 +1396,6 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
 
     await _syncTaskGoogleTasksState(task);
 
-    _refreshPagination();
-    notifyListeners();
     unawaited(_updateTaskCounterNotification());
     updateHomeWidgetWithNotification();
   }
@@ -1413,6 +1430,7 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
         }
       }
 
+      task.touch();
       await _source.addTask(task);
       try {
         if (!task.isCompleted &&
@@ -1458,6 +1476,7 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
   Future<void> toggleTaskPin(Task task) async {
     task.isPinned = !(task.isPinned ?? false);
     notifyListeners();
+    task.touch();
     await _source.addTask(task);
     _firestoreService.updateTask(task).catchError((e, s) {
       _errorHandlingService.logError(
@@ -1473,9 +1492,14 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
 
   Future<void> deleteTask(String id) async {
     try {
-      final task = _source.getTasks().firstWhere((t) => t.id == id);
+      final task = getTaskById(id);
+      if (task == null) return;
       task.isDeleted = true;
+      task.touch();
       await _source.addTask(task);
+      // A swiped Dismissible must leave the tree before any network await.
+      _refreshPagination();
+      notifyListeners();
       _firestoreService.updateTask(task).catchError((e, s) {
         _errorHandlingService.logError(
           e,
@@ -1488,8 +1512,6 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
     } catch (e, s) {
       _errorHandlingService.logError(e, s, reason: 'Deleting task');
     }
-    _refreshPagination();
-    notifyListeners();
     unawaited(_updateTaskCounterNotification());
     updateHomeWidgetWithNotification();
 
@@ -1498,7 +1520,10 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
 
   Future<void> restoreTask(Task task) async {
     task.isDeleted = false;
+    task.touch();
     await _source.addTask(task);
+    _refreshPagination();
+    notifyListeners();
     await _syncTaskGoogleTasksState(task);
     _firestoreService.updateTask(task).catchError((e, s) {
       _errorHandlingService.logError(
@@ -1528,10 +1553,13 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
 
   Future<void> deleteTaskPermanently(String id) async {
     final task = getTaskById(id);
-    if (task != null) {
-      await _removeGoogleTask(task);
-    }
+    final googleTaskId = task?.googleTaskId;
     await _source.deleteTask(id);
+    _refreshPagination();
+    notifyListeners();
+    if (googleTaskId != null) {
+      await _syncManager.removeGoogleTaskById(googleTaskId);
+    }
     _firestoreService.deleteTask(id).catchError((e, s) {
       _errorHandlingService.logError(
         e,
@@ -1728,18 +1756,7 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
 
   Category? getCategoryById(String? id) {
     if (id == null) return null;
-
-    try {
-      final category = _source.getCategories().firstWhere((c) => c.id == id);
-      return category;
-    } catch (e, s) {
-      _errorHandlingService.logError(
-        e,
-        s,
-        reason: 'Getting category by id: $id',
-      );
-      return null;
-    }
+    return _source.getCategory(id);
   }
 
   Future<void> _removeGoogleTask(Task task) async {
@@ -1753,13 +1770,7 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
     );
   }
 
-  Task? getTaskById(String id) {
-    try {
-      return _source.getTasks().firstWhere((t) => t.id == id);
-    } catch (e) {
-      return null;
-    }
-  }
+  Task? getTaskById(String id) => _source.getTask(id);
 
   Future<void> syncGoogleTasksToLocal() async {
     await _syncManager.syncGoogleTasksToLocal(

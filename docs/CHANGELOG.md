@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.20+110] - 2026-09-24 (Patch 11)
+
+### Fixed
+- Syncing no longer undoes newer edits made on another device: the most recent edit wins, including un-completing a task.
+- All tasks now appear in the list, calendar and board (previously only the first 50).
+- Fixed swipe-to-delete errors, notification links to filtered tasks, and recurring tasks not appearing at launch.
+
+### Changed
+- Much faster task list, instant updates when editing, and quicker startup and cloud sync.
+
 ## [0.2.20+110] - 2026-09-24 (Patch 10)
 
 ### Fixed

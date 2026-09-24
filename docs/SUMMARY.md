@@ -2,6 +2,32 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## Last-Write-Wins Task Sync, Performance & Correctness Pass - 2026-09-24 (Patch 11)
+
+#### Problem & Root Causes
+1. **Startup upload clobbered newer cloud edits**: `TaskSyncManager.uploadLocalDataToCloud()` blindly `set()` every local task on each launch/sign-in, reverting edits made on other devices. Tasks had no edit timestamp; `TaskConflictResolver` guessed with `completedAt ?? createdAt`, and the live listener always kept a local completion even if another device un-completed the task later.
+2. **Only 50 tasks visible**: `PaginationService` capped `TaskProvider.tasks` at `maxTasksPerPage` (50) and nothing ever called `loadMoreTasks()`, so the list, calendar, kanban, web home and command palette silently dropped tasks.
+3. **Default "due date" sort was ~300-700x slower** than other sorts: the comparator built local `DateTime(y,m,d)` objects (a timezone lookup each) O(n log n) times on every list refresh (44 ms @200 tasks, 1.8 s @3000 on desktop).
+4. **Other defects**: swipe-to-delete awaited Google Tasks network calls before removing the item (Dismissible "still part of the tree"); notification deep links searched the filtered list; recurring-task materialization never ran at cold start (premium resolves after `TaskProvider.init`); connectivity listener leaked (`addListener(...) as StreamSubscription?` stored null); startup blocked up to ~4 s offline on DNS probes; startup upload was N sequential 500 ms-throttled writes that also delayed the realtime listener; `getCategoryById` copied the list and logged a Crashlytics error on every miss.
+
+#### Solutions Applied
+1. **Last-write-wins sync** (`task.dart`, `task_sync_manager.dart`, `firestore_service.dart`, `offline_write_queue_service.dart`):
+   - New `Task.modifiedAt` (`@HiveField(24)`, nullable, Firestore `modifiedAt`), `touch()` on every local edit (provider mutations, Google Tasks back-sync, widget background completion) and `lastModified => modifiedAt ?? completedAt ?? createdAt`. Cloud copies are saved without restamping.
+   - Cloud edit time = `modifiedAt ?? updatedAt` (device clock preferred so a device compares its own edits on one clock; server time only for legacy docs/older app versions).
+   - Startup upload now only checks tasks edited since a per-user watermark (`tasks_upload_watermark_<uid>`), reads their cloud edit times from the server (`fetchTaskEditTimes`, 30-id `whereIn` chunks) and batch-uploads only missing/newer ones. Offline -> uploads nothing, watermark not advanced.
+   - Resolver and both "keep local completion" listener rules now compare `lastModified`, so un-completing on another device propagates.
+2. **Performance**: full filtered list (no cap) cached per refresh; O(1) Hive `getTask`/`getCategory`; precomputed due-day int keys in sort; private-task set precomputed; calendar indexes tasks per day once per build; Google Tasks reconciliation indexed; batched `uploadAll`; UI refreshes before network work in add/toggle/update/delete/restore.
+3. **Correctness**: deep link via `getTaskById`; materialize on premium resolution with re-entrancy guard; connectivity listener removed on dispose and init not awaited; pending widget refresh keeps its notification flag.
+
+#### Lessons
+- Never build local `DateTime`s inside sort comparators; precompute keys.
+- Timestamp comparisons across devices should prefer one clock per writer; server time only as a legacy fallback.
+
+#### Deployment
+- `flutter analyze` 0 issues; 375/375 tests passing (12 new: list cap, lookups, delete, premium materialization, LWW resolver/serialization, upload filtering/offline/watermark).
+- `flutter build apk --debug` and `flutter build web` succeed. Not launched on a device (no emulator/device available).
+- Shorebird Android Patch 11 (`0.2.20+110`).
+
 ## Fix Semester Scope Bounds & Web Token Grace - 2026-09-24 (Patch 10)
 
 #### Problem & Root Causes
