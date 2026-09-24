@@ -39,9 +39,17 @@ object FullCalendarWidgetUtils {
     const val PREF_GRID_DATA = "full_calendar_grid_data"
     const val PREF_EVENTS_BY_DATE = "full_calendar_events_by_date"
     const val PREF_IS_PREMIUM = "is_premium"
+    // App theme primary colors, synced from Flutter so the widget matches the app.
+    const val PREF_APP_PRIMARY_LIGHT = "app_primary_color_light"
+    const val PREF_APP_PRIMARY_DARK = "app_primary_color_dark"
 
     // Defaults
-    const val DEFAULT_HIGHLIGHT_COLOR = "#EF3842"
+    const val DEFAULT_HIGHLIGHT_COLOR = "#6366F1" // App primary (indigo)
+    const val DEFAULT_SHOW_WEEK_NUMBERS = false // The in-app calendar shows none
+
+    // In-app calendar weekend colors (Flutter Colors.redAccent / Colors.blueAccent)
+    val SUNDAY_COLOR = Color.parseColor("#FF5252")
+    val SATURDAY_COLOR = Color.parseColor("#448AFF")
     const val DEFAULT_THEME = "system"
     const val DEFAULT_START_OF_WEEK = 7 // Sunday
 
@@ -64,6 +72,27 @@ object FullCalendarWidgetUtils {
             Log.e(TAG, "Failed to parse highlight color '$hex', falling back to default $defaultHex", e)
             Color.parseColor(defaultHex)
         }
+    }
+
+    /** Whether the widget renders dark, following the system for the "system" theme. */
+    fun isDarkTheme(theme: String, context: Context): Boolean = when (theme) {
+        "dark", "glassmorphic" -> true
+        "light" -> false
+        else -> (context.resources.configuration.uiMode and
+            android.content.res.Configuration.UI_MODE_NIGHT_MASK) ==
+            android.content.res.Configuration.UI_MODE_NIGHT_YES
+    }
+
+    /**
+     * Accent used for today / selected / active filters: the user's chosen highlight if
+     * they set one, otherwise the app's own primary color for this theme, so the widget
+     * matches the in-app calendar.
+     */
+    fun resolveHighlightColor(widgetData: SharedPreferences, theme: String, context: Context): Int {
+        if (widgetData.contains(PREF_HIGHLIGHT_COLOR)) return parseHighlightColor(widgetData)
+        val key = if (isDarkTheme(theme, context)) PREF_APP_PRIMARY_DARK else PREF_APP_PRIMARY_LIGHT
+        val hex = widgetData.getString(key, null) ?: return Color.parseColor(DEFAULT_HIGHLIGHT_COLOR)
+        return try { Color.parseColor(hex) } catch (_: Exception) { Color.parseColor(DEFAULT_HIGHLIGHT_COLOR) }
     }
 
     /**

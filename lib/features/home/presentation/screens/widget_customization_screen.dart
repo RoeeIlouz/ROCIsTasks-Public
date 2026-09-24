@@ -20,7 +20,7 @@ class WidgetCustomizationScreen extends StatefulWidget {
 }
 
 class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
-  bool _showWeekNumbers = true;
+  bool _showWeekNumbers = false;
   bool _weekendHighlight = true;
   String _widgetTheme = 'system';
   bool _showTasks = true;
@@ -42,7 +42,7 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
       final prefs = await SharedPreferences.getInstance();
       setState(() {
         _showWeekNumbers =
-            prefs.getBool('full_calendar_show_week_numbers') ?? true;
+            prefs.getBool('full_calendar_show_week_numbers') ?? false;
         _weekendHighlight =
             prefs.getBool('full_calendar_weekend_highlight') ?? true;
         _widgetTheme = prefs.getString('full_calendar_theme') ?? 'system';

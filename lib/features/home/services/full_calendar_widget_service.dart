@@ -70,6 +70,10 @@ class FullCalendarWidgetService {
   static String? _cachedEventsKey;
   static DateTime? _cachedEventsTime;
 
+  /// The widget draws up to 2 pills or 3 dots, but needs the real count for
+  /// its "+N" label; this only bounds the saved data size.
+  static const _maxSummariesPerDay = 30;
+
   static List<SyncedScheduleEvent>? _cachedScheduleEvents;
   static String? _cachedScheduleKey;
   static DateTime? _cachedScheduleTime;
@@ -548,7 +552,7 @@ class FullCalendarWidgetService {
 
         // 1. Prioritize tasks
         for (final t in dayTasks) {
-          if (summaries.length >= 4) break;
+          if (summaries.length >= _maxSummariesPerDay) break;
           int? colorVal;
           try {
             final cat = categories.firstWhere(
@@ -575,7 +579,7 @@ class FullCalendarWidgetService {
 
         // 2. Google Calendar events
         for (final e in dayEvents) {
-          if (summaries.length >= 4) break;
+          if (summaries.length >= _maxSummariesPerDay) break;
           final timeStr = e.start != null
               ? _formatEventTime(e.start, e.end, l10n)
               : '';
@@ -604,7 +608,7 @@ class FullCalendarWidgetService {
 
         // 3. ROCIs Schedule events
         for (final s in daySchedule) {
-          if (summaries.length >= 4) break;
+          if (summaries.length >= _maxSummariesPerDay) break;
           final timeStr = _formatEventTime(s.startTime, s.endTime, l10n);
           final displayTitle = s.courseName.isNotEmpty
               ? (s.title.isNotEmpty &&
@@ -800,7 +804,7 @@ class FullCalendarWidgetService {
   }
 
   /// Adds saved summaries of [staleTypes] (sources that failed to refresh)
-  /// back into [fresh], keeping at most 4 summaries per day.
+  /// back into [fresh], keeping at most [_maxSummariesPerDay] per day.
   @visibleForTesting
   static void mergeStaleSummaries(
     Map<String, List<Map<String, dynamic>>> fresh,
@@ -816,7 +820,7 @@ class FullCalendarWidgetService {
       if (kept.isEmpty) continue;
       final day = fresh.putIfAbsent(entry.key, () => []);
       for (final summary in kept) {
-        if (day.length >= 4) break;
+        if (day.length >= _maxSummariesPerDay) break;
         day.add(summary);
       }
     }

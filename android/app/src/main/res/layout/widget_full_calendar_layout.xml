@@ -160,13 +160,13 @@
         android:paddingBottom="4dp">
 
         <TextView android:id="@+id/widget_weekday_num_header" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="0.6" android:gravity="center" android:text="#" android:textSize="11sp" android:textColor="@color/widget_secondary_text" android:textStyle="italic"/>
-        <TextView android:id="@+id/widget_weekday_sun_header" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="S" android:textSize="11sp" android:textColor="#EF4444" android:textStyle="bold" />
-        <TextView android:id="@+id/widget_weekday_mon_header" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="M" android:textSize="11sp" android:textColor="@color/widget_body_text" android:textStyle="bold" />
-        <TextView android:id="@+id/widget_weekday_tue_header" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="T" android:textSize="11sp" android:textColor="@color/widget_body_text" android:textStyle="bold" />
-        <TextView android:id="@+id/widget_weekday_wed_header" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="W" android:textSize="11sp" android:textColor="@color/widget_body_text" android:textStyle="bold" />
-        <TextView android:id="@+id/widget_weekday_thu_header" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="T" android:textSize="11sp" android:textColor="@color/widget_body_text" android:textStyle="bold" />
-        <TextView android:id="@+id/widget_weekday_fri_header" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="F" android:textSize="11sp" android:textColor="@color/widget_body_text" android:textStyle="bold" />
-        <TextView android:id="@+id/widget_weekday_sat_header" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="S" android:textSize="11sp" android:textColor="#3B82F6" android:textStyle="bold" />
+        <TextView android:id="@+id/widget_weekday_sun_header" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="S" android:textSize="12sp" android:textColor="#FF5252" android:textStyle="bold" android:maxLines="1" android:ellipsize="end" />
+        <TextView android:id="@+id/widget_weekday_mon_header" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="M" android:textSize="12sp" android:textColor="@color/widget_body_text" android:textStyle="bold" android:maxLines="1" android:ellipsize="end" />
+        <TextView android:id="@+id/widget_weekday_tue_header" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="T" android:textSize="12sp" android:textColor="@color/widget_body_text" android:textStyle="bold" android:maxLines="1" android:ellipsize="end" />
+        <TextView android:id="@+id/widget_weekday_wed_header" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="W" android:textSize="12sp" android:textColor="@color/widget_body_text" android:textStyle="bold" android:maxLines="1" android:ellipsize="end" />
+        <TextView android:id="@+id/widget_weekday_thu_header" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="T" android:textSize="12sp" android:textColor="@color/widget_body_text" android:textStyle="bold" android:maxLines="1" android:ellipsize="end" />
+        <TextView android:id="@+id/widget_weekday_fri_header" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="F" android:textSize="12sp" android:textColor="@color/widget_body_text" android:textStyle="bold" android:maxLines="1" android:ellipsize="end" />
+        <TextView android:id="@+id/widget_weekday_sat_header" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="S" android:textSize="12sp" android:textColor="#448AFF" android:textStyle="bold" android:maxLines="1" android:ellipsize="end" />
     </LinearLayout>
 
     <!-- Calendar List (Rows of weeks) -->
@@ -201,6 +201,7 @@
         android:focusable="true">
 
         <TextView
+            android:id="@+id/widget_premium_overlay_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"

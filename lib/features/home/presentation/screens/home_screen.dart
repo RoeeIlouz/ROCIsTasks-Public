@@ -194,16 +194,14 @@ class _HomeScreenState extends State<HomeScreen> {
       return;
     }
 
-    // Handle calendar/day/$date path format from FullCalendarWidget
-    // Just navigate to calendar page without setting a specific date
-    if (uri.host == 'calendar') {
-      // Navigating to calendar page
+    // Calendar tab; the FullCalendar widget adds ?date=yyyy-MM-dd for a tapped
+    // day, handled together with the legacy selected_date parameter below.
+    final dateStr =
+        uri.queryParameters['date'] ?? uri.queryParameters['selected_date'];
+    if (uri.host == 'calendar' && dateStr == null) {
       _onItemTapped(1);
       return;
     }
-
-    // Handle legacy selected_date query parameter format
-    final dateStr = uri.queryParameters['selected_date'];
     if (dateStr != null) {
       try {
         final date = DateTime.parse(dateStr);
