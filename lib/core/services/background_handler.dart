@@ -318,6 +318,8 @@ class BackgroundHandler {
       final box = await Hive.openBox<Task>(LocalTaskSource.boxName);
       final task = box.values.firstWhere((t) => t.id == taskId);
       task.isCompleted = true;
+      task.completedAt ??= DateTime.now();
+      task.touch();
       await task.save();
 
       final currentUser = FirebaseAuth.instance.currentUser;

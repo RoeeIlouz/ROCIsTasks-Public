@@ -60,22 +60,33 @@ class _CalendarScreenState extends State<CalendarScreen> {
     });
   }
 
+  static DateTime _dayKey(DateTime d) => DateTime(d.year, d.month, d.day);
+
+  /// Groups tasks by calendar day once per build, so the ~42 eventLoader
+  /// calls per month page are map lookups instead of full task scans.
+  static Map<DateTime, List<Task>> _indexTasksByDay(Iterable<Task> tasks) {
+    final index = <DateTime, List<Task>>{};
+    for (final task in tasks) {
+      final due = task.dueDate;
+      if (due == null) continue;
+      (index[_dayKey(due)] ??= []).add(task);
+    }
+    return index;
+  }
+
   List<dynamic> _getEventsForDay(
     DateTime day,
-    List<Task> allTasks,
-    CalendarProvider calendarProvider, {
-    TaskProvider? taskProvider,
-  }) {
+    Map<DateTime, List<Task>> tasksByDay,
+    Map<DateTime, List<Task>> upcomingByDay,
+    CalendarProvider calendarProvider,
+  ) {
+    final key = _dayKey(day);
     final tasks = calendarProvider.showTasks
-        ? allTasks.where((task) {
-            if (task.dueDate == null) return false;
-            return isSameDay(task.dueDate, day);
-          }).toList()
-        : <Task>[];
-
-    final upcomingTasks = (calendarProvider.showTasks && taskProvider != null)
-        ? taskProvider.getUpcomingRecurringTasksForDay(day)
-        : <Task>[];
+        ? (tasksByDay[key] ?? const <Task>[])
+        : const <Task>[];
+    final upcomingTasks = calendarProvider.showTasks
+        ? (upcomingByDay[key] ?? const <Task>[])
+        : const <Task>[];
 
     final events = calendarProvider.getEventsForDay(day);
 
@@ -90,13 +101,14 @@ class _CalendarScreenState extends State<CalendarScreen> {
   ) {
     if (event is Task) {
       Category? category;
-      try {
-        category = taskProvider.categories.firstWhere(
-          (cat) => event.categoryIds.isNotEmpty
-              ? event.categoryIds.contains(cat.id)
-              : cat.id == event.categoryId,
-        );
-      } catch (_) {}
+      if (event.categoryIds.isNotEmpty) {
+        for (final id in event.categoryIds) {
+          category = taskProvider.getCategoryById(id);
+          if (category != null) break;
+        }
+      } else {
+        category = taskProvider.getCategoryById(event.categoryId);
+      }
       if (category != null) return Color(category.colorValue);
       return colorService.taskColor;
     } else if (event is Event) {
@@ -179,15 +191,16 @@ class _CalendarScreenState extends State<CalendarScreen> {
     final colorService = Provider.of<CalendarColorService>(context);
     final l10n = AppLocalizations.of(context)!;
 
-    final tasks = taskProvider.tasks;
+    final tasksByDay = _indexTasksByDay(taskProvider.tasks);
+    final upcomingByDay = _indexTasksByDay(taskProvider.upcomingRecurringTasks);
     // events list not needed here as we query provider by day
     final selectedDay = calendarProvider.selectedDate;
 
     final selectedItems = _getEventsForDay(
       selectedDay,
-      tasks,
+      tasksByDay,
+      upcomingByDay,
       calendarProvider,
-      taskProvider: taskProvider,
     );
 
     return Column(
@@ -345,9 +358,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   eventLoader: (day) {
                     return _getEventsForDay(
                       day,
-                      tasks,
+                      tasksByDay,
+                      upcomingByDay,
                       calendarProvider,
-                      taskProvider: taskProvider,
                     );
                   },
                   calendarBuilders: CalendarBuilders(

@@ -147,6 +147,9 @@ class LocalTaskSource {
     return _box.values.toList();
   }
 
+  /// O(1) lookup; tasks are always stored keyed by their id.
+  Task? getTask(String id) => _box.get(id);
+
   ValueListenable<Box<Task>> listenToTasks() {
     return _box.listenable();
   }
@@ -172,6 +175,9 @@ class LocalTaskSource {
   List<Category> getCategories() {
     return _categoriesBox.values.toList();
   }
+
+  /// O(1) lookup; categories are always stored keyed by their id.
+  Category? getCategory(String id) => _categoriesBox.get(id);
 
   Future<void> addCategory(Category category) async {
     await _categoriesBox.put(category.id, category);

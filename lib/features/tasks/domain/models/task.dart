@@ -91,6 +91,11 @@ class Task extends HiveObject {
   @HiveField(23)
   DateTime? nextRecurrenceDate;
 
+  /// When this task was last edited, used for last-write-wins sync.
+  /// Null for tasks saved before this field existed; see [lastModified].
+  @HiveField(24)
+  DateTime? modifiedAt;
+
   Task({
     String? id,
     required this.title,
@@ -116,11 +121,18 @@ class Task extends HiveObject {
     List<TaskCustomField>? customFields,
     this.recurringParentId,
     this.nextRecurrenceDate,
+    this.modifiedAt,
   }) : id = id ?? const Uuid().v4(),
        createdAt = createdAt ?? DateTime.now(),
        attachmentPaths = attachmentPaths ?? <String>[],
        categoryIds = categoryIds ?? <String>[],
        customFields = customFields ?? <TaskCustomField>[];
+
+  /// Best-known time of the last edit, falling back for legacy tasks.
+  DateTime get lastModified => modifiedAt ?? completedAt ?? createdAt;
+
+  /// Records a local edit. Not called when saving copies received from the cloud.
+  void touch() => modifiedAt = DateTime.now();
 
   Task copyWith({
     String? id,
@@ -148,6 +160,7 @@ class Task extends HiveObject {
     String? recurringParentId,
     DateTime? nextRecurrenceDate,
     bool clearNextRecurrenceDate = false,
+    DateTime? modifiedAt,
   }) {
     return Task(
       id: id ?? this.id,
@@ -177,6 +190,7 @@ class Task extends HiveObject {
       nextRecurrenceDate: clearNextRecurrenceDate
           ? null
           : (nextRecurrenceDate ?? this.nextRecurrenceDate),
+      modifiedAt: modifiedAt ?? this.modifiedAt,
     );
   }
 
@@ -206,6 +220,7 @@ class Task extends HiveObject {
       'customFields': customFields?.map((cf) => cf.toMap()).toList(),
       'recurringParentId': recurringParentId,
       'nextRecurrenceDate': nextRecurrenceDate?.toIso8601String(),
+      'modifiedAt': modifiedAt?.toIso8601String(),
     };
   }
 
@@ -234,6 +249,7 @@ class Task extends HiveObject {
       'customFields': customFields?.map((cf) => cf.toMap()).toList(),
       'recurringParentId': recurringParentId,
       'nextRecurrenceDate': nextRecurrenceDate,
+      'modifiedAt': modifiedAt,
     };
   }
 
@@ -281,6 +297,13 @@ class Task extends HiveObject {
           .toList(),
       recurringParentId: map['recurringParentId'] as String?,
       nextRecurrenceDate: _parseDate(map['nextRecurrenceDate']),
+      modifiedAt: cloudModifiedAt(map),
     );
   }
+
+  /// Edit time of a stored document. Prefers the client edit time so a
+  /// device always compares its own edits on its own clock; the server write
+  /// time is only a fallback for documents written before `modifiedAt` existed.
+  static DateTime? cloudModifiedAt(Map<String, dynamic> map) =>
+      _parseDate(map['modifiedAt']) ?? _parseDate(map['updatedAt']);
 }

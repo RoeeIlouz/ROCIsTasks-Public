@@ -179,15 +179,17 @@ class _HomeScreenState extends State<HomeScreen> {
       final taskId = uri.queryParameters['id'];
       if (taskId != null) {
         final taskProvider = Provider.of<TaskProvider>(context, listen: false);
-        try {
-          final task = taskProvider.tasks.firstWhere((t) => t.id == taskId);
+        // Look up by id, not in the filtered list: the task may be hidden by
+        // the active search/category/date filters.
+        final task = taskProvider.getTaskById(taskId);
+        if (task != null) {
           Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => TaskDetailScreen(task: task),
             ),
           );
-        } catch (_) {}
+        }
       }
       return;
     }

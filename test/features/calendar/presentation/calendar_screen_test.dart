@@ -55,6 +55,8 @@ void main() {
 
     when(() => mockTaskProvider.tasks).thenReturn([]);
     when(() => mockTaskProvider.categories).thenReturn([]);
+    when(() => mockTaskProvider.upcomingRecurringTasks).thenReturn([]);
+    when(() => mockTaskProvider.getCategoryById(any())).thenReturn(null);
     when(
       () => mockTaskProvider.getUpcomingRecurringTasksForDay(any()),
     ).thenReturn([]);

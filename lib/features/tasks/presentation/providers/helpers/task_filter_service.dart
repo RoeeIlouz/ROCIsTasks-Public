@@ -229,9 +229,25 @@ class TaskFilterService {
         break;
     }
 
+    // Resolve privacy once per task rather than twice per comparison.
+    final privateTasks = shouldMaskPrivateContent
+        ? tasks.where(isPrivateTask).toSet()
+        : const <Task>{};
+
+    // Calendar-day keys computed once per task. Building local DateTimes in the
+    // comparator costs a timezone lookup per call, which made this sort
+    // ~300x slower than the others.
+    final dueDayKeys = Map<Task, int>.identity();
+    if (currentSortOption == TaskSortOption.dueDate) {
+      for (final t in tasks) {
+        final d = t.dueDate;
+        if (d != null) dueDayKeys[t] = d.year * 10000 + d.month * 100 + d.day;
+      }
+    }
+
     tasks.sort((a, b) {
-      final aPrivate = shouldMaskPrivateContent && isPrivateTask(a);
-      final bPrivate = shouldMaskPrivateContent && isPrivateTask(b);
+      final aPrivate = privateTasks.contains(a);
+      final bPrivate = privateTasks.contains(b);
       if (aPrivate != bPrivate) return aPrivate ? 1 : -1;
       if (aPrivate && bPrivate) {
         return a.title.toLowerCase().compareTo(b.title.toLowerCase());
@@ -247,17 +263,7 @@ class TaskFilterService {
           if (a.dueDate == null && b.dueDate == null) return 0;
           if (a.dueDate == null) return 1;
           if (b.dueDate == null) return -1;
-          final aDate = DateTime(
-            a.dueDate!.year,
-            a.dueDate!.month,
-            a.dueDate!.day,
-          );
-          final bDate = DateTime(
-            b.dueDate!.year,
-            b.dueDate!.month,
-            b.dueDate!.day,
-          );
-          final dayCmp = aDate.compareTo(bDate);
+          final dayCmp = dueDayKeys[a]!.compareTo(dueDayKeys[b]!);
           if (dayCmp != 0) return dayCmp;
           final prioCmp = b.priority.index.compareTo(a.priority.index);
           if (prioCmp != 0) return prioCmp;

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' hide Category;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
@@ -86,6 +87,19 @@ void main() {
     when(() => mockSource.init()).thenAnswer((_) async => {});
     when(() => mockSource.getTasks()).thenReturn([]);
     when(() => mockSource.getCategories()).thenReturn([]);
+    // Id lookups follow whatever getTasks()/getCategories() currently return.
+    when(() => mockSource.getTask(any())).thenAnswer(
+      (inv) => mockSource
+          .getTasks()
+          .where((t) => t.id == inv.positionalArguments.first)
+          .firstOrNull,
+    );
+    when(() => mockSource.getCategory(any())).thenAnswer(
+      (inv) => mockSource
+          .getCategories()
+          .where((c) => c.id == inv.positionalArguments.first)
+          .firstOrNull,
+    );
     when(() => mockNotificationService.init()).thenAnswer((_) async => {});
     when(
       () => mockNotificationService.requestPermissions(),
@@ -542,6 +556,99 @@ void main() {
         ).captured;
         expect(capturedTasks.length, 1);
         expect((capturedTasks.first as Task).id, 'rec-2');
+      },
+    );
+  });
+
+  group('TaskProvider list & lookups', () {
+    test('exposes every matching task (no silent 50-item cap)', () async {
+      final many = List.generate(120, (i) => Task(id: 't$i', title: 'Task $i'));
+      when(() => mockSource.getTasks()).thenReturn(many);
+
+      await taskProvider.init();
+
+      expect(taskProvider.tasks.length, 120);
+      expect(taskProvider.totalTaskCount, 120);
+    });
+
+    test('unknown category id returns null without logging an error', () async {
+      await taskProvider.init();
+      clearInteractions(mockErrorHandlingService);
+
+      expect(taskProvider.getCategoryById('missing'), isNull);
+      verifyNever(
+        () => mockErrorHandlingService.logError(
+          any(),
+          any(),
+          reason: any(named: 'reason'),
+        ),
+      );
+    });
+
+    test('deleteTask removes the task from the list', () async {
+      final task = Task(id: 'd1', title: 'Swipe me');
+      when(() => mockSource.getTasks()).thenReturn([task]);
+      when(() => mockSource.addTask(any())).thenAnswer((_) async {});
+      when(
+        () => mockFirestoreService.updateTask(any()),
+      ).thenAnswer((_) async {});
+      when(
+        () => mockAnalyticsService.logTaskDeleted(),
+      ).thenAnswer((_) async {});
+
+      await taskProvider.init();
+      expect(taskProvider.tasks.map((t) => t.id), ['d1']);
+
+      await taskProvider.deleteTask('d1');
+
+      expect(taskProvider.tasks, isEmpty);
+      expect(taskProvider.deletedTasks.map((t) => t.id), ['d1']);
+    });
+  });
+
+  group('TaskProvider premium resolution', () {
+    test(
+      'materializes due recurring tasks once premium resolves after init',
+      () async {
+        var premium = false;
+        when(
+          () => mockSubscriptionService.isPremium,
+        ).thenAnswer((_) => premium);
+        when(() => mockSource.addTask(any())).thenAnswer((_) async {});
+        when(
+          () => mockFirestoreService.updateTask(any()),
+        ).thenAnswer((_) async {});
+        when(
+          () => mockFirestoreService.addTask(any()),
+        ).thenAnswer((_) async {});
+
+        final now = DateTime.now();
+        final parent = Task(
+          id: 'rec-cold',
+          title: 'Cold start daily',
+          isCompleted: true,
+          recurrenceRule: 'FREQ=DAILY;INTERVAL=1',
+          nextRecurrenceDate: DateTime(now.year, now.month, now.day, 9),
+        );
+        when(() => mockSource.getTasks()).thenReturn([parent]);
+
+        await taskProvider.init();
+        verifyNever(() => mockSource.addTask(any()));
+
+        final listener =
+            verify(
+                  () => mockSubscriptionService.addListener(captureAny()),
+                ).captured.last
+                as VoidCallback;
+        premium = true;
+        listener();
+        await pumpEventQueue();
+
+        final added = verify(
+          () => mockSource.addTask(captureAny()),
+        ).captured.cast<Task>();
+        expect(added.where((t) => t.recurringParentId == 'rec-cold').length, 1);
+        expect(parent.nextRecurrenceDate, isNull);
       },
     );
   });
