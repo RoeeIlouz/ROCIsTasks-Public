@@ -2,7 +2,7 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
-## Permanent-Delete Tombstones & Web Deploy - 2026-09-24 (Web)
+## Permanent-Delete Tombstones & Web Deploy - 2026-09-24 (Patch 12)
 
 #### Problem & Root Causes
 * **Deleted-forever tasks came back**: "Delete forever" / empty trash called `doc.delete()`. The document vanished, so (a) any device still holding the task recreated it (startup upload saw it as "missing from cloud"; `updateTask` merge-writes and `addTask` sets recreate absent docs), and (b) a device offline during the delete never received a `removed` event and kept showing it forever.
@@ -16,12 +16,13 @@ This file summarizes errors encountered and changes made to the codebase, ensuri
 
 #### Notes / Lessons
 * Hard-deleting a document is not a delete signal in an offline-first multi-device app; keep a tombstone.
-* Android clients on Patch 11 still hard-delete and will show a received tombstone as a trashed task titled "deleted" until they get the next Shorebird patch.
+* Android clients still on Patch 11 hard-delete and show a received tombstone as a trashed task titled "deleted" until they pick up Patch 12 (applied on next app launch).
 * Basemode (`base` 0.15.2) installed by the user; workspace scaffolded (`.base/`, local, not committed).
 
 #### Deployment
 * `flutter analyze` 0 issues; 378/378 tests passing (new: tombstone schema, purge listener, purged upload skip, create+delete queue).
 * Web built and deployed to Firebase Hosting (https://rocis-todo.web.app).
+* Published Shorebird Android Patch 12 (`0.2.20+110`).
 
 ## Last-Write-Wins Task Sync, Performance & Correctness Pass - 2026-09-24 (Patch 11)
 
