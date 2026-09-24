@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.22+112] - 2026-09-24
+
+### Changed
+- Widgets redesigned to match the app: FullCalendar is the in-app calendar card; all other widgets share its colors, Outfit font, tinted icons, full translations and RTL. Widget checkboxes now complete tasks, all-day events stay on their day, lists clear when done, Up Next time stays current.
+
 ## [0.2.21+111] - 2026-09-24
 
 ### Changed

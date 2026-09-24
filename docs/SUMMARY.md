@@ -2,6 +2,35 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## Widget Redesign & Widget Data Fixes - v0.2.22+112 - 2026-09-24
+
+#### Problems
+* Every widget had its own hardcoded dark/light colors, system font, unicode glyph buttons (❮ ❯ ⦿ +), English-only priority/overlay text and a red legacy accent; none matched the app or the rebuilt FullCalendar.
+* Widget checkboxes never completed tasks: `rocistasks://complete` went through MainActivity to `home_screen`, which has no `complete` branch; `task_item` row taps were unhandled too.
+* Dart feeders: all-day events spilled into the next day, items sorted by midnight instead of start time, month grid used `Duration(days:)` (DST shifts day keys), lists kept stale data after the last task was completed, Up Next wrote relative times ("In 12m") that went stale and let undated tasks beat imminent events; three feeders (`schedule_list`, `month_events_map`, `calendar_list_data`) had no reader but ran on every task change.
+
+#### Solutions Applied
+* `WidgetStyle.kt`: shared palette (synced GlassContainer colors), card/tile/icon tinting, RTL, priority colors + localized labels, shared localized `widget_pro_overlay` include. All 8 widgets use it with Outfit fonts and tintable vector drawables.
+* MainActivity forwards `complete` to the background handler (then `moveTaskToBack`); `home_screen` treats `task_item` as `task_detail`.
+* `WidgetDataService.eventDays` (midnight-exclusive, calendar-day math) + `sortMinutes`/`dateOnly` per item; stale-guard only when no tasks are loaded; Up Next saves `up_next_start_millis` and Kotlin formats/refreshes it (`widget_event_days_test.dart`).
+* Kanban strikethrough uses a span (`setPaintFlags` isn't RemoteViews-safe); unused `MonthAgendaGridService`, `widget_layout_static.xml` and `WidgetLimitHelper.setupProOverlay` removed.
+
+#### Deployment
+* `flutter analyze` 0 issues; 389/389 tests; debug APK builds. Not visually verified on a device.
+
+## FullCalendar v2: In-App Calendar Card & Event Parity - v0.2.22+112 - 2026-09-24
+
+#### Problem (from side-by-side screenshots)
+* Data differed from the app: all-day events spilled into the next day (all-day exempted from the exclusive-midnight rule, no toLocal), recurring tasks were expanded into every occurrence, the widget ignored the app list filters and did not validate the Google calendar selection; private tasks were shown on the home screen in private mode.
+* Look differed: always 6 fixed-height rows (RemoteViewsService ListView), black background, red accent from a highlight value older versions stored without user choice, system font, chip-style header buttons, markers not bottom-aligned.
+
+#### Solutions Applied
+* Data: tasks via the app TaskFilterService with saved list filters (due date only) + premium next-recurrence previews; Google ids validated like CalendarProvider; CalendarProvider all-day rule; private tasks hidden when private mode is on (`full_calendar_parity_test.dart`).
+* Look: `FullCalendarGridRenderer` draws only the needed weeks into a weighted LinearLayout (no list service); card = GlassContainer colors synced from MyApp (`app_surface/on_surface/primary_color_light|dark`); Outfit font in res/font; tinted auto-mirrored icons; bottom-anchored pills/dots; widget accent overrides only after an explicit pick (`full_calendar_highlight_custom`).
+
+#### Deployment
+* `flutter analyze` 0 issues; 384/384 tests; debug APK builds. Internal release `0.2.22+112` together with the widget redesign below. Not visually verified on a device.
+
 ## FullCalendar Widget Redesign & v0.2.21+111 Internal Release - 2026-09-24
 
 #### Goals
