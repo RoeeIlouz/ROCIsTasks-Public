@@ -62,6 +62,10 @@ class AppConfig {
   static const String termsOfServiceUrl = 'https://rocisapps.com/terms.html';
   static const String websiteUrl = 'https://rocisapps.com';
   static const String webAppUrl = 'https://tasks.rocisapps.com';
+
+  /// Server-side RevenueCat check that records mobile Pro in Firestore.
+  static const String syncPremiumUrl =
+      'https://us-central1-rocis-todo.cloudfunctions.net/syncPremium';
   static const String githubUrl =
       'https://github.com/RoeeIlouz/ROCIsTasks-public';
 

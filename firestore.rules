@@ -10,9 +10,25 @@ service cloud.firestore {
       return isAuthenticated() && request.auth.uid == userId;
     }
 
+    // Billing fields are written only by Cloud Functions (Lemon Squeezy and
+    // RevenueCat webhooks, syncPremium), never by clients.
+    function billingFields() {
+      return ['is_premium', 'subscription_status', 'subscription_id',
+        'subscription_ends_at', 'subscription_trial_ends_at',
+        'ls_subscription_active', 'ls_lifetime', 'rc_premium', 'rc_expires_at',
+        'last_billing_sync', 'last_synced_from_mobile'];
+    }
+
+    function touchesBilling() {
+      return resource == null
+        ? request.resource.data.keys().hasAny(billingFields())
+        : request.resource.data.diff(resource.data).affectedKeys().hasAny(billingFields());
+    }
+
     match /users/{userId} {
-      // Allow user to read/write their own user doc
-      allow read, write: if isOwner(userId);
+      // Users read/write their own doc, except the billing fields.
+      allow read, delete: if isOwner(userId);
+      allow create, update: if isOwner(userId) && !touchesBilling();
 
       // Settings sub-collection
       match /settings/{settingId} {

@@ -33,6 +33,45 @@ function isLifetimeOrder(attributes) {
   return name.includes('lifetime');
 }
 
+/**
+ * Merges [update] into users/{uid} and recomputes is_premium from every source:
+ * Lemon Squeezy subscription, Lemon Squeezy lifetime and RevenueCat (mobile).
+ * Only the server writes these fields (see firestore.rules).
+ */
+async function applyEntitlements(uid, update) {
+  const ref = db.collection('users').doc(uid);
+  return db.runTransaction(async (tx) => {
+    const merged = { ...((await tx.get(ref)).data() || {}), ...update };
+    const premium = merged.ls_subscription_active === true ||
+      merged.ls_lifetime === true ||
+      merged.rc_premium === true;
+    tx.set(ref, {
+      ...update,
+      is_premium: premium,
+      last_billing_sync: admin.firestore.FieldValue.serverTimestamp(),
+    }, { merge: true });
+    return premium;
+  });
+}
+
+const RC_ENTITLEMENT = 'ROCIsApps Pro';
+
+/** Asks RevenueCat whether [uid] (the RevenueCat app user id) has Pro, and records it. */
+async function refreshRevenueCat(uid) {
+  const key = process.env.REVENUECAT_SECRET_KEY;
+  if (!key) throw new Error('REVENUECAT_SECRET_KEY is not configured.');
+  const response = await fetch(
+    `https://api.revenuecat.com/v1/subscribers/${encodeURIComponent(uid)}`,
+    { headers: { Authorization: `Bearer ${key}`, Accept: 'application/json' } },
+  );
+  if (!response.ok) throw new Error(`RevenueCat ${response.status} for ${uid}`);
+  const body = await response.json();
+  const entitlement = (body.subscriber && body.subscriber.entitlements || {})[RC_ENTITLEMENT];
+  const expires = entitlement && entitlement.expires_date;
+  const active = !!entitlement && (!expires || new Date(expires).getTime() > Date.now());
+  return applyEntitlements(uid, { rc_premium: active, rc_expires_at: expires || null });
+}
+
 // The project's default compute service account doesn't exist; run as the App Engine one.
 exports.lemonSqueezyWebhook = functions
   .runWith({ serviceAccount: 'rocis-todo@appspot.gserviceaccount.com' })
@@ -80,7 +119,6 @@ exports.lemonSqueezyWebhook = functions
       return;
     }
     const attributes = data.attributes;
-    const ref = db.collection('users').doc(String(userId));
 
     // Subscription and lifetime state are kept separately so that one kind of
     // event (e.g. an order or a renewal invoice) never revokes the other.
@@ -101,23 +139,72 @@ exports.lemonSqueezyWebhook = functions
       return;
     }
 
-    const isPremium = await db.runTransaction(async (tx) => {
-      const doc = (await tx.get(ref)).data() || {};
-      const merged = { ...doc, ...update };
-      const premium = merged.ls_subscription_active === true || merged.ls_lifetime === true;
-      tx.set(ref, {
-        ...update,
-        is_premium: premium,
-        last_billing_sync: admin.firestore.FieldValue.serverTimestamp(),
-      }, { merge: true });
-      return premium;
-    });
+    const isPremium = await applyEntitlements(String(userId), update);
 
     console.log(`"${meta.event_name}" (${data.type}, ${attributes.status}) -> is_premium=${isPremium} for ${userId}`);
     res.status(200).send('Webhook processed successfully.');
   } catch (error) {
     console.error('Error processing Lemon Squeezy webhook:', error);
     res.status(500).send('Internal Server Error');
+  }
+});
+
+const runOptions = { serviceAccount: 'rocis-todo@appspot.gserviceaccount.com' };
+
+/**
+ * RevenueCat webhook (Authorization header must equal REVENUECAT_WEBHOOK_AUTH). The
+ * payload only says which user changed; the entitlement is re-read from RevenueCat.
+ */
+exports.revenueCatWebhook = functions.runWith(runOptions).https.onRequest(async (req, res) => {
+  const auth = process.env.REVENUECAT_WEBHOOK_AUTH;
+  const given = req.headers.authorization || '';
+  if (!auth || given.length !== auth.length ||
+      !crypto.timingSafeEqual(Buffer.from(given), Buffer.from(auth))) {
+    res.status(401).send('Unauthorized');
+    return;
+  }
+  const event = (req.body && req.body.event) || {};
+  if (event.type === 'TEST') {
+    res.status(200).send('OK: test event');
+    return;
+  }
+  const ids = new Set([event.app_user_id, event.original_app_user_id, ...(event.aliases || [])]
+    .filter((id) => id && !String(id).startsWith('$RCAnonymousID')));
+  try {
+    for (const id of ids) {
+      const premium = await refreshRevenueCat(String(id));
+      console.log(`RevenueCat "${event.type}" -> is_premium=${premium} for ${id}`);
+    }
+    res.status(200).send('OK');
+  } catch (error) {
+    console.error('Error processing RevenueCat webhook:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+/**
+ * Called by the app (Authorization: Bearer <Firebase ID token>) after sign-in or a
+ * purchase, so existing and just-purchased subscriptions are recorded server-side.
+ */
+exports.syncPremium = functions.runWith(runOptions).https.onRequest(async (req, res) => {
+  res.set('Access-Control-Allow-Origin', '*');
+  if (req.method === 'OPTIONS') {
+    res.set('Access-Control-Allow-Headers', 'Authorization');
+    res.status(204).send('');
+    return;
+  }
+  const match = /^Bearer (.+)$/.exec(req.headers.authorization || '');
+  if (!match) {
+    res.status(401).send('Unauthorized');
+    return;
+  }
+  try {
+    const { uid } = await admin.auth().verifyIdToken(match[1]);
+    const premium = await refreshRevenueCat(uid);
+    res.status(200).json({ is_premium: premium });
+  } catch (error) {
+    console.error('syncPremium failed:', error);
+    res.status(error.code && String(error.code).startsWith('auth/') ? 401 : 500).send('Error');
   }
 });
 
