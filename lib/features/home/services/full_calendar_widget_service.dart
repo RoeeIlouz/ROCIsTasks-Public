@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'package:home_widget/home_widget.dart';
 import 'package:intl/intl.dart';
+import 'package:rocis_tasks/core/services/widget_data_service.dart';
 import 'package:rocis_tasks/core/services/logger_service.dart';
 import 'package:rocis_tasks/core/services/calendar_service.dart';
 import 'package:rocis_tasks/core/services/calendar_color_service.dart';
@@ -456,6 +457,7 @@ class FullCalendarWidgetService {
       final calendarColors = asyncResults[1] as Map<String, String>;
       final scheduleEvents = asyncResults[2] as List<SyncedScheduleEvent>;
       final l10n = asyncResults[3] as AppLocalizations?;
+      final clock = await WidgetDataService.clockFormat();
 
       // Pre-index Google events by date for O(1) lookup
       final eventsByDate = <String, List<dynamic>>{};
@@ -623,7 +625,7 @@ class FullCalendarWidgetService {
         for (final e in dayEvents) {
           if (summaries.length >= _maxSummariesPerDay) break;
           final timeStr = e.start != null
-              ? _formatEventTime(e.start, e.end, l10n)
+              ? _formatEventTime(e.start, e.end, l10n, clock)
               : '';
 
           final displayTitle = e.title ?? l10n?.event ?? 'Event';
@@ -651,7 +653,7 @@ class FullCalendarWidgetService {
         // 3. ROCIs Schedule events
         for (final s in daySchedule) {
           if (summaries.length >= _maxSummariesPerDay) break;
-          final timeStr = _formatEventTime(s.startTime, s.endTime, l10n);
+          final timeStr = _formatEventTime(s.startTime, s.endTime, l10n, clock);
           final displayTitle = s.courseName.isNotEmpty
               ? (s.title.isNotEmpty &&
                         s.title.toLowerCase().trim() !=
@@ -971,12 +973,13 @@ class FullCalendarWidgetService {
     DateTime? start,
     DateTime? end,
     AppLocalizations? l10n,
+    DateFormat clock,
   ) {
     if (start == null) return '';
 
     // Handle all-day events (when end is null or same day start/end with no time difference)
     if (end == null) {
-      return DateFormat('HH:mm').format(start);
+      return clock.format(start);
     }
 
     // Check if it's an all-day event (same date, start at midnight, end at midnight next day)
@@ -995,7 +998,7 @@ class FullCalendarWidgetService {
     if (start.year == end.year &&
         start.month == end.month &&
         start.day == end.day) {
-      return '${DateFormat('HH:mm').format(start)}-${DateFormat('HH:mm').format(end)}';
+      return '${clock.format(start)}-${clock.format(end)}';
     }
 
     // Multi-day event

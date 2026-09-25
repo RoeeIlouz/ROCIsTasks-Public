@@ -155,6 +155,16 @@ object WidgetStyle {
         views.setOnClickPendingIntent(R.id.widget_pro_overlay, paywall)
     }
 
+    /**
+     * Clock time in the app's 12h/24h setting (`use_24h_format`, synced by the app);
+     * 12h follows the language's own preference, like the app (Hebrew reads 16:30).
+     */
+    fun formatTime(widgetData: SharedPreferences, time: java.util.Date, locale: Locale): String {
+        val skeleton = if (widgetData.getBoolean("use_24h_format", false)) "Hm" else "jm"
+        val pattern = android.text.format.DateFormat.getBestDateTimePattern(locale, skeleton)
+        return java.text.SimpleDateFormat(pattern, locale).format(time)
+    }
+
     /** Black or white, whichever reads better on [background]. */
     fun onColor(background: Int): Int {
         val luminance = (0.299 * Color.red(background) + 0.587 * Color.green(background) + 0.114 * Color.blue(background)) / 255

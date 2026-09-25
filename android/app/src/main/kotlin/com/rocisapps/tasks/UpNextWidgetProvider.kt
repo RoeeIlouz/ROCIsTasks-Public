@@ -12,6 +12,7 @@ import android.text.format.DateFormat
 import android.view.View
 import android.widget.RemoteViews
 import es.antonborri.home_widget.HomeWidgetLaunchIntent
+import es.antonborri.home_widget.HomeWidgetPlugin
 import es.antonborri.home_widget.HomeWidgetProvider
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -183,7 +184,7 @@ class UpNextWidgetProvider : HomeWidgetProvider() {
                     nowText(locale)
                 }
                 diff in MINUTE until 60 * MINUTE -> inMinutesText(((diff + MINUTE - 1) / MINUTE).toInt().coerceIn(1, 59), locale)
-                else -> formatStart(context, startMillis, now, locale)
+                else -> formatStart(HomeWidgetPlugin.getData(context), startMillis, now, locale)
             }
         }
 
@@ -199,11 +200,10 @@ class UpNextWidgetProvider : HomeWidgetProvider() {
     }
 
     /** Same day: time; tomorrow: "Tomorrow time"; later: short date, all in the widget locale. */
-    private fun formatStart(context: Context, startMillis: Long, now: Long, locale: Locale): String {
+    private fun formatStart(widgetData: SharedPreferences, startMillis: Long, now: Long, locale: Locale): String {
         val start = Calendar.getInstance().apply { timeInMillis = startMillis }
         val today = Calendar.getInstance().apply { timeInMillis = now }
-        val skeleton = if (DateFormat.is24HourFormat(context)) "Hm" else "hm"
-        val time = SimpleDateFormat(DateFormat.getBestDateTimePattern(locale, skeleton), locale).format(start.time)
+        val time = WidgetStyle.formatTime(widgetData, start.time, locale)
         val tomorrow = (today.clone() as Calendar).apply { add(Calendar.DAY_OF_YEAR, 1) }
         return when {
             isSameDay(start, today) -> time

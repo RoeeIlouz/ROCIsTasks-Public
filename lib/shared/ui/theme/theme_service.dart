@@ -48,6 +48,7 @@ class ThemeService extends ChangeNotifier {
     _useAmoledTheme = prefs.getBool('use_amoled_theme') ?? false;
     // Load 24h format
     _use24HourFormat = prefs.getBool('use_24h_format') ?? false;
+    _syncClockToWidgets();
     // Load NLP settings
     _autoRemoveNlpDates = prefs.getBool('auto_remove_nlp_dates') ?? true;
     // Load task completion feedback
@@ -149,6 +150,16 @@ class ThemeService extends ChangeNotifier {
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('use_24h_format', _use24HourFormat);
+    _syncClockToWidgets();
+  }
+
+  /// Widgets that format times natively (Up Next, task list) read this.
+  void _syncClockToWidgets() {
+    if (kIsWeb) return;
+    HomeWidget.saveWidgetData<bool>(
+      'use_24h_format',
+      _use24HourFormat,
+    ).catchError((_) => null);
   }
 
   Future<void> toggleAutoRemoveNlpDates(bool value) async {
