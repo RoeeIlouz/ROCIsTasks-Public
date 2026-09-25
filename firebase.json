@@ -24,6 +24,10 @@
     ],
     "rewrites": [
       {
+        "source": "/delete-account",
+        "destination": "/delete-account.html"
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }
@@ -63,8 +67,5 @@
       }
     }
   },
-  "emulators": {
-    
-  }
-  
+  "emulators": {}
 }
