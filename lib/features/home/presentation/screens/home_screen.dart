@@ -175,6 +175,15 @@ class _HomeScreenState extends State<HomeScreen> {
       return;
     }
 
+    // Widget "Get Pro" buttons and premium overlays.
+    if (uri.host == 'paywall') {
+      Provider.of<SubscriptionService>(
+        context,
+        listen: false,
+      ).showPaywall(source: PaywallSource.widget);
+      return;
+    }
+
     // task_item is what the agenda widgets send for a row tap.
     if (uri.host == 'task_detail' || uri.host == 'task_item') {
       final taskId = uri.queryParameters['id'];

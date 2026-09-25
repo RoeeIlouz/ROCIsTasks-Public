@@ -530,5 +530,8 @@
   "mediumPriority": "עדיפות בינונית",
   "lowPriority": "עדיפות נמוכה",
   "kanbanWidget": "לוח קנבן",
-  "kanbanWidgetDesc": "לוח קנבן אינטראקטיבי עם עמודות משימות, במיקוד והושלם"
+  "kanbanWidgetDesc": "לוח קנבן אינטראקטיבי עם עמודות משימות, במיקוד והושלם",
+  "freeTrialBadge": "{days} ימי ניסיון חינם",
+  "startFreeTrial": "התחילו {days} ימי ניסיון חינם",
+  "trialThenPrice": "לאחר מכן {price} לשנה. אפשר לבטל בכל עת לפני סוף תקופת הניסיון ללא חיוב."
 }

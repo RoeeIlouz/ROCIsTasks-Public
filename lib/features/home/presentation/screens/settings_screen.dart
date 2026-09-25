@@ -412,7 +412,9 @@ class SettingsScreen extends StatelessWidget {
                   subscriptionService.isPremium,
               onChanged: (value) {
                 if (value && !subscriptionService.isPremium) {
-                  subscriptionService.showPaywall();
+                  subscriptionService.showPaywall(
+                    source: PaywallSource.glassmorphism,
+                  );
                   return;
                 }
                 themeService.toggleGlassmorphism(value);
@@ -444,7 +446,9 @@ class SettingsScreen extends StatelessWidget {
             ),
             onTap: () async {
               if (!subscriptionService.isPremium) {
-                await subscriptionService.showPaywall();
+                await subscriptionService.showPaywall(
+                  source: PaywallSource.accentColor,
+                );
                 return;
               }
               final colors = <Color>[

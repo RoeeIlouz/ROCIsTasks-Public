@@ -531,5 +531,11 @@
   "mediumPriority": "Medium Priority",
   "lowPriority": "Low Priority",
   "kanbanWidget": "Kanban Board",
-  "kanbanWidgetDesc": "Interactive Kanban board with To Do, In Focus, and Done columns"
+  "kanbanWidgetDesc": "Interactive Kanban board with To Do, In Focus, and Done columns",
+  "freeTrialBadge": "{days}-day free trial",
+  "@freeTrialBadge": {"placeholders": {"days": {"type": "int"}}},
+  "startFreeTrial": "Start {days}-day free trial",
+  "@startFreeTrial": {"placeholders": {"days": {"type": "int"}}},
+  "trialThenPrice": "Then {price} per year. Cancel anytime before the trial ends and you won't be charged.",
+  "@trialThenPrice": {"placeholders": {"price": {"type": "String"}}}
 }

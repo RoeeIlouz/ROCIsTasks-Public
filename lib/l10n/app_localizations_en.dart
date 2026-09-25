@@ -1479,4 +1479,19 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get kanbanWidgetDesc =>
       'Interactive Kanban board with To Do, In Focus, and Done columns';
+
+  @override
+  String freeTrialBadge(int days) {
+    return '$days-day free trial';
+  }
+
+  @override
+  String startFreeTrial(int days) {
+    return 'Start $days-day free trial';
+  }
+
+  @override
+  String trialThenPrice(String price) {
+    return 'Then $price per year. Cancel anytime before the trial ends and you won\'t be charged.';
+  }
 }

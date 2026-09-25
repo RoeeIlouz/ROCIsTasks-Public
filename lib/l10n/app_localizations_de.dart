@@ -1504,4 +1504,19 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get kanbanWidgetDesc =>
       'Interaktives Kanban-Board mit Spalten Zu erledigen, Im Fokus und Erledigt';
+
+  @override
+  String freeTrialBadge(int days) {
+    return '$days Tage gratis';
+  }
+
+  @override
+  String startFreeTrial(int days) {
+    return '$days Tage gratis testen';
+  }
+
+  @override
+  String trialThenPrice(String price) {
+    return 'Danach $price pro Jahr. Kündige vor Ende des Testzeitraums und dir wird nichts berechnet.';
+  }
 }

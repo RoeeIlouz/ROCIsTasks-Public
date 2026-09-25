@@ -1501,4 +1501,19 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get kanbanWidgetDesc =>
       'Tablero Kanban interactivo con columnas Por hacer, En foco y Hecho';
+
+  @override
+  String freeTrialBadge(int days) {
+    return '$days días gratis';
+  }
+
+  @override
+  String startFreeTrial(int days) {
+    return 'Empieza $days días gratis';
+  }
+
+  @override
+  String trialThenPrice(String price) {
+    return 'Después $price al año. Cancela antes de que termine la prueba y no se te cobrará.';
+  }
 }

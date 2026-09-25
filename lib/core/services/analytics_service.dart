@@ -10,15 +10,15 @@ class AnalyticsService {
   factory AnalyticsService() => _instance;
   AnalyticsService._internal();
 
-  final FirebaseAnalytics? _analytics =
-      kIsWeb ? null : FirebaseAnalytics.instance;
+  // Web reports too (firebase_options.web has a measurement ID).
+  final FirebaseAnalytics _analytics = FirebaseAnalytics.instance;
 
   /// Log a standard event
   Future<void> logEvent({
     required String name,
     Map<String, Object>? parameters,
   }) async {
-    if (!AppConfig.enableAnalytics || kIsWeb || _analytics == null) return;
+    if (!AppConfig.enableAnalytics) return;
 
     try {
       await _analytics.logEvent(name: name, parameters: parameters);
@@ -37,7 +37,7 @@ class AnalyticsService {
     required String screenName,
     String? screenClass,
   }) async {
-    if (!AppConfig.enableAnalytics || kIsWeb || _analytics == null) return;
+    if (!AppConfig.enableAnalytics) return;
 
     try {
       await _analytics.logScreenView(
@@ -153,6 +153,22 @@ class AnalyticsService {
     await logEvent(
       name: 'feature_limit_reached',
       parameters: {'feature': featureName},
+    );
+  }
+
+  /// A paywall was shown; [source] is the [PaywallSource] name.
+  Future<void> logPaywallShown({required String source}) async {
+    await logEvent(name: 'paywall_shown', parameters: {'source': source});
+  }
+
+  /// How a paywall closed: purchased, restored, cancelled, error, notPresented.
+  Future<void> logPaywallResult({
+    required String source,
+    required String result,
+  }) async {
+    await logEvent(
+      name: 'paywall_result',
+      parameters: {'source': source, 'result': result},
     );
   }
 

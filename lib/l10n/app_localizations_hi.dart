@@ -1486,4 +1486,19 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get kanbanWidgetDesc =>
       'कार्य, फोकस और पूर्ण कॉलम के साथ इंटरएक्टिव कैनबन बोर्ड';
+
+  @override
+  String freeTrialBadge(int days) {
+    return '$days दिन का मुफ़्त ट्रायल';
+  }
+
+  @override
+  String startFreeTrial(int days) {
+    return '$days दिन का मुफ़्त ट्रायल शुरू करें';
+  }
+
+  @override
+  String trialThenPrice(String price) {
+    return 'इसके बाद $price प्रति वर्ष। ट्रायल खत्म होने से पहले कभी भी रद्द करें, कोई शुल्क नहीं लगेगा।';
+  }
 }

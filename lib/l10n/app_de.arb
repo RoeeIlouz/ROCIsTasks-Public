@@ -531,5 +531,8 @@
   "mediumPriority": "Mittlere Priorität",
   "lowPriority": "Niedrige Priorität",
   "kanbanWidget": "Kanban-Board",
-  "kanbanWidgetDesc": "Interaktives Kanban-Board mit Spalten Zu erledigen, Im Fokus und Erledigt"
+  "kanbanWidgetDesc": "Interaktives Kanban-Board mit Spalten Zu erledigen, Im Fokus und Erledigt",
+  "freeTrialBadge": "{days} Tage gratis",
+  "startFreeTrial": "{days} Tage gratis testen",
+  "trialThenPrice": "Danach {price} pro Jahr. Kündige vor Ende des Testzeitraums und dir wird nichts berechnet."
 }

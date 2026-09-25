@@ -1470,4 +1470,19 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get kanbanWidgetDesc =>
       'لوحة كانبان تفاعلية تحتوي على أعمدة المهام وفي التركيز والمكتملة';
+
+  @override
+  String freeTrialBadge(int days) {
+    return 'تجربة مجانية $days أيام';
+  }
+
+  @override
+  String startFreeTrial(int days) {
+    return 'ابدأ تجربة مجانية لمدة $days أيام';
+  }
+
+  @override
+  String trialThenPrice(String price) {
+    return 'بعدها $price سنويًا. ألغِ في أي وقت قبل انتهاء التجربة ولن يتم خصم أي مبلغ.';
+  }
 }
