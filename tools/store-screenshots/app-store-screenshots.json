@@ -4,7 +4,14 @@
   "themeId": "rocis-onyx",
   "connectedCanvas": false,
   "locales": [
-    "en"
+    "en",
+    "he",
+    "ar",
+    "es",
+    "de",
+    "fr",
+    "sv",
+    "hi"
   ],
   "locale": "en",
   "device": "android",
@@ -75,10 +82,24 @@
         "id": "rocis_1",
         "layout": "hero",
         "label": {
-          "en": "HOME SCREEN WIDGETS"
+          "en": "HOME SCREEN WIDGETS",
+          "he": "ווידג׳טים למסך הבית",
+          "ar": "أدوات الشاشة الرئيسية",
+          "es": "WIDGETS DE INICIO",
+          "de": "STARTBILDSCHIRM-WIDGETS",
+          "fr": "WIDGETS D’ACCUEIL",
+          "sv": "WIDGETAR PÅ HEMSKÄRMEN",
+          "hi": "होम स्क्रीन विजेट"
         },
         "headline": {
-          "en": "Your day,\nat a glance."
+          "en": "Your day,\nat a glance.",
+          "he": "כל היום שלך\nבמבט אחד.",
+          "ar": "يومك\nبنظرة واحدة.",
+          "es": "Tu día,\nde un vistazo.",
+          "de": "Dein Tag\nauf einen Blick.",
+          "fr": "Votre journée\nen un coup d’œil.",
+          "sv": "Din dag\npå ett ögonkast.",
+          "hi": "आपका पूरा दिन,\nएक नज़र में।"
         },
         "screenshot": "/screenshots/android/phone/{locale}/01.png"
       },
@@ -86,10 +107,24 @@
         "id": "rocis_2",
         "layout": "device-bottom",
         "label": {
-          "en": "FULL CALENDAR"
+          "en": "FULL CALENDAR",
+          "he": "לוח שנה מלא",
+          "ar": "التقويم الكامل",
+          "es": "CALENDARIO COMPLETO",
+          "de": "GANZER KALENDER",
+          "fr": "CALENDRIER COMPLET",
+          "sv": "HEL KALENDER",
+          "hi": "पूरा कैलेंडर"
         },
         "headline": {
-          "en": "Your whole month\nin one widget."
+          "en": "Your whole month\nin one widget.",
+          "he": "כל החודש\nבווידג׳ט אחד.",
+          "ar": "شهرك كله\nفي أداة واحدة.",
+          "es": "Todo tu mes\nen un widget.",
+          "de": "Dein Monat\nin einem Widget.",
+          "fr": "Tout votre mois\ndans un widget.",
+          "sv": "Hela månaden\ni en widget.",
+          "hi": "पूरा महीना,\nएक विजेट में।"
         },
         "screenshot": "/screenshots/android/phone/{locale}/02.png",
         "inverted": true
@@ -98,10 +133,24 @@
         "id": "rocis_3",
         "layout": "device-top",
         "label": {
-          "en": "LIGHT OR DARK"
+          "en": "LIGHT OR DARK",
+          "he": "בהיר או כהה",
+          "ar": "فاتح أو داكن",
+          "es": "CLARO U OSCURO",
+          "de": "HELL ODER DUNKEL",
+          "fr": "CLAIR OU SOMBRE",
+          "sv": "LJUST ELLER MÖRKT",
+          "hi": "लाइट या डार्क"
         },
         "headline": {
-          "en": "Beautiful in\nevery theme."
+          "en": "Beautiful in\nevery theme.",
+          "he": "יפה בכל\nערכת נושא.",
+          "ar": "جميل\nفي كل مظهر.",
+          "es": "Precioso en\ncualquier tema.",
+          "de": "Schön in\njedem Design.",
+          "fr": "Superbe dans\ntous les thèmes.",
+          "sv": "Snyggt i\nvarje tema.",
+          "hi": "हर थीम में\nखूबसूरत।"
         },
         "screenshot": "/screenshots/android/phone/{locale}/03.png",
         "inverted": true,
@@ -128,10 +177,24 @@
         "id": "rocis_4",
         "layout": "device-bottom",
         "label": {
-          "en": "QUICK ADD"
+          "en": "QUICK ADD",
+          "he": "הוספה מהירה",
+          "ar": "إضافة سريعة",
+          "es": "AÑADIR RÁPIDO",
+          "de": "SCHNELL HINZUFÜGEN",
+          "fr": "AJOUT RAPIDE",
+          "sv": "SNABBTILLÄGG",
+          "hi": "तुरंत जोड़ें"
         },
         "headline": {
-          "en": "Type it.\nIt’s scheduled."
+          "en": "Type it.\nIt’s scheduled.",
+          "he": "כותבים.\nוזה בלו״ז.",
+          "ar": "اكتبها.\nوتُجدوَل فورًا.",
+          "es": "Escríbelo.\nYa está agendado.",
+          "de": "Eintippen.\nSchon eingeplant.",
+          "fr": "Tapez-le.\nC’est planifié.",
+          "sv": "Skriv det.\nDet är planerat.",
+          "hi": "लिखिए।\nशेड्यूल हो गया।"
         },
         "screenshot": "/screenshots/android/phone/{locale}/04.png"
       },
@@ -139,10 +202,24 @@
         "id": "rocis_5",
         "layout": "two-devices",
         "label": {
-          "en": "CALENDAR + BOARD"
+          "en": "CALENDAR + BOARD",
+          "he": "לוח שנה + לוח משימות",
+          "ar": "التقويم + اللوحة",
+          "es": "CALENDARIO + TABLERO",
+          "de": "KALENDER + BOARD",
+          "fr": "CALENDRIER + TABLEAU",
+          "sv": "KALENDER + TAVLA",
+          "hi": "कैलेंडर + बोर्ड"
         },
         "headline": {
-          "en": "Plan it\nyour way."
+          "en": "Plan it\nyour way.",
+          "he": "מתכננים\nבדרך שלכם.",
+          "ar": "خطّط\nعلى طريقتك.",
+          "es": "Organízate\na tu manera.",
+          "de": "Plane\nwie du willst.",
+          "fr": "Organisez-vous\nà votre façon.",
+          "sv": "Planera\npå ditt sätt.",
+          "hi": "अपने तरीके से\nप्लान करें।"
         },
         "screenshot": "/screenshots/android/phone/{locale}/05.png",
         "screenshotSecondary": "/screenshots/android/phone/{locale}/06.png",
@@ -178,10 +255,24 @@
         "id": "rocis_6",
         "layout": "device-top",
         "label": {
-          "en": "8 LANGUAGES · RTL"
+          "en": "8 LANGUAGES · RTL",
+          "he": "8 שפות · מימין לשמאל",
+          "ar": "8 لغات · من اليمين لليسار",
+          "es": "8 IDIOMAS · RTL",
+          "de": "8 SPRACHEN · RTL",
+          "fr": "8 LANGUES · RTL",
+          "sv": "8 SPRÅK · RTL",
+          "hi": "8 भाषाएँ"
         },
         "headline": {
-          "en": "Speaks your\nlanguage."
+          "en": "Speaks your\nlanguage.",
+          "he": "מדבר\nבשפה שלך.",
+          "ar": "يتحدث\nلغتك.",
+          "es": "Habla\ntu idioma.",
+          "de": "Spricht\ndeine Sprache.",
+          "fr": "Parle\nvotre langue.",
+          "sv": "Talar\nditt språk.",
+          "hi": "आपकी भाषा\nबोलता है।"
         },
         "screenshot": "/screenshots/android/phone/{locale}/07.png",
         "transforms": {
@@ -207,10 +298,24 @@
         "id": "rocis_7",
         "layout": "hero",
         "label": {
-          "en": "DAY AGENDA"
+          "en": "DAY AGENDA",
+          "he": "סדר היום",
+          "ar": "جدول اليوم",
+          "es": "AGENDA DEL DÍA",
+          "de": "TAGESAGENDA",
+          "fr": "AGENDA DU JOUR",
+          "sv": "DAGENS AGENDA",
+          "hi": "आज का एजेंडा"
         },
         "headline": {
-          "en": "Check it off\nfrom home."
+          "en": "Check it off\nfrom home.",
+          "he": "מסמנים ״בוצע״\nממסך הבית.",
+          "ar": "أنجز مهامك\nمن الشاشة الرئيسية.",
+          "es": "Márcalo hecho\ndesde el inicio.",
+          "de": "Abhaken direkt\nvom Startbildschirm.",
+          "fr": "Cochez-le\ndepuis l’accueil.",
+          "sv": "Bocka av\nfrån hemskärmen.",
+          "hi": "होम स्क्रीन से ही\nपूरा करें।"
         },
         "screenshot": "/screenshots/android/phone/{locale}/09.png",
         "inverted": true
@@ -219,10 +324,24 @@
         "id": "rocis_8",
         "layout": "no-device",
         "label": {
-          "en": "AND MORE"
+          "en": "AND MORE",
+          "he": "ועוד",
+          "ar": "والمزيد",
+          "es": "Y MÁS",
+          "de": "UND MEHR",
+          "fr": "ET PLUS",
+          "sv": "OCH MER",
+          "hi": "और भी बहुत कुछ"
         },
         "headline": {
-          "en": "Recurring tasks.\nReminders.\nCloud sync."
+          "en": "Recurring tasks.\nReminders.\nCloud sync.",
+          "he": "משימות חוזרות.\nתזכורות.\nסנכרון לענן.",
+          "ar": "مهام متكررة.\nتذكيرات.\nمزامنة سحابية.",
+          "es": "Tareas recurrentes.\nRecordatorios.\nSincronización.",
+          "de": "Wiederholungen.\nErinnerungen.\nCloud-Sync.",
+          "fr": "Tâches récurrentes.\nRappels.\nSynchro cloud.",
+          "sv": "Återkommande uppgifter.\nPåminnelser.\nMolnsynk.",
+          "hi": "रिपीट टास्क।\nरिमाइंडर।\nक्लाउड सिंक।"
         },
         "screenshot": ""
       }
@@ -317,7 +436,14 @@
         "layout": "feature-graphic",
         "label": {},
         "headline": {
-          "en": "Tasks & calendar, right on your home screen."
+          "en": "Tasks & calendar, right on your home screen.",
+          "he": "משימות ולוח שנה, ישר על מסך הבית.",
+          "ar": "المهام والتقويم، مباشرة على شاشتك الرئيسية.",
+          "es": "Tareas y calendario, en tu pantalla de inicio.",
+          "de": "Aufgaben & Kalender, direkt auf deinem Startbildschirm.",
+          "fr": "Tâches et calendrier, directement sur votre écran d’accueil.",
+          "sv": "Uppgifter och kalender, direkt på hemskärmen.",
+          "hi": "टास्क और कैलेंडर, सीधे आपकी होम स्क्रीन पर।"
         },
         "screenshot": "",
         "inverted": true

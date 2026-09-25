@@ -1,0 +1,283 @@
+{
+  "_comment": "Store screenshot captions per app language (label, headline). Slide order matches app-store-screenshots.json; fg = feature graphic tagline.",
+  "en": {
+    "1": [
+      "HOME SCREEN WIDGETS",
+      "Your day,\nat a glance."
+    ],
+    "2": [
+      "FULL CALENDAR",
+      "Your whole month\nin one widget."
+    ],
+    "3": [
+      "LIGHT OR DARK",
+      "Beautiful in\nevery theme."
+    ],
+    "4": [
+      "QUICK ADD",
+      "Type it.\nIt’s scheduled."
+    ],
+    "5": [
+      "CALENDAR + BOARD",
+      "Plan it\nyour way."
+    ],
+    "6": [
+      "8 LANGUAGES · RTL",
+      "Speaks your\nlanguage."
+    ],
+    "7": [
+      "DAY AGENDA",
+      "Check it off\nfrom home."
+    ],
+    "8": [
+      "AND MORE",
+      "Recurring tasks.\nReminders.\nCloud sync."
+    ],
+    "fg": "Tasks & calendar, right on your home screen."
+  },
+  "he": {
+    "1": [
+      "ווידג׳טים למסך הבית",
+      "כל היום שלך\nבמבט אחד."
+    ],
+    "2": [
+      "לוח שנה מלא",
+      "כל החודש\nבווידג׳ט אחד."
+    ],
+    "3": [
+      "בהיר או כהה",
+      "יפה בכל\nערכת נושא."
+    ],
+    "4": [
+      "הוספה מהירה",
+      "כותבים.\nוזה בלו״ז."
+    ],
+    "5": [
+      "לוח שנה + לוח משימות",
+      "מתכננים\nבדרך שלכם."
+    ],
+    "6": [
+      "8 שפות · מימין לשמאל",
+      "מדבר\nבשפה שלך."
+    ],
+    "7": [
+      "סדר היום",
+      "מסמנים ״בוצע״\nממסך הבית."
+    ],
+    "8": [
+      "ועוד",
+      "משימות חוזרות.\nתזכורות.\nסנכרון לענן."
+    ],
+    "fg": "משימות ולוח שנה, ישר על מסך הבית."
+  },
+  "ar": {
+    "1": [
+      "أدوات الشاشة الرئيسية",
+      "يومك\nبنظرة واحدة."
+    ],
+    "2": [
+      "التقويم الكامل",
+      "شهرك كله\nفي أداة واحدة."
+    ],
+    "3": [
+      "فاتح أو داكن",
+      "جميل\nفي كل مظهر."
+    ],
+    "4": [
+      "إضافة سريعة",
+      "اكتبها.\nوتُجدوَل فورًا."
+    ],
+    "5": [
+      "التقويم + اللوحة",
+      "خطّط\nعلى طريقتك."
+    ],
+    "6": [
+      "8 لغات · من اليمين لليسار",
+      "يتحدث\nلغتك."
+    ],
+    "7": [
+      "جدول اليوم",
+      "أنجز مهامك\nمن الشاشة الرئيسية."
+    ],
+    "8": [
+      "والمزيد",
+      "مهام متكررة.\nتذكيرات.\nمزامنة سحابية."
+    ],
+    "fg": "المهام والتقويم، مباشرة على شاشتك الرئيسية."
+  },
+  "es": {
+    "1": [
+      "WIDGETS DE INICIO",
+      "Tu día,\nde un vistazo."
+    ],
+    "2": [
+      "CALENDARIO COMPLETO",
+      "Todo tu mes\nen un widget."
+    ],
+    "3": [
+      "CLARO U OSCURO",
+      "Precioso en\ncualquier tema."
+    ],
+    "4": [
+      "AÑADIR RÁPIDO",
+      "Escríbelo.\nYa está agendado."
+    ],
+    "5": [
+      "CALENDARIO + TABLERO",
+      "Organízate\na tu manera."
+    ],
+    "6": [
+      "8 IDIOMAS · RTL",
+      "Habla\ntu idioma."
+    ],
+    "7": [
+      "AGENDA DEL DÍA",
+      "Márcalo hecho\ndesde el inicio."
+    ],
+    "8": [
+      "Y MÁS",
+      "Tareas recurrentes.\nRecordatorios.\nSincronización."
+    ],
+    "fg": "Tareas y calendario, en tu pantalla de inicio."
+  },
+  "de": {
+    "1": [
+      "STARTBILDSCHIRM-WIDGETS",
+      "Dein Tag\nauf einen Blick."
+    ],
+    "2": [
+      "GANZER KALENDER",
+      "Dein Monat\nin einem Widget."
+    ],
+    "3": [
+      "HELL ODER DUNKEL",
+      "Schön in\njedem Design."
+    ],
+    "4": [
+      "SCHNELL HINZUFÜGEN",
+      "Eintippen.\nSchon eingeplant."
+    ],
+    "5": [
+      "KALENDER + BOARD",
+      "Plane\nwie du willst."
+    ],
+    "6": [
+      "8 SPRACHEN · RTL",
+      "Spricht\ndeine Sprache."
+    ],
+    "7": [
+      "TAGESAGENDA",
+      "Abhaken direkt\nvom Startbildschirm."
+    ],
+    "8": [
+      "UND MEHR",
+      "Wiederholungen.\nErinnerungen.\nCloud-Sync."
+    ],
+    "fg": "Aufgaben & Kalender, direkt auf deinem Startbildschirm."
+  },
+  "fr": {
+    "1": [
+      "WIDGETS D’ACCUEIL",
+      "Votre journée\nen un coup d’œil."
+    ],
+    "2": [
+      "CALENDRIER COMPLET",
+      "Tout votre mois\ndans un widget."
+    ],
+    "3": [
+      "CLAIR OU SOMBRE",
+      "Superbe dans\ntous les thèmes."
+    ],
+    "4": [
+      "AJOUT RAPIDE",
+      "Tapez-le.\nC’est planifié."
+    ],
+    "5": [
+      "CALENDRIER + TABLEAU",
+      "Organisez-vous\nà votre façon."
+    ],
+    "6": [
+      "8 LANGUES · RTL",
+      "Parle\nvotre langue."
+    ],
+    "7": [
+      "AGENDA DU JOUR",
+      "Cochez-le\ndepuis l’accueil."
+    ],
+    "8": [
+      "ET PLUS",
+      "Tâches récurrentes.\nRappels.\nSynchro cloud."
+    ],
+    "fg": "Tâches et calendrier, directement sur votre écran d’accueil."
+  },
+  "sv": {
+    "1": [
+      "WIDGETAR PÅ HEMSKÄRMEN",
+      "Din dag\npå ett ögonkast."
+    ],
+    "2": [
+      "HEL KALENDER",
+      "Hela månaden\ni en widget."
+    ],
+    "3": [
+      "LJUST ELLER MÖRKT",
+      "Snyggt i\nvarje tema."
+    ],
+    "4": [
+      "SNABBTILLÄGG",
+      "Skriv det.\nDet är planerat."
+    ],
+    "5": [
+      "KALENDER + TAVLA",
+      "Planera\npå ditt sätt."
+    ],
+    "6": [
+      "8 SPRÅK · RTL",
+      "Talar\nditt språk."
+    ],
+    "7": [
+      "DAGENS AGENDA",
+      "Bocka av\nfrån hemskärmen."
+    ],
+    "8": [
+      "OCH MER",
+      "Återkommande uppgifter.\nPåminnelser.\nMolnsynk."
+    ],
+    "fg": "Uppgifter och kalender, direkt på hemskärmen."
+  },
+  "hi": {
+    "1": [
+      "होम स्क्रीन विजेट",
+      "आपका पूरा दिन,\nएक नज़र में।"
+    ],
+    "2": [
+      "पूरा कैलेंडर",
+      "पूरा महीना,\nएक विजेट में।"
+    ],
+    "3": [
+      "लाइट या डार्क",
+      "हर थीम में\nखूबसूरत।"
+    ],
+    "4": [
+      "तुरंत जोड़ें",
+      "लिखिए।\nशेड्यूल हो गया।"
+    ],
+    "5": [
+      "कैलेंडर + बोर्ड",
+      "अपने तरीके से\nप्लान करें।"
+    ],
+    "6": [
+      "8 भाषाएँ",
+      "आपकी भाषा\nबोलता है।"
+    ],
+    "7": [
+      "आज का एजेंडा",
+      "होम स्क्रीन से ही\nपूरा करें।"
+    ],
+    "8": [
+      "और भी बहुत कुछ",
+      "रिपीट टास्क।\nरिमाइंडर।\nक्लाउड सिंक।"
+    ],
+    "fg": "टास्क और कैलेंडर, सीधे आपकी होम स्क्रीन पर।"
+  }
+}

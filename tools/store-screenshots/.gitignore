@@ -5,3 +5,6 @@ out
 *.tsbuildinfo
 next-env.d.ts
 .env*.local
+
+# Regenerate with the editor ("Export bundle"); uploaded via the Play API.
+exports/
