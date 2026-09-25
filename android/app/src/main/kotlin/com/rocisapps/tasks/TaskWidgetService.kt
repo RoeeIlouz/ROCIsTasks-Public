@@ -308,7 +308,7 @@ class TaskWidgetFactory(private val context: Context) : RemoteViewsService.Remot
         val time = TaskListData.dueMillis(task)?.let { millis ->
             val cal = Calendar.getInstance().apply { timeInMillis = millis }
             if (cal.get(Calendar.HOUR_OF_DAY) == 0 && cal.get(Calendar.MINUTE) == 0) null
-            else SimpleDateFormat("HH:mm", locale).format(cal.time)
+            else WidgetStyle.formatTime(HomeWidgetPlugin.getData(context), cal.time, locale)
         }
         val label = if (time != null) "$day $time" else day
         return if (dueDate < today) "${WidgetStyle.overdueText(locale)} · $label" else label

@@ -71,6 +71,21 @@ class WidgetDataService {
     }
   }
 
+  /// Clock format for widget times: the app's 12h/24h setting, in the app
+  /// language (12h follows the language, e.g. Hebrew still reads 16:30).
+  static Future<DateFormat> clockFormat() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final lang =
+          prefs.getString('language_code') ??
+          PlatformDispatcher.instance.locale.languageCode;
+      final use24h = prefs.getBool('use_24h_format') ?? false;
+      return use24h ? DateFormat.Hm(lang) : DateFormat.jm(lang);
+    } catch (_) {
+      return DateFormat.Hm();
+    }
+  }
+
   /// Helper to get active app language
   Future<String> _getAppLanguage() async {
     try {
@@ -296,6 +311,7 @@ class WidgetDataService {
     String? userId,
   }) async {
     if (kIsWeb) return;
+    final clock = await clockFormat();
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final rangeStart = today.subtract(const Duration(days: 60));
@@ -330,9 +346,7 @@ class WidgetDataService {
         'date': taskDate.toIso8601String(),
         'dateOnly': dateOnlyFormatted,
         'dateDisplay': dateOnlyFormatted,
-        'timeDisplay': isAllDay
-            ? allDayLabel
-            : DateFormat('HH:mm').format(taskDate),
+        'timeDisplay': isAllDay ? allDayLabel : clock.format(taskDate),
         'isAllDay': isAllDay,
         'sortMinutes': _sortMinutes(t.dueDate, allDay: isAllDay),
         'isCompleted': false,
@@ -359,8 +373,8 @@ class WidgetDataService {
         final timeDisplay = isAllDay
             ? allDayLabel
             : (end != null
-                  ? '${DateFormat('HH:mm').format(start)}-${DateFormat('HH:mm').format(end)}'
-                  : DateFormat('HH:mm').format(start));
+                  ? '${clock.format(start)}-${clock.format(end)}'
+                  : clock.format(start));
         final calColor = calendarColors[event.calendarId] ?? '#4285F4';
         final days = eventDays(start, end);
 
@@ -542,6 +556,7 @@ class WidgetDataService {
     String? userId,
   }) async {
     if (kIsWeb) return;
+    final clock = await clockFormat();
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final rangeStart = today.subtract(const Duration(days: 1));
@@ -573,7 +588,7 @@ class WidgetDataService {
           'date': taskDate.toIso8601String(),
           'dateOnly': DateFormat('yyyy-MM-dd').format(taskDate),
           'timeDisplay': t.dueDate != null
-              ? DateFormat('HH:mm').format(t.dueDate!)
+              ? clock.format(t.dueDate!)
               : allDayLabel,
           'isAllDay': t.dueDate == null,
           'sortMinutes': _sortMinutes(t.dueDate, allDay: t.dueDate == null),
@@ -602,8 +617,8 @@ class WidgetDataService {
         final timeDisplay = isAllDay
             ? allDayLabel
             : (end != null
-                  ? '${DateFormat('HH:mm').format(start)}-${DateFormat('HH:mm').format(end)}'
-                  : DateFormat('HH:mm').format(start));
+                  ? '${clock.format(start)}-${clock.format(end)}'
+                  : clock.format(start));
         final calColor = calendarColors[event.calendarId] ?? '#4285F4';
         final days = eventDays(start, end);
 
@@ -750,6 +765,7 @@ class WidgetDataService {
     String? userId,
   }) async {
     if (kIsWeb) return;
+    final clock = await clockFormat();
     final now = DateTime.now();
     final upcomingList = <Map<String, dynamic>>[];
 
@@ -821,7 +837,7 @@ class WidgetDataService {
       final timeDisplay = start == null
           ? await _getTodayLabel()
           : _isSameDay(start, now)
-          ? DateFormat('HH:mm').format(start)
+          ? clock.format(start)
           : _formatDatePattern('MMM d', start, lang);
 
       await Future.wait([

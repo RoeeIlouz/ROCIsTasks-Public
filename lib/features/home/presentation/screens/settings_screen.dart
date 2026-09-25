@@ -509,7 +509,11 @@ class SettingsScreen extends StatelessWidget {
             ),
             title: Text(l10n.timeFormat24h),
             value: themeService.use24HourFormat,
-            onChanged: themeService.toggle24HourFormat,
+            onChanged: (value) async {
+              await themeService.toggle24HourFormat(value);
+              // Widget times are pre-formatted; rebuild them.
+              taskProvider.updateAllWidgets();
+            },
           ),
           ListTile(
             leading: _buildLeadingIcon(context, Icons.language, Colors.blue),

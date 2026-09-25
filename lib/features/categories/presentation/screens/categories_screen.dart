@@ -246,6 +246,7 @@ class CategoriesScreen extends StatelessWidget {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      useSafeArea: true,
       backgroundColor: Colors.transparent,
       builder: (context) => _CategorySheet(category: category),
     );
@@ -315,7 +316,11 @@ class _CategorySheetState extends State<_CategorySheet> {
       opacity: 0.9,
       borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
       padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+        // Keyboard and the system navigation bar.
+        bottom:
+            MediaQuery.of(context).viewInsets.bottom +
+            MediaQuery.of(context).viewPadding.bottom +
+            24,
         top: 12,
         left: 24,
         right: 24,
