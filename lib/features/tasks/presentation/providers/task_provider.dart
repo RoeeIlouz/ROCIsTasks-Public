@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:rocis_tasks/core/config/app_config.dart';
+import 'package:rocis_tasks/core/services/review_prompt_service.dart';
 import 'package:rocis_tasks/core/services/analytics_service.dart';
 import 'package:rocis_tasks/core/services/auth_service.dart';
 import 'package:rocis_tasks/core/services/calendar_service.dart';
@@ -981,6 +982,7 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
 
     if (task.isCompleted) {
       await _cancelTaskNotifications(task);
+      unawaited(ReviewPromptService().onTaskCompleted());
 
       // If this is a recurring task and user is Pro, determine the next recurring instance
       if (task.recurrenceRule != null &&

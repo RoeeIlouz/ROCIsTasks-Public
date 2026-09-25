@@ -1,7 +1,6 @@
 package com.rocisapps.tasks
 
 import android.os.Build
-import es.antonborri.home_widget.HomeWidgetBackgroundIntent
 import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
@@ -12,6 +11,7 @@ class MainActivity : FlutterFragmentActivity() {
     private val APP_INFO_CHANNEL = "com.rocisapps.tasks/app_info"
     private lateinit var notificationHelper: NotificationHelper
     private var widgetChannel: MethodChannel? = null
+    private var returnHomeAfterWidgetAction = false
 
     companion object {
     }
@@ -59,6 +59,17 @@ class MainActivity : FlutterFragmentActivity() {
 
         // Set up widget channel for deep link communication BEFORE handling intent
         widgetChannel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, WIDGET_CHANNEL)
+        widgetChannel?.setMethodCallHandler { call, result ->
+            if (call.method == "finishWidgetAction") {
+                if (returnHomeAfterWidgetAction) {
+                    returnHomeAfterWidgetAction = false
+                    moveTaskToBack(true)
+                }
+                result.success(null)
+            } else {
+                result.notImplemented()
+            }
+        }
 
         // Handle initial intent after channels are set up
         handleIntent(intent, channel)
@@ -80,18 +91,9 @@ class MainActivity : FlutterFragmentActivity() {
         
         // Handle widget deep links
         val data = intent?.data
-        if (data != null && data.scheme == "rocistasks" && data.host == "complete") {
-            // Widget checkboxes: complete in the background handler (the same path
-            // Up Next uses) and return to the home screen instead of opening the app.
-            try {
-                HomeWidgetBackgroundIntent.getBroadcast(this, data).send()
-            } catch (e: Exception) {
-                android.util.Log.e("MainActivity", "Failed to forward $data", e)
-            }
-            intent.data = null
-            moveTaskToBack(true)
-            return
-        }
+        // Widget checkboxes: the running app completes the task (a second background
+        // engine would race it on the same Hive box), then asks to return home.
+        returnHomeAfterWidgetAction = data?.scheme == "rocistasks" && data.host == "complete"
         if (data != null && data.scheme == "rocistasks") {
             // Send the URI to Flutter via the widget channel
             if (widgetChannel != null) {

@@ -16,6 +16,7 @@ import 'package:rocis_tasks/features/auth/presentation/screens/security_settings
 import 'package:home_widget/home_widget.dart' as hw;
 import 'package:provider/provider.dart';
 import 'package:rocis_tasks/features/calendar/presentation/providers/calendar_provider.dart';
+import 'package:rocis_tasks/core/services/review_prompt_service.dart';
 import 'package:rocis_tasks/core/services/notification_service.dart';
 import 'dart:async';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
@@ -122,6 +123,26 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Future<void> _completeFromWidget(String taskId) async {
+    final taskProvider = Provider.of<TaskProvider>(context, listen: false);
+    try {
+      // On a cold start the tasks may still be loading.
+      for (var i = 0; i < 40 && taskProvider.isLoading; i++) {
+        await Future<void>.delayed(const Duration(milliseconds: 250));
+      }
+      final task = taskProvider.getTaskById(taskId);
+      // The app is about to return to the home screen; no rating sheet now.
+      ReviewPromptService().suppressFor(const Duration(seconds: 10));
+      if (task != null && !task.isCompleted) {
+        await taskProvider.toggleTaskCompletion(task);
+      }
+    } finally {
+      try {
+        await _widgetChannel.invokeMethod('finishWidgetAction');
+      } catch (_) {}
+    }
+  }
+
   void _handleWidgetLaunch(Uri? uri) {
     if (uri == null) return;
 
@@ -172,6 +193,14 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         _isBoardView = true;
       });
+      return;
+    }
+
+    // Widget checkboxes: complete here (the running app owns the task store),
+    // then let Android return to the home screen.
+    if (uri.host == 'complete') {
+      final taskId = uri.queryParameters['id'];
+      if (taskId != null) _completeFromWidget(taskId);
       return;
     }
 
