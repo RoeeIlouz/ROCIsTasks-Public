@@ -534,5 +534,9 @@
   "freeTrialBadge": "{days} ימי ניסיון חינם",
   "startFreeTrial": "התחילו {days} ימי ניסיון חינם",
   "trialThenPrice": "לאחר מכן {price} לשנה. אפשר לבטל בכל עת לפני סוף תקופת הניסיון ללא חיוב.",
-  "plansUnavailable": "לא ניתן לטעון את התוכניות. בדקו את החיבור ונסו שוב."
+  "plansUnavailable": "לא ניתן לטעון את התוכניות. בדקו את החיבור ונסו שוב.",
+  "addToHomeScreen": "הוספה למסך הבית",
+  "fullCalendarWidgetTitle": "לוח שנה מלא",
+  "fullCalendarWidgetSubtitle": "כל החודש במבט אחד עם אירועים צבעוניים, מסננים והוספה מהירה.",
+  "widgetPinUnsupported": "המסך הראשי שלך לא תומך בהוספת ווידג׳טים מהאפליקציה. לחצו לחיצה ארוכה על מסך הבית, בחרו ווידג׳טים ומצאו את ROCI's Tasks."
 }

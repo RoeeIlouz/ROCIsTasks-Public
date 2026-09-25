@@ -12,6 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:src="@drawable/widget_day_fill"
+            android:tint="#1A6366F1"
         android:scaleType="fitXY"
         android:visibility="gone" />
 
@@ -21,6 +22,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:src="@drawable/widget_day_stroke"
+            android:tint="#FF6366F1"
         android:scaleType="fitXY"
         android:visibility="gone" />
 
@@ -83,6 +85,7 @@
                 android:layout_marginStart="1.5dp"
                 android:layout_marginEnd="1.5dp"
                 android:src="@drawable/widget_event_dot"
+            android:tint="#FF6366F1"
                 android:scaleType="fitCenter"
                 android:visibility="gone" />
 
@@ -93,6 +96,7 @@
                 android:layout_marginStart="1.5dp"
                 android:layout_marginEnd="1.5dp"
                 android:src="@drawable/widget_event_dot"
+            android:tint="#FF6366F1"
                 android:scaleType="fitCenter"
                 android:visibility="gone" />
 
@@ -103,6 +107,7 @@
                 android:layout_marginStart="1.5dp"
                 android:layout_marginEnd="1.5dp"
                 android:src="@drawable/widget_event_dot"
+            android:tint="#FF6366F1"
                 android:scaleType="fitCenter"
                 android:visibility="gone" />
 
@@ -113,6 +118,7 @@
                 android:layout_marginStart="1.5dp"
                 android:layout_marginEnd="1.5dp"
                 android:src="@drawable/widget_event_dot"
+            android:tint="#FF6366F1"
                 android:scaleType="fitCenter"
                 android:visibility="gone" />
         </LinearLayout>

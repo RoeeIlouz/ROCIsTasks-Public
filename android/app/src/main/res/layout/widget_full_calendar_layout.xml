@@ -12,14 +12,16 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="fitXY"
-        android:src="@drawable/widget_card_fill" />
+        android:src="@drawable/widget_card_fill"
+            android:tint="#FFF5F2FA" />
 
     <ImageView
         android:id="@+id/widget_fc_card_stroke"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="fitXY"
-        android:src="@drawable/widget_card_stroke" />
+        android:src="@drawable/widget_card_stroke"
+            android:tint="#1F6366F1" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -38,7 +40,7 @@
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
-            <TextView
+            <TextView android:textColor="#FF1B1B21"
                 android:id="@+id/widget_full_calendar_title"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -46,7 +48,8 @@
                 android:clickable="true"
                 android:ellipsize="end"
                 android:focusable="true"
-                android:fontFamily="@font/outfit_bold"
+                android:fontFamily="sans-serif"
+            android:textStyle="bold"
                 android:letterSpacing="-0.03"
                 android:maxLines="1"
                 android:paddingStart="4dp"
@@ -59,6 +62,7 @@
                 android:layout_height="36dp"
                 android:padding="6dp"
                 android:src="@drawable/ic_chevron_left_24"
+            android:tint="#FF1B1B21"
                 android:clickable="true"
                 android:focusable="true" />
 
@@ -68,6 +72,7 @@
                 android:layout_height="36dp"
                 android:padding="6dp"
                 android:src="@drawable/ic_chevron_right_24"
+            android:tint="#FF1B1B21"
                 android:clickable="true"
                 android:focusable="true" />
 
@@ -77,6 +82,7 @@
                 android:layout_height="36dp"
                 android:padding="7dp"
                 android:src="@drawable/ic_today_24"
+            android:tint="#FF1B1B21"
                 android:clickable="true"
                 android:focusable="true" />
 
@@ -86,6 +92,7 @@
                 android:layout_height="36dp"
                 android:padding="6dp"
                 android:src="@drawable/ic_add"
+            android:tint="#FF1B1B21"
                 android:clickable="true"
                 android:focusable="true" />
         </LinearLayout>
@@ -112,18 +119,20 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="fitXY"
-                    android:src="@drawable/widget_chip_fill" />
+                    android:src="@drawable/widget_chip_fill"
+            android:tint="#1F6366F1" />
                 <ImageView
                     android:id="@+id/widget_filter_tasks_stroke"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="fitXY"
-                    android:src="@drawable/widget_chip_stroke" />
-                <TextView
+                    android:src="@drawable/widget_chip_stroke"
+            android:tint="#596366F1" />
+                <TextView android:textColor="#FF1B1B21"
                     android:id="@+id/widget_filter_tasks_text"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:fontFamily="@font/outfit_medium"
+                    android:fontFamily="sans-serif-medium"
                     android:gravity="center"
                     android:paddingStart="12dp"
                     android:paddingEnd="12dp"
@@ -143,18 +152,20 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="fitXY"
-                    android:src="@drawable/widget_chip_fill" />
+                    android:src="@drawable/widget_chip_fill"
+            android:tint="#1F6366F1" />
                 <ImageView
                     android:id="@+id/widget_filter_google_stroke"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="fitXY"
-                    android:src="@drawable/widget_chip_stroke" />
-                <TextView
+                    android:src="@drawable/widget_chip_stroke"
+            android:tint="#596366F1" />
+                <TextView android:textColor="#FF1B1B21"
                     android:id="@+id/widget_filter_google_text"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:fontFamily="@font/outfit_medium"
+                    android:fontFamily="sans-serif-medium"
                     android:gravity="center"
                     android:paddingStart="12dp"
                     android:paddingEnd="12dp"
@@ -173,18 +184,20 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="fitXY"
-                    android:src="@drawable/widget_chip_fill" />
+                    android:src="@drawable/widget_chip_fill"
+            android:tint="#1F6366F1" />
                 <ImageView
                     android:id="@+id/widget_filter_rocis_stroke"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="fitXY"
-                    android:src="@drawable/widget_chip_stroke" />
-                <TextView
+                    android:src="@drawable/widget_chip_stroke"
+            android:tint="#596366F1" />
+                <TextView android:textColor="#FF1B1B21"
                     android:id="@+id/widget_filter_rocis_text"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:fontFamily="@font/outfit_medium"
+                    android:fontFamily="sans-serif-medium"
                     android:gravity="center"
                     android:paddingStart="12dp"
                     android:paddingEnd="12dp"
@@ -200,14 +213,14 @@
             android:layout_height="24dp"
             android:orientation="horizontal">
 
-            <TextView android:id="@+id/widget_weekday_num_header" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="0.6" android:gravity="center" android:text="#" android:textSize="11sp" android:fontFamily="@font/outfit_regular" android:visibility="gone" />
-            <TextView android:id="@+id/widget_weekday_sun_header" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:text="Sun" android:textSize="12sp" android:fontFamily="@font/outfit_bold" android:maxLines="1" android:ellipsize="end" />
-            <TextView android:id="@+id/widget_weekday_mon_header" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:text="Mon" android:textSize="12sp" android:fontFamily="@font/outfit_bold" android:maxLines="1" android:ellipsize="end" />
-            <TextView android:id="@+id/widget_weekday_tue_header" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:text="Tue" android:textSize="12sp" android:fontFamily="@font/outfit_bold" android:maxLines="1" android:ellipsize="end" />
-            <TextView android:id="@+id/widget_weekday_wed_header" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:text="Wed" android:textSize="12sp" android:fontFamily="@font/outfit_bold" android:maxLines="1" android:ellipsize="end" />
-            <TextView android:id="@+id/widget_weekday_thu_header" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:text="Thu" android:textSize="12sp" android:fontFamily="@font/outfit_bold" android:maxLines="1" android:ellipsize="end" />
-            <TextView android:id="@+id/widget_weekday_fri_header" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:text="Fri" android:textSize="12sp" android:fontFamily="@font/outfit_bold" android:maxLines="1" android:ellipsize="end" />
-            <TextView android:id="@+id/widget_weekday_sat_header" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:text="Sat" android:textSize="12sp" android:fontFamily="@font/outfit_bold" android:maxLines="1" android:ellipsize="end" />
+            <TextView android:textColor="#FF1B1B21" android:id="@+id/widget_weekday_num_header" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="0.6" android:gravity="center" android:text="#" android:textSize="11sp" android:fontFamily="sans-serif" android:visibility="gone" />
+            <TextView android:textColor="#FF1B1B21" android:id="@+id/widget_weekday_sun_header" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:text="Sun" android:textSize="12sp" android:fontFamily="sans-serif" android:textStyle="bold" android:maxLines="1" android:ellipsize="end" />
+            <TextView android:textColor="#FF1B1B21" android:id="@+id/widget_weekday_mon_header" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:text="Mon" android:textSize="12sp" android:fontFamily="sans-serif" android:textStyle="bold" android:maxLines="1" android:ellipsize="end" />
+            <TextView android:textColor="#FF1B1B21" android:id="@+id/widget_weekday_tue_header" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:text="Tue" android:textSize="12sp" android:fontFamily="sans-serif" android:textStyle="bold" android:maxLines="1" android:ellipsize="end" />
+            <TextView android:textColor="#FF1B1B21" android:id="@+id/widget_weekday_wed_header" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:text="Wed" android:textSize="12sp" android:fontFamily="sans-serif" android:textStyle="bold" android:maxLines="1" android:ellipsize="end" />
+            <TextView android:textColor="#FF1B1B21" android:id="@+id/widget_weekday_thu_header" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:text="Thu" android:textSize="12sp" android:fontFamily="sans-serif" android:textStyle="bold" android:maxLines="1" android:ellipsize="end" />
+            <TextView android:textColor="#FF1B1B21" android:id="@+id/widget_weekday_fri_header" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:text="Fri" android:textSize="12sp" android:fontFamily="sans-serif" android:textStyle="bold" android:maxLines="1" android:ellipsize="end" />
+            <TextView android:textColor="#FF1B1B21" android:id="@+id/widget_weekday_sat_header" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:text="Sat" android:textSize="12sp" android:fontFamily="sans-serif" android:textStyle="bold" android:maxLines="1" android:ellipsize="end" />
         </LinearLayout>
 
         <!-- Week rows are added at runtime (4-6, like the app) and share the height -->
@@ -234,7 +247,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:fontFamily="@font/outfit_bold"
+            android:fontFamily="sans-serif"
+            android:textStyle="bold"
             android:gravity="center"
             android:text="Premium Feature"
             android:textColor="#FFFFFF"

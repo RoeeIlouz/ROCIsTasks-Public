@@ -1489,4 +1489,18 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get plansUnavailable =>
       'לא ניתן לטעון את התוכניות. בדקו את החיבור ונסו שוב.';
+
+  @override
+  String get addToHomeScreen => 'הוספה למסך הבית';
+
+  @override
+  String get fullCalendarWidgetTitle => 'לוח שנה מלא';
+
+  @override
+  String get fullCalendarWidgetSubtitle =>
+      'כל החודש במבט אחד עם אירועים צבעוניים, מסננים והוספה מהירה.';
+
+  @override
+  String get widgetPinUnsupported =>
+      'המסך הראשי שלך לא תומך בהוספת ווידג׳טים מהאפליקציה. לחצו לחיצה ארוכה על מסך הבית, בחרו ווידג׳טים ומצאו את ROCI\'s Tasks.';
 }

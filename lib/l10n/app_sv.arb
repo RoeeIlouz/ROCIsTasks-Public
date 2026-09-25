@@ -535,5 +535,9 @@
   "freeTrialBadge": "{days} dagar gratis",
   "startFreeTrial": "Prova gratis i {days} dagar",
   "trialThenPrice": "Därefter {price} per år. Avsluta innan provperioden slutar så debiteras du inte.",
-  "plansUnavailable": "Det gick inte att läsa in planerna. Kontrollera anslutningen och försök igen."
+  "plansUnavailable": "Det gick inte att läsa in planerna. Kontrollera anslutningen och försök igen.",
+  "addToHomeScreen": "Lägg till på hemskärmen",
+  "fullCalendarWidgetTitle": "Hel kalender",
+  "fullCalendarWidgetSubtitle": "Hela månaden i en blick med färgade händelser, filter och snabbtillägg.",
+  "widgetPinUnsupported": "Din startskärm kan inte lägga till widgetar från appar. Håll ned hemskärmen, tryck på Widgetar och leta upp ROCI's Tasks."
 }

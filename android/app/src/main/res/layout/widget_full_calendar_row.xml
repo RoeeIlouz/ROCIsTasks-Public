@@ -13,11 +13,11 @@
         android:layout_height="match_parent"
         android:layout_weight="0.6"
         android:visibility="gone">
-        <TextView
+        <TextView android:textColor="#FF1B1B21"
             android:id="@+id/widget_full_week_num_text"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:fontFamily="@font/outfit_regular"
+            android:fontFamily="sans-serif"
             android:gravity="center"
             android:textSize="10sp" />
     </FrameLayout>
@@ -38,6 +38,7 @@
             android:layout_height="match_parent"
             android:scaleType="fitXY"
             android:src="@drawable/widget_day_fill"
+            android:tint="#1A6366F1"
             android:visibility="gone" />
 
         <ImageView
@@ -46,6 +47,7 @@
             android:layout_height="match_parent"
             android:scaleType="fitXY"
             android:src="@drawable/widget_day_stroke"
+            android:tint="#FF6366F1"
             android:visibility="gone" />
 
         <!-- Day number with its markers right underneath -->
@@ -58,13 +60,13 @@
             android:paddingEnd="2dp"
             android:paddingTop="5dp">
 
-        <TextView
+        <TextView android:textColor="#FF1B1B21"
             android:id="@+id/widget_full_day_text_0"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="3dp"
-            android:fontFamily="@font/outfit_regular"
+            android:fontFamily="sans-serif"
             android:includeFontPadding="false"
             android:text="1"
             android:textSize="13sp" />
@@ -79,19 +81,21 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="fitXY"
-                    android:src="@drawable/widget_event_badge_fill" />
+                    android:src="@drawable/widget_event_badge_fill"
+            android:tint="#266366F1" />
                 <ImageView
                     android:id="@+id/widget_full_event_stroke_0_1"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="fitXY"
-                    android:src="@drawable/widget_event_badge_stroke" />
-                <TextView
+                    android:src="@drawable/widget_event_badge_stroke"
+            android:tint="#596366F1" />
+                <TextView android:textColor="#FF1B1B21"
                     android:id="@+id/widget_full_event_text_0_1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
-                    android:fontFamily="@font/outfit_semibold"
+                    android:fontFamily="sans-serif-medium"
                     android:gravity="center"
                     android:includeFontPadding="false"
                     android:maxLines="1"
@@ -114,19 +118,21 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="fitXY"
-                    android:src="@drawable/widget_event_badge_fill" />
+                    android:src="@drawable/widget_event_badge_fill"
+            android:tint="#266366F1" />
                 <ImageView
                     android:id="@+id/widget_full_event_stroke_0_2"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="fitXY"
-                    android:src="@drawable/widget_event_badge_stroke" />
-                <TextView
+                    android:src="@drawable/widget_event_badge_stroke"
+            android:tint="#596366F1" />
+                <TextView android:textColor="#FF1B1B21"
                     android:id="@+id/widget_full_event_text_0_2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
-                    android:fontFamily="@font/outfit_semibold"
+                    android:fontFamily="sans-serif-medium"
                     android:gravity="center"
                     android:includeFontPadding="false"
                     android:maxLines="1"
@@ -155,6 +161,7 @@
                     android:layout_marginStart="1.5dp"
                     android:layout_marginEnd="1.5dp"
                     android:src="@drawable/widget_event_dot"
+            android:tint="#FF6366F1"
                     android:visibility="gone" />
 
                 <ImageView
@@ -164,6 +171,7 @@
                     android:layout_marginStart="1.5dp"
                     android:layout_marginEnd="1.5dp"
                     android:src="@drawable/widget_event_dot"
+            android:tint="#FF6366F1"
                     android:visibility="gone" />
 
                 <ImageView
@@ -173,14 +181,16 @@
                     android:layout_marginStart="1.5dp"
                     android:layout_marginEnd="1.5dp"
                     android:src="@drawable/widget_event_dot"
+            android:tint="#FF6366F1"
                     android:visibility="gone" />
 
-                <TextView
+                <TextView android:textColor="#FF1B1B21"
                     android:id="@+id/widget_full_more_0"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="2dp"
-                    android:fontFamily="@font/outfit_bold"
+                    android:fontFamily="sans-serif"
+            android:textStyle="bold"
                     android:includeFontPadding="false"
                     android:textSize="8sp"
                     android:visibility="gone" />
@@ -204,6 +214,7 @@
             android:layout_height="match_parent"
             android:scaleType="fitXY"
             android:src="@drawable/widget_day_fill"
+            android:tint="#1A6366F1"
             android:visibility="gone" />
 
         <ImageView
@@ -212,6 +223,7 @@
             android:layout_height="match_parent"
             android:scaleType="fitXY"
             android:src="@drawable/widget_day_stroke"
+            android:tint="#FF6366F1"
             android:visibility="gone" />
 
         <!-- Day number with its markers right underneath -->
@@ -224,13 +236,13 @@
             android:paddingEnd="2dp"
             android:paddingTop="5dp">
 
-        <TextView
+        <TextView android:textColor="#FF1B1B21"
             android:id="@+id/widget_full_day_text_1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="3dp"
-            android:fontFamily="@font/outfit_regular"
+            android:fontFamily="sans-serif"
             android:includeFontPadding="false"
             android:text="1"
             android:textSize="13sp" />
@@ -245,19 +257,21 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="fitXY"
-                    android:src="@drawable/widget_event_badge_fill" />
+                    android:src="@drawable/widget_event_badge_fill"
+            android:tint="#266366F1" />
                 <ImageView
                     android:id="@+id/widget_full_event_stroke_1_1"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="fitXY"
-                    android:src="@drawable/widget_event_badge_stroke" />
-                <TextView
+                    android:src="@drawable/widget_event_badge_stroke"
+            android:tint="#596366F1" />
+                <TextView android:textColor="#FF1B1B21"
                     android:id="@+id/widget_full_event_text_1_1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
-                    android:fontFamily="@font/outfit_semibold"
+                    android:fontFamily="sans-serif-medium"
                     android:gravity="center"
                     android:includeFontPadding="false"
                     android:maxLines="1"
@@ -280,19 +294,21 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="fitXY"
-                    android:src="@drawable/widget_event_badge_fill" />
+                    android:src="@drawable/widget_event_badge_fill"
+            android:tint="#266366F1" />
                 <ImageView
                     android:id="@+id/widget_full_event_stroke_1_2"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="fitXY"
-                    android:src="@drawable/widget_event_badge_stroke" />
-                <TextView
+                    android:src="@drawable/widget_event_badge_stroke"
+            android:tint="#596366F1" />
+                <TextView android:textColor="#FF1B1B21"
                     android:id="@+id/widget_full_event_text_1_2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
-                    android:fontFamily="@font/outfit_semibold"
+                    android:fontFamily="sans-serif-medium"
                     android:gravity="center"
                     android:includeFontPadding="false"
                     android:maxLines="1"
@@ -321,6 +337,7 @@
                     android:layout_marginStart="1.5dp"
                     android:layout_marginEnd="1.5dp"
                     android:src="@drawable/widget_event_dot"
+            android:tint="#FF6366F1"
                     android:visibility="gone" />
 
                 <ImageView
@@ -330,6 +347,7 @@
                     android:layout_marginStart="1.5dp"
                     android:layout_marginEnd="1.5dp"
                     android:src="@drawable/widget_event_dot"
+            android:tint="#FF6366F1"
                     android:visibility="gone" />
 
                 <ImageView
@@ -339,14 +357,16 @@
                     android:layout_marginStart="1.5dp"
                     android:layout_marginEnd="1.5dp"
                     android:src="@drawable/widget_event_dot"
+            android:tint="#FF6366F1"
                     android:visibility="gone" />
 
-                <TextView
+                <TextView android:textColor="#FF1B1B21"
                     android:id="@+id/widget_full_more_1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="2dp"
-                    android:fontFamily="@font/outfit_bold"
+                    android:fontFamily="sans-serif"
+            android:textStyle="bold"
                     android:includeFontPadding="false"
                     android:textSize="8sp"
                     android:visibility="gone" />
@@ -370,6 +390,7 @@
             android:layout_height="match_parent"
             android:scaleType="fitXY"
             android:src="@drawable/widget_day_fill"
+            android:tint="#1A6366F1"
             android:visibility="gone" />
 
         <ImageView
@@ -378,6 +399,7 @@
             android:layout_height="match_parent"
             android:scaleType="fitXY"
             android:src="@drawable/widget_day_stroke"
+            android:tint="#FF6366F1"
             android:visibility="gone" />
 
         <!-- Day number with its markers right underneath -->
@@ -390,13 +412,13 @@
             android:paddingEnd="2dp"
             android:paddingTop="5dp">
 
-        <TextView
+        <TextView android:textColor="#FF1B1B21"
             android:id="@+id/widget_full_day_text_2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="3dp"
-            android:fontFamily="@font/outfit_regular"
+            android:fontFamily="sans-serif"
             android:includeFontPadding="false"
             android:text="1"
             android:textSize="13sp" />
@@ -411,19 +433,21 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="fitXY"
-                    android:src="@drawable/widget_event_badge_fill" />
+                    android:src="@drawable/widget_event_badge_fill"
+            android:tint="#266366F1" />
                 <ImageView
                     android:id="@+id/widget_full_event_stroke_2_1"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="fitXY"
-                    android:src="@drawable/widget_event_badge_stroke" />
-                <TextView
+                    android:src="@drawable/widget_event_badge_stroke"
+            android:tint="#596366F1" />
+                <TextView android:textColor="#FF1B1B21"
                     android:id="@+id/widget_full_event_text_2_1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
-                    android:fontFamily="@font/outfit_semibold"
+                    android:fontFamily="sans-serif-medium"
                     android:gravity="center"
                     android:includeFontPadding="false"
                     android:maxLines="1"
@@ -446,19 +470,21 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="fitXY"
-                    android:src="@drawable/widget_event_badge_fill" />
+                    android:src="@drawable/widget_event_badge_fill"
+            android:tint="#266366F1" />
                 <ImageView
                     android:id="@+id/widget_full_event_stroke_2_2"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="fitXY"
-                    android:src="@drawable/widget_event_badge_stroke" />
-                <TextView
+                    android:src="@drawable/widget_event_badge_stroke"
+            android:tint="#596366F1" />
+                <TextView android:textColor="#FF1B1B21"
                     android:id="@+id/widget_full_event_text_2_2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
-                    android:fontFamily="@font/outfit_semibold"
+                    android:fontFamily="sans-serif-medium"
                     android:gravity="center"
                     android:includeFontPadding="false"
                     android:maxLines="1"
@@ -487,6 +513,7 @@
                     android:layout_marginStart="1.5dp"
                     android:layout_marginEnd="1.5dp"
                     android:src="@drawable/widget_event_dot"
+            android:tint="#FF6366F1"
                     android:visibility="gone" />
 
                 <ImageView
@@ -496,6 +523,7 @@
                     android:layout_marginStart="1.5dp"
                     android:layout_marginEnd="1.5dp"
                     android:src="@drawable/widget_event_dot"
+            android:tint="#FF6366F1"
                     android:visibility="gone" />
 
                 <ImageView
@@ -505,14 +533,16 @@
                     android:layout_marginStart="1.5dp"
                     android:layout_marginEnd="1.5dp"
                     android:src="@drawable/widget_event_dot"
+            android:tint="#FF6366F1"
                     android:visibility="gone" />
 
-                <TextView
+                <TextView android:textColor="#FF1B1B21"
                     android:id="@+id/widget_full_more_2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="2dp"
-                    android:fontFamily="@font/outfit_bold"
+                    android:fontFamily="sans-serif"
+            android:textStyle="bold"
                     android:includeFontPadding="false"
                     android:textSize="8sp"
                     android:visibility="gone" />
@@ -536,6 +566,7 @@
             android:layout_height="match_parent"
             android:scaleType="fitXY"
             android:src="@drawable/widget_day_fill"
+            android:tint="#1A6366F1"
             android:visibility="gone" />
 
         <ImageView
@@ -544,6 +575,7 @@
             android:layout_height="match_parent"
             android:scaleType="fitXY"
             android:src="@drawable/widget_day_stroke"
+            android:tint="#FF6366F1"
             android:visibility="gone" />
 
         <!-- Day number with its markers right underneath -->
@@ -556,13 +588,13 @@
             android:paddingEnd="2dp"
             android:paddingTop="5dp">
 
-        <TextView
+        <TextView android:textColor="#FF1B1B21"
             android:id="@+id/widget_full_day_text_3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="3dp"
-            android:fontFamily="@font/outfit_regular"
+            android:fontFamily="sans-serif"
             android:includeFontPadding="false"
             android:text="1"
             android:textSize="13sp" />
@@ -577,19 +609,21 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="fitXY"
-                    android:src="@drawable/widget_event_badge_fill" />
+                    android:src="@drawable/widget_event_badge_fill"
+            android:tint="#266366F1" />
                 <ImageView
                     android:id="@+id/widget_full_event_stroke_3_1"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="fitXY"
-                    android:src="@drawable/widget_event_badge_stroke" />
-                <TextView
+                    android:src="@drawable/widget_event_badge_stroke"
+            android:tint="#596366F1" />
+                <TextView android:textColor="#FF1B1B21"
                     android:id="@+id/widget_full_event_text_3_1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
-                    android:fontFamily="@font/outfit_semibold"
+                    android:fontFamily="sans-serif-medium"
                     android:gravity="center"
                     android:includeFontPadding="false"
                     android:maxLines="1"
@@ -612,19 +646,21 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="fitXY"
-                    android:src="@drawable/widget_event_badge_fill" />
+                    android:src="@drawable/widget_event_badge_fill"
+            android:tint="#266366F1" />
                 <ImageView
                     android:id="@+id/widget_full_event_stroke_3_2"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="fitXY"
-                    android:src="@drawable/widget_event_badge_stroke" />
-                <TextView
+                    android:src="@drawable/widget_event_badge_stroke"
+            android:tint="#596366F1" />
+                <TextView android:textColor="#FF1B1B21"
                     android:id="@+id/widget_full_event_text_3_2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
-                    android:fontFamily="@font/outfit_semibold"
+                    android:fontFamily="sans-serif-medium"
                     android:gravity="center"
                     android:includeFontPadding="false"
                     android:maxLines="1"
@@ -653,6 +689,7 @@
                     android:layout_marginStart="1.5dp"
                     android:layout_marginEnd="1.5dp"
                     android:src="@drawable/widget_event_dot"
+            android:tint="#FF6366F1"
                     android:visibility="gone" />
 
                 <ImageView
@@ -662,6 +699,7 @@
                     android:layout_marginStart="1.5dp"
                     android:layout_marginEnd="1.5dp"
                     android:src="@drawable/widget_event_dot"
+            android:tint="#FF6366F1"
                     android:visibility="gone" />
 
                 <ImageView
@@ -671,14 +709,16 @@
                     android:layout_marginStart="1.5dp"
                     android:layout_marginEnd="1.5dp"
                     android:src="@drawable/widget_event_dot"
+            android:tint="#FF6366F1"
                     android:visibility="gone" />
 
-                <TextView
+                <TextView android:textColor="#FF1B1B21"
                     android:id="@+id/widget_full_more_3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="2dp"
-                    android:fontFamily="@font/outfit_bold"
+                    android:fontFamily="sans-serif"
+            android:textStyle="bold"
                     android:includeFontPadding="false"
                     android:textSize="8sp"
                     android:visibility="gone" />
@@ -702,6 +742,7 @@
             android:layout_height="match_parent"
             android:scaleType="fitXY"
             android:src="@drawable/widget_day_fill"
+            android:tint="#1A6366F1"
             android:visibility="gone" />
 
         <ImageView
@@ -710,6 +751,7 @@
             android:layout_height="match_parent"
             android:scaleType="fitXY"
             android:src="@drawable/widget_day_stroke"
+            android:tint="#FF6366F1"
             android:visibility="gone" />
 
         <!-- Day number with its markers right underneath -->
@@ -722,13 +764,13 @@
             android:paddingEnd="2dp"
             android:paddingTop="5dp">
 
-        <TextView
+        <TextView android:textColor="#FF1B1B21"
             android:id="@+id/widget_full_day_text_4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="3dp"
-            android:fontFamily="@font/outfit_regular"
+            android:fontFamily="sans-serif"
             android:includeFontPadding="false"
             android:text="1"
             android:textSize="13sp" />
@@ -743,19 +785,21 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="fitXY"
-                    android:src="@drawable/widget_event_badge_fill" />
+                    android:src="@drawable/widget_event_badge_fill"
+            android:tint="#266366F1" />
                 <ImageView
                     android:id="@+id/widget_full_event_stroke_4_1"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="fitXY"
-                    android:src="@drawable/widget_event_badge_stroke" />
-                <TextView
+                    android:src="@drawable/widget_event_badge_stroke"
+            android:tint="#596366F1" />
+                <TextView android:textColor="#FF1B1B21"
                     android:id="@+id/widget_full_event_text_4_1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
-                    android:fontFamily="@font/outfit_semibold"
+                    android:fontFamily="sans-serif-medium"
                     android:gravity="center"
                     android:includeFontPadding="false"
                     android:maxLines="1"
@@ -778,19 +822,21 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="fitXY"
-                    android:src="@drawable/widget_event_badge_fill" />
+                    android:src="@drawable/widget_event_badge_fill"
+            android:tint="#266366F1" />
                 <ImageView
                     android:id="@+id/widget_full_event_stroke_4_2"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="fitXY"
-                    android:src="@drawable/widget_event_badge_stroke" />
-                <TextView
+                    android:src="@drawable/widget_event_badge_stroke"
+            android:tint="#596366F1" />
+                <TextView android:textColor="#FF1B1B21"
                     android:id="@+id/widget_full_event_text_4_2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
-                    android:fontFamily="@font/outfit_semibold"
+                    android:fontFamily="sans-serif-medium"
                     android:gravity="center"
                     android:includeFontPadding="false"
                     android:maxLines="1"
@@ -819,6 +865,7 @@
                     android:layout_marginStart="1.5dp"
                     android:layout_marginEnd="1.5dp"
                     android:src="@drawable/widget_event_dot"
+            android:tint="#FF6366F1"
                     android:visibility="gone" />
 
                 <ImageView
@@ -828,6 +875,7 @@
                     android:layout_marginStart="1.5dp"
                     android:layout_marginEnd="1.5dp"
                     android:src="@drawable/widget_event_dot"
+            android:tint="#FF6366F1"
                     android:visibility="gone" />
 
                 <ImageView
@@ -837,14 +885,16 @@
                     android:layout_marginStart="1.5dp"
                     android:layout_marginEnd="1.5dp"
                     android:src="@drawable/widget_event_dot"
+            android:tint="#FF6366F1"
                     android:visibility="gone" />
 
-                <TextView
+                <TextView android:textColor="#FF1B1B21"
                     android:id="@+id/widget_full_more_4"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="2dp"
-                    android:fontFamily="@font/outfit_bold"
+                    android:fontFamily="sans-serif"
+            android:textStyle="bold"
                     android:includeFontPadding="false"
                     android:textSize="8sp"
                     android:visibility="gone" />
@@ -868,6 +918,7 @@
             android:layout_height="match_parent"
             android:scaleType="fitXY"
             android:src="@drawable/widget_day_fill"
+            android:tint="#1A6366F1"
             android:visibility="gone" />
 
         <ImageView
@@ -876,6 +927,7 @@
             android:layout_height="match_parent"
             android:scaleType="fitXY"
             android:src="@drawable/widget_day_stroke"
+            android:tint="#FF6366F1"
             android:visibility="gone" />
 
         <!-- Day number with its markers right underneath -->
@@ -888,13 +940,13 @@
             android:paddingEnd="2dp"
             android:paddingTop="5dp">
 
-        <TextView
+        <TextView android:textColor="#FF1B1B21"
             android:id="@+id/widget_full_day_text_5"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="3dp"
-            android:fontFamily="@font/outfit_regular"
+            android:fontFamily="sans-serif"
             android:includeFontPadding="false"
             android:text="1"
             android:textSize="13sp" />
@@ -909,19 +961,21 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="fitXY"
-                    android:src="@drawable/widget_event_badge_fill" />
+                    android:src="@drawable/widget_event_badge_fill"
+            android:tint="#266366F1" />
                 <ImageView
                     android:id="@+id/widget_full_event_stroke_5_1"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="fitXY"
-                    android:src="@drawable/widget_event_badge_stroke" />
-                <TextView
+                    android:src="@drawable/widget_event_badge_stroke"
+            android:tint="#596366F1" />
+                <TextView android:textColor="#FF1B1B21"
                     android:id="@+id/widget_full_event_text_5_1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
-                    android:fontFamily="@font/outfit_semibold"
+                    android:fontFamily="sans-serif-medium"
                     android:gravity="center"
                     android:includeFontPadding="false"
                     android:maxLines="1"
@@ -944,19 +998,21 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="fitXY"
-                    android:src="@drawable/widget_event_badge_fill" />
+                    android:src="@drawable/widget_event_badge_fill"
+            android:tint="#266366F1" />
                 <ImageView
                     android:id="@+id/widget_full_event_stroke_5_2"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="fitXY"
-                    android:src="@drawable/widget_event_badge_stroke" />
-                <TextView
+                    android:src="@drawable/widget_event_badge_stroke"
+            android:tint="#596366F1" />
+                <TextView android:textColor="#FF1B1B21"
                     android:id="@+id/widget_full_event_text_5_2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
-                    android:fontFamily="@font/outfit_semibold"
+                    android:fontFamily="sans-serif-medium"
                     android:gravity="center"
                     android:includeFontPadding="false"
                     android:maxLines="1"
@@ -985,6 +1041,7 @@
                     android:layout_marginStart="1.5dp"
                     android:layout_marginEnd="1.5dp"
                     android:src="@drawable/widget_event_dot"
+            android:tint="#FF6366F1"
                     android:visibility="gone" />
 
                 <ImageView
@@ -994,6 +1051,7 @@
                     android:layout_marginStart="1.5dp"
                     android:layout_marginEnd="1.5dp"
                     android:src="@drawable/widget_event_dot"
+            android:tint="#FF6366F1"
                     android:visibility="gone" />
 
                 <ImageView
@@ -1003,14 +1061,16 @@
                     android:layout_marginStart="1.5dp"
                     android:layout_marginEnd="1.5dp"
                     android:src="@drawable/widget_event_dot"
+            android:tint="#FF6366F1"
                     android:visibility="gone" />
 
-                <TextView
+                <TextView android:textColor="#FF1B1B21"
                     android:id="@+id/widget_full_more_5"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="2dp"
-                    android:fontFamily="@font/outfit_bold"
+                    android:fontFamily="sans-serif"
+            android:textStyle="bold"
                     android:includeFontPadding="false"
                     android:textSize="8sp"
                     android:visibility="gone" />
@@ -1034,6 +1094,7 @@
             android:layout_height="match_parent"
             android:scaleType="fitXY"
             android:src="@drawable/widget_day_fill"
+            android:tint="#1A6366F1"
             android:visibility="gone" />
 
         <ImageView
@@ -1042,6 +1103,7 @@
             android:layout_height="match_parent"
             android:scaleType="fitXY"
             android:src="@drawable/widget_day_stroke"
+            android:tint="#FF6366F1"
             android:visibility="gone" />
 
         <!-- Day number with its markers right underneath -->
@@ -1054,13 +1116,13 @@
             android:paddingEnd="2dp"
             android:paddingTop="5dp">
 
-        <TextView
+        <TextView android:textColor="#FF1B1B21"
             android:id="@+id/widget_full_day_text_6"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="3dp"
-            android:fontFamily="@font/outfit_regular"
+            android:fontFamily="sans-serif"
             android:includeFontPadding="false"
             android:text="1"
             android:textSize="13sp" />
@@ -1075,19 +1137,21 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="fitXY"
-                    android:src="@drawable/widget_event_badge_fill" />
+                    android:src="@drawable/widget_event_badge_fill"
+            android:tint="#266366F1" />
                 <ImageView
                     android:id="@+id/widget_full_event_stroke_6_1"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="fitXY"
-                    android:src="@drawable/widget_event_badge_stroke" />
-                <TextView
+                    android:src="@drawable/widget_event_badge_stroke"
+            android:tint="#596366F1" />
+                <TextView android:textColor="#FF1B1B21"
                     android:id="@+id/widget_full_event_text_6_1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
-                    android:fontFamily="@font/outfit_semibold"
+                    android:fontFamily="sans-serif-medium"
                     android:gravity="center"
                     android:includeFontPadding="false"
                     android:maxLines="1"
@@ -1110,19 +1174,21 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="fitXY"
-                    android:src="@drawable/widget_event_badge_fill" />
+                    android:src="@drawable/widget_event_badge_fill"
+            android:tint="#266366F1" />
                 <ImageView
                     android:id="@+id/widget_full_event_stroke_6_2"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="fitXY"
-                    android:src="@drawable/widget_event_badge_stroke" />
-                <TextView
+                    android:src="@drawable/widget_event_badge_stroke"
+            android:tint="#596366F1" />
+                <TextView android:textColor="#FF1B1B21"
                     android:id="@+id/widget_full_event_text_6_2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
-                    android:fontFamily="@font/outfit_semibold"
+                    android:fontFamily="sans-serif-medium"
                     android:gravity="center"
                     android:includeFontPadding="false"
                     android:maxLines="1"
@@ -1151,6 +1217,7 @@
                     android:layout_marginStart="1.5dp"
                     android:layout_marginEnd="1.5dp"
                     android:src="@drawable/widget_event_dot"
+            android:tint="#FF6366F1"
                     android:visibility="gone" />
 
                 <ImageView
@@ -1160,6 +1227,7 @@
                     android:layout_marginStart="1.5dp"
                     android:layout_marginEnd="1.5dp"
                     android:src="@drawable/widget_event_dot"
+            android:tint="#FF6366F1"
                     android:visibility="gone" />
 
                 <ImageView
@@ -1169,14 +1237,16 @@
                     android:layout_marginStart="1.5dp"
                     android:layout_marginEnd="1.5dp"
                     android:src="@drawable/widget_event_dot"
+            android:tint="#FF6366F1"
                     android:visibility="gone" />
 
-                <TextView
+                <TextView android:textColor="#FF1B1B21"
                     android:id="@+id/widget_full_more_6"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="2dp"
-                    android:fontFamily="@font/outfit_bold"
+                    android:fontFamily="sans-serif"
+            android:textStyle="bold"
                     android:includeFontPadding="false"
                     android:textSize="8sp"
                     android:visibility="gone" />

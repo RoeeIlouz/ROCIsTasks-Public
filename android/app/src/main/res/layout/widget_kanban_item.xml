@@ -11,7 +11,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="fitXY"
-        android:src="@drawable/widget_item_fill" />
+        android:src="@drawable/widget_item_fill"
+            android:tint="#0D1B1B21" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -29,7 +30,8 @@
             android:layout_width="4dp"
             android:layout_height="28dp"
             android:scaleType="fitXY"
-            android:src="@drawable/widget_accent_bar" />
+            android:src="@drawable/widget_accent_bar"
+            android:tint="#FF6366F1" />
 
         <ImageView
             android:id="@+id/widget_kanban_check"
@@ -39,7 +41,8 @@
             android:contentDescription="Complete task"
             android:focusable="true"
             android:padding="8dp"
-            android:src="@drawable/ic_widget_check_off" />
+            android:src="@drawable/ic_widget_check_off"
+            android:tint="#B31B1B21" />
 
         <LinearLayout
             android:layout_width="0dp"
@@ -48,12 +51,12 @@
             android:orientation="vertical"
             android:paddingStart="2dp">
 
-            <TextView
+            <TextView android:textColor="#FF1B1B21"
                 android:id="@+id/widget_kanban_item_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
-                android:fontFamily="@font/outfit_semibold"
+                android:fontFamily="sans-serif-medium"
                 android:includeFontPadding="false"
                 android:maxLines="1"
                 android:text="Task title"
@@ -68,24 +71,24 @@
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
-                <TextView
+                <TextView android:textColor="#FF1B1B21"
                     android:id="@+id/widget_kanban_item_date"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="6dp"
-                    android:fontFamily="@font/outfit_medium"
+                    android:fontFamily="sans-serif-medium"
                     android:includeFontPadding="false"
                     android:maxLines="1"
                     android:text="Today"
                     android:textSize="12sp" />
 
-                <TextView
+                <TextView android:textColor="#FF1B1B21"
                     android:id="@+id/widget_kanban_item_category"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:ellipsize="end"
-                    android:fontFamily="@font/outfit_regular"
+                    android:fontFamily="sans-serif"
                     android:includeFontPadding="false"
                     android:maxLines="1"
                     android:text="Work"
@@ -106,13 +109,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="fitXY"
-                android:src="@drawable/widget_chip_fill" />
+                android:src="@drawable/widget_chip_fill"
+            android:tint="#1F6366F1" />
 
-            <TextView
+            <TextView android:textColor="#FF1B1B21"
                 android:id="@+id/widget_kanban_item_priority"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:fontFamily="@font/outfit_semibold"
+                android:fontFamily="sans-serif-medium"
                 android:gravity="center"
                 android:includeFontPadding="false"
                 android:paddingStart="8dp"
