@@ -357,89 +357,37 @@ class SubscriptionService extends ChangeNotifier {
     }
   }
 
-  /// Shows the paywall using RevenueCat's UI library.
-  /// returns true if a purchase was made (and thus premium is likely active)
+  /// Shows the app's plan picker ([PaywallScreen]) on every platform: Google
+  /// Play purchases through RevenueCat on Android, Lemon Squeezy checkout on
+  /// web. [source] is logged and names the feature on the sheet. Returns true
+  /// if the user has Pro afterwards.
   Future<bool> showPaywall({
     PaywallSource source = PaywallSource.settings,
   }) async {
+    if (_isPremium) return true;
+    final context = AppRouter.navigatorKey.currentContext;
+    if (context == null) return false;
+
     final analytics = AnalyticsService();
-    if (kIsWeb) {
-      if (_isPremium) return true;
-      final context = AppRouter.navigatorKey.currentContext;
-      if (context != null) {
-        unawaited(analytics.logPaywallShown(source: source.name));
-        final result = await showModalBottomSheet<bool>(
+    unawaited(analytics.logPaywallShown(source: source.name));
+    final purchased =
+        await showModalBottomSheet<bool>(
           context: context,
           isScrollControlled: true,
           useSafeArea: true,
-          builder: (context) => const PaywallScreen(),
-        );
-        unawaited(
-          analytics.logPaywallResult(
-            source: source.name,
-            result: result == true ? 'purchased' : 'closed',
-          ),
-        );
-        return result ?? false;
-      }
-      return false;
+          builder: (context) => PaywallScreen(source: source),
+        ) ??
+        false;
+    unawaited(
+      analytics.logPaywallResult(
+        source: source.name,
+        result: purchased ? 'purchased' : 'closed',
+      ),
+    );
+    if (purchased && !kIsWeb && _isConfigured) {
+      await _checkSubscriptionStatus();
     }
-    if (!_isConfigured) return false;
-    try {
-      // Only show if not already premium
-      if (_isPremium) {
-        AppLogger.info(
-          'Already premium, skipping paywall',
-          tag: 'Subscription',
-        );
-        return true;
-      }
-
-      AppLogger.info('Showing paywall ($source)...', tag: 'Subscription');
-      unawaited(analytics.logPaywallShown(source: source.name));
-
-      // The feature that triggered the paywall, for {{ custom.feature }}.
-      final context = AppRouter.navigatorKey.currentContext;
-      final l10n = context != null ? AppLocalizations.of(context) : null;
-
-      // Using presentPaywall instead of presentPaywallIfNeeded for diagnostics.
-      // This will show the "Current Offering" regardless of entitlement status.
-      final paywallResult = await RevenueCatUI.presentPaywall(
-        customVariables: l10n == null
-            ? null
-            : {
-                'feature': CustomVariableValue.string(
-                  source.featureLabel(l10n),
-                ),
-              },
-      );
-
-      AppLogger.info('Paywall result: $paywallResult', tag: 'Subscription');
-      unawaited(
-        analytics.logPaywallResult(
-          source: source.name,
-          result: paywallResult.name,
-        ),
-      );
-
-      final purchased =
-          paywallResult == PaywallResult.purchased ||
-          paywallResult == PaywallResult.restored;
-
-      // Force refresh customer info after successful purchase
-      if (purchased) {
-        AppLogger.info(
-          'Purchase detected, forcing customer info refresh',
-          tag: 'Subscription',
-        );
-        await _checkSubscriptionStatus();
-      }
-
-      return purchased;
-    } catch (e, s) {
-      _errorHandlingService.logError(e, s, reason: 'Showing paywall');
-      return false;
-    }
+    return purchased || _isPremium;
   }
 
   /// Toggles premium status specifically for the web platform.

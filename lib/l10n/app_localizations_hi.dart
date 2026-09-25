@@ -1501,4 +1501,8 @@ class AppLocalizationsHi extends AppLocalizations {
   String trialThenPrice(String price) {
     return 'इसके बाद $price प्रति वर्ष। ट्रायल खत्म होने से पहले कभी भी रद्द करें, कोई शुल्क नहीं लगेगा।';
   }
+
+  @override
+  String get plansUnavailable =>
+      'प्लान लोड नहीं हो सके। अपना कनेक्शन जाँचें और फिर से कोशिश करें।';
 }

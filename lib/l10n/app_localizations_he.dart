@@ -1485,4 +1485,8 @@ class AppLocalizationsHe extends AppLocalizations {
   String trialThenPrice(String price) {
     return 'לאחר מכן $price לשנה. אפשר לבטל בכל עת לפני סוף תקופת הניסיון ללא חיוב.';
   }
+
+  @override
+  String get plansUnavailable =>
+      'לא ניתן לטעון את התוכניות. בדקו את החיבור ונסו שוב.';
 }

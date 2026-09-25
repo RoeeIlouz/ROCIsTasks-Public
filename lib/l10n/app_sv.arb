@@ -534,5 +534,6 @@
   "kanbanWidgetDesc": "Interaktiv Kanban-tavla med kolumner för Att göra, I fokus och Klart",
   "freeTrialBadge": "{days} dagar gratis",
   "startFreeTrial": "Prova gratis i {days} dagar",
-  "trialThenPrice": "Därefter {price} per år. Avsluta innan provperioden slutar så debiteras du inte."
+  "trialThenPrice": "Därefter {price} per år. Avsluta innan provperioden slutar så debiteras du inte.",
+  "plansUnavailable": "Det gick inte att läsa in planerna. Kontrollera anslutningen och försök igen."
 }

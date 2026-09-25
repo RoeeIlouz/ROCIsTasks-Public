@@ -534,5 +534,6 @@
   "kanbanWidgetDesc": "Tableau Kanban interactif avec les colonnes À faire, En cours et Terminé",
   "freeTrialBadge": "{days} jours gratuits",
   "startFreeTrial": "Essayer {days} jours gratuitement",
-  "trialThenPrice": "Ensuite {price} par an. Annulez avant la fin de l'essai et vous ne serez pas débité."
+  "trialThenPrice": "Ensuite {price} par an. Annulez avant la fin de l'essai et vous ne serez pas débité.",
+  "plansUnavailable": "Impossible de charger les offres. Vérifiez votre connexion et réessayez."
 }

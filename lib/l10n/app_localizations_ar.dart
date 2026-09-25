@@ -1485,4 +1485,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String trialThenPrice(String price) {
     return 'بعدها $price سنويًا. ألغِ في أي وقت قبل انتهاء التجربة ولن يتم خصم أي مبلغ.';
   }
+
+  @override
+  String get plansUnavailable =>
+      'تعذّر تحميل الخطط. تحقّق من اتصالك وحاول مرة أخرى.';
 }

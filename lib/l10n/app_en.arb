@@ -537,5 +537,6 @@
   "startFreeTrial": "Start {days}-day free trial",
   "@startFreeTrial": {"placeholders": {"days": {"type": "int"}}},
   "trialThenPrice": "Then {price} per year. Cancel anytime before the trial ends and you won't be charged.",
-  "@trialThenPrice": {"placeholders": {"price": {"type": "String"}}}
+  "@trialThenPrice": {"placeholders": {"price": {"type": "String"}}},
+  "plansUnavailable": "Plans couldn't load. Check your connection and try again."
 }

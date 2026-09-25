@@ -533,5 +533,6 @@
   "kanbanWidgetDesc": "Tablero Kanban interactivo con columnas Por hacer, En foco y Hecho",
   "freeTrialBadge": "{days} días gratis",
   "startFreeTrial": "Empieza {days} días gratis",
-  "trialThenPrice": "Después {price} al año. Cancela antes de que termine la prueba y no se te cobrará."
+  "trialThenPrice": "Después {price} al año. Cancela antes de que termine la prueba y no se te cobrará.",
+  "plansUnavailable": "No se pudieron cargar los planes. Revisa tu conexión e inténtalo de nuevo."
 }
