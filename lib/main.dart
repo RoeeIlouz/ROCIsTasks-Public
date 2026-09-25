@@ -420,7 +420,7 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   static String? _syncedWidgetTheme;
 
   /// Shares the app's calendar-card colors with the home widgets so they look
@@ -467,9 +467,26 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       QuickActionsService().initialize(context);
     });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  /// Widgets on the "system" theme pick light/dark when they draw; redraw them
+  /// when the system switches while the app is running.
+  @override
+  void didChangePlatformBrightness() {
+    if (kIsWeb) return;
+    for (final name in _widgetProviders) {
+      HomeWidget.updateWidget(name: name).catchError((_) => null);
+    }
   }
 
   @override

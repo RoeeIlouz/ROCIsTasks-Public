@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart' hide Category;
 import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:rocis_tasks/core/dev/screenshot_seed.dart';
 import 'package:rocis_tasks/core/config/app_config.dart';
 import 'package:rocis_tasks/core/services/review_prompt_service.dart';
 import 'package:rocis_tasks/core/services/analytics_service.dart';
@@ -208,6 +209,14 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
 
     try {
       await _source.init();
+      if (ScreenshotSeed.enabled) {
+        // Store-screenshot builds only (compile-time flag).
+        final prefs = await SharedPreferences.getInstance();
+        await ScreenshotSeed.apply(
+          _source,
+          prefs.getString('language_code') ?? 'en',
+        );
+      }
       // Ensure notification service is initialized without blocking UI on permission prompt
       await _notificationService.init();
       unawaited(
