@@ -10,6 +10,8 @@ import 'package:home_widget/home_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart' show showModalBottomSheet;
 import 'package:rocis_tasks/core/config/app_config.dart';
 import 'package:rocis_tasks/core/config/app_secrets.dart';
@@ -162,6 +164,7 @@ class SubscriptionService extends ChangeNotifier {
 
     await _webSubscriptionListener?.cancel();
     _firestorePremium = false;
+    _serverSyncedRevenueCat = null;
 
     if (normalized == null || normalized.isEmpty) {
       _isPremium = false;
@@ -264,20 +267,32 @@ class SubscriptionService extends ChangeNotifier {
     }
   }
 
-  Future<void> _backSyncToFirestore(String userId) async {
+  /// RevenueCat state the server was last asked to record for this user.
+  bool? _serverSyncedRevenueCat;
+
+  /// Asks the server to re-read this user's RevenueCat entitlement and update
+  /// Firestore (clients can't write premium fields), so web and the widgets
+  /// follow mobile purchases. The Firestore listener picks up the result.
+  Future<void> _syncPremiumToServer() async {
+    if (_serverSyncedRevenueCat == _revenueCatPremium) return;
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null || user.uid != _syncedAuthUserId) return;
+    _serverSyncedRevenueCat = _revenueCatPremium;
     try {
-      if (!_firestorePremium) {
-        await FirebaseFirestore.instance.collection('users').doc(userId).set({
-          'is_premium': true,
-          'subscription_status': 'active',
-          'last_synced_from_mobile': FieldValue.serverTimestamp(),
-        }, SetOptions(merge: true));
-        _firestorePremium = true;
-        _updatePremiumState();
+      final token = await user.getIdToken();
+      final response = await http
+          .post(
+            Uri.parse(AppConfig.syncPremiumUrl),
+            headers: {'Authorization': 'Bearer $token'},
+          )
+          .timeout(const Duration(seconds: 15));
+      if (response.statusCode != 200) {
+        throw Exception('HTTP ${response.statusCode}');
       }
     } catch (e) {
+      _serverSyncedRevenueCat = null; // Retry on the next status update.
       AppLogger.warning(
-        'Failed to back-sync mobile premium status to Firestore: $e',
+        'Failed to sync premium status to the server: $e',
         tag: 'Subscription',
       );
     }
@@ -320,8 +335,8 @@ class SubscriptionService extends ChangeNotifier {
       }
     }
 
-    if (_revenueCatPremium && _syncedAuthUserId != null) {
-      _backSyncToFirestore(_syncedAuthUserId!);
+    if (_syncedAuthUserId != null) {
+      unawaited(_syncPremiumToServer());
     }
   }
 
