@@ -539,5 +539,6 @@
   "addToHomeScreen": "Zum Startbildschirm hinzufügen",
   "fullCalendarWidgetTitle": "Ganzer Kalender",
   "fullCalendarWidgetSubtitle": "Dein Monat auf einen Blick mit farbigen Terminen, Filtern und Schnellerfassung.",
-  "widgetPinUnsupported": "Dein Launcher kann keine Widgets aus Apps hinzufügen. Halte den Startbildschirm gedrückt, tippe auf Widgets und suche ROCI's Tasks."
+  "widgetPinUnsupported": "Dein Launcher kann keine Widgets aus Apps hinzufügen. Halte den Startbildschirm gedrückt, tippe auf Widgets und suche ROCI's Tasks.",
+  "yesterday": "Gestern"
 }

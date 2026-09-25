@@ -1512,4 +1512,7 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get widgetPinUnsupported =>
       'Your launcher can\'t add widgets from apps. Long-press your home screen, tap Widgets and find ROCI\'s Tasks.';
+
+  @override
+  String get yesterday => 'Yesterday';
 }

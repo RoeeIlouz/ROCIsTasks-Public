@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:rocis_tasks/core/utils/app_date_formats.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
 import 'package:rocis_tasks/features/tasks/presentation/widgets/task_tile.dart';
@@ -740,9 +741,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         onDelete: () => taskProvider.deleteTask(item.id),
                       );
                     } else if (item is Event) {
-                      final timeFormat = themeService.use24HourFormat
-                          ? DateFormat.Hm()
-                          : DateFormat.jm();
+                      final timeFormat = AppDateFormats.time(
+                        context,
+                        use24h: themeService.use24HourFormat,
+                      );
                       final cal = calendarProvider.availableCalendars
                           .firstWhere(
                             (c) => c.id == item.calendarId,
@@ -847,9 +849,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         ),
                       );
                     } else if (item is SyncedScheduleEvent) {
-                      final timeFormat = themeService.use24HourFormat
-                          ? DateFormat.Hm()
-                          : DateFormat.jm();
+                      final timeFormat = AppDateFormats.time(
+                        context,
+                        use24h: themeService.use24HourFormat,
+                      );
                       final eventColor = item.color;
                       final isDark =
                           Theme.of(context).brightness == Brightness.dark;

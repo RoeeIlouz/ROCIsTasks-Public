@@ -539,5 +539,6 @@
   "addToHomeScreen": "Ajouter à l'écran d'accueil",
   "fullCalendarWidgetTitle": "Calendrier complet",
   "fullCalendarWidgetSubtitle": "Votre mois en un coup d'œil avec événements colorés, filtres et ajout rapide.",
-  "widgetPinUnsupported": "Votre lanceur ne permet pas d'ajouter des widgets depuis une app. Appuyez longuement sur l'écran d'accueil, touchez Widgets et cherchez ROCI's Tasks."
+  "widgetPinUnsupported": "Votre lanceur ne permet pas d'ajouter des widgets depuis une app. Appuyez longuement sur l'écran d'accueil, touchez Widgets et cherchez ROCI's Tasks.",
+  "yesterday": "Hier"
 }

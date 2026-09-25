@@ -542,5 +542,6 @@
   "addToHomeScreen": "Add to home screen",
   "fullCalendarWidgetTitle": "Full Calendar",
   "fullCalendarWidgetSubtitle": "Your month at a glance with colored event pills, filters and quick add.",
-  "widgetPinUnsupported": "Your launcher can't add widgets from apps. Long-press your home screen, tap Widgets and find ROCI's Tasks."
+  "widgetPinUnsupported": "Your launcher can't add widgets from apps. Long-press your home screen, tap Widgets and find ROCI's Tasks.",
+  "yesterday": "Yesterday"
 }

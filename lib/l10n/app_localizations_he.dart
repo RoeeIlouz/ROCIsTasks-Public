@@ -1503,4 +1503,7 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get widgetPinUnsupported =>
       'המסך הראשי שלך לא תומך בהוספת ווידג׳טים מהאפליקציה. לחצו לחיצה ארוכה על מסך הבית, בחרו ווידג׳טים ומצאו את ROCI\'s Tasks.';
+
+  @override
+  String get yesterday => 'אתמול';
 }

@@ -2952,6 +2952,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your launcher can\'t add widgets from apps. Long-press your home screen, tap Widgets and find ROCI\'s Tasks.'**
   String get widgetPinUnsupported;
+
+  /// No description provided for @yesterday.
+  ///
+  /// In en, this message translates to:
+  /// **'Yesterday'**
+  String get yesterday;
 }
 
 class _AppLocalizationsDelegate

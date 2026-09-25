@@ -2,8 +2,9 @@ import 'package:flutter/foundation.dart' hide Category;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
+import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
+import 'package:rocis_tasks/core/utils/app_date_formats.dart';
 import 'package:rocis_tasks/features/categories/domain/models/category.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
@@ -47,22 +48,23 @@ class KanbanCard extends StatelessWidget {
     }
   }
 
-  String _formatDueDate(DateTime date) {
+  String _formatDueDate(BuildContext context, DateTime date) {
+    final l10n = AppLocalizations.of(context)!;
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final taskDate = DateTime(date.year, date.month, date.day);
     final difference = taskDate.difference(today).inDays;
 
     if (difference == 0) {
-      return DateFormat.jm().format(date);
+      return AppDateFormats.time(context, use24h: false).format(date);
     } else if (difference == 1) {
-      return 'Tomorrow';
+      return l10n.quickDateTomorrow;
     } else if (difference == -1) {
-      return 'Yesterday';
+      return l10n.yesterday;
     } else if (difference > 1 && difference < 7) {
-      return DateFormat('EEEE').format(date);
+      return AppDateFormats.pattern(context, 'EEEE').format(date);
     } else {
-      return DateFormat('MMM d').format(date);
+      return AppDateFormats.pattern(context, 'MMM d').format(date);
     }
   }
 
@@ -176,7 +178,10 @@ class KanbanCard extends StatelessWidget {
                                   ),
                                   const SizedBox(width: 4),
                                   Text(
-                                    task.priority.name.toUpperCase(),
+                                    AppDateFormats.priority(
+                                      AppLocalizations.of(context)!,
+                                      task.priority,
+                                    ).toUpperCase(),
                                     style: GoogleFonts.outfit(
                                       fontSize: 9,
                                       fontWeight: FontWeight.bold,
@@ -497,7 +502,10 @@ class KanbanCard extends StatelessWidget {
                                         ),
                                         const SizedBox(width: 3),
                                         Text(
-                                          _formatDueDate(task.dueDate!),
+                                          _formatDueDate(
+                                            context,
+                                            task.dueDate!,
+                                          ),
                                           style: GoogleFonts.outfit(
                                             fontSize: 10,
                                             fontWeight: FontWeight.bold,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
+import 'package:rocis_tasks/core/utils/app_date_formats.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/features/categories/domain/models/category.dart';
 import 'package:provider/provider.dart';
@@ -52,9 +53,6 @@ class TaskTile extends StatelessWidget {
         return Colors.greenAccent;
     }
   }
-
-  static final _timeFormat24 = DateFormat.Hm();
-  static final _timeFormat12 = DateFormat.jm();
 
   bool _isTaskFeedbackEnabled(ThemeService service) {
     try {
@@ -357,13 +355,11 @@ class TaskTile extends StatelessWidget {
                                         _buildChip(
                                           context,
                                           icon: Icons.access_time_rounded,
-                                          label: themeService.use24HourFormat
-                                              ? _timeFormat24.format(
-                                                  task.dueDate!,
-                                                )
-                                              : _timeFormat12.format(
-                                                  task.dueDate!,
-                                                ),
+                                          label: AppDateFormats.time(
+                                            context,
+                                            use24h:
+                                                themeService.use24HourFormat,
+                                          ).format(task.dueDate!),
                                           color:
                                               (!task.isCompleted &&
                                                   task.dueDate!.isBefore(
@@ -515,7 +511,10 @@ class TaskTile extends StatelessWidget {
                                   ),
                                   const SizedBox(width: 4),
                                   Text(
-                                    task.priority.name.toUpperCase(),
+                                    AppDateFormats.priority(
+                                      l10n,
+                                      task.priority,
+                                    ).toUpperCase(),
                                     style: GoogleFonts.outfit(
                                       fontSize: 9,
                                       fontWeight: FontWeight.bold,
@@ -866,9 +865,6 @@ class _MaskedPrivateTaskTile extends StatelessWidget {
   final VoidCallback? onLongPress;
   final bool isSelectionMode;
 
-  static final _timeFormat24 = DateFormat.Hm();
-  static final _timeFormat12 = DateFormat.jm();
-
   const _MaskedPrivateTaskTile({
     required this.title,
     required this.categories,
@@ -1022,9 +1018,10 @@ class _MaskedPrivateTaskTile extends StatelessWidget {
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
-                                  themeService.use24HourFormat
-                                      ? _timeFormat24.format(dueDate!)
-                                      : _timeFormat12.format(dueDate!),
+                                  AppDateFormats.time(
+                                    context,
+                                    use24h: themeService.use24HourFormat,
+                                  ).format(dueDate!),
                                   style: GoogleFonts.outfit(
                                     color: theme.colorScheme.primary,
                                     fontSize: 11,

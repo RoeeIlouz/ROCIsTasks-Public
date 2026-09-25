@@ -539,5 +539,6 @@
   "addToHomeScreen": "Lägg till på hemskärmen",
   "fullCalendarWidgetTitle": "Hel kalender",
   "fullCalendarWidgetSubtitle": "Hela månaden i en blick med färgade händelser, filter och snabbtillägg.",
-  "widgetPinUnsupported": "Din startskärm kan inte lägga till widgetar från appar. Håll ned hemskärmen, tryck på Widgetar och leta upp ROCI's Tasks."
+  "widgetPinUnsupported": "Din startskärm kan inte lägga till widgetar från appar. Håll ned hemskärmen, tryck på Widgetar och leta upp ROCI's Tasks.",
+  "yesterday": "Igår"
 }
