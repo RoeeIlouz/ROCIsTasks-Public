@@ -2,6 +2,28 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## Open Beta 0.3.0: Widget Fixes on Device, Paywall, Review Prompt, i18n - v0.3.0+114 - 2026-09-25
+
+#### Problems (found by testing on an Android 15 emulator)
+* Widget checkboxes did nothing: a second background Flutter engine raced the running app on the same Hive box.
+* Android paywall was RevenueCat's generic fallback (no RevenueCat paywall exists), so the Play free trial never showed.
+* Widget picker previews were blank (colors applied at runtime); launchers ignore @font in widgets and the 4 Outfit files were one variable font; the free-tier overlay clipped on 1-row widgets.
+* Quick add ignored times without "at" (its own hint "tomorrow 3pm"); Hebrew showed English priorities and "PM4:30" (static DateFormat built with the first locale); header title truncated.
+
+#### Solutions Applied
+* Checkboxes complete via the running app's TaskProvider, then `finishWidgetAction` returns home (lists + Up Next).
+* `showPaywall` opens the in-app `PaywallScreen` on every platform with a feature chip; Play trial read from `defaultOption.freePhase`.
+* "Add to home screen" (requestPinAppWidget) for all 8 widgets; XML default tints; system font families; one-row opaque overlay.
+* In-app review prompt (`in_app_review`, 10 completions / 3 days / 90-day cooldown). `AppDateFormats` (per-locale cache, localized priorities). NLP: "at" optional for unambiguous times.
+* Play Store deck (8 slides + feature graphic) in `tools/store-screenshots`, from real captures; `SCREENSHOT_PREMIUM` compile-time flag for captures.
+
+#### Known follow-ups
+* Widgets don't recolor instantly when the system switches light/dark (next refresh or app open fixes); use RemoteViews day/night colors (API 31).
+* Widget times are 24h regardless of the 12h setting.
+
+#### Deployment
+* `flutter analyze` 0 issues; 392/392 tests. Shorebird release + Play open testing (beta) `0.3.0+114`; web deployed.
+
 ## Server-Side Premium & Locked Billing Fields - 2026-09-25 (Patch 2 on 0.2.23+113)
 
 #### Problems
