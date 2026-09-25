@@ -81,30 +81,30 @@ For core feature modules like `tasks`, development is strictly separated into th
 
 The application leverages a hybrid **Offline-First Caching** model:
 - **Write Path**: Task creation, updates, and completions are committed instantly to the local **Hive** box, ensuring zero UI latency. The update is then asynchronously synchronized to **Firebase Firestore**.
-- **Read Path**: The app loads initially from Hive cache, showing task lists instantly. It then listens to Firestore streams to pull down external changes and resolve conflicts.
+- **Read Path**: The app loads initially from Hive cache, showing task lists instantly. It then listens to Firestore streams to pull down external changes.
+- **Conflicts**: last write wins on `Task.modifiedAt`; permanent deletes are `isPurged` tombstones so every device learns about them ([ADR-001](architecture/adr-001-last-write-wins-sync.md)).
 - **Offline Resilience**: When internet access is lost, transactions are held locally. Upon reconnection, the sync manager pushes local changes back to the cloud.
 
 ---
 
-## 📱 Interactive Widget & Background Engine
+## 📱 Home Screen Widgets
 
-The Android home screen widget integration utilizes a hybrid Kotlin-Dart bridge to guarantee zero lag:
+Eight native **RemoteViews** widgets (Kotlin) render data that Dart writes to the `home_widget` SharedPreferences:
 
-1. **Native Kotlin Interactivity** (`FullCalendarWidgetProvider`):
-   - Actions like calendar month navigation (`Prev`/`Next`/`Today`) are handled natively on the Android side in Kotlin. 
-   - Kotlin modifies and saves the navigation offset state in the shared widget SharedPreferences *before* invoking the Dart isolate. This prevents double-incrementing state and rendering delay.
-
-2. **Background Dart Isolate** (`BackgroundHandler`):
-   - Interactivity callbacks spawn a background Dart isolate.
-   - The isolate initializes a lightweight database instance (Hive) to read task data, processes changes (e.g. marking a task complete), updates Firestore, and triggers a widget redrawing command.
-   - **Isolate Protection**: To prevent background execution freezes, platform channel queries (such as timezone queries via `FlutterTimezone`) are strictly throttled with a 2-second timeout.
+1. **Shared design system** (`WidgetStyle.kt`): the app's palette (synced by `MyApp._syncWidgetTheme`), tinted white drawables, system font families, RTL, localized priorities and the shared free-tier overlay. Layout XML carries default tints so launcher previews render ([ADR-004](architecture/adr-004-widget-design-system.md)).
+2. **Native navigation state**: month/day navigation is handled in Kotlin, which saves the offset *before* notifying Dart (prevents double increments).
+3. **Task completion runs in the app**: checkbox taps open `MainActivity`, the main engine completes the task through `TaskProvider`, then the app returns to the home screen. A second background engine must not write to Hive while the app is running ([ADR-003](architecture/adr-003-widget-actions-in-running-app.md)).
+4. **Background isolate** (`BackgroundHandler`): read-only syncs (navigation, filters) run in a background Dart isolate; platform channel calls there use a 2-second timeout.
+5. **Time formatting** follows the app's 12h/24h setting (`use_24h_format`); widgets redraw when app colors or platform brightness change.
 
 ---
 
-## 💰 Monetization & RevenueCat Configuration
+## 💰 Monetization
 
-ROCIs Tasks employs a hybrid freemium model managed securely through **RevenueCat** (`purchases_flutter`):
-- **Free Limits**: Free users are limited to 5 categories, 1 basic widget type, no subtask lists, and no task attachments.
-- **Entitlements**: Entitlements are validated reactively via `SubscriptionService`.
-- **Lock System**: The app uses visual `PRO` badges and locks in settings and creation sheets. Attempting to access premium features triggers the sliding RevenueCat paywall interface dynamically.
-- **Birthday Promo Override**: The system contains a built-in time-based promo override (June 16 to July 16) that unlocks full Pro features automatically without querying subscription stores during the promotional month.
+- **Free limits**: 5 categories, 1 active home screen widget, no subtasks, recurrence, attachments or private mode.
+- **Purchases**: Google Play subscriptions through **RevenueCat** on Android (yearly has a 7-day free trial); **Lemon Squeezy** checkout on web (monthly, yearly, lifetime).
+- **Paywall**: every platform shows the app's own `PaywallScreen`, which names the feature that opened it and logs `paywall_shown` / `paywall_result` by source ([ADR-005](architecture/adr-005-in-app-paywall.md)).
+- **Entitlements are server-side**: Cloud Functions (`lemonSqueezyWebhook`, `revenueCatWebhook`, `syncPremium`) compute `users/{uid}.is_premium`; Firestore rules forbid clients from writing billing fields ([ADR-002](architecture/adr-002-server-authoritative-premium.md)).
+- **Birthday promo override**: a time-based promo (June 16 to July 16) unlocks Pro without querying the stores.
+- **Store assets**: localized screenshots and listings are generated and uploaded by `tools/store-screenshots` ([ADR-006](architecture/adr-006-store-asset-pipeline.md)).
+
