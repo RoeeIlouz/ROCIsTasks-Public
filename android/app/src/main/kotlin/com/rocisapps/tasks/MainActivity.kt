@@ -66,6 +66,17 @@ class MainActivity : FlutterFragmentActivity() {
                     moveTaskToBack(true)
                 }
                 result.success(null)
+            } else if (call.method == "pinWidget") {
+                // Asks the launcher to add one of our widgets ("Add to home screen" sheet).
+                val provider = call.argument<String>("provider") ?: ""
+                val manager = android.appwidget.AppWidgetManager.getInstance(this)
+                val known = WidgetLimitHelper.ALL_PROVIDERS.any { it.simpleName == provider }
+                if (known && manager.isRequestPinAppWidgetSupported) {
+                    val component = android.content.ComponentName(this, "com.rocisapps.tasks.$provider")
+                    result.success(manager.requestPinAppWidget(component, null, null))
+                } else {
+                    result.success(false)
+                }
             } else {
                 result.notImplemented()
             }

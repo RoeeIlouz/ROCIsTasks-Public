@@ -2928,6 +2928,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Plans couldn\'t load. Check your connection and try again.'**
   String get plansUnavailable;
+
+  /// No description provided for @addToHomeScreen.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to home screen'**
+  String get addToHomeScreen;
+
+  /// No description provided for @fullCalendarWidgetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Full Calendar'**
+  String get fullCalendarWidgetTitle;
+
+  /// No description provided for @fullCalendarWidgetSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your month at a glance with colored event pills, filters and quick add.'**
+  String get fullCalendarWidgetSubtitle;
+
+  /// No description provided for @widgetPinUnsupported.
+  ///
+  /// In en, this message translates to:
+  /// **'Your launcher can\'t add widgets from apps. Long-press your home screen, tap Widgets and find ROCI\'s Tasks.'**
+  String get widgetPinUnsupported;
 }
 
 class _AppLocalizationsDelegate

@@ -1505,4 +1505,18 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get plansUnavailable =>
       'प्लान लोड नहीं हो सके। अपना कनेक्शन जाँचें और फिर से कोशिश करें।';
+
+  @override
+  String get addToHomeScreen => 'होम स्क्रीन पर जोड़ें';
+
+  @override
+  String get fullCalendarWidgetTitle => 'पूरा कैलेंडर';
+
+  @override
+  String get fullCalendarWidgetSubtitle =>
+      'रंगीन इवेंट, फ़िल्टर और तुरंत जोड़ने के साथ पूरा महीना एक नज़र में।';
+
+  @override
+  String get widgetPinUnsupported =>
+      'आपका लॉन्चर ऐप से विजेट नहीं जोड़ सकता। होम स्क्रीन को देर तक दबाएँ, विजेट चुनें और ROCI\'s Tasks खोजें।';
 }

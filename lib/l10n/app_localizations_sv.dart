@@ -1510,4 +1510,18 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get plansUnavailable =>
       'Det gick inte att läsa in planerna. Kontrollera anslutningen och försök igen.';
+
+  @override
+  String get addToHomeScreen => 'Lägg till på hemskärmen';
+
+  @override
+  String get fullCalendarWidgetTitle => 'Hel kalender';
+
+  @override
+  String get fullCalendarWidgetSubtitle =>
+      'Hela månaden i en blick med färgade händelser, filter och snabbtillägg.';
+
+  @override
+  String get widgetPinUnsupported =>
+      'Din startskärm kan inte lägga till widgetar från appar. Håll ned hemskärmen, tryck på Widgetar och leta upp ROCI\'s Tasks.';
 }

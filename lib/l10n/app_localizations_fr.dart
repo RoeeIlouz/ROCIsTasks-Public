@@ -1522,4 +1522,18 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get plansUnavailable =>
       'Impossible de charger les offres. Vérifiez votre connexion et réessayez.';
+
+  @override
+  String get addToHomeScreen => 'Ajouter à l\'écran d\'accueil';
+
+  @override
+  String get fullCalendarWidgetTitle => 'Calendrier complet';
+
+  @override
+  String get fullCalendarWidgetSubtitle =>
+      'Votre mois en un coup d\'œil avec événements colorés, filtres et ajout rapide.';
+
+  @override
+  String get widgetPinUnsupported =>
+      'Votre lanceur ne permet pas d\'ajouter des widgets depuis une app. Appuyez longuement sur l\'écran d\'accueil, touchez Widgets et cherchez ROCI\'s Tasks.';
 }

@@ -141,7 +141,7 @@ object WidgetStyle {
         val lang = WidgetLocaleHelper.getNormalizedLanguage(locale)
         views.setViewVisibility(R.id.widget_pro_overlay, View.VISIBLE)
         views.setInt(R.id.widget_pro_overlay_scrim, "setColorFilter", palette.surface)
-        views.setInt(R.id.widget_pro_overlay_scrim, "setImageAlpha", 0xF2)
+        views.setInt(R.id.widget_pro_overlay_scrim, "setImageAlpha", 0xFF)
         views.setInt(R.id.widget_pro_overlay_icon, "setColorFilter", palette.primary)
         views.setTextViewText(R.id.widget_pro_overlay_title, proTitle(lang))
         views.setTextColor(R.id.widget_pro_overlay_title, palette.onSurface)

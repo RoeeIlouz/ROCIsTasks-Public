@@ -1523,4 +1523,18 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get plansUnavailable =>
       'Tarife konnten nicht geladen werden. Prüfe deine Verbindung und versuche es erneut.';
+
+  @override
+  String get addToHomeScreen => 'Zum Startbildschirm hinzufügen';
+
+  @override
+  String get fullCalendarWidgetTitle => 'Ganzer Kalender';
+
+  @override
+  String get fullCalendarWidgetSubtitle =>
+      'Dein Monat auf einen Blick mit farbigen Terminen, Filtern und Schnellerfassung.';
+
+  @override
+  String get widgetPinUnsupported =>
+      'Dein Launcher kann keine Widgets aus Apps hinzufügen. Halte den Startbildschirm gedrückt, tippe auf Widgets und suche ROCI\'s Tasks.';
 }

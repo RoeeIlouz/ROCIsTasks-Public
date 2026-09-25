@@ -535,5 +535,9 @@
   "freeTrialBadge": "{days} Tage gratis",
   "startFreeTrial": "{days} Tage gratis testen",
   "trialThenPrice": "Danach {price} pro Jahr. Kündige vor Ende des Testzeitraums und dir wird nichts berechnet.",
-  "plansUnavailable": "Tarife konnten nicht geladen werden. Prüfe deine Verbindung und versuche es erneut."
+  "plansUnavailable": "Tarife konnten nicht geladen werden. Prüfe deine Verbindung und versuche es erneut.",
+  "addToHomeScreen": "Zum Startbildschirm hinzufügen",
+  "fullCalendarWidgetTitle": "Ganzer Kalender",
+  "fullCalendarWidgetSubtitle": "Dein Monat auf einen Blick mit farbigen Terminen, Filtern und Schnellerfassung.",
+  "widgetPinUnsupported": "Dein Launcher kann keine Widgets aus Apps hinzufügen. Halte den Startbildschirm gedrückt, tippe auf Widgets und suche ROCI's Tasks."
 }

@@ -11,7 +11,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="fitXY"
-        android:src="@drawable/widget_item_fill" />
+        android:src="@drawable/widget_item_fill"
+            android:tint="#0D1B1B21" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -29,7 +30,8 @@
             android:layout_width="3dp"
             android:layout_height="26dp"
             android:scaleType="fitXY"
-            android:src="@drawable/widget_accent_bar" />
+            android:src="@drawable/widget_accent_bar"
+            android:tint="#FF6366F1" />
 
         <ImageView
             android:id="@+id/widget_month_item_check"
@@ -41,7 +43,8 @@
             android:paddingEnd="6dp"
             android:paddingTop="7dp"
             android:paddingBottom="7dp"
-            android:src="@drawable/ic_widget_check_off" />
+            android:src="@drawable/ic_widget_check_off"
+            android:tint="#B31B1B21" />
 
         <ImageView
             android:id="@+id/widget_month_item_event_icon"
@@ -52,6 +55,7 @@
             android:paddingTop="9dp"
             android:paddingBottom="9dp"
             android:src="@drawable/ic_widget_event"
+            android:tint="#FF6366F1"
             android:visibility="gone" />
 
         <LinearLayout
@@ -60,12 +64,12 @@
             android:layout_weight="1"
             android:orientation="vertical">
 
-            <TextView
+            <TextView android:textColor="#FF1B1B21"
                 android:id="@+id/widget_month_item_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
-                android:fontFamily="@font/outfit_semibold"
+                android:fontFamily="sans-serif-medium"
                 android:includeFontPadding="false"
                 android:maxLines="1"
                 android:text="Task or event title"
@@ -79,24 +83,24 @@
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
-                <TextView
+                <TextView android:textColor="#FF1B1B21"
                     android:id="@+id/widget_month_item_time"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="6dp"
-                    android:fontFamily="@font/outfit_semibold"
+                    android:fontFamily="sans-serif-medium"
                     android:includeFontPadding="false"
                     android:maxLines="1"
                     android:text="09:00"
                     android:textSize="12sp" />
 
-                <TextView
+                <TextView android:textColor="#FF1B1B21"
                     android:id="@+id/widget_month_item_meta"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:ellipsize="end"
-                    android:fontFamily="@font/outfit_regular"
+                    android:fontFamily="sans-serif"
                     android:includeFontPadding="false"
                     android:maxLines="1"
                     android:text="Work"

@@ -1498,4 +1498,18 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get plansUnavailable =>
       'Plans couldn\'t load. Check your connection and try again.';
+
+  @override
+  String get addToHomeScreen => 'Add to home screen';
+
+  @override
+  String get fullCalendarWidgetTitle => 'Full Calendar';
+
+  @override
+  String get fullCalendarWidgetSubtitle =>
+      'Your month at a glance with colored event pills, filters and quick add.';
+
+  @override
+  String get widgetPinUnsupported =>
+      'Your launcher can\'t add widgets from apps. Long-press your home screen, tap Widgets and find ROCI\'s Tasks.';
 }

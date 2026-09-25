@@ -11,14 +11,16 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="fitXY"
-        android:src="@drawable/widget_card_fill" />
+        android:src="@drawable/widget_card_fill"
+            android:tint="#FFF5F2FA" />
 
     <ImageView
         android:id="@+id/widget_quick_card_stroke"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="fitXY"
-        android:src="@drawable/widget_card_stroke" />
+        android:src="@drawable/widget_card_stroke"
+            android:tint="#1F6366F1" />
 
     <LinearLayout
         android:id="@+id/widget_quick_action_main"
@@ -57,24 +59,25 @@
                     android:gravity="center"
                     android:orientation="vertical">
 
-                    <TextView
+                    <TextView android:textColor="#FF1B1B21"
                         android:id="@+id/widget_quick_stat_number"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/outfit_bold"
+                        android:fontFamily="sans-serif"
+            android:textStyle="bold"
                         android:includeFontPadding="false"
                         android:letterSpacing="-0.03"
                         android:maxLines="1"
                         android:text="3"
                         android:textSize="20sp" />
 
-                    <TextView
+                    <TextView android:textColor="#FF1B1B21"
                         android:id="@+id/widget_quick_stat_label"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="1dp"
                         android:ellipsize="end"
-                        android:fontFamily="@font/outfit_medium"
+                        android:fontFamily="sans-serif-medium"
                         android:includeFontPadding="false"
                         android:maxLines="1"
                         android:maxWidth="46dp"
@@ -83,13 +86,13 @@
                 </LinearLayout>
             </FrameLayout>
 
-            <TextView
+            <TextView android:textColor="#FF1B1B21"
                 android:id="@+id/widget_quick_done_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="3dp"
                 android:ellipsize="end"
-                android:fontFamily="@font/outfit_medium"
+                android:fontFamily="sans-serif-medium"
                 android:includeFontPadding="false"
                 android:maxLines="1"
                 android:maxWidth="72dp"
@@ -117,7 +120,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="fitXY"
-                    android:src="@drawable/widget_item_fill" />
+                    android:src="@drawable/widget_item_fill"
+            android:tint="#0D1B1B21" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -131,16 +135,17 @@
                         android:id="@+id/widget_quick_btn_add_icon"
                         android:layout_width="22dp"
                         android:layout_height="22dp"
-                        android:src="@drawable/ic_add" />
+                        android:src="@drawable/ic_add"
+            android:tint="#FF1B1B21" />
 
-                    <TextView
+                    <TextView android:textColor="#FF1B1B21"
                         android:id="@+id/widget_quick_btn_add_text"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:layout_weight="1"
                         android:ellipsize="end"
-                        android:fontFamily="@font/outfit_semibold"
+                        android:fontFamily="sans-serif-medium"
                         android:includeFontPadding="false"
                         android:maxLines="1"
                         android:text="New Task"
@@ -162,7 +167,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="fitXY"
-                    android:src="@drawable/widget_item_fill" />
+                    android:src="@drawable/widget_item_fill"
+            android:tint="#0D1B1B21" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -177,16 +183,17 @@
                         android:layout_width="22dp"
                         android:layout_height="22dp"
                         android:padding="1dp"
-                        android:src="@drawable/ic_today_24" />
+                        android:src="@drawable/ic_today_24"
+            android:tint="#FF1B1B21" />
 
-                    <TextView
+                    <TextView android:textColor="#FF1B1B21"
                         android:id="@+id/widget_quick_btn_cal_text"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:layout_weight="1"
                         android:ellipsize="end"
-                        android:fontFamily="@font/outfit_semibold"
+                        android:fontFamily="sans-serif-medium"
                         android:includeFontPadding="false"
                         android:maxLines="1"
                         android:text="Calendar"

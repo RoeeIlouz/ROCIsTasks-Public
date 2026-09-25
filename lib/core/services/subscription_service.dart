@@ -64,7 +64,11 @@ class SubscriptionService extends ChangeNotifier {
   bool _firestorePremium = false;
   bool _revenueCatPremium = false;
 
-  bool get isPremium => _isPremium;
+  /// Store-screenshot builds only (`--dart-define=SCREENSHOT_PREMIUM=true`);
+  /// a compile-time constant, so release builds can't enable it.
+  static const _screenshotPremium = bool.fromEnvironment('SCREENSHOT_PREMIUM');
+
+  bool get isPremium => _isPremium || _screenshotPremium;
   bool get isInitialized => _isInitialized;
   String? get configurationError => _configurationError;
 
@@ -241,7 +245,8 @@ class SubscriptionService extends ChangeNotifier {
   }
 
   void _updatePremiumState() {
-    final newPremium = _revenueCatPremium || _firestorePremium;
+    final newPremium =
+        _screenshotPremium || _revenueCatPremium || _firestorePremium;
     if (_isPremium != newPremium) {
       _isPremium = newPremium;
       notifyListeners();

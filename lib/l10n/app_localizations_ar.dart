@@ -1489,4 +1489,18 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get plansUnavailable =>
       'تعذّر تحميل الخطط. تحقّق من اتصالك وحاول مرة أخرى.';
+
+  @override
+  String get addToHomeScreen => 'إضافة إلى الشاشة الرئيسية';
+
+  @override
+  String get fullCalendarWidgetTitle => 'التقويم الكامل';
+
+  @override
+  String get fullCalendarWidgetSubtitle =>
+      'شهرك بنظرة واحدة مع أحداث ملونة وفلاتر وإضافة سريعة.';
+
+  @override
+  String get widgetPinUnsupported =>
+      'لا تدعم الشاشة الرئيسية إضافة الأدوات من التطبيقات. اضغط مطولاً على الشاشة الرئيسية، ثم الأدوات وابحث عن ROCI\'s Tasks.';
 }

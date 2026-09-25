@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -1549,8 +1550,39 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
     );
   }
 
+  static const _widgetChannel = MethodChannel('com.rocisapps.tasks/widget');
+
+  /// Asks the launcher to add [provider] to the home screen.
+  Future<void> _pinWidget(String provider, AppLocalizations l10n) async {
+    bool requested = false;
+    try {
+      requested =
+          await _widgetChannel.invokeMethod<bool>('pinWidget', {
+            'provider': provider,
+          }) ??
+          false;
+    } catch (_) {}
+    if (!requested && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.widgetPinUnsupported),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
+
   Widget _buildWidgetSuiteSection(ThemeData theme, AppLocalizations l10n) {
     final widgets = [
+      {
+        'title': l10n.fullCalendarWidgetTitle,
+        'subtitle': l10n.fullCalendarWidgetSubtitle,
+        'icon': Icons.calendar_month_rounded,
+        'tag': '4x4',
+        'color': const Color(0xFF8B5CF6),
+        'previewIndex': 0,
+        'provider': 'FullCalendarWidgetProvider',
+      },
       {
         'title': l10n.todayAgendaWidgetTitle,
         'subtitle': l10n.todayAgendaWidgetSubtitle,
@@ -1558,6 +1590,7 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
         'tag': '4x3 / 4x2',
         'color': const Color(0xFF6366F1),
         'previewIndex': 1,
+        'provider': 'TodayAgendaWidgetProvider',
       },
       {
         'title': l10n.monthAgendaWidgetTitle,
@@ -1566,6 +1599,7 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
         'tag': '4x4 / 4x3',
         'color': const Color(0xFF10B981),
         'previewIndex': 2,
+        'provider': 'MonthAgendaWidgetProvider',
       },
       {
         'title': l10n.timelineAgendaWidgetTitle,
@@ -1574,6 +1608,7 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
         'tag': '4x3 / 4x4',
         'color': const Color(0xFFF59E0B),
         'previewIndex': 3,
+        'provider': 'TimelineAgendaWidgetProvider',
       },
       {
         'title': l10n.quickActionWidgetTitle,
@@ -1582,6 +1617,7 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
         'tag': '2x2',
         'color': const Color(0xFFEF4444),
         'previewIndex': 4,
+        'provider': 'QuickActionWidgetProvider',
       },
       {
         'title': l10n.upNextWidgetTitle,
@@ -1590,6 +1626,7 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
         'tag': '3x1 / 4x1',
         'color': const Color(0xFF06B6D4),
         'previewIndex': 5,
+        'provider': 'UpNextWidgetProvider',
       },
       {
         'title': l10n.tasksWidgetTitle,
@@ -1597,23 +1634,35 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
         'icon': Icons.checklist_rounded,
         'tag': '4x3',
         'color': const Color(0xFF0284C7),
-        'previewIndex': 0,
+        'previewIndex': null,
+        'provider': 'TaskWidgetProvider',
+      },
+      {
+        'title': l10n.kanbanWidget,
+        'subtitle': l10n.kanbanWidgetDesc,
+        'icon': Icons.view_kanban_rounded,
+        'tag': '4x3',
+        'color': const Color(0xFF14B8A6),
+        'previewIndex': null,
+        'provider': 'KanbanWidgetProvider',
       },
     ];
 
     return Column(
       children: widgets.map((w) {
         final iconColor = w['color'] as Color;
-        final previewIndex = w['previewIndex'] as int;
+        final previewIndex = w['previewIndex'] as int?;
         return Padding(
           padding: const EdgeInsets.only(bottom: 12),
           child: InkWell(
-            onTap: () {
-              HapticFeedback.selectionClick();
-              setState(() {
-                _selectedPreviewIndex = previewIndex;
-              });
-            },
+            onTap: previewIndex == null
+                ? null
+                : () {
+                    HapticFeedback.selectionClick();
+                    setState(() {
+                      _selectedPreviewIndex = previewIndex;
+                    });
+                  },
             borderRadius: BorderRadius.circular(16),
             child: GlassContainer(
               padding: const EdgeInsets.all(14),
@@ -1678,6 +1727,27 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
                             ),
                           ),
                         ),
+                        if (!kIsWeb) ...[
+                          const SizedBox(height: 8),
+                          Align(
+                            alignment: AlignmentDirectional.centerStart,
+                            child: TextButton.icon(
+                              onPressed: () =>
+                                  _pinWidget(w['provider'] as String, l10n),
+                              icon: const Icon(
+                                Icons.add_to_home_screen_rounded,
+                                size: 18,
+                              ),
+                              label: Text(l10n.addToHomeScreen),
+                              style: TextButton.styleFrom(
+                                visualDensity: VisualDensity.compact,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ],
                     ),
                   ),
