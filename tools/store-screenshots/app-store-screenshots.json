@@ -1,0 +1,328 @@
+{
+  "schemaVersion": 2,
+  "appName": "ROCI's Tasks",
+  "themeId": "rocis-onyx",
+  "connectedCanvas": false,
+  "locales": [
+    "en"
+  ],
+  "locale": "en",
+  "device": "android",
+  "orientation": "portrait",
+  "appIcon": "/app-icon.png",
+  "slidesByDevice": {
+    "iphone": [
+      {
+        "id": "s_mugzrj8j_0",
+        "layout": "hero",
+        "label": {
+          "en": "MEET YOUR APP"
+        },
+        "headline": {
+          "en": "Sell one\nidea per slide."
+        },
+        "screenshot": ""
+      },
+      {
+        "id": "s_mugzrj8j_1",
+        "layout": "device-bottom",
+        "label": {
+          "en": "FEATURE 01"
+        },
+        "headline": {
+          "en": "Your headline\nlives here."
+        },
+        "screenshot": ""
+      },
+      {
+        "id": "s_mugzrj8j_2",
+        "layout": "two-devices",
+        "label": {
+          "en": "FEATURE 02"
+        },
+        "headline": {
+          "en": "Show two\nscreens at once."
+        },
+        "screenshot": "",
+        "screenshotSecondary": ""
+      },
+      {
+        "id": "s_mugzrj8j_3",
+        "layout": "device-top",
+        "label": {
+          "en": "FEATURE 03"
+        },
+        "headline": {
+          "en": "Flip the contrast\nfor visual rhythm."
+        },
+        "screenshot": "",
+        "inverted": true
+      },
+      {
+        "id": "s_mugzrj8j_4",
+        "layout": "no-device",
+        "label": {
+          "en": "MORE"
+        },
+        "headline": {
+          "en": "And so\nmuch more."
+        },
+        "screenshot": ""
+      }
+    ],
+    "android": [
+      {
+        "id": "rocis_1",
+        "layout": "hero",
+        "label": {
+          "en": "HOME SCREEN WIDGETS"
+        },
+        "headline": {
+          "en": "Your day,\nat a glance."
+        },
+        "screenshot": "/screenshots/android/phone/{locale}/01.png"
+      },
+      {
+        "id": "rocis_2",
+        "layout": "device-bottom",
+        "label": {
+          "en": "FULL CALENDAR"
+        },
+        "headline": {
+          "en": "Your whole month\nin one widget."
+        },
+        "screenshot": "/screenshots/android/phone/{locale}/02.png",
+        "inverted": true
+      },
+      {
+        "id": "rocis_3",
+        "layout": "device-top",
+        "label": {
+          "en": "LIGHT OR DARK"
+        },
+        "headline": {
+          "en": "Beautiful in\nevery theme."
+        },
+        "screenshot": "/screenshots/android/phone/{locale}/03.png",
+        "inverted": true,
+        "transforms": {
+          "device": {
+            "x": 260,
+            "y": 90,
+            "width": 560,
+            "height": 1218,
+            "rotation": 0,
+            "zIndex": 3
+          },
+          "caption": {
+            "x": 90,
+            "y": 1390,
+            "width": 900,
+            "height": 430,
+            "rotation": 0,
+            "zIndex": 4
+          }
+        }
+      },
+      {
+        "id": "rocis_4",
+        "layout": "device-bottom",
+        "label": {
+          "en": "QUICK ADD"
+        },
+        "headline": {
+          "en": "Type it.\nIt’s scheduled."
+        },
+        "screenshot": "/screenshots/android/phone/{locale}/04.png"
+      },
+      {
+        "id": "rocis_5",
+        "layout": "two-devices",
+        "label": {
+          "en": "CALENDAR + BOARD"
+        },
+        "headline": {
+          "en": "Plan it\nyour way."
+        },
+        "screenshot": "/screenshots/android/phone/{locale}/05.png",
+        "screenshotSecondary": "/screenshots/android/phone/{locale}/06.png",
+        "inverted": true,
+        "transforms": {
+          "deviceSecondary": {
+            "x": -40,
+            "y": 600,
+            "width": 540,
+            "height": 1175,
+            "rotation": -6,
+            "zIndex": 2
+          },
+          "device": {
+            "x": 500,
+            "y": 700,
+            "width": 560,
+            "height": 1218,
+            "rotation": 0,
+            "zIndex": 3
+          },
+          "caption": {
+            "x": 90,
+            "y": 110,
+            "width": 900,
+            "height": 420,
+            "rotation": 0,
+            "zIndex": 4
+          }
+        }
+      },
+      {
+        "id": "rocis_6",
+        "layout": "device-top",
+        "label": {
+          "en": "8 LANGUAGES · RTL"
+        },
+        "headline": {
+          "en": "Speaks your\nlanguage."
+        },
+        "screenshot": "/screenshots/android/phone/{locale}/07.png",
+        "transforms": {
+          "device": {
+            "x": 260,
+            "y": 90,
+            "width": 560,
+            "height": 1218,
+            "rotation": 0,
+            "zIndex": 3
+          },
+          "caption": {
+            "x": 90,
+            "y": 1390,
+            "width": 900,
+            "height": 430,
+            "rotation": 0,
+            "zIndex": 4
+          }
+        }
+      },
+      {
+        "id": "rocis_7",
+        "layout": "hero",
+        "label": {
+          "en": "DAY AGENDA"
+        },
+        "headline": {
+          "en": "Check it off\nfrom home."
+        },
+        "screenshot": "/screenshots/android/phone/{locale}/09.png",
+        "inverted": true
+      },
+      {
+        "id": "rocis_8",
+        "layout": "no-device",
+        "label": {
+          "en": "AND MORE"
+        },
+        "headline": {
+          "en": "Recurring tasks.\nReminders.\nCloud sync."
+        },
+        "screenshot": ""
+      }
+    ],
+    "ipad": [
+      {
+        "id": "s_mugzrj8j_a",
+        "layout": "hero",
+        "label": {
+          "en": "MEET YOUR APP"
+        },
+        "headline": {
+          "en": "Made for\nthe big screen."
+        },
+        "screenshot": ""
+      },
+      {
+        "id": "s_mugzrj8j_b",
+        "layout": "device-bottom",
+        "label": {
+          "en": "FEATURE 01"
+        },
+        "headline": {
+          "en": "Built for\nfocus."
+        },
+        "screenshot": ""
+      },
+      {
+        "id": "s_mugzrj8j_c",
+        "layout": "device-top",
+        "label": {
+          "en": "FEATURE 02"
+        },
+        "headline": {
+          "en": "Always within reach."
+        },
+        "screenshot": "",
+        "inverted": true
+      }
+    ],
+    "android-7": [
+      {
+        "id": "s_mugzrj8j_d",
+        "layout": "hero",
+        "label": {
+          "en": "MEET YOUR APP"
+        },
+        "headline": {
+          "en": "Pocket-sized\npower."
+        },
+        "screenshot": ""
+      },
+      {
+        "id": "s_mugzrj8j_e",
+        "layout": "split-landscape",
+        "label": {
+          "en": "FEATURE 01"
+        },
+        "headline": {
+          "en": "Wide canvas,\nbigger ideas."
+        },
+        "screenshot": ""
+      }
+    ],
+    "android-10": [
+      {
+        "id": "s_mugzrj8j_f",
+        "layout": "hero",
+        "label": {
+          "en": "MEET YOUR APP"
+        },
+        "headline": {
+          "en": "Made for\nthe big screen."
+        },
+        "screenshot": ""
+      },
+      {
+        "id": "s_mugzrj8j_g",
+        "layout": "split-landscape",
+        "label": {
+          "en": "FEATURE 01"
+        },
+        "headline": {
+          "en": "Wide canvas,\nbigger ideas."
+        },
+        "screenshot": ""
+      }
+    ],
+    "feature-graphic": [
+      {
+        "id": "rocis_fg",
+        "layout": "feature-graphic",
+        "label": {},
+        "headline": {
+          "en": "Tasks & calendar, right on your home screen."
+        },
+        "screenshot": "",
+        "inverted": true
+      }
+    ]
+  },
+  "crossScreenMockupsByDevice": {}
+}
