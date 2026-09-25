@@ -418,13 +418,18 @@ class _HomeScreenState extends State<HomeScreen> {
                         ).setSearchQuery(value);
                       },
                     )
-                  : Text(
-                      _currentIndex == 0
-                          ? (_isBoardView ? l10n.boardView : l10n.myTasks)
-                          : _currentIndex == 1
-                          ? l10n.calendar
-                          : l10n.settings,
-                      style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
+                  // Scale down instead of truncating when the actions leave
+                  // little room (e.g. "המשימות שלי").
+                  : FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        _currentIndex == 0
+                            ? (_isBoardView ? l10n.boardView : l10n.myTasks)
+                            : _currentIndex == 1
+                            ? l10n.calendar
+                            : l10n.settings,
+                        style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
+                      ),
                     ),
               leading: _currentIndex == 0
                   ? IconButton(

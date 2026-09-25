@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:rocis_tasks/core/utils/app_date_formats.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/features/categories/domain/models/category.dart';
 import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
@@ -389,7 +390,10 @@ class _QuickAddTaskBottomSheetState extends State<QuickAddTaskBottomSheet> {
                         if (_priority != TaskPriority.medium) ...[
                           _buildTokenChip(
                             icon: Icons.flag_rounded,
-                            label: _priority.name.toUpperCase(),
+                            label: AppDateFormats.priority(
+                              l10n,
+                              _priority,
+                            ).toUpperCase(),
                             color: _getPriorityColor(_priority),
                             onClear: () =>
                                 setState(() => _priority = TaskPriority.medium),

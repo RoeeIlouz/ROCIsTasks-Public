@@ -1536,4 +1536,7 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get widgetPinUnsupported =>
       'Votre lanceur ne permet pas d\'ajouter des widgets depuis une app. Appuyez longuement sur l\'écran d\'accueil, touchez Widgets et cherchez ROCI\'s Tasks.';
+
+  @override
+  String get yesterday => 'Hier';
 }

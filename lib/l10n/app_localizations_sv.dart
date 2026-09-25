@@ -1524,4 +1524,7 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get widgetPinUnsupported =>
       'Din startskärm kan inte lägga till widgetar från appar. Håll ned hemskärmen, tryck på Widgetar och leta upp ROCI\'s Tasks.';
+
+  @override
+  String get yesterday => 'Igår';
 }

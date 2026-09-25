@@ -1537,4 +1537,7 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get widgetPinUnsupported =>
       'Dein Launcher kann keine Widgets aus Apps hinzufügen. Halte den Startbildschirm gedrückt, tippe auf Widgets und suche ROCI\'s Tasks.';
+
+  @override
+  String get yesterday => 'Gestern';
 }

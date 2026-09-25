@@ -65,7 +65,7 @@ class TodayAgendaWidgetProvider : HomeWidgetProvider() {
                     cal.add(Calendar.DAY_OF_YEAR, offset)
                 }
 
-                val titleStr = WidgetLocaleHelper.getDateTitle(cal, widgetLocale, true)
+                val titleStr = WidgetLocaleHelper.getDateTitle(cal, widgetLocale, false)
 
                 val subtitleStr = when (offset) {
                     0 -> WidgetLocaleHelper.getTodayText(widgetLocale)

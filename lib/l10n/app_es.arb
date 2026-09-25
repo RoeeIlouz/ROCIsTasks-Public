@@ -538,5 +538,6 @@
   "addToHomeScreen": "Añadir a la pantalla de inicio",
   "fullCalendarWidgetTitle": "Calendario completo",
   "fullCalendarWidgetSubtitle": "Tu mes de un vistazo con eventos de colores, filtros y creación rápida.",
-  "widgetPinUnsupported": "Tu launcher no permite añadir widgets desde apps. Mantén pulsada la pantalla de inicio, toca Widgets y busca ROCI's Tasks."
+  "widgetPinUnsupported": "Tu launcher no permite añadir widgets desde apps. Mantén pulsada la pantalla de inicio, toca Widgets y busca ROCI's Tasks.",
+  "yesterday": "Ayer"
 }

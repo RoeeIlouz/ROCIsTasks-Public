@@ -1519,4 +1519,7 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get widgetPinUnsupported =>
       'आपका लॉन्चर ऐप से विजेट नहीं जोड़ सकता। होम स्क्रीन को देर तक दबाएँ, विजेट चुनें और ROCI\'s Tasks खोजें।';
+
+  @override
+  String get yesterday => 'कल';
 }

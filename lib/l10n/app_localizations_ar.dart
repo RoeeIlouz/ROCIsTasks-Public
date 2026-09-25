@@ -1503,4 +1503,7 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get widgetPinUnsupported =>
       'لا تدعم الشاشة الرئيسية إضافة الأدوات من التطبيقات. اضغط مطولاً على الشاشة الرئيسية، ثم الأدوات وابحث عن ROCI\'s Tasks.';
+
+  @override
+  String get yesterday => 'أمس';
 }
