@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.23+113] - 2026-09-25 (Patch 2)
+
+### Security
+- Pro status is now recorded only by the server (RevenueCat and Lemon Squeezy webhooks); the app asks the server to re-check instead of writing it, and accounts can no longer grant themselves Pro. Web and mobile purchases no longer overwrite each other.
+
 ## [0.2.23+113] - 2026-09-25 (Patch 1)
 
 ### Changed

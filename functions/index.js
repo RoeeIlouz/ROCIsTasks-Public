@@ -54,22 +54,37 @@ async function applyEntitlements(uid, update) {
   });
 }
 
-const RC_ENTITLEMENT = 'ROCIsApps Pro';
+const RC_PROJECT_ID = 'proj562f5a11';
 
-/** Asks RevenueCat whether [uid] (the RevenueCat app user id) has Pro, and records it. */
+/**
+ * Asks RevenueCat (API v2, read-only customers key) whether [uid] (the RevenueCat app
+ * user id) has an active entitlement, and records it. The project's only entitlement
+ * is Pro; set REVENUECAT_ENTITLEMENT_ID (entl...) to require a specific one.
+ */
 async function refreshRevenueCat(uid) {
   const key = process.env.REVENUECAT_SECRET_KEY;
   if (!key) throw new Error('REVENUECAT_SECRET_KEY is not configured.');
   const response = await fetch(
-    `https://api.revenuecat.com/v1/subscribers/${encodeURIComponent(uid)}`,
+    `https://api.revenuecat.com/v2/projects/${RC_PROJECT_ID}/customers/` +
+      `${encodeURIComponent(uid)}/active_entitlements?limit=20`,
     { headers: { Authorization: `Bearer ${key}`, Accept: 'application/json' } },
   );
-  if (!response.ok) throw new Error(`RevenueCat ${response.status} for ${uid}`);
-  const body = await response.json();
-  const entitlement = (body.subscriber && body.subscriber.entitlements || {})[RC_ENTITLEMENT];
-  const expires = entitlement && entitlement.expires_date;
-  const active = !!entitlement && (!expires || new Date(expires).getTime() > Date.now());
-  return applyEntitlements(uid, { rc_premium: active, rc_expires_at: expires || null });
+  let items = [];
+  if (response.status !== 404) { // 404: never used RevenueCat, so no entitlement.
+    if (!response.ok) throw new Error(`RevenueCat ${response.status} for ${uid}`);
+    items = (await response.json()).items || [];
+  }
+  const wanted = process.env.REVENUECAT_ENTITLEMENT_ID;
+  const now = Date.now();
+  const active = items.filter((e) =>
+    (!wanted || e.entitlement_id === wanted) && (e.expires_at == null || e.expires_at > now));
+  const expiresAt = active.some((e) => e.expires_at == null) ? null
+    : active.reduce((max, e) => Math.max(max, e.expires_at), 0) || null;
+  console.log(`RevenueCat entitlement for ${uid}: ${active.length > 0}`);
+  return applyEntitlements(uid, {
+    rc_premium: active.length > 0,
+    rc_expires_at: expiresAt ? new Date(expiresAt).toISOString() : null,
+  });
 }
 
 // The project's default compute service account doesn't exist; run as the App Engine one.
