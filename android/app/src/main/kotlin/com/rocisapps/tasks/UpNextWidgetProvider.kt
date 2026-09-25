@@ -64,8 +64,6 @@ class UpNextWidgetProvider : HomeWidgetProvider() {
                     renderCaughtUp(context, views, palette, widgetLocale)
                 } else {
                     val accent = WidgetStyle.parseColor(widgetData.getString("up_next_color", ""), palette.primary)
-                    views.setViewVisibility(R.id.widget_up_next_color_strip, View.VISIBLE)
-                    views.setInt(R.id.widget_up_next_color_strip, "setColorFilter", accent)
                     views.setViewVisibility(R.id.widget_up_next_done_icon, View.GONE)
                     views.setViewVisibility(R.id.widget_up_next_add_btn, View.GONE)
                     views.setTextViewText(R.id.widget_up_next_title, rawTitle)
@@ -133,7 +131,6 @@ class UpNextWidgetProvider : HomeWidgetProvider() {
         palette: FullCalendarWidgetUtils.Palette,
         locale: Locale
     ) {
-        views.setViewVisibility(R.id.widget_up_next_color_strip, View.GONE)
         views.setViewVisibility(R.id.widget_up_next_check, View.GONE)
         views.setViewVisibility(R.id.widget_up_next_event_icon, View.GONE)
         views.setViewVisibility(R.id.widget_up_next_done_icon, View.VISIBLE)

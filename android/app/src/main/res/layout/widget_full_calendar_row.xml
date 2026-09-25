@@ -48,26 +48,26 @@
             android:src="@drawable/widget_day_stroke"
             android:visibility="gone" />
 
+        <!-- Day number with its markers right underneath -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:orientation="vertical"
+            android:paddingStart="2dp"
+            android:paddingEnd="2dp"
+            android:paddingTop="5dp">
+
         <TextView
             android:id="@+id/widget_full_day_text_0"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="top|center_horizontal"
-            android:layout_marginTop="5dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="3dp"
             android:fontFamily="@font/outfit_regular"
             android:includeFontPadding="false"
             android:text="1"
             android:textSize="13sp" />
-
-        <!-- Markers sit at the bottom of the cell, like the app -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:layout_marginBottom="4dp"
-            android:orientation="vertical"
-            android:paddingStart="2dp"
-            android:paddingEnd="2dp">
 
             <FrameLayout
                 android:id="@+id/widget_full_event_box_0_1"
@@ -214,26 +214,26 @@
             android:src="@drawable/widget_day_stroke"
             android:visibility="gone" />
 
+        <!-- Day number with its markers right underneath -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:orientation="vertical"
+            android:paddingStart="2dp"
+            android:paddingEnd="2dp"
+            android:paddingTop="5dp">
+
         <TextView
             android:id="@+id/widget_full_day_text_1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="top|center_horizontal"
-            android:layout_marginTop="5dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="3dp"
             android:fontFamily="@font/outfit_regular"
             android:includeFontPadding="false"
             android:text="1"
             android:textSize="13sp" />
-
-        <!-- Markers sit at the bottom of the cell, like the app -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:layout_marginBottom="4dp"
-            android:orientation="vertical"
-            android:paddingStart="2dp"
-            android:paddingEnd="2dp">
 
             <FrameLayout
                 android:id="@+id/widget_full_event_box_1_1"
@@ -380,26 +380,26 @@
             android:src="@drawable/widget_day_stroke"
             android:visibility="gone" />
 
+        <!-- Day number with its markers right underneath -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:orientation="vertical"
+            android:paddingStart="2dp"
+            android:paddingEnd="2dp"
+            android:paddingTop="5dp">
+
         <TextView
             android:id="@+id/widget_full_day_text_2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="top|center_horizontal"
-            android:layout_marginTop="5dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="3dp"
             android:fontFamily="@font/outfit_regular"
             android:includeFontPadding="false"
             android:text="1"
             android:textSize="13sp" />
-
-        <!-- Markers sit at the bottom of the cell, like the app -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:layout_marginBottom="4dp"
-            android:orientation="vertical"
-            android:paddingStart="2dp"
-            android:paddingEnd="2dp">
 
             <FrameLayout
                 android:id="@+id/widget_full_event_box_2_1"
@@ -546,26 +546,26 @@
             android:src="@drawable/widget_day_stroke"
             android:visibility="gone" />
 
+        <!-- Day number with its markers right underneath -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:orientation="vertical"
+            android:paddingStart="2dp"
+            android:paddingEnd="2dp"
+            android:paddingTop="5dp">
+
         <TextView
             android:id="@+id/widget_full_day_text_3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="top|center_horizontal"
-            android:layout_marginTop="5dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="3dp"
             android:fontFamily="@font/outfit_regular"
             android:includeFontPadding="false"
             android:text="1"
             android:textSize="13sp" />
-
-        <!-- Markers sit at the bottom of the cell, like the app -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:layout_marginBottom="4dp"
-            android:orientation="vertical"
-            android:paddingStart="2dp"
-            android:paddingEnd="2dp">
 
             <FrameLayout
                 android:id="@+id/widget_full_event_box_3_1"
@@ -712,26 +712,26 @@
             android:src="@drawable/widget_day_stroke"
             android:visibility="gone" />
 
+        <!-- Day number with its markers right underneath -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:orientation="vertical"
+            android:paddingStart="2dp"
+            android:paddingEnd="2dp"
+            android:paddingTop="5dp">
+
         <TextView
             android:id="@+id/widget_full_day_text_4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="top|center_horizontal"
-            android:layout_marginTop="5dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="3dp"
             android:fontFamily="@font/outfit_regular"
             android:includeFontPadding="false"
             android:text="1"
             android:textSize="13sp" />
-
-        <!-- Markers sit at the bottom of the cell, like the app -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:layout_marginBottom="4dp"
-            android:orientation="vertical"
-            android:paddingStart="2dp"
-            android:paddingEnd="2dp">
 
             <FrameLayout
                 android:id="@+id/widget_full_event_box_4_1"
@@ -878,26 +878,26 @@
             android:src="@drawable/widget_day_stroke"
             android:visibility="gone" />
 
+        <!-- Day number with its markers right underneath -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:orientation="vertical"
+            android:paddingStart="2dp"
+            android:paddingEnd="2dp"
+            android:paddingTop="5dp">
+
         <TextView
             android:id="@+id/widget_full_day_text_5"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="top|center_horizontal"
-            android:layout_marginTop="5dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="3dp"
             android:fontFamily="@font/outfit_regular"
             android:includeFontPadding="false"
             android:text="1"
             android:textSize="13sp" />
-
-        <!-- Markers sit at the bottom of the cell, like the app -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:layout_marginBottom="4dp"
-            android:orientation="vertical"
-            android:paddingStart="2dp"
-            android:paddingEnd="2dp">
 
             <FrameLayout
                 android:id="@+id/widget_full_event_box_5_1"
@@ -1044,26 +1044,26 @@
             android:src="@drawable/widget_day_stroke"
             android:visibility="gone" />
 
+        <!-- Day number with its markers right underneath -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:orientation="vertical"
+            android:paddingStart="2dp"
+            android:paddingEnd="2dp"
+            android:paddingTop="5dp">
+
         <TextView
             android:id="@+id/widget_full_day_text_6"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="top|center_horizontal"
-            android:layout_marginTop="5dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="3dp"
             android:fontFamily="@font/outfit_regular"
             android:includeFontPadding="false"
             android:text="1"
             android:textSize="13sp" />
-
-        <!-- Markers sit at the bottom of the cell, like the app -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:layout_marginBottom="4dp"
-            android:orientation="vertical"
-            android:paddingStart="2dp"
-            android:paddingEnd="2dp">
 
             <FrameLayout
                 android:id="@+id/widget_full_event_box_6_1"

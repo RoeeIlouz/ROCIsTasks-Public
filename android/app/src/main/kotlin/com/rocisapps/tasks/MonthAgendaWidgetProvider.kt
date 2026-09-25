@@ -67,23 +67,33 @@ class MonthAgendaWidgetProvider : HomeWidgetProvider() {
         }
     }
 
-    private data class CellIds(val root: Int, val fill: Int, val stroke: Int, val text: Int, val dots: Int, val dotIds: List<Int>)
+    private data class CellIds(
+        val root: Int, val fill: Int, val stroke: Int, val text: Int,
+        val pillIds: List<Int>, val dots: Int, val dotIds: List<Int>
+    )
 
     // Explicit ids (no reflection: R8 may strip or rename R fields in release).
     private val cellIds = listOf(
         CellIds(R.id.widget_month_day_0, R.id.widget_month_fill_0, R.id.widget_month_stroke_0, R.id.widget_month_text_0,
+            listOf(R.id.widget_month_pill_0_1, R.id.widget_month_pill_0_2),
             R.id.widget_month_dots_0, listOf(R.id.widget_month_dot_0_1, R.id.widget_month_dot_0_2, R.id.widget_month_dot_0_3)),
         CellIds(R.id.widget_month_day_1, R.id.widget_month_fill_1, R.id.widget_month_stroke_1, R.id.widget_month_text_1,
+            listOf(R.id.widget_month_pill_1_1, R.id.widget_month_pill_1_2),
             R.id.widget_month_dots_1, listOf(R.id.widget_month_dot_1_1, R.id.widget_month_dot_1_2, R.id.widget_month_dot_1_3)),
         CellIds(R.id.widget_month_day_2, R.id.widget_month_fill_2, R.id.widget_month_stroke_2, R.id.widget_month_text_2,
+            listOf(R.id.widget_month_pill_2_1, R.id.widget_month_pill_2_2),
             R.id.widget_month_dots_2, listOf(R.id.widget_month_dot_2_1, R.id.widget_month_dot_2_2, R.id.widget_month_dot_2_3)),
         CellIds(R.id.widget_month_day_3, R.id.widget_month_fill_3, R.id.widget_month_stroke_3, R.id.widget_month_text_3,
+            listOf(R.id.widget_month_pill_3_1, R.id.widget_month_pill_3_2),
             R.id.widget_month_dots_3, listOf(R.id.widget_month_dot_3_1, R.id.widget_month_dot_3_2, R.id.widget_month_dot_3_3)),
         CellIds(R.id.widget_month_day_4, R.id.widget_month_fill_4, R.id.widget_month_stroke_4, R.id.widget_month_text_4,
+            listOf(R.id.widget_month_pill_4_1, R.id.widget_month_pill_4_2),
             R.id.widget_month_dots_4, listOf(R.id.widget_month_dot_4_1, R.id.widget_month_dot_4_2, R.id.widget_month_dot_4_3)),
         CellIds(R.id.widget_month_day_5, R.id.widget_month_fill_5, R.id.widget_month_stroke_5, R.id.widget_month_text_5,
+            listOf(R.id.widget_month_pill_5_1, R.id.widget_month_pill_5_2),
             R.id.widget_month_dots_5, listOf(R.id.widget_month_dot_5_1, R.id.widget_month_dot_5_2, R.id.widget_month_dot_5_3)),
         CellIds(R.id.widget_month_day_6, R.id.widget_month_fill_6, R.id.widget_month_stroke_6, R.id.widget_month_text_6,
+            listOf(R.id.widget_month_pill_6_1, R.id.widget_month_pill_6_2),
             R.id.widget_month_dots_6, listOf(R.id.widget_month_dot_6_1, R.id.widget_month_dot_6_2, R.id.widget_month_dot_6_3))
     )
 
@@ -316,14 +326,26 @@ class MonthAgendaWidgetProvider : HomeWidgetProvider() {
             }
         )
 
-        // Up to three dots in the items' category / calendar colors.
+        // Like the FullCalendar widget: 1-2 items -> colored pills, 3+ -> colored dots
+        // (pills are title-less here; the half-width grid has no room for text).
         val colors = markers[date].orEmpty()
-        views.setViewVisibility(ids.dots, if (colors.isEmpty()) View.GONE else View.VISIBLE)
+        val usePills = colors.size in 1..2
+        val alpha = if (isCurrentMonth) 0xFF else 0x66
+        ids.pillIds.forEachIndexed { k, pillId ->
+            if (usePills && k < colors.size) {
+                views.setViewVisibility(pillId, View.VISIBLE)
+                views.setInt(pillId, "setColorFilter", colors[k])
+                views.setInt(pillId, "setImageAlpha", alpha)
+            } else {
+                views.setViewVisibility(pillId, View.GONE)
+            }
+        }
+        views.setViewVisibility(ids.dots, if (colors.size > 2) View.VISIBLE else View.GONE)
         ids.dotIds.forEachIndexed { k, dotId ->
-            if (k < colors.size) {
+            if (colors.size > 2 && k < colors.size) {
                 views.setViewVisibility(dotId, View.VISIBLE)
                 views.setInt(dotId, "setColorFilter", colors[k])
-                views.setInt(dotId, "setImageAlpha", if (isCurrentMonth) 0xFF else 0x66)
+                views.setInt(dotId, "setImageAlpha", alpha)
             } else {
                 views.setViewVisibility(dotId, View.GONE)
             }
