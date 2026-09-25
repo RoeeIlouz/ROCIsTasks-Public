@@ -8,3 +8,6 @@ next-env.d.ts
 
 # Regenerate with the editor ("Export bundle"); uploaded via the Play API.
 exports/
+scripts/emu/
+scripts/editor/
+scripts/__pycache__/
