@@ -1519,4 +1519,8 @@ class AppLocalizationsDe extends AppLocalizations {
   String trialThenPrice(String price) {
     return 'Danach $price pro Jahr. Kündige vor Ende des Testzeitraums und dir wird nichts berechnet.';
   }
+
+  @override
+  String get plansUnavailable =>
+      'Tarife konnten nicht geladen werden. Prüfe deine Verbindung und versuche es erneut.';
 }

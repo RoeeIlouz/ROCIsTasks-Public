@@ -1518,4 +1518,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String trialThenPrice(String price) {
     return 'Ensuite $price par an. Annulez avant la fin de l\'essai et vous ne serez pas débité.';
   }
+
+  @override
+  String get plansUnavailable =>
+      'Impossible de charger les offres. Vérifiez votre connexion et réessayez.';
 }

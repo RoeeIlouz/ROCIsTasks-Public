@@ -2922,6 +2922,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Then {price} per year. Cancel anytime before the trial ends and you won\'t be charged.'**
   String trialThenPrice(String price);
+
+  /// No description provided for @plansUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Plans couldn\'t load. Check your connection and try again.'**
+  String get plansUnavailable;
 }
 
 class _AppLocalizationsDelegate

@@ -1506,4 +1506,8 @@ class AppLocalizationsSv extends AppLocalizations {
   String trialThenPrice(String price) {
     return 'Därefter $price per år. Avsluta innan provperioden slutar så debiteras du inte.';
   }
+
+  @override
+  String get plansUnavailable =>
+      'Det gick inte att läsa in planerna. Kontrollera anslutningen och försök igen.';
 }

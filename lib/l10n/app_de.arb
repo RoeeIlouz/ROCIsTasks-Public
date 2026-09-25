@@ -534,5 +534,6 @@
   "kanbanWidgetDesc": "Interaktives Kanban-Board mit Spalten Zu erledigen, Im Fokus und Erledigt",
   "freeTrialBadge": "{days} Tage gratis",
   "startFreeTrial": "{days} Tage gratis testen",
-  "trialThenPrice": "Danach {price} pro Jahr. Kündige vor Ende des Testzeitraums und dir wird nichts berechnet."
+  "trialThenPrice": "Danach {price} pro Jahr. Kündige vor Ende des Testzeitraums und dir wird nichts berechnet.",
+  "plansUnavailable": "Tarife konnten nicht geladen werden. Prüfe deine Verbindung und versuche es erneut."
 }

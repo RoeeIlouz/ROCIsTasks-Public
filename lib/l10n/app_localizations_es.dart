@@ -1516,4 +1516,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String trialThenPrice(String price) {
     return 'Después $price al año. Cancela antes de que termine la prueba y no se te cobrará.';
   }
+
+  @override
+  String get plansUnavailable =>
+      'No se pudieron cargar los planes. Revisa tu conexión e inténtalo de nuevo.';
 }

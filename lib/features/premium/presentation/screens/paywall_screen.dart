@@ -11,7 +11,10 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
 
 class PaywallScreen extends StatefulWidget {
-  const PaywallScreen({super.key});
+  /// What opened the sheet; feature-specific sources name the feature on top.
+  final PaywallSource source;
+
+  const PaywallScreen({super.key, this.source = PaywallSource.settings});
 
   @override
   State<PaywallScreen> createState() => _PaywallScreenState();
@@ -124,6 +127,47 @@ class _PaywallScreenState extends State<PaywallScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
+
+                  // The feature the user just tried to use.
+                  if (_featureLabel(l10n) case final feature?) ...[
+                    Center(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.primary.withValues(
+                            alpha: 0.12,
+                          ),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.lock_open_rounded,
+                              size: 16,
+                              color: theme.colorScheme.primary,
+                            ),
+                            const SizedBox(width: 6),
+                            Flexible(
+                              child: Text(
+                                feature,
+                                overflow: TextOverflow.ellipsis,
+                                style: GoogleFonts.outfit(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: theme.colorScheme.primary,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                  ],
 
                   // Title & Subtitle
                   Text(
@@ -453,15 +497,15 @@ class _PaywallScreenState extends State<PaywallScreen> {
           }
         }
       } else {
-        // Fallback if offering packages aren't loaded from RevenueCat store yet
-        await subscriptionService.showPaywall(
-          source: PaywallSource.premiumScreen,
-        );
-        if (mounted && subscriptionService.isPremium) {
-          Navigator.pop(context, true);
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(l10n.welcomeToPro)));
+        // Plans didn't load (offline, or the store isn't ready): retry once.
+        await _loadOfferings();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(l10n.plansUnavailable),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
         }
       }
     } catch (e) {
@@ -554,6 +598,15 @@ class _PaywallScreenState extends State<PaywallScreen> {
       ],
     );
   }
+
+  /// Name of the feature that opened the sheet, or null for general entry
+  /// points (settings, premium screen, widgets).
+  String? _featureLabel(AppLocalizations l10n) => switch (widget.source) {
+    PaywallSource.settings ||
+    PaywallSource.premiumScreen ||
+    PaywallSource.widget => null,
+    final source => source.featureLabel(l10n),
+  };
 
   /// Free-trial length in days of [package]'s default Play offer, if any.
   int? _trialDays(Package? package) {
