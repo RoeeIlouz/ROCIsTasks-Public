@@ -2,6 +2,20 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## Server-Side Premium & Locked Billing Fields - 2026-09-25 (Patch 2 on 0.2.23+113)
+
+#### Problems
+* `firestore.rules` let users write their whole `users/{uid}` doc, so anyone could set `is_premium: true` (free web Pro).
+* The app back-synced RevenueCat Pro by writing `is_premium` itself; a Lemon Squeezy event could then overwrite it (e.g. a web test expiring removed Pro from an Android subscriber).
+
+#### Solutions Applied
+* Functions: `revenueCatWebhook` (Authorization = REVENUECAT_WEBHOOK_AUTH) and `syncPremium` (Firebase ID token) re-read entitlements from RevenueCat API v2 (read-only customers key, project `proj562f5a11`); `applyEntitlements` sets `is_premium = ls_subscription_active || ls_lifetime || rc_premium` in a transaction.
+* App: `_syncPremiumToServer()` (plain `http`, Shorebird-patchable) replaces `_backSyncToFirestore`.
+* Rules: owner may create/update the user doc only if no billing field is touched.
+
+#### Deployment
+* `flutter analyze` 0 issues; tests pass. Functions deployed and verified (401 unauthenticated; RevenueCat entitlement read for a live subscriber). Shorebird Android Patch 2 (`0.2.23+113`); web deployed; rules deployed.
+
 ## Paywall Funnel, Free Trial & Web Purchase Webhook - 2026-09-25 (Patch 1 on 0.2.23+113)
 
 #### Problems
