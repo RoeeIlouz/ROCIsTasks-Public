@@ -75,8 +75,12 @@ docs/marketing/
 docs/MARKETING_SCHEDULE.md
 1.1.0
 graphify-out/
+.base/
 .serena/
-functions/
+functions/node_modules/
+functions/.env
+functions/key.pem
+functions/*.log
 assets/screenshots/*
 docs/notebooklm/
 # Environment and Security Files
