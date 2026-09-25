@@ -17,9 +17,11 @@ This file summarizes errors encountered and changes made to the codebase, ensuri
 * In-app review prompt (`in_app_review`, 10 completions / 3 days / 90-day cooldown). `AppDateFormats` (per-locale cache, localized priorities). NLP: "at" optional for unambiguous times.
 * Play Store deck (8 slides + feature graphic) in `tools/store-screenshots`, from real captures; `SCREENSHOT_PREMIUM` compile-time flag for captures.
 
+* Widget times follow the app's 12h/24h setting (`WidgetDataService.clockFormat`, `WidgetStyle.formatTime`); widgets redraw on light/dark switch while the app runs (`didChangePlatformBrightness`); category sheet respects the nav bar.
+* Store presence in 9 Play languages (listing text + 8 screenshots + feature graphic each) generated from localized demo data (`SCREENSHOT_SEED`) and uploaded via the Play Developer API (`tools/store-screenshots`).
+
 #### Known follow-ups
-* Widgets don't recolor instantly when the system switches light/dark (next refresh or app open fixes); use RemoteViews day/night colors (API 31).
-* Widget times are 24h regardless of the 12h setting.
+* If the app isn't running when the system switches light/dark, widgets update on their next refresh; full fix = RemoteViews day/night colors (API 31).
 
 #### Deployment
 * `flutter analyze` 0 issues; 392/392 tests. Shorebird release + Play open testing (beta) `0.3.0+114`; web deployed.
