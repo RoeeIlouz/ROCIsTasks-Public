@@ -11,7 +11,6 @@ import android.net.Uri
 import android.text.format.DateFormat
 import android.view.View
 import android.widget.RemoteViews
-import es.antonborri.home_widget.HomeWidgetBackgroundIntent
 import es.antonborri.home_widget.HomeWidgetLaunchIntent
 import es.antonborri.home_widget.HomeWidgetProvider
 import java.text.SimpleDateFormat
@@ -79,7 +78,10 @@ class UpNextWidgetProvider : HomeWidgetProvider() {
                         views.setInt(R.id.widget_up_next_check, "setColorFilter", palette.onSurfaceMuted)
                         views.setOnClickPendingIntent(
                             R.id.widget_up_next_check,
-                            HomeWidgetBackgroundIntent.getBroadcast(context, Uri.parse("rocistasks://complete?id=$id"))
+                            // Completed by the running app (see MainActivity), not a background engine.
+                            HomeWidgetLaunchIntent.getActivity(
+                                context, MainActivity::class.java, Uri.parse("rocistasks://complete?id=$id")
+                            )
                         )
                         views.setOnClickPendingIntent(
                             R.id.widget_up_next_main,
