@@ -2,6 +2,19 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## Widget Polish from Tester Feedback - v0.2.23+113 - 2026-09-25
+
+#### Requests / Problems
+* Testers asked: hide the Up Next category color line; make the Month Agenda calendar look like FullCalendar (colored pills); move FullCalendar pills/dots closer to the day number.
+* Changing the app accent only redrew the FullCalendar widget (`_syncWidgetTheme` updated one provider).
+
+#### Solutions Applied
+* Up Next strip removed. Month Agenda cells: day number with 1-2 title-less colored pills or 3 dots right underneath (grid is half-width, ~20dp columns). FullCalendar cell markers moved into a top-anchored column under the number (`gen_fc_layouts.py`).
+* `MyApp._syncWidgetTheme` updates all 8 widget providers.
+
+#### Deployment
+* `flutter analyze` 0 issues; debug APK builds. Internal release `0.2.23+113`.
+
 ## Widget Redesign & Widget Data Fixes - v0.2.22+112 - 2026-09-24
 
 #### Problems
