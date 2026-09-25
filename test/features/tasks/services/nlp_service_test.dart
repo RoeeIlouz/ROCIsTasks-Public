@@ -95,6 +95,31 @@ void main() {
         expect(result.hasTime, true);
       });
 
+      test('should parse a time without "at" (the input hint example)', () {
+        final result = NlpService.parse('Finish report tomorrow 3pm !high');
+        expect(result.title, 'Finish report');
+        expect(result.hasTime, true);
+        expect(result.dueDate!.hour, 15);
+        expect(result.priority, TaskPriority.high);
+      });
+
+      test('should parse "today 10am" and "18:30" without "at"', () {
+        final morning = NlpService.parse('Submit design review today 10am');
+        expect(morning.title, 'Submit design review');
+        expect(morning.dueDate!.hour, 10);
+
+        final evening = NlpService.parse('Gym 18:30');
+        expect(evening.title, 'Gym');
+        expect(evening.dueDate!.hour, 18);
+        expect(evening.dueDate!.minute, 30);
+      });
+
+      test('should keep bare numbers in the title', () {
+        final result = NlpService.parse('Buy 3 apples');
+        expect(result.title, 'Buy 3 apples');
+        expect(result.hasTime, false);
+      });
+
       test('should trim extra whitespace from title', () {
         final result = NlpService.parse('  Buy milk  ');
         expect(result.title, 'Buy milk');
