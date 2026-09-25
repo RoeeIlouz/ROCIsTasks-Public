@@ -2,6 +2,25 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## Paywall Funnel, Free Trial & Web Purchase Webhook - 2026-09-25 (Patch 1 on 0.2.23+113)
+
+#### Problems
+* Web analytics was skipped explicitly (`kIsWeb` guards) although web has a measurement ID; no paywall funnel events existed.
+* `rocistasks://paywall` (widget "Get Pro" / premium overlays) was unhandled, so it only opened the app.
+* The Lemon Squeezy webhook (`functions/index.js`) had never been deployed (Cloud Functions API disabled), so web purchases never granted Pro. Its logic was also wrong: checked `trialing` (LS sends `on_trial`), revoked `cancelled` subscriptions before `ends_at`, and let any event (orders, invoices) overwrite `is_premium` (lifetime never granted).
+* The Lemon Squeezy notice showed on the Android plan picker.
+
+#### Solutions Applied
+* `PaywallSource` enum: `paywall_shown`/`paywall_result` events per trigger; RevenueCat paywalls get `{{ custom.feature }}`; home screen handles `paywall` links.
+* Plan picker shows the Play free trial (badge, CTA, terms) from `defaultOption.freePhase`; 3 new strings in 8 ARBs.
+* Webhook rewritten: `ls_subscription_active` (on_trial/active/past_due, cancelled until ends_at) and `ls_lifetime` (lifetime orders by name or LEMONSQUEEZY_LIFETIME_VARIANT_IDS) combined in a transaction; Node 22, runs as the App Engine service account (default compute SA missing). Deployed on Blaze; artifact cleanup policy set. `functions/` code now tracked (secrets still ignored).
+
+#### Open
+* Firestore rules still let users write their own `is_premium`; move mobile sync server-side (RevenueCat webhook) and lock the field.
+
+#### Deployment
+* `flutter analyze` 0 issues; 389/389 tests. Shorebird Android Patch 1 (`0.2.23+113`); web deployed; function live.
+
 ## Widget Polish from Tester Feedback - v0.2.23+113 - 2026-09-25
 
 #### Requests / Problems
