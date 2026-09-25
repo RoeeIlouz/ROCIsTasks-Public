@@ -313,7 +313,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
       listen: false,
     );
     if (!subscriptionService.isPremium) {
-      subscriptionService.showPaywall();
+      subscriptionService.showPaywall(source: PaywallSource.attachments);
       return;
     }
 
@@ -342,7 +342,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
       listen: false,
     );
     if (!subscriptionService.isPremium) {
-      subscriptionService.showPaywall();
+      subscriptionService.showPaywall(source: PaywallSource.attachments);
       return;
     }
 
@@ -1017,7 +1017,9 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   child: InkWell(
                     onTap: () async {
                       if (!subscriptionService.isPremium) {
-                        subscriptionService.showPaywall();
+                        subscriptionService.showPaywall(
+                          source: PaywallSource.recurrence,
+                        );
                         return;
                       }
                       HapticFeedback.lightImpact();
@@ -1263,7 +1265,9 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
               icon: const Icon(Icons.add_circle_outline, size: 20),
               onPressed: () {
                 if (!subscriptionService.isPremium) {
-                  subscriptionService.showPaywall();
+                  subscriptionService.showPaywall(
+                    source: PaywallSource.subtasks,
+                  );
                   return;
                 }
                 HapticFeedback.lightImpact();
@@ -1339,7 +1343,9 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
             value: _requireSubTasksBeforeReminders,
             onChanged: (value) {
               if (!subscriptionService.isPremium) {
-                subscriptionService.showPaywall();
+                subscriptionService.showPaywall(
+                  source: PaywallSource.subtaskReminders,
+                );
                 return;
               }
               setState(() => _requireSubTasksBeforeReminders = value);

@@ -239,7 +239,7 @@ class CategoriesScreen extends StatelessWidget {
         context,
         listen: false,
       );
-      subscriptionService.showPaywall();
+      subscriptionService.showPaywall(source: PaywallSource.categoryLimit);
       return;
     }
 
@@ -406,7 +406,9 @@ class _CategorySheetState extends State<_CategorySheet> {
               value: _isPrivate,
               onChanged: (value) {
                 if (!subscriptionService.isPremium) {
-                  subscriptionService.showPaywall();
+                  subscriptionService.showPaywall(
+                    source: PaywallSource.privateCategory,
+                  );
                   return;
                 }
                 setState(() => _isPrivate = value);

@@ -1491,4 +1491,19 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get kanbanWidgetDesc =>
       'Interaktiv Kanban-tavla med kolumner för Att göra, I fokus och Klart';
+
+  @override
+  String freeTrialBadge(int days) {
+    return '$days dagar gratis';
+  }
+
+  @override
+  String startFreeTrial(int days) {
+    return 'Prova gratis i $days dagar';
+  }
+
+  @override
+  String trialThenPrice(String price) {
+    return 'Därefter $price per år. Avsluta innan provperioden slutar så debiteras du inte.';
+  }
 }

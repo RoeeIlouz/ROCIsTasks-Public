@@ -72,6 +72,9 @@ class _PaywallScreenState extends State<PaywallScreen> {
         _yearlyPackage?.storeProduct.priceString ?? l10n.yearlyPlanPrice;
     final lifetimePrice =
         _lifetimePackage?.storeProduct.priceString ?? l10n.lifetimePlanPrice;
+    // Only when Google Play offers this user a free trial on the yearly plan.
+    final trialDays = _trialDays(_yearlyPackage);
+    final showTrial = trialDays != null && _selectedPlanIndex == 1;
 
     return Container(
       decoration: BoxDecoration(
@@ -221,7 +224,9 @@ class _PaywallScreenState extends State<PaywallScreen> {
                           index: 1,
                           title: l10n.yearlyPlanTitle,
                           price: yearlyPrice,
-                          badge: l10n.yearlyPlanSaving,
+                          badge: trialDays != null
+                              ? l10n.freeTrialBadge(trialDays)
+                              : l10n.yearlyPlanSaving,
                           theme: theme,
                         ),
                       ),
@@ -239,18 +244,22 @@ class _PaywallScreenState extends State<PaywallScreen> {
                   ),
                   const SizedBox(height: 20),
 
-                  // Notice
-                  Text(
-                    l10n.webPaywallNotice,
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.outfit(
-                      fontSize: 12,
-                      color: theme.textTheme.bodySmall?.color?.withValues(
-                        alpha: 0.6,
+                  // Notice: trial terms on mobile, the payment processor on web.
+                  if (kIsWeb || showTrial) ...[
+                    Text(
+                      showTrial
+                          ? l10n.trialThenPrice(yearlyPrice)
+                          : l10n.webPaywallNotice,
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.outfit(
+                        fontSize: 12,
+                        color: theme.textTheme.bodySmall?.color?.withValues(
+                          alpha: 0.6,
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 16),
+                    const SizedBox(height: 16),
+                  ],
 
                   // Upgrade / Subscribe Button
                   ElevatedButton(
@@ -276,7 +285,9 @@ class _PaywallScreenState extends State<PaywallScreen> {
                             ),
                           )
                         : Text(
-                            l10n.upgradeToPro,
+                            showTrial
+                                ? l10n.startFreeTrial(trialDays)
+                                : l10n.upgradeToPro,
                             style: GoogleFonts.outfit(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -443,7 +454,9 @@ class _PaywallScreenState extends State<PaywallScreen> {
         }
       } else {
         // Fallback if offering packages aren't loaded from RevenueCat store yet
-        await subscriptionService.showPaywall();
+        await subscriptionService.showPaywall(
+          source: PaywallSource.premiumScreen,
+        );
         if (mounted && subscriptionService.isPremium) {
           Navigator.pop(context, true);
           ScaffoldMessenger.of(
@@ -540,6 +553,20 @@ class _PaywallScreenState extends State<PaywallScreen> {
         ),
       ],
     );
+  }
+
+  /// Free-trial length in days of [package]'s default Play offer, if any.
+  int? _trialDays(Package? package) {
+    final period =
+        package?.storeProduct.defaultOption?.freePhase?.billingPeriod;
+    if (period == null) return null;
+    return switch (period.unit) {
+      PeriodUnit.day => period.value,
+      PeriodUnit.week => period.value * 7,
+      PeriodUnit.month => period.value * 30,
+      PeriodUnit.year => period.value * 365,
+      PeriodUnit.unknown => null,
+    };
   }
 
   Widget _buildPlanCard({

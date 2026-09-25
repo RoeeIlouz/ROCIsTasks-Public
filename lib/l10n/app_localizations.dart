@@ -2904,6 +2904,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Interactive Kanban board with To Do, In Focus, and Done columns'**
   String get kanbanWidgetDesc;
+
+  /// No description provided for @freeTrialBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'{days}-day free trial'**
+  String freeTrialBadge(int days);
+
+  /// No description provided for @startFreeTrial.
+  ///
+  /// In en, this message translates to:
+  /// **'Start {days}-day free trial'**
+  String startFreeTrial(int days);
+
+  /// No description provided for @trialThenPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Then {price} per year. Cancel anytime before the trial ends and you won\'t be charged.'**
+  String trialThenPrice(String price);
 }
 
 class _AppLocalizationsDelegate

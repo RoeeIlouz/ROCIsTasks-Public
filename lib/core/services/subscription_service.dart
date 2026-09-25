@@ -14,9 +14,39 @@ import 'package:flutter/material.dart' show showModalBottomSheet;
 import 'package:rocis_tasks/core/config/app_config.dart';
 import 'package:rocis_tasks/core/config/app_secrets.dart';
 import 'package:rocis_tasks/core/config/router.dart';
+import 'package:rocis_tasks/core/services/analytics_service.dart';
 import 'package:rocis_tasks/core/services/error_handling_service.dart';
 import 'package:rocis_tasks/core/services/logger_service.dart' hide LogLevel;
 import 'package:rocis_tasks/features/premium/presentation/screens/paywall_screen.dart';
+import 'package:rocis_tasks/l10n/app_localizations.dart';
+
+/// Where a paywall was opened from. Logged with every paywall event, and passed
+/// to RevenueCat paywalls as `{{ custom.feature }}` (the localized feature name).
+enum PaywallSource {
+  settings,
+  premiumScreen,
+  widget,
+  categoryLimit,
+  privateCategory,
+  glassmorphism,
+  accentColor,
+  attachments,
+  recurrence,
+  subtasks,
+  subtaskReminders;
+
+  String featureLabel(AppLocalizations l10n) => switch (this) {
+    categoryLimit => l10n.unlimitedCategories,
+    privateCategory => l10n.privateCategory,
+    glassmorphism => l10n.glassmorphismEffects,
+    accentColor => l10n.accentColor,
+    attachments => l10n.attachments,
+    recurrence => l10n.recurringTasks,
+    subtasks || subtaskReminders => l10n.subtasksAndChecklists,
+    widget => l10n.premiumWidgets,
+    settings || premiumScreen => l10n.rocisTasksPro,
+  };
+}
 
 class SubscriptionService extends ChangeNotifier {
   final ErrorHandlingService _errorHandlingService;
@@ -314,16 +344,26 @@ class SubscriptionService extends ChangeNotifier {
 
   /// Shows the paywall using RevenueCat's UI library.
   /// returns true if a purchase was made (and thus premium is likely active)
-  Future<bool> showPaywall() async {
+  Future<bool> showPaywall({
+    PaywallSource source = PaywallSource.settings,
+  }) async {
+    final analytics = AnalyticsService();
     if (kIsWeb) {
       if (_isPremium) return true;
       final context = AppRouter.navigatorKey.currentContext;
       if (context != null) {
+        unawaited(analytics.logPaywallShown(source: source.name));
         final result = await showModalBottomSheet<bool>(
           context: context,
           isScrollControlled: true,
           useSafeArea: true,
           builder: (context) => const PaywallScreen(),
+        );
+        unawaited(
+          analytics.logPaywallResult(
+            source: source.name,
+            result: result == true ? 'purchased' : 'closed',
+          ),
         );
         return result ?? false;
       }
@@ -340,13 +380,32 @@ class SubscriptionService extends ChangeNotifier {
         return true;
       }
 
-      AppLogger.info('Showing paywall...', tag: 'Subscription');
+      AppLogger.info('Showing paywall ($source)...', tag: 'Subscription');
+      unawaited(analytics.logPaywallShown(source: source.name));
+
+      // The feature that triggered the paywall, for {{ custom.feature }}.
+      final context = AppRouter.navigatorKey.currentContext;
+      final l10n = context != null ? AppLocalizations.of(context) : null;
 
       // Using presentPaywall instead of presentPaywallIfNeeded for diagnostics.
       // This will show the "Current Offering" regardless of entitlement status.
-      final paywallResult = await RevenueCatUI.presentPaywall();
+      final paywallResult = await RevenueCatUI.presentPaywall(
+        customVariables: l10n == null
+            ? null
+            : {
+                'feature': CustomVariableValue.string(
+                  source.featureLabel(l10n),
+                ),
+              },
+      );
 
       AppLogger.info('Paywall result: $paywallResult', tag: 'Subscription');
+      unawaited(
+        analytics.logPaywallResult(
+          source: source.name,
+          result: paywallResult.name,
+        ),
+      );
 
       final purchased =
           paywallResult == PaywallResult.purchased ||

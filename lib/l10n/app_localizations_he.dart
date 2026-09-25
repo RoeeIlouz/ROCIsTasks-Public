@@ -1470,4 +1470,19 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get kanbanWidgetDesc =>
       'לוח קנבן אינטראקטיבי עם עמודות משימות, במיקוד והושלם';
+
+  @override
+  String freeTrialBadge(int days) {
+    return '$days ימי ניסיון חינם';
+  }
+
+  @override
+  String startFreeTrial(int days) {
+    return 'התחילו $days ימי ניסיון חינם';
+  }
+
+  @override
+  String trialThenPrice(String price) {
+    return 'לאחר מכן $price לשנה. אפשר לבטל בכל עת לפני סוף תקופת הניסיון ללא חיוב.';
+  }
 }

@@ -1503,4 +1503,19 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get kanbanWidgetDesc =>
       'Tableau Kanban interactif avec les colonnes À faire, En cours et Terminé';
+
+  @override
+  String freeTrialBadge(int days) {
+    return '$days jours gratuits';
+  }
+
+  @override
+  String startFreeTrial(int days) {
+    return 'Essayer $days jours gratuitement';
+  }
+
+  @override
+  String trialThenPrice(String price) {
+    return 'Ensuite $price par an. Annulez avant la fin de l\'essai et vous ne serez pas débité.';
+  }
 }
