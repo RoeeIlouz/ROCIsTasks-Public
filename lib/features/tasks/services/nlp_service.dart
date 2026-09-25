@@ -212,19 +212,34 @@ class NlpService {
       }
     }
 
-    // 6. Check for time patterns (e.g. "at 5pm", "at 18:00", "at 2:30pm")
-    final timeRegex = RegExp(
-      r'\bat\s+(\d{1,2})(?::(\d{2}))?\s*(am|pm)?\b',
-      caseSensitive: false,
-    );
-    final timeMatch = timeRegex.firstMatch(cleanTitle);
+    // 6. Check for time patterns: "at" is optional when the time is
+    // unambiguous ("3pm", "2:30pm", "18:00"); a bare number needs it ("at 5"),
+    // so "buy 3 apples" stays in the title.
+    final timePatterns = [
+      RegExp(
+        r'\b(?:at\s+)?(\d{1,2})(?::(\d{2}))?\s*(am|pm)\b',
+        caseSensitive: false,
+      ),
+      RegExp(r'\b(?:at\s+)?(\d{1,2}):(\d{2})\b', caseSensitive: false),
+      RegExp(r'\bat\s+(\d{1,2})\b', caseSensitive: false),
+    ];
+    var timeRegex = timePatterns.first;
+    RegExpMatch? timeMatch;
+    for (final pattern in timePatterns) {
+      timeMatch = pattern.firstMatch(cleanTitle);
+      if (timeMatch != null) {
+        timeRegex = pattern;
+        break;
+      }
+    }
 
     if (timeMatch != null) {
       int hour = int.parse(timeMatch.group(1)!);
-      int minute = timeMatch.group(2) != null
-          ? int.parse(timeMatch.group(2)!)
-          : 0;
-      String? amPm = timeMatch.group(3)?.toLowerCase();
+      final minuteText = timeMatch.groupCount >= 2 ? timeMatch.group(2) : null;
+      int minute = minuteText != null ? int.parse(minuteText) : 0;
+      String? amPm = timeMatch.groupCount >= 3
+          ? timeMatch.group(3)?.toLowerCase()
+          : null;
 
       bool isValidTime = false;
       if (amPm != null) {
