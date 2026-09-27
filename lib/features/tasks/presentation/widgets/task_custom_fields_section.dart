@@ -132,9 +132,7 @@ class TaskCustomFieldsSection extends StatelessWidget {
         ),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       backgroundColor: theme.colorScheme.surfaceContainerLow,
       side: BorderSide(
         color: theme.colorScheme.primary.withValues(alpha: 0.18),
@@ -263,7 +261,9 @@ class _CustomFieldItemEditorState extends State<_CustomFieldItemEditor> {
                     hintText: l10n.fieldLabel,
                     hintStyle: GoogleFonts.outfit(
                       fontSize: 12,
-                      color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+                      color: theme.colorScheme.onSurfaceVariant.withValues(
+                        alpha: 0.6,
+                      ),
                     ),
                     border: InputBorder.none,
                   ),
@@ -282,7 +282,9 @@ class _CustomFieldItemEditorState extends State<_CustomFieldItemEditor> {
                     hintText: _getValueHint(widget.field.type, l10n),
                     hintStyle: GoogleFonts.outfit(
                       fontSize: 13,
-                      color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+                      color: theme.colorScheme.onSurfaceVariant.withValues(
+                        alpha: 0.6,
+                      ),
                     ),
                     border: InputBorder.none,
                   ),

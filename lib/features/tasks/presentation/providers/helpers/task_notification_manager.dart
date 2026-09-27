@@ -8,7 +8,7 @@ class TaskNotificationManager {
   final NotificationService _notificationService;
 
   TaskNotificationManager({NotificationService? notificationService})
-      : _notificationService = notificationService ?? NotificationService();
+    : _notificationService = notificationService ?? NotificationService();
 
   DateTime applyQuietHours(
     DateTime date, {
@@ -32,7 +32,13 @@ class TaskNotificationManager {
     final endDate = (spansMidnight && minutes >= quietStartMinutes)
         ? date.add(const Duration(days: 1))
         : date;
-    return DateTime(endDate.year, endDate.month, endDate.day, endHour, endMinute);
+    return DateTime(
+      endDate.year,
+      endDate.month,
+      endDate.day,
+      endHour,
+      endMinute,
+    );
   }
 
   List<int> getNotificationIdsForTask(Task task) {
@@ -70,9 +76,11 @@ class TaskNotificationManager {
     }
     if (actionId == 'snooze_tomorrow_morning') {
       final now = DateTime.now();
-      final tomorrow = DateTime(now.year, now.month, now.day).add(
-        const Duration(days: 1),
-      );
+      final tomorrow = DateTime(
+        now.year,
+        now.month,
+        now.day,
+      ).add(const Duration(days: 1));
       return DateTime(tomorrow.year, tomorrow.month, tomorrow.day, 9);
     }
     return base.add(const Duration(minutes: 15));
@@ -113,7 +121,9 @@ class TaskNotificationManager {
         : l10n.taskReminderTitle(task.title);
     final body = shouldHide
         ? l10n.taskDueNowBody
-        : (task.description.isNotEmpty ? task.description : l10n.taskDueNowBody);
+        : (task.description.isNotEmpty
+              ? task.description
+              : l10n.taskDueNowBody);
 
     final actions = <AndroidNotificationAction>[
       if (advancedRemindersEnabled) ...[
@@ -210,7 +220,8 @@ class TaskNotificationManager {
     List<String>? formattedTitles,
   }) async {
     try {
-      final titles = formattedTitles ?? uncompletedTasks.map((t) => t.title).toList();
+      final titles =
+          formattedTitles ?? uncompletedTasks.map((t) => t.title).toList();
 
       await _notificationService.showTaskCountNotification(
         uncompletedTasks.length,
@@ -221,7 +232,9 @@ class TaskNotificationManager {
           uncompletedTasks.length,
         ),
         tasksRemainingLabel: l10n.notificationTasksRemaining,
-        tasksSummaryLabel: l10n.notificationTasksSummary(uncompletedTasks.length),
+        tasksSummaryLabel: l10n.notificationTasksSummary(
+          uncompletedTasks.length,
+        ),
       );
     } catch (_) {}
   }

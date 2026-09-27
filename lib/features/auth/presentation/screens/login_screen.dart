@@ -63,10 +63,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _signInWithEmail() async {
     if (!_formKey.currentState!.validate()) return;
-    
+
     setState(() => _isLoading = true);
     final authService = Provider.of<AuthService>(context, listen: false);
-    
+
     try {
       await authService.signInWithEmailAndPassword(
         _emailController.text.trim(),
@@ -91,26 +91,26 @@ class _LoginScreenState extends State<LoginScreen> {
     final email = _emailController.text.trim();
     if (email.isEmpty || !email.contains('@')) {
       final l10n = AppLocalizations.of(context)!;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.invalidEmail)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.invalidEmail)));
       return;
     }
-    
+
     final authService = Provider.of<AuthService>(context, listen: false);
     try {
       await authService.sendPasswordResetEmail(email);
       if (mounted) {
         final l10n = AppLocalizations.of(context)!;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.passwordResetEmailSent)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.passwordResetEmailSent)));
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString())),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(e.toString())));
       }
     }
   }
@@ -181,7 +181,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   keyboardType: TextInputType.emailAddress,
                   validator: (value) {
-                    if (value == null || value.isEmpty || !value.contains('@')) {
+                    if (value == null ||
+                        value.isEmpty ||
+                        !value.contains('@')) {
                       return l10n.invalidEmail;
                     }
                     return null;
@@ -230,7 +232,10 @@ class _LoginScreenState extends State<LoginScreen> {
                           const Expanded(child: Divider()),
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: Text('OR', style: TextStyle(color: Colors.grey[600])),
+                            child: Text(
+                              'OR',
+                              style: TextStyle(color: Colors.grey[600]),
+                            ),
                           ),
                           const Expanded(child: Divider()),
                         ],
@@ -262,7 +267,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           side: BorderSide(
-                            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5),
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.outline.withValues(alpha: 0.5),
                           ),
                         ),
                         child: Text(l10n.continueAsGuest),

@@ -144,7 +144,9 @@ class AttachmentUtils {
         child: Container(
           constraints: const BoxConstraints(maxHeight: 550, maxWidth: 500),
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.95),
+            color: Theme.of(
+              context,
+            ).colorScheme.surface.withValues(alpha: 0.95),
             borderRadius: BorderRadius.circular(20),
           ),
           padding: const EdgeInsets.all(12),
