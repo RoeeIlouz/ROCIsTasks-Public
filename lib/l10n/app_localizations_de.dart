@@ -1975,4 +1975,91 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get deleteForever => 'Endgültig löschen';
+
+  @override
+  String get tplGroceryProduce => 'Obst & Gemüse';
+
+  @override
+  String get tplGroceryDairy => 'Milchprodukte';
+
+  @override
+  String get tplGroceryBakery => 'Bäckerei';
+
+  @override
+  String get tplGroceryPantry => 'Vorräte';
+
+  @override
+  String get tplWorkSprint => 'Sprint-Board prüfen';
+
+  @override
+  String get tplWorkTop3 => 'Top-3-Aufgaben priorisieren';
+
+  @override
+  String get tplWorkStandup => 'Team-Sync & Standup';
+
+  @override
+  String get tplRoutineWater => '500 ml Wasser trinken';
+
+  @override
+  String get tplRoutineStretch => '15 Min. Morgen-Dehnen';
+
+  @override
+  String get tplRoutinePlan => 'Tagesprioritäten planen';
+
+  @override
+  String get tplStudyRead => 'Kapitelnotizen lesen';
+
+  @override
+  String get tplStudyPractice => '5 Aufgaben üben';
+
+  @override
+  String get tplStudyFlashcards => 'Karteikarten-Zusammenfassung erstellen';
+
+  @override
+  String previewTasksRemaining(String count) {
+    return '$count Aufgaben offen';
+  }
+
+  @override
+  String previewStartsIn(String minutes, String time) {
+    return 'Beginnt in $minutes Min. · $time';
+  }
+
+  @override
+  String previewNextEvent(String title) {
+    return 'Als Nächstes: $title';
+  }
+
+  @override
+  String get previewAgenda => 'Agenda';
+
+  @override
+  String get previewGrocery => 'Einkauf';
+
+  @override
+  String get previewSampleDesignReview => 'Design-Review & Übergabe';
+
+  @override
+  String get previewSampleUpdateDeps => 'App-Abhängigkeiten aktualisieren';
+
+  @override
+  String get previewSampleSprintPlanning => 'Sprint-Planung';
+
+  @override
+  String get previewSampleGroceryShopping => 'Einkaufen';
+
+  @override
+  String get previewSampleStandup => 'Tägliches Standup';
+
+  @override
+  String get previewSampleMeet => 'Google Meet · Team';
+
+  @override
+  String get previewSampleRelease => 'Release vorbereiten';
+
+  @override
+  String get previewSampleProductTasks => 'Produktaufgaben';
+
+  @override
+  String get previewSampleLaunchReview => 'Produktlaunch-Review';
 }

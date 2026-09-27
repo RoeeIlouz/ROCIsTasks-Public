@@ -1943,4 +1943,91 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deleteForever => 'Delete forever';
+
+  @override
+  String get tplGroceryProduce => 'Fresh produce';
+
+  @override
+  String get tplGroceryDairy => 'Dairy & milk';
+
+  @override
+  String get tplGroceryBakery => 'Bakery';
+
+  @override
+  String get tplGroceryPantry => 'Pantry staples';
+
+  @override
+  String get tplWorkSprint => 'Review sprint board';
+
+  @override
+  String get tplWorkTop3 => 'Prioritize top 3 tasks';
+
+  @override
+  String get tplWorkStandup => 'Team sync & standup';
+
+  @override
+  String get tplRoutineWater => 'Drink 500 ml water';
+
+  @override
+  String get tplRoutineStretch => '15 min morning stretch';
+
+  @override
+  String get tplRoutinePlan => 'Plan the day\'s priorities';
+
+  @override
+  String get tplStudyRead => 'Read chapter notes';
+
+  @override
+  String get tplStudyPractice => 'Practice 5 problems';
+
+  @override
+  String get tplStudyFlashcards => 'Make a flashcard summary';
+
+  @override
+  String previewTasksRemaining(String count) {
+    return '$count tasks remaining';
+  }
+
+  @override
+  String previewStartsIn(String minutes, String time) {
+    return 'Starts in $minutes min · $time';
+  }
+
+  @override
+  String previewNextEvent(String title) {
+    return 'Next: $title';
+  }
+
+  @override
+  String get previewAgenda => 'Agenda';
+
+  @override
+  String get previewGrocery => 'Grocery';
+
+  @override
+  String get previewSampleDesignReview => 'Design review & handoff';
+
+  @override
+  String get previewSampleUpdateDeps => 'Update app dependencies';
+
+  @override
+  String get previewSampleSprintPlanning => 'Sprint planning';
+
+  @override
+  String get previewSampleGroceryShopping => 'Grocery shopping';
+
+  @override
+  String get previewSampleStandup => 'Daily standup call';
+
+  @override
+  String get previewSampleMeet => 'Google Meet · Team';
+
+  @override
+  String get previewSampleRelease => 'Prepare the release';
+
+  @override
+  String get previewSampleProductTasks => 'Product tasks';
+
+  @override
+  String get previewSampleLaunchReview => 'Product launch review';
 }

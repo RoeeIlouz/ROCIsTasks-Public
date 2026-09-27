@@ -767,5 +767,56 @@
   "decreaseInterval": "Decrease",
   "increaseInterval": "Increase",
   "restoreTask": "Restore",
-  "deleteForever": "Delete forever"
+  "deleteForever": "Delete forever",
+  "tplGroceryProduce": "Fresh produce",
+  "tplGroceryDairy": "Dairy & milk",
+  "tplGroceryBakery": "Bakery",
+  "tplGroceryPantry": "Pantry staples",
+  "tplWorkSprint": "Review sprint board",
+  "tplWorkTop3": "Prioritize top 3 tasks",
+  "tplWorkStandup": "Team sync & standup",
+  "tplRoutineWater": "Drink 500 ml water",
+  "tplRoutineStretch": "15 min morning stretch",
+  "tplRoutinePlan": "Plan the day's priorities",
+  "tplStudyRead": "Read chapter notes",
+  "tplStudyPractice": "Practice 5 problems",
+  "tplStudyFlashcards": "Make a flashcard summary",
+  "previewTasksRemaining": "{count} tasks remaining",
+  "@previewTasksRemaining": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "previewStartsIn": "Starts in {minutes} min · {time}",
+  "@previewStartsIn": {
+    "placeholders": {
+      "minutes": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "previewNextEvent": "Next: {title}",
+  "@previewNextEvent": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "previewAgenda": "Agenda",
+  "previewGrocery": "Grocery",
+  "previewSampleDesignReview": "Design review & handoff",
+  "previewSampleUpdateDeps": "Update app dependencies",
+  "previewSampleSprintPlanning": "Sprint planning",
+  "previewSampleGroceryShopping": "Grocery shopping",
+  "previewSampleStandup": "Daily standup call",
+  "previewSampleMeet": "Google Meet · Team",
+  "previewSampleRelease": "Prepare the release",
+  "previewSampleProductTasks": "Product tasks",
+  "previewSampleLaunchReview": "Product launch review"
 }

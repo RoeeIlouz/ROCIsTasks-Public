@@ -1975,4 +1975,91 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get deleteForever => 'Supprimer définitivement';
+
+  @override
+  String get tplGroceryProduce => 'Fruits et légumes';
+
+  @override
+  String get tplGroceryDairy => 'Produits laitiers';
+
+  @override
+  String get tplGroceryBakery => 'Boulangerie';
+
+  @override
+  String get tplGroceryPantry => 'Épicerie de base';
+
+  @override
+  String get tplWorkSprint => 'Revoir le tableau du sprint';
+
+  @override
+  String get tplWorkTop3 => 'Prioriser les 3 tâches principales';
+
+  @override
+  String get tplWorkStandup => 'Point d\'équipe quotidien';
+
+  @override
+  String get tplRoutineWater => 'Boire 500 ml d\'eau';
+
+  @override
+  String get tplRoutineStretch => '15 min d\'étirements';
+
+  @override
+  String get tplRoutinePlan => 'Planifier les priorités du jour';
+
+  @override
+  String get tplStudyRead => 'Lire les notes du chapitre';
+
+  @override
+  String get tplStudyPractice => 'S\'entraîner sur 5 exercices';
+
+  @override
+  String get tplStudyFlashcards => 'Faire des fiches de révision';
+
+  @override
+  String previewTasksRemaining(String count) {
+    return '$count tâches restantes';
+  }
+
+  @override
+  String previewStartsIn(String minutes, String time) {
+    return 'Commence dans $minutes min · $time';
+  }
+
+  @override
+  String previewNextEvent(String title) {
+    return 'Ensuite : $title';
+  }
+
+  @override
+  String get previewAgenda => 'Agenda';
+
+  @override
+  String get previewGrocery => 'Courses';
+
+  @override
+  String get previewSampleDesignReview => 'Revue et livraison du design';
+
+  @override
+  String get previewSampleUpdateDeps => 'Mettre à jour les dépendances';
+
+  @override
+  String get previewSampleSprintPlanning => 'Planification du sprint';
+
+  @override
+  String get previewSampleGroceryShopping => 'Faire les courses';
+
+  @override
+  String get previewSampleStandup => 'Point quotidien';
+
+  @override
+  String get previewSampleMeet => 'Google Meet · Équipe';
+
+  @override
+  String get previewSampleRelease => 'Préparer la version';
+
+  @override
+  String get previewSampleProductTasks => 'Tâches produit';
+
+  @override
+  String get previewSampleLaunchReview => 'Revue du lancement';
 }

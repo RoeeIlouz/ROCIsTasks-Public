@@ -1970,4 +1970,91 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get deleteForever => 'Eliminar para siempre';
+
+  @override
+  String get tplGroceryProduce => 'Frutas y verduras';
+
+  @override
+  String get tplGroceryDairy => 'Lácteos';
+
+  @override
+  String get tplGroceryBakery => 'Panadería';
+
+  @override
+  String get tplGroceryPantry => 'Despensa';
+
+  @override
+  String get tplWorkSprint => 'Revisar el tablero del sprint';
+
+  @override
+  String get tplWorkTop3 => 'Priorizar las 3 tareas principales';
+
+  @override
+  String get tplWorkStandup => 'Reunión diaria del equipo';
+
+  @override
+  String get tplRoutineWater => 'Beber 500 ml de agua';
+
+  @override
+  String get tplRoutineStretch => '15 min de estiramientos';
+
+  @override
+  String get tplRoutinePlan => 'Planificar las prioridades del día';
+
+  @override
+  String get tplStudyRead => 'Leer los apuntes del capítulo';
+
+  @override
+  String get tplStudyPractice => 'Practicar 5 ejercicios';
+
+  @override
+  String get tplStudyFlashcards => 'Hacer un resumen en tarjetas';
+
+  @override
+  String previewTasksRemaining(String count) {
+    return '$count tareas pendientes';
+  }
+
+  @override
+  String previewStartsIn(String minutes, String time) {
+    return 'Empieza en $minutes min · $time';
+  }
+
+  @override
+  String previewNextEvent(String title) {
+    return 'Siguiente: $title';
+  }
+
+  @override
+  String get previewAgenda => 'Agenda';
+
+  @override
+  String get previewGrocery => 'Compras';
+
+  @override
+  String get previewSampleDesignReview => 'Revisión y entrega del diseño';
+
+  @override
+  String get previewSampleUpdateDeps => 'Actualizar dependencias de la app';
+
+  @override
+  String get previewSampleSprintPlanning => 'Planificación del sprint';
+
+  @override
+  String get previewSampleGroceryShopping => 'Hacer la compra';
+
+  @override
+  String get previewSampleStandup => 'Reunión diaria';
+
+  @override
+  String get previewSampleMeet => 'Google Meet · Equipo';
+
+  @override
+  String get previewSampleRelease => 'Preparar la versión';
+
+  @override
+  String get previewSampleProductTasks => 'Tareas de producto';
+
+  @override
+  String get previewSampleLaunchReview => 'Revisión del lanzamiento';
 }
