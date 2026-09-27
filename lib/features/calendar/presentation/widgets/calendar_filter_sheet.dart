@@ -332,9 +332,11 @@ class CalendarFilterSheet extends StatelessWidget {
                                   size: 18,
                                 ),
                                 const SizedBox(width: 12),
-                                const Expanded(
+                                Expanded(
                                   child: Text(
-                                    'No calendars loaded',
+                                    AppLocalizations.of(
+                                      context,
+                                    )!.noCalendarsLoaded,
                                     style: TextStyle(fontSize: 13),
                                   ),
                                 ),
@@ -342,7 +344,9 @@ class CalendarFilterSheet extends StatelessWidget {
                                   onPressed: () {
                                     provider.requestPermissionsAndReload();
                                   },
-                                  child: const Text('Sync Calendars'),
+                                  child: Text(
+                                    AppLocalizations.of(context)!.syncCalendars,
+                                  ),
                                 ),
                               ],
                             ),

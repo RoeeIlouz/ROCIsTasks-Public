@@ -1527,4 +1527,435 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get yesterday => 'Igår';
+
+  @override
+  String pinLockedOut(String seconds) {
+    return 'För många felaktiga PIN-koder. Försök igen om $seconds s.';
+  }
+
+  @override
+  String get pinSaved => 'PIN sparad';
+
+  @override
+  String get orDivider => 'ELLER';
+
+  @override
+  String get openExternally => 'Öppna externt';
+
+  @override
+  String get syncDeviceCalendar => 'Synka enhetens kalender';
+
+  @override
+  String get openInRocisSchedule => 'Öppna i ROCIs Schedule';
+
+  @override
+  String get syncCalendars => 'Synka kalendrar';
+
+  @override
+  String a11yCategory(String name) {
+    return 'Kategori: $name';
+  }
+
+  @override
+  String get a11yDeleteCategory => 'Ta bort kategori';
+
+  @override
+  String a11yColorOption(String number) {
+    return 'Färgalternativ $number';
+  }
+
+  @override
+  String a11yIconOption(String number) {
+    return 'Ikonalternativ $number';
+  }
+
+  @override
+  String a11yColorHex(String hex) {
+    return 'Färg $hex';
+  }
+
+  @override
+  String get a11yClearDate => 'Rensa valt datum';
+
+  @override
+  String get a11yClearRecurrence => 'Rensa upprepning';
+
+  @override
+  String get a11yRemoveField => 'Ta bort fält';
+
+  @override
+  String get taskCompletionFeedback => 'Återkoppling vid avklarad uppgift';
+
+  @override
+  String get taskCompletionFeedbackSubtitle =>
+      'Kort vibration när du bockar av en uppgift';
+
+  @override
+  String get cookiePreferences => 'Cookie-inställningar';
+
+  @override
+  String get cookiePreferencesSubtitle =>
+      'Återställ samtycke till cookies och lagring';
+
+  @override
+  String get scheduleSynergyTitle => 'ROCIs Schedule';
+
+  @override
+  String get scheduleSynergySubtitle => 'Molnsynk aktiv med ROCIs Schedule';
+
+  @override
+  String get openAction => 'Öppna';
+
+  @override
+  String addedToToday(String title) {
+    return '\"$title\" har lagts till i Idag';
+  }
+
+  @override
+  String get taskUpdated => 'Uppgiften uppdaterad';
+
+  @override
+  String get taskCreated => 'Uppgiften skapad';
+
+  @override
+  String get taskDeleted => 'Uppgiften borttagen';
+
+  @override
+  String get backToTasks => 'Tillbaka till uppgifter';
+
+  @override
+  String get calendarDisconnectedReconnect =>
+      'Kalendern är frånkopplad. Tryck för att ansluta igen';
+
+  @override
+  String get webSearchHint => 'Sök uppgifter eller gå till... (⌘K)';
+
+  @override
+  String get allCategories => 'Alla kategorier';
+
+  @override
+  String get quickAddTodayHint =>
+      'Lägg snabbt till en uppgift i Idag... (tryck Enter)';
+
+  @override
+  String get todayAndOverdue => 'Idag & försenade';
+
+  @override
+  String get inboxAndUpcoming => 'Inkorg & kommande';
+
+  @override
+  String get closeEsc => 'Stäng (Esc)';
+
+  @override
+  String get taskTitleHint => 'Uppgiftens titel...';
+
+  @override
+  String get taskNotesHint => 'Lägg till beskrivning eller anteckningar...';
+
+  @override
+  String get addSubtaskHint => 'Lägg till en deluppgift... (tryck Enter)';
+
+  @override
+  String get paletteActions => 'Åtgärder';
+
+  @override
+  String get cmdNewTaskSubtitle => 'Skapa en ny uppgift med alla egenskaper';
+
+  @override
+  String get cmdTasksSubtitle => 'Byt till uppgiftslistan';
+
+  @override
+  String get cmdKanbanSubtitle => 'Byt till Kanban-tavlan';
+
+  @override
+  String get cmdCalendarSubtitle => 'Byt till kalender och agenda';
+
+  @override
+  String get cmdCategoriesSubtitle => 'Hantera kategorier';
+
+  @override
+  String get cmdSettingsSubtitle => 'Öppna inställningar';
+
+  @override
+  String get cmdSyncSubtitle => 'Synka uppgifter åt båda håll nu';
+
+  @override
+  String get cmdToggleTheme => 'Växla tema (mörkt / ljust)';
+
+  @override
+  String get cmdToggleThemeSubtitle => 'Byt färgläge';
+
+  @override
+  String get cmdCategoryFilterSubtitle =>
+      'Filtrera uppgifter efter den här kategorin';
+
+  @override
+  String get cmdSearchHint => 'Skriv ett kommando eller sök uppgifter...';
+
+  @override
+  String get clearAction => 'Rensa';
+
+  @override
+  String get dismissAction => 'Stäng';
+
+  @override
+  String get openingCheckout => 'Öppnar kassan...';
+
+  @override
+  String purchaseError(String error) {
+    return 'Köpfel: $error';
+  }
+
+  @override
+  String get syncedWithGoogleTasks => 'Synkad med Google Tasks';
+
+  @override
+  String get syncingToCloud => 'Synkar ändringar till molnet...';
+
+  @override
+  String get allSyncedToCloud => 'Alla ändringar synkade till molnet';
+
+  @override
+  String get connectedAndSynced => 'Ansluten & synkad';
+
+  @override
+  String get notificationActionAddTask => 'Lägg till uppgift';
+
+  @override
+  String couldNotOpenUrl(String name) {
+    return 'Det gick inte att öppna $name';
+  }
+
+  @override
+  String fileNotFound(String name) {
+    return 'Filen hittades inte: $name';
+  }
+
+  @override
+  String noAppToOpen(String name) {
+    return 'Ingen app hittades för att öppna $name';
+  }
+
+  @override
+  String get cannotOpenLocalFileOnWeb =>
+      'Lokala filer kan inte öppnas på webben';
+
+  @override
+  String get checkingDeviceCapabilities =>
+      'Kontrollerar enhetens funktioner...';
+
+  @override
+  String get noTitle => 'Ingen titel';
+
+  @override
+  String get scheduleClearForDate => 'Du har inget inplanerat det här datumet.';
+
+  @override
+  String get calendarPermissionRequired =>
+      'Kalenderbehörighet krävs för att visa händelser.';
+
+  @override
+  String a11yGoogleCalendarEvent(String title) {
+    return 'Google Kalender-händelse: $title';
+  }
+
+  @override
+  String get noCalendarsLoaded => 'Inga kalendrar har lästs in';
+
+  @override
+  String get a11yEditCategory => 'Redigera kategori';
+
+  @override
+  String get cookiePreferencesReset =>
+      'Cookie-inställningarna har återställts. Samtyckesrutan visas strax.';
+
+  @override
+  String get betaFeatures => 'Betafunktioner';
+
+  @override
+  String get scheduleIntegrationSubtitle =>
+      'Synka universitetets schema och öppna ROCIs Schedule härifrån';
+
+  @override
+  String get noMatchingCommands => 'Inga matchande kommandon eller uppgifter';
+
+  @override
+  String get cookieBannerTitle => 'Inställningar för cookies och lagring';
+
+  @override
+  String get cookieBannerBody =>
+      'Vi använder nödvändig lagring och säkra sessionscookies för att hålla dina Google Tasks- och kalenderkopplingar anslutna mellan besök. Välj ditt alternativ nedan.';
+
+  @override
+  String get essentialOnly => 'Endast nödvändiga';
+
+  @override
+  String get acceptAll => 'Godkänn alla';
+
+  @override
+  String get a11yPickDateHint => 'Välj datum och tid';
+
+  @override
+  String get a11yRecurrenceHint => 'Ställ in upprepning';
+
+  @override
+  String get emptyStateSubtitle => 'Håll huvudet klart och dagen organiserad.';
+
+  @override
+  String get a11ySelected => 'Vald';
+
+  @override
+  String get a11yNotSelected => 'Inte vald';
+
+  @override
+  String get authenticating => 'Autentiserar...';
+
+  @override
+  String get errorScreenTitle => 'Något gick fel';
+
+  @override
+  String get errorScreenBody =>
+      'Ett oväntat fel inträffade. Det har rapporterats.';
+
+  @override
+  String get tryAgain => 'Försök igen';
+
+  @override
+  String get offlineTooltip =>
+      'Offline: ändringar sparas på enheten och synkas när du är online igen';
+
+  @override
+  String get syncingLabel => 'Synkar...';
+
+  @override
+  String get syncErrorLabel => 'Synkfel';
+
+  @override
+  String get syncErrorRetry => 'Synkfel. Tryck för att försöka igen.';
+
+  @override
+  String get syncedLabel => 'Synkad';
+
+  @override
+  String get calendarDisconnected => 'Kalendern är frånkopplad';
+
+  @override
+  String get getAndroidApp => 'Skaffa Android-appen';
+
+  @override
+  String get onGooglePlay => 'På Google Play';
+
+  @override
+  String get userProfile => 'Användarprofil';
+
+  @override
+  String get userFallbackName => 'Användare';
+
+  @override
+  String helloUser(String name) {
+    return 'Hej, $name 👋';
+  }
+
+  @override
+  String get helloThere => 'Hej 👋';
+
+  @override
+  String get webDashboardSubtitle =>
+      'Organisera dina prioriteringar och håll synken frisk.';
+
+  @override
+  String get totalActive => 'Aktiva totalt';
+
+  @override
+  String get upcomingSection => 'Kommande';
+
+  @override
+  String get switchToComfortableView => 'Byt till luftig vy';
+
+  @override
+  String get switchToCompactView => 'Byt till kompakt vy';
+
+  @override
+  String get noTasksInSection => 'Inga uppgifter i det här avsnittet';
+
+  @override
+  String get selectATask => 'Välj en uppgift';
+
+  @override
+  String get selectATaskBody =>
+      'Klicka på en uppgift för att visa och redigera den, eller på \"+ Ny uppgift\" för att skapa en.';
+
+  @override
+  String get taskDetails => 'Uppgiftsdetaljer';
+
+  @override
+  String get savingStatus => 'Sparar';
+
+  @override
+  String get savedStatus => 'Sparat';
+
+  @override
+  String get titleRequired => 'Titel krävs';
+
+  @override
+  String get statusLabel => 'Status';
+
+  @override
+  String get inProgress => 'Pågår';
+
+  @override
+  String get dueDateLabel => 'Förfallodatum';
+
+  @override
+  String get setDate => 'Ange datum';
+
+  @override
+  String subtasksProgress(String done, String total) {
+    return 'Deluppgifter ($done/$total)';
+  }
+
+  @override
+  String get liveWidgetPreview => 'Förhandsvisning av widget';
+
+  @override
+  String get calendarWidgetBehavior => 'Kalenderwidgetens beteende';
+
+  @override
+  String get widgetGeneric => 'Widget';
+
+  @override
+  String get widgetNameMonthList => 'Månad & lista';
+
+  @override
+  String get widgetNameTimeline => 'Tidslinje';
+
+  @override
+  String get widgetNameQuickActions => 'Snabbåtgärder';
+
+  @override
+  String get widgetNameUpNext => 'Härnäst';
+
+  @override
+  String get filterWidgetTasks => 'Filtrera widgetens uppgifter';
+
+  @override
+  String get addSubtask => 'Lägg till deluppgift';
+
+  @override
+  String get removeSubtask => 'Ta bort deluppgift';
+
+  @override
+  String get addItem => 'Lägg till vara';
+
+  @override
+  String get decreaseInterval => 'Minska';
+
+  @override
+  String get increaseInterval => 'Öka';
+
+  @override
+  String get restoreTask => 'Återställ';
+
+  @override
+  String get deleteForever => 'Radera permanent';
 }

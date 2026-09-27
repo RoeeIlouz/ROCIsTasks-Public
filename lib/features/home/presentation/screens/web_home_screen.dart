@@ -234,7 +234,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
     _quickAddController.clear();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Added "$title" to Today'),
+        content: Text(AppLocalizations.of(context)!.addedToToday(title)),
         duration: const Duration(seconds: 2),
       ),
     );
@@ -325,7 +325,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
           customFields: validCustomFields,
         );
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Task updated successfully')),
+          SnackBar(content: Text(AppLocalizations.of(context)!.taskUpdated)),
         );
         _selectTask(null);
       } else if (_isCreatingTask) {
@@ -343,7 +343,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
           customFields: validCustomFields,
         );
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Task created successfully')),
+          SnackBar(content: Text(AppLocalizations.of(context)!.taskCreated)),
         );
         _selectTask(null);
       }
@@ -517,7 +517,9 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                                 IconButton(
                                   icon: const Icon(Icons.arrow_back_rounded),
                                   onPressed: () => _selectTask(null),
-                                  tooltip: 'Back to tasks',
+                                  tooltip: AppLocalizations.of(
+                                    context,
+                                  )!.backToTasks,
                                 ),
                                 Text(
                                   _isCreatingTask
@@ -735,8 +737,13 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                 ? Padding(
                     padding: const EdgeInsets.only(bottom: 12),
                     child: Tooltip(
-                      message: 'Calendar Disconnected - Tap to Reconnect',
+                      message: AppLocalizations.of(
+                        context,
+                      )!.calendarDisconnectedReconnect,
                       child: IconButton(
+                        tooltip: AppLocalizations.of(
+                          context,
+                        )!.calendarDisconnectedReconnect,
                         icon: Icon(
                           Icons.warning_amber_rounded,
                           color: theme.colorScheme.error,
@@ -778,7 +785,9 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
-                                'Calendar Disconnected',
+                                AppLocalizations.of(
+                                  context,
+                                )!.calendarDisconnected,
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.bold,
@@ -818,8 +827,8 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                             foregroundColor: theme.colorScheme.onError,
                             elevation: 0,
                           ),
-                          child: const Text(
-                            'Reconnect',
+                          child: Text(
+                            AppLocalizations.of(context)!.reconnect,
                             style: TextStyle(fontSize: 11),
                           ),
                         ),
@@ -836,6 +845,9 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                       message:
                           '${l10n.googleTasksDisconnected} - ${l10n.reconnect}',
                       child: IconButton(
+                        tooltip: AppLocalizations.of(
+                          context,
+                        )!.calendarDisconnectedReconnect,
                         icon: Icon(
                           Icons.warning_amber_rounded,
                           color: theme.colorScheme.error,
@@ -978,7 +990,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Get Android App',
+                                AppLocalizations.of(context)!.getAndroidApp,
                                 style: GoogleFonts.outfit(
                                   fontSize: 13,
                                   fontWeight: FontWeight.bold,
@@ -986,7 +998,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                                 ),
                               ),
                               Text(
-                                'On Google Play',
+                                AppLocalizations.of(context)!.onGooglePlay,
                                 style: TextStyle(
                                   fontSize: 10,
                                   color: theme.disabledColor,
@@ -1017,7 +1029,8 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
           if (user != null)
             isCompact
                 ? Tooltip(
-                    message: user.email ?? 'User Profile',
+                    message:
+                        user.email ?? AppLocalizations.of(context)!.userProfile,
                     child: CircleAvatar(
                       radius: 18,
                       backgroundColor: theme.colorScheme.primary.withValues(
@@ -1077,7 +1090,9 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                                 (user.displayName != null &&
                                         user.displayName!.isNotEmpty)
                                     ? user.displayName!
-                                    : 'User',
+                                    : AppLocalizations.of(
+                                        context,
+                                      )!.userFallbackName,
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 13,
@@ -1114,6 +1129,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                 ? Tooltip(
                     message: l10n.signIn,
                     child: IconButton(
+                      tooltip: AppLocalizations.of(context)!.signIn,
                       icon: const Icon(
                         Icons.login_rounded,
                         color: Colors.orangeAccent,
@@ -1456,7 +1472,11 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Hello, ${user?.displayName ?? 'Productive User'} 👋',
+                          (user?.displayName?.isNotEmpty ?? false)
+                              ? AppLocalizations.of(
+                                  context,
+                                )!.helloUser(user!.displayName!)
+                              : AppLocalizations.of(context)!.helloThere,
                           style: GoogleFonts.outfit(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -1467,7 +1487,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Organize your priorities and keep your sync healthy.',
+                          AppLocalizations.of(context)!.webDashboardSubtitle,
                           style: TextStyle(
                             color: theme.disabledColor,
                             fontSize: 13,
@@ -1486,7 +1506,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                           onPressed: _initCreateTask,
                           icon: const Icon(Icons.add, size: 18),
                           label: Text(
-                            'New Task',
+                            AppLocalizations.of(context)!.newTask,
                             style: GoogleFonts.outfit(
                               fontWeight: FontWeight.bold,
                             ),
@@ -1514,7 +1534,11 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Hello, ${user?.displayName ?? 'Productive User'} 👋',
+                          (user?.displayName?.isNotEmpty ?? false)
+                              ? AppLocalizations.of(
+                                  context,
+                                )!.helloUser(user!.displayName!)
+                              : AppLocalizations.of(context)!.helloThere,
                           style: GoogleFonts.outfit(
                             fontSize: 26,
                             fontWeight: FontWeight.bold,
@@ -1525,7 +1549,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Organize your priorities and keep your sync healthy.',
+                          AppLocalizations.of(context)!.webDashboardSubtitle,
                           style: TextStyle(
                             color: theme.disabledColor,
                             fontSize: 13,
@@ -1543,7 +1567,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                     onPressed: _initCreateTask,
                     icon: const Icon(Icons.add, size: 18),
                     label: Text(
-                      'New Task',
+                      AppLocalizations.of(context)!.newTask,
                       style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
                     ),
                     style: FilledButton.styleFrom(
@@ -1573,13 +1597,13 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                       children: [
                         _buildStatCard(
                           context,
-                          'Total Active',
+                          AppLocalizations.of(context)!.totalActive,
                           '${activeTasks.length}',
                           Icons.assignment_turned_in_rounded,
                         ),
                         _buildStatCard(
                           context,
-                          'Today & Overdue',
+                          AppLocalizations.of(context)!.todayAndOverdue,
                           '${todayAndOverdue.length}',
                           Icons.today_rounded,
                           color: Colors.orangeAccent,
@@ -1591,7 +1615,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                       children: [
                         _buildStatCard(
                           context,
-                          'Upcoming',
+                          AppLocalizations.of(context)!.upcomingSection,
                           '${inboxAndUpcoming.length}',
                           Icons.upcoming_rounded,
                           color: theme.colorScheme.primary,
@@ -1605,20 +1629,20 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                 children: [
                   _buildStatCard(
                     context,
-                    'Total Active',
+                    AppLocalizations.of(context)!.totalActive,
                     '${activeTasks.length}',
                     Icons.assignment_turned_in_rounded,
                   ),
                   _buildStatCard(
                     context,
-                    'Today & Overdue',
+                    AppLocalizations.of(context)!.todayAndOverdue,
                     '${todayAndOverdue.length}',
                     Icons.today_rounded,
                     color: Colors.orangeAccent,
                   ),
                   _buildStatCard(
                     context,
-                    'Upcoming',
+                    AppLocalizations.of(context)!.upcomingSection,
                     '${inboxAndUpcoming.length}',
                     Icons.upcoming_rounded,
                     color: theme.colorScheme.primary,
@@ -1639,7 +1663,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                   style: GoogleFonts.outfit(fontSize: 14),
                   decoration: InputDecoration(
                     prefixIcon: const Icon(Icons.search_rounded, size: 20),
-                    hintText: 'Search tasks or jump to... (⌘K)',
+                    hintText: AppLocalizations.of(context)!.webSearchHint,
                     hintStyle: TextStyle(
                       fontSize: 13,
                       color: theme.disabledColor,
@@ -1706,7 +1730,14 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                     .map(
                       (p) => DropdownMenuItem(
                         value: p,
-                        child: Text('$p Priority'),
+                        child: Text(switch (p) {
+                          'High' => AppLocalizations.of(context)!.highPriority,
+                          'Medium' => AppLocalizations.of(
+                            context,
+                          )!.mediumPriority,
+                          'Low' => AppLocalizations.of(context)!.lowPriority,
+                          _ => AppLocalizations.of(context)!.all,
+                        }),
                       ),
                     )
                     .toList(),
@@ -1721,12 +1752,12 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
               const SizedBox(width: 16),
               DropdownButton<String?>(
                 value: _selectedCategoryFilter,
-                hint: const Text('All Categories'),
+                hint: Text(AppLocalizations.of(context)!.allCategories),
                 underline: const SizedBox(),
                 items: [
-                  const DropdownMenuItem(
+                  DropdownMenuItem(
                     value: null,
-                    child: Text('All Categories'),
+                    child: Text(AppLocalizations.of(context)!.allCategories),
                   ),
                   ...provider.categories.map(
                     (c) => DropdownMenuItem(value: c.id, child: Text(c.name)),
@@ -1741,8 +1772,8 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
               const SizedBox(width: 12),
               Tooltip(
                 message: _compactDensity
-                    ? 'Switch to Comfortable View'
-                    : 'Switch to Compact View',
+                    ? AppLocalizations.of(context)!.switchToComfortableView
+                    : AppLocalizations.of(context)!.switchToCompactView,
                 child: InkWell(
                   onTap: () {
                     setState(() {
@@ -1801,7 +1832,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                     focusNode: _quickAddFocusNode,
                     style: GoogleFonts.outfit(fontSize: 13),
                     decoration: InputDecoration(
-                      hintText: 'Quick add task to Today... (Press Enter)',
+                      hintText: AppLocalizations.of(context)!.quickAddTodayHint,
                       hintStyle: TextStyle(
                         fontSize: 13,
                         color: theme.disabledColor,
@@ -1850,7 +1881,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                 // Column 1: Today & Overdue
                 Expanded(
                   child: _buildTaskColumn(
-                    title: 'Today & Overdue',
+                    title: AppLocalizations.of(context)!.todayAndOverdue,
                     tasks: todayAndOverdue,
                     provider: provider,
                     l10n: l10n,
@@ -1860,7 +1891,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                 // Column 2: Inbox & Upcoming
                 Expanded(
                   child: _buildTaskColumn(
-                    title: 'Inbox & Upcoming',
+                    title: AppLocalizations.of(context)!.inboxAndUpcoming,
                     tasks: inboxAndUpcoming,
                     provider: provider,
                     l10n: l10n,
@@ -1998,7 +2029,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                   ),
                   child: Center(
                     child: Text(
-                      'No tasks in this section',
+                      AppLocalizations.of(context)!.noTasksInSection,
                       style: TextStyle(
                         color: theme.disabledColor,
                         fontSize: 13,
@@ -2077,7 +2108,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
               ),
               const SizedBox(height: 16),
               Text(
-                'Select a Task',
+                AppLocalizations.of(context)!.selectATask,
                 style: GoogleFonts.outfit(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -2086,7 +2117,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Click any task to view and update details, or click "+ New Task" to create one inline.',
+                AppLocalizations.of(context)!.selectATaskBody,
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 12, color: theme.disabledColor),
               ),
@@ -2112,7 +2143,9 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                 Row(
                   children: [
                     Text(
-                      isEditing ? 'Task Details' : 'New Task',
+                      isEditing
+                          ? AppLocalizations.of(context)!.taskDetails
+                          : AppLocalizations.of(context)!.newTask,
                       style: GoogleFonts.outfit(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -2151,7 +2184,9 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                               ),
                             const SizedBox(width: 4),
                             Text(
-                              _saveStatus == 'saving' ? 'Saving' : 'Saved',
+                              _saveStatus == 'saving'
+                                  ? AppLocalizations.of(context)!.savingStatus
+                                  : AppLocalizations.of(context)!.savedStatus,
                               style: TextStyle(
                                 fontSize: 10,
                                 fontWeight: FontWeight.bold,
@@ -2175,18 +2210,22 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                           size: 18,
                         ),
                         color: Colors.redAccent,
-                        tooltip: 'Delete Task',
+                        tooltip: AppLocalizations.of(context)!.deleteTaskTitle,
                         onPressed: () {
                           provider.deleteTask(_selectedTask!.id);
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Task deleted')),
+                            SnackBar(
+                              content: Text(
+                                AppLocalizations.of(context)!.taskDeleted,
+                              ),
+                            ),
                           );
                           _selectTask(null);
                         },
                       ),
                     IconButton(
                       icon: const Icon(Icons.close_rounded, size: 18),
-                      tooltip: 'Close (ESC)',
+                      tooltip: AppLocalizations.of(context)!.closeEsc,
                       onPressed: () => _selectTask(null),
                     ),
                   ],
@@ -2213,7 +2252,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                         letterSpacing: -0.3,
                       ),
                       decoration: InputDecoration(
-                        hintText: 'Task title...',
+                        hintText: AppLocalizations.of(context)!.taskTitleHint,
                         hintStyle: TextStyle(
                           color: theme.disabledColor.withValues(alpha: 0.5),
                           fontSize: 18,
@@ -2225,7 +2264,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                       ),
                       validator: (value) =>
                           value == null || value.trim().isEmpty
-                          ? 'Title is required'
+                          ? AppLocalizations.of(context)!.titleRequired
                           : null,
                       onChanged: (_) => _triggerAutoSave(),
                     ),
@@ -2242,7 +2281,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                         ),
                       ),
                       decoration: InputDecoration(
-                        hintText: 'Add description or notes...',
+                        hintText: AppLocalizations.of(context)!.taskNotesHint,
                         hintStyle: TextStyle(
                           color: theme.disabledColor.withValues(alpha: 0.6),
                           fontSize: 13,
@@ -2283,7 +2322,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                                     ),
                                     const SizedBox(width: 8),
                                     Text(
-                                      'Status',
+                                      AppLocalizations.of(context)!.statusLabel,
                                       style: TextStyle(
                                         fontSize: 12,
                                         color: theme.disabledColor,
@@ -2333,8 +2372,12 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                                         const SizedBox(width: 4),
                                         Text(
                                           (_selectedTask?.isCompleted ?? false)
-                                              ? 'Completed'
-                                              : 'In Progress',
+                                              ? AppLocalizations.of(
+                                                  context,
+                                                )!.completed
+                                              : AppLocalizations.of(
+                                                  context,
+                                                )!.inProgress,
                                           style: TextStyle(
                                             fontSize: 11,
                                             fontWeight: FontWeight.w600,
@@ -2367,7 +2410,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                                   ),
                                   const SizedBox(width: 8),
                                   Text(
-                                    'Due Date',
+                                    AppLocalizations.of(context)!.dueDateLabel,
                                     style: TextStyle(
                                       fontSize: 12,
                                       color: theme.disabledColor,
@@ -2399,7 +2442,9 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                                     children: [
                                       Text(
                                         _dueDate == null
-                                            ? 'Set Date'
+                                            ? AppLocalizations.of(
+                                                context,
+                                              )!.setDate
                                             : DateFormat.yMMMd()
                                                   .add_jm()
                                                   .format(_dueDate!),
@@ -2413,17 +2458,23 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                                       ),
                                       if (_dueDate != null) ...[
                                         const SizedBox(width: 4),
-                                        GestureDetector(
-                                          onTap: () {
-                                            setState(() {
-                                              _dueDate = null;
-                                            });
-                                            _triggerAutoSave();
-                                          },
-                                          child: Icon(
-                                            Icons.close_rounded,
-                                            size: 13,
-                                            color: theme.disabledColor,
+                                        Semantics(
+                                          button: true,
+                                          label: AppLocalizations.of(
+                                            context,
+                                          )!.a11yClearDate,
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              setState(() {
+                                                _dueDate = null;
+                                              });
+                                              _triggerAutoSave();
+                                            },
+                                            child: Icon(
+                                              Icons.close_rounded,
+                                              size: 13,
+                                              color: theme.disabledColor,
+                                            ),
                                           ),
                                         ),
                                       ],
@@ -2448,7 +2499,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                                   ),
                                   const SizedBox(width: 8),
                                   Text(
-                                    'Priority',
+                                    AppLocalizations.of(context)!.priority,
                                     style: TextStyle(
                                       fontSize: 12,
                                       color: theme.disabledColor,
@@ -2622,7 +2673,10 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Subtasks (${_subTasks.where((s) => s.isCompleted).length}/${_subTasks.length})',
+                          AppLocalizations.of(context)!.subtasksProgress(
+                            '${_subTasks.where((s) => s.isCompleted).length}',
+                            '${_subTasks.length}',
+                          ),
                           style: GoogleFonts.outfit(
                             fontWeight: FontWeight.bold,
                             fontSize: 12,
@@ -2673,6 +2727,9 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                               ),
                             ),
                             IconButton(
+                              tooltip: AppLocalizations.of(
+                                context,
+                              )!.removeSubtask,
                               icon: const Icon(Icons.close_rounded, size: 14),
                               color: theme.disabledColor,
                               padding: EdgeInsets.zero,
@@ -2715,7 +2772,9 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                               controller: _newSubtaskController,
                               style: const TextStyle(fontSize: 12),
                               decoration: InputDecoration(
-                                hintText: 'Add a subtask... (Press Enter)',
+                                hintText: AppLocalizations.of(
+                                  context,
+                                )!.addSubtaskHint,
                                 hintStyle: TextStyle(
                                   fontSize: 12,
                                   color: theme.disabledColor,

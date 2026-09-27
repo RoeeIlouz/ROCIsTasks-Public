@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:rocis_tasks/core/config/app_config.dart';
 import 'package:rocis_tasks/core/services/web/cookie_service.dart';
+import 'package:rocis_tasks/l10n/app_localizations.dart';
 
 /// Floating Glassmorphic Cookie & Storage Consent Banner for Web.
 /// Provides GDPR-compliant 'Accept All' and 'Essential Only' choices
@@ -170,7 +171,7 @@ class _CookieConsentBannerState extends State<CookieConsentBanner> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Cookie & Storage Preferences',
+                            AppLocalizations.of(context)!.cookieBannerTitle,
                             style: GoogleFonts.outfit(
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
@@ -179,7 +180,7 @@ class _CookieConsentBannerState extends State<CookieConsentBanner> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'We use essential storage and secure session cookies to keep your Google Tasks and Calendar integrations connected across visits. Choose your preference below.',
+                            AppLocalizations.of(context)!.cookieBannerBody,
                             style: TextStyle(
                               fontSize: 13,
                               height: 1.4,
@@ -212,7 +213,7 @@ class _CookieConsentBannerState extends State<CookieConsentBanner> {
                               vertical: 2,
                             ),
                             child: Text(
-                              'Privacy Policy',
+                              AppLocalizations.of(context)!.privacyPolicy,
                               style: TextStyle(
                                 fontSize: 12,
                                 color: primaryColor,
@@ -241,7 +242,7 @@ class _CookieConsentBannerState extends State<CookieConsentBanner> {
                               vertical: 2,
                             ),
                             child: Text(
-                              'Terms of Service',
+                              AppLocalizations.of(context)!.termsOfService,
                               style: TextStyle(
                                 fontSize: 12,
                                 color: primaryColor,
@@ -271,8 +272,8 @@ class _CookieConsentBannerState extends State<CookieConsentBanner> {
                               ),
                             ),
                           ),
-                          child: const Text(
-                            'Essential Only',
+                          child: Text(
+                            AppLocalizations.of(context)!.essentialOnly,
                             style: TextStyle(fontSize: 13),
                           ),
                         ),
@@ -288,8 +289,8 @@ class _CookieConsentBannerState extends State<CookieConsentBanner> {
                               borderRadius: BorderRadius.circular(10),
                             ),
                           ),
-                          child: const Text(
-                            'Accept All',
+                          child: Text(
+                            AppLocalizations.of(context)!.acceptAll,
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,

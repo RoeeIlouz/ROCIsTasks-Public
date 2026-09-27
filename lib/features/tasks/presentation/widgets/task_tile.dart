@@ -251,7 +251,11 @@ class TaskTile extends StatelessWidget {
                           enableHaptics: hasTaskFeedback,
                           enableSparkles: !isSelectionMode,
                           semanticsLabel: isSelectionMode
-                              ? (isSelected ? 'Selected' : 'Not selected')
+                              ? (isSelected
+                                    ? AppLocalizations.of(context)!.a11ySelected
+                                    : AppLocalizations.of(
+                                        context,
+                                      )!.a11yNotSelected)
                               : (task.isCompleted
                                     ? l10n.markAsIncomplete
                                     : l10n.markAsComplete),
@@ -438,6 +442,9 @@ class TaskTile extends StatelessWidget {
                                   : l10n.pinTask,
                               button: true,
                               child: IconButton(
+                                tooltip: (task.isPinned ?? false)
+                                    ? l10n.unpinTask
+                                    : l10n.pinTask,
                                 icon: Icon(
                                   (task.isPinned ?? false)
                                       ? Icons.push_pin
@@ -1069,7 +1076,7 @@ class _GTasksBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Tooltip(
-      message: 'Synced with Google Tasks',
+      message: AppLocalizations.of(context)!.syncedWithGoogleTasks,
       child: Container(
         width: 20,
         height: 20,

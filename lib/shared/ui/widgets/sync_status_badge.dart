@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:rocis_tasks/core/services/connectivity_service.dart';
 import 'package:rocis_tasks/core/services/sync_status_service.dart';
 import 'package:rocis_tasks/core/services/firestore_service.dart';
+import 'package:rocis_tasks/l10n/app_localizations.dart';
 
 class SyncStatusBadge extends StatelessWidget {
   final bool compact;
@@ -26,8 +27,7 @@ class SyncStatusBadge extends StatelessWidget {
             context,
             icon: Icons.cloud_off_rounded,
             label: compact ? null : 'Offline',
-            tooltip:
-                'Offline mode: all changes saved safely to local Hive storage',
+            tooltip: AppLocalizations.of(context)!.offlineTooltip,
             backgroundColor: Theme.of(
               context,
             ).colorScheme.errorContainer.withValues(alpha: 0.25),
@@ -41,8 +41,8 @@ class SyncStatusBadge extends StatelessWidget {
             context,
             icon: Icons.sync_rounded,
             isSpinning: true,
-            label: compact ? null : 'Syncing...',
-            tooltip: 'Synchronizing changes with cloud...',
+            label: compact ? null : AppLocalizations.of(context)!.syncingLabel,
+            tooltip: AppLocalizations.of(context)!.syncingToCloud,
             backgroundColor: const Color(0xFFF37000).withValues(alpha: 0.15),
             foregroundColor: const Color(0xFFF37000),
           );
@@ -52,8 +52,12 @@ class SyncStatusBadge extends StatelessWidget {
           return _buildBadge(
             context,
             icon: Icons.sync_problem_rounded,
-            label: compact ? null : 'Sync Error',
-            tooltip: syncStatus.lastErrorMessage ?? 'Sync error. Tap to retry.',
+            label: compact
+                ? null
+                : AppLocalizations.of(context)!.syncErrorLabel,
+            tooltip:
+                syncStatus.lastErrorMessage ??
+                AppLocalizations.of(context)!.syncErrorRetry,
             backgroundColor: Theme.of(
               context,
             ).colorScheme.errorContainer.withValues(alpha: 0.3),
@@ -68,8 +72,8 @@ class SyncStatusBadge extends StatelessWidget {
           return _buildBadge(
             context,
             icon: Icons.cloud_done_rounded,
-            label: compact ? null : 'Synced',
-            tooltip: 'All changes synced to cloud',
+            label: compact ? null : AppLocalizations.of(context)!.syncedLabel,
+            tooltip: AppLocalizations.of(context)!.allSyncedToCloud,
             backgroundColor: const Color(0xFF10B981).withValues(alpha: 0.15),
             foregroundColor: const Color(0xFF10B981),
           );
@@ -78,7 +82,7 @@ class SyncStatusBadge extends StatelessWidget {
         // Idle online: subtle synced indicator
         if (compact) {
           return Tooltip(
-            message: 'Connected & Synced',
+            message: AppLocalizations.of(context)!.connectedAndSynced,
             child: Icon(
               Icons.cloud_done_outlined,
               size: 16,

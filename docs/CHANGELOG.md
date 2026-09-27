@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0+114] - 2026-09-27 (Patch 2)
+
+### Changed
+- The private-tasks PIN is now stored hashed, and after 5 wrong tries PIN entry locks for 30 seconds, doubling up to 15 minutes. Around 130 screens, messages and buttons that were English-only are now translated, and icon buttons, color choices and plan cards are labeled for screen readers.
+
 ## [0.3.0+114] - 2026-09-27 (Patch 1)
 
 ### Changed

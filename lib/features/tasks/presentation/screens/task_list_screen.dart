@@ -522,7 +522,7 @@ class _TaskListViewState extends State<TaskListView> {
                           Text(
                             isInboxZero
                                 ? l10n.allCaughtUpSubtitle
-                                : 'Keep your mind clear and your day organized.',
+                                : l10n.emptyStateSubtitle,
                             textAlign: TextAlign.center,
                             style: theme.textTheme.bodyMedium?.copyWith(
                               color: theme.colorScheme.onSurface.withValues(
@@ -808,7 +808,7 @@ class _TaskListViewState extends State<TaskListView> {
                 size: 18,
                 color: theme.colorScheme.onSurfaceVariant,
               ),
-              tooltip: 'Dismiss',
+              tooltip: AppLocalizations.of(context)!.dismissAction,
               onPressed: () {
                 setState(() {
                   _dismissedGoogleTasksWarning = true;

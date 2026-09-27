@@ -457,6 +457,7 @@ class BackgroundHandler {
         ),
         tasksRemainingLabel: l10n.notificationTasksRemaining,
         tasksSummaryLabel: l10n.notificationTasksSummary(pendingTasks.length),
+        addTaskLabel: l10n.notificationActionAddTask,
       );
     } catch (e) {
       AppLogger.error('Background task error', error: e, tag: 'Background');

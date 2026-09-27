@@ -744,8 +744,10 @@ class SettingsScreen extends StatelessWidget {
                 Icons.vibration_rounded,
                 Colors.deepOrange,
               ),
-              title: const Text('Task Completion Feedback'),
-              subtitle: const Text('Haptic pulse when ticking off a task'),
+              title: Text(AppLocalizations.of(context)!.taskCompletionFeedback),
+              subtitle: Text(
+                AppLocalizations.of(context)!.taskCompletionFeedbackSubtitle,
+              ),
               value: themeService.taskCompletionFeedback,
               onChanged: themeService.toggleTaskCompletionFeedback,
             ),
@@ -1126,14 +1128,16 @@ class SettingsScreen extends StatelessWidget {
                 Icons.cookie_outlined,
                 Colors.orange,
               ),
-              title: const Text('Cookie Preferences'),
-              subtitle: const Text('Reset cookie & storage consent'),
+              title: Text(AppLocalizations.of(context)!.cookiePreferences),
+              subtitle: Text(
+                AppLocalizations.of(context)!.cookiePreferencesSubtitle,
+              ),
               trailing: const Icon(Icons.refresh, size: 16),
               onTap: () {
                 CookieConsentBanner.resetConsent();
                 showSuccessSnackBar(
                   context,
-                  'Cookie preferences reset. The consent banner will appear shortly.',
+                  AppLocalizations.of(context)!.cookiePreferencesReset,
                 );
               },
             ),
@@ -1241,15 +1245,17 @@ class SettingsScreen extends StatelessWidget {
                 Icons.school_rounded,
                 Colors.indigo,
               ),
-              title: const Text('ROCIs Schedule Synergy'),
-              subtitle: const Text('Cloud sync active with ROCIs Schedule'),
+              title: Text(AppLocalizations.of(context)!.scheduleSynergyTitle),
+              subtitle: Text(
+                AppLocalizations.of(context)!.scheduleSynergySubtitle,
+              ),
               trailing: FilledButton.tonalIcon(
                 onPressed: () {
                   HapticFeedback.selectionClick();
                   ScheduleBridgeService.openScheduleApp();
                 },
                 icon: const Icon(Icons.open_in_new_rounded, size: 16),
-                label: const Text('Open'),
+                label: Text(AppLocalizations.of(context)!.openAction),
               ),
             ),
           ]),
@@ -1322,7 +1328,7 @@ class SettingsScreen extends StatelessWidget {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                         content: Text(
-                                          '${l10n.debugModeUnlocked} & Beta Features Unlocked! 🚀',
+                                          '${l10n.debugModeUnlocked} · ${l10n.betaFeatures} 🚀',
                                         ),
                                       ),
                                     );
@@ -1447,7 +1453,9 @@ class SettingsScreen extends StatelessWidget {
                                             ),
                                             const SizedBox(width: 8),
                                             Text(
-                                              'Beta Features',
+                                              AppLocalizations.of(
+                                                context,
+                                              )!.betaFeatures,
                                               style: TextStyle(
                                                 fontWeight: FontWeight.bold,
                                                 color: Theme.of(
@@ -1460,11 +1468,15 @@ class SettingsScreen extends StatelessWidget {
                                         const SizedBox(height: 8),
                                         SwitchListTile(
                                           contentPadding: EdgeInsets.zero,
-                                          title: const Text(
-                                            'ROCIs Schedule Synergy (Beta)',
+                                          title: Text(
+                                            AppLocalizations.of(
+                                              context,
+                                            )!.scheduleSynergyTitle,
                                           ),
-                                          subtitle: const Text(
-                                            'Sync university timetable events and enable cross-app launcher',
+                                          subtitle: Text(
+                                            AppLocalizations.of(
+                                              context,
+                                            )!.scheduleIntegrationSubtitle,
                                           ),
                                           value: themeService
                                               .enableScheduleIntegration,
@@ -1654,6 +1666,7 @@ class _TimezonePickerSheetState extends State<_TimezonePickerSheet> {
                   prefixIcon: const Icon(Icons.search),
                   suffixIcon: _searchQuery.isNotEmpty
                       ? IconButton(
+                          tooltip: AppLocalizations.of(context)!.clearAction,
                           icon: const Icon(Icons.clear),
                           onPressed: () {
                             _searchController.clear();

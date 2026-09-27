@@ -278,6 +278,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       ),
                       const Spacer(),
                       IconButton(
+                        tooltip: MaterialLocalizations.of(
+                          context,
+                        ).previousMonthTooltip,
                         icon: const Icon(Icons.chevron_left_rounded),
                         visualDensity: VisualDensity.compact,
                         onPressed: () {
@@ -290,6 +293,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         },
                       ),
                       IconButton(
+                        tooltip: MaterialLocalizations.of(
+                          context,
+                        ).nextMonthTooltip,
                         icon: const Icon(Icons.chevron_right_rounded),
                         visualDensity: VisualDensity.compact,
                         onPressed: () {
@@ -417,7 +423,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         if (event is Task) {
                           title = event.title;
                         } else if (event is Event) {
-                          title = event.title ?? 'No Title';
+                          title =
+                              event.title ??
+                              AppLocalizations.of(context)!.noTitle;
                         } else if (event is SyncedScheduleEvent) {
                           title = event.courseName.isNotEmpty
                               ? (event.title.isNotEmpty &&
@@ -581,7 +589,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                           ),
                           const SizedBox(height: 6),
                           Text(
-                            'Your schedule is clear for this date.',
+                            AppLocalizations.of(context)!.scheduleClearForDate,
                             textAlign: TextAlign.center,
                             style: Theme.of(context).textTheme.bodySmall
                                 ?.copyWith(
@@ -620,16 +628,22 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                     .requestPermissionsAndReload();
                                 if (context.mounted && !granted) {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
+                                    SnackBar(
                                       content: Text(
-                                        'Calendar permission is required to display events.',
+                                        AppLocalizations.of(
+                                          context,
+                                        )!.calendarPermissionRequired,
                                       ),
                                     ),
                                   );
                                 }
                               },
                               icon: const Icon(Icons.sync_rounded, size: 16),
-                              label: const Text('Sync Device Calendar'),
+                              label: Text(
+                                AppLocalizations.of(
+                                  context,
+                                )!.syncDeviceCalendar,
+                              ),
                             ),
                           ],
                         ],
@@ -774,8 +788,11 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         isSelected: false,
                         tintColor: eventColor,
                         child: Semantics(
-                          label:
-                              'Google Calendar Event: ${item.title ?? 'No Title'}',
+                          label: AppLocalizations.of(context)!
+                              .a11yGoogleCalendarEvent(
+                                item.title ??
+                                    AppLocalizations.of(context)!.noTitle,
+                              ),
                           child: ListTile(
                             contentPadding: const EdgeInsets.symmetric(
                               horizontal: 16,
@@ -794,7 +811,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
                               ),
                             ),
                             title: Text(
-                              item.title ?? 'No Title',
+                              item.title ??
+                                  AppLocalizations.of(context)!.noTitle,
                               style: Theme.of(context).textTheme.titleMedium
                                   ?.copyWith(
                                     fontWeight: FontWeight.bold,
@@ -1016,7 +1034,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                 size: 18,
                                 color: eventColor,
                               ),
-                              tooltip: 'Open in ROCIs Schedule',
+                              tooltip: AppLocalizations.of(
+                                context,
+                              )!.openInRocisSchedule,
                               onPressed: () {
                                 HapticFeedback.lightImpact();
                                 ScheduleBridgeService.openScheduleEvent(

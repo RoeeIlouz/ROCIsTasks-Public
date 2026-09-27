@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:rocis_tasks/core/services/logger_service.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:rocis_tasks/l10n/app_localizations.dart';
 
 /// A widget that catches unhandled Flutter errors and displays a fallback UI
 class GlobalErrorBoundary extends StatefulWidget {
@@ -31,7 +32,14 @@ class _GlobalErrorBoundaryState extends State<GlobalErrorBoundary> {
     setState(() {});
   }
 
+  /// Can build above the app's Localizations (e.g. an error in MaterialApp),
+  /// so English is the fallback.
   Widget _buildErrorUI(Object error) {
+    return Builder(builder: (context) => _buildErrorContent(context, error));
+  }
+
+  Widget _buildErrorContent(BuildContext context, Object error) {
+    final l10n = Localizations.of<AppLocalizations>(context, AppLocalizations);
     return Material(
       child: Container(
         padding: const EdgeInsets.all(24),
@@ -47,7 +55,7 @@ class _GlobalErrorBoundaryState extends State<GlobalErrorBoundary> {
               ),
               const SizedBox(height: 24),
               Text(
-                'Oops! Something went wrong',
+                l10n?.errorScreenTitle ?? 'Something went wrong',
                 style: GoogleFonts.outfit(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -57,7 +65,8 @@ class _GlobalErrorBoundaryState extends State<GlobalErrorBoundary> {
               ),
               const SizedBox(height: 16),
               Text(
-                'An unexpected error occurred. We\'ve been notified and are looking into it.',
+                l10n?.errorScreenBody ??
+                    'An unexpected error occurred. It has been reported.',
                 style: GoogleFonts.outfit(
                   fontSize: 16,
                   color: const Color(0xFF757575),
@@ -69,7 +78,7 @@ class _GlobalErrorBoundaryState extends State<GlobalErrorBoundary> {
                 onPressed: _handleRetry,
                 icon: const Icon(Icons.refresh_rounded),
                 label: Text(
-                  'Try Again',
+                  l10n?.tryAgain ?? 'Try again',
                   style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
                 ),
                 style: FilledButton.styleFrom(

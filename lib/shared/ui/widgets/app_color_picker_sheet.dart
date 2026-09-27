@@ -322,7 +322,9 @@ class _AppColorPickerSheetState extends State<AppColorPickerSheet> {
                       _updateColor(color);
                     },
                     child: Semantics(
-                      label: 'Color ${_formatHex(color)}',
+                      label: AppLocalizations.of(
+                        context,
+                      )!.a11yColorHex(_formatHex(color)),
                       selected: isSelected,
                       button: true,
                       child: AnimatedContainer(

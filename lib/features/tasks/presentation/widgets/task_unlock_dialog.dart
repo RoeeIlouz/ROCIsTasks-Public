@@ -149,7 +149,7 @@ class _TaskUnlockDialogState extends State<TaskUnlockDialog> {
                   child: CircularProgressIndicator(strokeWidth: 3),
                 ),
                 const SizedBox(height: 16),
-                Text('Authenticating...', style: theme.textTheme.bodySmall),
+                Text(l10n.authenticating, style: theme.textTheme.bodySmall),
               ] else if (_showPinInput) ...[
                 // PIN input decoration
                 TextField(
@@ -264,17 +264,22 @@ class _TaskUnlockDialogState extends State<TaskUnlockDialog> {
     final pin = _pinController.text.trim();
     if (pin.isEmpty) return;
 
-    final success = await privateModeService.unlockWithPin(pin);
-    if (mounted) {
-      if (success) {
-        Navigator.pop(context, true);
-      } else {
-        setState(() {
-          _errorMessage = l10n.wrongPin;
-          _pinController.clear();
-        });
-      }
+    final result = await privateModeService.unlockWithPin(pin);
+    if (!mounted) return;
+    if (result == PinUnlockResult.unlocked) {
+      Navigator.pop(context, true);
+      return;
     }
+    final lockout = result == PinUnlockResult.lockedOut
+        ? await privateModeService.pinLockoutRemaining()
+        : null;
+    if (!mounted) return;
+    setState(() {
+      _errorMessage = lockout == null
+          ? l10n.wrongPin
+          : l10n.pinLockedOut((lockout.inSeconds + 1).toString());
+      _pinController.clear();
+    });
   }
 
   @override

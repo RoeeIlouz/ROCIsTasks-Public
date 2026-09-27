@@ -235,6 +235,7 @@ class NotificationService {
     String? uncompletedTasksLabel,
     String? tasksRemainingLabel,
     String? tasksSummaryLabel,
+    String? addTaskLabel,
   }) async {
     if (kIsWeb) return;
     try {
@@ -271,7 +272,7 @@ class NotificationService {
         actions: [
           AndroidNotificationAction(
             'add_task',
-            'Add Task',
+            addTaskLabel ?? 'Add Task',
             icon: DrawableResourceAndroidBitmap('launcher_icon'),
             showsUserInterface: true,
           ),
@@ -282,7 +283,7 @@ class NotificationService {
 
       await flutterLocalNotificationsPlugin.show(
         id: 888,
-        title: 'Tasks Remaining',
+        title: tasksRemainingLabel ?? 'Tasks Remaining',
         body: body,
         notificationDetails: details,
       );

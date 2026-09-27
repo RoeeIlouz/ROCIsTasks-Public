@@ -1506,4 +1506,429 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get yesterday => 'أمس';
+
+  @override
+  String pinLockedOut(String seconds) {
+    return 'محاولات خاطئة كثيرة. حاول مرة أخرى بعد $seconds ثانية.';
+  }
+
+  @override
+  String get pinSaved => 'تم حفظ رقم PIN';
+
+  @override
+  String get orDivider => 'أو';
+
+  @override
+  String get openExternally => 'فتح خارجيًا';
+
+  @override
+  String get syncDeviceCalendar => 'مزامنة تقويم الجهاز';
+
+  @override
+  String get openInRocisSchedule => 'فتح في ROCIs Schedule';
+
+  @override
+  String get syncCalendars => 'مزامنة التقويمات';
+
+  @override
+  String a11yCategory(String name) {
+    return 'الفئة: $name';
+  }
+
+  @override
+  String get a11yDeleteCategory => 'حذف الفئة';
+
+  @override
+  String a11yColorOption(String number) {
+    return 'خيار اللون $number';
+  }
+
+  @override
+  String a11yIconOption(String number) {
+    return 'خيار الأيقونة $number';
+  }
+
+  @override
+  String a11yColorHex(String hex) {
+    return 'اللون $hex';
+  }
+
+  @override
+  String get a11yClearDate => 'مسح التاريخ المحدد';
+
+  @override
+  String get a11yClearRecurrence => 'مسح التكرار';
+
+  @override
+  String get a11yRemoveField => 'إزالة الحقل';
+
+  @override
+  String get taskCompletionFeedback => 'تنبيه إكمال المهمة';
+
+  @override
+  String get taskCompletionFeedbackSubtitle => 'اهتزاز خفيف عند إكمال مهمة';
+
+  @override
+  String get cookiePreferences => 'تفضيلات ملفات تعريف الارتباط';
+
+  @override
+  String get cookiePreferencesSubtitle =>
+      'إعادة تعيين الموافقة على ملفات تعريف الارتباط والتخزين';
+
+  @override
+  String get scheduleSynergyTitle => 'ROCIs Schedule';
+
+  @override
+  String get scheduleSynergySubtitle =>
+      'المزامنة السحابية نشطة مع ROCIs Schedule';
+
+  @override
+  String get openAction => 'فتح';
+
+  @override
+  String addedToToday(String title) {
+    return 'تمت إضافة \"$title\" إلى اليوم';
+  }
+
+  @override
+  String get taskUpdated => 'تم تحديث المهمة';
+
+  @override
+  String get taskCreated => 'تم إنشاء المهمة';
+
+  @override
+  String get taskDeleted => 'تم حذف المهمة';
+
+  @override
+  String get backToTasks => 'العودة إلى المهام';
+
+  @override
+  String get calendarDisconnectedReconnect =>
+      'التقويم غير متصل. اضغط لإعادة الاتصال';
+
+  @override
+  String get webSearchHint => 'ابحث في المهام أو انتقل إلى... (⌘K)';
+
+  @override
+  String get allCategories => 'كل الفئات';
+
+  @override
+  String get quickAddTodayHint => 'أضف مهمة لليوم بسرعة... (اضغط Enter)';
+
+  @override
+  String get todayAndOverdue => 'اليوم والمتأخرة';
+
+  @override
+  String get inboxAndUpcoming => 'الوارد والقادمة';
+
+  @override
+  String get closeEsc => 'إغلاق (Esc)';
+
+  @override
+  String get taskTitleHint => 'عنوان المهمة...';
+
+  @override
+  String get taskNotesHint => 'أضف وصفًا أو ملاحظات...';
+
+  @override
+  String get addSubtaskHint => 'أضف مهمة فرعية... (اضغط Enter)';
+
+  @override
+  String get paletteActions => 'الإجراءات';
+
+  @override
+  String get cmdNewTaskSubtitle => 'أنشئ مهمة جديدة بكل الخصائص';
+
+  @override
+  String get cmdTasksSubtitle => 'الانتقال إلى قائمة المهام';
+
+  @override
+  String get cmdKanbanSubtitle => 'الانتقال إلى لوحة كانبان';
+
+  @override
+  String get cmdCalendarSubtitle => 'الانتقال إلى التقويم وجدول الأعمال';
+
+  @override
+  String get cmdCategoriesSubtitle => 'إدارة الفئات';
+
+  @override
+  String get cmdSettingsSubtitle => 'فتح التفضيلات';
+
+  @override
+  String get cmdSyncSubtitle => 'مزامنة المهام في الاتجاهين الآن';
+
+  @override
+  String get cmdToggleTheme => 'تبديل السمة (داكن / فاتح)';
+
+  @override
+  String get cmdToggleThemeSubtitle => 'تبديل وضع الألوان';
+
+  @override
+  String get cmdCategoryFilterSubtitle => 'تصفية المهام حسب هذه الفئة';
+
+  @override
+  String get cmdSearchHint => 'اكتب أمرًا أو ابحث في المهام...';
+
+  @override
+  String get clearAction => 'مسح';
+
+  @override
+  String get dismissAction => 'تجاهل';
+
+  @override
+  String get openingCheckout => 'جارٍ فتح صفحة الدفع...';
+
+  @override
+  String purchaseError(String error) {
+    return 'خطأ في الشراء: $error';
+  }
+
+  @override
+  String get syncedWithGoogleTasks => 'متزامنة مع Google Tasks';
+
+  @override
+  String get syncingToCloud => 'جارٍ مزامنة التغييرات مع السحابة...';
+
+  @override
+  String get allSyncedToCloud => 'تمت مزامنة كل التغييرات مع السحابة';
+
+  @override
+  String get connectedAndSynced => 'متصل ومتزامن';
+
+  @override
+  String get notificationActionAddTask => 'إضافة مهمة';
+
+  @override
+  String couldNotOpenUrl(String name) {
+    return 'تعذّر فتح $name';
+  }
+
+  @override
+  String fileNotFound(String name) {
+    return 'الملف غير موجود: $name';
+  }
+
+  @override
+  String noAppToOpen(String name) {
+    return 'لا يوجد تطبيق لفتح $name';
+  }
+
+  @override
+  String get cannotOpenLocalFileOnWeb =>
+      'لا يمكن فتح الملفات المحلية على الويب';
+
+  @override
+  String get checkingDeviceCapabilities => 'جارٍ التحقق من إمكانيات الجهاز...';
+
+  @override
+  String get noTitle => 'بلا عنوان';
+
+  @override
+  String get scheduleClearForDate => 'جدولك فارغ في هذا التاريخ.';
+
+  @override
+  String get calendarPermissionRequired => 'يلزم إذن التقويم لعرض الأحداث.';
+
+  @override
+  String a11yGoogleCalendarEvent(String title) {
+    return 'حدث في تقويم Google: $title';
+  }
+
+  @override
+  String get noCalendarsLoaded => 'لم يتم تحميل أي تقويم';
+
+  @override
+  String get a11yEditCategory => 'تعديل الفئة';
+
+  @override
+  String get cookiePreferencesReset =>
+      'تمت إعادة تعيين تفضيلات ملفات تعريف الارتباط. ستظهر لافتة الموافقة قريبًا.';
+
+  @override
+  String get betaFeatures => 'ميزات تجريبية';
+
+  @override
+  String get scheduleIntegrationSubtitle =>
+      'مزامنة أحداث الجدول الجامعي وفتح ROCIs Schedule من هنا';
+
+  @override
+  String get noMatchingCommands => 'لا توجد أوامر أو مهام مطابقة';
+
+  @override
+  String get cookieBannerTitle => 'تفضيلات ملفات تعريف الارتباط والتخزين';
+
+  @override
+  String get cookieBannerBody =>
+      'نستخدم التخزين الأساسي وملفات تعريف ارتباط آمنة للجلسة لإبقاء تكامل Google Tasks والتقويم متصلًا بين الزيارات. اختر تفضيلك أدناه.';
+
+  @override
+  String get essentialOnly => 'الأساسية فقط';
+
+  @override
+  String get acceptAll => 'قبول الكل';
+
+  @override
+  String get a11yPickDateHint => 'اختر التاريخ والوقت';
+
+  @override
+  String get a11yRecurrenceHint => 'إعداد التكرار';
+
+  @override
+  String get emptyStateSubtitle => 'صفِّ ذهنك ونظّم يومك.';
+
+  @override
+  String get a11ySelected => 'محدد';
+
+  @override
+  String get a11yNotSelected => 'غير محدد';
+
+  @override
+  String get authenticating => 'جارٍ التحقق...';
+
+  @override
+  String get errorScreenTitle => 'حدث خطأ ما';
+
+  @override
+  String get errorScreenBody => 'حدث خطأ غير متوقع وتم الإبلاغ عنه.';
+
+  @override
+  String get tryAgain => 'حاول مرة أخرى';
+
+  @override
+  String get offlineTooltip =>
+      'غير متصل: تُحفظ التغييرات على هذا الجهاز وتتم مزامنتها عند عودة الاتصال';
+
+  @override
+  String get syncingLabel => 'جارٍ المزامنة...';
+
+  @override
+  String get syncErrorLabel => 'خطأ في المزامنة';
+
+  @override
+  String get syncErrorRetry => 'خطأ في المزامنة. اضغط لإعادة المحاولة.';
+
+  @override
+  String get syncedLabel => 'متزامن';
+
+  @override
+  String get calendarDisconnected => 'التقويم غير متصل';
+
+  @override
+  String get getAndroidApp => 'احصل على تطبيق Android';
+
+  @override
+  String get onGooglePlay => 'على Google Play';
+
+  @override
+  String get userProfile => 'الملف الشخصي';
+
+  @override
+  String get userFallbackName => 'مستخدم';
+
+  @override
+  String helloUser(String name) {
+    return 'مرحبًا، $name 👋';
+  }
+
+  @override
+  String get helloThere => 'مرحبًا 👋';
+
+  @override
+  String get webDashboardSubtitle => 'نظّم أولوياتك وحافظ على المزامنة.';
+
+  @override
+  String get totalActive => 'إجمالي النشطة';
+
+  @override
+  String get upcomingSection => 'القادمة';
+
+  @override
+  String get switchToComfortableView => 'التبديل إلى العرض المريح';
+
+  @override
+  String get switchToCompactView => 'التبديل إلى العرض المضغوط';
+
+  @override
+  String get noTasksInSection => 'لا توجد مهام في هذا القسم';
+
+  @override
+  String get selectATask => 'اختر مهمة';
+
+  @override
+  String get selectATaskBody =>
+      'انقر على مهمة لعرضها وتعديلها، أو انقر على \"+ مهمة جديدة\" لإنشاء واحدة.';
+
+  @override
+  String get taskDetails => 'تفاصيل المهمة';
+
+  @override
+  String get savingStatus => 'جارٍ الحفظ';
+
+  @override
+  String get savedStatus => 'تم الحفظ';
+
+  @override
+  String get titleRequired => 'العنوان مطلوب';
+
+  @override
+  String get statusLabel => 'الحالة';
+
+  @override
+  String get inProgress => 'قيد التنفيذ';
+
+  @override
+  String get dueDateLabel => 'تاريخ الاستحقاق';
+
+  @override
+  String get setDate => 'تعيين التاريخ';
+
+  @override
+  String subtasksProgress(String done, String total) {
+    return 'المهام الفرعية ($done/$total)';
+  }
+
+  @override
+  String get liveWidgetPreview => 'معاينة مباشرة للأداة';
+
+  @override
+  String get calendarWidgetBehavior => 'سلوك أداة التقويم';
+
+  @override
+  String get widgetGeneric => 'أداة';
+
+  @override
+  String get widgetNameMonthList => 'الشهر والقائمة';
+
+  @override
+  String get widgetNameTimeline => 'المخطط الزمني';
+
+  @override
+  String get widgetNameQuickActions => 'إجراءات سريعة';
+
+  @override
+  String get widgetNameUpNext => 'التالي';
+
+  @override
+  String get filterWidgetTasks => 'تصفية مهام الأداة';
+
+  @override
+  String get addSubtask => 'إضافة مهمة فرعية';
+
+  @override
+  String get removeSubtask => 'إزالة المهمة الفرعية';
+
+  @override
+  String get addItem => 'إضافة عنصر';
+
+  @override
+  String get decreaseInterval => 'إنقاص';
+
+  @override
+  String get increaseInterval => 'زيادة';
+
+  @override
+  String get restoreTask => 'استعادة';
+
+  @override
+  String get deleteForever => 'حذف نهائيًا';
 }

@@ -127,6 +127,7 @@ class _LoginScreenState extends State<LoginScreen> {
         elevation: 0,
         leading: canPop
             ? IconButton(
+                tooltip: MaterialLocalizations.of(context).backButtonTooltip,
                 icon: const Icon(Icons.arrow_back),
                 onPressed: () => Navigator.of(context).pop(),
               )
@@ -233,7 +234,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 16),
                             child: Text(
-                              'OR',
+                              AppLocalizations.of(context)!.orDivider,
                               style: TextStyle(color: Colors.grey[600]),
                             ),
                           ),

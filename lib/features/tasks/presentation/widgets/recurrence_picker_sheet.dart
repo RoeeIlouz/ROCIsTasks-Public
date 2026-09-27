@@ -276,6 +276,7 @@ class _RecurrencePickerSheetState extends State<RecurrencePickerSheet> {
                   Row(
                     children: [
                       IconButton.filledTonal(
+                        tooltip: AppLocalizations.of(context)!.decreaseInterval,
                         icon: const Icon(Icons.remove_rounded, size: 18),
                         onPressed: _customInterval > 1
                             ? () {
@@ -298,6 +299,7 @@ class _RecurrencePickerSheetState extends State<RecurrencePickerSheet> {
                         ),
                       ),
                       IconButton.filledTonal(
+                        tooltip: AppLocalizations.of(context)!.increaseInterval,
                         icon: const Icon(Icons.add_rounded, size: 18),
                         onPressed: _customInterval < 99
                             ? () {
