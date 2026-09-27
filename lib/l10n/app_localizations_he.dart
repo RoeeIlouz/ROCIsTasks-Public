@@ -1506,4 +1506,428 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get yesterday => 'אתמול';
+
+  @override
+  String pinLockedOut(String seconds) {
+    return 'יותר מדי קודי PIN שגויים. נסה שוב בעוד $seconds שניות.';
+  }
+
+  @override
+  String get pinSaved => 'ה-PIN נשמר';
+
+  @override
+  String get orDivider => 'או';
+
+  @override
+  String get openExternally => 'פתח באפליקציה חיצונית';
+
+  @override
+  String get syncDeviceCalendar => 'סנכרן את לוח השנה במכשיר';
+
+  @override
+  String get openInRocisSchedule => 'פתח ב-ROCIs Schedule';
+
+  @override
+  String get syncCalendars => 'סנכרן לוחות שנה';
+
+  @override
+  String a11yCategory(String name) {
+    return 'קטגוריה: $name';
+  }
+
+  @override
+  String get a11yDeleteCategory => 'מחק קטגוריה';
+
+  @override
+  String a11yColorOption(String number) {
+    return 'אפשרות צבע $number';
+  }
+
+  @override
+  String a11yIconOption(String number) {
+    return 'אפשרות סמל $number';
+  }
+
+  @override
+  String a11yColorHex(String hex) {
+    return 'צבע $hex';
+  }
+
+  @override
+  String get a11yClearDate => 'נקה את התאריך שנבחר';
+
+  @override
+  String get a11yClearRecurrence => 'נקה חזרה';
+
+  @override
+  String get a11yRemoveField => 'הסר שדה';
+
+  @override
+  String get taskCompletionFeedback => 'משוב בסיום משימה';
+
+  @override
+  String get taskCompletionFeedbackSubtitle => 'רטט קצר כשמסמנים משימה כבוצעה';
+
+  @override
+  String get cookiePreferences => 'העדפות עוגיות';
+
+  @override
+  String get cookiePreferencesSubtitle => 'איפוס ההסכמה לעוגיות ולאחסון';
+
+  @override
+  String get scheduleSynergyTitle => 'ROCIs Schedule';
+
+  @override
+  String get scheduleSynergySubtitle => 'סנכרון ענן פעיל עם ROCIs Schedule';
+
+  @override
+  String get openAction => 'פתח';
+
+  @override
+  String addedToToday(String title) {
+    return '\"$title\" נוספה להיום';
+  }
+
+  @override
+  String get taskUpdated => 'המשימה עודכנה';
+
+  @override
+  String get taskCreated => 'המשימה נוצרה';
+
+  @override
+  String get taskDeleted => 'המשימה נמחקה';
+
+  @override
+  String get backToTasks => 'חזרה למשימות';
+
+  @override
+  String get calendarDisconnectedReconnect =>
+      'לוח השנה מנותק. הקש כדי להתחבר מחדש';
+
+  @override
+  String get webSearchHint => 'חפש משימות או עבור אל... (⌘K)';
+
+  @override
+  String get allCategories => 'כל הקטגוריות';
+
+  @override
+  String get quickAddTodayHint => 'הוספה מהירה של משימה להיום... (הקש Enter)';
+
+  @override
+  String get todayAndOverdue => 'היום ובאיחור';
+
+  @override
+  String get inboxAndUpcoming => 'תיבת דואר ובקרוב';
+
+  @override
+  String get closeEsc => 'סגור (Esc)';
+
+  @override
+  String get taskTitleHint => 'כותרת המשימה...';
+
+  @override
+  String get taskNotesHint => 'הוסף תיאור או הערות...';
+
+  @override
+  String get addSubtaskHint => 'הוסף תת-משימה... (הקש Enter)';
+
+  @override
+  String get paletteActions => 'פעולות';
+
+  @override
+  String get cmdNewTaskSubtitle => 'צור משימה חדשה עם כל המאפיינים';
+
+  @override
+  String get cmdTasksSubtitle => 'מעבר לרשימת המשימות';
+
+  @override
+  String get cmdKanbanSubtitle => 'מעבר ללוח הקנבן';
+
+  @override
+  String get cmdCalendarSubtitle => 'מעבר ללוח השנה ולסדר היום';
+
+  @override
+  String get cmdCategoriesSubtitle => 'ניהול קטגוריות';
+
+  @override
+  String get cmdSettingsSubtitle => 'פתח העדפות';
+
+  @override
+  String get cmdSyncSubtitle => 'סנכרן משימות בשני הכיוונים עכשיו';
+
+  @override
+  String get cmdToggleTheme => 'החלף ערכת נושא (כהה / בהיר)';
+
+  @override
+  String get cmdToggleThemeSubtitle => 'החלף את מצב הצבעים';
+
+  @override
+  String get cmdCategoryFilterSubtitle => 'סנן משימות לפי קטגוריה זו';
+
+  @override
+  String get cmdSearchHint => 'הקלד פקודה או חפש משימות...';
+
+  @override
+  String get clearAction => 'נקה';
+
+  @override
+  String get dismissAction => 'סגור';
+
+  @override
+  String get openingCheckout => 'פותח את התשלום...';
+
+  @override
+  String purchaseError(String error) {
+    return 'שגיאה ברכישה: $error';
+  }
+
+  @override
+  String get syncedWithGoogleTasks => 'מסונכרן עם Google Tasks';
+
+  @override
+  String get syncingToCloud => 'מסנכרן שינויים לענן...';
+
+  @override
+  String get allSyncedToCloud => 'כל השינויים סונכרנו לענן';
+
+  @override
+  String get connectedAndSynced => 'מחובר ומסונכרן';
+
+  @override
+  String get notificationActionAddTask => 'הוסף משימה';
+
+  @override
+  String couldNotOpenUrl(String name) {
+    return 'לא ניתן לפתוח את $name';
+  }
+
+  @override
+  String fileNotFound(String name) {
+    return 'הקובץ לא נמצא: $name';
+  }
+
+  @override
+  String noAppToOpen(String name) {
+    return 'לא נמצאה אפליקציה לפתיחת $name';
+  }
+
+  @override
+  String get cannotOpenLocalFileOnWeb => 'לא ניתן לפתוח קבצים מקומיים באתר';
+
+  @override
+  String get checkingDeviceCapabilities => 'בודק את יכולות המכשיר...';
+
+  @override
+  String get noTitle => 'ללא כותרת';
+
+  @override
+  String get scheduleClearForDate => 'הלוח שלך פנוי בתאריך הזה.';
+
+  @override
+  String get calendarPermissionRequired =>
+      'נדרשת הרשאת לוח שנה כדי להציג אירועים.';
+
+  @override
+  String a11yGoogleCalendarEvent(String title) {
+    return 'אירוע ביומן Google: $title';
+  }
+
+  @override
+  String get noCalendarsLoaded => 'לא נטענו לוחות שנה';
+
+  @override
+  String get a11yEditCategory => 'ערוך קטגוריה';
+
+  @override
+  String get cookiePreferencesReset =>
+      'העדפות העוגיות אופסו. באנר ההסכמה יופיע בקרוב.';
+
+  @override
+  String get betaFeatures => 'תכונות בטא';
+
+  @override
+  String get scheduleIntegrationSubtitle =>
+      'סנכרון מערכת השעות מהאוניברסיטה ופתיחת ROCIs Schedule מכאן';
+
+  @override
+  String get noMatchingCommands => 'אין פקודות או משימות תואמות';
+
+  @override
+  String get cookieBannerTitle => 'העדפות עוגיות ואחסון';
+
+  @override
+  String get cookieBannerBody =>
+      'אנו משתמשים באחסון חיוני ובעוגיות סשן מאובטחות כדי לשמור על החיבור ל-Google Tasks וליומן בין ביקורים. בחר את העדפתך למטה.';
+
+  @override
+  String get essentialOnly => 'חיוניות בלבד';
+
+  @override
+  String get acceptAll => 'קבל הכול';
+
+  @override
+  String get a11yPickDateHint => 'בחר תאריך ושעה';
+
+  @override
+  String get a11yRecurrenceHint => 'הגדר חזרה';
+
+  @override
+  String get emptyStateSubtitle => 'ראש שקט ויום מאורגן.';
+
+  @override
+  String get a11ySelected => 'נבחר';
+
+  @override
+  String get a11yNotSelected => 'לא נבחר';
+
+  @override
+  String get authenticating => 'מאמת...';
+
+  @override
+  String get errorScreenTitle => 'משהו השתבש';
+
+  @override
+  String get errorScreenBody => 'אירעה שגיאה לא צפויה. היא דווחה.';
+
+  @override
+  String get tryAgain => 'נסה שוב';
+
+  @override
+  String get offlineTooltip =>
+      'לא מקוון: השינויים נשמרים במכשיר ויסונכרנו כשהחיבור יחזור';
+
+  @override
+  String get syncingLabel => 'מסנכרן...';
+
+  @override
+  String get syncErrorLabel => 'שגיאת סנכרון';
+
+  @override
+  String get syncErrorRetry => 'שגיאת סנכרון. הקש לניסיון חוזר.';
+
+  @override
+  String get syncedLabel => 'מסונכרן';
+
+  @override
+  String get calendarDisconnected => 'לוח השנה מנותק';
+
+  @override
+  String get getAndroidApp => 'הורד את אפליקציית Android';
+
+  @override
+  String get onGooglePlay => 'ב-Google Play';
+
+  @override
+  String get userProfile => 'פרופיל משתמש';
+
+  @override
+  String get userFallbackName => 'משתמש';
+
+  @override
+  String helloUser(String name) {
+    return 'שלום, $name 👋';
+  }
+
+  @override
+  String get helloThere => 'שלום 👋';
+
+  @override
+  String get webDashboardSubtitle =>
+      'סדר את סדרי העדיפויות ושמור על סנכרון תקין.';
+
+  @override
+  String get totalActive => 'סה״כ פעילות';
+
+  @override
+  String get upcomingSection => 'בקרוב';
+
+  @override
+  String get switchToComfortableView => 'מעבר לתצוגה מרווחת';
+
+  @override
+  String get switchToCompactView => 'מעבר לתצוגה צפופה';
+
+  @override
+  String get noTasksInSection => 'אין משימות בקטע הזה';
+
+  @override
+  String get selectATask => 'בחר משימה';
+
+  @override
+  String get selectATaskBody =>
+      'לחץ על משימה כדי לצפות בה ולערוך אותה, או על \"+ משימה חדשה\" כדי ליצור אחת.';
+
+  @override
+  String get taskDetails => 'פרטי המשימה';
+
+  @override
+  String get savingStatus => 'שומר';
+
+  @override
+  String get savedStatus => 'נשמר';
+
+  @override
+  String get titleRequired => 'חובה להזין כותרת';
+
+  @override
+  String get statusLabel => 'סטטוס';
+
+  @override
+  String get inProgress => 'בתהליך';
+
+  @override
+  String get dueDateLabel => 'תאריך יעד';
+
+  @override
+  String get setDate => 'קבע תאריך';
+
+  @override
+  String subtasksProgress(String done, String total) {
+    return 'תת-משימות ($done/$total)';
+  }
+
+  @override
+  String get liveWidgetPreview => 'תצוגה מקדימה חיה של הווידג\'ט';
+
+  @override
+  String get calendarWidgetBehavior => 'התנהגות ווידג\'ט לוח השנה';
+
+  @override
+  String get widgetGeneric => 'ווידג\'ט';
+
+  @override
+  String get widgetNameMonthList => 'חודש ורשימה';
+
+  @override
+  String get widgetNameTimeline => 'ציר זמן';
+
+  @override
+  String get widgetNameQuickActions => 'פעולות מהירות';
+
+  @override
+  String get widgetNameUpNext => 'הבא בתור';
+
+  @override
+  String get filterWidgetTasks => 'סינון משימות בווידג\'ט';
+
+  @override
+  String get addSubtask => 'הוסף תת-משימה';
+
+  @override
+  String get removeSubtask => 'הסר תת-משימה';
+
+  @override
+  String get addItem => 'הוסף פריט';
+
+  @override
+  String get decreaseInterval => 'הפחת';
+
+  @override
+  String get increaseInterval => 'הגדל';
+
+  @override
+  String get restoreTask => 'שחזר';
+
+  @override
+  String get deleteForever => 'מחק לצמיתות';
 }

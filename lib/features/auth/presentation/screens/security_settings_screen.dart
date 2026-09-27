@@ -184,7 +184,9 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
                     ),
                     subtitle: Text(
                       _checkingHardware
-                          ? 'Checking device capabilities...'
+                          ? AppLocalizations.of(
+                              context,
+                            )!.checkingDeviceCapabilities
                           : !_deviceSupportsBiometrics
                           ? l10n.biometricNotAvailable
                           : l10n.biometricUnlockSubtitle,
@@ -322,9 +324,9 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
     }
     final saved = await privateModeService.setPin(pinController.text);
     if (saved && context.mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('PIN saved successfully')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLocalizations.of(context)!.pinSaved)),
+      );
     }
   }
 }

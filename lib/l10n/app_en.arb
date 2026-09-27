@@ -543,5 +543,229 @@
   "fullCalendarWidgetTitle": "Full Calendar",
   "fullCalendarWidgetSubtitle": "Your month at a glance with colored event pills, filters and quick add.",
   "widgetPinUnsupported": "Your launcher can't add widgets from apps. Long-press your home screen, tap Widgets and find ROCI's Tasks.",
-  "yesterday": "Yesterday"
+  "yesterday": "Yesterday",
+  "pinLockedOut": "Too many wrong PINs. Try again in {seconds} s.",
+  "@pinLockedOut": {
+    "placeholders": {
+      "seconds": {
+        "type": "String"
+      }
+    }
+  },
+  "pinSaved": "PIN saved",
+  "orDivider": "OR",
+  "openExternally": "Open externally",
+  "syncDeviceCalendar": "Sync Device Calendar",
+  "openInRocisSchedule": "Open in ROCIs Schedule",
+  "syncCalendars": "Sync Calendars",
+  "a11yCategory": "Category: {name}",
+  "@a11yCategory": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "a11yDeleteCategory": "Delete category",
+  "a11yColorOption": "Color option {number}",
+  "@a11yColorOption": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "a11yIconOption": "Icon option {number}",
+  "@a11yIconOption": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "a11yColorHex": "Color {hex}",
+  "@a11yColorHex": {
+    "placeholders": {
+      "hex": {
+        "type": "String"
+      }
+    }
+  },
+  "a11yClearDate": "Clear selected date",
+  "a11yClearRecurrence": "Clear recurrence",
+  "a11yRemoveField": "Remove field",
+  "taskCompletionFeedback": "Task Completion Feedback",
+  "taskCompletionFeedbackSubtitle": "Haptic pulse when ticking off a task",
+  "cookiePreferences": "Cookie Preferences",
+  "cookiePreferencesSubtitle": "Reset cookie & storage consent",
+  "scheduleSynergyTitle": "ROCIs Schedule",
+  "scheduleSynergySubtitle": "Cloud sync active with ROCIs Schedule",
+  "openAction": "Open",
+  "addedToToday": "Added \"{title}\" to Today",
+  "@addedToToday": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "taskUpdated": "Task updated",
+  "taskCreated": "Task created",
+  "taskDeleted": "Task deleted",
+  "backToTasks": "Back to tasks",
+  "calendarDisconnectedReconnect": "Calendar disconnected. Tap to reconnect",
+  "webSearchHint": "Search tasks or jump to... (⌘K)",
+  "allCategories": "All Categories",
+  "quickAddTodayHint": "Quick add task to Today... (Press Enter)",
+  "todayAndOverdue": "Today & Overdue",
+  "inboxAndUpcoming": "Inbox & Upcoming",
+  "closeEsc": "Close (Esc)",
+  "taskTitleHint": "Task title...",
+  "taskNotesHint": "Add description or notes...",
+  "addSubtaskHint": "Add a subtask... (Press Enter)",
+  "paletteActions": "Actions",
+  "cmdNewTaskSubtitle": "Create a new task with full properties",
+  "cmdTasksSubtitle": "Switch to the task list",
+  "cmdKanbanSubtitle": "Switch to the Kanban board",
+  "cmdCalendarSubtitle": "Switch to calendar and agenda",
+  "cmdCategoriesSubtitle": "Manage categories",
+  "cmdSettingsSubtitle": "Open preferences",
+  "cmdSyncSubtitle": "Sync tasks both ways now",
+  "cmdToggleTheme": "Toggle theme (dark / light)",
+  "cmdToggleThemeSubtitle": "Switch the color mode",
+  "cmdCategoryFilterSubtitle": "Filter tasks by this category",
+  "cmdSearchHint": "Type a command or search tasks...",
+  "clearAction": "Clear",
+  "dismissAction": "Dismiss",
+  "openingCheckout": "Opening checkout...",
+  "purchaseError": "Purchase error: {error}",
+  "@purchaseError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "syncedWithGoogleTasks": "Synced with Google Tasks",
+  "syncingToCloud": "Syncing changes to the cloud...",
+  "allSyncedToCloud": "All changes synced to the cloud",
+  "connectedAndSynced": "Connected & synced",
+  "notificationActionAddTask": "Add Task",
+  "couldNotOpenUrl": "Couldn't open {name}",
+  "@couldNotOpenUrl": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "fileNotFound": "File not found: {name}",
+  "@fileNotFound": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "noAppToOpen": "No app found to open {name}",
+  "@noAppToOpen": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "cannotOpenLocalFileOnWeb": "Local files can't be opened on the web",
+  "checkingDeviceCapabilities": "Checking device capabilities...",
+  "noTitle": "No title",
+  "scheduleClearForDate": "Your schedule is clear for this date.",
+  "calendarPermissionRequired": "Calendar permission is required to display events.",
+  "a11yGoogleCalendarEvent": "Google Calendar event: {title}",
+  "@a11yGoogleCalendarEvent": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "noCalendarsLoaded": "No calendars loaded",
+  "a11yEditCategory": "Edit category",
+  "cookiePreferencesReset": "Cookie preferences reset. The consent banner will appear shortly.",
+  "betaFeatures": "Beta Features",
+  "scheduleIntegrationSubtitle": "Sync university timetable events and open ROCIs Schedule from here",
+  "noMatchingCommands": "No matching commands or tasks",
+  "cookieBannerTitle": "Cookie & Storage Preferences",
+  "cookieBannerBody": "We use essential storage and secure session cookies to keep your Google Tasks and Calendar integrations connected across visits. Choose your preference below.",
+  "essentialOnly": "Essential Only",
+  "acceptAll": "Accept All",
+  "a11yPickDateHint": "Choose date and time",
+  "a11yRecurrenceHint": "Set up repeat",
+  "emptyStateSubtitle": "Keep your mind clear and your day organized.",
+  "a11ySelected": "Selected",
+  "a11yNotSelected": "Not selected",
+  "authenticating": "Authenticating...",
+  "errorScreenTitle": "Something went wrong",
+  "errorScreenBody": "An unexpected error occurred. It has been reported.",
+  "tryAgain": "Try again",
+  "offlineTooltip": "Offline: changes are saved on this device and sync when you're back online",
+  "syncingLabel": "Syncing...",
+  "syncErrorLabel": "Sync error",
+  "syncErrorRetry": "Sync error. Tap to retry.",
+  "syncedLabel": "Synced",
+  "calendarDisconnected": "Calendar disconnected",
+  "getAndroidApp": "Get the Android app",
+  "onGooglePlay": "On Google Play",
+  "userProfile": "User profile",
+  "userFallbackName": "User",
+  "helloUser": "Hello, {name} 👋",
+  "@helloUser": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "helloThere": "Hello 👋",
+  "webDashboardSubtitle": "Organize your priorities and keep your sync healthy.",
+  "totalActive": "Total active",
+  "upcomingSection": "Upcoming",
+  "switchToComfortableView": "Switch to comfortable view",
+  "switchToCompactView": "Switch to compact view",
+  "noTasksInSection": "No tasks in this section",
+  "selectATask": "Select a task",
+  "selectATaskBody": "Click a task to view and edit it, or click \"+ New Task\" to create one.",
+  "taskDetails": "Task details",
+  "savingStatus": "Saving",
+  "savedStatus": "Saved",
+  "titleRequired": "Title is required",
+  "statusLabel": "Status",
+  "inProgress": "In progress",
+  "dueDateLabel": "Due date",
+  "setDate": "Set date",
+  "subtasksProgress": "Subtasks ({done}/{total})",
+  "@subtasksProgress": {
+    "placeholders": {
+      "done": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "liveWidgetPreview": "Live widget preview",
+  "calendarWidgetBehavior": "Calendar widget behavior",
+  "widgetGeneric": "Widget",
+  "widgetNameMonthList": "Month & List",
+  "widgetNameTimeline": "Timeline",
+  "widgetNameQuickActions": "Quick Actions",
+  "widgetNameUpNext": "Up Next",
+  "filterWidgetTasks": "Filter widget tasks",
+  "addSubtask": "Add subtask",
+  "removeSubtask": "Remove subtask",
+  "addItem": "Add item",
+  "decreaseInterval": "Decrease",
+  "increaseInterval": "Increase",
+  "restoreTask": "Restore",
+  "deleteForever": "Delete forever"
 }

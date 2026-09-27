@@ -1540,4 +1540,439 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get yesterday => 'Gestern';
+
+  @override
+  String pinLockedOut(String seconds) {
+    return 'Zu viele falsche PINs. Versuche es in $seconds s erneut.';
+  }
+
+  @override
+  String get pinSaved => 'PIN gespeichert';
+
+  @override
+  String get orDivider => 'ODER';
+
+  @override
+  String get openExternally => 'Extern öffnen';
+
+  @override
+  String get syncDeviceCalendar => 'Gerätekalender synchronisieren';
+
+  @override
+  String get openInRocisSchedule => 'In ROCIs Schedule öffnen';
+
+  @override
+  String get syncCalendars => 'Kalender synchronisieren';
+
+  @override
+  String a11yCategory(String name) {
+    return 'Kategorie: $name';
+  }
+
+  @override
+  String get a11yDeleteCategory => 'Kategorie löschen';
+
+  @override
+  String a11yColorOption(String number) {
+    return 'Farboption $number';
+  }
+
+  @override
+  String a11yIconOption(String number) {
+    return 'Symboloption $number';
+  }
+
+  @override
+  String a11yColorHex(String hex) {
+    return 'Farbe $hex';
+  }
+
+  @override
+  String get a11yClearDate => 'Ausgewähltes Datum löschen';
+
+  @override
+  String get a11yClearRecurrence => 'Wiederholung löschen';
+
+  @override
+  String get a11yRemoveField => 'Feld entfernen';
+
+  @override
+  String get taskCompletionFeedback => 'Feedback beim Abhaken';
+
+  @override
+  String get taskCompletionFeedbackSubtitle =>
+      'Kurze Vibration beim Abhaken einer Aufgabe';
+
+  @override
+  String get cookiePreferences => 'Cookie-Einstellungen';
+
+  @override
+  String get cookiePreferencesSubtitle =>
+      'Cookie- und Speicherzustimmung zurücksetzen';
+
+  @override
+  String get scheduleSynergyTitle => 'ROCIs Schedule';
+
+  @override
+  String get scheduleSynergySubtitle =>
+      'Cloud-Synchronisierung mit ROCIs Schedule aktiv';
+
+  @override
+  String get openAction => 'Öffnen';
+
+  @override
+  String addedToToday(String title) {
+    return '\"$title\" zu Heute hinzugefügt';
+  }
+
+  @override
+  String get taskUpdated => 'Aufgabe aktualisiert';
+
+  @override
+  String get taskCreated => 'Aufgabe erstellt';
+
+  @override
+  String get taskDeleted => 'Aufgabe gelöscht';
+
+  @override
+  String get backToTasks => 'Zurück zu den Aufgaben';
+
+  @override
+  String get calendarDisconnectedReconnect =>
+      'Kalender getrennt. Zum erneuten Verbinden tippen';
+
+  @override
+  String get webSearchHint => 'Aufgaben suchen oder springen zu... (⌘K)';
+
+  @override
+  String get allCategories => 'Alle Kategorien';
+
+  @override
+  String get quickAddTodayHint =>
+      'Schnell eine Aufgabe für heute hinzufügen... (Enter drücken)';
+
+  @override
+  String get todayAndOverdue => 'Heute & überfällig';
+
+  @override
+  String get inboxAndUpcoming => 'Eingang & demnächst';
+
+  @override
+  String get closeEsc => 'Schließen (Esc)';
+
+  @override
+  String get taskTitleHint => 'Aufgabentitel...';
+
+  @override
+  String get taskNotesHint => 'Beschreibung oder Notizen hinzufügen...';
+
+  @override
+  String get addSubtaskHint => 'Unteraufgabe hinzufügen... (Enter drücken)';
+
+  @override
+  String get paletteActions => 'Aktionen';
+
+  @override
+  String get cmdNewTaskSubtitle =>
+      'Neue Aufgabe mit allen Eigenschaften erstellen';
+
+  @override
+  String get cmdTasksSubtitle => 'Zur Aufgabenliste wechseln';
+
+  @override
+  String get cmdKanbanSubtitle => 'Zum Kanban-Board wechseln';
+
+  @override
+  String get cmdCalendarSubtitle => 'Zu Kalender und Agenda wechseln';
+
+  @override
+  String get cmdCategoriesSubtitle => 'Kategorien verwalten';
+
+  @override
+  String get cmdSettingsSubtitle => 'Einstellungen öffnen';
+
+  @override
+  String get cmdSyncSubtitle =>
+      'Aufgaben jetzt in beide Richtungen synchronisieren';
+
+  @override
+  String get cmdToggleTheme => 'Design wechseln (dunkel / hell)';
+
+  @override
+  String get cmdToggleThemeSubtitle => 'Farbmodus wechseln';
+
+  @override
+  String get cmdCategoryFilterSubtitle =>
+      'Aufgaben nach dieser Kategorie filtern';
+
+  @override
+  String get cmdSearchHint => 'Befehl eingeben oder Aufgaben suchen...';
+
+  @override
+  String get clearAction => 'Löschen';
+
+  @override
+  String get dismissAction => 'Ausblenden';
+
+  @override
+  String get openingCheckout => 'Kasse wird geöffnet...';
+
+  @override
+  String purchaseError(String error) {
+    return 'Kauffehler: $error';
+  }
+
+  @override
+  String get syncedWithGoogleTasks => 'Mit Google Tasks synchronisiert';
+
+  @override
+  String get syncingToCloud =>
+      'Änderungen werden mit der Cloud synchronisiert...';
+
+  @override
+  String get allSyncedToCloud => 'Alle Änderungen mit der Cloud synchronisiert';
+
+  @override
+  String get connectedAndSynced => 'Verbunden & synchronisiert';
+
+  @override
+  String get notificationActionAddTask => 'Aufgabe hinzufügen';
+
+  @override
+  String couldNotOpenUrl(String name) {
+    return '$name konnte nicht geöffnet werden';
+  }
+
+  @override
+  String fileNotFound(String name) {
+    return 'Datei nicht gefunden: $name';
+  }
+
+  @override
+  String noAppToOpen(String name) {
+    return 'Keine App zum Öffnen von $name gefunden';
+  }
+
+  @override
+  String get cannotOpenLocalFileOnWeb =>
+      'Lokale Dateien können im Web nicht geöffnet werden';
+
+  @override
+  String get checkingDeviceCapabilities => 'Gerätefunktionen werden geprüft...';
+
+  @override
+  String get noTitle => 'Kein Titel';
+
+  @override
+  String get scheduleClearForDate => 'An diesem Tag ist nichts geplant.';
+
+  @override
+  String get calendarPermissionRequired =>
+      'Zum Anzeigen von Terminen ist die Kalenderberechtigung erforderlich.';
+
+  @override
+  String a11yGoogleCalendarEvent(String title) {
+    return 'Google Kalender-Termin: $title';
+  }
+
+  @override
+  String get noCalendarsLoaded => 'Keine Kalender geladen';
+
+  @override
+  String get a11yEditCategory => 'Kategorie bearbeiten';
+
+  @override
+  String get cookiePreferencesReset =>
+      'Cookie-Einstellungen zurückgesetzt. Der Zustimmungshinweis erscheint gleich.';
+
+  @override
+  String get betaFeatures => 'Beta-Funktionen';
+
+  @override
+  String get scheduleIntegrationSubtitle =>
+      'Stundenplan-Termine synchronisieren und ROCIs Schedule von hier öffnen';
+
+  @override
+  String get noMatchingCommands => 'Keine passenden Befehle oder Aufgaben';
+
+  @override
+  String get cookieBannerTitle => 'Cookie- und Speichereinstellungen';
+
+  @override
+  String get cookieBannerBody =>
+      'Wir nutzen notwendigen Speicher und sichere Sitzungscookies, damit deine Google Tasks- und Kalender-Verbindungen zwischen Besuchen bestehen bleiben. Wähle unten deine Einstellung.';
+
+  @override
+  String get essentialOnly => 'Nur notwendige';
+
+  @override
+  String get acceptAll => 'Alle akzeptieren';
+
+  @override
+  String get a11yPickDateHint => 'Datum und Uhrzeit wählen';
+
+  @override
+  String get a11yRecurrenceHint => 'Wiederholung einrichten';
+
+  @override
+  String get emptyStateSubtitle =>
+      'Behalte einen klaren Kopf und einen geordneten Tag.';
+
+  @override
+  String get a11ySelected => 'Ausgewählt';
+
+  @override
+  String get a11yNotSelected => 'Nicht ausgewählt';
+
+  @override
+  String get authenticating => 'Authentifizierung...';
+
+  @override
+  String get errorScreenTitle => 'Etwas ist schiefgelaufen';
+
+  @override
+  String get errorScreenBody =>
+      'Ein unerwarteter Fehler ist aufgetreten. Er wurde gemeldet.';
+
+  @override
+  String get tryAgain => 'Erneut versuchen';
+
+  @override
+  String get offlineTooltip =>
+      'Offline: Änderungen werden auf diesem Gerät gespeichert und synchronisiert, sobald du wieder online bist';
+
+  @override
+  String get syncingLabel => 'Synchronisiert...';
+
+  @override
+  String get syncErrorLabel => 'Sync-Fehler';
+
+  @override
+  String get syncErrorRetry => 'Sync-Fehler. Zum Wiederholen tippen.';
+
+  @override
+  String get syncedLabel => 'Synchronisiert';
+
+  @override
+  String get calendarDisconnected => 'Kalender getrennt';
+
+  @override
+  String get getAndroidApp => 'Android-App holen';
+
+  @override
+  String get onGooglePlay => 'Bei Google Play';
+
+  @override
+  String get userProfile => 'Nutzerprofil';
+
+  @override
+  String get userFallbackName => 'Nutzer';
+
+  @override
+  String helloUser(String name) {
+    return 'Hallo, $name 👋';
+  }
+
+  @override
+  String get helloThere => 'Hallo 👋';
+
+  @override
+  String get webDashboardSubtitle =>
+      'Ordne deine Prioritäten und halte deine Synchronisierung aktuell.';
+
+  @override
+  String get totalActive => 'Aktiv gesamt';
+
+  @override
+  String get upcomingSection => 'Demnächst';
+
+  @override
+  String get switchToComfortableView => 'Zur komfortablen Ansicht wechseln';
+
+  @override
+  String get switchToCompactView => 'Zur kompakten Ansicht wechseln';
+
+  @override
+  String get noTasksInSection => 'Keine Aufgaben in diesem Bereich';
+
+  @override
+  String get selectATask => 'Aufgabe auswählen';
+
+  @override
+  String get selectATaskBody =>
+      'Klicke auf eine Aufgabe, um sie anzusehen und zu bearbeiten, oder auf „+ Neue Aufgabe“, um eine zu erstellen.';
+
+  @override
+  String get taskDetails => 'Aufgabendetails';
+
+  @override
+  String get savingStatus => 'Wird gespeichert';
+
+  @override
+  String get savedStatus => 'Gespeichert';
+
+  @override
+  String get titleRequired => 'Titel ist erforderlich';
+
+  @override
+  String get statusLabel => 'Status';
+
+  @override
+  String get inProgress => 'In Bearbeitung';
+
+  @override
+  String get dueDateLabel => 'Fälligkeitsdatum';
+
+  @override
+  String get setDate => 'Datum festlegen';
+
+  @override
+  String subtasksProgress(String done, String total) {
+    return 'Unteraufgaben ($done/$total)';
+  }
+
+  @override
+  String get liveWidgetPreview => 'Live-Vorschau des Widgets';
+
+  @override
+  String get calendarWidgetBehavior => 'Verhalten des Kalender-Widgets';
+
+  @override
+  String get widgetGeneric => 'Widget';
+
+  @override
+  String get widgetNameMonthList => 'Monat & Liste';
+
+  @override
+  String get widgetNameTimeline => 'Zeitleiste';
+
+  @override
+  String get widgetNameQuickActions => 'Schnellaktionen';
+
+  @override
+  String get widgetNameUpNext => 'Als Nächstes';
+
+  @override
+  String get filterWidgetTasks => 'Widget-Aufgaben filtern';
+
+  @override
+  String get addSubtask => 'Unteraufgabe hinzufügen';
+
+  @override
+  String get removeSubtask => 'Unteraufgabe entfernen';
+
+  @override
+  String get addItem => 'Artikel hinzufügen';
+
+  @override
+  String get decreaseInterval => 'Verringern';
+
+  @override
+  String get increaseInterval => 'Erhöhen';
+
+  @override
+  String get restoreTask => 'Wiederherstellen';
+
+  @override
+  String get deleteForever => 'Endgültig löschen';
 }

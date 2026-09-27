@@ -103,6 +103,7 @@ class TrashScreen extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         IconButton(
+                          tooltip: AppLocalizations.of(context)!.restoreTask,
                           icon: Icon(
                             Icons.restore,
                             color: Theme.of(context).colorScheme.secondary,
@@ -118,6 +119,7 @@ class TrashScreen extends StatelessWidget {
                           },
                         ),
                         IconButton(
+                          tooltip: AppLocalizations.of(context)!.deleteForever,
                           icon: Icon(
                             Icons.delete_forever_outlined,
                             color: Theme.of(context).colorScheme.error,

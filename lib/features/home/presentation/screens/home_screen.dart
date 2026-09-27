@@ -366,6 +366,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ? AppBar(
               backgroundColor: theme.colorScheme.primaryContainer,
               leading: IconButton(
+                tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
                 icon: const Icon(Icons.close),
                 onPressed: taskProvider.clearSelection,
               ),
@@ -456,6 +457,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 if (_currentIndex == 0) ...[
                   IconButton(
+                    tooltip: _isSearching
+                        ? MaterialLocalizations.of(context).closeButtonTooltip
+                        : MaterialLocalizations.of(context).searchFieldLabel,
                     icon: Icon(_isSearching ? Icons.close : Icons.search),
                     onPressed: () {
                       setState(() {

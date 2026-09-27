@@ -1515,4 +1515,432 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get yesterday => 'Yesterday';
+
+  @override
+  String pinLockedOut(String seconds) {
+    return 'Too many wrong PINs. Try again in $seconds s.';
+  }
+
+  @override
+  String get pinSaved => 'PIN saved';
+
+  @override
+  String get orDivider => 'OR';
+
+  @override
+  String get openExternally => 'Open externally';
+
+  @override
+  String get syncDeviceCalendar => 'Sync Device Calendar';
+
+  @override
+  String get openInRocisSchedule => 'Open in ROCIs Schedule';
+
+  @override
+  String get syncCalendars => 'Sync Calendars';
+
+  @override
+  String a11yCategory(String name) {
+    return 'Category: $name';
+  }
+
+  @override
+  String get a11yDeleteCategory => 'Delete category';
+
+  @override
+  String a11yColorOption(String number) {
+    return 'Color option $number';
+  }
+
+  @override
+  String a11yIconOption(String number) {
+    return 'Icon option $number';
+  }
+
+  @override
+  String a11yColorHex(String hex) {
+    return 'Color $hex';
+  }
+
+  @override
+  String get a11yClearDate => 'Clear selected date';
+
+  @override
+  String get a11yClearRecurrence => 'Clear recurrence';
+
+  @override
+  String get a11yRemoveField => 'Remove field';
+
+  @override
+  String get taskCompletionFeedback => 'Task Completion Feedback';
+
+  @override
+  String get taskCompletionFeedbackSubtitle =>
+      'Haptic pulse when ticking off a task';
+
+  @override
+  String get cookiePreferences => 'Cookie Preferences';
+
+  @override
+  String get cookiePreferencesSubtitle => 'Reset cookie & storage consent';
+
+  @override
+  String get scheduleSynergyTitle => 'ROCIs Schedule';
+
+  @override
+  String get scheduleSynergySubtitle => 'Cloud sync active with ROCIs Schedule';
+
+  @override
+  String get openAction => 'Open';
+
+  @override
+  String addedToToday(String title) {
+    return 'Added \"$title\" to Today';
+  }
+
+  @override
+  String get taskUpdated => 'Task updated';
+
+  @override
+  String get taskCreated => 'Task created';
+
+  @override
+  String get taskDeleted => 'Task deleted';
+
+  @override
+  String get backToTasks => 'Back to tasks';
+
+  @override
+  String get calendarDisconnectedReconnect =>
+      'Calendar disconnected. Tap to reconnect';
+
+  @override
+  String get webSearchHint => 'Search tasks or jump to... (⌘K)';
+
+  @override
+  String get allCategories => 'All Categories';
+
+  @override
+  String get quickAddTodayHint => 'Quick add task to Today... (Press Enter)';
+
+  @override
+  String get todayAndOverdue => 'Today & Overdue';
+
+  @override
+  String get inboxAndUpcoming => 'Inbox & Upcoming';
+
+  @override
+  String get closeEsc => 'Close (Esc)';
+
+  @override
+  String get taskTitleHint => 'Task title...';
+
+  @override
+  String get taskNotesHint => 'Add description or notes...';
+
+  @override
+  String get addSubtaskHint => 'Add a subtask... (Press Enter)';
+
+  @override
+  String get paletteActions => 'Actions';
+
+  @override
+  String get cmdNewTaskSubtitle => 'Create a new task with full properties';
+
+  @override
+  String get cmdTasksSubtitle => 'Switch to the task list';
+
+  @override
+  String get cmdKanbanSubtitle => 'Switch to the Kanban board';
+
+  @override
+  String get cmdCalendarSubtitle => 'Switch to calendar and agenda';
+
+  @override
+  String get cmdCategoriesSubtitle => 'Manage categories';
+
+  @override
+  String get cmdSettingsSubtitle => 'Open preferences';
+
+  @override
+  String get cmdSyncSubtitle => 'Sync tasks both ways now';
+
+  @override
+  String get cmdToggleTheme => 'Toggle theme (dark / light)';
+
+  @override
+  String get cmdToggleThemeSubtitle => 'Switch the color mode';
+
+  @override
+  String get cmdCategoryFilterSubtitle => 'Filter tasks by this category';
+
+  @override
+  String get cmdSearchHint => 'Type a command or search tasks...';
+
+  @override
+  String get clearAction => 'Clear';
+
+  @override
+  String get dismissAction => 'Dismiss';
+
+  @override
+  String get openingCheckout => 'Opening checkout...';
+
+  @override
+  String purchaseError(String error) {
+    return 'Purchase error: $error';
+  }
+
+  @override
+  String get syncedWithGoogleTasks => 'Synced with Google Tasks';
+
+  @override
+  String get syncingToCloud => 'Syncing changes to the cloud...';
+
+  @override
+  String get allSyncedToCloud => 'All changes synced to the cloud';
+
+  @override
+  String get connectedAndSynced => 'Connected & synced';
+
+  @override
+  String get notificationActionAddTask => 'Add Task';
+
+  @override
+  String couldNotOpenUrl(String name) {
+    return 'Couldn\'t open $name';
+  }
+
+  @override
+  String fileNotFound(String name) {
+    return 'File not found: $name';
+  }
+
+  @override
+  String noAppToOpen(String name) {
+    return 'No app found to open $name';
+  }
+
+  @override
+  String get cannotOpenLocalFileOnWeb =>
+      'Local files can\'t be opened on the web';
+
+  @override
+  String get checkingDeviceCapabilities => 'Checking device capabilities...';
+
+  @override
+  String get noTitle => 'No title';
+
+  @override
+  String get scheduleClearForDate => 'Your schedule is clear for this date.';
+
+  @override
+  String get calendarPermissionRequired =>
+      'Calendar permission is required to display events.';
+
+  @override
+  String a11yGoogleCalendarEvent(String title) {
+    return 'Google Calendar event: $title';
+  }
+
+  @override
+  String get noCalendarsLoaded => 'No calendars loaded';
+
+  @override
+  String get a11yEditCategory => 'Edit category';
+
+  @override
+  String get cookiePreferencesReset =>
+      'Cookie preferences reset. The consent banner will appear shortly.';
+
+  @override
+  String get betaFeatures => 'Beta Features';
+
+  @override
+  String get scheduleIntegrationSubtitle =>
+      'Sync university timetable events and open ROCIs Schedule from here';
+
+  @override
+  String get noMatchingCommands => 'No matching commands or tasks';
+
+  @override
+  String get cookieBannerTitle => 'Cookie & Storage Preferences';
+
+  @override
+  String get cookieBannerBody =>
+      'We use essential storage and secure session cookies to keep your Google Tasks and Calendar integrations connected across visits. Choose your preference below.';
+
+  @override
+  String get essentialOnly => 'Essential Only';
+
+  @override
+  String get acceptAll => 'Accept All';
+
+  @override
+  String get a11yPickDateHint => 'Choose date and time';
+
+  @override
+  String get a11yRecurrenceHint => 'Set up repeat';
+
+  @override
+  String get emptyStateSubtitle =>
+      'Keep your mind clear and your day organized.';
+
+  @override
+  String get a11ySelected => 'Selected';
+
+  @override
+  String get a11yNotSelected => 'Not selected';
+
+  @override
+  String get authenticating => 'Authenticating...';
+
+  @override
+  String get errorScreenTitle => 'Something went wrong';
+
+  @override
+  String get errorScreenBody =>
+      'An unexpected error occurred. It has been reported.';
+
+  @override
+  String get tryAgain => 'Try again';
+
+  @override
+  String get offlineTooltip =>
+      'Offline: changes are saved on this device and sync when you\'re back online';
+
+  @override
+  String get syncingLabel => 'Syncing...';
+
+  @override
+  String get syncErrorLabel => 'Sync error';
+
+  @override
+  String get syncErrorRetry => 'Sync error. Tap to retry.';
+
+  @override
+  String get syncedLabel => 'Synced';
+
+  @override
+  String get calendarDisconnected => 'Calendar disconnected';
+
+  @override
+  String get getAndroidApp => 'Get the Android app';
+
+  @override
+  String get onGooglePlay => 'On Google Play';
+
+  @override
+  String get userProfile => 'User profile';
+
+  @override
+  String get userFallbackName => 'User';
+
+  @override
+  String helloUser(String name) {
+    return 'Hello, $name 👋';
+  }
+
+  @override
+  String get helloThere => 'Hello 👋';
+
+  @override
+  String get webDashboardSubtitle =>
+      'Organize your priorities and keep your sync healthy.';
+
+  @override
+  String get totalActive => 'Total active';
+
+  @override
+  String get upcomingSection => 'Upcoming';
+
+  @override
+  String get switchToComfortableView => 'Switch to comfortable view';
+
+  @override
+  String get switchToCompactView => 'Switch to compact view';
+
+  @override
+  String get noTasksInSection => 'No tasks in this section';
+
+  @override
+  String get selectATask => 'Select a task';
+
+  @override
+  String get selectATaskBody =>
+      'Click a task to view and edit it, or click \"+ New Task\" to create one.';
+
+  @override
+  String get taskDetails => 'Task details';
+
+  @override
+  String get savingStatus => 'Saving';
+
+  @override
+  String get savedStatus => 'Saved';
+
+  @override
+  String get titleRequired => 'Title is required';
+
+  @override
+  String get statusLabel => 'Status';
+
+  @override
+  String get inProgress => 'In progress';
+
+  @override
+  String get dueDateLabel => 'Due date';
+
+  @override
+  String get setDate => 'Set date';
+
+  @override
+  String subtasksProgress(String done, String total) {
+    return 'Subtasks ($done/$total)';
+  }
+
+  @override
+  String get liveWidgetPreview => 'Live widget preview';
+
+  @override
+  String get calendarWidgetBehavior => 'Calendar widget behavior';
+
+  @override
+  String get widgetGeneric => 'Widget';
+
+  @override
+  String get widgetNameMonthList => 'Month & List';
+
+  @override
+  String get widgetNameTimeline => 'Timeline';
+
+  @override
+  String get widgetNameQuickActions => 'Quick Actions';
+
+  @override
+  String get widgetNameUpNext => 'Up Next';
+
+  @override
+  String get filterWidgetTasks => 'Filter widget tasks';
+
+  @override
+  String get addSubtask => 'Add subtask';
+
+  @override
+  String get removeSubtask => 'Remove subtask';
+
+  @override
+  String get addItem => 'Add item';
+
+  @override
+  String get decreaseInterval => 'Decrease';
+
+  @override
+  String get increaseInterval => 'Increase';
+
+  @override
+  String get restoreTask => 'Restore';
+
+  @override
+  String get deleteForever => 'Delete forever';
 }

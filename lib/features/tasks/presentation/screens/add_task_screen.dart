@@ -695,7 +695,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
               const SizedBox(height: 10),
               Semantics(
                 label: l10n.dueDateAndTime,
-                hint: 'Double tap to open date and time picker',
+                hint: AppLocalizations.of(context)!.a11yPickDateHint,
                 button: true,
                 child: InkWell(
                   onTap: () => _selectDate(context),
@@ -731,7 +731,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                         const Spacer(),
                         if (_selectedDate != null)
                           Semantics(
-                            label: 'Clear selected date',
+                            label: AppLocalizations.of(context)!.a11yClearDate,
                             button: true,
                             child: GestureDetector(
                               onTap: () {
@@ -1012,7 +1012,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                 const SizedBox(height: 10),
                 Semantics(
                   label: l10n.recurrence,
-                  hint: 'Double tap to configure recurrence',
+                  hint: AppLocalizations.of(context)!.a11yRecurrenceHint,
                   button: true,
                   child: InkWell(
                     onTap: () async {
@@ -1063,7 +1063,9 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                           const Spacer(),
                           if (_recurrenceRule != null)
                             Semantics(
-                              label: 'Clear recurrence',
+                              label: AppLocalizations.of(
+                                context,
+                              )!.a11yClearRecurrence,
                               button: true,
                               child: GestureDetector(
                                 onTap: () {
@@ -1262,6 +1264,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
               ),
             const Spacer(),
             IconButton(
+              tooltip: AppLocalizations.of(context)!.addSubtask,
               icon: const Icon(Icons.add_circle_outline, size: 20),
               onPressed: () {
                 if (!subscriptionService.isPremium) {
@@ -1311,6 +1314,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   ),
                 ),
                 IconButton(
+                  tooltip: AppLocalizations.of(context)!.removeSubtask,
                   icon: const Icon(Icons.remove_circle_outline, size: 18),
                   onPressed: () {
                     setState(() {

@@ -1,4 +1,8 @@
+import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
+
+import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -84,11 +88,17 @@ class SecurityService {
   }
 }
 
+enum PinUnlockResult { unlocked, wrong, lockedOut }
+
 class PrivateModeService extends ChangeNotifier {
   static const _secureStorage = FlutterSecureStorage();
   static const _pinKey = 'private_mode_pin_v1';
   static const _enabledKey = 'private_mode_enabled_v1';
   static const _biometricEnabledKey = 'private_mode_biometric_enabled_v1';
+  static const _failedAttemptsKey = 'private_mode_failed_attempts_v1';
+  static const _lockedUntilKey = 'private_mode_locked_until_v1';
+  static const _freeAttempts = 5;
+  static const _hashRounds = 10000;
 
   final LocalAuthentication _localAuth = LocalAuthentication();
 
@@ -151,25 +161,83 @@ class PrivateModeService extends ChangeNotifier {
   Future<bool> setPin(String pin) async {
     final normalized = pin.trim();
     if (normalized.length < 4) return false;
-    await _secureStorage.write(key: _pinKey, value: normalized);
+    await _secureStorage.write(key: _pinKey, value: _hashPin(normalized));
+    await _resetFailedAttempts();
     _hasPin = true;
     _unlocked = false;
     notifyListeners();
     return true;
   }
 
+  /// Stored as `v2:<salt>:<hash>`. PINs saved before hashing are plain text;
+  /// they still verify and are rehashed on the next successful unlock.
+  static String _hashPin(String pin, {String? salt}) {
+    salt ??= base64Url.encode(
+      List<int>.generate(16, (_) => Random.secure().nextInt(256)),
+    );
+    List<int> digest = utf8.encode('$salt:$pin');
+    for (var i = 0; i < _hashRounds; i++) {
+      digest = sha256.convert(digest).bytes;
+    }
+    return 'v2:$salt:${base64Url.encode(digest)}';
+  }
+
   Future<bool> verifyPin(String pin) async {
     final stored = await _secureStorage.read(key: _pinKey);
     if (stored == null || stored.isEmpty) return false;
-    return stored == pin.trim();
+    final normalized = pin.trim();
+    final parts = stored.split(':');
+    if (parts.length == 3 && parts[0] == 'v2') {
+      return _hashPin(normalized, salt: parts[1]) == stored;
+    }
+    if (stored != normalized) return false;
+    await _secureStorage.write(key: _pinKey, value: _hashPin(normalized));
+    return true;
   }
 
-  Future<bool> unlockWithPin(String pin) async {
-    final ok = await verifyPin(pin);
-    if (!ok) return false;
+  /// Time left before another PIN may be tried, or null if entry is open.
+  Future<Duration?> pinLockoutRemaining() async {
+    final prefs = await SharedPreferences.getInstance();
+    final until = prefs.getInt(_lockedUntilKey);
+    if (until == null) return null;
+    final left = DateTime.fromMillisecondsSinceEpoch(
+      until,
+    ).difference(DateTime.now());
+    return left > Duration.zero ? left : null;
+  }
+
+  /// The first [_freeAttempts] wrong PINs cost nothing; each one after that
+  /// locks entry for twice as long as the last (30 s up to 15 min). The count
+  /// survives restarts, so closing the app doesn't reset it.
+  Future<PinUnlockResult> unlockWithPin(String pin) async {
+    if (await pinLockoutRemaining() != null) return PinUnlockResult.lockedOut;
+    if (!await verifyPin(pin)) {
+      final prefs = await SharedPreferences.getInstance();
+      final failures = (prefs.getInt(_failedAttemptsKey) ?? 0) + 1;
+      await prefs.setInt(_failedAttemptsKey, failures);
+      if (failures >= _freeAttempts) {
+        final seconds = min(
+          30 << min(failures - _freeAttempts, 5),
+          const Duration(minutes: 15).inSeconds,
+        );
+        await prefs.setInt(
+          _lockedUntilKey,
+          DateTime.now().add(Duration(seconds: seconds)).millisecondsSinceEpoch,
+        );
+        return PinUnlockResult.lockedOut;
+      }
+      return PinUnlockResult.wrong;
+    }
+    await _resetFailedAttempts();
     _unlocked = true;
     notifyListeners();
-    return true;
+    return PinUnlockResult.unlocked;
+  }
+
+  Future<void> _resetFailedAttempts() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_failedAttemptsKey);
+    await prefs.remove(_lockedUntilKey);
   }
 
   Future<bool> canUseBiometrics() async {

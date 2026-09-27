@@ -792,6 +792,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                 ),
               ),
               IconButton(
+                tooltip: AppLocalizations.of(context)!.addItem,
                 icon: const Icon(Icons.add_circle_rounded),
                 color: theme.colorScheme.primary,
                 onPressed: () {

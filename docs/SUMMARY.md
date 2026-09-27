@@ -2,6 +2,23 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## PIN Lockout, Localization & Accessibility Pass - 2026-09-27 (Patch 2 on 0.3.0+114)
+
+#### Problems & Root Causes
+* The private-mode PIN was stored in plain text (inside flutter_secure_storage) and could be tried without limit, so all 10,000 4-digit PINs were reachable by hand.
+* ~130 user-facing strings were hardcoded English (web dashboard, command palette, sync badge, cookie banner, error screen, snackbars, Semantics labels), breaking the ARB-only rule for he/ar/de/es/fr/hi/sv users.
+* 25 icon-only buttons had no tooltip and several tap targets (widget theme/color swatches, paywall plans, chip clear buttons) had no role or label, so screen readers announced "button" or nothing.
+
+#### Solutions Applied
+* `PrivateModeService`: PIN stored as `v2:<salt>:<sha256 x10000>`; legacy plain PINs verify once and are rehashed. 5 free attempts, then a lockout of 30 s doubling to 15 min, persisted in SharedPreferences. `unlockWithPin` returns `PinUnlockResult`; the unlock dialog shows the remaining time (`pinLockedOut`). `crypto` made a direct dependency (already in the lockfile).
+* ~140 ARB keys added in all 8 languages; `GlobalErrorBoundary` falls back to English when it renders above `Localizations`. Notification "Add Task" action and "Tasks Remaining" title use the passed-in labels.
+* Tooltips from `MaterialLocalizations` (close/back/month/search) or ARB keys; `Semantics(button, selected, label)` around bare `GestureDetector` taps.
+* Hosting: HSTS, nosniff, Referrer-Policy, Permissions-Policy (payment left allowed for RevenueCat web checkout; no framing headers because the Firebase auth iframe shares the site).
+
+#### Notes
+* Backup rules excluding flutter_secure_storage prefs (restored copies can't be decrypted) are a manifest change and ship with the next full release, not this patch.
+* Not localized yet: sample content in widget previews and task-template subtasks.
+
 ## ROCIs Schedule Classes Shown as Schedule Events, Not Google Events - 2026-09-27 (Patch 1 on 0.3.0+114)
 
 #### Problems

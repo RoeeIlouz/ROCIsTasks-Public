@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:rocis_tasks/l10n/app_localizations.dart';
 
 /// Utility for parsing, previewing, and opening task file attachments.
 class AttachmentUtils {
@@ -92,7 +93,10 @@ class AttachmentUtils {
         }
       } catch (e) {
         if (context.mounted) {
-          _showErrorSnackBar(context, 'Could not open URL: $filename');
+          _showErrorSnackBar(
+            context,
+            AppLocalizations.of(context)!.couldNotOpenUrl(filename),
+          );
         }
       }
       return;
@@ -101,7 +105,10 @@ class AttachmentUtils {
     if (!kIsWeb) {
       final file = File(path);
       if (!file.existsSync()) {
-        _showErrorSnackBar(context, 'File not found: $filename');
+        _showErrorSnackBar(
+          context,
+          AppLocalizations.of(context)!.fileNotFound(filename),
+        );
         return;
       }
 
@@ -123,10 +130,16 @@ class AttachmentUtils {
       }
 
       if (!launched && context.mounted) {
-        _showErrorSnackBar(context, 'No app found to open $filename');
+        _showErrorSnackBar(
+          context,
+          AppLocalizations.of(context)!.noAppToOpen(filename),
+        );
       }
     } else {
-      _showErrorSnackBar(context, 'Cannot open local file on web');
+      _showErrorSnackBar(
+        context,
+        AppLocalizations.of(context)!.cannotOpenLocalFileOnWeb,
+      );
     }
   }
 
@@ -169,7 +182,7 @@ class AttachmentUtils {
                   if (localPath != null)
                     IconButton(
                       icon: const Icon(Icons.open_in_new_rounded, size: 20),
-                      tooltip: 'Open externally',
+                      tooltip: AppLocalizations.of(context)!.openExternally,
                       onPressed: () async {
                         final uri = Uri.file(localPath);
                         try {
@@ -188,6 +201,9 @@ class AttachmentUtils {
                       },
                     ),
                   IconButton(
+                    tooltip: MaterialLocalizations.of(
+                      context,
+                    ).closeButtonTooltip,
                     icon: const Icon(Icons.close_rounded, size: 20),
                     onPressed: () => Navigator.pop(dialogContext),
                   ),

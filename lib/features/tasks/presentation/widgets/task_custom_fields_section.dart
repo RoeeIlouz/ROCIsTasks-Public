@@ -298,7 +298,7 @@ class _CustomFieldItemEditorState extends State<_CustomFieldItemEditor> {
           ),
           // 48dp removal button
           Semantics(
-            label: 'Remove field',
+            label: AppLocalizations.of(context)!.a11yRemoveField,
             button: true,
             child: InkWell(
               onTap: () {

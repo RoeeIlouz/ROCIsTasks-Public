@@ -82,8 +82,10 @@ class CategoriesScreen extends StatelessWidget {
                 margin: const EdgeInsets.only(bottom: 12),
                 borderRadius: BorderRadius.circular(20),
                 child: Semantics(
-                  label: 'Category: ${category.name}',
-                  hint: 'Double tap to edit category',
+                  label: AppLocalizations.of(
+                    context,
+                  )!.a11yCategory(category.name),
+                  hint: AppLocalizations.of(context)!.a11yEditCategory,
                   child: Material(
                     type: MaterialType.transparency,
                     child: ListTile(
@@ -126,9 +128,14 @@ class CategoriesScreen extends StatelessWidget {
                               size: 18,
                             ),
                           Semantics(
-                            label: 'Delete category',
+                            label: AppLocalizations.of(
+                              context,
+                            )!.a11yDeleteCategory,
                             button: true,
                             child: IconButton(
+                              tooltip: AppLocalizations.of(
+                                context,
+                              )!.a11yDeleteCategory,
                               icon: Icon(
                                 Icons.delete_outline_rounded,
                                 color: theme.colorScheme.error.withValues(
@@ -508,7 +515,9 @@ class _CategorySheetState extends State<_CategorySheet> {
                   final color = _colors[index];
                   final isSelected = _selectedColor == color.toARGB32();
                   return Semantics(
-                    label: 'Color option ${index + 1}',
+                    label: AppLocalizations.of(
+                      context,
+                    )!.a11yColorOption('${index + 1}'),
                     selected: isSelected,
                     button: true,
                     child: GestureDetector(
@@ -565,7 +574,9 @@ class _CategorySheetState extends State<_CategorySheet> {
                 final icon = _icons[index];
                 final isSelected = _selectedIcon == icon.codePoint;
                 return Semantics(
-                  label: 'Icon option ${index + 1}',
+                  label: AppLocalizations.of(
+                    context,
+                  )!.a11yIconOption('${index + 1}'),
                   selected: isSelected,
                   button: true,
                   child: GestureDetector(

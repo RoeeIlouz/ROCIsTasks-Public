@@ -1522,4 +1522,434 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get yesterday => 'कल';
+
+  @override
+  String pinLockedOut(String seconds) {
+    return 'बहुत सारे गलत PIN। $seconds सेकंड में फिर से कोशिश करें।';
+  }
+
+  @override
+  String get pinSaved => 'PIN सहेजा गया';
+
+  @override
+  String get orDivider => 'या';
+
+  @override
+  String get openExternally => 'बाहर खोलें';
+
+  @override
+  String get syncDeviceCalendar => 'डिवाइस कैलेंडर सिंक करें';
+
+  @override
+  String get openInRocisSchedule => 'ROCIs Schedule में खोलें';
+
+  @override
+  String get syncCalendars => 'कैलेंडर सिंक करें';
+
+  @override
+  String a11yCategory(String name) {
+    return 'श्रेणी: $name';
+  }
+
+  @override
+  String get a11yDeleteCategory => 'श्रेणी हटाएं';
+
+  @override
+  String a11yColorOption(String number) {
+    return 'रंग विकल्प $number';
+  }
+
+  @override
+  String a11yIconOption(String number) {
+    return 'आइकन विकल्प $number';
+  }
+
+  @override
+  String a11yColorHex(String hex) {
+    return 'रंग $hex';
+  }
+
+  @override
+  String get a11yClearDate => 'चुनी गई तारीख हटाएं';
+
+  @override
+  String get a11yClearRecurrence => 'दोहराव हटाएं';
+
+  @override
+  String get a11yRemoveField => 'फ़ील्ड हटाएं';
+
+  @override
+  String get taskCompletionFeedback => 'कार्य पूरा होने पर प्रतिक्रिया';
+
+  @override
+  String get taskCompletionFeedbackSubtitle => 'कार्य पूरा करने पर हल्का कंपन';
+
+  @override
+  String get cookiePreferences => 'कुकी प्राथमिकताएं';
+
+  @override
+  String get cookiePreferencesSubtitle => 'कुकी और स्टोरेज सहमति रीसेट करें';
+
+  @override
+  String get scheduleSynergyTitle => 'ROCIs Schedule';
+
+  @override
+  String get scheduleSynergySubtitle =>
+      'ROCIs Schedule के साथ क्लाउड सिंक सक्रिय';
+
+  @override
+  String get openAction => 'खोलें';
+
+  @override
+  String addedToToday(String title) {
+    return '\"$title\" आज में जोड़ा गया';
+  }
+
+  @override
+  String get taskUpdated => 'कार्य अपडेट किया गया';
+
+  @override
+  String get taskCreated => 'कार्य बनाया गया';
+
+  @override
+  String get taskDeleted => 'कार्य हटाया गया';
+
+  @override
+  String get backToTasks => 'कार्यों पर वापस जाएं';
+
+  @override
+  String get calendarDisconnectedReconnect =>
+      'कैलेंडर डिस्कनेक्ट है। फिर से जोड़ने के लिए टैप करें';
+
+  @override
+  String get webSearchHint => 'कार्य खोजें या यहां जाएं... (⌘K)';
+
+  @override
+  String get allCategories => 'सभी श्रेणियां';
+
+  @override
+  String get quickAddTodayHint =>
+      'आज के लिए झटपट कार्य जोड़ें... (Enter दबाएं)';
+
+  @override
+  String get todayAndOverdue => 'आज और अतिदेय';
+
+  @override
+  String get inboxAndUpcoming => 'इनबॉक्स और आगामी';
+
+  @override
+  String get closeEsc => 'बंद करें (Esc)';
+
+  @override
+  String get taskTitleHint => 'कार्य का शीर्षक...';
+
+  @override
+  String get taskNotesHint => 'विवरण या नोट्स जोड़ें...';
+
+  @override
+  String get addSubtaskHint => 'उप-कार्य जोड़ें... (Enter दबाएं)';
+
+  @override
+  String get paletteActions => 'क्रियाएं';
+
+  @override
+  String get cmdNewTaskSubtitle => 'सभी गुणों के साथ नया कार्य बनाएं';
+
+  @override
+  String get cmdTasksSubtitle => 'कार्य सूची पर जाएं';
+
+  @override
+  String get cmdKanbanSubtitle => 'कानबन बोर्ड पर जाएं';
+
+  @override
+  String get cmdCalendarSubtitle => 'कैलेंडर और एजेंडा पर जाएं';
+
+  @override
+  String get cmdCategoriesSubtitle => 'श्रेणियां प्रबंधित करें';
+
+  @override
+  String get cmdSettingsSubtitle => 'प्राथमिकताएं खोलें';
+
+  @override
+  String get cmdSyncSubtitle => 'अभी दोनों ओर कार्य सिंक करें';
+
+  @override
+  String get cmdToggleTheme => 'थीम बदलें (डार्क / लाइट)';
+
+  @override
+  String get cmdToggleThemeSubtitle => 'रंग मोड बदलें';
+
+  @override
+  String get cmdCategoryFilterSubtitle => 'इस श्रेणी से कार्य फ़िल्टर करें';
+
+  @override
+  String get cmdSearchHint => 'कमांड लिखें या कार्य खोजें...';
+
+  @override
+  String get clearAction => 'साफ़ करें';
+
+  @override
+  String get dismissAction => 'खारिज करें';
+
+  @override
+  String get openingCheckout => 'चेकआउट खुल रहा है...';
+
+  @override
+  String purchaseError(String error) {
+    return 'खरीद में त्रुटि: $error';
+  }
+
+  @override
+  String get syncedWithGoogleTasks => 'Google Tasks के साथ सिंक';
+
+  @override
+  String get syncingToCloud => 'बदलाव क्लाउड में सिंक हो रहे हैं...';
+
+  @override
+  String get allSyncedToCloud => 'सभी बदलाव क्लाउड में सिंक हो गए';
+
+  @override
+  String get connectedAndSynced => 'जुड़ा और सिंक';
+
+  @override
+  String get notificationActionAddTask => 'कार्य जोड़ें';
+
+  @override
+  String couldNotOpenUrl(String name) {
+    return '$name नहीं खुल सका';
+  }
+
+  @override
+  String fileNotFound(String name) {
+    return 'फ़ाइल नहीं मिली: $name';
+  }
+
+  @override
+  String noAppToOpen(String name) {
+    return '$name खोलने के लिए कोई ऐप नहीं मिला';
+  }
+
+  @override
+  String get cannotOpenLocalFileOnWeb =>
+      'वेब पर स्थानीय फ़ाइलें नहीं खुल सकतीं';
+
+  @override
+  String get checkingDeviceCapabilities =>
+      'डिवाइस की क्षमताएं जांची जा रही हैं...';
+
+  @override
+  String get noTitle => 'कोई शीर्षक नहीं';
+
+  @override
+  String get scheduleClearForDate => 'इस तारीख के लिए आपका शेड्यूल खाली है।';
+
+  @override
+  String get calendarPermissionRequired =>
+      'इवेंट दिखाने के लिए कैलेंडर अनुमति ज़रूरी है।';
+
+  @override
+  String a11yGoogleCalendarEvent(String title) {
+    return 'Google कैलेंडर इवेंट: $title';
+  }
+
+  @override
+  String get noCalendarsLoaded => 'कोई कैलेंडर लोड नहीं हुआ';
+
+  @override
+  String get a11yEditCategory => 'श्रेणी संपादित करें';
+
+  @override
+  String get cookiePreferencesReset =>
+      'कुकी प्राथमिकताएं रीसेट हो गईं। सहमति बैनर जल्द दिखेगा।';
+
+  @override
+  String get betaFeatures => 'बीटा सुविधाएं';
+
+  @override
+  String get scheduleIntegrationSubtitle =>
+      'विश्वविद्यालय की समय-सारणी सिंक करें और यहीं से ROCIs Schedule खोलें';
+
+  @override
+  String get noMatchingCommands => 'कोई मेल खाता कमांड या कार्य नहीं';
+
+  @override
+  String get cookieBannerTitle => 'कुकी और स्टोरेज प्राथमिकताएं';
+
+  @override
+  String get cookieBannerBody =>
+      'आपके Google Tasks और कैलेंडर कनेक्शन को हर विज़िट पर जोड़े रखने के लिए हम ज़रूरी स्टोरेज और सुरक्षित सेशन कुकी इस्तेमाल करते हैं। नीचे अपनी पसंद चुनें।';
+
+  @override
+  String get essentialOnly => 'केवल ज़रूरी';
+
+  @override
+  String get acceptAll => 'सभी स्वीकार करें';
+
+  @override
+  String get a11yPickDateHint => 'तारीख और समय चुनें';
+
+  @override
+  String get a11yRecurrenceHint => 'दोहराव सेट करें';
+
+  @override
+  String get emptyStateSubtitle => 'मन साफ़ और दिन व्यवस्थित रखें।';
+
+  @override
+  String get a11ySelected => 'चयनित';
+
+  @override
+  String get a11yNotSelected => 'चयनित नहीं';
+
+  @override
+  String get authenticating => 'प्रमाणित किया जा रहा है...';
+
+  @override
+  String get errorScreenTitle => 'कुछ गलत हो गया';
+
+  @override
+  String get errorScreenBody =>
+      'एक अनपेक्षित त्रुटि हुई। इसकी रिपोर्ट कर दी गई है।';
+
+  @override
+  String get tryAgain => 'फिर से कोशिश करें';
+
+  @override
+  String get offlineTooltip =>
+      'ऑफ़लाइन: बदलाव इस डिवाइस पर सेव हैं और ऑनलाइन होते ही सिंक होंगे';
+
+  @override
+  String get syncingLabel => 'सिंक हो रहा है...';
+
+  @override
+  String get syncErrorLabel => 'सिंक त्रुटि';
+
+  @override
+  String get syncErrorRetry =>
+      'सिंक त्रुटि। फिर से कोशिश करने के लिए टैप करें।';
+
+  @override
+  String get syncedLabel => 'सिंक हो गया';
+
+  @override
+  String get calendarDisconnected => 'कैलेंडर डिस्कनेक्ट है';
+
+  @override
+  String get getAndroidApp => 'Android ऐप पाएं';
+
+  @override
+  String get onGooglePlay => 'Google Play पर';
+
+  @override
+  String get userProfile => 'उपयोगकर्ता प्रोफ़ाइल';
+
+  @override
+  String get userFallbackName => 'उपयोगकर्ता';
+
+  @override
+  String helloUser(String name) {
+    return 'नमस्ते, $name 👋';
+  }
+
+  @override
+  String get helloThere => 'नमस्ते 👋';
+
+  @override
+  String get webDashboardSubtitle =>
+      'अपनी प्राथमिकताएं व्यवस्थित करें और सिंक को सही रखें।';
+
+  @override
+  String get totalActive => 'कुल सक्रिय';
+
+  @override
+  String get upcomingSection => 'आगामी';
+
+  @override
+  String get switchToComfortableView => 'आरामदायक दृश्य पर जाएं';
+
+  @override
+  String get switchToCompactView => 'कॉम्पैक्ट दृश्य पर जाएं';
+
+  @override
+  String get noTasksInSection => 'इस अनुभाग में कोई कार्य नहीं';
+
+  @override
+  String get selectATask => 'कोई कार्य चुनें';
+
+  @override
+  String get selectATaskBody =>
+      'किसी कार्य को देखने और बदलने के लिए उस पर क्लिक करें, या नया बनाने के लिए \"+ नया कार्य\" पर क्लिक करें।';
+
+  @override
+  String get taskDetails => 'कार्य विवरण';
+
+  @override
+  String get savingStatus => 'सेव हो रहा है';
+
+  @override
+  String get savedStatus => 'सेव हो गया';
+
+  @override
+  String get titleRequired => 'शीर्षक ज़रूरी है';
+
+  @override
+  String get statusLabel => 'स्थिति';
+
+  @override
+  String get inProgress => 'प्रगति में';
+
+  @override
+  String get dueDateLabel => 'नियत तारीख';
+
+  @override
+  String get setDate => 'तारीख सेट करें';
+
+  @override
+  String subtasksProgress(String done, String total) {
+    return 'उप-कार्य ($done/$total)';
+  }
+
+  @override
+  String get liveWidgetPreview => 'विजेट का लाइव पूर्वावलोकन';
+
+  @override
+  String get calendarWidgetBehavior => 'कैलेंडर विजेट का व्यवहार';
+
+  @override
+  String get widgetGeneric => 'विजेट';
+
+  @override
+  String get widgetNameMonthList => 'महीना और सूची';
+
+  @override
+  String get widgetNameTimeline => 'टाइमलाइन';
+
+  @override
+  String get widgetNameQuickActions => 'त्वरित क्रियाएं';
+
+  @override
+  String get widgetNameUpNext => 'आगे';
+
+  @override
+  String get filterWidgetTasks => 'विजेट कार्य फ़िल्टर करें';
+
+  @override
+  String get addSubtask => 'उप-कार्य जोड़ें';
+
+  @override
+  String get removeSubtask => 'उप-कार्य हटाएं';
+
+  @override
+  String get addItem => 'आइटम जोड़ें';
+
+  @override
+  String get decreaseInterval => 'घटाएं';
+
+  @override
+  String get increaseInterval => 'बढ़ाएं';
+
+  @override
+  String get restoreTask => 'पुनर्स्थापित करें';
+
+  @override
+  String get deleteForever => 'हमेशा के लिए हटाएं';
 }

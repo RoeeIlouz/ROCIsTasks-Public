@@ -135,7 +135,7 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Live Widget Preview',
+                AppLocalizations.of(context)!.liveWidgetPreview,
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
@@ -187,7 +187,7 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
 
           // 4. Toggles & Behavior (Active for Calendar widgets)
           Text(
-            'Calendar Widget Behavior',
+            AppLocalizations.of(context)!.calendarWidgetBehavior,
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
             ),
@@ -220,30 +220,33 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
   String _getWidgetTag(int index) {
     switch (index) {
       case 0:
-        return '4x4 Full Calendar';
+        return '4×4 · ${AppLocalizations.of(context)!.calendar}';
       case 1:
-        return '4x3 Day Agenda';
+        return '4×3 · ${AppLocalizations.of(context)!.todayAgendaWidgetTitle}';
       case 2:
-        return '4x4 Month & Agenda';
+        return '4×4 · ${AppLocalizations.of(context)!.widgetNameMonthList}';
       case 3:
-        return '4x3 Timeline';
+        return '4×3 · ${AppLocalizations.of(context)!.widgetNameTimeline}';
       case 4:
-        return '2x2 Quick Actions';
+        return '2×2 · ${AppLocalizations.of(context)!.widgetNameQuickActions}';
       case 5:
-        return '3x1 Up Next Pill';
+        return '3×1 · ${AppLocalizations.of(context)!.widgetNameUpNext}';
       default:
-        return 'Widget';
+        return AppLocalizations.of(context)!.widgetGeneric;
     }
   }
 
   Widget _buildWidgetSwitcher(ThemeData theme, AppLocalizations l10n) {
     final tabs = [
-      {'icon': Icons.calendar_month_rounded, 'name': 'Calendar'},
-      {'icon': Icons.view_agenda_rounded, 'name': 'Day Agenda'},
-      {'icon': Icons.calendar_view_month_rounded, 'name': 'Month & List'},
-      {'icon': Icons.timeline_rounded, 'name': 'Timeline'},
-      {'icon': Icons.add_task_rounded, 'name': 'Quick Actions'},
-      {'icon': Icons.play_arrow_rounded, 'name': 'Up Next'},
+      {'icon': Icons.calendar_month_rounded, 'name': l10n.calendar},
+      {'icon': Icons.view_agenda_rounded, 'name': l10n.todayAgendaWidgetTitle},
+      {
+        'icon': Icons.calendar_view_month_rounded,
+        'name': l10n.widgetNameMonthList,
+      },
+      {'icon': Icons.timeline_rounded, 'name': l10n.widgetNameTimeline},
+      {'icon': Icons.add_task_rounded, 'name': l10n.widgetNameQuickActions},
+      {'icon': Icons.play_arrow_rounded, 'name': l10n.widgetNameUpNext},
     ];
 
     return SingleChildScrollView(
@@ -1175,58 +1178,62 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
             runSpacing: 8,
             children: themes.map((t) {
               final isSel = _widgetTheme == t['id'];
-              return GestureDetector(
-                onTap: () {
-                  HapticFeedback.selectionClick();
-                  setState(() {
-                    _widgetTheme = t['id'] as String;
-                  });
-                  _saveSetting('full_calendar_theme', t['id']);
-                },
-                child: Container(
-                  width: itemWidth,
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 12,
-                    horizontal: 8,
-                  ),
-                  decoration: BoxDecoration(
-                    color: isSel
-                        ? theme.colorScheme.primary.withValues(alpha: 0.15)
-                        : Colors.transparent,
-                    border: Border.all(
-                      color: isSel
-                          ? theme.colorScheme.primary
-                          : theme.dividerColor.withValues(alpha: 0.1),
-                      width: 1.5,
+              return Semantics(
+                button: true,
+                selected: isSel,
+                child: GestureDetector(
+                  onTap: () {
+                    HapticFeedback.selectionClick();
+                    setState(() {
+                      _widgetTheme = t['id'] as String;
+                    });
+                    _saveSetting('full_calendar_theme', t['id']);
+                  },
+                  child: Container(
+                    width: itemWidth,
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 12,
+                      horizontal: 8,
                     ),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        t['icon'] as IconData,
+                    decoration: BoxDecoration(
+                      color: isSel
+                          ? theme.colorScheme.primary.withValues(alpha: 0.15)
+                          : Colors.transparent,
+                      border: Border.all(
                         color: isSel
                             ? theme.colorScheme.primary
-                            : theme.iconTheme.color?.withValues(alpha: 0.7),
-                        size: 20,
+                            : theme.dividerColor.withValues(alpha: 0.1),
+                        width: 1.5,
                       ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          t['label'] as String,
-                          style: TextStyle(
-                            color: isSel
-                                ? theme.colorScheme.primary
-                                : theme.textTheme.bodyMedium?.color,
-                            fontWeight: isSel
-                                ? FontWeight.bold
-                                : FontWeight.normal,
-                            fontSize: 12,
-                          ),
-                          overflow: TextOverflow.ellipsis,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          t['icon'] as IconData,
+                          color: isSel
+                              ? theme.colorScheme.primary
+                              : theme.iconTheme.color?.withValues(alpha: 0.7),
+                          size: 20,
                         ),
-                      ),
-                    ],
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            t['label'] as String,
+                            style: TextStyle(
+                              color: isSel
+                                  ? theme.colorScheme.primary
+                                  : theme.textTheme.bodyMedium?.color,
+                              fontWeight: isSel
+                                  ? FontWeight.bold
+                                  : FontWeight.normal,
+                              fontSize: 12,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               );
@@ -1273,97 +1280,108 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
                 (c['hex'] as String).toLowerCase();
             final itemColor = c['color'] as Color;
 
-            return GestureDetector(
+            return Semantics(
+              button: true,
+              selected: isSelected,
+              label: AppLocalizations.of(
+                context,
+              )!.a11yColorHex(c['hex'] as String),
+              child: GestureDetector(
+                onTap: () {
+                  HapticFeedback.selectionClick();
+                  setState(() {
+                    _highlightColor = c['hex'] as String;
+                  });
+                  _saveSetting('full_calendar_highlight_color', c['hex']);
+                  // An explicit pick overrides the app's accent on the widget.
+                  _saveSetting('full_calendar_highlight_custom', true);
+                },
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: itemColor,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: isSelected ? Colors.white : Colors.transparent,
+                      width: 3,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: itemColor.withValues(
+                          alpha: isSelected ? 0.6 : 0.2,
+                        ),
+                        blurRadius: isSelected ? 8 : 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: isSelected
+                      ? const Icon(Icons.check, color: Colors.white, size: 18)
+                      : null,
+                ),
+              ),
+            );
+          }),
+          // Expandable custom color picker button
+          Semantics(
+            button: true,
+            label: AppLocalizations.of(context)!.customColor,
+            child: GestureDetector(
               onTap: () {
                 HapticFeedback.selectionClick();
-                setState(() {
-                  _highlightColor = c['hex'] as String;
-                });
-                _saveSetting('full_calendar_highlight_color', c['hex']);
-                // An explicit pick overrides the app's accent on the widget.
-                _saveSetting('full_calendar_highlight_custom', true);
+                AppColorPickerSheet.show(
+                  context: context,
+                  title: AppLocalizations.of(context)!.widgetAccentColor,
+                  initialColor: currentColor,
+                  presetColors: colors.map((c) => c['color'] as Color).toList(),
+                  onColorChanged: (newColor) {
+                    final hex =
+                        '#${newColor.toARGB32().toRadixString(16).padLeft(8, '0')}';
+                    setState(() {
+                      _highlightColor = hex;
+                    });
+                    _saveSetting('full_calendar_highlight_color', hex);
+                    _saveSetting('full_calendar_highlight_custom', true);
+                  },
+                );
               },
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
-                  color: itemColor,
+                  color: isCustomSelected
+                      ? currentColor
+                      : theme.colorScheme.surfaceContainerHighest.withValues(
+                          alpha: 0.5,
+                        ),
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: isSelected ? Colors.white : Colors.transparent,
-                    width: 3,
+                    color: isCustomSelected
+                        ? Colors.white
+                        : theme.colorScheme.outline.withValues(alpha: 0.4),
+                    width: isCustomSelected ? 3 : 1.5,
                   ),
                   boxShadow: [
-                    BoxShadow(
-                      color: itemColor.withValues(
-                        alpha: isSelected ? 0.6 : 0.2,
+                    if (isCustomSelected)
+                      BoxShadow(
+                        color: currentColor.withValues(alpha: 0.6),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
                       ),
-                      blurRadius: isSelected ? 8 : 4,
-                      offset: const Offset(0, 2),
-                    ),
                   ],
                 ),
-                child: isSelected
-                    ? const Icon(Icons.check, color: Colors.white, size: 18)
-                    : null,
-              ),
-            );
-          }),
-          // Expandable custom color picker button
-          GestureDetector(
-            onTap: () {
-              HapticFeedback.selectionClick();
-              AppColorPickerSheet.show(
-                context: context,
-                title: AppLocalizations.of(context)!.widgetAccentColor,
-                initialColor: currentColor,
-                presetColors: colors.map((c) => c['color'] as Color).toList(),
-                onColorChanged: (newColor) {
-                  final hex =
-                      '#${newColor.toARGB32().toRadixString(16).padLeft(8, '0')}';
-                  setState(() {
-                    _highlightColor = hex;
-                  });
-                  _saveSetting('full_calendar_highlight_color', hex);
-                  _saveSetting('full_calendar_highlight_custom', true);
-                },
-              );
-            },
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                color: isCustomSelected
-                    ? currentColor
-                    : theme.colorScheme.surfaceContainerHighest.withValues(
-                        alpha: 0.5,
-                      ),
-                shape: BoxShape.circle,
-                border: Border.all(
+                child: Icon(
+                  isCustomSelected ? Icons.check : Icons.colorize_rounded,
                   color: isCustomSelected
-                      ? Colors.white
-                      : theme.colorScheme.outline.withValues(alpha: 0.4),
-                  width: isCustomSelected ? 3 : 1.5,
+                      ? (currentColor.computeLuminance() > 0.5
+                            ? Colors.black
+                            : Colors.white)
+                      : theme.colorScheme.primary,
+                  size: 16,
                 ),
-                boxShadow: [
-                  if (isCustomSelected)
-                    BoxShadow(
-                      color: currentColor.withValues(alpha: 0.6),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                ],
-              ),
-              child: Icon(
-                isCustomSelected ? Icons.check : Icons.colorize_rounded,
-                color: isCustomSelected
-                    ? (currentColor.computeLuminance() > 0.5
-                          ? Colors.black
-                          : Colors.white)
-                    : theme.colorScheme.primary,
-                size: 16,
               ),
             ),
           ),
@@ -1491,9 +1509,9 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
                   color: theme.colorScheme.primary,
                 ),
                 title: Text(l10n.categories),
-                subtitle: const Text(
-                  'Filter widget tasks',
-                  style: TextStyle(fontSize: 12),
+                subtitle: Text(
+                  AppLocalizations.of(context)!.filterWidgetTasks,
+                  style: const TextStyle(fontSize: 12),
                 ),
                 trailing: DropdownButton<String>(
                   value: _selectedCategoryFilter,

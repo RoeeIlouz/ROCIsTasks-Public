@@ -64,6 +64,7 @@ dependencies:
   connectivity_plus: ^7.1.1
 
   # Security & Encryption
+  crypto: ^3.0.7
   encrypt: ^5.0.3
   local_auth: ^3.0.1
 

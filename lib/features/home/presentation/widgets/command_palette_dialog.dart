@@ -121,11 +121,11 @@ class _CommandPaletteDialogState extends State<CommandPaletteDialog> {
       CommandPaletteItem(
         id: 'action_new_task',
         title: l10n.newTask,
-        subtitle: 'Create a new task with full properties',
+        subtitle: l10n.cmdNewTaskSubtitle,
         icon: Icons.add_circle_outline_rounded,
         iconColor: theme.colorScheme.primary,
         shortcut: 'C',
-        section: 'Actions',
+        section: l10n.paletteActions,
         onSelect: () {
           Navigator.of(context).pop();
           widget.onCreateTask();
@@ -133,12 +133,12 @@ class _CommandPaletteDialogState extends State<CommandPaletteDialog> {
       ),
       CommandPaletteItem(
         id: 'action_tab_tasks',
-        title: '${l10n.tasks} (List View)',
-        subtitle: 'Switch to main tasks workspace',
+        title: l10n.tasks,
+        subtitle: l10n.cmdTasksSubtitle,
         icon: Icons.task_alt_rounded,
         iconColor: theme.colorScheme.primary,
         shortcut: '1',
-        section: 'Actions',
+        section: l10n.paletteActions,
         onSelect: () {
           Navigator.of(context).pop();
           widget.onSwitchTab('tasks');
@@ -147,11 +147,11 @@ class _CommandPaletteDialogState extends State<CommandPaletteDialog> {
       CommandPaletteItem(
         id: 'action_tab_board',
         title: l10n.boardView,
-        subtitle: 'Switch to Kanban board view',
+        subtitle: l10n.cmdKanbanSubtitle,
         icon: Icons.view_kanban_outlined,
         iconColor: Colors.blueAccent,
         shortcut: '2',
-        section: 'Actions',
+        section: l10n.paletteActions,
         onSelect: () {
           Navigator.of(context).pop();
           widget.onSwitchTab('board');
@@ -160,11 +160,11 @@ class _CommandPaletteDialogState extends State<CommandPaletteDialog> {
       CommandPaletteItem(
         id: 'action_tab_calendar',
         title: l10n.calendar,
-        subtitle: 'Switch to calendar and agenda view',
+        subtitle: l10n.cmdCalendarSubtitle,
         icon: Icons.calendar_month_rounded,
         iconColor: Colors.orangeAccent,
         shortcut: '3',
-        section: 'Actions',
+        section: l10n.paletteActions,
         onSelect: () {
           Navigator.of(context).pop();
           widget.onSwitchTab('calendar');
@@ -173,11 +173,11 @@ class _CommandPaletteDialogState extends State<CommandPaletteDialog> {
       CommandPaletteItem(
         id: 'action_tab_categories',
         title: l10n.categories,
-        subtitle: 'Manage task tags and categories',
+        subtitle: l10n.cmdCategoriesSubtitle,
         icon: Icons.dashboard_customize_outlined,
         iconColor: Colors.purpleAccent,
         shortcut: '4',
-        section: 'Actions',
+        section: l10n.paletteActions,
         onSelect: () {
           Navigator.of(context).pop();
           widget.onSwitchTab('categories');
@@ -186,11 +186,11 @@ class _CommandPaletteDialogState extends State<CommandPaletteDialog> {
       CommandPaletteItem(
         id: 'action_tab_settings',
         title: l10n.settings,
-        subtitle: 'Open preferences and configuration',
+        subtitle: l10n.cmdSettingsSubtitle,
         icon: Icons.settings_rounded,
         iconColor: Colors.blueGrey,
         shortcut: '5',
-        section: 'Actions',
+        section: l10n.paletteActions,
         onSelect: () {
           Navigator.of(context).pop();
           widget.onSwitchTab('settings');
@@ -198,11 +198,11 @@ class _CommandPaletteDialogState extends State<CommandPaletteDialog> {
       ),
       CommandPaletteItem(
         id: 'action_sync',
-        title: 'Sync with Google Tasks',
-        subtitle: 'Trigger bidirectional cloud synchronization',
+        title: l10n.syncWithGoogleTasks,
+        subtitle: l10n.cmdSyncSubtitle,
         icon: Icons.sync_rounded,
         iconColor: theme.colorScheme.primary,
-        section: 'Actions',
+        section: l10n.paletteActions,
         onSelect: () {
           Navigator.of(context).pop();
           widget.onSyncTasks();
@@ -210,11 +210,11 @@ class _CommandPaletteDialogState extends State<CommandPaletteDialog> {
       ),
       CommandPaletteItem(
         id: 'action_toggle_theme',
-        title: 'Toggle Theme (Dark / Light)',
-        subtitle: 'Switch application color mode',
+        title: l10n.cmdToggleTheme,
+        subtitle: l10n.cmdToggleThemeSubtitle,
         icon: Icons.brightness_6_rounded,
         iconColor: Colors.amber,
-        section: 'Actions',
+        section: l10n.paletteActions,
         onSelect: () {
           Navigator.of(context).pop();
           widget.onToggleTheme();
@@ -264,7 +264,7 @@ class _CommandPaletteDialogState extends State<CommandPaletteDialog> {
                     ? Colors.orangeAccent
                     : theme.disabledColor),
           shortcut: task.isCompleted ? 'Done' : 'Task',
-          section: 'Tasks',
+          section: l10n.tasks,
           onSelect: () {
             Navigator.of(context).pop();
             widget.onSelectTask(task);
@@ -286,11 +286,11 @@ class _CommandPaletteDialogState extends State<CommandPaletteDialog> {
         items.add(
           CommandPaletteItem(
             id: 'cat_${cat.id}',
-            title: 'Category: ${cat.name}',
-            subtitle: 'Filter workspace tasks by this category',
+            title: l10n.a11yCategory(cat.name),
+            subtitle: l10n.cmdCategoryFilterSubtitle,
             icon: Icons.label_outline_rounded,
             iconColor: Color(cat.colorValue),
-            section: 'Categories',
+            section: l10n.categories,
             onSelect: () {
               Navigator.of(context).pop();
               widget.onSelectCategory!(cat.id);
@@ -403,7 +403,9 @@ class _CommandPaletteDialogState extends State<CommandPaletteDialog> {
                           ),
                           decoration: InputDecoration(
                             border: InputBorder.none,
-                            hintText: 'Type a command or search tasks...',
+                            hintText: AppLocalizations.of(
+                              context,
+                            )!.cmdSearchHint,
                             hintStyle: TextStyle(
                               color: theme.disabledColor,
                               fontSize: 15,
@@ -417,7 +419,7 @@ class _CommandPaletteDialogState extends State<CommandPaletteDialog> {
                         IconButton(
                           icon: const Icon(Icons.clear_rounded, size: 18),
                           onPressed: _searchController.clear,
-                          tooltip: 'Clear',
+                          tooltip: AppLocalizations.of(context)!.clearAction,
                           visualDensity: VisualDensity.compact,
                         ),
                       Container(
@@ -468,7 +470,9 @@ class _CommandPaletteDialogState extends State<CommandPaletteDialog> {
                                 ),
                                 const SizedBox(height: 12),
                                 Text(
-                                  'No matching commands or tasks found',
+                                  AppLocalizations.of(
+                                    context,
+                                  )!.noMatchingCommands,
                                   style: TextStyle(
                                     fontSize: 13,
                                     color: theme.disabledColor,

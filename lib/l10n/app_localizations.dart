@@ -2958,6 +2958,786 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Yesterday'**
   String get yesterday;
+
+  /// No description provided for @pinLockedOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Too many wrong PINs. Try again in {seconds} s.'**
+  String pinLockedOut(String seconds);
+
+  /// No description provided for @pinSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'PIN saved'**
+  String get pinSaved;
+
+  /// No description provided for @orDivider.
+  ///
+  /// In en, this message translates to:
+  /// **'OR'**
+  String get orDivider;
+
+  /// No description provided for @openExternally.
+  ///
+  /// In en, this message translates to:
+  /// **'Open externally'**
+  String get openExternally;
+
+  /// No description provided for @syncDeviceCalendar.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync Device Calendar'**
+  String get syncDeviceCalendar;
+
+  /// No description provided for @openInRocisSchedule.
+  ///
+  /// In en, this message translates to:
+  /// **'Open in ROCIs Schedule'**
+  String get openInRocisSchedule;
+
+  /// No description provided for @syncCalendars.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync Calendars'**
+  String get syncCalendars;
+
+  /// No description provided for @a11yCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Category: {name}'**
+  String a11yCategory(String name);
+
+  /// No description provided for @a11yDeleteCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete category'**
+  String get a11yDeleteCategory;
+
+  /// No description provided for @a11yColorOption.
+  ///
+  /// In en, this message translates to:
+  /// **'Color option {number}'**
+  String a11yColorOption(String number);
+
+  /// No description provided for @a11yIconOption.
+  ///
+  /// In en, this message translates to:
+  /// **'Icon option {number}'**
+  String a11yIconOption(String number);
+
+  /// No description provided for @a11yColorHex.
+  ///
+  /// In en, this message translates to:
+  /// **'Color {hex}'**
+  String a11yColorHex(String hex);
+
+  /// No description provided for @a11yClearDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear selected date'**
+  String get a11yClearDate;
+
+  /// No description provided for @a11yClearRecurrence.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear recurrence'**
+  String get a11yClearRecurrence;
+
+  /// No description provided for @a11yRemoveField.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove field'**
+  String get a11yRemoveField;
+
+  /// No description provided for @taskCompletionFeedback.
+  ///
+  /// In en, this message translates to:
+  /// **'Task Completion Feedback'**
+  String get taskCompletionFeedback;
+
+  /// No description provided for @taskCompletionFeedbackSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Haptic pulse when ticking off a task'**
+  String get taskCompletionFeedbackSubtitle;
+
+  /// No description provided for @cookiePreferences.
+  ///
+  /// In en, this message translates to:
+  /// **'Cookie Preferences'**
+  String get cookiePreferences;
+
+  /// No description provided for @cookiePreferencesSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset cookie & storage consent'**
+  String get cookiePreferencesSubtitle;
+
+  /// No description provided for @scheduleSynergyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'ROCIs Schedule'**
+  String get scheduleSynergyTitle;
+
+  /// No description provided for @scheduleSynergySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud sync active with ROCIs Schedule'**
+  String get scheduleSynergySubtitle;
+
+  /// No description provided for @openAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get openAction;
+
+  /// No description provided for @addedToToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Added \"{title}\" to Today'**
+  String addedToToday(String title);
+
+  /// No description provided for @taskUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Task updated'**
+  String get taskUpdated;
+
+  /// No description provided for @taskCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Task created'**
+  String get taskCreated;
+
+  /// No description provided for @taskDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Task deleted'**
+  String get taskDeleted;
+
+  /// No description provided for @backToTasks.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to tasks'**
+  String get backToTasks;
+
+  /// No description provided for @calendarDisconnectedReconnect.
+  ///
+  /// In en, this message translates to:
+  /// **'Calendar disconnected. Tap to reconnect'**
+  String get calendarDisconnectedReconnect;
+
+  /// No description provided for @webSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search tasks or jump to... (⌘K)'**
+  String get webSearchHint;
+
+  /// No description provided for @allCategories.
+  ///
+  /// In en, this message translates to:
+  /// **'All Categories'**
+  String get allCategories;
+
+  /// No description provided for @quickAddTodayHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick add task to Today... (Press Enter)'**
+  String get quickAddTodayHint;
+
+  /// No description provided for @todayAndOverdue.
+  ///
+  /// In en, this message translates to:
+  /// **'Today & Overdue'**
+  String get todayAndOverdue;
+
+  /// No description provided for @inboxAndUpcoming.
+  ///
+  /// In en, this message translates to:
+  /// **'Inbox & Upcoming'**
+  String get inboxAndUpcoming;
+
+  /// No description provided for @closeEsc.
+  ///
+  /// In en, this message translates to:
+  /// **'Close (Esc)'**
+  String get closeEsc;
+
+  /// No description provided for @taskTitleHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Task title...'**
+  String get taskTitleHint;
+
+  /// No description provided for @taskNotesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Add description or notes...'**
+  String get taskNotesHint;
+
+  /// No description provided for @addSubtaskHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a subtask... (Press Enter)'**
+  String get addSubtaskHint;
+
+  /// No description provided for @paletteActions.
+  ///
+  /// In en, this message translates to:
+  /// **'Actions'**
+  String get paletteActions;
+
+  /// No description provided for @cmdNewTaskSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a new task with full properties'**
+  String get cmdNewTaskSubtitle;
+
+  /// No description provided for @cmdTasksSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch to the task list'**
+  String get cmdTasksSubtitle;
+
+  /// No description provided for @cmdKanbanSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch to the Kanban board'**
+  String get cmdKanbanSubtitle;
+
+  /// No description provided for @cmdCalendarSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch to calendar and agenda'**
+  String get cmdCalendarSubtitle;
+
+  /// No description provided for @cmdCategoriesSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage categories'**
+  String get cmdCategoriesSubtitle;
+
+  /// No description provided for @cmdSettingsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Open preferences'**
+  String get cmdSettingsSubtitle;
+
+  /// No description provided for @cmdSyncSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync tasks both ways now'**
+  String get cmdSyncSubtitle;
+
+  /// No description provided for @cmdToggleTheme.
+  ///
+  /// In en, this message translates to:
+  /// **'Toggle theme (dark / light)'**
+  String get cmdToggleTheme;
+
+  /// No description provided for @cmdToggleThemeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch the color mode'**
+  String get cmdToggleThemeSubtitle;
+
+  /// No description provided for @cmdCategoryFilterSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter tasks by this category'**
+  String get cmdCategoryFilterSubtitle;
+
+  /// No description provided for @cmdSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Type a command or search tasks...'**
+  String get cmdSearchHint;
+
+  /// No description provided for @clearAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get clearAction;
+
+  /// No description provided for @dismissAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Dismiss'**
+  String get dismissAction;
+
+  /// No description provided for @openingCheckout.
+  ///
+  /// In en, this message translates to:
+  /// **'Opening checkout...'**
+  String get openingCheckout;
+
+  /// No description provided for @purchaseError.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase error: {error}'**
+  String purchaseError(String error);
+
+  /// No description provided for @syncedWithGoogleTasks.
+  ///
+  /// In en, this message translates to:
+  /// **'Synced with Google Tasks'**
+  String get syncedWithGoogleTasks;
+
+  /// No description provided for @syncingToCloud.
+  ///
+  /// In en, this message translates to:
+  /// **'Syncing changes to the cloud...'**
+  String get syncingToCloud;
+
+  /// No description provided for @allSyncedToCloud.
+  ///
+  /// In en, this message translates to:
+  /// **'All changes synced to the cloud'**
+  String get allSyncedToCloud;
+
+  /// No description provided for @connectedAndSynced.
+  ///
+  /// In en, this message translates to:
+  /// **'Connected & synced'**
+  String get connectedAndSynced;
+
+  /// No description provided for @notificationActionAddTask.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Task'**
+  String get notificationActionAddTask;
+
+  /// No description provided for @couldNotOpenUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t open {name}'**
+  String couldNotOpenUrl(String name);
+
+  /// No description provided for @fileNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'File not found: {name}'**
+  String fileNotFound(String name);
+
+  /// No description provided for @noAppToOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'No app found to open {name}'**
+  String noAppToOpen(String name);
+
+  /// No description provided for @cannotOpenLocalFileOnWeb.
+  ///
+  /// In en, this message translates to:
+  /// **'Local files can\'t be opened on the web'**
+  String get cannotOpenLocalFileOnWeb;
+
+  /// No description provided for @checkingDeviceCapabilities.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking device capabilities...'**
+  String get checkingDeviceCapabilities;
+
+  /// No description provided for @noTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No title'**
+  String get noTitle;
+
+  /// No description provided for @scheduleClearForDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Your schedule is clear for this date.'**
+  String get scheduleClearForDate;
+
+  /// No description provided for @calendarPermissionRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Calendar permission is required to display events.'**
+  String get calendarPermissionRequired;
+
+  /// No description provided for @a11yGoogleCalendarEvent.
+  ///
+  /// In en, this message translates to:
+  /// **'Google Calendar event: {title}'**
+  String a11yGoogleCalendarEvent(String title);
+
+  /// No description provided for @noCalendarsLoaded.
+  ///
+  /// In en, this message translates to:
+  /// **'No calendars loaded'**
+  String get noCalendarsLoaded;
+
+  /// No description provided for @a11yEditCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit category'**
+  String get a11yEditCategory;
+
+  /// No description provided for @cookiePreferencesReset.
+  ///
+  /// In en, this message translates to:
+  /// **'Cookie preferences reset. The consent banner will appear shortly.'**
+  String get cookiePreferencesReset;
+
+  /// No description provided for @betaFeatures.
+  ///
+  /// In en, this message translates to:
+  /// **'Beta Features'**
+  String get betaFeatures;
+
+  /// No description provided for @scheduleIntegrationSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync university timetable events and open ROCIs Schedule from here'**
+  String get scheduleIntegrationSubtitle;
+
+  /// No description provided for @noMatchingCommands.
+  ///
+  /// In en, this message translates to:
+  /// **'No matching commands or tasks'**
+  String get noMatchingCommands;
+
+  /// No description provided for @cookieBannerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cookie & Storage Preferences'**
+  String get cookieBannerTitle;
+
+  /// No description provided for @cookieBannerBody.
+  ///
+  /// In en, this message translates to:
+  /// **'We use essential storage and secure session cookies to keep your Google Tasks and Calendar integrations connected across visits. Choose your preference below.'**
+  String get cookieBannerBody;
+
+  /// No description provided for @essentialOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Essential Only'**
+  String get essentialOnly;
+
+  /// No description provided for @acceptAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Accept All'**
+  String get acceptAll;
+
+  /// No description provided for @a11yPickDateHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose date and time'**
+  String get a11yPickDateHint;
+
+  /// No description provided for @a11yRecurrenceHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Set up repeat'**
+  String get a11yRecurrenceHint;
+
+  /// No description provided for @emptyStateSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep your mind clear and your day organized.'**
+  String get emptyStateSubtitle;
+
+  /// No description provided for @a11ySelected.
+  ///
+  /// In en, this message translates to:
+  /// **'Selected'**
+  String get a11ySelected;
+
+  /// No description provided for @a11yNotSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'Not selected'**
+  String get a11yNotSelected;
+
+  /// No description provided for @authenticating.
+  ///
+  /// In en, this message translates to:
+  /// **'Authenticating...'**
+  String get authenticating;
+
+  /// No description provided for @errorScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong'**
+  String get errorScreenTitle;
+
+  /// No description provided for @errorScreenBody.
+  ///
+  /// In en, this message translates to:
+  /// **'An unexpected error occurred. It has been reported.'**
+  String get errorScreenBody;
+
+  /// No description provided for @tryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get tryAgain;
+
+  /// No description provided for @offlineTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Offline: changes are saved on this device and sync when you\'re back online'**
+  String get offlineTooltip;
+
+  /// No description provided for @syncingLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Syncing...'**
+  String get syncingLabel;
+
+  /// No description provided for @syncErrorLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync error'**
+  String get syncErrorLabel;
+
+  /// No description provided for @syncErrorRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync error. Tap to retry.'**
+  String get syncErrorRetry;
+
+  /// No description provided for @syncedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Synced'**
+  String get syncedLabel;
+
+  /// No description provided for @calendarDisconnected.
+  ///
+  /// In en, this message translates to:
+  /// **'Calendar disconnected'**
+  String get calendarDisconnected;
+
+  /// No description provided for @getAndroidApp.
+  ///
+  /// In en, this message translates to:
+  /// **'Get the Android app'**
+  String get getAndroidApp;
+
+  /// No description provided for @onGooglePlay.
+  ///
+  /// In en, this message translates to:
+  /// **'On Google Play'**
+  String get onGooglePlay;
+
+  /// No description provided for @userProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'User profile'**
+  String get userProfile;
+
+  /// No description provided for @userFallbackName.
+  ///
+  /// In en, this message translates to:
+  /// **'User'**
+  String get userFallbackName;
+
+  /// No description provided for @helloUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Hello, {name} 👋'**
+  String helloUser(String name);
+
+  /// No description provided for @helloThere.
+  ///
+  /// In en, this message translates to:
+  /// **'Hello 👋'**
+  String get helloThere;
+
+  /// No description provided for @webDashboardSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Organize your priorities and keep your sync healthy.'**
+  String get webDashboardSubtitle;
+
+  /// No description provided for @totalActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Total active'**
+  String get totalActive;
+
+  /// No description provided for @upcomingSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming'**
+  String get upcomingSection;
+
+  /// No description provided for @switchToComfortableView.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch to comfortable view'**
+  String get switchToComfortableView;
+
+  /// No description provided for @switchToCompactView.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch to compact view'**
+  String get switchToCompactView;
+
+  /// No description provided for @noTasksInSection.
+  ///
+  /// In en, this message translates to:
+  /// **'No tasks in this section'**
+  String get noTasksInSection;
+
+  /// No description provided for @selectATask.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a task'**
+  String get selectATask;
+
+  /// No description provided for @selectATaskBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Click a task to view and edit it, or click \"+ New Task\" to create one.'**
+  String get selectATaskBody;
+
+  /// No description provided for @taskDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Task details'**
+  String get taskDetails;
+
+  /// No description provided for @savingStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving'**
+  String get savingStatus;
+
+  /// No description provided for @savedStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved'**
+  String get savedStatus;
+
+  /// No description provided for @titleRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Title is required'**
+  String get titleRequired;
+
+  /// No description provided for @statusLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get statusLabel;
+
+  /// No description provided for @inProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'In progress'**
+  String get inProgress;
+
+  /// No description provided for @dueDateLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Due date'**
+  String get dueDateLabel;
+
+  /// No description provided for @setDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Set date'**
+  String get setDate;
+
+  /// No description provided for @subtasksProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Subtasks ({done}/{total})'**
+  String subtasksProgress(String done, String total);
+
+  /// No description provided for @liveWidgetPreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Live widget preview'**
+  String get liveWidgetPreview;
+
+  /// No description provided for @calendarWidgetBehavior.
+  ///
+  /// In en, this message translates to:
+  /// **'Calendar widget behavior'**
+  String get calendarWidgetBehavior;
+
+  /// No description provided for @widgetGeneric.
+  ///
+  /// In en, this message translates to:
+  /// **'Widget'**
+  String get widgetGeneric;
+
+  /// No description provided for @widgetNameMonthList.
+  ///
+  /// In en, this message translates to:
+  /// **'Month & List'**
+  String get widgetNameMonthList;
+
+  /// No description provided for @widgetNameTimeline.
+  ///
+  /// In en, this message translates to:
+  /// **'Timeline'**
+  String get widgetNameTimeline;
+
+  /// No description provided for @widgetNameQuickActions.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick Actions'**
+  String get widgetNameQuickActions;
+
+  /// No description provided for @widgetNameUpNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Up Next'**
+  String get widgetNameUpNext;
+
+  /// No description provided for @filterWidgetTasks.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter widget tasks'**
+  String get filterWidgetTasks;
+
+  /// No description provided for @addSubtask.
+  ///
+  /// In en, this message translates to:
+  /// **'Add subtask'**
+  String get addSubtask;
+
+  /// No description provided for @removeSubtask.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove subtask'**
+  String get removeSubtask;
+
+  /// No description provided for @addItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Add item'**
+  String get addItem;
+
+  /// No description provided for @decreaseInterval.
+  ///
+  /// In en, this message translates to:
+  /// **'Decrease'**
+  String get decreaseInterval;
+
+  /// No description provided for @increaseInterval.
+  ///
+  /// In en, this message translates to:
+  /// **'Increase'**
+  String get increaseInterval;
+
+  /// No description provided for @restoreTask.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore'**
+  String get restoreTask;
+
+  /// No description provided for @deleteForever.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete forever'**
+  String get deleteForever;
 }
 
 class _AppLocalizationsDelegate

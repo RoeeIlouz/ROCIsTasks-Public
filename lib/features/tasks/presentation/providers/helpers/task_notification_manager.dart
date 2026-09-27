@@ -235,6 +235,7 @@ class TaskNotificationManager {
         tasksSummaryLabel: l10n.notificationTasksSummary(
           uncompletedTasks.length,
         ),
+        addTaskLabel: l10n.notificationActionAddTask,
       );
     } catch (_) {}
   }

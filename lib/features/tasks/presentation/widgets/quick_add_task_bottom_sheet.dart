@@ -121,7 +121,7 @@ class _QuickAddTaskBottomSheetState extends State<QuickAddTaskBottomSheet> {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    'Task created!',
+                    AppLocalizations.of(context)!.taskCreated,
                     style: GoogleFonts.outfit(fontWeight: FontWeight.w600),
                   ),
                 ),
@@ -529,7 +529,7 @@ class _QuickAddTaskBottomSheetState extends State<QuickAddTaskBottomSheet> {
                           alpha: 0.6,
                         ),
                       ),
-                      tooltip: 'More options',
+                      tooltip: AppLocalizations.of(context)!.moreOptions,
                       onPressed: _openFullAddTaskScreen,
                       constraints: const BoxConstraints(
                         minWidth: 36,
@@ -606,9 +606,13 @@ class _QuickAddTaskBottomSheetState extends State<QuickAddTaskBottomSheet> {
             ),
           ),
           const SizedBox(width: 4),
-          GestureDetector(
-            onTap: onClear,
-            child: Icon(Icons.close_rounded, size: 12, color: color),
+          Semantics(
+            button: true,
+            label: AppLocalizations.of(context)!.clearAction,
+            child: GestureDetector(
+              onTap: onClear,
+              child: Icon(Icons.close_rounded, size: 12, color: color),
+            ),
           ),
         ],
       ),
