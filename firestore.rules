@@ -14,7 +14,7 @@ service cloud.firestore {
     // RevenueCat webhooks, syncPremium), never by clients.
     function billingFields() {
       return ['is_premium', 'subscription_status', 'subscription_id',
-        'subscription_ends_at', 'subscription_trial_ends_at',
+        'subscription_ends_at', 'subscription_trial_ends_at', 'ls_subscription_updated_at',
         'ls_subscription_active', 'ls_lifetime', 'rc_premium', 'rc_expires_at',
         'last_billing_sync', 'last_synced_from_mobile'];
     }

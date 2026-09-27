@@ -12,6 +12,7 @@
         ".git",
         "firebase-debug.log",
         "firestore-debug.log",
+        "test",
         "*.pem",
         "*.key",
         "*.p12",
