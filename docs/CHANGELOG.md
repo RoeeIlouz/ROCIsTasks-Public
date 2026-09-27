@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0+114] - 2026-09-27 (Patch 3)
+
+### Changed
+- Task templates (grocery, work, morning routine, study) now add their steps in your language, and the widget previews show sample tasks, dates and times in your language and date format.
+
 ## [0.3.0+114] - 2026-09-27 (Patch 2)
 
 ### Changed

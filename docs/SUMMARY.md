@@ -2,6 +2,19 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## Localized Templates & Widget Previews; Functions Secrets - 2026-09-27 (Patch 3 on 0.3.0+114)
+
+#### Problems & Root Causes
+* Task templates inserted 13 English subtasks and the widget previews showed English sample tasks and US-format dates/times regardless of language (left over from Patch 2).
+* Webhook secrets were deployed as plain env vars from `functions/.env`; Lemon Squeezy events could be applied out of order.
+
+#### Solutions Applied
+* 27 ARB keys (`tpl*`, `preview*`) in all 8 languages. Preview dates, weekday letters and times use `DateFormat` with the app locale on a fixed sample date (Fri 2026-08-21).
+* Functions (deployed separately, not part of the patch): secrets in Secret Manager via `runWith({secrets})`; subscription events older than the recorded `ls_subscription_updated_at` are ignored (field is server-only in firestore.rules). `npm test` runs node:test helpers tests.
+
+#### Notes
+* Next full release: merge `release/backup-rules` (backup exclusions for flutter_secure_storage; home_widget background receiver no longer exported).
+
 ## PIN Lockout, Localization & Accessibility Pass - 2026-09-27 (Patch 2 on 0.3.0+114)
 
 #### Problems & Root Causes

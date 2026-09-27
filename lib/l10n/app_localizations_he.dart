@@ -1930,4 +1930,91 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get deleteForever => 'מחק לצמיתות';
+
+  @override
+  String get tplGroceryProduce => 'פירות וירקות';
+
+  @override
+  String get tplGroceryDairy => 'מוצרי חלב';
+
+  @override
+  String get tplGroceryBakery => 'מאפייה';
+
+  @override
+  String get tplGroceryPantry => 'מוצרי מזווה';
+
+  @override
+  String get tplWorkSprint => 'סקירת לוח הספרינט';
+
+  @override
+  String get tplWorkTop3 => 'תעדוף 3 המשימות החשובות';
+
+  @override
+  String get tplWorkStandup => 'סנכרון צוות ועמידה יומית';
+
+  @override
+  String get tplRoutineWater => 'לשתות 500 מ״ל מים';
+
+  @override
+  String get tplRoutineStretch => '15 דק׳ מתיחות בוקר';
+
+  @override
+  String get tplRoutinePlan => 'תכנון סדרי העדיפויות להיום';
+
+  @override
+  String get tplStudyRead => 'קריאת סיכומי הפרק';
+
+  @override
+  String get tplStudyPractice => 'לתרגל 5 שאלות';
+
+  @override
+  String get tplStudyFlashcards => 'להכין כרטיסיות סיכום';
+
+  @override
+  String previewTasksRemaining(String count) {
+    return 'נותרו $count משימות';
+  }
+
+  @override
+  String previewStartsIn(String minutes, String time) {
+    return 'מתחיל בעוד $minutes דק׳ · $time';
+  }
+
+  @override
+  String previewNextEvent(String title) {
+    return 'הבא: $title';
+  }
+
+  @override
+  String get previewAgenda => 'סדר יום';
+
+  @override
+  String get previewGrocery => 'קניות';
+
+  @override
+  String get previewSampleDesignReview => 'סקירת עיצוב והעברה';
+
+  @override
+  String get previewSampleUpdateDeps => 'עדכון תלויות האפליקציה';
+
+  @override
+  String get previewSampleSprintPlanning => 'תכנון ספרינט';
+
+  @override
+  String get previewSampleGroceryShopping => 'קניות בסופר';
+
+  @override
+  String get previewSampleStandup => 'שיחת עמידה יומית';
+
+  @override
+  String get previewSampleMeet => 'Google Meet · צוות';
+
+  @override
+  String get previewSampleRelease => 'הכנת גרסה';
+
+  @override
+  String get previewSampleProductTasks => 'משימות מוצר';
+
+  @override
+  String get previewSampleLaunchReview => 'סקירת השקת מוצר';
 }

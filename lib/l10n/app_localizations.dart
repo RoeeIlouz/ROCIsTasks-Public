@@ -3738,6 +3738,168 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Delete forever'**
   String get deleteForever;
+
+  /// No description provided for @tplGroceryProduce.
+  ///
+  /// In en, this message translates to:
+  /// **'Fresh produce'**
+  String get tplGroceryProduce;
+
+  /// No description provided for @tplGroceryDairy.
+  ///
+  /// In en, this message translates to:
+  /// **'Dairy & milk'**
+  String get tplGroceryDairy;
+
+  /// No description provided for @tplGroceryBakery.
+  ///
+  /// In en, this message translates to:
+  /// **'Bakery'**
+  String get tplGroceryBakery;
+
+  /// No description provided for @tplGroceryPantry.
+  ///
+  /// In en, this message translates to:
+  /// **'Pantry staples'**
+  String get tplGroceryPantry;
+
+  /// No description provided for @tplWorkSprint.
+  ///
+  /// In en, this message translates to:
+  /// **'Review sprint board'**
+  String get tplWorkSprint;
+
+  /// No description provided for @tplWorkTop3.
+  ///
+  /// In en, this message translates to:
+  /// **'Prioritize top 3 tasks'**
+  String get tplWorkTop3;
+
+  /// No description provided for @tplWorkStandup.
+  ///
+  /// In en, this message translates to:
+  /// **'Team sync & standup'**
+  String get tplWorkStandup;
+
+  /// No description provided for @tplRoutineWater.
+  ///
+  /// In en, this message translates to:
+  /// **'Drink 500 ml water'**
+  String get tplRoutineWater;
+
+  /// No description provided for @tplRoutineStretch.
+  ///
+  /// In en, this message translates to:
+  /// **'15 min morning stretch'**
+  String get tplRoutineStretch;
+
+  /// No description provided for @tplRoutinePlan.
+  ///
+  /// In en, this message translates to:
+  /// **'Plan the day\'s priorities'**
+  String get tplRoutinePlan;
+
+  /// No description provided for @tplStudyRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Read chapter notes'**
+  String get tplStudyRead;
+
+  /// No description provided for @tplStudyPractice.
+  ///
+  /// In en, this message translates to:
+  /// **'Practice 5 problems'**
+  String get tplStudyPractice;
+
+  /// No description provided for @tplStudyFlashcards.
+  ///
+  /// In en, this message translates to:
+  /// **'Make a flashcard summary'**
+  String get tplStudyFlashcards;
+
+  /// No description provided for @previewTasksRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} tasks remaining'**
+  String previewTasksRemaining(String count);
+
+  /// No description provided for @previewStartsIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Starts in {minutes} min · {time}'**
+  String previewStartsIn(String minutes, String time);
+
+  /// No description provided for @previewNextEvent.
+  ///
+  /// In en, this message translates to:
+  /// **'Next: {title}'**
+  String previewNextEvent(String title);
+
+  /// No description provided for @previewAgenda.
+  ///
+  /// In en, this message translates to:
+  /// **'Agenda'**
+  String get previewAgenda;
+
+  /// No description provided for @previewGrocery.
+  ///
+  /// In en, this message translates to:
+  /// **'Grocery'**
+  String get previewGrocery;
+
+  /// No description provided for @previewSampleDesignReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Design review & handoff'**
+  String get previewSampleDesignReview;
+
+  /// No description provided for @previewSampleUpdateDeps.
+  ///
+  /// In en, this message translates to:
+  /// **'Update app dependencies'**
+  String get previewSampleUpdateDeps;
+
+  /// No description provided for @previewSampleSprintPlanning.
+  ///
+  /// In en, this message translates to:
+  /// **'Sprint planning'**
+  String get previewSampleSprintPlanning;
+
+  /// No description provided for @previewSampleGroceryShopping.
+  ///
+  /// In en, this message translates to:
+  /// **'Grocery shopping'**
+  String get previewSampleGroceryShopping;
+
+  /// No description provided for @previewSampleStandup.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily standup call'**
+  String get previewSampleStandup;
+
+  /// No description provided for @previewSampleMeet.
+  ///
+  /// In en, this message translates to:
+  /// **'Google Meet · Team'**
+  String get previewSampleMeet;
+
+  /// No description provided for @previewSampleRelease.
+  ///
+  /// In en, this message translates to:
+  /// **'Prepare the release'**
+  String get previewSampleRelease;
+
+  /// No description provided for @previewSampleProductTasks.
+  ///
+  /// In en, this message translates to:
+  /// **'Product tasks'**
+  String get previewSampleProductTasks;
+
+  /// No description provided for @previewSampleLaunchReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Product launch review'**
+  String get previewSampleLaunchReview;
 }
 
 class _AppLocalizationsDelegate

@@ -1958,4 +1958,91 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get deleteForever => 'Radera permanent';
+
+  @override
+  String get tplGroceryProduce => 'Frukt & grönt';
+
+  @override
+  String get tplGroceryDairy => 'Mejeri';
+
+  @override
+  String get tplGroceryBakery => 'Bageri';
+
+  @override
+  String get tplGroceryPantry => 'Skafferivaror';
+
+  @override
+  String get tplWorkSprint => 'Gå igenom sprinttavlan';
+
+  @override
+  String get tplWorkTop3 => 'Prioritera de 3 viktigaste uppgifterna';
+
+  @override
+  String get tplWorkStandup => 'Teamsynk & standup';
+
+  @override
+  String get tplRoutineWater => 'Drick 500 ml vatten';
+
+  @override
+  String get tplRoutineStretch => '15 min morgonstretch';
+
+  @override
+  String get tplRoutinePlan => 'Planera dagens prioriteringar';
+
+  @override
+  String get tplStudyRead => 'Läs kapitelanteckningar';
+
+  @override
+  String get tplStudyPractice => 'Öva på 5 uppgifter';
+
+  @override
+  String get tplStudyFlashcards => 'Gör en sammanfattning med flashcards';
+
+  @override
+  String previewTasksRemaining(String count) {
+    return '$count uppgifter kvar';
+  }
+
+  @override
+  String previewStartsIn(String minutes, String time) {
+    return 'Börjar om $minutes min · $time';
+  }
+
+  @override
+  String previewNextEvent(String title) {
+    return 'Nästa: $title';
+  }
+
+  @override
+  String get previewAgenda => 'Agenda';
+
+  @override
+  String get previewGrocery => 'Handla';
+
+  @override
+  String get previewSampleDesignReview => 'Designgenomgång & överlämning';
+
+  @override
+  String get previewSampleUpdateDeps => 'Uppdatera appens beroenden';
+
+  @override
+  String get previewSampleSprintPlanning => 'Sprintplanering';
+
+  @override
+  String get previewSampleGroceryShopping => 'Handla mat';
+
+  @override
+  String get previewSampleStandup => 'Dagligt standupmöte';
+
+  @override
+  String get previewSampleMeet => 'Google Meet · Team';
+
+  @override
+  String get previewSampleRelease => 'Förbered releasen';
+
+  @override
+  String get previewSampleProductTasks => 'Produktuppgifter';
+
+  @override
+  String get previewSampleLaunchReview => 'Genomgång av produktlanseringen';
 }

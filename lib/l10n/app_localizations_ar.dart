@@ -1931,4 +1931,91 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get deleteForever => 'حذف نهائيًا';
+
+  @override
+  String get tplGroceryProduce => 'خضار وفواكه طازجة';
+
+  @override
+  String get tplGroceryDairy => 'ألبان وحليب';
+
+  @override
+  String get tplGroceryBakery => 'مخبوزات';
+
+  @override
+  String get tplGroceryPantry => 'مؤن المطبخ';
+
+  @override
+  String get tplWorkSprint => 'مراجعة لوحة السبرنت';
+
+  @override
+  String get tplWorkTop3 => 'تحديد أهم 3 مهام';
+
+  @override
+  String get tplWorkStandup => 'اجتماع الفريق اليومي';
+
+  @override
+  String get tplRoutineWater => 'اشرب 500 مل ماء';
+
+  @override
+  String get tplRoutineStretch => 'تمدد صباحي 15 دقيقة';
+
+  @override
+  String get tplRoutinePlan => 'خطط لأولويات اليوم';
+
+  @override
+  String get tplStudyRead => 'قراءة ملاحظات الفصل';
+
+  @override
+  String get tplStudyPractice => 'حل 5 تمارين';
+
+  @override
+  String get tplStudyFlashcards => 'إعداد بطاقات مراجعة';
+
+  @override
+  String previewTasksRemaining(String count) {
+    return '$count مهام متبقية';
+  }
+
+  @override
+  String previewStartsIn(String minutes, String time) {
+    return 'يبدأ خلال $minutes د · $time';
+  }
+
+  @override
+  String previewNextEvent(String title) {
+    return 'التالي: $title';
+  }
+
+  @override
+  String get previewAgenda => 'جدول الأعمال';
+
+  @override
+  String get previewGrocery => 'البقالة';
+
+  @override
+  String get previewSampleDesignReview => 'مراجعة التصميم وتسليمه';
+
+  @override
+  String get previewSampleUpdateDeps => 'تحديث مكتبات التطبيق';
+
+  @override
+  String get previewSampleSprintPlanning => 'تخطيط السبرنت';
+
+  @override
+  String get previewSampleGroceryShopping => 'التسوق للبقالة';
+
+  @override
+  String get previewSampleStandup => 'اجتماع يومي';
+
+  @override
+  String get previewSampleMeet => 'Google Meet · الفريق';
+
+  @override
+  String get previewSampleRelease => 'تجهيز الإصدار';
+
+  @override
+  String get previewSampleProductTasks => 'مهام المنتج';
+
+  @override
+  String get previewSampleLaunchReview => 'مراجعة إطلاق المنتج';
 }

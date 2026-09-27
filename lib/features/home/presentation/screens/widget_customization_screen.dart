@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -318,6 +319,12 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
     );
   }
 
+  /// Sample date in the widget previews (a Friday); formatted per locale.
+  static final _previewDate = DateTime(2026, 8, 21);
+  String get _loc => Localizations.localeOf(context).toString();
+  String _previewTime(int hour, int minute) =>
+      DateFormat.jm(_loc).format(DateTime(2026, 8, 21, hour, minute));
+
   Widget _buildLivePreview(ThemeData theme, bool isDark, bool isGlass) {
     // Style configuration based on selected theme
     final Color previewBg;
@@ -457,7 +464,7 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
             ),
             Expanded(
               child: Text(
-                'August 2026',
+                DateFormat.yMMMM(_loc).format(_previewDate),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: textColor,
@@ -493,7 +500,12 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _buildMockFilter('Tasks', _showTasks, textColor, theme),
+            _buildMockFilter(
+              AppLocalizations.of(context)!.tasks,
+              _showTasks,
+              textColor,
+              theme,
+            ),
             const SizedBox(width: 6),
             _buildMockFilter('Google', _showGoogle, textColor, theme),
           ],
@@ -518,15 +530,10 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
               ),
             ...List.generate(7, (index) {
               final dayOfWeek = (_startOfWeek + index - 1) % 7 + 1;
-              final dayLetter = [
-                'M',
-                'T',
-                'W',
-                'T',
-                'F',
-                'S',
-                'S',
-              ][dayOfWeek - 1];
+              final dayLetter = DateFormat(
+                'EEEEE',
+                _loc,
+              ).format(DateTime(2026, 8, 16 + dayOfWeek));
               final Color dayColor;
               if (_weekendHighlight) {
                 if (dayOfWeek == 7) {
@@ -651,7 +658,7 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Friday, Aug 21',
+                    DateFormat.MMMMEEEEd(_loc).format(_previewDate),
                     style: TextStyle(
                       color: textColor,
                       fontWeight: FontWeight.bold,
@@ -659,7 +666,7 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
                     ),
                   ),
                   Text(
-                    'Today · 3 tasks remaining',
+                    '${AppLocalizations.of(context)!.quickDateToday} · ${AppLocalizations.of(context)!.previewTasksRemaining('3')}',
                     style: TextStyle(
                       color: accentColor,
                       fontSize: 11,
@@ -689,8 +696,8 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
         ),
         const SizedBox(height: 10),
         _buildAgendaRowMock(
-          'Design Review & Handoff',
-          '10:00 AM',
+          AppLocalizations.of(context)!.previewSampleDesignReview,
+          _previewTime(10, 0),
           accentColor,
           textColor,
           secondaryTextColor,
@@ -698,8 +705,8 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
         ),
         const SizedBox(height: 6),
         _buildAgendaRowMock(
-          'Update Flutter Dependencies',
-          '02:30 PM',
+          AppLocalizations.of(context)!.previewSampleUpdateDeps,
+          _previewTime(14, 30),
           const Color(0xFF10B981),
           textColor,
           secondaryTextColor,
@@ -724,7 +731,7 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
           child: Column(
             children: [
               Text(
-                'August 2026',
+                DateFormat.yMMMM(_loc).format(_previewDate),
                 style: TextStyle(
                   color: textColor,
                   fontWeight: FontWeight.bold,
@@ -788,7 +795,7 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Agenda (21st)',
+                '${AppLocalizations.of(context)!.previewAgenda} · ${DateFormat.MMMd(_loc).format(_previewDate)}',
                 style: TextStyle(
                   color: accentColor,
                   fontWeight: FontWeight.bold,
@@ -797,8 +804,8 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
               ),
               const SizedBox(height: 4),
               _buildAgendaRowMock(
-                'Sprint Planning',
-                '09:00 AM',
+                AppLocalizations.of(context)!.previewSampleSprintPlanning,
+                _previewTime(9, 0),
                 accentColor,
                 textColor,
                 secondaryTextColor,
@@ -807,8 +814,8 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
               ),
               const SizedBox(height: 4),
               _buildAgendaRowMock(
-                'Grocery Shopping',
-                '06:00 PM',
+                AppLocalizations.of(context)!.previewSampleGroceryShopping,
+                _previewTime(18, 0),
                 const Color(0xFFF59E0B),
                 textColor,
                 secondaryTextColor,
@@ -840,7 +847,7 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Text(
-                'TODAY · Fri, Aug 21',
+                '${AppLocalizations.of(context)!.quickDateToday.toUpperCase()} · ${DateFormat.MMMEd(_loc).format(_previewDate)}',
                 style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.bold,
@@ -852,18 +859,18 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
         ),
         const SizedBox(height: 8),
         _buildTimelineRowMock(
-          '09:00 AM',
-          'Daily Standup Call',
-          'Google Meet · Team',
+          _previewTime(9, 0),
+          AppLocalizations.of(context)!.previewSampleStandup,
+          AppLocalizations.of(context)!.previewSampleMeet,
           accentColor,
           textColor,
           secondaryTextColor,
         ),
         const SizedBox(height: 6),
         _buildTimelineRowMock(
-          '11:30 AM',
-          'Prepare Release v0.2.9',
-          'Product Tasks',
+          _previewTime(11, 30),
+          AppLocalizations.of(context)!.previewSampleRelease,
+          AppLocalizations.of(context)!.previewSampleProductTasks,
           const Color(0xFF10B981),
           textColor,
           secondaryTextColor,
@@ -881,22 +888,22 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
     final actions = [
       {
         'icon': Icons.add_task_rounded,
-        'label': 'New Task',
+        'label': AppLocalizations.of(context)!.newTask,
         'color': accentColor,
       },
       {
         'icon': Icons.shopping_basket_rounded,
-        'label': 'Grocery',
+        'label': AppLocalizations.of(context)!.previewGrocery,
         'color': const Color(0xFF10B981),
       },
       {
         'icon': Icons.calendar_month_rounded,
-        'label': 'Calendar',
+        'label': AppLocalizations.of(context)!.calendar,
         'color': const Color(0xFFF59E0B),
       },
       {
         'icon': Icons.lock_outline_rounded,
-        'label': 'Private',
+        'label': AppLocalizations.of(context)!.privateLabel,
         'color': const Color(0xFFEF4444),
       },
     ];
@@ -907,7 +914,7 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Quick Launch',
+              AppLocalizations.of(context)!.widgetNameQuickActions,
               style: TextStyle(
                 color: textColor,
                 fontWeight: FontWeight.bold,
@@ -915,7 +922,7 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
               ),
             ),
             Text(
-              '09:41 AM',
+              _previewTime(9, 41),
               style: TextStyle(
                 color: secondaryTextColor,
                 fontSize: 11,
@@ -985,7 +992,9 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Next: Product Launch Review',
+                AppLocalizations.of(context)!.previewNextEvent(
+                  AppLocalizations.of(context)!.previewSampleLaunchReview,
+                ),
                 style: TextStyle(
                   color: textColor,
                   fontWeight: FontWeight.bold,
@@ -995,7 +1004,9 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
                 overflow: TextOverflow.ellipsis,
               ),
               Text(
-                'Starts in 25 min · 11:00 AM',
+                AppLocalizations.of(
+                  context,
+                )!.previewStartsIn('25', _previewTime(11, 0)),
                 style: TextStyle(color: secondaryTextColor, fontSize: 11),
               ),
             ],
@@ -1008,7 +1019,7 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
             borderRadius: BorderRadius.circular(8),
           ),
           child: Text(
-            'Up Next',
+            AppLocalizations.of(context)!.widgetNameUpNext,
             style: TextStyle(
               fontSize: 10,
               fontWeight: FontWeight.bold,
