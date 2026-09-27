@@ -5,12 +5,19 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rocis_tasks/core/services/calendar_service.dart';
+import 'package:rocis_tasks/core/services/schedule_firestore_service.dart';
 import 'package:rocis_tasks/core/services/widget_data_service.dart';
 import 'package:rocis_tasks/features/home/services/full_calendar_widget_service.dart';
 import 'package:rocis_tasks/features/tasks/data/datasources/local_task_source.dart';
 import 'package:rocis_tasks/features/tasks/services/task_widget_service.dart';
 
-class MockCalendarService extends Mock implements CalendarService {}
+class MockCalendarService extends Mock implements CalendarService {
+  @override
+  Future<List<SyncedScheduleEvent>> getExportedScheduleEvents({
+    DateTime? startDate,
+    DateTime? endDate,
+  }) async => [];
+}
 
 class MockLocalTaskSource extends Mock implements LocalTaskSource {}
 

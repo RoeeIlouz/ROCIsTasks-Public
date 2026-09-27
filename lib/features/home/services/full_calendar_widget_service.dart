@@ -8,6 +8,7 @@ import 'package:rocis_tasks/core/services/widget_data_service.dart';
 import 'package:rocis_tasks/core/services/logger_service.dart';
 import 'package:rocis_tasks/core/services/calendar_service.dart';
 import 'package:rocis_tasks/core/services/calendar_color_service.dart';
+import 'package:rocis_tasks/core/services/schedule_events_loader.dart';
 import 'package:rocis_tasks/core/services/schedule_firestore_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -404,10 +405,14 @@ class FullCalendarWidgetService {
           return _cachedScheduleEvents!;
         }
         try {
-          final res = await _scheduleService.fetchEvents(
+          final res = await loadScheduleEvents(
+            scheduleService: _scheduleService,
+            calendarService: _calendarService,
             uid: effectiveUid,
             email: effectiveEmail,
             forceRefresh: forceRefresh,
+            startDate: bufferStartDate,
+            endDate: bufferEndDate,
           );
           // fetchEvents returns [] both for "no classes" and "offline with no
           // cache"; treat empty as not refreshed so offline runs don't wipe.

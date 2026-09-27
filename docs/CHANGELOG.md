@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0+114] - 2026-09-27 (Patch 1)
+
+### Changed
+- Classes that ROCIs Schedule exports to Google Calendar now show only as ROCIs Schedule events (course, color, link) instead of Google events, with no duplicates. The "ROCIs Schedule" Google calendar is hidden from calendar lists. Today, Timeline, Up Next and Month agenda widgets now show your classes too.
+
 ## [0.3.0+114] - 2026-09-25
 
 ### Added

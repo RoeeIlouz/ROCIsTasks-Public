@@ -1,5 +1,8 @@
 import 'package:device_calendar/device_calendar.dart';
+import 'package:flutter/painting.dart' show Color;
+import 'package:rocis_tasks/core/services/calendar_color_service.dart';
 import 'package:rocis_tasks/core/services/logger_service.dart';
+import 'package:rocis_tasks/core/services/schedule_firestore_service.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
@@ -18,6 +21,17 @@ class CalendarService {
   List<Calendar>? _cachedCalendars;
   DateTime? _cachedCalendarsTime;
   static const Duration _calendarCacheTtl = Duration(minutes: 5);
+
+  /// The Google calendar ROCIs Schedule exports classes into. Its events are
+  /// shown as ROCIs Schedule events, never as Google events, so it is left out
+  /// of the calendar list and of every Google event fetch.
+  static const String rocisScheduleCalendarName = 'ROCIs Schedule';
+  static const String _keyScheduleCalendarIds = 'rocis_schedule_calendar_ids';
+  List<Calendar> _scheduleCalendars = [];
+  Set<String>? _scheduleCalendarIds;
+
+  static bool isRocisScheduleCalendarName(String? name) =>
+      name?.trim().toLowerCase() == rocisScheduleCalendarName.toLowerCase();
 
   CalendarService({AuthService? authService, GoogleOAuthManager? oauthManager})
     : _authService = authService,
@@ -156,6 +170,7 @@ class CalendarService {
 
     // 2. Query Google Calendar REST API whenever authenticated
     final List<Calendar> googleApiCalendars = [];
+    final apiScheduleIds = <String>{};
     if (token != null && token.isNotEmpty) {
       try {
         final uri = Uri.https(
@@ -205,6 +220,11 @@ class CalendarService {
             final summary = (item['summary'] as String?)?.trim();
             final description = (item['description'] as String?)?.trim();
             final isPrimary = item['primary'] == true;
+            // Matched on the original name too, so a renamed copy still counts.
+            if (isRocisScheduleCalendarName(summary) ||
+                isRocisScheduleCalendarName(summaryOverride)) {
+              apiScheduleIds.add(id);
+            }
 
             String? name;
             if (summaryOverride != null && summaryOverride.isNotEmpty) {
@@ -251,7 +271,9 @@ class CalendarService {
         );
       }
     } else if (kIsWeb) {
-      AppLogger.info('Web: No Google access token available for calendar fetch; returning empty list without throwing.');
+      AppLogger.info(
+        'Web: No Google access token available for calendar fetch; returning empty list without throwing.',
+      );
     }
 
     final List<Calendar> combined = [];
@@ -285,7 +307,16 @@ class CalendarService {
       combined.addAll(rawCalendars);
     }
 
-    final calendars = _sanitizeAndFilterCalendars(combined);
+    final sanitized = _sanitizeAndFilterCalendars(combined);
+    bool isSchedule(Calendar c) =>
+        apiScheduleIds.contains(c.id) || isRocisScheduleCalendarName(c.name);
+    _scheduleCalendars = sanitized.where(isSchedule).toList();
+    final calendars = sanitized.where((c) => !isSchedule(c)).toList();
+    if (sanitized.isNotEmpty) {
+      await _rememberScheduleCalendarIds(
+        _scheduleCalendars.map((c) => c.id).whereType<String>().toSet(),
+      );
+    }
 
     if (calendars.isEmpty && (kIsWeb || (token != null && token.isNotEmpty))) {
       calendars.add(
@@ -361,6 +392,195 @@ class CalendarService {
   List<Event> deduplicateEventsForTesting(List<Event> events) =>
       _deduplicateEvents(events);
 
+  /// Persisted so background isolates and saved calendar selections can
+  /// exclude the ROCIs Schedule calendar without listing calendars first.
+  /// Ids are only added: a listing that missed the Google API (device
+  /// calendars only) must not un-hide the API copy in a saved selection.
+  Future<void> _rememberScheduleCalendarIds(Set<String> ids) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final merged = {...?prefs.getStringList(_keyScheduleCalendarIds), ...ids};
+      _scheduleCalendarIds = merged;
+      await prefs.setStringList(_keyScheduleCalendarIds, merged.toList());
+    } catch (_) {
+      _scheduleCalendarIds = {...?_scheduleCalendarIds, ...ids};
+    }
+  }
+
+  Future<Set<String>> _knownScheduleCalendarIds() async {
+    if (_scheduleCalendarIds != null) return _scheduleCalendarIds!;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final saved = prefs.getStringList(_keyScheduleCalendarIds);
+      if (saved != null) return _scheduleCalendarIds = saved.toSet();
+      await getAvailableCalendars();
+    } catch (_) {}
+    return _scheduleCalendarIds ?? {};
+  }
+
+  /// Classes ROCIs Schedule exported to Google Calendar, as schedule events.
+  /// Used only when the schedule itself can't be read, so classes still show
+  /// as ROCIs Schedule events. Recurring classes arrive as single occurrences.
+  Future<List<SyncedScheduleEvent>> getExportedScheduleEvents({
+    DateTime? startDate,
+    DateTime? endDate,
+  }) async {
+    final now = DateTime.now();
+    final start = startDate ?? now.subtract(const Duration(days: 365));
+    final end = endDate ?? now.add(const Duration(days: 365));
+    final result = <SyncedScheduleEvent>[];
+    try {
+      await getAvailableCalendars();
+      if (_scheduleCalendars.isEmpty) return result;
+      final fallbackColor = await _scheduleFallbackColor();
+      final token = await _getAccessToken();
+
+      for (final calendar in _scheduleCalendars) {
+        final id = calendar.id!;
+        final isApiCalendar =
+            id.contains('@') || id.contains('google') || kIsWeb;
+        if (isApiCalendar && token != null && token.isNotEmpty) {
+          String? pageToken;
+          do {
+            final uri = Uri.https(
+              'www.googleapis.com',
+              '/calendar/v3/calendars/${Uri.encodeComponent(id)}/events',
+              {
+                'timeMin': start.toUtc().toIso8601String(),
+                'timeMax': end.toUtc().toIso8601String(),
+                'singleEvents': 'true',
+                'maxResults': '2500',
+                'pageToken': ?pageToken,
+              },
+            );
+            final response = await http
+                .get(uri, headers: {'Authorization': 'Bearer $token'})
+                .timeout(const Duration(seconds: 8));
+            if (response.statusCode != 200) break;
+            final data = json.decode(response.body) as Map<String, dynamic>;
+            for (final item in (data['items'] as List<dynamic>? ?? [])) {
+              final event = exportedScheduleEventFromGoogle(
+                item as Map<String, dynamic>,
+                fallbackColor: fallbackColor,
+              );
+              if (event != null) result.add(event);
+            }
+            pageToken = data['nextPageToken'] as String?;
+          } while (pageToken != null);
+        } else if (!kIsWeb) {
+          final events = await _deviceCalendarPlugin.retrieveEvents(
+            id,
+            RetrieveEventsParams(startDate: start, endDate: end),
+          );
+          for (final e in events.data ?? const <Event>[]) {
+            if (e.start == null) continue;
+            final title = splitExportedTitle(e.title ?? '');
+            result.add(
+              SyncedScheduleEvent(
+                id: e.eventId ?? '',
+                title: title.label,
+                courseId: '',
+                courseName: title.course,
+                courseCode: '',
+                location: e.location ?? '',
+                typeIndex: 0,
+                startTime: e.start!.toLocal(),
+                endTime: (e.end ?? e.start!.add(const Duration(hours: 1)))
+                    .toLocal(),
+                recurring: false,
+                daysOfWeek: const [],
+                color: fallbackColor,
+                notes: '',
+              ),
+            );
+          }
+        }
+      }
+    } catch (e) {
+      AppLogger.warning('Reading exported ROCIs Schedule events failed: $e');
+    }
+    return result;
+  }
+
+  Future<Color> _scheduleFallbackColor() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final saved = prefs.getInt(CalendarColorService.keyScheduleColor);
+      if (saved != null) return Color(saved);
+    } catch (_) {}
+    return CalendarColorService.defaultScheduleColor;
+  }
+
+  /// Google's fixed event colours, which ROCIs Schedule picks the course
+  /// colour's nearest match from.
+  static const Map<String, Color> _googleEventColors = {
+    '1': Color(0xFF7986CB),
+    '2': Color(0xFF33B679),
+    '3': Color(0xFF8E24AA),
+    '4': Color(0xFFE67C73),
+    '5': Color(0xFFF6BF26),
+    '6': Color(0xFFF4511E),
+    '7': Color(0xFF039BE5),
+    '8': Color(0xFF616161),
+    '9': Color(0xFF3F51B5),
+    '10': Color(0xFF0B8043),
+    '11': Color(0xFFD50000),
+  };
+
+  /// ROCIs Schedule titles exported events "Course · Label".
+  @visibleForTesting
+  static ({String course, String label}) splitExportedTitle(String summary) {
+    final parts = summary.split(' · ');
+    if (parts.length < 2) return (course: '', label: summary.trim());
+    return (
+      course: parts.first.trim(),
+      label: parts.sublist(1).join(' · ').trim(),
+    );
+  }
+
+  /// A Google Calendar API event exported by ROCIs Schedule, as a schedule
+  /// event. Its schedule id travels in the private extended properties.
+  @visibleForTesting
+  static SyncedScheduleEvent? exportedScheduleEventFromGoogle(
+    Map<String, dynamic> item, {
+    required Color fallbackColor,
+  }) {
+    if (item['status'] == 'cancelled') return null;
+    final startTime = DateTime.tryParse(
+      (item['start'] as Map?)?['dateTime'] as String? ?? '',
+    )?.toLocal();
+    if (startTime == null) return null;
+    final endTime =
+        DateTime.tryParse(
+          (item['end'] as Map?)?['dateTime'] as String? ?? '',
+        )?.toLocal() ??
+        startTime.add(const Duration(hours: 1));
+
+    final private = (item['extendedProperties'] as Map?)?['private'] as Map?;
+    final title = splitExportedTitle(item['summary'] as String? ?? '');
+    // The description opens with "Course: Name (CODE)".
+    final firstLine = (item['description'] as String? ?? '').split('\n').first;
+    final code = title.course.isNotEmpty && firstLine.contains(title.course)
+        ? RegExp(r'\(([^()]+)\)\s*$').firstMatch(firstLine)?.group(1) ?? ''
+        : '';
+
+    return SyncedScheduleEvent(
+      id: private?['rocisEventId'] as String? ?? item['id'] as String? ?? '',
+      title: title.label,
+      courseId: '',
+      courseName: title.course,
+      courseCode: code,
+      location: item['location'] as String? ?? '',
+      typeIndex: 0,
+      startTime: startTime,
+      endTime: endTime,
+      recurring: false,
+      daysOfWeek: const [],
+      color: _googleEventColors[item['colorId']] ?? fallbackColor,
+      notes: '',
+    );
+  }
+
   Future<Map<String, String>> getCalendarColors({
     bool forceRefresh = false,
   }) async {
@@ -420,7 +640,10 @@ class CalendarService {
 
     final token = await _getAccessToken();
 
-    List<String> targetCalendarIds = calendarIds ?? [];
+    final scheduleCalendarIds = await _knownScheduleCalendarIds();
+    List<String> targetCalendarIds = (calendarIds ?? [])
+        .where((id) => !scheduleCalendarIds.contains(id))
+        .toList();
     if (targetCalendarIds.isEmpty) {
       final cals = await getAvailableCalendars();
       targetCalendarIds = cals.map((c) => c.id).whereType<String>().toList();
@@ -609,11 +832,11 @@ class CalendarService {
 
     // Fallback: If 0 events were found (e.g. offline, background isolate, token expired),
     // restore from cache for the requested range so widgets never go blank
-    final cached = await _getCachedEvents(
+    final cached = (await _getCachedEvents(
       startDate: start,
       endDate: end,
       calendarIds: targetCalendarIds,
-    );
+    )).where((e) => !scheduleCalendarIds.contains(e.calendarId)).toList();
     if (cached.isNotEmpty) {
       AppLogger.info(
         'Restored ${cached.length} calendar events from local cache for widget/background',
