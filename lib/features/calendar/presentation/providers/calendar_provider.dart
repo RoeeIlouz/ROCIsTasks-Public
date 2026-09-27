@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:rocis_tasks/core/services/auth_service.dart';
 import 'package:rocis_tasks/core/services/calendar_service.dart';
+import 'package:rocis_tasks/core/services/schedule_events_loader.dart';
 import 'package:rocis_tasks/core/services/schedule_firestore_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rocis_tasks/features/home/services/full_calendar_widget_service.dart';
@@ -344,24 +345,20 @@ class CalendarProvider extends ChangeNotifier {
         );
       }
 
-      try {
-        if (forceRefreshSchedule) {
-          _scheduleFirestoreService.clearCache();
-        }
-        _scheduleEvents = await _scheduleFirestoreService.fetchEvents(
-          uid: effectiveUid,
-          email: effectiveEmail,
-          forceRefresh: forceRefreshSchedule,
-        );
-        _processScheduleEventsToMap();
-      } catch (e) {
-        AppLogger.warning(
-          'CalendarProvider: Could not fetch schedule events: $e',
-        );
-        _scheduleEvents = [];
-        _scheduleEventsMap = {};
+      if (forceRefreshSchedule) {
+        _scheduleFirestoreService.clearCache();
       }
+      _scheduleEvents = await loadScheduleEvents(
+        scheduleService: _scheduleFirestoreService,
+        calendarService: _calendarService,
+        uid: effectiveUid,
+        email: effectiveEmail,
+        forceRefresh: forceRefreshSchedule,
+      );
+    } else {
+      _scheduleEvents = await _calendarService.getExportedScheduleEvents();
     }
+    _processScheduleEventsToMap();
 
     // 3. Sync widget with latest events in background
     _widgetService

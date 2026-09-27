@@ -2,6 +2,20 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## ROCIs Schedule Classes Shown as Schedule Events, Not Google Events - 2026-09-27 (Patch 1 on 0.3.0+114)
+
+#### Problems
+* ROCIs Schedule exports classes to its own "ROCIs Schedule" Google calendar; Tasks loaded that calendar like any other, so classes also appeared as generic Google events (duplicates of the native schedule events).
+* Today, Timeline, Up Next and Month agenda widgets never read ROCIs Schedule, so they only saw classes through those Google copies.
+
+#### Solutions Applied
+* `CalendarService` detects the calendar by name (`summary` or `summaryOverride`), drops it from `getAvailableCalendars`, colors, the filter/color sheets and every `getEvents` fetch and cache fallback; ids persist (add-only) in `rocis_schedule_calendar_ids` for background isolates and saved selections.
+* `loadScheduleEvents` (new): schedule first; if empty, `getExportedScheduleEvents` converts the Google copies into `SyncedScheduleEvent` (rocisEventId, "Course · Label" title, colorId). Used by the calendar screen, FullCalendar widget and `WidgetDataService`.
+* `WidgetDataService` adds schedule occurrences (`type: 'schedule'`) to the four agenda widgets, honoring `full_calendar_show_schedule`.
+
+#### Deployment
+* `flutter analyze` 0 issues; 398/398 tests. Shorebird Android Patch 1 (`0.3.0+114`).
+
 ## Open Beta 0.3.0: Widget Fixes on Device, Paywall, Review Prompt, i18n - v0.3.0+114 - 2026-09-25
 
 #### Problems (found by testing on an Android 15 emulator)

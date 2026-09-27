@@ -3,6 +3,8 @@ import 'package:flutter/foundation.dart' hide Category;
 import 'package:home_widget/home_widget.dart';
 import 'package:intl/intl.dart';
 import 'package:rocis_tasks/core/services/calendar_service.dart';
+import 'package:rocis_tasks/core/services/schedule_events_loader.dart';
+import 'package:rocis_tasks/core/services/schedule_firestore_service.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/features/categories/domain/models/category.dart';
 import 'package:rocis_tasks/core/services/logger_service.dart';
@@ -11,8 +13,91 @@ import 'package:device_calendar/device_calendar.dart';
 
 class WidgetDataService {
   final CalendarService _calendarService;
+  final ScheduleFirestoreService _scheduleService;
+  Future<List<SyncedScheduleEvent>>? _scheduleLoad;
+  DateTime? _scheduleLoadTime;
 
-  WidgetDataService(this._calendarService);
+  WidgetDataService(
+    this._calendarService, {
+    ScheduleFirestoreService? scheduleService,
+  }) : _scheduleService = scheduleService ?? ScheduleFirestoreService();
+
+  /// ROCIs Schedule classes, unless the user hid them. The widgets update
+  /// together, so they share one load.
+  Future<List<SyncedScheduleEvent>> _getScheduleEvents() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      if (!(prefs.getBool('full_calendar_show_schedule') ?? true)) return [];
+    } catch (_) {}
+    final loadedAt = _scheduleLoadTime;
+    if (_scheduleLoad == null ||
+        loadedAt == null ||
+        DateTime.now().difference(loadedAt) > const Duration(minutes: 1)) {
+      _scheduleLoadTime = DateTime.now();
+      _scheduleLoad = loadScheduleEvents(
+        scheduleService: _scheduleService,
+        calendarService: _calendarService,
+      );
+    }
+    return _scheduleLoad!;
+  }
+
+  /// Every class time of [events] on the days from [from] up to [to].
+  @visibleForTesting
+  static List<({SyncedScheduleEvent event, DateTime start, DateTime end})>
+  scheduleOccurrences(
+    List<SyncedScheduleEvent> events,
+    DateTime from,
+    DateTime to,
+  ) {
+    final first = DateTime(from.year, from.month, from.day);
+    final result =
+        <({SyncedScheduleEvent event, DateTime start, DateTime end})>[];
+    for (final e in events) {
+      final duration = e.endTime.difference(e.startTime);
+      if (!e.recurring) {
+        if (!e.startTime.isBefore(first) && e.startTime.isBefore(to)) {
+          result.add((event: e, start: e.startTime, end: e.endTime));
+        }
+        continue;
+      }
+      for (
+        var day = first;
+        day.isBefore(to);
+        day = DateTime(day.year, day.month, day.day + 1)
+      ) {
+        if (!e.occursOnDay(day)) continue;
+        final start = DateTime(
+          day.year,
+          day.month,
+          day.day,
+          e.startTime.hour,
+          e.startTime.minute,
+        );
+        result.add((event: e, start: start, end: start.add(duration)));
+      }
+    }
+    return result;
+  }
+
+  /// "Course: Lecture", like the full calendar widget.
+  static String _scheduleTitle(SyncedScheduleEvent s, String fallback) {
+    final title = s.title.trim();
+    final course = s.courseName.trim();
+    if (course.isEmpty) return title.isNotEmpty ? title : fallback;
+    if (title.isEmpty || title.toLowerCase() == course.toLowerCase()) {
+      return course;
+    }
+    return '$course: $title';
+  }
+
+  static String _scheduleSubtitle(SyncedScheduleEvent s) =>
+      s.location.isNotEmpty && s.courseCode.isNotEmpty
+      ? '${s.courseCode} • ${s.location}'
+      : (s.location.isNotEmpty ? s.location : s.courseCode);
+
+  static String _scheduleColor(SyncedScheduleEvent s) =>
+      '#${s.color.toARGB32().toRadixString(16).padLeft(8, '0')}';
 
   /// Local days an event occupies. Same rule as the in-app calendar: an end at
   /// midnight is exclusive, so all-day events don't spill into the next day.
@@ -409,6 +494,27 @@ class WidgetDataService {
       );
     }
 
+    // 3. ROCIs Schedule classes
+    final scheduleEvents = await _getScheduleEvents();
+    for (final o in scheduleOccurrences(scheduleEvents, rangeStart, rangeEnd)) {
+      final day = DateFormat('yyyy-MM-dd').format(o.start);
+      agendaItems.add({
+        'type': 'schedule',
+        'id': o.event.id,
+        'title': _scheduleTitle(o.event, noTitleLabel),
+        'subtitle': _scheduleSubtitle(o.event),
+        'date': o.start.toIso8601String(),
+        'dateOnly': day,
+        'dateDisplay': day,
+        'timeDisplay': '${clock.format(o.start)}-${clock.format(o.end)}',
+        'isAllDay': false,
+        'sortMinutes': _sortMinutes(o.start, allDay: false),
+        'isCompleted': false,
+        'category_color': _scheduleColor(o.event),
+        'priority': '',
+      });
+    }
+
     agendaItems.sort(_compareItems);
 
     // An empty result only means "no data yet" when no tasks are loaded;
@@ -485,6 +591,14 @@ class WidgetDataService {
         for (final day in eventDays(event.start!, event.end)) {
           eventsByDate[DateFormat('yyyy-MM-dd').format(day)] = true;
         }
+      }
+      final gridEnd = DateTime(endDate.year, endDate.month, endDate.day + 1);
+      for (final o in scheduleOccurrences(
+        await _getScheduleEvents(),
+        startDate,
+        gridEnd,
+      )) {
+        eventsByDate[DateFormat('yyyy-MM-dd').format(o.start)] = true;
       }
 
       final categoryTasks = await _filterTasksByCategory(allTasks);
@@ -647,6 +761,28 @@ class WidgetDataService {
         }
       }
     } catch (_) {}
+
+    // 3. ROCIs Schedule classes (rangeStart is exclusive, as above)
+    for (final o in scheduleOccurrences(
+      await _getScheduleEvents(),
+      today,
+      rangeEnd,
+    )) {
+      rawItems.add({
+        'type': 'schedule',
+        'id': o.event.id,
+        'title': _scheduleTitle(o.event, noTitleLabel),
+        'subtitle': _scheduleSubtitle(o.event),
+        'date': o.start.toIso8601String(),
+        'dateOnly': DateFormat('yyyy-MM-dd').format(o.start),
+        'timeDisplay': '${clock.format(o.start)}-${clock.format(o.end)}',
+        'isAllDay': false,
+        'sortMinutes': _sortMinutes(o.start, allDay: false),
+        'isCompleted': false,
+        'category_color': _scheduleColor(o.event),
+        'priority': '',
+      });
+    }
 
     rawItems.sort(_compareItems);
     final tomorrow = DateTime(today.year, today.month, today.day + 1);
@@ -823,6 +959,28 @@ class WidgetDataService {
         });
       }
     } catch (_) {}
+
+    // 3. ROCIs Schedule classes
+    final noTitle = await _getNoTitleLabel();
+    for (final o in scheduleOccurrences(
+      await _getScheduleEvents(),
+      now,
+      now.add(const Duration(days: 3)),
+    )) {
+      if (!o.start.isAfter(now.subtract(const Duration(minutes: 15)))) {
+        continue;
+      }
+      upcomingList.add({
+        'type': 'schedule',
+        'id': o.event.id,
+        'title': _scheduleTitle(o.event, noTitle),
+        'subtitle': _scheduleSubtitle(o.event),
+        'category_color': _scheduleColor(o.event),
+        'rank': o.start,
+        'start': o.start,
+        'priority': '',
+      });
+    }
 
     upcomingList.sort(
       (a, b) => (a['rank'] as DateTime).compareTo(b['rank'] as DateTime),
