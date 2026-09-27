@@ -27,8 +27,14 @@ class _TaskUnlockDialogState extends State<TaskUnlockDialog> {
   }
 
   Future<void> _attemptBiometricAuth() async {
-    final privateModeService = Provider.of<PrivateModeService>(context, listen: false);
-    final subscriptionService = Provider.of<SubscriptionService>(context, listen: false);
+    final privateModeService = Provider.of<PrivateModeService>(
+      context,
+      listen: false,
+    );
+    final subscriptionService = Provider.of<SubscriptionService>(
+      context,
+      listen: false,
+    );
     final l10n = AppLocalizations.of(context)!;
 
     // Check if biometric is enabled, supported, and the user is premium
@@ -114,7 +120,7 @@ class _TaskUnlockDialogState extends State<TaskUnlockDialog> {
                 ),
               ),
               const SizedBox(height: 20),
-              
+
               // Title
               Text(
                 l10n.privateTask,
@@ -125,7 +131,7 @@ class _TaskUnlockDialogState extends State<TaskUnlockDialog> {
                 ),
               ),
               const SizedBox(height: 8),
-              
+
               // Subtitle
               Text(
                 l10n.privateTaskSubtitle,
@@ -143,10 +149,7 @@ class _TaskUnlockDialogState extends State<TaskUnlockDialog> {
                   child: CircularProgressIndicator(strokeWidth: 3),
                 ),
                 const SizedBox(height: 16),
-                Text(
-                  'Authenticating...',
-                  style: theme.textTheme.bodySmall,
-                ),
+                Text('Authenticating...', style: theme.textTheme.bodySmall),
               ] else if (_showPinInput) ...[
                 // PIN input decoration
                 TextField(
@@ -165,7 +168,8 @@ class _TaskUnlockDialogState extends State<TaskUnlockDialog> {
                       color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
                     ),
                     filled: true,
-                    fillColor: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+                    fillColor: theme.colorScheme.surfaceContainerHighest
+                        .withValues(alpha: 0.3),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
                       borderSide: BorderSide.none,
@@ -209,7 +213,9 @@ class _TaskUnlockDialogState extends State<TaskUnlockDialog> {
                         ),
                         child: Text(
                           l10n.unlock,
-                          style: GoogleFonts.outfit(fontWeight: FontWeight.w600),
+                          style: GoogleFonts.outfit(
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                     ),
@@ -222,7 +228,10 @@ class _TaskUnlockDialogState extends State<TaskUnlockDialog> {
                   icon: const Icon(Icons.fingerprint_rounded),
                   label: Text(l10n.useBiometrics),
                   style: FilledButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 12,
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
@@ -248,7 +257,10 @@ class _TaskUnlockDialogState extends State<TaskUnlockDialog> {
     );
   }
 
-  Future<void> _verifyPin(PrivateModeService privateModeService, AppLocalizations l10n) async {
+  Future<void> _verifyPin(
+    PrivateModeService privateModeService,
+    AppLocalizations l10n,
+  ) async {
     final pin = _pinController.text.trim();
     if (pin.isEmpty) return;
 

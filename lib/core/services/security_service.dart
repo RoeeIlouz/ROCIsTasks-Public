@@ -21,7 +21,8 @@ class SecurityService {
     final client = HttpClient();
 
     client.connectionTimeout = const Duration(seconds: 10);
-    client.badCertificateCallback = (X509Certificate cert, String host, int port) {
+    client
+        .badCertificateCallback = (X509Certificate cert, String host, int port) {
       if (_allowedFingerprints.isEmpty) {
         AppLogger.warning(
           'SSL Pinning: No fingerprints configured — allowing connection to $host',

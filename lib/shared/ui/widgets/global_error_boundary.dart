@@ -73,8 +73,13 @@ class _GlobalErrorBoundaryState extends State<GlobalErrorBoundary> {
                   style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
                 ),
                 style: FilledButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 32,
+                    vertical: 16,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                 ),
               ),
               if (kDebugMode) ...[

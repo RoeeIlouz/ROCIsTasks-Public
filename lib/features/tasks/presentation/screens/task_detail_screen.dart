@@ -22,11 +22,7 @@ class TaskDetailScreen extends StatefulWidget {
   final Task task;
   final Category? category;
 
-  const TaskDetailScreen({
-    super.key,
-    required this.task,
-    this.category,
-  });
+  const TaskDetailScreen({super.key, required this.task, this.category});
 
   @override
   State<TaskDetailScreen> createState() => _TaskDetailScreenState();
@@ -35,8 +31,10 @@ class TaskDetailScreen extends StatefulWidget {
 class _TaskDetailScreenState extends State<TaskDetailScreen> {
   bool _authorized = false;
   bool _promptScheduled = false;
-  final TextEditingController _newGroceryItemController = TextEditingController();
-  final TextEditingController _newGroceryQtyController = TextEditingController();
+  final TextEditingController _newGroceryItemController =
+      TextEditingController();
+  final TextEditingController _newGroceryQtyController =
+      TextEditingController();
 
   @override
   void dispose() {
@@ -44,7 +42,10 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
     _newGroceryQtyController.dispose();
     PrivateModeService? privateModeService;
     try {
-      privateModeService = Provider.of<PrivateModeService>(context, listen: false);
+      privateModeService = Provider.of<PrivateModeService>(
+        context,
+        listen: false,
+      );
     } catch (_) {
       privateModeService = null;
     }
@@ -81,8 +82,8 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
     return Consumer<TaskProvider>(
       builder: (context, provider, child) {
         final updatedTask = provider.getTaskById(widget.task.id) ?? widget.task;
-        final categoryIds = updatedTask.categoryIds.isNotEmpty 
-            ? updatedTask.categoryIds 
+        final categoryIds = updatedTask.categoryIds.isNotEmpty
+            ? updatedTask.categoryIds
             : (updatedTask.categoryId != null ? [updatedTask.categoryId!] : []);
         final updatedCategories = categoryIds
             .map((id) => provider.getCategoryById(id))
@@ -152,7 +153,8 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                     ),
                     const SizedBox(height: 24),
                     FilledButton(
-                      onPressed: () => _promptUnlock(provider, popOnCancel: false),
+                      onPressed: () =>
+                          _promptUnlock(provider, popOnCancel: false),
                       child: Text(l10n.unlock),
                     ),
                   ],
@@ -197,7 +199,10 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                     if (!updatedTask.isGroceryList)
                       InkWell(
                         onTap: () {
-                          final themeService = Provider.of<ThemeService>(context, listen: false);
+                          final themeService = Provider.of<ThemeService>(
+                            context,
+                            listen: false,
+                          );
                           if (themeService.taskCompletionFeedback) {
                             if (!updatedTask.isCompleted) {
                               HapticFeedback.mediumImpact();
@@ -231,7 +236,9 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                           size: 28,
                           color: updatedTask.isCompleted
                               ? theme.colorScheme.primary
-                              : theme.colorScheme.primary.withValues(alpha: 0.7),
+                              : theme.colorScheme.primary.withValues(
+                                  alpha: 0.7,
+                                ),
                         ),
                       ),
                     Expanded(
@@ -262,31 +269,45 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                       spacing: 12,
                       runSpacing: 12,
                       children: [
-                        ...updatedCategories.map((c) => Chip(
-                          avatar: Icon(
-                            IconUtils.getIconData(c.iconCode),
-                            color: Color(c.colorValue),
-                            size: 18,
+                        ...updatedCategories.map(
+                          (c) => Chip(
+                            avatar: Icon(
+                              IconUtils.getIconData(c.iconCode),
+                              color: Color(c.colorValue),
+                              size: 18,
+                            ),
+                            label: Text(c.name),
+                            backgroundColor: Color(
+                              c.colorValue,
+                            ).withValues(alpha: 0.1),
+                            side: BorderSide.none,
                           ),
-                          label: Text(c.name),
-                          backgroundColor: Color(c.colorValue).withValues(alpha: 0.1),
-                          side: BorderSide.none,
-                        )),
+                        ),
                         if (updatedTask.dueDate != null)
                           Chip(
                             avatar: Icon(
                               Icons.calendar_today_outlined,
                               size: 18,
-                              color: _getDueDateColor(updatedTask.dueDate!, theme),
-                            ),
-                            label: Text(
-                              DateFormat('MMM d, y, HH:mm').format(updatedTask.dueDate!),
-                              style: TextStyle(
-                                color: _getDueDateColor(updatedTask.dueDate!, theme),
+                              color: _getDueDateColor(
+                                updatedTask.dueDate!,
+                                theme,
                               ),
                             ),
-                            backgroundColor: _getDueDateColor(updatedTask.dueDate!, theme)
-                                .withValues(alpha: 0.1),
+                            label: Text(
+                              DateFormat(
+                                'MMM d, y, HH:mm',
+                              ).format(updatedTask.dueDate!),
+                              style: TextStyle(
+                                color: _getDueDateColor(
+                                  updatedTask.dueDate!,
+                                  theme,
+                                ),
+                              ),
+                            ),
+                            backgroundColor: _getDueDateColor(
+                              updatedTask.dueDate!,
+                              theme,
+                            ).withValues(alpha: 0.1),
                             side: BorderSide.none,
                           ),
                         Chip(
@@ -301,8 +322,9 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                               color: _getPriorityColor(updatedTask.priority),
                             ),
                           ),
-                          backgroundColor: _getPriorityColor(updatedTask.priority)
-                              .withValues(alpha: 0.1),
+                          backgroundColor: _getPriorityColor(
+                            updatedTask.priority,
+                          ).withValues(alpha: 0.1),
                           side: BorderSide.none,
                         ),
                         if (updatedTask.recurrenceRule != null &&
@@ -356,8 +378,15 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                 ],
 
                 if (updatedTask.isGroceryList)
-                  _buildGroceryListSection(context, updatedTask, provider, l10n, theme)
-                else if (updatedTask.subTasks != null && updatedTask.subTasks!.isNotEmpty) ...[
+                  _buildGroceryListSection(
+                    context,
+                    updatedTask,
+                    provider,
+                    l10n,
+                    theme,
+                  )
+                else if (updatedTask.subTasks != null &&
+                    updatedTask.subTasks!.isNotEmpty) ...[
                   Text(
                     l10n.subtasks,
                     style: theme.textTheme.titleMedium?.copyWith(
@@ -370,12 +399,16 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                     borderRadius: BorderRadius.circular(16),
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     child: Column(
-                      children: List.generate(updatedTask.subTasks!.length, (index) {
+                      children: List.generate(updatedTask.subTasks!.length, (
+                        index,
+                      ) {
                         final subtask = updatedTask.subTasks![index];
                         return Column(
                           children: [
                             CheckboxListTile(
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                              ),
                               controlAffinity: ListTileControlAffinity.leading,
                               title: Text(
                                 subtask.title,
@@ -398,7 +431,9 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                               Divider(
                                 height: 1,
                                 thickness: 1,
-                                color: theme.dividerColor.withValues(alpha: 0.08),
+                                color: theme.dividerColor.withValues(
+                                  alpha: 0.08,
+                                ),
                               ),
                           ],
                         );
@@ -408,7 +443,8 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                   const SizedBox(height: 24),
                 ],
 
-                if (updatedTask.customFields != null && updatedTask.customFields!.isNotEmpty) ...[
+                if (updatedTask.customFields != null &&
+                    updatedTask.customFields!.isNotEmpty) ...[
                   Text(
                     l10n.customFields,
                     style: theme.textTheme.titleMedium?.copyWith(
@@ -418,15 +454,24 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                   ),
                   const SizedBox(height: 12),
                   ...updatedTask.customFields!.map((field) {
-                    final icon = CustomFieldActionService.getIcon(field.type, field.value);
-                    final actionIcon = CustomFieldActionService.getActionIcon(field.type, field.value);
+                    final icon = CustomFieldActionService.getIcon(
+                      field.type,
+                      field.value,
+                    );
+                    final actionIcon = CustomFieldActionService.getActionIcon(
+                      field.type,
+                      field.value,
+                    );
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 10.0),
                       child: InkWell(
                         borderRadius: BorderRadius.circular(16),
                         onTap: () {
                           HapticFeedback.lightImpact();
-                          CustomFieldActionService.performAction(context, field);
+                          CustomFieldActionService.performAction(
+                            context,
+                            field,
+                          );
                         },
                         onLongPress: () {
                           CustomFieldActionService.copyToClipboard(
@@ -437,13 +482,18 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                         },
                         child: GlassContainer(
                           borderRadius: BorderRadius.circular(16),
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
                           child: Row(
                             children: [
                               Container(
                                 padding: const EdgeInsets.all(10),
                                 decoration: BoxDecoration(
-                                  color: theme.colorScheme.primary.withValues(alpha: 0.12),
+                                  color: theme.colorScheme.primary.withValues(
+                                    alpha: 0.12,
+                                  ),
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Icon(
@@ -467,7 +517,9 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                                         ),
                                       ),
                                     Text(
-                                      field.value.isNotEmpty ? field.value : '—',
+                                      field.value.isNotEmpty
+                                          ? field.value
+                                          : '—',
                                       style: GoogleFonts.outfit(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w500,
@@ -485,7 +537,10 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                                 tooltip: field.value,
                                 onPressed: () {
                                   HapticFeedback.lightImpact();
-                                  CustomFieldActionService.performAction(context, field);
+                                  CustomFieldActionService.performAction(
+                                    context,
+                                    field,
+                                  );
                                 },
                               ),
                             ],
@@ -524,7 +579,8 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                               overflow: TextOverflow.ellipsis,
                               style: theme.textTheme.bodySmall,
                             ),
-                            onPressed: () => AttachmentUtils.openAttachment(context, path),
+                            onPressed: () =>
+                                AttachmentUtils.openAttachment(context, path),
                           );
                         }).toList(),
                       ),
@@ -538,8 +594,6 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
       },
     );
   }
-
-
 
   Color _getDueDateColor(DateTime date, ThemeData theme) {
     if (date.isBefore(DateTime.now())) {
@@ -621,7 +675,11 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
       children: [
         Row(
           children: [
-            Icon(Icons.shopping_cart_rounded, color: theme.colorScheme.primary, size: 22),
+            Icon(
+              Icons.shopping_cart_rounded,
+              color: theme.colorScheme.primary,
+              size: 22,
+            ),
             const SizedBox(width: 8),
             Text(
               l10n.groceryListMode,
@@ -638,7 +696,10 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                   provider.resetGroceryList(task);
                 },
                 icon: const Icon(Icons.refresh_rounded, size: 16),
-                label: Text(l10n.resetCart, style: GoogleFonts.outfit(fontSize: 12)),
+                label: Text(
+                  l10n.resetCart,
+                  style: GoogleFonts.outfit(fontSize: 12),
+                ),
               ),
           ],
         ),
@@ -655,11 +716,18 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                 children: [
                   Text(
                     l10n.itemsInCart(completed, total),
-                    style: GoogleFonts.outfit(fontWeight: FontWeight.w600, fontSize: 13),
+                    style: GoogleFonts.outfit(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
+                    ),
                   ),
                   Text(
                     '${(progress * 100).toInt()}%',
-                    style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 13, color: theme.colorScheme.primary),
+                    style: GoogleFonts.outfit(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                      color: theme.colorScheme.primary,
+                    ),
                   ),
                 ],
               ),
@@ -669,8 +737,12 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                 child: LinearProgressIndicator(
                   value: progress,
                   minHeight: 6,
-                  backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.15),
-                  valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
+                  backgroundColor: theme.colorScheme.primary.withValues(
+                    alpha: 0.15,
+                  ),
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    theme.colorScheme.primary,
+                  ),
                 ),
               ),
             ],
@@ -695,7 +767,11 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                   style: GoogleFonts.outfit(fontSize: 14),
                   onSubmitted: (val) {
                     if (val.trim().isNotEmpty) {
-                      provider.addGroceryItem(task, val, quantity: _newGroceryQtyController.text);
+                      provider.addGroceryItem(
+                        task,
+                        val,
+                        quantity: _newGroceryQtyController.text,
+                      );
                       _newGroceryItemController.clear();
                       _newGroceryQtyController.clear();
                     }
@@ -721,7 +797,11 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                 onPressed: () {
                   final title = _newGroceryItemController.text;
                   if (title.trim().isNotEmpty) {
-                    provider.addGroceryItem(task, title, quantity: _newGroceryQtyController.text);
+                    provider.addGroceryItem(
+                      task,
+                      title,
+                      quantity: _newGroceryQtyController.text,
+                    );
                     _newGroceryItemController.clear();
                     _newGroceryQtyController.clear();
                   }
@@ -735,7 +815,11 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
         if (toBuyItems.isNotEmpty) ...[
           Text(
             '${l10n.toBuy} (${toBuyItems.length})',
-            style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 13, color: theme.colorScheme.onSurfaceVariant),
+            style: GoogleFonts.outfit(
+              fontWeight: FontWeight.bold,
+              fontSize: 13,
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
           ),
           const SizedBox(height: 8),
           GlassContainer(
@@ -745,15 +829,26 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
               children: List.generate(toBuyItems.length, (index) {
                 final item = toBuyItems[index];
                 return CheckboxListTile(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 0,
+                  ),
                   controlAffinity: ListTileControlAffinity.leading,
-                  title: Text(item.title, style: GoogleFonts.outfit(fontWeight: FontWeight.w500)),
+                  title: Text(
+                    item.title,
+                    style: GoogleFonts.outfit(fontWeight: FontWeight.w500),
+                  ),
                   secondary: item.quantity != null && item.quantity!.isNotEmpty
                       ? Chip(
-                          label: Text(item.quantity!, style: GoogleFonts.outfit(fontSize: 11)),
+                          label: Text(
+                            item.quantity!,
+                            style: GoogleFonts.outfit(fontSize: 11),
+                          ),
                           visualDensity: VisualDensity.compact,
                           padding: EdgeInsets.zero,
-                          backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
+                          backgroundColor: theme.colorScheme.primary.withValues(
+                            alpha: 0.1,
+                          ),
                           side: BorderSide.none,
                         )
                       : null,
@@ -775,14 +870,24 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
             children: [
               Text(
                 '${l10n.inCart} (${inCartItems.length})',
-                style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 13, color: theme.colorScheme.onSurfaceVariant),
+                style: GoogleFonts.outfit(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 13,
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
               ),
               TextButton(
                 onPressed: () {
                   HapticFeedback.lightImpact();
                   provider.clearCompletedSubTasks(task);
                 },
-                child: Text(l10n.clearCartItems, style: GoogleFonts.outfit(fontSize: 12, color: theme.colorScheme.error)),
+                child: Text(
+                  l10n.clearCartItems,
+                  style: GoogleFonts.outfit(
+                    fontSize: 12,
+                    color: theme.colorScheme.error,
+                  ),
+                ),
               ),
             ],
           ),
@@ -794,7 +899,10 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
               children: List.generate(inCartItems.length, (index) {
                 final item = inCartItems[index];
                 return CheckboxListTile(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 0,
+                  ),
                   controlAffinity: ListTileControlAffinity.leading,
                   title: Text(
                     item.title,
@@ -805,7 +913,13 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                   ),
                   secondary: item.quantity != null && item.quantity!.isNotEmpty
                       ? Chip(
-                          label: Text(item.quantity!, style: GoogleFonts.outfit(fontSize: 11, color: theme.disabledColor)),
+                          label: Text(
+                            item.quantity!,
+                            style: GoogleFonts.outfit(
+                              fontSize: 11,
+                              color: theme.disabledColor,
+                            ),
+                          ),
                           visualDensity: VisualDensity.compact,
                           padding: EdgeInsets.zero,
                           side: BorderSide.none,

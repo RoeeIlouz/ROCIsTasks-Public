@@ -155,7 +155,9 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
                       children: [
                         Text(
                           l10n.biometricUnlock,
-                          style: GoogleFonts.outfit(fontWeight: FontWeight.w500),
+                          style: GoogleFonts.outfit(
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                         if (!isPremium) ...[
                           const SizedBox(width: 8),
