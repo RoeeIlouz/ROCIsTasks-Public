@@ -38,10 +38,12 @@ function isLifetimeOrder(attributes) {
  * Lemon Squeezy subscription, Lemon Squeezy lifetime and RevenueCat (mobile).
  * Only the server writes these fields (see firestore.rules).
  */
-async function applyEntitlements(uid, update) {
+async function applyEntitlements(uid, update, isStale = () => false) {
   const ref = db.collection('users').doc(uid);
   return db.runTransaction(async (tx) => {
-    const merged = { ...((await tx.get(ref)).data() || {}), ...update };
+    const current = (await tx.get(ref)).data() || {};
+    if (isStale(current)) return current.is_premium === true;
+    const merged = { ...current, ...update };
     const premium = merged.ls_subscription_active === true ||
       merged.ls_lifetime === true ||
       merged.rc_premium === true;
@@ -52,6 +54,16 @@ async function applyEntitlements(uid, update) {
     }, { merge: true });
     return premium;
   });
+}
+
+/**
+ * Lemon Squeezy doesn't guarantee delivery order, so a retried older event can
+ * arrive after a newer one. It's stale when its updated_at is before the one
+ * already recorded.
+ */
+function subscriptionEventIsStale(recordedUpdatedAt, eventUpdatedAt) {
+  if (!recordedUpdatedAt || !eventUpdatedAt) return false;
+  return new Date(eventUpdatedAt).getTime() < new Date(recordedUpdatedAt).getTime();
 }
 
 const RC_PROJECT_ID = 'proj562f5a11';
@@ -88,9 +100,13 @@ async function refreshRevenueCat(uid) {
 }
 
 // The project's default compute service account doesn't exist; run as the App Engine one.
-exports.lemonSqueezyWebhook = functions
-  .runWith({ serviceAccount: 'rocis-todo@appspot.gserviceaccount.com' })
-  .https.onRequest(async (req, res) => {
+// Secrets come from Secret Manager (firebase functions:secrets:set), exposed as env vars.
+const runOptions = {
+  serviceAccount: 'rocis-todo@appspot.gserviceaccount.com',
+  secrets: ['LEMONSQUEEZY_SECRET', 'REVENUECAT_SECRET_KEY', 'REVENUECAT_WEBHOOK_AUTH'],
+};
+
+exports.lemonSqueezyWebhook = functions.runWith(runOptions).https.onRequest(async (req, res) => {
   if (req.method !== 'POST') {
     res.status(405).send('Method Not Allowed');
     return;
@@ -138,13 +154,17 @@ exports.lemonSqueezyWebhook = functions
     // Subscription and lifetime state are kept separately so that one kind of
     // event (e.g. an order or a renewal invoice) never revokes the other.
     let update;
+    let isStale;
     if (data.type === 'subscriptions') {
+      isStale = (current) =>
+        subscriptionEventIsStale(current.ls_subscription_updated_at, attributes.updated_at);
       update = {
         ls_subscription_active: subscriptionGrantsPro(attributes),
         subscription_status: attributes.status || 'unknown',
         subscription_id: String(data.id),
         subscription_ends_at: attributes.ends_at || null,
         subscription_trial_ends_at: attributes.trial_ends_at || null,
+        ls_subscription_updated_at: attributes.updated_at || null,
       };
     } else if (data.type === 'orders' && isLifetimeOrder(attributes)) {
       update = { ls_lifetime: attributes.status === 'paid' };
@@ -154,7 +174,7 @@ exports.lemonSqueezyWebhook = functions
       return;
     }
 
-    const isPremium = await applyEntitlements(String(userId), update);
+    const isPremium = await applyEntitlements(String(userId), update, isStale);
 
     console.log(`"${meta.event_name}" (${data.type}, ${attributes.status}) -> is_premium=${isPremium} for ${userId}`);
     res.status(200).send('Webhook processed successfully.');
@@ -163,8 +183,6 @@ exports.lemonSqueezyWebhook = functions
     res.status(500).send('Internal Server Error');
   }
 });
-
-const runOptions = { serviceAccount: 'rocis-todo@appspot.gserviceaccount.com' };
 
 /**
  * RevenueCat webhook (Authorization header must equal REVENUECAT_WEBHOOK_AUTH). The
@@ -223,4 +241,4 @@ exports.syncPremium = functions.runWith(runOptions).https.onRequest(async (req, 
   }
 });
 
-module.exports._test = { subscriptionGrantsPro, isLifetimeOrder };
+module.exports._test = { subscriptionGrantsPro, isLifetimeOrder, subscriptionEventIsStale };
