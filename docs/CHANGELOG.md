@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.2+116] - 2026-09-28 (Patch 2)
+
+### Changed
+- Cleaner My Tasks top bar: search sits next to the board toggle; only filter (and help) on the other side.
+- The + button opens a menu: New task, Scan QR code, Categories. Long-press still opens the full editor.
+- Sync status is quieter: a thin line while syncing and a red dot on the title if a sync fails (tap to retry).
+
 ## [0.3.2+116] - 2026-09-28 (Patch 1)
 
 ### Changed
