@@ -11,6 +11,7 @@ Steps (run in order; the page loads first and waits for CanvasKit):
   g:PATH    open base URL + PATH (e.g. #/share?d=...), then wait for load
 Env STATUS_TIME=5:18 captures at 390x816 and adds a 28px Android status bar
 (time, wifi, battery) tinted from the app's top edge, so web shots match emulator ones.
+Env PREFS='{"language_code": "de"}' presets shared_preferences before first load.
 Web can't show Android widgets or the camera; those come from emulator captures.
 """
 import functools
@@ -66,6 +67,11 @@ with sync_playwright() as p:
     browser = p.chromium.launch()
     ctx = browser.new_context(viewport={"width": 390, "height": 844 - (BAR if status_time else 0)}, device_scale_factor=3,
                               is_mobile=True, has_touch=True, locale=locale)
+    if os.environ.get("PREFS"):
+        import json
+        sets = "".join(f"localStorage.setItem('flutter.{k}', {json.dumps(json.dumps(v))});"
+                       for k, v in json.loads(os.environ["PREFS"]).items())
+        ctx.add_init_script(f"if (!sessionStorage.getItem('_seeded')) {{ {sets} sessionStorage.setItem('_seeded', '1'); }}")
     page = ctx.new_page()
     page.clock.set_fixed_time(datetime.fromisoformat(iso))
     base = f"http://127.0.0.1:{srv.server_address[1]}/"
