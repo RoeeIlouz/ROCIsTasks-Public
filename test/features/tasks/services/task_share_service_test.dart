@@ -25,7 +25,7 @@ void main() {
         categoryName: 'Personal',
       );
 
-      expect(payload.startsWith(TaskShareService.offlineScheme), isTrue);
+      expect(payload.startsWith('${TaskShareService.linkBase}?d='), isTrue);
       expect(payload, contains('?d='));
 
       final decoded = service.decodeOfflinePayload(payload);
@@ -36,6 +36,24 @@ void main() {
       expect(decoded['c'], equals('Personal'));
       expect(decoded['due'], contains('2026-10-15'));
     });
+
+    test(
+      'resolves https links, router-relative links and legacy QR codes',
+      () async {
+        final link = service.generateOfflinePayload(Task(title: 'Shared'));
+        final query = Uri.parse(link).query;
+
+        for (final raw in [
+          link,
+          '/share?$query', // what the /share route receives as state.uri
+          'rocis://task/import?$query', // QR codes made by 0.3.1
+        ]) {
+          final data = await service.resolveQrString(raw, <Category>[]);
+          expect(data.task.title, 'Shared', reason: raw);
+          expect(data.isCloud, isFalse, reason: raw);
+        }
+      },
+    );
 
     test('resets all subtasks to uncompleted upon resolution', () async {
       final task = Task(
