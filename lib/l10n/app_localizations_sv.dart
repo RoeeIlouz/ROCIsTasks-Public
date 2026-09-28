@@ -2047,70 +2047,70 @@ class AppLocalizationsSv extends AppLocalizations {
   String get previewSampleLaunchReview => 'Genomgång av produktlanseringen';
 
   @override
-  String get shareTaskQr => 'Share via QR Code';
+  String get shareTaskQr => 'Dela via QR-kod';
 
   @override
-  String get scanQrCode => 'Scan QR Code';
+  String get scanQrCode => 'Skanna QR-kod';
 
   @override
-  String get offlineDirect => 'Offline Direct';
+  String get offlineDirect => 'Direkt offline';
 
   @override
   String get offlineDirectDesc =>
-      '100% private. Works without internet. Attachments not included.';
+      '100 % privat. Fungerar utan internet. Bilagor ingår inte.';
 
   @override
-  String get cloudShare7Days => 'Cloud Link (7 Days)';
+  String get cloudShare7Days => 'Molnlänk (7 dagar)';
 
   @override
   String get cloudShareDesc =>
-      'Shared securely via cloud. Expires automatically in 7 days.';
+      'Delas säkert via molnet. Upphör automatiskt efter 7 dagar.';
 
   @override
-  String get copyQrPayload => 'Copy QR Data';
+  String get copyQrPayload => 'Kopiera QR-data';
 
   @override
-  String get qrDataCopied => 'QR data copied to clipboard';
+  String get qrDataCopied => 'QR-data kopierades till urklipp';
 
   @override
-  String get pickFromGallery => 'Pick from Gallery';
+  String get pickFromGallery => 'Välj från galleriet';
 
   @override
-  String get importTask => 'Import Task';
+  String get importTask => 'Importera uppgift';
 
   @override
-  String get importTaskPreview => 'Import Task Preview';
+  String get importTaskPreview => 'Förhandsvisning av import';
 
   @override
-  String get taskImportedSuccess => 'Task imported successfully!';
+  String get taskImportedSuccess => 'Uppgiften importerades!';
 
   @override
-  String get invalidQrCode => 'Invalid or unrecognized task QR code.';
+  String get invalidQrCode => 'Ogiltig eller okänd QR-kod för uppgift.';
 
   @override
-  String get taskExpired => 'This shared task has expired.';
+  String get taskExpired => 'Den här delade uppgiften har upphört.';
 
   @override
   String suggestedCategory(String category) {
-    return 'Suggested category: $category';
+    return 'Föreslagen kategori: $category';
   }
 
   @override
-  String get destinationCategory => 'Destination Category';
+  String get destinationCategory => 'Målkategori';
 
   @override
   String get cameraPermissionRequired =>
-      'Camera permission is required to scan QR codes.';
+      'Kamerabehörighet krävs för att skanna QR-koder.';
 
   @override
-  String get grantPermission => 'Grant Permission';
+  String get grantPermission => 'Ge behörighet';
 
   @override
-  String get flashOn => 'Turn on flash';
+  String get flashOn => 'Slå på blixten';
 
   @override
-  String get flashOff => 'Turn off flash';
+  String get flashOff => 'Stäng av blixten';
 
   @override
-  String get flipCamera => 'Flip camera';
+  String get flipCamera => 'Byt kamera';
 }
