@@ -163,3 +163,89 @@ class SyncStatusBadge extends StatelessWidget {
     return Tooltip(message: tooltip, child: badge);
   }
 }
+
+/// App bar `bottom`: a thin indeterminate line while syncing, otherwise an
+/// empty strip of the same height so the bar never changes size.
+class SyncProgressLine extends StatelessWidget implements PreferredSizeWidget {
+  const SyncProgressLine({super.key});
+
+  @override
+  Size get preferredSize => const Size.fromHeight(2);
+
+  @override
+  Widget build(BuildContext context) {
+    final syncStatus = SyncStatusService();
+    return ListenableBuilder(
+      listenable: Listenable.merge([ConnectivityService(), syncStatus]),
+      builder: (context, _) {
+        final show = syncStatus.isSyncing && !ConnectivityService().isOffline;
+        return SizedBox(
+          height: 2,
+          child: AnimatedOpacity(
+            opacity: show ? 1 : 0,
+            duration: const Duration(milliseconds: 250),
+            child: show
+                ? Semantics(
+                    label: AppLocalizations.of(context)!.syncingToCloud,
+                    child: LinearProgressIndicator(
+                      minHeight: 2,
+                      backgroundColor: Colors.transparent,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  )
+                : const SizedBox.shrink(),
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// A small dot beside the title when the last sync failed; tap to retry.
+/// Nothing is shown while everything is synced.
+class SyncErrorDot extends StatelessWidget {
+  const SyncErrorDot({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final syncStatus = SyncStatusService();
+    return ListenableBuilder(
+      listenable: Listenable.merge([ConnectivityService(), syncStatus]),
+      builder: (context, _) {
+        if (!syncStatus.hasError || ConnectivityService().isOffline) {
+          return const SizedBox.shrink();
+        }
+        final l10n = AppLocalizations.of(context)!;
+        final color = Theme.of(context).colorScheme.error;
+        return Tooltip(
+          message: syncStatus.lastErrorMessage ?? l10n.syncErrorRetry,
+          child: Semantics(
+            button: true,
+            label: l10n.syncErrorRetry,
+            child: InkResponse(
+              radius: 18,
+              onTap: () => FirestoreService().processOfflineQueue(),
+              child: Padding(
+                padding: const EdgeInsetsDirectional.only(start: 8),
+                child: Container(
+                  width: 8,
+                  height: 8,
+                  decoration: BoxDecoration(
+                    color: color,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: color.withValues(alpha: 0.5),
+                        blurRadius: 6,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
