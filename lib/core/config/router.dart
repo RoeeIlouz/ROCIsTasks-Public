@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:rocis_tasks/core/services/auth_service.dart';
@@ -12,6 +13,7 @@ import 'package:rocis_tasks/features/categories/presentation/screens/categories_
 import 'package:rocis_tasks/features/home/presentation/screens/settings_screen.dart';
 import 'package:rocis_tasks/features/calendar/presentation/screens/calendar_screen.dart';
 import 'package:rocis_tasks/features/tasks/presentation/widgets/kanban/kanban_board_view.dart';
+import 'package:rocis_tasks/features/tasks/presentation/screens/shared_task_link_screen.dart';
 
 class AppRouter {
   static final GlobalKey<NavigatorState> navigatorKey =
@@ -22,10 +24,15 @@ class AppRouter {
 
   AppRouter(this.authService, this.onboardingService);
 
+  // The web app uses hash URLs, so a https://tasks.rocisapps.com/share?… link
+  // would start at '/'; route it to the share screen explicitly.
+  static String get _initialLocation =>
+      kIsWeb && Uri.base.path == '/share' ? '/share?${Uri.base.query}' : '/';
+
   late final GoRouter router = GoRouter(
     navigatorKey: navigatorKey,
     refreshListenable: Listenable.merge([authService, onboardingService]),
-    initialLocation: '/',
+    initialLocation: _initialLocation,
     debugLogDiagnostics: kDebugMode,
     routes: [
       GoRoute(path: '/', builder: (context, state) => const HomeScreen()),
@@ -54,12 +61,20 @@ class AppRouter {
         path: '/kanban',
         builder: (context, state) => const Scaffold(body: KanbanBoardView()),
       ),
+      GoRoute(
+        path: '/share',
+        builder: (context, state) => SharedTaskLinkScreen(link: state.uri),
+      ),
     ],
     redirect: (context, state) {
       final isLoggedIn = authService.currentUser != null;
       final isOnboardingComplete = onboardingService.hasSeenOnboarding;
       final isLoggingIn = state.uri.path == '/login';
       final isOnboarding = state.uri.path == '/onboarding';
+
+      // Let shared links through before onboarding; going home afterwards
+      // redirects to onboarding as usual.
+      if (state.uri.path == '/share') return null;
 
       if (!isOnboardingComplete) {
         return isOnboarding ? null : '/onboarding';

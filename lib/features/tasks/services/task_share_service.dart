@@ -24,9 +24,12 @@ class TaskShareData {
 }
 
 class TaskShareService {
-  static const String offlineScheme = 'rocis://task/import';
-  static const String cloudScheme = 'rocis://task/cloud';
-  static const String cloudWebPrefix = 'https://rocistasks.web.app/share';
+  /// Share links are verified App Links: they open the app, or the web app
+  /// when it isn't installed. Both routes handle `/share`.
+  static const String linkBase = 'https://tasks.rocisapps.com/share';
+
+  /// Cloud prefix of QR codes made by 0.3.1; they still resolve.
+  static const String legacyCloudScheme = 'rocis://task/cloud';
   static const int cloudTtlDays = 7;
 
   final FirebaseFirestore? _customFirestore;
@@ -41,7 +44,7 @@ class TaskShareService {
   // ---------------------------------------------------------------------------
 
   /// Compresses a [task] into an offline QR payload string.
-  /// Format: `rocis://task/import?d=<BASE64URL_GZIP_JSON>`
+  /// Format: `https://tasks.rocisapps.com/share?d=<BASE64URL_GZIP_JSON>`
   String generateOfflinePayload(Task task, {String? categoryName}) {
     final Map<String, dynamic> compact = {
       'v': 1,
@@ -73,7 +76,7 @@ class TaskShareService {
     final compressedBytes = GZipEncoder().encodeBytes(utf8Bytes);
     final base64Payload = base64Url.encode(compressedBytes);
 
-    return '$offlineScheme?d=$base64Payload';
+    return '$linkBase?d=$base64Payload';
   }
 
   /// Decodes raw text from a QR code if it represents an offline task.
@@ -123,7 +126,7 @@ class TaskShareService {
   // ---------------------------------------------------------------------------
 
   /// Uploads a task snapshot to Firestore `/shared_tasks/{shareId}` with a 7-day TTL.
-  /// Returns the share URI: `rocis://task/cloud?id={shareId}`.
+  /// Returns the share URI: `https://tasks.rocisapps.com/share?id={shareId}`.
   Future<String> uploadCloudTask(
     Task task, {
     String? categoryName,
@@ -156,7 +159,7 @@ class TaskShareService {
     };
 
     await docRef.set(docData);
-    return '$cloudScheme?id=${docRef.id}';
+    return '$linkBase?id=${docRef.id}';
   }
 
   /// Fetches a task snapshot from Firestore.
@@ -233,7 +236,7 @@ class TaskShareService {
 
   /// Extracts the cloud share ID from known URI schemes or web URLs.
   String? _extractCloudId(String raw) {
-    if (raw.startsWith(cloudScheme) || raw.contains('id=')) {
+    if (raw.startsWith(legacyCloudScheme) || raw.contains('id=')) {
       final uri = Uri.tryParse(raw);
       if (uri != null && uri.queryParameters.containsKey('id')) {
         return uri.queryParameters['id'];

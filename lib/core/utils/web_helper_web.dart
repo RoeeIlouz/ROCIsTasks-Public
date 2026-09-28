@@ -8,3 +8,13 @@ void openLemonSqueezyCheckout(String url) {
     js.context.callMethod('open', [url, '_blank']);
   }
 }
+
+/// Replaces the address bar URL without reloading (e.g. drop a handled
+/// `/share?d=…` so a refresh doesn't reopen the import).
+void replaceBrowserUrl(String url) {
+  (js.context['history'] as js.JsObject).callMethod('replaceState', [
+    null,
+    '',
+    url,
+  ]);
+}
