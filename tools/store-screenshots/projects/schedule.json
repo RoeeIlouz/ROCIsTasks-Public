@@ -7,7 +7,7 @@
     "en"
   ],
   "locale": "en",
-  "device": "feature-graphic",
+  "device": "android",
   "orientation": "portrait",
   "appIcon": "/schedule-icon.png",
   "slidesByDevice": {
@@ -81,6 +81,102 @@
           "en": "Your semester,\nsorted."
         },
         "screenshot": "/screenshots/schedule/phone/{locale}/01.png"
+      },
+      {
+        "id": "sch_2",
+        "layout": "two-devices",
+        "label": {
+          "en": "SHARE BY QR OR LINK"
+        },
+        "headline": {
+          "en": "Share a course\nin one scan."
+        },
+        "screenshot": "/screenshots/schedule/phone/{locale}/03.png",
+        "screenshotSecondary": "/screenshots/schedule/phone/{locale}/02.png",
+        "inverted": true,
+        "transforms": {
+          "deviceSecondary": {
+            "x": -10,
+            "y": 600,
+            "width": 540,
+            "height": 1175,
+            "rotation": -6,
+            "zIndex": 2
+          },
+          "device": {
+            "x": 500,
+            "y": 700,
+            "width": 560,
+            "height": 1218,
+            "rotation": 0,
+            "zIndex": 3
+          },
+          "caption": {
+            "x": 90,
+            "y": 110,
+            "width": 900,
+            "height": 420,
+            "rotation": 0,
+            "zIndex": 4
+          }
+        }
+      },
+      {
+        "id": "sch_3",
+        "layout": "device-bottom",
+        "label": {
+          "en": "GPA & CREDITS"
+        },
+        "headline": {
+          "en": "Your GPA,\nalways current."
+        },
+        "screenshot": "/screenshots/schedule/phone/{locale}/04.png"
+      },
+      {
+        "id": "sch_4",
+        "layout": "device-top",
+        "label": {
+          "en": "ASSIGNMENTS"
+        },
+        "headline": {
+          "en": "Never miss\na deadline."
+        },
+        "screenshot": "/screenshots/schedule/phone/{locale}/05.png",
+        "inverted": true
+      },
+      {
+        "id": "sch_5",
+        "layout": "device-bottom",
+        "label": {
+          "en": "CALENDAR IMPORT"
+        },
+        "headline": {
+          "en": "Import your\ntimetable."
+        },
+        "screenshot": "/screenshots/schedule/phone/{locale}/06.png"
+      },
+      {
+        "id": "sch_6",
+        "layout": "hero",
+        "label": {
+          "en": "DARK MODE"
+        },
+        "headline": {
+          "en": "Easy on the eyes,\nlate at night."
+        },
+        "screenshot": "/screenshots/schedule/phone/{locale}/07.png"
+      },
+      {
+        "id": "sch_7",
+        "layout": "no-device",
+        "label": {
+          "en": "AND MORE"
+        },
+        "headline": {
+          "en": "Class reminders.\nExam countdowns.\nWorks offline."
+        },
+        "screenshot": "",
+        "inverted": true
       }
     ],
     "ipad": [
