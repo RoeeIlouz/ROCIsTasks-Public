@@ -2,6 +2,16 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## QR Share Translations; Patch Number in Version - 2026-09-28 (Patch 1 on 0.3.2+116)
+
+#### Problems & Root Causes
+* 21 QR share/scan strings existed only in en/he, so gen-l10n warned and ar/de/es/fr/hi/sv showed English.
+* The app showed only the release version, so there was no way to tell which Shorebird patch a device runs.
+
+#### Solutions Applied
+* The 21 keys translated into ar, de, es, fr, hi, sv.
+* `AppVersionService.label()` reads the running patch from `shorebird_code_push` (`ShorebirdUpdater.readCurrentPatch`) and Settings shows `0.3.2 P1`; plain version in debug/web/tests. The package is pure Dart (FFI into the engine), so it ships in a patch.
+
 ## Localized Templates & Widget Previews; Functions Secrets - 2026-09-27 (Patch 3 on 0.3.0+114)
 
 #### Problems & Root Causes

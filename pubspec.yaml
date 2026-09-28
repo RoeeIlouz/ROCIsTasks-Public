@@ -90,6 +90,7 @@ dependencies:
   qr_flutter: ^4.1.0
   mobile_scanner: ^7.4.2
   archive: ^4.3.0
+  shorebird_code_push: ^2.0.7
 
 dependency_overrides:
   timezone: ^0.11.0
