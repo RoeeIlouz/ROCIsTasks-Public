@@ -32,6 +32,7 @@ import 'package:rocis_tasks/features/tasks/presentation/widgets/kanban/kanban_bo
 import 'package:rocis_tasks/core/services/subscription_service.dart';
 import 'package:rocis_tasks/features/home/presentation/widgets/cookie_consent_banner.dart';
 import 'package:rocis_tasks/shared/ui/widgets/sync_status_badge.dart';
+import 'package:rocis_tasks/features/home/presentation/widgets/fab_speed_dial.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -46,6 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
   StreamSubscription? _notificationActionSubscription;
   bool _isSearching = false;
   bool _isBoardView = false;
+  final GlobalKey _fabKey = GlobalKey();
   final TextEditingController _searchController = TextEditingController();
 
   // Widget channel for receiving deep links from Android
@@ -91,6 +93,54 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     }
     return null;
+  }
+
+  Future<void> _openFabMenu(bool useGlass, AppLocalizations l10n) async {
+    final action = await showFabSpeedDial<_FabAction>(
+      context: context,
+      fabKey: _fabKey,
+      useGlass: useGlass,
+      actions: [
+        if (!kIsWeb)
+          FabSpeedDialAction(
+            value: _FabAction.scanQr,
+            icon: Icons.qr_code_scanner_rounded,
+            label: l10n.scanQrCode,
+          ),
+        FabSpeedDialAction(
+          value: _FabAction.categories,
+          icon: Icons.dashboard_customize_outlined,
+          label: l10n.categories,
+        ),
+        FabSpeedDialAction(
+          value: _FabAction.newTask,
+          icon: Icons.edit_rounded,
+          label: l10n.newTask,
+        ),
+      ],
+    );
+    if (!mounted || action == null) return;
+    switch (action) {
+      case _FabAction.newTask:
+        _showQuickAddTask();
+      case _FabAction.scanQr:
+        TaskQrScannerScreen.open(context);
+      case _FabAction.categories:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const CategoriesScreen()),
+        );
+    }
+  }
+
+  void _toggleSearch() {
+    setState(() {
+      if (_isSearching) {
+        _searchController.clear();
+        Provider.of<TaskProvider>(context, listen: false).setSearchQuery('');
+      }
+      _isSearching = !_isSearching;
+    });
   }
 
   void _navigateToAddTask({
@@ -422,77 +472,67 @@ class _HomeScreenState extends State<HomeScreen> {
                     )
                   // Scale down instead of truncating when the actions leave
                   // little room (e.g. "המשימות שלי").
-                  : FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Text(
-                        _currentIndex == 0
-                            ? (_isBoardView ? l10n.boardView : l10n.myTasks)
-                            : _currentIndex == 1
-                            ? l10n.calendar
-                            : l10n.settings,
-                        style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
-                      ),
+                  : Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Flexible(
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              _currentIndex == 0
+                                  ? (_isBoardView
+                                        ? l10n.boardView
+                                        : l10n.myTasks)
+                                  : _currentIndex == 1
+                                  ? l10n.calendar
+                                  : l10n.settings,
+                              style: GoogleFonts.outfit(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SyncErrorDot(),
+                      ],
                     ),
+              // Thin line while syncing; offline has its own banner below.
+              bottom: const SyncProgressLine(),
+              leadingWidth: _currentIndex == 0 ? 96 : null,
               leading: _currentIndex == 0
-                  ? IconButton(
-                      icon: Icon(
-                        _isBoardView
-                            ? Icons.view_list_rounded
-                            : Icons.view_kanban_outlined,
-                      ),
-                      tooltip: _isBoardView ? l10n.listView : l10n.boardView,
-                      onPressed: () {
-                        HapticFeedback.lightImpact();
-                        setState(() {
-                          _isBoardView = !_isBoardView;
-                        });
-                      },
+                  ? Row(
+                      children: [
+                        IconButton(
+                          icon: Icon(
+                            _isBoardView
+                                ? Icons.view_list_rounded
+                                : Icons.view_kanban_outlined,
+                          ),
+                          tooltip: _isBoardView
+                              ? l10n.listView
+                              : l10n.boardView,
+                          onPressed: () {
+                            HapticFeedback.lightImpact();
+                            setState(() {
+                              _isBoardView = !_isBoardView;
+                            });
+                          },
+                        ),
+                        IconButton(
+                          tooltip: _isSearching
+                              ? MaterialLocalizations.of(
+                                  context,
+                                ).closeButtonTooltip
+                              : MaterialLocalizations.of(
+                                  context,
+                                ).searchFieldLabel,
+                          icon: Icon(_isSearching ? Icons.close : Icons.search),
+                          onPressed: _toggleSearch,
+                        ),
+                      ],
                     )
                   : null,
               actions: [
-                const Center(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 4),
-                    child: SyncStatusBadge(compact: true),
-                  ),
-                ),
                 if (_currentIndex == 0) ...[
-                  IconButton(
-                    tooltip: _isSearching
-                        ? MaterialLocalizations.of(context).closeButtonTooltip
-                        : MaterialLocalizations.of(context).searchFieldLabel,
-                    icon: Icon(_isSearching ? Icons.close : Icons.search),
-                    onPressed: () {
-                      setState(() {
-                        if (_isSearching) {
-                          _searchController.clear();
-                          Provider.of<TaskProvider>(
-                            context,
-                            listen: false,
-                          ).setSearchQuery('');
-                        }
-                        _isSearching = !_isSearching;
-                      });
-                    },
-                  ),
-                  if (!kIsWeb)
-                    IconButton(
-                      icon: const Icon(Icons.qr_code_scanner_rounded),
-                      tooltip: l10n.scanQrCode,
-                      onPressed: () => TaskQrScannerScreen.open(context),
-                    ),
-                  IconButton(
-                    icon: const Icon(Icons.dashboard_customize_outlined),
-                    tooltip: l10n.categories,
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const CategoriesScreen(),
-                        ),
-                      );
-                    },
-                  ),
                   IconButton(
                     icon: const Icon(Icons.filter_alt_outlined),
                     tooltip: l10n.sortAndFilter,
@@ -588,6 +628,7 @@ class _HomeScreenState extends State<HomeScreen> {
       floatingActionButton: _currentIndex == 0 || _currentIndex == 1
           ? EasterEggSpinner(
               child: GlassContainer(
+                key: _fabKey,
                 borderRadius: BorderRadius.circular(16),
                 elevation: 4.0,
                 color: useGlass
@@ -598,6 +639,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   color: Colors.transparent,
                   child: InkWell(
                     onTap: () {
+                      // My Tasks: speed dial (new task, scan QR, categories).
+                      if (_currentIndex == 0) {
+                        _openFabMenu(useGlass, l10n);
+                        return;
+                      }
                       HapticFeedback.lightImpact();
                       _showQuickAddTask();
                     },
@@ -854,3 +900,5 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
+
+enum _FabAction { newTask, scanQr, categories }
