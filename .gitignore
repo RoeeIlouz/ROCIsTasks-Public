@@ -115,7 +115,7 @@ config/secrets/
 # Improvement Plan
 IMPROVEMENT_PLAN.md
 ignored/
-
+CLAUDE.md
 # Brand Guide
 docs/brand-guidelines.md
 assets/design-tokens.css
