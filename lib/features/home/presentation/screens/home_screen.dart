@@ -8,6 +8,7 @@ import 'package:rocis_tasks/features/tasks/presentation/screens/add_task_screen.
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/features/tasks/presentation/screens/task_detail_screen.dart';
 import 'package:rocis_tasks/features/tasks/presentation/screens/task_list_screen.dart';
+import 'package:rocis_tasks/features/tasks/presentation/screens/task_qr_scanner_screen.dart';
 import 'package:rocis_tasks/features/tasks/presentation/widgets/task_sort_filter_sheet.dart';
 import 'package:rocis_tasks/features/home/presentation/screens/settings_screen.dart';
 import 'package:rocis_tasks/features/tasks/presentation/widgets/quick_add_task_bottom_sheet.dart';
@@ -474,6 +475,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       });
                     },
                   ),
+                  if (!kIsWeb)
+                    IconButton(
+                      icon: const Icon(Icons.qr_code_scanner_rounded),
+                      tooltip: l10n.scanQrCode,
+                      onPressed: () => TaskQrScannerScreen.open(context),
+                    ),
                   IconButton(
                     icon: const Icon(Icons.dashboard_customize_outlined),
                     tooltip: l10n.categories,

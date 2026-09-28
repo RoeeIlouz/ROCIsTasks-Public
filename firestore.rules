@@ -71,5 +71,22 @@ service cloud.firestore {
               && request.resource.data.description.size() <= 200);
       }
     }
+
+    // QR "Cloud Link" shares. A signed-in author creates a snapshot that anyone
+    // holding its random ID can open; listing is denied. The app rejects
+    // expired shares and a TTL policy on expiresAt deletes them.
+    match /shared_tasks/{shareId} {
+      allow get: if true;
+      allow create: if isAuthenticated()
+        && request.resource.data.authorId == request.auth.uid
+        && request.resource.data.id == shareId
+        && request.resource.data.expiresAt is timestamp
+        && request.resource.data.expiresAt < request.time + duration.value(8, 'd')
+        && request.resource.data.task is map
+        && request.resource.data.task.title is string
+        && request.resource.data.task.title.size() <= 500;
+      allow delete: if isAuthenticated()
+        && resource.data.authorId == request.auth.uid;
+    }
   }
 }

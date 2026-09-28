@@ -13,6 +13,7 @@ import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:rocis_tasks/core/utils/icon_utils.dart';
 import 'package:rocis_tasks/core/services/security_service.dart';
 import 'package:rocis_tasks/features/tasks/presentation/widgets/task_unlock_dialog.dart';
+import 'package:rocis_tasks/features/tasks/presentation/widgets/share_task_qr_sheet.dart';
 import 'package:rocis_tasks/core/services/subscription_service.dart';
 import 'package:rocis_tasks/core/utils/attachment_utils.dart';
 import 'package:rocis_tasks/features/tasks/domain/services/custom_field_action_service.dart';
@@ -167,6 +168,11 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
         return Scaffold(
           appBar: AppBar(
             actions: [
+              IconButton(
+                icon: const Icon(Icons.qr_code_2_rounded),
+                tooltip: l10n.shareTaskQr,
+                onPressed: () => ShareTaskQrSheet.show(context, updatedTask),
+              ),
               IconButton(
                 icon: const Icon(Icons.edit_outlined),
                 tooltip: l10n.editTask,
