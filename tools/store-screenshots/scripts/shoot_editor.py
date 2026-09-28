@@ -9,7 +9,7 @@ action = sys.argv[1] if len(sys.argv) > 1 else 'preview'
 with sync_playwright() as p:
     browser = p.chromium.launch(headless=True)
     page = browser.new_page(viewport={'width': 1800, 'height': 1100}, accept_downloads=True)
-    page.goto('http://localhost:3100', wait_until='networkidle')
+    page.goto('http://localhost:3100', wait_until='load')
     page.wait_for_timeout(4000)
     if action == 'preview':
         page.screenshot(path=os.path.join(OUT, 'editor.png'))
