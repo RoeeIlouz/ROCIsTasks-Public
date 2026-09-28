@@ -16,7 +16,7 @@
 
   <br />
 
-  <img src="assets/images/play_store/feature_graphic.png" alt="ROCIs Tasks Feature Graphic" width="100%" style="border-radius: 16px;" />
+  <img src="assets/images/play_store/en/feature.jpg" alt="ROCIs Tasks Feature Graphic" width="100%" style="border-radius: 16px;" />
 
 </div>
 
@@ -70,24 +70,24 @@
 <div align="center">
   <table>
     <tr>
-      <td width="33%"><img src="assets/images/play_store/screenshot_01.png" alt="Daily Focus Agenda" /></td>
-      <td width="33%"><img src="assets/images/play_store/screenshot_02.png" alt="Natural Language Input" /></td>
-      <td width="33%"><img src="assets/images/play_store/screenshot_03.png" alt="Home Screen Widgets" /></td>
+      <td width="33%"><img src="assets/images/play_store/en/phone/01.jpg" alt="Home Screen Widgets" /></td>
+      <td width="33%"><img src="assets/images/play_store/en/phone/02.jpg" alt="Full Calendar Widget" /></td>
+      <td width="33%"><img src="assets/images/play_store/en/phone/04.jpg" alt="Quick Add" /></td>
     </tr>
     <tr>
-      <td align="center"><b>Daily Focus Agenda</b></td>
-      <td align="center"><b>Natural Language Input</b></td>
-      <td align="center"><b>Android Home Widgets</b></td>
+      <td align="center"><b>Home Screen Widgets</b></td>
+      <td align="center"><b>Full Calendar Widget</b></td>
+      <td align="center"><b>Quick Add</b></td>
     </tr>
     <tr>
-      <td width="33%"><img src="assets/images/play_store/screenshot_04.png" alt="Unified Calendar Sync" /></td>
-      <td width="33%"><img src="assets/images/play_store/screenshot_05.png" alt="Subtasks & Attachments" /></td>
-      <td width="33%"><img src="assets/images/play_store/screenshot_06.png" alt="Productivity Analytics" /></td>
+      <td width="33%"><img src="assets/images/play_store/en/phone/05.jpg" alt="Calendar and Board" /></td>
+      <td width="33%"><img src="assets/images/play_store/en/phone/08.jpg" alt="Share by QR or Link" /></td>
+      <td width="33%"><img src="assets/images/play_store/en/phone/06.jpg" alt="8 Languages and RTL" /></td>
     </tr>
     <tr>
-      <td align="center"><b>Unified Calendar Sync</b></td>
-      <td align="center"><b>Subtasks & Attachments</b></td>
-      <td align="center"><b>Productivity Analytics</b></td>
+      <td align="center"><b>Calendar + Board</b></td>
+      <td align="center"><b>Share by QR or Link</b></td>
+      <td align="center"><b>8 Languages + RTL</b></td>
     </tr>
   </table>
 </div>

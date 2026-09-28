@@ -2,6 +2,17 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## Store & README Graphics Refresh - 2026-09-29 (assets only, no app change)
+
+#### Problems & Root Causes
+* Play screenshots 4 and 5 showed the old top bar and "New Task" button; QR/link sharing (0.3.2) was not shown anywhere.
+* README used an older, separate set (`assets/images/play_store/screenshot_0N.png`); store exports under `tools/store-screenshots/exports/` are untracked.
+
+#### Solutions Applied
+* Canonical store set: `assets/images/play_store/<locale>/{feature.jpg, phone/01-08.jpg}`, 8 locales, JPEG q92 without alpha. README points at `en/`. Old flat files kept until deletion is approved.
+* Refreshed slides 4 (My Tasks) and 5 (Board + Calendar); slide 8 is now "Share by QR or link" (share sheet + import preview). Widget slides unchanged.
+* Web capture pipeline: `tools/store-screenshots/scripts/capture_web.py` (Flutter web build with `SCREENSHOT_SEED`, pinned clock, Android status bar) and `convert_images.py`; editor supports `STORE_PROJECT=schedule` for the ROCIs Schedule deck.
+
 ## Decluttered Mobile Top Bar; Speed-Dial FAB - 2026-09-28 (Patch 2 on 0.3.2+116)
 
 #### Problems & Root Causes
