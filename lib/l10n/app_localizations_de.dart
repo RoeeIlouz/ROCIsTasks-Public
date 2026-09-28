@@ -2064,70 +2064,70 @@ class AppLocalizationsDe extends AppLocalizations {
   String get previewSampleLaunchReview => 'Produktlaunch-Review';
 
   @override
-  String get shareTaskQr => 'Share via QR Code';
+  String get shareTaskQr => 'Per QR-Code teilen';
 
   @override
-  String get scanQrCode => 'Scan QR Code';
+  String get scanQrCode => 'QR-Code scannen';
 
   @override
-  String get offlineDirect => 'Offline Direct';
+  String get offlineDirect => 'Offline direkt';
 
   @override
   String get offlineDirectDesc =>
-      '100% private. Works without internet. Attachments not included.';
+      '100 % privat. Funktioniert ohne Internet. Anhänge sind nicht enthalten.';
 
   @override
-  String get cloudShare7Days => 'Cloud Link (7 Days)';
+  String get cloudShare7Days => 'Cloud-Link (7 Tage)';
 
   @override
   String get cloudShareDesc =>
-      'Shared securely via cloud. Expires automatically in 7 days.';
+      'Sicher über die Cloud geteilt. Läuft nach 7 Tagen automatisch ab.';
 
   @override
-  String get copyQrPayload => 'Copy QR Data';
+  String get copyQrPayload => 'QR-Daten kopieren';
 
   @override
-  String get qrDataCopied => 'QR data copied to clipboard';
+  String get qrDataCopied => 'QR-Daten in die Zwischenablage kopiert';
 
   @override
-  String get pickFromGallery => 'Pick from Gallery';
+  String get pickFromGallery => 'Aus Galerie wählen';
 
   @override
-  String get importTask => 'Import Task';
+  String get importTask => 'Aufgabe importieren';
 
   @override
-  String get importTaskPreview => 'Import Task Preview';
+  String get importTaskPreview => 'Vorschau: Aufgabe importieren';
 
   @override
-  String get taskImportedSuccess => 'Task imported successfully!';
+  String get taskImportedSuccess => 'Aufgabe erfolgreich importiert!';
 
   @override
-  String get invalidQrCode => 'Invalid or unrecognized task QR code.';
+  String get invalidQrCode => 'Ungültiger oder unbekannter Aufgaben-QR-Code.';
 
   @override
-  String get taskExpired => 'This shared task has expired.';
+  String get taskExpired => 'Diese geteilte Aufgabe ist abgelaufen.';
 
   @override
   String suggestedCategory(String category) {
-    return 'Suggested category: $category';
+    return 'Vorgeschlagene Kategorie: $category';
   }
 
   @override
-  String get destinationCategory => 'Destination Category';
+  String get destinationCategory => 'Zielkategorie';
 
   @override
   String get cameraPermissionRequired =>
-      'Camera permission is required to scan QR codes.';
+      'Zum Scannen von QR-Codes wird die Kameraberechtigung benötigt.';
 
   @override
-  String get grantPermission => 'Grant Permission';
+  String get grantPermission => 'Berechtigung erteilen';
 
   @override
-  String get flashOn => 'Turn on flash';
+  String get flashOn => 'Blitz einschalten';
 
   @override
-  String get flashOff => 'Turn off flash';
+  String get flashOff => 'Blitz ausschalten';
 
   @override
-  String get flipCamera => 'Flip camera';
+  String get flipCamera => 'Kamera wechseln';
 }
