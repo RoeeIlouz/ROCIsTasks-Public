@@ -2,6 +2,16 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## Decluttered Mobile Top Bar; Speed-Dial FAB - 2026-09-28 (Patch 2 on 0.3.2+116)
+
+#### Problems & Root Causes
+* The mobile My Tasks app bar held up to 7 actions (board, sync badge, search, scan QR, categories, filter, help).
+
+#### Solutions Applied
+* `leading` is a Row (board toggle + search, `leadingWidth: 96`); actions keep filter/help only.
+* My Tasks FAB opens `showFabSpeedDial` (`widgets/fab_speed_dial.dart`): a `showGeneralDialog` anchored to the FAB's rect via a GlobalKey (RTL-aware), options New task / Scan QR (not web) / Categories. Long-press = full editor; Calendar tab keeps Quick Add.
+* `SyncStatusBadge` removed from the mobile bar: `SyncProgressLine` (AppBar `bottom`, fixed 2px) while syncing, `SyncErrorDot` on the title on error (tap = `processOfflineQueue`). Web layout still uses the badge.
+
 ## QR Share Translations; Patch Number in Version - 2026-09-28 (Patch 1 on 0.3.2+116)
 
 #### Problems & Root Causes
