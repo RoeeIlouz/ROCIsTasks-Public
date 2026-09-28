@@ -322,9 +322,9 @@
       },
       {
         "id": "rocis_8",
-        "layout": "no-device",
+        "layout": "two-devices",
         "label": {
-          "en": "AND MORE",
+          "en": "SHARE BY QR OR LINK",
           "he": "ועוד",
           "ar": "والمزيد",
           "es": "Y MÁS",
@@ -334,7 +334,7 @@
           "hi": "और भी बहुत कुछ"
         },
         "headline": {
-          "en": "Recurring tasks.\nReminders.\nCloud sync.",
+          "en": "Send a task.\nNo account needed.",
           "he": "משימות חוזרות.\nתזכורות.\nסנכרון לענן.",
           "ar": "مهام متكررة.\nتذكيرات.\nمزامنة سحابية.",
           "es": "Tareas recurrentes.\nRecordatorios.\nSincronización.",
@@ -343,7 +343,35 @@
           "sv": "Återkommande uppgifter.\nPåminnelser.\nMolnsynk.",
           "hi": "रिपीट टास्क।\nरिमाइंडर।\nक्लाउड सिंक।"
         },
-        "screenshot": ""
+        "screenshot": "/screenshots/android/phone/{locale}/11.png",
+        "inverted": true,
+        "screenshotSecondary": "/screenshots/android/phone/{locale}/10.png",
+        "transforms": {
+          "deviceSecondary": {
+            "x": -10,
+            "y": 600,
+            "width": 540,
+            "height": 1175,
+            "rotation": -6,
+            "zIndex": 2
+          },
+          "device": {
+            "x": 500,
+            "y": 700,
+            "width": 560,
+            "height": 1218,
+            "rotation": 0,
+            "zIndex": 3
+          },
+          "caption": {
+            "x": 90,
+            "y": 110,
+            "width": 900,
+            "height": 420,
+            "rotation": 0,
+            "zIndex": 4
+          }
+        }
       }
     ],
     "ipad": [
