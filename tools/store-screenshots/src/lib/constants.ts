@@ -94,6 +94,16 @@ export const THEMES: Record<string, Theme> = {
     accent: "#EF3842",
     muted: "#94A3B8",
   },
+  "rocis-tide": {
+    id: "rocis-tide",
+    name: "ROCIs Tide",
+    bg: "#0B1D1F",
+    bgAlt: "#F0FDFA",
+    fg: "#FFFFFF",
+    fgAlt: "#0F172A",
+    accent: "#14B8A6",
+    muted: "#94A3B8",
+  },
   "clean-light": {
     id: "clean-light",
     name: "Clean Light",

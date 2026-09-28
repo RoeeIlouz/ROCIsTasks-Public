@@ -9,7 +9,7 @@ action = sys.argv[1] if len(sys.argv) > 1 else 'preview'
 with sync_playwright() as p:
     browser = p.chromium.launch(headless=True)
     page = browser.new_page(viewport={'width': 1800, 'height': 1100}, accept_downloads=True)
-    page.goto('http://localhost:3100', wait_until='load')
+    page.goto('http://localhost:' + os.environ.get('EDITOR_PORT', '3100'), wait_until='load')
     page.wait_for_timeout(4000)
     if action == 'preview':
         page.screenshot(path=os.path.join(OUT, 'editor.png'))
@@ -30,7 +30,7 @@ with sync_playwright() as p:
             page.wait_for_timeout(2500)
         with page.expect_download(timeout=300000) as dl:
             page.get_by_text('Export bundle', exact=False).first.click()
-        path = os.path.join(OUT, device.replace(' ', '_') + '.zip')
+        path = os.path.join(OUT, os.environ.get('STORE_PROJECT', 'tasks') + '_' + device.replace(' ', '_') + '.zip')
         dl.value.save_as(path)
         print('saved', path)
     browser.close()
