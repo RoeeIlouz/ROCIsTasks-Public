@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.2+116] - 2026-09-28
+
+### Added
+- Shared task links open the app: QR codes and copied links are now https://tasks.rocisapps.com/share links (App Link, web fallback); Share/Scan QR buttons; cloud links work; backup rules exclude secure storage
+
 ## [0.3.1+115] - 2026-09-28
 
 ### Added
