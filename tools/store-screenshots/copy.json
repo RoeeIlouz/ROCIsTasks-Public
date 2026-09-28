@@ -65,8 +65,8 @@
       "מסמנים ״בוצע״\nממסך הבית."
     ],
     "8": [
-      "ועוד",
-      "משימות חוזרות.\nתזכורות.\nסנכרון לענן."
+      "שיתוף ב-QR או בקישור",
+      "שולחים משימה.\nבלי חשבון."
     ],
     "fg": "משימות ולוח שנה, ישר על מסך הבית."
   },
@@ -100,8 +100,8 @@
       "أنجز مهامك\nمن الشاشة الرئيسية."
     ],
     "8": [
-      "والمزيد",
-      "مهام متكررة.\nتذكيرات.\nمزامنة سحابية."
+      "المشاركة عبر QR أو رابط",
+      "أرسل مهمة.\nدون حساب."
     ],
     "fg": "المهام والتقويم، مباشرة على شاشتك الرئيسية."
   },
@@ -135,8 +135,8 @@
       "Márcalo hecho\ndesde el inicio."
     ],
     "8": [
-      "Y MÁS",
-      "Tareas recurrentes.\nRecordatorios.\nSincronización."
+      "COMPARTE POR QR O ENLACE",
+      "Envía una tarea.\nSin cuenta."
     ],
     "fg": "Tareas y calendario, en tu pantalla de inicio."
   },
@@ -170,8 +170,8 @@
       "Abhaken direkt\nvom Startbildschirm."
     ],
     "8": [
-      "UND MEHR",
-      "Wiederholungen.\nErinnerungen.\nCloud-Sync."
+      "TEILEN PER QR ODER LINK",
+      "Aufgabe senden.\nOhne Konto."
     ],
     "fg": "Aufgaben & Kalender, direkt auf deinem Startbildschirm."
   },
@@ -205,8 +205,8 @@
       "Cochez-le\ndepuis l’accueil."
     ],
     "8": [
-      "ET PLUS",
-      "Tâches récurrentes.\nRappels.\nSynchro cloud."
+      "PARTAGE PAR QR OU LIEN",
+      "Envoyez une tâche.\nSans compte."
     ],
     "fg": "Tâches et calendrier, directement sur votre écran d’accueil."
   },
@@ -240,8 +240,8 @@
       "Bocka av\nfrån hemskärmen."
     ],
     "8": [
-      "OCH MER",
-      "Återkommande uppgifter.\nPåminnelser.\nMolnsynk."
+      "DELA MED QR ELLER LÄNK",
+      "Skicka en uppgift.\nInget konto krävs."
     ],
     "fg": "Uppgifter och kalender, direkt på hemskärmen."
   },
@@ -275,8 +275,8 @@
       "होम स्क्रीन से ही\nपूरा करें।"
     ],
     "8": [
-      "और भी बहुत कुछ",
-      "रिपीट टास्क।\nरिमाइंडर।\nक्लाउड सिंक।"
+      "QR या लिंक से शेयर करें",
+      "टास्क भेजें।\nबिना अकाउंट के।"
     ],
     "fg": "टास्क और कैलेंडर, सीधे आपकी होम स्क्रीन पर।"
   }

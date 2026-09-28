@@ -14,7 +14,7 @@
     "hi"
   ],
   "locale": "en",
-  "device": "android",
+  "device": "feature-graphic",
   "orientation": "portrait",
   "appIcon": "/app-icon.png",
   "slidesByDevice": {
@@ -325,23 +325,23 @@
         "layout": "two-devices",
         "label": {
           "en": "SHARE BY QR OR LINK",
-          "he": "ועוד",
-          "ar": "والمزيد",
-          "es": "Y MÁS",
-          "de": "UND MEHR",
-          "fr": "ET PLUS",
-          "sv": "OCH MER",
-          "hi": "और भी बहुत कुछ"
+          "he": "שיתוף ב-QR או בקישור",
+          "ar": "المشاركة عبر QR أو رابط",
+          "es": "COMPARTE POR QR O ENLACE",
+          "de": "TEILEN PER QR ODER LINK",
+          "fr": "PARTAGE PAR QR OU LIEN",
+          "sv": "DELA MED QR ELLER LÄNK",
+          "hi": "QR या लिंक से शेयर करें"
         },
         "headline": {
           "en": "Send a task.\nNo account needed.",
-          "he": "משימות חוזרות.\nתזכורות.\nסנכרון לענן.",
-          "ar": "مهام متكررة.\nتذكيرات.\nمزامنة سحابية.",
-          "es": "Tareas recurrentes.\nRecordatorios.\nSincronización.",
-          "de": "Wiederholungen.\nErinnerungen.\nCloud-Sync.",
-          "fr": "Tâches récurrentes.\nRappels.\nSynchro cloud.",
-          "sv": "Återkommande uppgifter.\nPåminnelser.\nMolnsynk.",
-          "hi": "रिपीट टास्क।\nरिमाइंडर।\nक्लाउड सिंक।"
+          "he": "שולחים משימה.\nבלי חשבון.",
+          "ar": "أرسل مهمة.\nدون حساب.",
+          "es": "Envía una tarea.\nSin cuenta.",
+          "de": "Aufgabe senden.\nOhne Konto.",
+          "fr": "Envoyez une tâche.\nSans compte.",
+          "sv": "Skicka en uppgift.\nInget konto krävs.",
+          "hi": "टास्क भेजें।\nबिना अकाउंट के।"
         },
         "screenshot": "/screenshots/android/phone/{locale}/11.png",
         "inverted": true,
