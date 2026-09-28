@@ -818,5 +818,33 @@
   "previewSampleMeet": "Google Meet · Team",
   "previewSampleRelease": "Prepare the release",
   "previewSampleProductTasks": "Product tasks",
-  "previewSampleLaunchReview": "Product launch review"
+  "previewSampleLaunchReview": "Product launch review",
+  "shareTaskQr": "Share via QR Code",
+  "scanQrCode": "Scan QR Code",
+  "offlineDirect": "Offline Direct",
+  "offlineDirectDesc": "100% private. Works without internet. Attachments not included.",
+  "cloudShare7Days": "Cloud Link (7 Days)",
+  "cloudShareDesc": "Shared securely via cloud. Expires automatically in 7 days.",
+  "copyQrPayload": "Copy QR Data",
+  "qrDataCopied": "QR data copied to clipboard",
+  "pickFromGallery": "Pick from Gallery",
+  "importTask": "Import Task",
+  "importTaskPreview": "Import Task Preview",
+  "taskImportedSuccess": "Task imported successfully!",
+  "invalidQrCode": "Invalid or unrecognized task QR code.",
+  "taskExpired": "This shared task has expired.",
+  "suggestedCategory": "Suggested category: {category}",
+  "@suggestedCategory": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "destinationCategory": "Destination Category",
+  "cameraPermissionRequired": "Camera permission is required to scan QR codes.",
+  "grantPermission": "Grant Permission",
+  "flashOn": "Turn on flash",
+  "flashOff": "Turn off flash",
+  "flipCamera": "Flip camera"
 }

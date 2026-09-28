@@ -2017,4 +2017,71 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get previewSampleLaunchReview => 'סקירת השקת מוצר';
+
+  @override
+  String get shareTaskQr => 'שיתוף באמצעות קוד QR';
+
+  @override
+  String get scanQrCode => 'סריקת קוד QR';
+
+  @override
+  String get offlineDirect => 'ישיר ללא אינטרנט';
+
+  @override
+  String get offlineDirectDesc =>
+      '100% פרטי. עובד ללא חיבור רשת. ללא קבצים מצורפים.';
+
+  @override
+  String get cloudShare7Days => 'קישור ענן (7 ימים)';
+
+  @override
+  String get cloudShareDesc =>
+      'משותף באופן מאובטח דרך הענן. פג תוקף אוטומטית לאחר 7 ימים.';
+
+  @override
+  String get copyQrPayload => 'העתקת נתוני QR';
+
+  @override
+  String get qrDataCopied => 'נתוני ה-QR הועתקו ללוח';
+
+  @override
+  String get pickFromGallery => 'בחירה מהגלריה';
+
+  @override
+  String get importTask => 'ייבוא משימה';
+
+  @override
+  String get importTaskPreview => 'תצוגה מקדימה לייבוא משימה';
+
+  @override
+  String get taskImportedSuccess => 'המשימה יובאה בהצלחה!';
+
+  @override
+  String get invalidQrCode => 'קוד QR לא תקין או אינו מכיל משימה.';
+
+  @override
+  String get taskExpired => 'פג תוקפו של שיתוף משימה זה.';
+
+  @override
+  String suggestedCategory(String category) {
+    return 'קטגוריה מקורית: $category';
+  }
+
+  @override
+  String get destinationCategory => 'קטגוריית יעד';
+
+  @override
+  String get cameraPermissionRequired => 'נדרשת הרשאת מצלמה לסריקת קוד QR.';
+
+  @override
+  String get grantPermission => 'הענקת הרשאה';
+
+  @override
+  String get flashOn => 'הפעלת פנס';
+
+  @override
+  String get flashOff => 'כיבוי פנס';
+
+  @override
+  String get flipCamera => 'היפוך מצלמה';
 }

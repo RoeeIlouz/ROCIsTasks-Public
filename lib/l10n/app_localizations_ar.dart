@@ -2018,4 +2018,72 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get previewSampleLaunchReview => 'مراجعة إطلاق المنتج';
+
+  @override
+  String get shareTaskQr => 'Share via QR Code';
+
+  @override
+  String get scanQrCode => 'Scan QR Code';
+
+  @override
+  String get offlineDirect => 'Offline Direct';
+
+  @override
+  String get offlineDirectDesc =>
+      '100% private. Works without internet. Attachments not included.';
+
+  @override
+  String get cloudShare7Days => 'Cloud Link (7 Days)';
+
+  @override
+  String get cloudShareDesc =>
+      'Shared securely via cloud. Expires automatically in 7 days.';
+
+  @override
+  String get copyQrPayload => 'Copy QR Data';
+
+  @override
+  String get qrDataCopied => 'QR data copied to clipboard';
+
+  @override
+  String get pickFromGallery => 'Pick from Gallery';
+
+  @override
+  String get importTask => 'Import Task';
+
+  @override
+  String get importTaskPreview => 'Import Task Preview';
+
+  @override
+  String get taskImportedSuccess => 'Task imported successfully!';
+
+  @override
+  String get invalidQrCode => 'Invalid or unrecognized task QR code.';
+
+  @override
+  String get taskExpired => 'This shared task has expired.';
+
+  @override
+  String suggestedCategory(String category) {
+    return 'Suggested category: $category';
+  }
+
+  @override
+  String get destinationCategory => 'Destination Category';
+
+  @override
+  String get cameraPermissionRequired =>
+      'Camera permission is required to scan QR codes.';
+
+  @override
+  String get grantPermission => 'Grant Permission';
+
+  @override
+  String get flashOn => 'Turn on flash';
+
+  @override
+  String get flashOff => 'Turn off flash';
+
+  @override
+  String get flipCamera => 'Flip camera';
 }

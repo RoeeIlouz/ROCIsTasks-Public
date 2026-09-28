@@ -3900,6 +3900,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Product launch review'**
   String get previewSampleLaunchReview;
+
+  /// No description provided for @shareTaskQr.
+  ///
+  /// In en, this message translates to:
+  /// **'Share via QR Code'**
+  String get shareTaskQr;
+
+  /// No description provided for @scanQrCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan QR Code'**
+  String get scanQrCode;
+
+  /// No description provided for @offlineDirect.
+  ///
+  /// In en, this message translates to:
+  /// **'Offline Direct'**
+  String get offlineDirect;
+
+  /// No description provided for @offlineDirectDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'100% private. Works without internet. Attachments not included.'**
+  String get offlineDirectDesc;
+
+  /// No description provided for @cloudShare7Days.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud Link (7 Days)'**
+  String get cloudShare7Days;
+
+  /// No description provided for @cloudShareDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Shared securely via cloud. Expires automatically in 7 days.'**
+  String get cloudShareDesc;
+
+  /// No description provided for @copyQrPayload.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy QR Data'**
+  String get copyQrPayload;
+
+  /// No description provided for @qrDataCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'QR data copied to clipboard'**
+  String get qrDataCopied;
+
+  /// No description provided for @pickFromGallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick from Gallery'**
+  String get pickFromGallery;
+
+  /// No description provided for @importTask.
+  ///
+  /// In en, this message translates to:
+  /// **'Import Task'**
+  String get importTask;
+
+  /// No description provided for @importTaskPreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Import Task Preview'**
+  String get importTaskPreview;
+
+  /// No description provided for @taskImportedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Task imported successfully!'**
+  String get taskImportedSuccess;
+
+  /// No description provided for @invalidQrCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid or unrecognized task QR code.'**
+  String get invalidQrCode;
+
+  /// No description provided for @taskExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'This shared task has expired.'**
+  String get taskExpired;
+
+  /// No description provided for @suggestedCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Suggested category: {category}'**
+  String suggestedCategory(String category);
+
+  /// No description provided for @destinationCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Destination Category'**
+  String get destinationCategory;
+
+  /// No description provided for @cameraPermissionRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera permission is required to scan QR codes.'**
+  String get cameraPermissionRequired;
+
+  /// No description provided for @grantPermission.
+  ///
+  /// In en, this message translates to:
+  /// **'Grant Permission'**
+  String get grantPermission;
+
+  /// No description provided for @flashOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn on flash'**
+  String get flashOn;
+
+  /// No description provided for @flashOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn off flash'**
+  String get flashOff;
+
+  /// No description provided for @flipCamera.
+  ///
+  /// In en, this message translates to:
+  /// **'Flip camera'**
+  String get flipCamera;
 }
 
 class _AppLocalizationsDelegate
