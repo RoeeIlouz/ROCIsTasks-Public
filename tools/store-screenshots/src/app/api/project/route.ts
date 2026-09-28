@@ -4,7 +4,10 @@ import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
-const PROJECT_FILE = "app-store-screenshots.json";
+// STORE_PROJECT=<name> edits projects/<name>.json (e.g. schedule); default is the Tasks deck.
+const PROJECT_FILE = process.env.STORE_PROJECT
+  ? path.join("projects", `${process.env.STORE_PROJECT}.json`)
+  : "app-store-screenshots.json";
 
 function filePath() {
   return path.join(process.cwd(), PROJECT_FILE);
