@@ -16,6 +16,7 @@ import 'package:rocis_tasks/core/services/backup_service.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:rocis_tasks/core/config/app_config.dart';
+import 'package:rocis_tasks/core/services/app_version_service.dart';
 import 'package:rocis_tasks/features/home/presentation/widgets/cookie_consent_banner.dart';
 import 'package:rocis_tasks/shared/ui/widgets/snackbars.dart';
 import 'package:rocis_tasks/features/home/presentation/screens/app_guide_screen.dart';
@@ -1334,14 +1335,20 @@ class SettingsScreen extends StatelessWidget {
                                     );
                                   }
                                 },
-                                child: Text(
-                                  AppConfig.appVersion,
-                                  style: Theme.of(context).textTheme.bodyMedium
-                                      ?.copyWith(
-                                        color: Theme.of(
-                                          context,
-                                        ).colorScheme.onSurfaceVariant,
-                                      ),
+                                child: FutureBuilder<String>(
+                                  future: AppVersionService.label(),
+                                  initialData: AppConfig.appVersion,
+                                  builder: (context, snapshot) => Text(
+                                    snapshot.data ?? AppConfig.appVersion,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium
+                                        ?.copyWith(
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.onSurfaceVariant,
+                                        ),
+                                  ),
                                 ),
                               ),
                               const SizedBox(height: 16),

@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.2+116] - 2026-09-28 (Patch 1)
+
+### Changed
+- QR sharing and scanning are now translated into Arabic, German, Spanish, French, Hindi and Swedish.
+- Settings shows the running patch after the version (e.g. 0.3.2 P1).
+
 ## [0.3.2+116] - 2026-09-28
 
 ### Added
