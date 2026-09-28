@@ -89,6 +89,7 @@ dependencies:
   in_app_review: ^2.0.12
   qr_flutter: ^4.1.0
   mobile_scanner: ^7.4.2
+  archive: ^4.3.0
 
 dependency_overrides:
   timezone: ^0.11.0

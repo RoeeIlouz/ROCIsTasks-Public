@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:io' show gzip;
+import 'package:archive/archive.dart' show GZipDecoder, GZipEncoder;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:uuid/uuid.dart';
 
@@ -70,7 +70,7 @@ class TaskShareService {
 
     final jsonStr = jsonEncode(compact);
     final utf8Bytes = utf8.encode(jsonStr);
-    final compressedBytes = gzip.encode(utf8Bytes);
+    final compressedBytes = GZipEncoder().encodeBytes(utf8Bytes);
     final base64Payload = base64Url.encode(compressedBytes);
 
     return '$offlineScheme?d=$base64Payload';
@@ -99,7 +99,7 @@ class TaskShareService {
 
       // Base64Url decode -> GZip decompress -> UTF-8 decode -> JSON
       final compressedBytes = base64Url.decode(encodedData);
-      final decompressedBytes = gzip.decode(compressedBytes);
+      final decompressedBytes = GZipDecoder().decodeBytes(compressedBytes);
       final jsonStr = utf8.decode(decompressedBytes);
       final decoded = jsonDecode(jsonStr);
 
