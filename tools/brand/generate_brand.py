@@ -37,11 +37,32 @@ def check_path(b):
     return f'M{x + w * 0.56:.2f} {y + h * 0.8:.2f} L{x + w * 0.74:.2f} {y + h * 0.98:.2f} L{x + w * 1.1:.2f} {y + h * 0.55:.2f}'
 
 
-def toe_trim(b):
-    """Polygon under the check's long arm: trims the R's foot so no sliver shows past the check."""
-    x, y, w, h = b
-    pts = [(x + w * 0.74, y + h * 0.98), (x + w * 1.1, y + h * 0.55), (x + w * 1.25, y + h + 8), (x + w * 0.7, y + h + 8)]
-    return 'M' + ' L'.join(f'{px:.2f} {py:.2f}' for px, py in pts) + ' Z'
+BOWL_BASE = 0.655  # fraction of cap height where the Unbounded bowl ends and the leg begins
+
+
+def tasks_mark(box, ink, bg, check):
+    """Unbounded R whose leg is replaced by a check.
+
+    The leg is covered in `bg`, the check starts under the bowl, and a clipped
+    copy of the R's bowl is drawn over the check's start so the joint is seamless.
+    """
+    x, y, w, h = box
+    letter, _ = r_letter(ink, 58, 75, 58)
+    cut_y = y + h * BOWL_BASE
+    cover = f'<rect x="{x + w * 0.29:.2f}" y="{cut_y:.2f}" width="{w:.2f}" height="{h * (1 - BOWL_BASE) + 3:.2f}" fill="{bg}"/>'
+    sx, sy = x + w * 0.46, y + h * 0.55   # start, hidden under the bowl
+    vx, vy = x + w * 0.64, y + h * 0.96   # vertex, on the baseline
+    ex, ey = x + w * 1.14, y + h * 0.42   # end of the long arm
+    p = f'M{sx:.2f} {sy:.2f} L{vx:.2f} {vy:.2f} L{ex:.2f} {ey:.2f}'
+    # The long arm passes in front of the bowl's corner: a bg-colored band
+    # around it leaves a clean parallel gap instead of a collision.
+    gap = f'<path d="M{vx:.2f} {vy:.2f} L{ex:.2f} {ey:.2f}" fill="none" stroke="{bg}" stroke-width="21" stroke-linecap="butt"/>'
+    stroke = f'<path d="{p}" fill="none" stroke="{check}" stroke-width="13" stroke-linejoin="miter" stroke-miterlimit="4" stroke-linecap="butt"/>'
+    # Re-draw only the bowl area above the short arm, hiding the check's start.
+    bowl = f'<g clip-path="url(#bowl)">{letter}</g>'
+    defs = (f'<clipPath id="bowl"><rect x="{x + w * 0.29:.2f}" y="0" width="{w * 0.33:.2f}" '
+            f'height="{cut_y:.2f}"/></clipPath>')
+    return defs, letter + cover + gap + stroke + bowl
 
 
 def grid_cells(b):
@@ -69,11 +90,8 @@ def app_content(app):
     band = shade(tile, 0.78)
     letter, box = r_letter(WHITE, 58, 75, 58)
     if app == 'tasks':
-        p = check_path(box)
-        # Trim the R's foot under the check, then a knockout outline around it.
-        badge = (f'<path d="{toe_trim(box)}" fill="{tile}"/>'
-                 f'<path d="{p}" fill="none" stroke="{tile}" stroke-width="22" stroke-linejoin="round" stroke-linecap="round"/>'
-                 f'<path d="{p}" fill="none" stroke="{accent}" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"/>')
+        defs, mark = tasks_mark(box, WHITE, tile, accent)
+        return f'<defs>{defs}</defs>' + cue(app, band) + mark
     else:
         (bx, by, bs), cells = grid_cells(box)
         badge = f'<rect x="{bx:.2f}" y="{by:.2f}" width="{bs}" height="{bs}" rx="7" fill="{tile}"/>' + ''.join(
@@ -107,11 +125,11 @@ def adaptive_monochrome(app):
     """Single-color silhouette for Android 13+ themed icons (system tints it)."""
     letter, box = r_letter(WHITE, 58, 75, 58)
     if app == 'tasks':
-        p = check_path(box)
-        cut = (f'<path d="{toe_trim(box)}" fill="black"/>'
-               f'<path d="{p}" fill="none" stroke="black" stroke-width="22" stroke-linejoin="round" stroke-linecap="round"/>'
-               f'<path d="{p}" fill="none" stroke="white" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"/>')
+        clip, mark = tasks_mark(box, 'white', 'black', 'white')
         cues = f'<rect x="43" y="12" width="34" height="18" rx="6" fill="white"/><rect x="53" y="17" width="14" height="5" rx="2.5" fill="black"/>'
+        return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 108"><defs>{clip}<mask id="m" maskUnits="userSpaceOnUse" x="0" y="0" width="108" height="108">'
+                f'<g transform="translate(18 18) scale(0.6)">{cues}{mark}</g></mask></defs>'
+                f'<rect width="108" height="108" fill="{WHITE}" mask="url(#m)"/></svg>')
     else:
         (bx, by, bs), cells = grid_cells(box)
         cut = f'<rect x="{bx:.2f}" y="{by:.2f}" width="{bs}" height="{bs}" rx="7" fill="black"/>' + ''.join(
