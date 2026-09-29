@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-29T17:13:47.946652+00:00",
+  "last_run_timestamp": "2026-09-29T21:38:24.036354+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -3350,6 +3350,42 @@
       "title": "Show HN: Squidbrake – self-hosted approval gateway for AI agent tool calls",
       "url": "https://news.ycombinator.com/item?id=49894667",
       "inspected_at": "2026-09-29T17:13:47.939666+00:00"
+    },
+    "hn_49900368": {
+      "platform": "hackernews",
+      "title": "Show HN: A tool site with zero back end – everything runs client-side",
+      "url": "https://news.ycombinator.com/item?id=49900368",
+      "inspected_at": "2026-09-29T21:38:24.030232+00:00"
+    },
+    "hn_49900300": {
+      "platform": "hackernews",
+      "title": "Show HN: Kursal, a decentralized E2E encrypted messenger",
+      "url": "https://news.ycombinator.com/item?id=49900300",
+      "inspected_at": "2026-09-29T21:38:24.030316+00:00"
+    },
+    "hn_49899464": {
+      "platform": "hackernews",
+      "title": "Show HN: Clx 0.4.0 – native compiler for Lua",
+      "url": "https://news.ycombinator.com/item?id=49899464",
+      "inspected_at": "2026-09-29T21:38:24.030386+00:00"
+    },
+    "hn_49899130": {
+      "platform": "hackernews",
+      "title": "Show HN: Chow, a FOSS food diary",
+      "url": "https://news.ycombinator.com/item?id=49899130",
+      "inspected_at": "2026-09-29T21:38:24.030441+00:00"
+    },
+    "hn_49898465": {
+      "platform": "hackernews",
+      "title": "Ask HN: OpenSEO inspiration for other tools, asking for opinion",
+      "url": "https://news.ycombinator.com/item?id=49898465",
+      "inspected_at": "2026-09-29T21:38:24.030488+00:00"
+    },
+    "hn_49898411": {
+      "platform": "hackernews",
+      "title": "Show HN: Relay – a harness for AI coding agents that recover and verify",
+      "url": "https://news.ycombinator.com/item?id=49898411",
+      "inspected_at": "2026-09-29T21:38:24.030528+00:00"
     }
   },
   "pending_drafts": {
