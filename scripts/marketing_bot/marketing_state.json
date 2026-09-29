@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-23T21:09:06.379075+00:00",
+  "last_run_timestamp": "2026-09-29T17:13:47.946652+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -3314,6 +3314,42 @@
       "title": "Flutter theme transitions: package or DIY? Looking for feedback",
       "url": "https://reddit.com/r/FlutterDev/comments/1woh8pr/flutter_theme_transitions_package_or_diy_looking/",
       "inspected_at": "2026-09-23T21:08:57.147650+00:00"
+    },
+    "hn_49896439": {
+      "platform": "hackernews",
+      "title": "Show HN: Helping small business owners automate their front of house",
+      "url": "https://news.ycombinator.com/item?id=49896439",
+      "inspected_at": "2026-09-29T17:13:47.939309+00:00"
+    },
+    "hn_49896243": {
+      "platform": "hackernews",
+      "title": "Show HN: I fixed MealPal's UX (and its math) with a Chrome extension",
+      "url": "https://news.ycombinator.com/item?id=49896243",
+      "inspected_at": "2026-09-29T17:13:47.939421+00:00"
+    },
+    "hn_49895281": {
+      "platform": "hackernews",
+      "title": "Show HN: A terminal UI for GitHub Actions across all repos and orgs",
+      "url": "https://news.ycombinator.com/item?id=49895281",
+      "inspected_at": "2026-09-29T17:13:47.939507+00:00"
+    },
+    "hn_49894951": {
+      "platform": "hackernews",
+      "title": "Show HN: Sensored – streaming-first PII/PHI redaction",
+      "url": "https://news.ycombinator.com/item?id=49894951",
+      "inspected_at": "2026-09-29T17:13:47.939573+00:00"
+    },
+    "hn_49894784": {
+      "platform": "hackernews",
+      "title": "Show HN: ProgressCove, calm and smart to-do app with Home Assistant integration",
+      "url": "https://news.ycombinator.com/item?id=49894784",
+      "inspected_at": "2026-09-29T17:13:47.939622+00:00"
+    },
+    "hn_49894667": {
+      "platform": "hackernews",
+      "title": "Show HN: Squidbrake – self-hosted approval gateway for AI agent tool calls",
+      "url": "https://news.ycombinator.com/item?id=49894667",
+      "inspected_at": "2026-09-29T17:13:47.939666+00:00"
     }
   },
   "pending_drafts": {
@@ -3943,13 +3979,17 @@
     }
   },
   "tuned_queries_cache": {
-    "timestamp": 1789875323.8124912,
+    "timestamp": 1790702014.6269715,
     "queries": [
-      "offline recurring task app",
-      "fast flutter todo list",
-      "calendar sync task manager",
-      "local first productivity app",
-      "todo list with home widget"
+      "indie app showcase",
+      "built a todo app",
+      "offline first task app",
+      "flutter task app",
+      "android home widget app",
+      "what todo app do you use",
+      "todo app recommendation indie",
+      "simple task manager with calendar sync",
+      "offline to-do app without subscription"
     ]
   },
   "analytics_snapshot": {
