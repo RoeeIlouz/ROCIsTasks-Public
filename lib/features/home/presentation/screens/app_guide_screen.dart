@@ -29,7 +29,7 @@ class _AppGuideScreenState extends State<AppGuideScreen> {
       body: l10n.guideQuickAddBody,
     ),
     _GuideTopic(
-      icon: Icons.swipe_rounded,
+      icon: Icons.swipe,
       title: l10n.guideGesturesTitle,
       body: l10n.guideGesturesDesc,
     ),
@@ -46,7 +46,7 @@ class _AppGuideScreenState extends State<AppGuideScreen> {
     ),
     if (!kIsWeb)
       _GuideTopic(
-        icon: Icons.notifications_active_rounded,
+        icon: Icons.notifications_active_outlined,
         title: l10n.guideNotificationsTitle,
         body: l10n.guideRemindersBody,
       ),
@@ -78,7 +78,7 @@ class _AppGuideScreenState extends State<AppGuideScreen> {
       isPro: true,
     ),
     _GuideTopic(
-      icon: Icons.cloud_sync_rounded,
+      icon: Icons.cloud_done_rounded,
       title: l10n.guideCloudSyncTitle,
       body: l10n.guideCloudSyncDesc,
     ),
