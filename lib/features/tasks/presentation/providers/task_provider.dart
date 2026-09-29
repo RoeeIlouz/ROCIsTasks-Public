@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart' hide Category;
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:rocis_tasks/shared/ui/app_messenger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:rocis_tasks/core/dev/screenshot_seed.dart';
@@ -246,20 +248,7 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
     // Populate all home screen widgets with initial data and restore task counter notification
     unawaited(_updateWidgets(showNotification: true));
 
-    Future.delayed(const Duration(seconds: 2), () async {
-      final allTasks = _source.getTasks();
-      for (final task in allTasks) {
-        try {
-          await _scheduleTaskNotifications(task);
-        } catch (e, s) {
-          _errorHandlingService.logError(
-            e,
-            s,
-            reason: 'Rescheduling notification',
-          );
-        }
-      }
-    });
+    Future.delayed(const Duration(seconds: 2), rescheduleAllTaskNotifications);
 
     // Connectivity probing can take several seconds offline (DNS fallbacks),
     // so never hold the first frame on it; the listener catches the result.
@@ -388,7 +377,40 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
     await _notificationManager.cancelTaskNotificationsById(taskId);
   }
 
+  /// Re-arms every task's reminders, including the deferred next iteration
+  /// of completed recurring tasks.
+  Future<void> rescheduleAllTaskNotifications({
+    bool cancelExisting = false,
+  }) async {
+    final allTasks = _source.getTasks();
+    if (cancelExisting) await _notificationService.cancelAllNotifications();
+    for (final task in allTasks) {
+      try {
+        await _scheduleTaskNotifications(task);
+      } catch (e, s) {
+        _errorHandlingService.logError(
+          e,
+          s,
+          reason: 'Rescheduling notification',
+        );
+      }
+    }
+  }
+
   Future<void> _scheduleTaskNotifications(Task task) async {
+    // A completed recurring task owns the reminder for its deferred next
+    // iteration; bulk reschedules (startup, full sync, remote sync) must
+    // restore that preview or the chain stops notifying after one cycle.
+    if (task.isCompleted &&
+        task.nextRecurrenceDate != null &&
+        (task.recurrenceRule?.trim().isNotEmpty ?? false) &&
+        !(task.isDeleted ?? false) &&
+        _subscriptionService.isPremium) {
+      task = TaskRecurrenceService.createUpcomingPreviewTask(
+        task,
+        task.nextRecurrenceDate!,
+      );
+    }
     await _notificationManager.scheduleTaskNotifications(
       task,
       l10n: _l10n,
@@ -485,12 +507,7 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
       );
       await updateHomeWidgetWithNotification();
 
-      final allTasks = _source.getTasks();
-      await _notificationService.cancelAllNotifications();
-
-      for (final task in allTasks) {
-        await _scheduleTaskNotifications(task);
-      }
+      await rescheduleAllTaskNotifications(cancelExisting: true);
     } catch (e, s) {
       _errorHandlingService.logError(e, s, reason: 'Performing full sync');
       rethrow;
@@ -967,7 +984,25 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
     }
   }
 
-  Future<void> toggleTaskCompletion(Task task) async {
+  /// Open subtasks that block completing [task] ("Subtasks required").
+  int blockingSubTaskCount(Task task) {
+    if (!task.requireSubTasksBeforeReminders || task.isCompleted) return 0;
+    return task.subTasks?.where((st) => !st.isCompleted).length ?? 0;
+  }
+
+  /// Returns false when the task could not be completed because required
+  /// subtasks are still open.
+  Future<bool> toggleTaskCompletion(Task task) async {
+    final blocking = blockingSubTaskCount(task);
+    if (blocking > 0) {
+      HapticFeedback.heavyImpact();
+      appMessengerKey.currentState
+        ?..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(content: Text(_l10n.completeSubtasksFirst(blocking))),
+        );
+      return false;
+    }
     task.isCompleted = !task.isCompleted;
     task.completedAt = task.isCompleted ? DateTime.now() : null;
 
@@ -1117,6 +1152,7 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
     if (task.isCompleted) {
       await _analyticsService.logTaskCompleted();
     }
+    return true;
   }
 
   Future<Task?> _materializeRecurringTask(

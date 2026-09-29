@@ -685,6 +685,18 @@ class AuthService extends ChangeNotifier {
       _scheduleAuth = null;
     }
 
+    // On web the persisted session is restored asynchronously after a page
+    // load; reading currentUser before the first auth event sees null, and the
+    // owner-only Schedule rules then reject the unauthenticated reads.
+    final scheduleAuth = _scheduleAuth;
+    if (kIsWeb && scheduleAuth != null && scheduleAuth.currentUser == null) {
+      try {
+        await scheduleAuth.authStateChanges().first.timeout(
+          const Duration(seconds: 3),
+        );
+      } catch (_) {}
+    }
+
     if (_scheduleAuth?.currentUser != null) {
       scheduleAuthError.value = null;
       // Do NOT persist secUid — ScheduleFirestoreService handles this.

@@ -141,15 +141,6 @@ class SettingsScreen extends StatelessWidget {
                 ],
               ),
             ),
-            ListTile(
-              leading: _buildLeadingIcon(
-                context,
-                Icons.cloud_done_rounded,
-                Colors.teal,
-              ),
-              title: Text(l10n.cloudSync),
-              subtitle: Text(l10n.cloudSyncActive),
-            ),
           ] else ...[
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -241,6 +232,25 @@ class SettingsScreen extends StatelessWidget {
                 await subscriptionService.manageSubscription();
               },
             ),
+          if (subscriptionService.isPremium)
+            ListTile(
+              leading: _buildLeadingIcon(
+                context,
+                Icons.security_rounded,
+                Colors.teal,
+              ),
+              title: Text(l10n.securitySettings),
+              subtitle: Text(l10n.securitySettingsSubtitle),
+              trailing: const Icon(Icons.chevron_right_rounded),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const SecuritySettingsScreen(),
+                  ),
+                );
+              },
+            ),
           if (user != null)
             ListTile(
               leading: _buildLeadingIcon(
@@ -259,6 +269,100 @@ class SettingsScreen extends StatelessWidget {
                 }
               },
             ),
+          ListTile(
+            leading: _buildLeadingIcon(
+              context,
+              Icons.person_remove_outlined,
+              Colors.red,
+            ),
+            title: Text(
+              l10n.deleteAccountTitle,
+              style: TextStyle(color: Colors.red[700]),
+            ),
+            subtitle: Text(l10n.deleteAccountSubtitle),
+            onTap: () async {
+              final confirmed = await showDialog<bool>(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: Text(l10n.deleteAccountConfirmTitle),
+                  content: Text(l10n.deleteAccountConfirmBody),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, false),
+                      child: Text(l10n.cancel),
+                    ),
+                    TextButton(
+                      style: TextButton.styleFrom(foregroundColor: Colors.red),
+                      onPressed: () => Navigator.pop(context, true),
+                      child: Text(l10n.deleteEverything),
+                    ),
+                  ],
+                ),
+              );
+
+              if (!context.mounted) {
+                return;
+              }
+
+              if (confirmed == true) {
+                String? password;
+                final providerIds =
+                    user?.providerData.map((p) => p.providerId).toSet() ?? {};
+                if (providerIds.contains('password')) {
+                  final controller = TextEditingController();
+                  password = await showDialog<String>(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: Text(l10n.password),
+                      content: TextField(
+                        controller: controller,
+                        obscureText: true,
+                        autofillHints: const [AutofillHints.password],
+                        decoration: InputDecoration(labelText: l10n.password),
+                        onSubmitted: (value) =>
+                            Navigator.pop(context, value.trim()),
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: Text(l10n.cancel),
+                        ),
+                        TextButton(
+                          style: TextButton.styleFrom(
+                            foregroundColor: Colors.red,
+                          ),
+                          onPressed: () =>
+                              Navigator.pop(context, controller.text.trim()),
+                          child: Text(l10n.deleteEverything),
+                        ),
+                      ],
+                    ),
+                  );
+                  if (!context.mounted) {
+                    return;
+                  }
+                  if (password?.isEmpty ?? true) {
+                    return;
+                  }
+                }
+
+                final success = await authService.deleteAccount(
+                  password: password,
+                );
+                if (success) {
+                  if (context.mounted) {
+                    Navigator.popUntil(context, (route) => route.isFirst);
+                  }
+                } else {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(l10n.deletionFailed)),
+                    );
+                  }
+                }
+              }
+            },
+          ),
         ]),
         _buildSectionHeader(context, l10n.appearance),
         _buildSectionCard(context, [
@@ -379,18 +483,19 @@ class SettingsScreen extends StatelessWidget {
               );
             },
           ),
-          SwitchListTile(
-            secondary: _buildLeadingIcon(context, Icons.palette, Colors.pink),
-            title: Text(l10n.materialTheme),
-            subtitle: Text(l10n.useSystemColors),
-            value: themeService.useMaterialTheme,
-            onChanged: (value) {
-              themeService.toggleMaterialTheme(value);
-              analyticsService.logThemeChanged(
-                themeMode: value ? 'material_on' : 'material_off',
-              );
-            },
-          ),
+          if (!kIsWeb)
+            SwitchListTile(
+              secondary: _buildLeadingIcon(context, Icons.palette, Colors.pink),
+              title: Text(l10n.materialTheme),
+              subtitle: Text(l10n.useSystemColors),
+              value: themeService.useMaterialTheme,
+              onChanged: (value) {
+                themeService.toggleMaterialTheme(value);
+                analyticsService.logThemeChanged(
+                  themeMode: value ? 'material_on' : 'material_off',
+                );
+              },
+            ),
           if (!kIsWeb)
             SwitchListTile(
               secondary: _buildLeadingIcon(context, Icons.blur_on, Colors.teal),
@@ -453,6 +558,7 @@ class SettingsScreen extends StatelessWidget {
                 return;
               }
               final colors = <Color>[
+                AppTheme.primaryColor,
                 const Color(0xFF6366F1),
                 const Color(0xFF10B981),
                 const Color(0xFFF59E0B),
@@ -484,24 +590,25 @@ class SettingsScreen extends StatelessWidget {
               );
             },
           ),
-          SwitchListTile(
-            secondary: _buildLeadingIcon(
-              context,
-              Icons.brightness_2,
-              Colors.indigo,
+          if (themeService.isDarkMode)
+            SwitchListTile(
+              secondary: _buildLeadingIcon(
+                context,
+                Icons.brightness_2,
+                Colors.indigo,
+              ),
+              title: Text(l10n.amoledDarkMode),
+              subtitle: Text(l10n.pureBlackBackground),
+              value: themeService.useAmoledTheme,
+              onChanged: themeService.isDarkMode
+                  ? (value) {
+                      themeService.toggleAmoledTheme(value);
+                      analyticsService.logThemeChanged(
+                        themeMode: value ? 'amoled_on' : 'amoled_off',
+                      );
+                    }
+                  : null,
             ),
-            title: Text(l10n.amoledDarkMode),
-            subtitle: Text(l10n.pureBlackBackground),
-            value: themeService.useAmoledTheme,
-            onChanged: themeService.isDarkMode
-                ? (value) {
-                    themeService.toggleAmoledTheme(value);
-                    analyticsService.logThemeChanged(
-                      themeMode: value ? 'amoled_on' : 'amoled_off',
-                    );
-                  }
-                : null,
-          ),
           SwitchListTile(
             secondary: _buildLeadingIcon(
               context,
@@ -765,207 +872,172 @@ class SettingsScreen extends StatelessWidget {
               await taskProvider.setShowMyTasksGuideShortcut(value);
             },
           ),
-          if (subscriptionService.isPremium) ...[
-            if (!kIsWeb) ...[
-              SwitchListTile(
-                secondary: _buildLeadingIcon(
-                  context,
-                  Icons.notifications_active_outlined,
-                  theme.colorScheme.primary,
-                ),
-                title: Text(l10n.advancedReminders),
-                subtitle: Text(l10n.advancedRemindersSubtitle),
-                value: taskProvider.advancedRemindersEnabled,
-                onChanged: (value) async {
-                  await taskProvider.setAdvancedRemindersEnabled(value);
-                },
-              ),
-              SwitchListTile(
-                secondary: _buildLeadingIcon(
-                  context,
-                  Icons.notification_important_outlined,
-                  Colors.red,
-                ),
-                title: Text(l10n.nagReminders),
-                subtitle: Text(l10n.nagRemindersSubtitle),
-                value: taskProvider.nagRemindersEnabled,
-                onChanged: (value) async {
-                  await taskProvider.setNagRemindersEnabled(value);
-                },
-              ),
-              if (taskProvider.nagRemindersEnabled) ...[
-                ListTile(
-                  leading: _buildLeadingIcon(
-                    context,
-                    Icons.schedule_outlined,
-                    Colors.orange,
-                  ),
-                  title: Text(l10n.nagInterval),
-                  subtitle: Text(
-                    _formatMinutes(taskProvider.nagIntervalMinutes),
-                  ),
-                  onTap: () async {
-                    final selected = await showDialog<int>(
-                      context: context,
-                      builder: (context) => SimpleDialog(
-                        title: Text(l10n.nagInterval),
-                        children: [
-                          SimpleDialogOption(
-                            onPressed: () => Navigator.pop(context, 15),
-                            child: const Text('15m'),
-                          ),
-                          SimpleDialogOption(
-                            onPressed: () => Navigator.pop(context, 30),
-                            child: const Text('30m'),
-                          ),
-                          SimpleDialogOption(
-                            onPressed: () => Navigator.pop(context, 60),
-                            child: const Text('60m'),
-                          ),
-                        ],
-                      ),
-                    );
-                    if (selected == null) return;
-                    await taskProvider.setNagIntervalMinutes(selected);
-                  },
-                ),
-                ListTile(
-                  leading: _buildLeadingIcon(
-                    context,
-                    Icons.format_list_numbered_rounded,
-                    Colors.blue,
-                  ),
-                  title: Text(l10n.nagCount),
-                  subtitle: Text('${taskProvider.nagCount}'),
-                  onTap: () async {
-                    final selected = await showDialog<int>(
-                      context: context,
-                      builder: (context) => SimpleDialog(
-                        title: Text(l10n.nagCount),
-                        children: [
-                          for (final count in [1, 2, 3, 4, 5])
-                            SimpleDialogOption(
-                              onPressed: () => Navigator.pop(context, count),
-                              child: Text('$count'),
-                            ),
-                        ],
-                      ),
-                    );
-                    if (selected == null) return;
-                    await taskProvider.setNagCount(selected);
-                  },
-                ),
-              ],
-              SwitchListTile(
-                secondary: _buildLeadingIcon(
-                  context,
-                  Icons.bedtime_outlined,
-                  Colors.indigo,
-                ),
-                title: Text(l10n.quietHours),
-                subtitle: Text(l10n.quietHoursSubtitle),
-                value: taskProvider.quietHoursEnabled,
-                onChanged: (value) async {
-                  await taskProvider.setQuietHoursEnabled(value);
-                },
-              ),
-              if (taskProvider.quietHoursEnabled) ...[
-                ListTile(
-                  leading: _buildLeadingIcon(
-                    context,
-                    Icons.nights_stay_outlined,
-                    Colors.blue,
-                  ),
-                  title: Text(l10n.quietHoursStart),
-                  subtitle: Text(
-                    MaterialLocalizations.of(context).formatTimeOfDay(
-                      TimeOfDay(
-                        hour: taskProvider.quietStartMinutes ~/ 60,
-                        minute: taskProvider.quietStartMinutes % 60,
-                      ),
-                    ),
-                  ),
-                  onTap: () async {
-                    final selected = await showTimePicker(
-                      context: context,
-                      initialTime: TimeOfDay(
-                        hour: taskProvider.quietStartMinutes ~/ 60,
-                        minute: taskProvider.quietStartMinutes % 60,
-                      ),
-                    );
-                    if (selected == null) return;
-                    await taskProvider.setQuietHoursStartMinutes(
-                      selected.hour * 60 + selected.minute,
-                    );
-                  },
-                ),
-                ListTile(
-                  leading: _buildLeadingIcon(
-                    context,
-                    Icons.wb_sunny_outlined,
-                    Colors.amber,
-                  ),
-                  title: Text(l10n.quietHoursEnd),
-                  subtitle: Text(
-                    MaterialLocalizations.of(context).formatTimeOfDay(
-                      TimeOfDay(
-                        hour: taskProvider.quietEndMinutes ~/ 60,
-                        minute: taskProvider.quietEndMinutes % 60,
-                      ),
-                    ),
-                  ),
-                  onTap: () async {
-                    final selected = await showTimePicker(
-                      context: context,
-                      initialTime: TimeOfDay(
-                        hour: taskProvider.quietEndMinutes ~/ 60,
-                        minute: taskProvider.quietEndMinutes % 60,
-                      ),
-                    );
-                    if (selected == null) return;
-                    await taskProvider.setQuietHoursEndMinutes(
-                      selected.hour * 60 + selected.minute,
-                    );
-                  },
-                ),
-              ],
-            ],
-            ListTile(
-              leading: _buildLeadingIcon(
-                context,
-                Icons.security_rounded,
-                Colors.teal,
-              ),
-              title: Text(l10n.securitySettings),
-              subtitle: Text(l10n.securitySettingsSubtitle),
-              trailing: const Icon(Icons.chevron_right_rounded),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const SecuritySettingsScreen(),
-                  ),
-                );
-              },
-            ),
-          ],
-          if (!kIsWeb)
-            ListTile(
-              leading: _buildLeadingIcon(
+        ]),
+        if (subscriptionService.isPremium && !kIsWeb) ...[
+          _buildSectionHeader(context, l10n.guideNotificationsTitle),
+          _buildSectionCard(context, [
+            SwitchListTile(
+              secondary: _buildLeadingIcon(
                 context,
                 Icons.notifications_active_outlined,
-                Colors.blue,
+                theme.colorScheme.primary,
               ),
-              title: Text(l10n.showTaskCounterNotification),
-              subtitle: Text(l10n.showTaskCounterNotificationSubtitle),
-              onTap: () async {
-                await taskProvider.updateHomeWidgetWithNotification();
-                if (context.mounted) {
-                  showSuccessSnackBar(context, l10n.notificationRefreshed);
-                }
+              title: Text(l10n.advancedReminders),
+              subtitle: Text(l10n.advancedRemindersSubtitle),
+              value: taskProvider.advancedRemindersEnabled,
+              onChanged: (value) async {
+                await taskProvider.setAdvancedRemindersEnabled(value);
               },
             ),
-        ]),
+            SwitchListTile(
+              secondary: _buildLeadingIcon(
+                context,
+                Icons.notification_important_outlined,
+                Colors.red,
+              ),
+              title: Text(l10n.nagReminders),
+              subtitle: Text(l10n.nagRemindersSubtitle),
+              value: taskProvider.nagRemindersEnabled,
+              onChanged: (value) async {
+                await taskProvider.setNagRemindersEnabled(value);
+              },
+            ),
+            if (taskProvider.nagRemindersEnabled) ...[
+              ListTile(
+                leading: _buildLeadingIcon(
+                  context,
+                  Icons.schedule_outlined,
+                  Colors.orange,
+                ),
+                title: Text(l10n.nagInterval),
+                subtitle: Text(_formatMinutes(taskProvider.nagIntervalMinutes)),
+                onTap: () async {
+                  final selected = await showDialog<int>(
+                    context: context,
+                    builder: (context) => SimpleDialog(
+                      title: Text(l10n.nagInterval),
+                      children: [
+                        SimpleDialogOption(
+                          onPressed: () => Navigator.pop(context, 15),
+                          child: const Text('15m'),
+                        ),
+                        SimpleDialogOption(
+                          onPressed: () => Navigator.pop(context, 30),
+                          child: const Text('30m'),
+                        ),
+                        SimpleDialogOption(
+                          onPressed: () => Navigator.pop(context, 60),
+                          child: const Text('60m'),
+                        ),
+                      ],
+                    ),
+                  );
+                  if (selected == null) return;
+                  await taskProvider.setNagIntervalMinutes(selected);
+                },
+              ),
+              ListTile(
+                leading: _buildLeadingIcon(
+                  context,
+                  Icons.format_list_numbered_rounded,
+                  Colors.blue,
+                ),
+                title: Text(l10n.nagCount),
+                subtitle: Text('${taskProvider.nagCount}'),
+                onTap: () async {
+                  final selected = await showDialog<int>(
+                    context: context,
+                    builder: (context) => SimpleDialog(
+                      title: Text(l10n.nagCount),
+                      children: [
+                        for (final count in [1, 2, 3, 4, 5])
+                          SimpleDialogOption(
+                            onPressed: () => Navigator.pop(context, count),
+                            child: Text('$count'),
+                          ),
+                      ],
+                    ),
+                  );
+                  if (selected == null) return;
+                  await taskProvider.setNagCount(selected);
+                },
+              ),
+            ],
+            SwitchListTile(
+              secondary: _buildLeadingIcon(
+                context,
+                Icons.bedtime_outlined,
+                Colors.indigo,
+              ),
+              title: Text(l10n.quietHours),
+              subtitle: Text(l10n.quietHoursSubtitle),
+              value: taskProvider.quietHoursEnabled,
+              onChanged: (value) async {
+                await taskProvider.setQuietHoursEnabled(value);
+              },
+            ),
+            if (taskProvider.quietHoursEnabled) ...[
+              ListTile(
+                leading: _buildLeadingIcon(
+                  context,
+                  Icons.nights_stay_outlined,
+                  Colors.blue,
+                ),
+                title: Text(l10n.quietHoursStart),
+                subtitle: Text(
+                  MaterialLocalizations.of(context).formatTimeOfDay(
+                    TimeOfDay(
+                      hour: taskProvider.quietStartMinutes ~/ 60,
+                      minute: taskProvider.quietStartMinutes % 60,
+                    ),
+                  ),
+                ),
+                onTap: () async {
+                  final selected = await showTimePicker(
+                    context: context,
+                    initialTime: TimeOfDay(
+                      hour: taskProvider.quietStartMinutes ~/ 60,
+                      minute: taskProvider.quietStartMinutes % 60,
+                    ),
+                  );
+                  if (selected == null) return;
+                  await taskProvider.setQuietHoursStartMinutes(
+                    selected.hour * 60 + selected.minute,
+                  );
+                },
+              ),
+              ListTile(
+                leading: _buildLeadingIcon(
+                  context,
+                  Icons.wb_sunny_outlined,
+                  Colors.amber,
+                ),
+                title: Text(l10n.quietHoursEnd),
+                subtitle: Text(
+                  MaterialLocalizations.of(context).formatTimeOfDay(
+                    TimeOfDay(
+                      hour: taskProvider.quietEndMinutes ~/ 60,
+                      minute: taskProvider.quietEndMinutes % 60,
+                    ),
+                  ),
+                ),
+                onTap: () async {
+                  final selected = await showTimePicker(
+                    context: context,
+                    initialTime: TimeOfDay(
+                      hour: taskProvider.quietEndMinutes ~/ 60,
+                      minute: taskProvider.quietEndMinutes % 60,
+                    ),
+                  );
+                  if (selected == null) return;
+                  await taskProvider.setQuietHoursEndMinutes(
+                    selected.hour * 60 + selected.minute,
+                  );
+                },
+              ),
+            ],
+          ]),
+        ],
         _buildSectionHeader(context, l10n.dataAndSync),
         _buildSectionCard(context, [
           ListTile(
@@ -1021,9 +1093,6 @@ class SettingsScreen extends StatelessWidget {
               );
             },
           ),
-        ]),
-        _buildSectionHeader(context, l10n.backupAndRestore),
-        _buildSectionCard(context, [
           ListTile(
             leading: _buildLeadingIcon(context, Icons.upload_file, Colors.teal),
             title: Text(l10n.exportData),
@@ -1104,8 +1173,44 @@ class SettingsScreen extends StatelessWidget {
             },
           ),
         ]),
-        _buildSectionHeader(context, l10n.privacyAndGdpr),
+        _buildSectionHeader(context, l10n.about),
         _buildSectionCard(context, [
+          ListTile(
+            leading: _buildLeadingIcon(
+              context,
+              Icons.help_outline_rounded,
+              Colors.green,
+            ),
+            title: Text(l10n.appGuide),
+            subtitle: Text(l10n.appGuideSubtitle),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const AppGuideScreen()),
+              );
+            },
+          ),
+          if (themeService.enableScheduleIntegration)
+            ListTile(
+              leading: _buildLeadingIcon(
+                context,
+                Icons.school_rounded,
+                Colors.indigo,
+              ),
+              title: Text(AppLocalizations.of(context)!.scheduleSynergyTitle),
+              subtitle: Text(
+                AppLocalizations.of(context)!.scheduleSynergySubtitle,
+              ),
+              trailing: FilledButton.tonalIcon(
+                onPressed: () {
+                  HapticFeedback.selectionClick();
+                  ScheduleBridgeService.openScheduleApp();
+                },
+                icon: const Icon(Icons.open_in_new_rounded, size: 16),
+                label: Text(AppLocalizations.of(context)!.openAction),
+              ),
+            ),
           ListTile(
             leading: _buildLeadingIcon(
               context,
@@ -1142,143 +1247,6 @@ class SettingsScreen extends StatelessWidget {
                 );
               },
             ),
-          ListTile(
-            leading: _buildLeadingIcon(
-              context,
-              Icons.person_remove_outlined,
-              Colors.red,
-            ),
-            title: Text(
-              l10n.deleteAccountTitle,
-              style: TextStyle(color: Colors.red[700]),
-            ),
-            subtitle: Text(l10n.deleteAccountSubtitle),
-            onTap: () async {
-              final confirmed = await showDialog<bool>(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: Text(l10n.deleteAccountConfirmTitle),
-                  content: Text(l10n.deleteAccountConfirmBody),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context, false),
-                      child: Text(l10n.cancel),
-                    ),
-                    TextButton(
-                      style: TextButton.styleFrom(foregroundColor: Colors.red),
-                      onPressed: () => Navigator.pop(context, true),
-                      child: Text(l10n.deleteEverything),
-                    ),
-                  ],
-                ),
-              );
-
-              if (!context.mounted) {
-                return;
-              }
-
-              if (confirmed == true) {
-                String? password;
-                final providerIds =
-                    user?.providerData.map((p) => p.providerId).toSet() ?? {};
-                if (providerIds.contains('password')) {
-                  final controller = TextEditingController();
-                  password = await showDialog<String>(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      title: Text(l10n.password),
-                      content: TextField(
-                        controller: controller,
-                        obscureText: true,
-                        autofillHints: const [AutofillHints.password],
-                        decoration: InputDecoration(labelText: l10n.password),
-                        onSubmitted: (value) =>
-                            Navigator.pop(context, value.trim()),
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: Text(l10n.cancel),
-                        ),
-                        TextButton(
-                          style: TextButton.styleFrom(
-                            foregroundColor: Colors.red,
-                          ),
-                          onPressed: () =>
-                              Navigator.pop(context, controller.text.trim()),
-                          child: Text(l10n.deleteEverything),
-                        ),
-                      ],
-                    ),
-                  );
-                  if (!context.mounted) {
-                    return;
-                  }
-                  if (password?.isEmpty ?? true) {
-                    return;
-                  }
-                }
-
-                final success = await authService.deleteAccount(
-                  password: password,
-                );
-                if (success) {
-                  if (context.mounted) {
-                    Navigator.popUntil(context, (route) => route.isFirst);
-                  }
-                } else {
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(l10n.deletionFailed)),
-                    );
-                  }
-                }
-              }
-            },
-          ),
-        ]),
-        if (themeService.enableScheduleIntegration) ...[
-          _buildSectionHeader(context, 'ROCIs Ecosystem'),
-          _buildSectionCard(context, [
-            ListTile(
-              leading: _buildLeadingIcon(
-                context,
-                Icons.school_rounded,
-                Colors.indigo,
-              ),
-              title: Text(AppLocalizations.of(context)!.scheduleSynergyTitle),
-              subtitle: Text(
-                AppLocalizations.of(context)!.scheduleSynergySubtitle,
-              ),
-              trailing: FilledButton.tonalIcon(
-                onPressed: () {
-                  HapticFeedback.selectionClick();
-                  ScheduleBridgeService.openScheduleApp();
-                },
-                icon: const Icon(Icons.open_in_new_rounded, size: 16),
-                label: Text(AppLocalizations.of(context)!.openAction),
-              ),
-            ),
-          ]),
-        ],
-        _buildSectionHeader(context, l10n.about),
-        _buildSectionCard(context, [
-          ListTile(
-            leading: _buildLeadingIcon(
-              context,
-              Icons.help_outline_rounded,
-              Colors.green,
-            ),
-            title: Text(l10n.appGuide),
-            subtitle: Text(l10n.appGuideSubtitle),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const AppGuideScreen()),
-              );
-            },
-          ),
           ListTile(
             leading: _buildLeadingIcon(
               context,

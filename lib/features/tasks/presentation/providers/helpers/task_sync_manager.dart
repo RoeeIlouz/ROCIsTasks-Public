@@ -64,7 +64,10 @@ class TaskSyncManager {
     _purgedSubscription = null;
   }
 
-  static String uploadWatermarkKey(String uid) => 'tasks_upload_watermark_$uid';
+  // v2 forces one full reconcile so tasks that never reached the cloud (or
+  // whose cloud copy lacks the fields the listener queries on) get repaired.
+  static String uploadWatermarkKey(String uid) =>
+      'tasks_upload_watermark_v2_$uid';
 
   /// Pushes local tasks the cloud is missing or holds an older version of.
   ///
@@ -102,6 +105,7 @@ class TaskSyncManager {
           // Deleted forever elsewhere: never resurrect it. The purge listener
           // removes the local copy.
           if (cloud.isPurged) return false;
+          if (cloud.missingQueryFields) return true;
           final cloudEdit = cloud.editedAt;
           return cloudEdit == null || t.lastModified.isAfter(cloudEdit);
         }).toList();

@@ -2,10 +2,47 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
-  // Premium Color Palette - Refined
-  static const Color primaryColor = Color(0xFF6366F1); // Modern Indigo
+  // Brand palette, taken from the app logo: a red check on charcoal.
+  static const Color primaryColor = Color(0xFFE5323F); // Logo red
+  static const Color brandCharcoal = Color(0xFF2D2F33); // Logo badge
   static const Color secondaryColor = Color(0xFF10B981); // Emerald
   static const Color accentColor = Color(0xFFF59E0B); // Amber
+
+  /// Logo-matched scheme: red accents (fidelity keeps the logo's exact hue)
+  /// over neutral charcoal greys instead of red-tinted surfaces.
+  static ColorScheme brandScheme(Brightness brightness) {
+    final accent = ColorScheme.fromSeed(
+      seedColor: primaryColor,
+      brightness: brightness,
+      dynamicSchemeVariant: DynamicSchemeVariant.fidelity,
+    );
+    final grey = ColorScheme.fromSeed(
+      seedColor: brandCharcoal,
+      brightness: brightness,
+      dynamicSchemeVariant: DynamicSchemeVariant.neutral,
+    );
+    return accent.copyWith(
+      secondary: grey.primary,
+      onSecondary: grey.onPrimary,
+      secondaryContainer: grey.primaryContainer,
+      onSecondaryContainer: grey.onPrimaryContainer,
+      surface: grey.surface,
+      onSurface: grey.onSurface,
+      onSurfaceVariant: grey.onSurfaceVariant,
+      surfaceDim: grey.surfaceDim,
+      surfaceBright: grey.surfaceBright,
+      surfaceContainerLowest: grey.surfaceContainerLowest,
+      surfaceContainerLow: grey.surfaceContainerLow,
+      surfaceContainer: grey.surfaceContainer,
+      surfaceContainerHigh: grey.surfaceContainerHigh,
+      surfaceContainerHighest: grey.surfaceContainerHighest,
+      outline: grey.outline,
+      outlineVariant: grey.outlineVariant,
+      inverseSurface: grey.inverseSurface,
+      onInverseSurface: grey.onInverseSurface,
+      surfaceTint: Colors.transparent,
+    );
+  }
 
   static const Color backgroundLight = Color(0xFFF8FAFC);
   static const Color surfaceLight = Colors.white;
@@ -27,11 +64,7 @@ class AppTheme {
 
   static ThemeData createLightTheme(ColorScheme? dynamicColorScheme) {
     final ColorScheme scheme =
-        dynamicColorScheme ??
-        ColorScheme.fromSeed(
-          seedColor: primaryColor,
-          brightness: Brightness.light,
-        );
+        dynamicColorScheme ?? brandScheme(Brightness.light);
 
     return ThemeData(
       useMaterial3: true,
@@ -70,11 +103,7 @@ class AppTheme {
     bool isAmoled = false,
   }) {
     final ColorScheme scheme =
-        dynamicColorScheme ??
-        ColorScheme.fromSeed(
-          seedColor: primaryColor,
-          brightness: Brightness.dark,
-        );
+        dynamicColorScheme ?? brandScheme(Brightness.dark);
 
     final bgColor = isAmoled ? Colors.black : scheme.surface;
     final surfaceColor = isAmoled ? Colors.black : scheme.surfaceContainerLow;

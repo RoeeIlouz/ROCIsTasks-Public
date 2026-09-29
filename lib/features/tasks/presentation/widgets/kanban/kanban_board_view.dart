@@ -350,8 +350,9 @@ class _KanbanBoardViewState extends State<KanbanBoardView> {
           }
         },
         onTaskDropped: (task) async {
-          if (!task.isCompleted) {
-            await taskProvider.toggleTaskCompletion(task);
+          if (!task.isCompleted &&
+              !await taskProvider.toggleTaskCompletion(task)) {
+            return;
           }
           setState(() {
             _manualTodoTaskIds.remove(task.id);

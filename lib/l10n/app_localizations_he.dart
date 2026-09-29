@@ -827,7 +827,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get guideCloudSyncDesc =>
-      'גש למשימות שלך מכל מכשיר עם סנכרון ענן מאובטח.';
+      'התחברו כדי לסנכרן את המשימות בין הטלפון לבין tasks.rocisapps.com. בהגדרות יש גם סנכרון עכשיו, פח, וגיבוי שאפשר לייצא או לייבא.';
 
   @override
   String get guideAddingTasksTitle => 'הוספת משימות';
@@ -841,14 +841,14 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get guideGesturesDesc =>
-      'החלק ימינה כדי להשלים משימה, שמאלה כדי למחוק. לחיצה ארוכה לאפשרויות נוספות.';
+      'הקישו על משימה כדי לפתוח אותה. החליקו ימינה כדי להשלים ושמאלה כדי למחוק; משימות שנמחקו ממתינות בפח, ומשם אפשר לשחזר אותן. לחיצה ארוכה על משימה מאפשרת לבחור כמה משימות יחד.';
 
   @override
   String get guideWidgetsTitle => 'ווידג\'טים למסך הבית';
 
   @override
   String get guideWidgetsDesc =>
-      'הוסף ווידג\'טים של ROCI\'s Tasks למסך הבית שלך לגישה מהירה ועדכוני סטטוס.';
+      'לחצו לחיצה ארוכה על מסך הבית, פתחו ווידג\'טים ובחרו ROCI\'s Tasks: רשימות משימות, סדר היום, לוח השנה או הלוח. את המראה שלהם אפשר להתאים בהגדרות.';
 
   @override
   String get guideCustomizationTitle => 'התאמה אישית';
@@ -971,7 +971,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get requireSubTasksBeforeRemindersSubtitle =>
-      'לא שולח תזכורות עד שכל תת-המשימות הושלמו';
+      'לא ניתן לסמן את המשימה כהושלמה עד שכל תתי-המשימות יושלמו';
 
   @override
   String get debugModeUnlocked => 'מצב מפתחים פתוח!';
@@ -2084,4 +2084,68 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get flipCamera => 'היפוך מצלמה';
+
+  @override
+  String completeSubtasksFirst(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'יש להשלים קודם $count תתי-משימות פתוחות',
+      one: 'יש להשלים קודם את תת-המשימה האחרונה',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get guideSearchHint => 'חיפוש במדריך';
+
+  @override
+  String get guideNoResults => 'לא נמצאו נושאים תואמים';
+
+  @override
+  String get guideProBadge => 'PRO';
+
+  @override
+  String get guideQuickAddTitle => 'הוספה מהירה עם טקסט חכם';
+
+  @override
+  String get guideQuickAddBody =>
+      'הקישו על + ובחרו משימה חדשה, ואז כתבו באופן טבעי. הפרטים יתמלאו בשבילכם:\n• תאריכים: today, tomorrow, tonight, next week, in 3 days, friday\n• שעות: 6pm, 18:30, at 9\n• עדיפות: !high, !low (או p1 עד p3)\n• קטגוריה: #עבודה\nדוגמה: \"Call mom tomorrow 6pm !high #family\"';
+
+  @override
+  String get guideSubtasksBody =>
+      'פתחו משימה והוסיפו תתי-משימות כדי לחלק אותה לשלבים. הפעילו \"נדרשות תת-משימות\" והמשימה לא תסומן כהושלמה עד שכל תתי-המשימות יושלמו. רשימות קניות מסתיימות מעצמן כשכל הפריטים מסומנים.';
+
+  @override
+  String get guideRecurringTitle => 'משימות חוזרות';
+
+  @override
+  String get guideRecurringBody =>
+      'הגדירו משימה שתחזור מדי יום, בימי חול, מדי שבוע, חודש, שנה או לפי כלל מותאם. כשתשלימו אותה, המופע הבא יתוזמן עם התזכורת שלו ויופיע ביום שלו.';
+
+  @override
+  String get guideRemindersBody =>
+      'משימה עם שעת יעד מזכירה לכם כשהיא מגיעה. מההתראה אפשר להשלים, לפתוח או לדחות אותה. גרסת Pro מוסיפה אפשרויות דחייה, תזכורות חוזרות עד שתגיבו ושעות שקט.';
+
+  @override
+  String get guideViewsTitle => 'רשימה, לוח ולוח שנה';
+
+  @override
+  String get guideViewsBody =>
+      'עברו בין הרשימה, הלוח ולוח השנה. הלוח ממיין משימות לעמודות לביצוע, בפוקוס והושלם, ואפשר לגרור כרטיסים ביניהן. לוח השנה מציג את המשימות לצד אירועי Google Calendar ושיעורי ROCIs Schedule.';
+
+  @override
+  String get guideSharingTitle => 'שיתוף משימות';
+
+  @override
+  String get guideSharingBody =>
+      'פתחו משימה ושתפו אותה כקישור או כקוד QR. הצד השני יראה תצוגה מקדימה ויוכל לייבא עותק משלו. כדי לסרוק קוד, הקישו על + ובחרו סריקת קוד QR.';
+
+  @override
+  String get guidePrivacyBody =>
+      'סמנו קטגוריה כפרטית והגדירו קוד PIN בהגדרות. כל עוד היא נעולה, המשימות שלה מוסתרות מהרשימה, מהווידג\'טים ומההתראות.';
+
+  @override
+  String get guideGoogleTasksBody =>
+      'הפעילו סנכרון עם Google Tasks במשימה כדי לשקף אותה לרשימת Google Tasks שלכם.';
 }

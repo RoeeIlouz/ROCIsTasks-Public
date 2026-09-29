@@ -846,7 +846,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get guideCloudSyncDesc =>
-      'Accédez à vos tâches depuis n\'importe quel appareil grâce à la synchronisation cloud sécurisée.';
+      'Connectez-vous pour synchroniser vos tâches entre votre téléphone et tasks.rocisapps.com. Les Paramètres proposent aussi Synchroniser maintenant, la Corbeille et une sauvegarde à exporter ou importer.';
 
   @override
   String get guideAddingTasksTitle => 'Ajouter des tâches';
@@ -860,14 +860,14 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get guideGesturesDesc =>
-      'Faites glisser vers la droite pour terminer, vers la gauche pour supprimer. Appuyez longuement pour d\'autres options.';
+      'Touchez une tâche pour l\'ouvrir. Balayez vers la droite pour la terminer et vers la gauche pour la supprimer ; les tâches supprimées attendent dans la Corbeille, d\'où vous pouvez les restaurer. Appuyez longuement sur une tâche pour en sélectionner plusieurs.';
 
   @override
   String get guideWidgetsTitle => 'Widgets d\'écran d\'accueil';
 
   @override
   String get guideWidgetsDesc =>
-      'Ajoutez des widgets ROCI\'s Tasks à votre écran d\'accueil pour un accès rapide.';
+      'Appuyez longuement sur l\'écran d\'accueil, ouvrez Widgets et choisissez ROCI\'s Tasks : listes de tâches, agenda du jour, calendrier ou tableau. Ajustez leur apparence dans les Paramètres.';
 
   @override
   String get guideCustomizationTitle => 'Personnalisation';
@@ -997,7 +997,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get requireSubTasksBeforeRemindersSubtitle =>
-      'Ne pas envoyer de rappels avant que toutes les sous-tâches ne soient terminées';
+      'La tâche ne peut être cochée qu\'une fois toutes les sous-tâches terminées';
 
   @override
   String get debugModeUnlocked => 'Mode débogage déverrouillé !';
@@ -2130,4 +2130,68 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get flipCamera => 'Changer de caméra';
+
+  @override
+  String completeSubtasksFirst(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Terminez d\'abord les $count sous-tâches restantes',
+      one: 'Terminez d\'abord la dernière sous-tâche',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get guideSearchHint => 'Rechercher dans le guide';
+
+  @override
+  String get guideNoResults => 'Aucun sujet correspondant';
+
+  @override
+  String get guideProBadge => 'PRO';
+
+  @override
+  String get guideQuickAddTitle => 'Ajout rapide avec texte intelligent';
+
+  @override
+  String get guideQuickAddBody =>
+      'Touchez + et choisissez Nouvelle tâche, puis écrivez naturellement. Les détails sont remplis pour vous :\n• Dates : today, tomorrow, tonight, next week, in 3 days, friday\n• Heures : 6pm, 18:30, at 9\n• Priorité : !high, !low (ou p1 à p3)\n• Catégorie : #travail\nExemple : \"Call mom tomorrow 6pm !high #family\"';
+
+  @override
+  String get guideSubtasksBody =>
+      'Ouvrez une tâche et ajoutez des sous-tâches pour la découper en étapes. Activez \"Sous-tâches requises\" et la tâche ne pourra être cochée qu\'une fois toutes les sous-tâches terminées. Les listes de courses se terminent seules quand tout est coché.';
+
+  @override
+  String get guideRecurringTitle => 'Tâches récurrentes';
+
+  @override
+  String get guideRecurringBody =>
+      'Faites se répéter une tâche chaque jour, en semaine, chaque semaine, mois ou année, ou selon une règle personnalisée. Quand vous la terminez, la suivante est planifiée avec son rappel et apparaît le jour prévu.';
+
+  @override
+  String get guideRemindersBody =>
+      'Une tâche avec une heure vous prévient à l\'échéance. Depuis la notification, vous pouvez la terminer, l\'ouvrir ou la reporter. Pro ajoute plus d\'options de report, des rappels répétés jusqu\'à ce que vous agissiez et des heures calmes.';
+
+  @override
+  String get guideViewsTitle => 'Liste, tableau et calendrier';
+
+  @override
+  String get guideViewsBody =>
+      'Passez de la liste au tableau et au calendrier. Le tableau range les tâches en À faire, En cours et Terminé, et vous pouvez glisser les cartes d\'une colonne à l\'autre. Le calendrier affiche vos tâches à côté des événements Google Agenda et des cours ROCIs Schedule.';
+
+  @override
+  String get guideSharingTitle => 'Partager des tâches';
+
+  @override
+  String get guideSharingBody =>
+      'Ouvrez une tâche et partagez-la par lien ou code QR. L\'autre personne voit un aperçu et peut importer sa propre copie. Pour scanner un code, touchez + et choisissez Scanner un code QR.';
+
+  @override
+  String get guidePrivacyBody =>
+      'Marquez une catégorie comme privée et définissez un code PIN dans les Paramètres. Tant qu\'elle est verrouillée, ses tâches sont masquées de la liste, des widgets et des notifications.';
+
+  @override
+  String get guideGoogleTasksBody =>
+      'Activez la synchronisation avec Google Tasks sur une tâche pour la reproduire dans votre liste Google Tasks.';
 }

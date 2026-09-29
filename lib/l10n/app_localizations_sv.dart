@@ -839,7 +839,7 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get guideCloudSyncDesc =>
-      'Få tillgång till dina uppgifter från valfri enhet med säker molnsynkronisering.';
+      'Logga in för att synka dina uppgifter mellan telefonen och tasks.rocisapps.com. I Inställningar finns även Synka nu, papperskorgen och en säkerhetskopia som du kan exportera eller importera.';
 
   @override
   String get guideAddingTasksTitle => 'Lägga till uppgifter';
@@ -853,14 +853,14 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get guideGesturesDesc =>
-      'Svep åt höger för att slutföra, svep åt vänster för att ta bort. Långpressa för fler alternativ.';
+      'Tryck på en uppgift för att öppna den. Svep åt höger för att slutföra den och åt vänster för att radera den; raderade uppgifter hamnar i papperskorgen där du kan återställa dem. Håll in en uppgift för att markera flera.';
 
   @override
   String get guideWidgetsTitle => 'Hemwidgetar';
 
   @override
   String get guideWidgetsDesc =>
-      'Lägg till ROCI\'s Tasks-widgetar på din hemskärm för snabbåtkomst och statusuppdateringar.';
+      'Håll in hemskärmen, öppna Widgetar och välj ROCI\'s Tasks: uppgiftslistor, dagens agenda, kalendern eller tavlan. Anpassa utseendet i Inställningar.';
 
   @override
   String get guideCustomizationTitle => 'Anpassning';
@@ -987,7 +987,7 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get requireSubTasksBeforeRemindersSubtitle =>
-      'Skicka inte påminnelser förrän alla underuppgifter är klara';
+      'Uppgiften kan inte bockas av förrän alla underuppgifter är klara';
 
   @override
   String get debugModeUnlocked => 'Utvecklarläge upplåst!';
@@ -2113,4 +2113,68 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get flipCamera => 'Byt kamera';
+
+  @override
+  String completeSubtasksFirst(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Slutför de $count öppna underuppgifterna först',
+      one: 'Slutför den sista underuppgiften först',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get guideSearchHint => 'Sök i guiden';
+
+  @override
+  String get guideNoResults => 'Inga matchande ämnen';
+
+  @override
+  String get guideProBadge => 'PRO';
+
+  @override
+  String get guideQuickAddTitle => 'Snabbt tillägg med smart text';
+
+  @override
+  String get guideQuickAddBody =>
+      'Tryck på + och välj Ny uppgift, skriv sedan som vanligt. Detaljerna fylls i åt dig:\n• Datum: today, tomorrow, tonight, next week, in 3 days, friday\n• Tider: 6pm, 18:30, at 9\n• Prioritet: !high, !low (eller p1 till p3)\n• Kategori: #jobb\nExempel: \"Call mom tomorrow 6pm !high #family\"';
+
+  @override
+  String get guideSubtasksBody =>
+      'Öppna en uppgift och lägg till underuppgifter för att dela upp den i steg. Slå på \"Underuppgifter krävs\" så kan uppgiften inte bockas av förrän alla underuppgifter är klara. Inköpslistor slutförs av sig själva när allt är avbockat.';
+
+  @override
+  String get guideRecurringTitle => 'Återkommande uppgifter';
+
+  @override
+  String get guideRecurringBody =>
+      'Låt en uppgift upprepas dagligen, på vardagar, varje vecka, månad eller år, eller enligt en egen regel. När du slutför den schemaläggs nästa med sin påminnelse och dyker upp på sin dag.';
+
+  @override
+  String get guideRemindersBody =>
+      'En uppgift med tid påminner dig när den förfaller. Från aviseringen kan du slutföra, öppna eller snooza den. Pro ger fler snooze-val, upprepade påminnelser tills du agerar och tysta timmar.';
+
+  @override
+  String get guideViewsTitle => 'Lista, tavla och kalender';
+
+  @override
+  String get guideViewsBody =>
+      'Växla mellan listan, tavlan och kalendern. Tavlan sorterar uppgifter i Att göra, I fokus och Klart, och du kan dra kort mellan kolumnerna. Kalendern visar dina uppgifter bredvid Google Kalender-händelser och ROCIs Schedule-lektioner.';
+
+  @override
+  String get guideSharingTitle => 'Dela uppgifter';
+
+  @override
+  String get guideSharingBody =>
+      'Öppna en uppgift och dela den som länk eller QR-kod. Mottagaren ser en förhandsvisning och kan importera en egen kopia. Tryck på + och välj Skanna QR-kod för att skanna en kod.';
+
+  @override
+  String get guidePrivacyBody =>
+      'Markera en kategori som privat och ange en PIN-kod i Inställningar. Så länge den är låst döljs dess uppgifter i listan, widgetar och aviseringar.';
+
+  @override
+  String get guideGoogleTasksBody =>
+      'Slå på synk med Google Tasks för en uppgift för att spegla den till din Google Tasks-lista.';
 }

@@ -8,6 +8,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import 'package:rocis_tasks/shared/ui/app_messenger.dart';
 import 'package:rocis_tasks/shared/ui/ui_kit.dart';
 import 'package:rocis_tasks/core/services/auth_service.dart';
 import 'package:rocis_tasks/core/services/calendar_service.dart';
@@ -527,6 +528,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         return MaterialApp.router(
           title: "ROCI's Tasks",
           debugShowCheckedModeBanner: false,
+          scaffoldMessengerKey: appMessengerKey,
           theme: lightTheme,
           darkTheme: darkTheme,
           themeMode: themeService.themeMode,

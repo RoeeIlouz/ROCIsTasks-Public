@@ -155,15 +155,47 @@ void main() {
       ).thenReturn([missing, newerHere, newerInCloud, purged]);
       when(() => firestore.fetchTaskStates(any())).thenAnswer(
         (_) async => {
-          'newer': (editedAt: at(5), isPurged: false),
-          'stale': (editedAt: at(5), isPurged: false),
-          'purged': (editedAt: at(5), isPurged: true),
+          'newer': (
+            editedAt: at(5),
+            isPurged: false,
+            missingQueryFields: false,
+          ),
+          'stale': (
+            editedAt: at(5),
+            isPurged: false,
+            missingQueryFields: false,
+          ),
+          'purged': (
+            editedAt: at(5),
+            isPurged: true,
+            missingQueryFields: false,
+          ),
         },
       );
 
       await manager.uploadLocalDataToCloud();
 
       expect(uploadedTasks().map((t) => t.id), ['missing', 'newer']);
+    });
+
+    test('rewrites cloud copies other devices cannot query', () async {
+      // The cloud copy is newer, but lacks isDeleted/isCompleted, so the
+      // active-task listener on other devices (web) never sees it.
+      final hidden = Task(id: 'hidden', title: 'h', modifiedAt: at(1));
+      when(() => source.getTasks()).thenReturn([hidden]);
+      when(() => firestore.fetchTaskStates(any())).thenAnswer(
+        (_) async => {
+          'hidden': (
+            editedAt: at(5),
+            isPurged: false,
+            missingQueryFields: true,
+          ),
+        },
+      );
+
+      await manager.uploadLocalDataToCloud();
+
+      expect(uploadedTasks().map((t) => t.id), ['hidden']);
     });
 
     test('uploads nothing and keeps retrying when offline', () async {

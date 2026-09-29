@@ -107,13 +107,6 @@ class TaskNotificationManager {
 
     await cancelTaskNotifications(task);
 
-    if (isPremium &&
-        task.requireSubTasksBeforeReminders &&
-        (task.subTasks?.isNotEmpty ?? false) &&
-        (task.subTasks?.any((st) => !st.isCompleted) ?? false)) {
-      return;
-    }
-
     final shouldHide = shouldHidePrivate && isPrivate;
 
     final title = shouldHide

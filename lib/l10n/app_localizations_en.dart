@@ -835,7 +835,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get guideCloudSyncDesc =>
-      'Access your tasks from any device with secure cloud synchronization.';
+      'Sign in to sync your tasks between your phone and tasks.rocisapps.com. Settings also has Sync now, Trash, and a backup you can export or import.';
 
   @override
   String get guideAddingTasksTitle => 'Adding Tasks';
@@ -849,14 +849,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get guideGesturesDesc =>
-      'Swipe right to complete a task, swipe left to delete it. Long-press for more options.';
+      'Tap a task to open it. Swipe right to complete it and left to delete it; deleted tasks wait in Trash, where you can restore them. Long-press a task to select several at once.';
 
   @override
   String get guideWidgetsTitle => 'Home Widgets';
 
   @override
   String get guideWidgetsDesc =>
-      'Add ROCI\'s Tasks widgets to your home screen for quick access and status updates.';
+      'Long-press your home screen, open Widgets and pick ROCI\'s Tasks: task lists, today\'s agenda, the calendar or the board. Adjust their look in Settings.';
 
   @override
   String get guideCustomizationTitle => 'Customization';
@@ -980,7 +980,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get requireSubTasksBeforeRemindersSubtitle =>
-      'Don’t send reminders until all subtasks are completed';
+      'The task can\'t be checked off until every subtask is done';
 
   @override
   String get debugModeUnlocked => 'Debug mode unlocked!';
@@ -2098,4 +2098,68 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get flipCamera => 'Flip camera';
+
+  @override
+  String completeSubtasksFirst(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Finish the $count open subtasks first',
+      one: 'Finish the last subtask first',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get guideSearchHint => 'Search the guide';
+
+  @override
+  String get guideNoResults => 'No matching topics';
+
+  @override
+  String get guideProBadge => 'PRO';
+
+  @override
+  String get guideQuickAddTitle => 'Quick add with smart text';
+
+  @override
+  String get guideQuickAddBody =>
+      'Tap + and choose New task, then type naturally. The details are filled in for you:\n• Dates: today, tomorrow, tonight, next week, in 3 days, friday\n• Times: 6pm, 18:30, at 9\n• Priority: !high, !low (or p1 to p3)\n• Category: #work\nExample: \"Call mom tomorrow 6pm !high #family\"';
+
+  @override
+  String get guideSubtasksBody =>
+      'Open a task and add subtasks to split it into steps. Turn on \"Subtasks required\" and the task can\'t be checked off until every subtask is done. Grocery lists complete themselves once every item is checked.';
+
+  @override
+  String get guideRecurringTitle => 'Recurring tasks';
+
+  @override
+  String get guideRecurringBody =>
+      'Set a task to repeat daily, on weekdays, weekly, monthly, yearly or on a custom rule. When you complete it, the next one is scheduled with its reminder and shows up on its day.';
+
+  @override
+  String get guideRemindersBody =>
+      'A task with a due time reminds you when it\'s due. From the notification you can complete it, open it or snooze it. Pro adds more snooze options, repeat reminders until you act, and quiet hours.';
+
+  @override
+  String get guideViewsTitle => 'List, board and calendar';
+
+  @override
+  String get guideViewsBody =>
+      'Switch between the list, the board and the calendar. The board sorts tasks into To do, In focus and Done, and you can drag cards between columns. The calendar shows your tasks next to Google Calendar events and ROCIs Schedule classes.';
+
+  @override
+  String get guideSharingTitle => 'Share tasks';
+
+  @override
+  String get guideSharingBody =>
+      'Open a task and share it as a link or a QR code. The other person sees a preview and can import their own copy. To scan a code, tap + and choose Scan QR code.';
+
+  @override
+  String get guidePrivacyBody =>
+      'Mark a category as private and set a PIN in Settings. While locked, its tasks are hidden from the list, widgets and notifications.';
+
+  @override
+  String get guideGoogleTasksBody =>
+      'Turn on Sync with Google Tasks for a task to mirror it into your Google Tasks list.';
 }

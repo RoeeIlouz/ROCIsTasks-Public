@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.2+116] - 2026-09-29 (Patch 3)
+
+### Changed
+- Red and charcoal theme to match the app logo; Material You colors are now optional.
+- Recurring tasks keep reminding after the first repeat, also when completed from a widget.
+- "Subtasks required" now blocks checking off the task until every subtask is done.
+- Faster + menu, tidier Settings, and a new searchable App guide.
+- Web: full-size calendar, missing tasks and ROCIs Schedule classes now appear.
+
 ## [0.3.2+116] - 2026-09-28 (Patch 2)
 
 ### Changed

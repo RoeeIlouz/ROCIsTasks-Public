@@ -112,7 +112,10 @@ class GlassContainer extends StatelessWidget {
       ),
     );
 
-    if (!useGlass) {
+    // blur <= 0 keeps the glass tint but skips the BackdropFilter, for
+    // surfaces that animate over a dimmed barrier where a live blur only
+    // costs frames.
+    if (!useGlass || blur <= 0) {
       return Container(margin: margin, child: innerContainer);
     }
 

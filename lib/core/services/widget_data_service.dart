@@ -427,7 +427,7 @@ class WidgetDataService {
         'subtitle': cat?.name ?? '',
         'category_color': cat != null
             ? '#${cat.colorValue.toRadixString(16).padLeft(8, '0')}'
-            : '#6366F1',
+            : '#E5323F',
         'date': taskDate.toIso8601String(),
         'dateOnly': dateOnlyFormatted,
         'dateDisplay': dateOnlyFormatted,
@@ -698,7 +698,7 @@ class WidgetDataService {
           'subtitle': cat?.name ?? '',
           'category_color': cat != null
               ? '#${cat.colorValue.toRadixString(16).padLeft(8, '0')}'
-              : '#6366F1',
+              : '#E5323F',
           'date': taskDate.toIso8601String(),
           'dateOnly': DateFormat('yyyy-MM-dd').format(taskDate),
           'timeDisplay': t.dueDate != null
@@ -923,7 +923,7 @@ class WidgetDataService {
         'subtitle': cat?.name ?? '',
         'category_color': cat != null
             ? '#${cat.colorValue.toRadixString(16).padLeft(8, '0')}'
-            : '#6366F1',
+            : '#E5323F',
         'rank': due ?? now.add(const Duration(hours: 24)),
         'start': due,
         'priority': t.priority.name,
@@ -1098,7 +1098,7 @@ class WidgetDataService {
         'category': cat?.name ?? '',
         'category_color': cat != null
             ? '#${cat.colorValue.toRadixString(16).padLeft(8, '0')}'
-            : '#6366F1',
+            : '#E5323F',
         'priority': t.priority.name,
         'isCompleted': t.isCompleted,
         'isOverdue': isOverdue,

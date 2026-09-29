@@ -8,7 +8,7 @@ import 'package:rocis_tasks/l10n/app_localizations.dart';
 class ThemeService extends ChangeNotifier {
   ThemeMode _themeMode = ThemeMode.system;
 
-  bool _useMaterialTheme = true;
+  bool _useMaterialTheme = false;
   bool _useAmoledTheme = false;
   bool _useGlassmorphism = false;
   bool _use24HourFormat = false;
@@ -41,7 +41,7 @@ class ThemeService extends ChangeNotifier {
       _themeMode = ThemeMode.values[themeModeIndex];
     }
     // Load Material Theme
-    _useMaterialTheme = prefs.getBool('use_material_theme') ?? true;
+    _useMaterialTheme = prefs.getBool('use_material_theme') ?? false;
     // Load Glassmorphism Theme
     _useGlassmorphism = prefs.getBool('use_glassmorphism') ?? false;
     // Load AMOLED Theme

@@ -1678,7 +1678,7 @@ abstract class AppLocalizations {
   /// No description provided for @guideCloudSyncDesc.
   ///
   /// In en, this message translates to:
-  /// **'Access your tasks from any device with secure cloud synchronization.'**
+  /// **'Sign in to sync your tasks between your phone and tasks.rocisapps.com. Settings also has Sync now, Trash, and a backup you can export or import.'**
   String get guideCloudSyncDesc;
 
   /// No description provided for @guideAddingTasksTitle.
@@ -1702,7 +1702,7 @@ abstract class AppLocalizations {
   /// No description provided for @guideGesturesDesc.
   ///
   /// In en, this message translates to:
-  /// **'Swipe right to complete a task, swipe left to delete it. Long-press for more options.'**
+  /// **'Tap a task to open it. Swipe right to complete it and left to delete it; deleted tasks wait in Trash, where you can restore them. Long-press a task to select several at once.'**
   String get guideGesturesDesc;
 
   /// No description provided for @guideWidgetsTitle.
@@ -1714,7 +1714,7 @@ abstract class AppLocalizations {
   /// No description provided for @guideWidgetsDesc.
   ///
   /// In en, this message translates to:
-  /// **'Add ROCI\'s Tasks widgets to your home screen for quick access and status updates.'**
+  /// **'Long-press your home screen, open Widgets and pick ROCI\'s Tasks: task lists, today\'s agenda, the calendar or the board. Adjust their look in Settings.'**
   String get guideWidgetsDesc;
 
   /// No description provided for @guideCustomizationTitle.
@@ -1954,7 +1954,7 @@ abstract class AppLocalizations {
   /// No description provided for @requireSubTasksBeforeRemindersSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Don’t send reminders until all subtasks are completed'**
+  /// **'The task can\'t be checked off until every subtask is done'**
   String get requireSubTasksBeforeRemindersSubtitle;
 
   /// No description provided for @debugModeUnlocked.
@@ -4026,6 +4026,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Flip camera'**
   String get flipCamera;
+
+  /// No description provided for @completeSubtasksFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Finish the last subtask first} other{Finish the {count} open subtasks first}}'**
+  String completeSubtasksFirst(int count);
+
+  /// No description provided for @guideSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search the guide'**
+  String get guideSearchHint;
+
+  /// No description provided for @guideNoResults.
+  ///
+  /// In en, this message translates to:
+  /// **'No matching topics'**
+  String get guideNoResults;
+
+  /// No description provided for @guideProBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'PRO'**
+  String get guideProBadge;
+
+  /// No description provided for @guideQuickAddTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick add with smart text'**
+  String get guideQuickAddTitle;
+
+  /// No description provided for @guideQuickAddBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap + and choose New task, then type naturally. The details are filled in for you:\n• Dates: today, tomorrow, tonight, next week, in 3 days, friday\n• Times: 6pm, 18:30, at 9\n• Priority: !high, !low (or p1 to p3)\n• Category: #work\nExample: \"Call mom tomorrow 6pm !high #family\"'**
+  String get guideQuickAddBody;
+
+  /// No description provided for @guideSubtasksBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Open a task and add subtasks to split it into steps. Turn on \"Subtasks required\" and the task can\'t be checked off until every subtask is done. Grocery lists complete themselves once every item is checked.'**
+  String get guideSubtasksBody;
+
+  /// No description provided for @guideRecurringTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Recurring tasks'**
+  String get guideRecurringTitle;
+
+  /// No description provided for @guideRecurringBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Set a task to repeat daily, on weekdays, weekly, monthly, yearly or on a custom rule. When you complete it, the next one is scheduled with its reminder and shows up on its day.'**
+  String get guideRecurringBody;
+
+  /// No description provided for @guideRemindersBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A task with a due time reminds you when it\'s due. From the notification you can complete it, open it or snooze it. Pro adds more snooze options, repeat reminders until you act, and quiet hours.'**
+  String get guideRemindersBody;
+
+  /// No description provided for @guideViewsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'List, board and calendar'**
+  String get guideViewsTitle;
+
+  /// No description provided for @guideViewsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch between the list, the board and the calendar. The board sorts tasks into To do, In focus and Done, and you can drag cards between columns. The calendar shows your tasks next to Google Calendar events and ROCIs Schedule classes.'**
+  String get guideViewsBody;
+
+  /// No description provided for @guideSharingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Share tasks'**
+  String get guideSharingTitle;
+
+  /// No description provided for @guideSharingBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Open a task and share it as a link or a QR code. The other person sees a preview and can import their own copy. To scan a code, tap + and choose Scan QR code.'**
+  String get guideSharingBody;
+
+  /// No description provided for @guidePrivacyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark a category as private and set a PIN in Settings. While locked, its tasks are hidden from the list, widgets and notifications.'**
+  String get guidePrivacyBody;
+
+  /// No description provided for @guideGoogleTasksBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn on Sync with Google Tasks for a task to mirror it into your Google Tasks list.'**
+  String get guideGoogleTasksBody;
 }
 
 class _AppLocalizationsDelegate

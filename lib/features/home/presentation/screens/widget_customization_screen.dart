@@ -28,7 +28,7 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
   bool _showTasks = true;
   bool _showGoogle = true;
   int _startOfWeek = 7;
-  String _highlightColor = '#6366F1';
+  String _highlightColor = '#E5323F';
   String _selectedCategoryFilter = 'all';
   bool _isLoading = true;
   int _selectedPreviewIndex = 0;
@@ -52,7 +52,7 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
         _showGoogle = prefs.getBool('full_calendar_show_google') ?? true;
         _startOfWeek = prefs.getInt('full_calendar_start_of_week') ?? 7;
         _highlightColor =
-            prefs.getString('full_calendar_highlight_color') ?? '#6366F1';
+            prefs.getString('full_calendar_highlight_color') ?? '#E5323F';
         _selectedCategoryFilter =
             prefs.getString('widget_filter_category_id') ?? 'all';
         _isLoading = false;
@@ -1257,6 +1257,7 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
 
   Widget _buildColorPicker(ThemeData theme) {
     final colors = [
+      {'hex': '#E5323F', 'name': 'ROCIs Red', 'color': const Color(0xFFE5323F)},
       {'hex': '#6366F1', 'name': 'Indigo', 'color': const Color(0xFF6366F1)},
       {'hex': '#10B981', 'name': 'Emerald', 'color': const Color(0xFF10B981)},
       {'hex': '#F59E0B', 'name': 'Orange', 'color': const Color(0xFFF59E0B)},

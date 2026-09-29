@@ -98,7 +98,7 @@ void main() {
     when(() => mockTaskProvider.errorMessage).thenReturn(null);
     when(
       () => mockTaskProvider.toggleTaskCompletion(any()),
-    ).thenAnswer((_) async {});
+    ).thenAnswer((_) async => true);
     when(() => mockTaskProvider.updateTask(any())).thenAnswer((_) async {});
     when(
       () => mockTaskProvider.addTask(

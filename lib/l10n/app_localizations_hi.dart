@@ -838,7 +838,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get guideCloudSyncDesc =>
-      'सुरक्षित क्लाउड सिंक्रोनाइज़ेशन के साथ किसी भी उपकरण से अपने कार्यों तक पहुंचें।';
+      'अपने फ़ोन और tasks.rocisapps.com के बीच कार्य सिंक करने के लिए साइन इन करें। सेटिंग्स में अभी सिंक करें, ट्रैश और एक बैकअप भी है जिसे आप निर्यात या आयात कर सकते हैं।';
 
   @override
   String get guideAddingTasksTitle => 'कार्य जोड़ना';
@@ -852,14 +852,14 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get guideGesturesDesc =>
-      'कार्य पूरा करने के लिए दाएं स्वाइप करें, हटाने के लिए बाएं स्वाइप करें। अधिक विकल्पों के लिए दबाकर रखें।';
+      'किसी कार्य को खोलने के लिए उस पर टैप करें। पूरा करने के लिए दाईं ओर और हटाने के लिए बाईं ओर स्वाइप करें; हटाए गए कार्य ट्रैश में रहते हैं, जहाँ से आप उन्हें वापस ला सकते हैं। कई कार्य चुनने के लिए किसी कार्य को देर तक दबाएँ।';
 
   @override
   String get guideWidgetsTitle => 'होम विजेट्स';
 
   @override
   String get guideWidgetsDesc =>
-      'त्वरित पहुंच और स्थिति अपडेट के लिए अपनी होम स्क्रीन पर ROCI\'s Tasks विजेट जोड़ें।';
+      'होम स्क्रीन को देर तक दबाएँ, विजेट खोलें और ROCI\'s Tasks चुनें: कार्य सूचियाँ, आज का एजेंडा, कैलेंडर या बोर्ड। उनका रूप सेटिंग्स में बदलें।';
 
   @override
   String get guideCustomizationTitle => 'कस्टमाइज़ेशन';
@@ -984,7 +984,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get requireSubTasksBeforeRemindersSubtitle =>
-      'जब तक सभी उप-कार्य पूरे न हो जाएं, अनुस्मारक न भेजें';
+      'सभी उप-कार्य पूरे होने तक कार्य पूरा नहीं किया जा सकता';
 
   @override
   String get debugModeUnlocked => 'डीबग मोड अनलॉक्ड!';
@@ -2107,4 +2107,68 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get flipCamera => 'कैमरा बदलें';
+
+  @override
+  String completeSubtasksFirst(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'पहले $count खुले उप-कार्य पूरे करें',
+      one: 'पहले अंतिम उप-कार्य पूरा करें',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get guideSearchHint => 'गाइड में खोजें';
+
+  @override
+  String get guideNoResults => 'कोई मिलता-जुलता विषय नहीं';
+
+  @override
+  String get guideProBadge => 'PRO';
+
+  @override
+  String get guideQuickAddTitle => 'स्मार्ट टेक्स्ट से तुरंत जोड़ें';
+
+  @override
+  String get guideQuickAddBody =>
+      '+ पर टैप करें और नया कार्य चुनें, फिर सामान्य तरीके से लिखें। विवरण अपने-आप भर जाते हैं:\n• तारीख: today, tomorrow, tonight, next week, in 3 days, friday\n• समय: 6pm, 18:30, at 9\n• प्राथमिकता: !high, !low (या p1 से p3)\n• श्रेणी: #work\nउदाहरण: \"Call mom tomorrow 6pm !high #family\"';
+
+  @override
+  String get guideSubtasksBody =>
+      'किसी कार्य को खोलें और उसे चरणों में बाँटने के लिए उप-कार्य जोड़ें। \"उप-कार्य आवश्यक हैं\" चालू करें, तो सभी उप-कार्य पूरे होने तक कार्य पूरा नहीं होगा। सभी आइटम चेक होते ही किराना सूचियाँ अपने-आप पूरी हो जाती हैं।';
+
+  @override
+  String get guideRecurringTitle => 'दोहराए जाने वाले कार्य';
+
+  @override
+  String get guideRecurringBody =>
+      'किसी कार्य को रोज़, कार्यदिवसों पर, हर हफ़्ते, महीने, साल या अपने नियम से दोहराएँ। उसे पूरा करने पर अगला कार्य रिमाइंडर के साथ तय हो जाता है और अपने दिन दिखाई देता है।';
+
+  @override
+  String get guideRemindersBody =>
+      'समय वाला कार्य नियत समय पर आपको याद दिलाता है। सूचना से आप उसे पूरा कर सकते हैं, खोल सकते हैं या स्नूज़ कर सकते हैं। Pro में स्नूज़ के और विकल्प, जवाब देने तक दोहराए जाने वाले रिमाइंडर और शांत समय मिलते हैं।';
+
+  @override
+  String get guideViewsTitle => 'सूची, बोर्ड और कैलेंडर';
+
+  @override
+  String get guideViewsBody =>
+      'सूची, बोर्ड और कैलेंडर के बीच बदलें। बोर्ड कार्यों को करना है, फ़ोकस में और पूरा कॉलम में रखता है, और आप कार्डों को कॉलमों के बीच खींच सकते हैं। कैलेंडर आपके कार्यों को Google Calendar इवेंट और ROCIs Schedule कक्षाओं के साथ दिखाता है।';
+
+  @override
+  String get guideSharingTitle => 'कार्य साझा करें';
+
+  @override
+  String get guideSharingBody =>
+      'कोई कार्य खोलें और उसे लिंक या QR कोड के रूप में साझा करें। दूसरे व्यक्ति को पूर्वावलोकन दिखता है और वह अपनी कॉपी आयात कर सकता है। कोड स्कैन करने के लिए + पर टैप करें और QR कोड स्कैन करें चुनें।';
+
+  @override
+  String get guidePrivacyBody =>
+      'किसी श्रेणी को निजी चिह्नित करें और सेटिंग्स में PIN सेट करें। लॉक रहने तक उसके कार्य सूची, विजेट और सूचनाओं से छिपे रहते हैं।';
+
+  @override
+  String get guideGoogleTasksBody =>
+      'किसी कार्य को अपनी Google Tasks सूची में दिखाने के लिए उस पर Google Tasks के साथ सिंक चालू करें।';
 }
