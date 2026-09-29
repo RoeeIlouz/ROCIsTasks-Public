@@ -75,13 +75,28 @@ with sync_playwright() as p:
         print('sheet done')
     if 'export' in sys.argv:
         os.makedirs(PNG, exist_ok=True)
+        import re
+        blank = []
         for svg, name, w, h in EXPORTS:
-            pg = b.new_page(viewport={'width': w, 'height': h or w})
-            pg.set_content(f'<body style="margin:0;background:transparent"><img id="i" src="{url(svg)}" style="display:block;width:{w}px"></body>')
-            pg.wait_for_function('document.getElementById("i").complete')
-            img = pg.query_selector('#i')
-            img.screenshot(path=os.path.join(PNG, name), omit_background=True)
+            if not h:  # wordmarks: height from the viewBox aspect ratio
+                vb = re.search(r'viewBox="([^"]+)"', open(os.path.join(SVG, svg), encoding='utf-8').read()).group(1).split()
+                h = round(w * float(vb[3]) / float(vb[2]))
+            # Open the SVG itself as the page: an about:blank page (set_content)
+            # may not load file:// images, which silently produced empty PNGs.
+            pg = b.new_page(viewport={'width': w, 'height': h})
+            pg.goto(url(svg))
+            pg.wait_for_timeout(100)
+            out = os.path.join(PNG, name)
+            pg.screenshot(path=out, omit_background=True)
+            painted = pg.evaluate('''() => {
+              const s = document.documentElement; const r = s.getBoundingClientRect();
+              return r.width > 0 && s.querySelectorAll('path,rect').length > 0;
+            }''')
+            if not painted:
+                blank.append(name)
             pg.close()
+        if blank:
+            raise SystemExit(f'Empty exports: {blank}')
         print(len(EXPORTS), 'PNGs ->', PNG)
     b.close()
 
