@@ -246,7 +246,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
 
     CommandPaletteDialog.show(
       context: context,
-      tasks: taskProvider.tasks.where((t) => !t.isCompleted).toList(),
+      tasks: taskProvider.allTasks.where((t) => !t.isCompleted).toList(),
       categories: taskProvider.categories,
       onSelectTask: _selectTask,
       onCreateTask: _initCreateTask,
@@ -656,7 +656,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
           // Navigation Tabs List
           Builder(
             builder: (context) {
-              final activeTasksCount = taskProvider.tasks
+              final activeTasksCount = taskProvider.allTasks
                   .where((t) => !t.isCompleted)
                   .length;
               return Column(
@@ -1413,7 +1413,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
   ) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final activeTasks = provider.tasks.where((t) => !t.isCompleted).toList();
+    final activeTasks = provider.allTasks.where((t) => !t.isCompleted).toList();
 
     // Sort logic to match filters
     final query = _searchController.text.toLowerCase();

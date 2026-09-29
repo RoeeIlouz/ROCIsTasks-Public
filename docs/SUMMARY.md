@@ -2,6 +2,24 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## Recurring Reminders, Required Subtasks, Brand Theme, Web Fixes - 2026-09-29 (Patch 3 on 0.3.2+116)
+
+#### Problems & Root Causes
+* Recurring tasks stopped notifying after one cycle: the next iteration's reminder ("preview_<id>") was scheduled only at completion; `performFullSync` cancelled all notifications and rescheduled open tasks only, the startup reschedule skipped completed tasks, and widget completion (`BackgroundHandler._completeTaskInBackground`) never set `nextRecurrenceDate`.
+* "Subtasks required" (`requireSubTasksBeforeReminders`) only muted reminders; the parent could still be completed.
+* Speed-dial pills each ran a `BackdropFilter` inside Fade/Slide transitions: a full re-blur per pill per frame.
+* Web missed tasks: `getActiveTasksStream` filters `isCompleted == false && isDeleted == false`, which never matches docs missing those fields; the upload watermark meant such docs were never rewritten. Web dashboard and calendar also read the filtered `TaskProvider.tasks`.
+* Web Schedule events empty after reload: the secondary `rocis-schedule` auth restores asynchronously, so `ensureSecondaryAuth` saw `currentUser == null` and REST reads went out without an ID token (owner-only rules).
+* Both apps defaulted to Material You, hiding the brand colors on Android 12+.
+
+#### Solutions Applied
+* `_scheduleTaskNotifications` maps a completed recurring task with `nextRecurrenceDate` to its preview task; startup and full sync share `rescheduleAllTaskNotifications`. Widget completion computes `nextRecurrenceDate`.
+* `toggleTaskCompletion` returns `Future<bool>` and refuses while required subtasks are open (snackbar via global `appMessengerKey`); kanban Done drop and widget completion respect it.
+* `GlassContainer(blur: 0)` keeps the tint without a BackdropFilter; speed dial uses it, 160ms transition.
+* `CloudTaskState.missingQueryFields`; upload watermark key bumped to `tasks_upload_watermark_v2_<uid>` for one full reconcile. Web and calendar use `allTasks`.
+* `ensureSecondaryAuth` awaits the first `authStateChanges()` event on web (3s timeout).
+* `AppTheme.brandScheme` (red E5323F fidelity + charcoal neutral greys); `use_material_theme` defaults to false. Calendar gets a wide layout (>= 900px): full-height grid with titled chips and a side agenda. Settings regrouped; App guide rewritten (8 locales).
+
 ## Store & README Graphics Refresh - 2026-09-29 (assets only, no app change)
 
 #### Problems & Root Causes

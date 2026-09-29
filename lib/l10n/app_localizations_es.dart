@@ -846,7 +846,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get guideCloudSyncDesc =>
-      'Accede a tus tareas desde cualquier dispositivo con sincronización segura en la nube.';
+      'Inicia sesión para sincronizar tus tareas entre el móvil y tasks.rocisapps.com. En Ajustes también tienes Sincronizar ahora, la Papelera y una copia de seguridad que puedes exportar o importar.';
 
   @override
   String get guideAddingTasksTitle => 'Añadir tareas';
@@ -860,14 +860,14 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get guideGesturesDesc =>
-      'Desliza a la derecha para completar una tarea, desliza a la izquierda para eliminarla. Mantén presionado para más opciones.';
+      'Toca una tarea para abrirla. Desliza a la derecha para completarla y a la izquierda para eliminarla; las tareas eliminadas esperan en la Papelera, donde puedes restaurarlas. Mantén pulsada una tarea para seleccionar varias.';
 
   @override
   String get guideWidgetsTitle => 'Widgets de inicio';
 
   @override
   String get guideWidgetsDesc =>
-      'Añade widgets de ROCI\'s Tasks a tu pantalla de inicio para un acceso rápido y actualizaciones de estado.';
+      'Mantén pulsada la pantalla de inicio, abre Widgets y elige ROCI\'s Tasks: listas de tareas, la agenda de hoy, el calendario o el tablero. Ajusta su aspecto en Ajustes.';
 
   @override
   String get guideCustomizationTitle => 'Personalización';
@@ -996,7 +996,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get requireSubTasksBeforeRemindersSubtitle =>
-      'No envía recordatorios hasta completar todas las subtareas';
+      'La tarea no se puede completar hasta terminar todas las subtareas';
 
   @override
   String get debugModeUnlocked => '¡Modo de depuración desbloqueado!';
@@ -2125,4 +2125,68 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get flipCamera => 'Cambiar cámara';
+
+  @override
+  String completeSubtasksFirst(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Termina primero las $count subtareas pendientes',
+      one: 'Termina primero la última subtarea',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get guideSearchHint => 'Buscar en la guía';
+
+  @override
+  String get guideNoResults => 'No hay temas que coincidan';
+
+  @override
+  String get guideProBadge => 'PRO';
+
+  @override
+  String get guideQuickAddTitle => 'Añadir rápido con texto inteligente';
+
+  @override
+  String get guideQuickAddBody =>
+      'Toca + y elige Nueva tarea; luego escribe con naturalidad. Los detalles se completan solos:\n• Fechas: today, tomorrow, tonight, next week, in 3 days, friday\n• Horas: 6pm, 18:30, at 9\n• Prioridad: !high, !low (o p1 a p3)\n• Categoría: #trabajo\nEjemplo: \"Call mom tomorrow 6pm !high #family\"';
+
+  @override
+  String get guideSubtasksBody =>
+      'Abre una tarea y añade subtareas para dividirla en pasos. Activa \"Subtareas requeridas\" y la tarea no se podrá completar hasta terminar todas las subtareas. Las listas de la compra se completan solas cuando marcas todos los artículos.';
+
+  @override
+  String get guideRecurringTitle => 'Tareas recurrentes';
+
+  @override
+  String get guideRecurringBody =>
+      'Haz que una tarea se repita a diario, entre semana, cada semana, mes o año, o con una regla personalizada. Al completarla, la siguiente se programa con su recordatorio y aparece en su día.';
+
+  @override
+  String get guideRemindersBody =>
+      'Una tarea con hora te avisa cuando vence. Desde la notificación puedes completarla, abrirla o posponerla. Pro añade más opciones para posponer, recordatorios repetidos hasta que actúes y horas de silencio.';
+
+  @override
+  String get guideViewsTitle => 'Lista, tablero y calendario';
+
+  @override
+  String get guideViewsBody =>
+      'Cambia entre la lista, el tablero y el calendario. El tablero ordena las tareas en Por hacer, En foco y Hecho, y puedes arrastrar tarjetas entre columnas. El calendario muestra tus tareas junto a los eventos de Google Calendar y las clases de ROCIs Schedule.';
+
+  @override
+  String get guideSharingTitle => 'Compartir tareas';
+
+  @override
+  String get guideSharingBody =>
+      'Abre una tarea y compártela como enlace o código QR. La otra persona ve una vista previa y puede importar su propia copia. Para escanear un código, toca + y elige Escanear código QR.';
+
+  @override
+  String get guidePrivacyBody =>
+      'Marca una categoría como privada y define un PIN en Ajustes. Mientras esté bloqueada, sus tareas se ocultan de la lista, los widgets y las notificaciones.';
+
+  @override
+  String get guideGoogleTasksBody =>
+      'Activa la sincronización con Google Tasks en una tarea para reflejarla en tu lista de Google Tasks.';
 }

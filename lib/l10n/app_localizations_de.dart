@@ -847,7 +847,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get guideCloudSyncDesc =>
-      'Greifen Sie mit sicherer Cloud-Synchronisation von jedem Gerät auf Ihre Aufgaben zu.';
+      'Melde dich an, um deine Aufgaben zwischen Handy und tasks.rocisapps.com zu synchronisieren. In den Einstellungen findest du außerdem Jetzt synchronisieren, den Papierkorb und ein Backup zum Exportieren oder Importieren.';
 
   @override
   String get guideAddingTasksTitle => 'Aufgaben hinzufügen';
@@ -861,14 +861,14 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get guideGesturesDesc =>
-      'Wischen Sie nach rechts zum Erledigen, nach links zum Löschen. Gedrückt halten für mehr Optionen.';
+      'Tippe auf eine Aufgabe, um sie zu öffnen. Wische nach rechts, um sie zu erledigen, und nach links, um sie zu löschen; gelöschte Aufgaben landen im Papierkorb und lassen sich wiederherstellen. Halte eine Aufgabe gedrückt, um mehrere auszuwählen.';
 
   @override
   String get guideWidgetsTitle => 'Startbildschirm-Widgets';
 
   @override
   String get guideWidgetsDesc =>
-      'Fügen Sie ROCI\'s Tasks-Widgets zu Ihrem Startbildschirm hinzu für schnellen Zugriff und Updates.';
+      'Halte den Startbildschirm gedrückt, öffne Widgets und wähle ROCI\'s Tasks: Aufgabenlisten, die Tagesübersicht, den Kalender oder das Board. Ihr Aussehen passt du in den Einstellungen an.';
 
   @override
   String get guideCustomizationTitle => 'Anpassung';
@@ -997,7 +997,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get requireSubTasksBeforeRemindersSubtitle =>
-      'Keine Erinnerungen senden, bis alle Unteraufgaben erledigt sind';
+      'Die Aufgabe kann erst abgehakt werden, wenn alle Unteraufgaben erledigt sind';
 
   @override
   String get debugModeUnlocked => 'Entwicklermodus freigeschaltet!';
@@ -2130,4 +2130,68 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get flipCamera => 'Kamera wechseln';
+
+  @override
+  String completeSubtasksFirst(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Erledige zuerst die $count offenen Unteraufgaben',
+      one: 'Erledige zuerst die letzte Unteraufgabe',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get guideSearchHint => 'Anleitung durchsuchen';
+
+  @override
+  String get guideNoResults => 'Keine passenden Themen';
+
+  @override
+  String get guideProBadge => 'PRO';
+
+  @override
+  String get guideQuickAddTitle => 'Schnell hinzufügen mit smartem Text';
+
+  @override
+  String get guideQuickAddBody =>
+      'Tippe auf + und wähle Neue Aufgabe, dann schreib ganz natürlich. Die Details werden für dich ausgefüllt:\n• Datum: today, tomorrow, tonight, next week, in 3 days, friday\n• Uhrzeit: 6pm, 18:30, at 9\n• Priorität: !high, !low (oder p1 bis p3)\n• Kategorie: #arbeit\nBeispiel: \"Call mom tomorrow 6pm !high #family\"';
+
+  @override
+  String get guideSubtasksBody =>
+      'Öffne eine Aufgabe und füge Unteraufgaben hinzu, um sie in Schritte zu teilen. Mit \"Unteraufgaben erforderlich\" lässt sich die Aufgabe erst abhaken, wenn alle Unteraufgaben erledigt sind. Einkaufslisten erledigen sich selbst, sobald alles abgehakt ist.';
+
+  @override
+  String get guideRecurringTitle => 'Wiederkehrende Aufgaben';
+
+  @override
+  String get guideRecurringBody =>
+      'Lass eine Aufgabe täglich, an Werktagen, wöchentlich, monatlich, jährlich oder nach eigener Regel wiederholen. Wenn du sie erledigst, wird die nächste samt Erinnerung geplant und erscheint an ihrem Tag.';
+
+  @override
+  String get guideRemindersBody =>
+      'Eine Aufgabe mit Uhrzeit erinnert dich, wenn sie fällig ist. In der Benachrichtigung kannst du sie erledigen, öffnen oder schlummern lassen. Pro bietet mehr Schlummer-Optionen, wiederholte Erinnerungen bis zur Reaktion und Ruhezeiten.';
+
+  @override
+  String get guideViewsTitle => 'Liste, Board und Kalender';
+
+  @override
+  String get guideViewsBody =>
+      'Wechsle zwischen Liste, Board und Kalender. Das Board sortiert Aufgaben in Zu erledigen, Im Fokus und Erledigt, und du kannst Karten zwischen den Spalten ziehen. Der Kalender zeigt deine Aufgaben neben Google-Kalender-Terminen und ROCIs-Schedule-Kursen.';
+
+  @override
+  String get guideSharingTitle => 'Aufgaben teilen';
+
+  @override
+  String get guideSharingBody =>
+      'Öffne eine Aufgabe und teile sie als Link oder QR-Code. Die andere Person sieht eine Vorschau und kann eine eigene Kopie importieren. Zum Scannen tippe auf + und wähle QR-Code scannen.';
+
+  @override
+  String get guidePrivacyBody =>
+      'Markiere eine Kategorie als privat und lege in den Einstellungen eine PIN fest. Solange sie gesperrt ist, sind ihre Aufgaben in Liste, Widgets und Benachrichtigungen verborgen.';
+
+  @override
+  String get guideGoogleTasksBody =>
+      'Aktiviere bei einer Aufgabe die Synchronisierung mit Google Tasks, um sie in deine Google-Tasks-Liste zu spiegeln.';
 }

@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
+import 'package:rocis_tasks/features/tasks/domain/models/sub_task.dart';
 import 'package:rocis_tasks/features/tasks/data/datasources/local_task_source.dart';
 import 'package:rocis_tasks/core/services/notification_service.dart';
 import 'package:rocis_tasks/core/services/firestore_service.dart';
@@ -529,6 +530,35 @@ void main() {
     );
 
     test(
+      'bulk reschedule restores the reminder for a deferred iteration',
+      () async {
+        await taskProvider.init();
+        final next = DateTime.now().add(const Duration(days: 2));
+        final parent = Task(
+          id: 'rec-3',
+          title: 'Water plants',
+          isCompleted: true,
+          dueDate: next.subtract(const Duration(days: 1)),
+          recurrenceRule: 'FREQ=DAILY;INTERVAL=1',
+        )..nextRecurrenceDate = next;
+        when(() => mockSource.getTasks()).thenReturn([parent]);
+
+        await taskProvider.rescheduleAllTaskNotifications(cancelExisting: true);
+
+        verify(
+          () => mockNotificationService.scheduleNotification(
+            id: NotificationService.getNotificationId('preview_rec-3'),
+            title: any(named: 'title'),
+            body: any(named: 'body'),
+            scheduledDate: next,
+            taskId: 'preview_rec-3',
+            androidActions: any(named: 'androidActions'),
+          ),
+        ).called(1);
+      },
+    );
+
+    test(
       'does not spawn next recurring task when user is not premium',
       () async {
         when(() => mockSubscriptionService.isPremium).thenReturn(false);
@@ -651,5 +681,47 @@ void main() {
         expect(parent.nextRecurrenceDate, isNull);
       },
     );
+  });
+
+  group('TaskProvider required subtasks', () {
+    test('blocks completing a task while required subtasks are open', () async {
+      TestWidgetsFlutterBinding.ensureInitialized();
+      when(() => mockSource.addTask(any())).thenAnswer((_) async => {});
+      await taskProvider.init();
+      final task = Task(
+        id: 'req-1',
+        title: 'Pack',
+        subTasks: [
+          SubTask(title: 'Clothes', isCompleted: true),
+          SubTask(title: 'Charger'),
+        ],
+        requireSubTasksBeforeReminders: true,
+      );
+
+      final completed = await taskProvider.toggleTaskCompletion(task);
+
+      expect(completed, isFalse);
+      expect(task.isCompleted, isFalse);
+      verifyNever(() => mockSource.addTask(any()));
+    });
+
+    test('completes once every required subtask is done', () async {
+      when(() => mockSource.addTask(any())).thenAnswer((_) async => {});
+      when(
+        () => mockFirestoreService.updateTask(any()),
+      ).thenAnswer((_) async => {});
+      await taskProvider.init();
+      final task = Task(
+        id: 'req-2',
+        title: 'Pack',
+        subTasks: [SubTask(title: 'Charger', isCompleted: true)],
+        requireSubTasksBeforeReminders: true,
+      );
+
+      final completed = await taskProvider.toggleTaskCompletion(task);
+
+      expect(completed, isTrue);
+      expect(task.isCompleted, isTrue);
+    });
   });
 }

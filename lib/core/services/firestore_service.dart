@@ -19,7 +19,11 @@ class TaskSyncEvent {
 }
 
 /// Cloud-side state of a task used to decide whether to upload a local copy.
-typedef CloudTaskState = ({DateTime? editedAt, bool isPurged});
+typedef CloudTaskState = ({
+  DateTime? editedAt,
+  bool isPurged,
+  bool missingQueryFields,
+});
 
 class FirestoreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -301,6 +305,12 @@ class FirestoreService {
           doc.id: (
             editedAt: Task.cloudModifiedAt(doc.data()),
             isPurged: isPurgedData(doc.data()),
+            // The active-task listener filters on these with isEqualTo, which
+            // never matches a missing or null field, so such docs are
+            // invisible to every other device until rewritten.
+            missingQueryFields:
+                doc.data()['isCompleted'] is! bool ||
+                doc.data()['isDeleted'] is! bool,
           ),
     };
   }

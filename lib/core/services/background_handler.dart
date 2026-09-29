@@ -11,6 +11,7 @@ import 'package:rocis_tasks/features/categories/domain/models/category.dart';
 import 'package:rocis_tasks/features/home/services/full_calendar_widget_service.dart';
 import 'package:rocis_tasks/features/tasks/data/datasources/local_task_source.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
+import 'package:rocis_tasks/features/tasks/domain/services/task_recurrence_service.dart';
 import 'package:rocis_tasks/features/tasks/services/task_widget_service.dart';
 import 'package:rocis_tasks/core/services/logger_service.dart';
 import 'package:rocis_tasks/l10n/l10n_helper.dart';
@@ -317,8 +318,28 @@ class BackgroundHandler {
 
       final box = await Hive.openBox<Task>(LocalTaskSource.boxName);
       final task = box.values.firstWhere((t) => t.id == taskId);
+      if (task.isCompleted) return;
+      // "Subtasks required": the parent stays open until every subtask is done.
+      if (task.requireSubTasksBeforeReminders &&
+          (task.subTasks?.any((st) => !st.isCompleted) ?? false)) {
+        return;
+      }
       task.isCompleted = true;
       task.completedAt ??= DateTime.now();
+      // Defer the next iteration like the in-app toggle does; the app
+      // materializes it (and restores its reminder) on the next launch.
+      final rule = task.recurrenceRule;
+      if (rule != null && rule.trim().isNotEmpty) {
+        final next = TaskRecurrenceService.getNextDueDate(
+          task.dueDate ?? task.createdAt,
+          rule,
+          after: DateTime.now(),
+        );
+        if (next != null) task.nextRecurrenceDate = next;
+      }
+      await NotificationService().cancelNotification(
+        NotificationService.getNotificationId(task.id),
+      );
       task.touch();
       await task.save();
 

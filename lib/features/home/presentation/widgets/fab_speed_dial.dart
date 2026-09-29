@@ -35,7 +35,7 @@ Future<T?> showFabSpeedDial<T>({
     barrierDismissible: true,
     barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
     barrierColor: Colors.black.withValues(alpha: 0.35),
-    transitionDuration: const Duration(milliseconds: 220),
+    transitionDuration: const Duration(milliseconds: 160),
     pageBuilder: (context, animation, _) => _FabSpeedDial<T>(
       anchor: anchor,
       actions: actions,
@@ -84,11 +84,13 @@ class _FabSpeedDial<T> extends StatelessWidget {
                   curved,
                   // The option nearest the FAB appears first.
                   index: actions.length - 1 - i,
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: _ActionPill<T>(
-                      action: actions[i],
-                      useGlass: useGlass,
+                  child: RepaintBoundary(
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: _ActionPill<T>(
+                        action: actions[i],
+                        useGlass: useGlass,
+                      ),
                     ),
                   ),
                 ),
@@ -117,7 +119,7 @@ class _FabSpeedDial<T> extends StatelessWidget {
     required int index,
     required Widget child,
   }) {
-    final start = (index * 0.12).clamp(0.0, 0.6);
+    final start = (index * 0.08).clamp(0.0, 0.3);
     final interval = CurvedAnimation(
       parent: animation,
       curve: Interval(start, 1, curve: Curves.easeOutCubic),
@@ -126,7 +128,7 @@ class _FabSpeedDial<T> extends StatelessWidget {
       opacity: interval,
       child: SlideTransition(
         position: Tween(
-          begin: const Offset(0, 0.4),
+          begin: const Offset(0, 0.25),
           end: Offset.zero,
         ).animate(interval),
         child: child,
@@ -155,12 +157,13 @@ class _FabSpeedDial<T> extends StatelessWidget {
     return Tooltip(
       message: tooltip,
       child: GlassContainer(
+        blur: 0,
         borderRadius: BorderRadius.circular(16),
         elevation: 4.0,
         color: useGlass
             ? theme.colorScheme.primary.withValues(alpha: 0.15)
             : (filled ? theme.colorScheme.primary : theme.colorScheme.surface),
-        opacity: 0.15,
+        opacity: 0.92,
         child: Material(
           color: Colors.transparent,
           child: InkWell(
@@ -188,12 +191,13 @@ class _ActionPill<T> extends StatelessWidget {
       label: action.label,
       excludeSemantics: true,
       child: GlassContainer(
+        blur: 0,
         borderRadius: BorderRadius.circular(16),
         elevation: 3.0,
         color: useGlass
             ? theme.colorScheme.primary.withValues(alpha: 0.12)
             : theme.colorScheme.surfaceContainerHigh,
-        opacity: 0.15,
+        opacity: 0.92,
         child: Material(
           color: Colors.transparent,
           child: InkWell(

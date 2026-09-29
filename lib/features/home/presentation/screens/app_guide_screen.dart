@@ -1,224 +1,257 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:rocis_tasks/shared/ui/widgets/glass_container.dart';
 
-class AppGuideScreen extends StatelessWidget {
+/// Searchable, task-oriented help: each topic is a concrete "how do I" with
+/// the exact syntax or steps, collapsed until opened.
+class AppGuideScreen extends StatefulWidget {
   const AppGuideScreen({super.key});
+
+  @override
+  State<AppGuideScreen> createState() => _AppGuideScreenState();
+}
+
+class _AppGuideScreenState extends State<AppGuideScreen> {
+  final _searchController = TextEditingController();
+  String _query = '';
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  List<_GuideTopic> _topics(AppLocalizations l10n) => [
+    _GuideTopic(
+      icon: Icons.bolt_rounded,
+      title: l10n.guideQuickAddTitle,
+      body: l10n.guideQuickAddBody,
+    ),
+    _GuideTopic(
+      icon: Icons.swipe_rounded,
+      title: l10n.guideGesturesTitle,
+      body: l10n.guideGesturesDesc,
+    ),
+    _GuideTopic(
+      icon: Icons.checklist_rtl_rounded,
+      title: l10n.subtasksAndChecklists,
+      body: l10n.guideSubtasksBody,
+    ),
+    _GuideTopic(
+      icon: Icons.repeat_rounded,
+      title: l10n.guideRecurringTitle,
+      body: l10n.guideRecurringBody,
+      isPro: true,
+    ),
+    if (!kIsWeb)
+      _GuideTopic(
+        icon: Icons.notifications_active_rounded,
+        title: l10n.guideNotificationsTitle,
+        body: l10n.guideRemindersBody,
+      ),
+    _GuideTopic(
+      icon: Icons.view_kanban_rounded,
+      title: l10n.guideViewsTitle,
+      body: l10n.guideViewsBody,
+    ),
+    _GuideTopic(
+      icon: Icons.search_rounded,
+      title: l10n.searchSymbols,
+      body: l10n.searchSymbolsDesc,
+    ),
+    _GuideTopic(
+      icon: Icons.qr_code_2_rounded,
+      title: l10n.guideSharingTitle,
+      body: l10n.guideSharingBody,
+    ),
+    if (!kIsWeb)
+      _GuideTopic(
+        icon: Icons.widgets_rounded,
+        title: l10n.guideWidgetsTitle,
+        body: l10n.guideWidgetsDesc,
+      ),
+    _GuideTopic(
+      icon: Icons.lock_outline_rounded,
+      title: l10n.privateMode,
+      body: l10n.guidePrivacyBody,
+      isPro: true,
+    ),
+    _GuideTopic(
+      icon: Icons.cloud_sync_rounded,
+      title: l10n.guideCloudSyncTitle,
+      body: l10n.guideCloudSyncDesc,
+    ),
+    _GuideTopic(
+      icon: Icons.playlist_add_check_rounded,
+      title: l10n.syncWithGoogleTasks,
+      body: l10n.guideGoogleTasksBody,
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
+    final q = _query.trim().toLowerCase();
+    final topics = _topics(l10n)
+        .where(
+          (t) =>
+              q.isEmpty ||
+              t.title.toLowerCase().contains(q) ||
+              t.body.toLowerCase().contains(q),
+        )
+        .toList();
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.appGuideTitle),
-      ),
+      appBar: AppBar(title: Text(l10n.appGuideTitle)),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
-          _buildGuideSection(
-            context,
-            l10n.features,
-            [
-              _GuideItem(
-                icon: Icons.check_circle_outline,
-                title: l10n.tasks,
-                description: l10n.guideTaskDesc,
-              ),
-              _GuideItem(
-                icon: Icons.calendar_month,
-                title: l10n.calendar,
-                description: l10n.guideCalendarDesc,
-              ),
-              _GuideItem(
-                icon: Icons.category,
-                title: l10n.categories,
-                description: l10n.guideCategoriesDesc,
-              ),
-              _GuideItem(
-                icon: Icons.flag_outlined,
-                title: l10n.priority,
-                description: l10n.guidePriorityDesc,
-              ),
-              _GuideItem(
-                icon: Icons.push_pin_outlined,
-                title: l10n.pinTask,
-                description: l10n.guidePinningDesc,
-              ),
-              _GuideItem(
-                icon: Icons.checklist_rtl_outlined,
-                title: l10n.subtasksAndChecklists,
-                description: l10n.subtasksAndChecklistsDesc,
-              ),
-              _GuideItem(
-                icon: Icons.attachment_rounded,
-                title: l10n.attachments,
-                description: l10n.guideAttachmentsDesc,
-              ),
-              _GuideItem(
-                icon: Icons.lock_outline_rounded,
-                title: l10n.privateMode,
-                description: l10n.privateModeSubtitle,
-              ),
-              _GuideItem(
-                icon: Icons.playlist_add_check_rounded,
-                title: l10n.syncWithGoogleTasks,
-                description: l10n.syncWithGoogleTasksSubtitle,
-              ),
-              _GuideItem(
-                icon: Icons.notifications_active,
-                title: l10n.guideNotificationsTitle,
-                description: l10n.guideNotificationsDesc,
-              ),
-              _GuideItem(
-                icon: Icons.sync,
-                title: l10n.guideCloudSyncTitle,
-                description: l10n.guideCloudSyncDesc,
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          _buildGuideSection(
-            context,
-            l10n.howToUse,
-            [
-              _GuideItem(
-                icon: Icons.add,
-                title: l10n.guideAddingTasksTitle,
-                description: l10n.guideAddingTasksDesc,
-              ),
-              _GuideItem(
-                icon: Icons.swipe,
-                title: l10n.guideGesturesTitle,
-                description: l10n.guideGesturesDesc,
-              ),
-              _GuideItem(
-                icon: Icons.widgets,
-                title: l10n.guideWidgetsTitle,
-                description: l10n.guideWidgetsDesc,
-              ),
-              _GuideItem(
-                icon: Icons.settings,
-                title: l10n.guideCustomizationTitle,
-                description: l10n.guideCustomizationDesc,
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          _buildGuideSection(
-            context,
-            l10n.searchSymbols,
-            [
-              _GuideItem(
-                icon: Icons.search,
-                title: l10n.searchSymbolsDesc,
-                description: '',
-              ),
-            ],
-          ),
-          const SizedBox(height: 32),
-          Center(
-            child: Text(
-              l10n.guideHappyOrganizing,
-              style: theme.textTheme.titleMedium?.copyWith(
-                color: theme.colorScheme.primary,
-                fontWeight: FontWeight.bold,
+          TextField(
+            controller: _searchController,
+            onChanged: (v) => setState(() => _query = v),
+            decoration: InputDecoration(
+              prefixIcon: const Icon(Icons.search_rounded),
+              hintText: l10n.guideSearchHint,
+              suffixIcon: _query.isEmpty
+                  ? null
+                  : IconButton(
+                      icon: const Icon(Icons.close_rounded),
+                      tooltip: MaterialLocalizations.of(
+                        context,
+                      ).deleteButtonTooltip,
+                      onPressed: () {
+                        _searchController.clear();
+                        setState(() => _query = '');
+                      },
+                    ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
               ),
             ),
           ),
           const SizedBox(height: 16),
+          if (topics.isEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 48),
+              child: Center(
+                child: Text(
+                  l10n.guideNoResults,
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+            ),
+          for (final topic in topics)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: _TopicCard(
+                // Re-key on the query so a search opens matching topics.
+                key: ValueKey('${topic.title}|${q.isNotEmpty}'),
+                topic: topic,
+                proLabel: l10n.guideProBadge,
+                initiallyExpanded: q.isNotEmpty,
+              ),
+            ),
         ],
       ),
     );
   }
+}
 
-  Widget _buildGuideSection(BuildContext context, String title, List<_GuideItem> items) {
+class _TopicCard extends StatelessWidget {
+  final _GuideTopic topic;
+  final String proLabel;
+  final bool initiallyExpanded;
+
+  const _TopicCard({
+    super.key,
+    required this.topic,
+    required this.proLabel,
+    required this.initiallyExpanded,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-          child: Text(
-            title,
-            style: theme.textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: theme.colorScheme.secondary,
+    final scheme = theme.colorScheme;
+    return GlassContainer(
+      borderRadius: BorderRadius.circular(20),
+      child: Theme(
+        // ExpansionTile draws dividers when open; the card is the boundary.
+        data: theme.copyWith(dividerColor: Colors.transparent),
+        child: ExpansionTile(
+          initiallyExpanded: initiallyExpanded,
+          tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+          expandedCrossAxisAlignment: CrossAxisAlignment.start,
+          leading: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: scheme.primary.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(12),
             ),
+            child: Icon(topic.icon, color: scheme.primary, size: 22),
           ),
-        ),
-        GlassContainer(
-          borderRadius: BorderRadius.circular(20),
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: List.generate(items.length, (index) {
-              final item = items[index];
-              return Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Icon(item.icon, color: theme.colorScheme.primary),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                item.title,
-                                style: theme.textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              if (item.description.isNotEmpty) ...[
-                                const SizedBox(height: 4),
-                                Text(
-                                  item.description,
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.8),
-                                  ),
-                                ),
-                              ],
-                            ],
-                          ),
-                        ),
-                      ],
+          title: Row(
+            children: [
+              Flexible(
+                child: Text(
+                  topic.title,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              if (topic.isPro) ...[
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: scheme.primary,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    proLabel,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: scheme.onPrimary,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
-                  if (index < items.length - 1)
-                    Divider(
-                      height: 1,
-                      thickness: 1,
-                      color: theme.dividerColor.withValues(alpha: 0.08),
-                    ),
-                ],
-              );
-            }),
+                ),
+              ],
+            ],
           ),
+          children: [
+            Text(
+              topic.body,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                height: 1.5,
+                color: scheme.onSurface.withValues(alpha: 0.85),
+              ),
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }
 
-class _GuideItem {
+class _GuideTopic {
   final IconData icon;
   final String title;
-  final String description;
+  final String body;
+  final bool isPro;
 
-  _GuideItem({
+  const _GuideTopic({
     required this.icon,
     required this.title,
-    required this.description,
+    required this.body,
+    this.isPro = false,
   });
 }

@@ -131,6 +131,114 @@ class _CalendarScreenState extends State<CalendarScreen> {
     return colorService.taskColor;
   }
 
+  /// From this width the calendar becomes a full-height month grid with the
+  /// selected day's agenda beside it (web / tablets) instead of stacked.
+  static const double _wideLayoutMinWidth = 900;
+
+  static Widget _expandIf(bool expand, Widget child) =>
+      expand ? Expanded(child: child) : child;
+
+  String _eventTitle(dynamic event, AppLocalizations l10n) {
+    if (event is Task) return event.title;
+    if (event is Event) return event.title ?? l10n.noTitle;
+    if (event is SyncedScheduleEvent) {
+      final course = event.courseName.trim();
+      final title = event.title.trim();
+      if (course.isEmpty) return title;
+      if (title.isEmpty || title.toLowerCase() == course.toLowerCase()) {
+        return course;
+      }
+      return '$course: $title';
+    }
+    return '';
+  }
+
+  /// Titled chips for a tall month cell: as many as fit, then "+N".
+  Widget _buildWideMarkers(
+    List<dynamic> events,
+    TaskProvider taskProvider,
+    CalendarProvider calendarProvider,
+    CalendarColorService colorService,
+  ) {
+    final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    const chipExtent = 20.0;
+    return Positioned(
+      top: 28,
+      left: 8,
+      right: 8,
+      bottom: 6,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          var fit = (constraints.maxHeight / chipExtent).floor();
+          if (fit < events.length) fit -= 1; // leave a row for "+N"
+          final shown = events.take(fit.clamp(0, events.length)).toList();
+          final hidden = events.length - shown.length;
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              for (final event in shown)
+                _buildWideChip(
+                  event,
+                  _getEventColor(
+                    event,
+                    taskProvider,
+                    calendarProvider,
+                    colorService,
+                  ),
+                  _eventTitle(event, l10n),
+                  theme,
+                  chipExtent,
+                ),
+              if (hidden > 0)
+                Text(
+                  '+$hidden',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                  ),
+                ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildWideChip(
+    dynamic event,
+    Color color,
+    String title,
+    ThemeData theme,
+    double extent,
+  ) {
+    final done = event is Task && event.isCompleted;
+    return Container(
+      height: extent - 2,
+      margin: const EdgeInsets.only(bottom: 2),
+      padding: const EdgeInsets.symmetric(horizontal: 6),
+      alignment: AlignmentDirectional.centerStart,
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.14),
+        borderRadius: BorderRadius.circular(5),
+        border: BorderDirectional(start: BorderSide(color: color, width: 3)),
+      ),
+      child: Text(
+        title,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+          color: theme.colorScheme.onSurface,
+          decoration: done ? TextDecoration.lineThrough : null,
+        ),
+      ),
+    );
+  }
+
   Widget _buildCalendarCell(
     DateTime day, {
     bool isSelected = false,
@@ -193,7 +301,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
     final colorService = Provider.of<CalendarColorService>(context);
     final l10n = AppLocalizations.of(context)!;
 
-    final tasksByDay = _indexTasksByDay(taskProvider.tasks);
+    // Every task, not the list screen's filtered view: list filters must
+    // not silently hide tasks here.
+    final tasksByDay = _indexTasksByDay(taskProvider.allTasks);
     final upcomingByDay = _indexTasksByDay(taskProvider.upcomingRecurringTasks);
     // events list not needed here as we query provider by day
     final selectedDay = calendarProvider.selectedDate;
@@ -214,46 +324,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
       calendarProvider,
     );
 
-    return Column(
-      children: [
-        if (calendarProvider.isGoogleCalendarTokenExpired)
-          Container(
-            width: double.infinity,
-            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.amber.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.amber.shade700),
-            ),
-            child: Row(
-              children: [
-                const Icon(Icons.warning_amber_rounded, color: Colors.amber),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    l10n.googleTasksDisconnected,
-                    style: const TextStyle(fontSize: 13),
-                  ),
-                ),
-                TextButton(
-                  onPressed: () async {
-                    final authService = Provider.of<AuthService>(
-                      context,
-                      listen: false,
-                    );
-                    final success = await authService.linkGoogleTasks();
-                    if (success) {
-                      calendarProvider.resetTokenExpiredState();
-                      await calendarProvider.loadEvents();
-                    }
-                  },
-                  child: Text(l10n.reconnect),
-                ),
-              ],
-            ),
-          ),
-        Padding(
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isWide = constraints.maxWidth >= _wideLayoutMinWidth;
+        final calendarCard = Padding(
           padding: const EdgeInsets.all(8.0),
           child: GlassContainer(
             padding: const EdgeInsets.all(8.0),
@@ -339,726 +413,811 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     ],
                   ),
                 ),
-                TableCalendar(
-                  headerVisible: false,
-                  firstDay: DateTime(2020, 1, 1),
-                  lastDay: DateTime(2035, 12, 31),
-                  focusedDay: _focusedDay,
-                  calendarFormat: _calendarFormat,
-                  daysOfWeekHeight: 24,
-                  selectedDayPredicate: (day) {
-                    return isSameDay(selectedDay, day);
-                  },
-                  onDaySelected: (selectedDay, focusedDay) {
-                    if (!isSameDay(
-                      calendarProvider.selectedDate,
-                      selectedDay,
-                    )) {
-                      calendarProvider.setSelectedDate(selectedDay);
+                _expandIf(
+                  isWide,
+                  TableCalendar(
+                    headerVisible: false,
+                    shouldFillViewport: isWide,
+                    firstDay: DateTime(2020, 1, 1),
+                    lastDay: DateTime(2035, 12, 31),
+                    focusedDay: _focusedDay,
+                    calendarFormat: _calendarFormat,
+                    daysOfWeekHeight: 24,
+                    selectedDayPredicate: (day) {
+                      return isSameDay(selectedDay, day);
+                    },
+                    onDaySelected: (selectedDay, focusedDay) {
+                      if (!isSameDay(
+                        calendarProvider.selectedDate,
+                        selectedDay,
+                      )) {
+                        calendarProvider.setSelectedDate(selectedDay);
+                        setState(() {
+                          _focusedDay = focusedDay;
+                        });
+                      }
+                    },
+                    onFormatChanged: (format) {
+                      if (_calendarFormat != format) {
+                        setState(() {
+                          _calendarFormat = format;
+                        });
+                      }
+                    },
+                    onPageChanged: (focusedDay) {
                       setState(() {
                         _focusedDay = focusedDay;
                       });
-                    }
-                  },
-                  onFormatChanged: (format) {
-                    if (_calendarFormat != format) {
-                      setState(() {
-                        _calendarFormat = format;
-                      });
-                    }
-                  },
-                  onPageChanged: (focusedDay) {
-                    setState(() {
-                      _focusedDay = focusedDay;
-                    });
-                  },
-                  eventLoader: (day) {
-                    return _getEventsForDay(
-                      day,
-                      tasksByDay,
-                      upcomingByDay,
-                      calendarProvider,
-                    );
-                  },
-                  calendarBuilders: CalendarBuilders(
-                    dowBuilder: (context, day) {
-                      final text = DateFormat.E().format(day);
-                      Color textColor = Theme.of(context).colorScheme.onSurface;
-                      if (day.weekday == DateTime.sunday) {
-                        textColor = Colors.redAccent;
-                      } else if (day.weekday == DateTime.saturday) {
-                        textColor = Colors.blueAccent;
-                      }
-                      return Center(
-                        child: Text(
-                          text,
-                          style: TextStyle(
-                            color: textColor,
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                    },
+                    eventLoader: (day) {
+                      return _getEventsForDay(
+                        day,
+                        tasksByDay,
+                        upcomingByDay,
+                        calendarProvider,
                       );
                     },
-                    defaultBuilder: (context, day, focusedDay) =>
-                        _buildCalendarCell(day),
-                    todayBuilder: (context, day, focusedDay) =>
-                        _buildCalendarCell(day, isToday: true),
-                    selectedBuilder: (context, day, focusedDay) =>
-                        _buildCalendarCell(day, isSelected: true),
-                    outsideBuilder: (context, day, focusedDay) =>
-                        _buildCalendarCell(day, isOutside: true),
-                    markerBuilder: (context, date, events) {
-                      if (events.isEmpty) return const SizedBox.shrink();
-
-                      if (events.length == 1) {
-                        final event = events.first;
-                        String title = '';
-                        final c = _getEventColor(
-                          event,
-                          taskProvider,
-                          calendarProvider,
-                          colorService,
+                    calendarBuilders: CalendarBuilders(
+                      dowBuilder: (context, day) {
+                        final text = DateFormat.E().format(day);
+                        Color textColor = Theme.of(
+                          context,
+                        ).colorScheme.onSurface;
+                        if (day.weekday == DateTime.sunday) {
+                          textColor = Colors.redAccent;
+                        } else if (day.weekday == DateTime.saturday) {
+                          textColor = Colors.blueAccent;
+                        }
+                        return Center(
+                          child: Text(
+                            text,
+                            style: TextStyle(
+                              color: textColor,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         );
-                        if (event is Task) {
-                          title = event.title;
-                        } else if (event is Event) {
-                          title =
-                              event.title ??
-                              AppLocalizations.of(context)!.noTitle;
-                        } else if (event is SyncedScheduleEvent) {
-                          title = event.courseName.isNotEmpty
-                              ? (event.title.isNotEmpty &&
-                                        event.title.toLowerCase().trim() !=
-                                            event.courseName
-                                                .toLowerCase()
-                                                .trim()
-                                    ? '${event.courseName}: ${event.title}'
-                                    : event.courseName)
-                              : (event.title.isNotEmpty
-                                    ? event.title
-                                    : 'Class');
+                      },
+                      defaultBuilder: (context, day, focusedDay) =>
+                          _buildCalendarCell(day),
+                      todayBuilder: (context, day, focusedDay) =>
+                          _buildCalendarCell(day, isToday: true),
+                      selectedBuilder: (context, day, focusedDay) =>
+                          _buildCalendarCell(day, isSelected: true),
+                      outsideBuilder: (context, day, focusedDay) =>
+                          _buildCalendarCell(day, isOutside: true),
+                      markerBuilder: (context, date, events) {
+                        if (events.isEmpty) return const SizedBox.shrink();
+                        if (isWide) {
+                          return _buildWideMarkers(
+                            events,
+                            taskProvider,
+                            calendarProvider,
+                            colorService,
+                          );
+                        }
+
+                        if (events.length == 1) {
+                          final event = events.first;
+                          String title = '';
+                          final c = _getEventColor(
+                            event,
+                            taskProvider,
+                            calendarProvider,
+                            colorService,
+                          );
+                          if (event is Task) {
+                            title = event.title;
+                          } else if (event is Event) {
+                            title =
+                                event.title ??
+                                AppLocalizations.of(context)!.noTitle;
+                          } else if (event is SyncedScheduleEvent) {
+                            title = event.courseName.isNotEmpty
+                                ? (event.title.isNotEmpty &&
+                                          event.title.toLowerCase().trim() !=
+                                              event.courseName
+                                                  .toLowerCase()
+                                                  .trim()
+                                      ? '${event.courseName}: ${event.title}'
+                                      : event.courseName)
+                                : (event.title.isNotEmpty
+                                      ? event.title
+                                      : 'Class');
+                          }
+
+                          return Positioned(
+                            bottom: 4,
+                            left: 2,
+                            right: 2,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 4,
+                                vertical: 1.5,
+                              ),
+                              decoration: BoxDecoration(
+                                color: c.withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(4),
+                                border: Border.all(
+                                  color: c.withValues(alpha: 0.35),
+                                  width: 0.5,
+                                ),
+                              ),
+                              child: Text(
+                                title,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 8.0,
+                                  fontWeight: FontWeight.w600,
+                                  color: c,
+                                  height: 1.1,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          );
+                        }
+
+                        final dotWidgets = <Widget>[];
+                        final visibleEvents = events.take(3).toList();
+                        for (final event in visibleEvents) {
+                          final c = _getEventColor(
+                            event,
+                            taskProvider,
+                            calendarProvider,
+                            colorService,
+                          );
+                          dotWidgets.add(
+                            Container(
+                              width: 6,
+                              height: 6,
+                              margin: const EdgeInsets.symmetric(
+                                horizontal: 1.5,
+                              ),
+                              decoration: BoxDecoration(
+                                color: c,
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: c.withValues(alpha: 0.4),
+                                    blurRadius: 2,
+                                    spreadRadius: 0.5,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }
+
+                        if (events.length > 3) {
+                          dotWidgets.add(
+                            Padding(
+                              padding: const EdgeInsets.only(left: 2),
+                              child: Text(
+                                '+${events.length - 3}',
+                                style: TextStyle(
+                                  fontSize: 8,
+                                  color: Theme.of(context).colorScheme.onSurface
+                                      .withValues(alpha: 0.7),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          );
                         }
 
                         return Positioned(
-                          bottom: 4,
-                          left: 2,
-                          right: 2,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 4,
-                              vertical: 1.5,
-                            ),
-                            decoration: BoxDecoration(
-                              color: c.withValues(alpha: 0.15),
-                              borderRadius: BorderRadius.circular(4),
-                              border: Border.all(
-                                color: c.withValues(alpha: 0.35),
-                                width: 0.5,
-                              ),
-                            ),
-                            child: Text(
-                              title,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: 8.0,
-                                fontWeight: FontWeight.w600,
-                                color: c,
-                                height: 1.1,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
+                          bottom: 6,
+                          left: 0,
+                          right: 0,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: dotWidgets,
                           ),
                         );
-                      }
-
-                      final dotWidgets = <Widget>[];
-                      final visibleEvents = events.take(3).toList();
-                      for (final event in visibleEvents) {
-                        final c = _getEventColor(
-                          event,
-                          taskProvider,
-                          calendarProvider,
-                          colorService,
-                        );
-                        dotWidgets.add(
-                          Container(
-                            width: 6,
-                            height: 6,
-                            margin: const EdgeInsets.symmetric(horizontal: 1.5),
-                            decoration: BoxDecoration(
-                              color: c,
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: c.withValues(alpha: 0.4),
-                                  blurRadius: 2,
-                                  spreadRadius: 0.5,
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      }
-
-                      if (events.length > 3) {
-                        dotWidgets.add(
-                          Padding(
-                            padding: const EdgeInsets.only(left: 2),
-                            child: Text(
-                              '+${events.length - 3}',
-                              style: TextStyle(
-                                fontSize: 8,
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.onSurface.withValues(alpha: 0.7),
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        );
-                      }
-
-                      return Positioned(
-                        bottom: 6,
-                        left: 0,
-                        right: 0,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: dotWidgets,
-                        ),
-                      );
-                    },
-                  ),
-                  calendarStyle: const CalendarStyle(
-                    markersMaxCount: 0, // We handle markers ourselves
-                    outsideDaysVisible: true,
+                      },
+                    ),
+                    calendarStyle: const CalendarStyle(
+                      markersMaxCount: 0, // We handle markers ourselves
+                      outsideDaysVisible: true,
+                    ),
                   ),
                 ),
               ],
             ),
           ),
-        ),
-        const SizedBox(height: 8.0),
-        Expanded(
-          child: calendarProvider.isLoading
-              ? const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16),
-                  child: TaskListSkeleton(),
-                )
-              : selectedItems.isEmpty
-              ? SingleChildScrollView(
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 16.0, bottom: 16.0),
-                    child: GlassContainer(
-                      margin: const EdgeInsets.symmetric(horizontal: 16),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 24,
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(14),
-                            decoration: BoxDecoration(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.primary.withValues(alpha: 0.12),
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              Icons.event_available_rounded,
-                              size: 44,
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
+        );
+        final Widget agenda = calendarProvider.isLoading
+            ? const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16),
+                child: TaskListSkeleton(),
+              )
+            : selectedItems.isEmpty
+            ? SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 16.0, bottom: 16.0),
+                  child: GlassContainer(
+                    margin: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 24,
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(14),
+                          decoration: BoxDecoration(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.primary.withValues(alpha: 0.12),
+                            shape: BoxShape.circle,
                           ),
-                          const SizedBox(height: 14),
-                          Text(
-                            l10n.noEventsForThisDay,
-                            textAlign: TextAlign.center,
-                            style: GoogleFonts.outfit(
-                              fontSize: 17,
-                              fontWeight: FontWeight.bold,
-                              color: Theme.of(context).colorScheme.onSurface,
-                            ),
+                          child: Icon(
+                            Icons.event_available_rounded,
+                            size: 44,
+                            color: Theme.of(context).colorScheme.primary,
                           ),
-                          const SizedBox(height: 6),
-                          Text(
-                            AppLocalizations.of(context)!.scheduleClearForDate,
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.bodySmall
-                                ?.copyWith(
-                                  color: Theme.of(context).colorScheme.onSurface
-                                      .withValues(alpha: 0.65),
-                                ),
+                        ),
+                        const SizedBox(height: 14),
+                        Text(
+                          l10n.noEventsForThisDay,
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.outfit(
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
-                          const SizedBox(height: 16),
-                          FilledButton.icon(
-                            onPressed: () {
-                              HapticFeedback.lightImpact();
-                              showModalBottomSheet(
-                                context: context,
-                                isScrollControlled: true,
-                                backgroundColor: Colors.transparent,
-                                builder: (context) => QuickAddTaskBottomSheet(
-                                  initialDueDate: calendarProvider.selectedDate,
-                                ),
-                              );
-                            },
-                            style: FilledButton.styleFrom(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(14),
-                              ),
-                            ),
-                            icon: const Icon(Icons.add_rounded, size: 18),
-                            label: Text(l10n.newTask),
-                          ),
-                          if (!kIsWeb &&
-                              calendarProvider.availableCalendars.isEmpty) ...[
-                            const SizedBox(height: 8),
-                            TextButton.icon(
-                              onPressed: () async {
-                                HapticFeedback.lightImpact();
-                                final granted = await calendarProvider
-                                    .requestPermissionsAndReload();
-                                if (context.mounted && !granted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        AppLocalizations.of(
-                                          context,
-                                        )!.calendarPermissionRequired,
-                                      ),
-                                    ),
-                                  );
-                                }
-                              },
-                              icon: const Icon(Icons.sync_rounded, size: 16),
-                              label: Text(
-                                AppLocalizations.of(
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          AppLocalizations.of(context)!.scheduleClearForDate,
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(
+                                color: Theme.of(
                                   context,
-                                )!.syncDeviceCalendar,
+                                ).colorScheme.onSurface.withValues(alpha: 0.65),
                               ),
+                        ),
+                        const SizedBox(height: 16),
+                        FilledButton.icon(
+                          onPressed: () {
+                            HapticFeedback.lightImpact();
+                            showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              backgroundColor: Colors.transparent,
+                              builder: (context) => QuickAddTaskBottomSheet(
+                                initialDueDate: calendarProvider.selectedDate,
+                              ),
+                            );
+                          },
+                          style: FilledButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
                             ),
-                          ],
+                          ),
+                          icon: const Icon(Icons.add_rounded, size: 18),
+                          label: Text(l10n.newTask),
+                        ),
+                        if (!kIsWeb &&
+                            calendarProvider.availableCalendars.isEmpty) ...[
+                          const SizedBox(height: 8),
+                          TextButton.icon(
+                            onPressed: () async {
+                              HapticFeedback.lightImpact();
+                              final granted = await calendarProvider
+                                  .requestPermissionsAndReload();
+                              if (context.mounted && !granted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      AppLocalizations.of(
+                                        context,
+                                      )!.calendarPermissionRequired,
+                                    ),
+                                  ),
+                                );
+                              }
+                            },
+                            icon: const Icon(Icons.sync_rounded, size: 16),
+                            label: Text(
+                              AppLocalizations.of(context)!.syncDeviceCalendar,
+                            ),
+                          ),
                         ],
-                      ),
+                      ],
                     ),
                   ),
-                )
-              : ListView.builder(
-                  itemCount: selectedItems.length,
-                  padding: const EdgeInsets.only(bottom: 100),
-                  itemBuilder: (context, index) {
-                    final item = selectedItems[index];
+                ),
+              )
+            : ListView.builder(
+                itemCount: selectedItems.length,
+                padding: const EdgeInsets.only(bottom: 100),
+                itemBuilder: (context, index) {
+                  final item = selectedItems[index];
 
-                    if (item is Task) {
-                      final isPreview = item.id.startsWith('preview_');
-                      if (isPreview) {
-                        return Padding(
+                  if (item is Task) {
+                    final isPreview = item.id.startsWith('preview_');
+                    if (isPreview) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 4,
+                        ),
+                        child: GlassContainer(
+                          borderRadius: BorderRadius.circular(16),
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 4,
+                            horizontal: 14,
+                            vertical: 12,
                           ),
-                          child: GlassContainer(
-                            borderRadius: BorderRadius.circular(16),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 14,
-                              vertical: 12,
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.update_rounded,
+                                color: Theme.of(context).colorScheme.primary,
+                                size: 20,
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      item.title,
+                                      style: GoogleFonts.outfit(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 15,
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onSurface,
+                                      ),
+                                    ),
+                                    if (item.description.isNotEmpty) ...[
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        item.description,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: Theme.of(
+                                          context,
+                                        ).textTheme.bodySmall,
+                                      ),
+                                    ],
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.primary.withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  l10n.upcomingRecurringBadge,
+                                  style: TextStyle(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }
+
+                    final List<String> categoryIds = item.categoryIds.isNotEmpty
+                        ? item.categoryIds
+                        : (item.categoryId != null ? [item.categoryId!] : []);
+                    final categories = categoryIds
+                        .map(taskProvider.getCategoryById)
+                        .where((c) => c != null)
+                        .cast<Category>()
+                        .toList();
+
+                    return TaskTile(
+                      task: item,
+                      categories: categories,
+                      enableSwipeToDelete: true,
+                      enablePin: false,
+                      onToggle: () => taskProvider.toggleTaskCompletion(item),
+                      onDelete: () => taskProvider.deleteTask(item.id),
+                    );
+                  } else if (item is Event) {
+                    final timeFormat = AppDateFormats.time(
+                      context,
+                      use24h: themeService.use24HourFormat,
+                    );
+                    final cal = calendarProvider.availableCalendars.firstWhere(
+                      (c) => c.id == item.calendarId,
+                      orElse: Calendar.new,
+                    );
+                    final Color? nativeColor = cal.color != null
+                        ? Color(cal.color!)
+                        : null;
+                    final eventColor = colorService
+                        .getEffectiveSubcalendarColor(
+                          item.calendarId,
+                          nativeColor: nativeColor,
+                        );
+                    final isDark =
+                        Theme.of(context).brightness == Brightness.dark;
+                    return GlassContainer(
+                      margin: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 6,
+                      ),
+                      border: Border.all(
+                        color: isDark
+                            ? eventColor.withValues(alpha: 0.25)
+                            : eventColor.withValues(alpha: 0.18),
+                        width: 1.0,
+                      ),
+                      isSelected: false,
+                      tintColor: eventColor,
+                      child: Semantics(
+                        label: AppLocalizations.of(context)!
+                            .a11yGoogleCalendarEvent(
+                              item.title ??
+                                  AppLocalizations.of(context)!.noTitle,
                             ),
+                        child: ListTile(
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
+                          leading: Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: eventColor.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Icon(
+                              Icons.event_note_rounded,
+                              color: eventColor,
+                              size: 24,
+                            ),
+                          ),
+                          title: Text(
+                            item.title ?? AppLocalizations.of(context)!.noTitle,
+                            style: Theme.of(context).textTheme.titleMedium
+                                ?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: -0.5,
+                                ),
+                          ),
+                          subtitle: Padding(
+                            padding: const EdgeInsets.only(top: 4),
                             child: Row(
                               children: [
                                 Icon(
-                                  Icons.update_rounded,
-                                  color: Theme.of(context).colorScheme.primary,
-                                  size: 20,
+                                  Icons.access_time_rounded,
+                                  size: 14,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurfaceVariant,
                                 ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text(
-                                        item.title,
-                                        style: GoogleFonts.outfit(
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 15,
-                                          color: Theme.of(
-                                            context,
-                                          ).colorScheme.onSurface,
-                                        ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  '${item.start != null ? timeFormat.format(item.start!) : ''} - '
+                                  '${item.end != null ? timeFormat.format(item.end!) : ''}',
+                                  style: Theme.of(context).textTheme.bodySmall
+                                      ?.copyWith(
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onSurfaceVariant,
+                                        fontWeight: FontWeight.w500,
                                       ),
-                                      if (item.description.isNotEmpty) ...[
-                                        const SizedBox(height: 2),
-                                        Text(
-                                          item.description,
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: Theme.of(
-                                            context,
-                                          ).textTheme.bodySmall,
-                                        ),
-                                      ],
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 4,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Theme.of(context).colorScheme.primary
-                                        .withValues(alpha: 0.15),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Text(
-                                    l10n.upcomingRecurringBadge,
-                                    style: TextStyle(
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.primary,
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
                                 ),
                               ],
                             ),
                           ),
-                        );
-                      }
-
-                      final List<String> categoryIds =
-                          item.categoryIds.isNotEmpty
-                          ? item.categoryIds
-                          : (item.categoryId != null ? [item.categoryId!] : []);
-                      final categories = categoryIds
-                          .map(taskProvider.getCategoryById)
-                          .where((c) => c != null)
-                          .cast<Category>()
-                          .toList();
-
-                      return TaskTile(
-                        task: item,
-                        categories: categories,
-                        enableSwipeToDelete: true,
-                        enablePin: false,
-                        onToggle: () => taskProvider.toggleTaskCompletion(item),
-                        onDelete: () => taskProvider.deleteTask(item.id),
-                      );
-                    } else if (item is Event) {
-                      final timeFormat = AppDateFormats.time(
-                        context,
-                        use24h: themeService.use24HourFormat,
-                      );
-                      final cal = calendarProvider.availableCalendars
-                          .firstWhere(
-                            (c) => c.id == item.calendarId,
-                            orElse: Calendar.new,
-                          );
-                      final Color? nativeColor = cal.color != null
-                          ? Color(cal.color!)
-                          : null;
-                      final eventColor = colorService
-                          .getEffectiveSubcalendarColor(
-                            item.calendarId,
-                            nativeColor: nativeColor,
-                          );
-                      final isDark =
-                          Theme.of(context).brightness == Brightness.dark;
-                      return GlassContainer(
-                        margin: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 6,
-                        ),
-                        border: Border.all(
-                          color: isDark
-                              ? eventColor.withValues(alpha: 0.25)
-                              : eventColor.withValues(alpha: 0.18),
-                          width: 1.0,
-                        ),
-                        isSelected: false,
-                        tintColor: eventColor,
-                        child: Semantics(
-                          label: AppLocalizations.of(context)!
-                              .a11yGoogleCalendarEvent(
-                                item.title ??
-                                    AppLocalizations.of(context)!.noTitle,
-                              ),
-                          child: ListTile(
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 8,
+                          trailing: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
                             ),
-                            leading: Container(
-                              padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                color: eventColor.withValues(alpha: 0.12),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Icon(
-                                Icons.event_note_rounded,
-                                color: eventColor,
-                                size: 24,
-                              ),
+                            decoration: BoxDecoration(
+                              color: eventColor.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(8),
                             ),
-                            title: Text(
-                              item.title ??
-                                  AppLocalizations.of(context)!.noTitle,
-                              style: Theme.of(context).textTheme.titleMedium
+                            child: Text(
+                              'Google',
+                              style: Theme.of(context).textTheme.labelSmall
                                   ?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: -0.5,
+                                    color: eventColor,
+                                    fontWeight: FontWeight.w600,
                                   ),
                             ),
-                            subtitle: Padding(
-                              padding: const EdgeInsets.only(top: 4),
-                              child: Row(
+                          ),
+                        ),
+                      ),
+                    );
+                  } else if (item is SyncedScheduleEvent) {
+                    final timeFormat = AppDateFormats.time(
+                      context,
+                      use24h: themeService.use24HourFormat,
+                    );
+                    final eventColor = item.color;
+                    final isDark =
+                        Theme.of(context).brightness == Brightness.dark;
+                    return GlassContainer(
+                      margin: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 6,
+                      ),
+                      border: Border.all(
+                        color: isDark
+                            ? eventColor.withValues(alpha: 0.25)
+                            : eventColor.withValues(alpha: 0.18),
+                        width: 1.0,
+                      ),
+                      isSelected: false,
+                      tintColor: eventColor,
+                      child: Semantics(
+                        label:
+                            'ROCIs Schedule Event: ${item.courseName.isNotEmpty ? '${item.courseName} - ${item.title}' : item.title}',
+                        child: ListTile(
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
+                          leading: Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: eventColor.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Icon(
+                              Icons.school_rounded,
+                              color: eventColor,
+                              size: 24,
+                            ),
+                          ),
+                          title: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Row(
                                 children: [
+                                  Expanded(
+                                    child: Text(
+                                      item.courseName.isNotEmpty
+                                          ? item.courseName
+                                          : (item.title.isNotEmpty
+                                                ? item.title
+                                                : 'Class'),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.bold,
+                                            letterSpacing: -0.5,
+                                          ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  if (item.courseCode.isNotEmpty) ...[
+                                    const SizedBox(width: 6),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 6,
+                                        vertical: 2,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: eventColor.withValues(
+                                          alpha: 0.15,
+                                        ),
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                      child: Text(
+                                        item.courseCode,
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.bold,
+                                          color: eventColor,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                              if (item.courseName.isNotEmpty &&
+                                  item.title.isNotEmpty &&
+                                  item.title.toLowerCase().trim() !=
+                                      item.courseName.toLowerCase().trim()) ...[
+                                const SizedBox(height: 2),
+                                Text(
+                                  item.title,
+                                  style: Theme.of(context).textTheme.bodySmall
+                                      ?.copyWith(
+                                        color: eventColor,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ],
+                          ),
+                          subtitle: Padding(
+                            padding: const EdgeInsets.only(top: 4.0),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.access_time_rounded,
+                                  size: 14,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurfaceVariant,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  '${timeFormat.format(item.startTime)} - ${timeFormat.format(item.endTime)}',
+                                  style: Theme.of(context).textTheme.bodySmall
+                                      ?.copyWith(
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onSurfaceVariant,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                ),
+                                if (item.location.isNotEmpty) ...[
+                                  const SizedBox(width: 8),
                                   Icon(
-                                    Icons.access_time_rounded,
+                                    Icons.location_on_outlined,
                                     size: 14,
                                     color: Theme.of(
                                       context,
                                     ).colorScheme.onSurfaceVariant,
                                   ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    '${item.start != null ? timeFormat.format(item.start!) : ''} - '
-                                    '${item.end != null ? timeFormat.format(item.end!) : ''}',
-                                    style: Theme.of(context).textTheme.bodySmall
-                                        ?.copyWith(
-                                          color: Theme.of(
-                                            context,
-                                          ).colorScheme.onSurfaceVariant,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            trailing: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: eventColor.withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                'Google',
-                                style: Theme.of(context).textTheme.labelSmall
-                                    ?.copyWith(
-                                      color: eventColor,
-                                      fontWeight: FontWeight.w600,
+                                  const SizedBox(width: 2),
+                                  Expanded(
+                                    child: Text(
+                                      item.location,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.copyWith(
+                                            color: Theme.of(
+                                              context,
+                                            ).colorScheme.onSurfaceVariant,
+                                          ),
+                                      overflow: TextOverflow.ellipsis,
                                     ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-                    } else if (item is SyncedScheduleEvent) {
-                      final timeFormat = AppDateFormats.time(
-                        context,
-                        use24h: themeService.use24HourFormat,
-                      );
-                      final eventColor = item.color;
-                      final isDark =
-                          Theme.of(context).brightness == Brightness.dark;
-                      return GlassContainer(
-                        margin: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 6,
-                        ),
-                        border: Border.all(
-                          color: isDark
-                              ? eventColor.withValues(alpha: 0.25)
-                              : eventColor.withValues(alpha: 0.18),
-                          width: 1.0,
-                        ),
-                        isSelected: false,
-                        tintColor: eventColor,
-                        child: Semantics(
-                          label:
-                              'ROCIs Schedule Event: ${item.courseName.isNotEmpty ? '${item.courseName} - ${item.title}' : item.title}',
-                          child: ListTile(
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 8,
-                            ),
-                            leading: Container(
-                              padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                color: eventColor.withValues(alpha: 0.12),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Icon(
-                                Icons.school_rounded,
-                                color: eventColor,
-                                size: 24,
-                              ),
-                            ),
-                            title: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        item.courseName.isNotEmpty
-                                            ? item.courseName
-                                            : (item.title.isNotEmpty
-                                                  ? item.title
-                                                  : 'Class'),
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleMedium
-                                            ?.copyWith(
-                                              fontWeight: FontWeight.bold,
-                                              letterSpacing: -0.5,
-                                            ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                    if (item.courseCode.isNotEmpty) ...[
-                                      const SizedBox(width: 6),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 6,
-                                          vertical: 2,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: eventColor.withValues(
-                                            alpha: 0.15,
-                                          ),
-                                          borderRadius: BorderRadius.circular(
-                                            6,
-                                          ),
-                                        ),
-                                        child: Text(
-                                          item.courseCode,
-                                          style: TextStyle(
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.bold,
-                                            color: eventColor,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ],
-                                ),
-                                if (item.courseName.isNotEmpty &&
-                                    item.title.isNotEmpty &&
-                                    item.title.toLowerCase().trim() !=
-                                        item.courseName
-                                            .toLowerCase()
-                                            .trim()) ...[
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    item.title,
-                                    style: Theme.of(context).textTheme.bodySmall
-                                        ?.copyWith(
-                                          color: eventColor,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ],
                               ],
                             ),
-                            subtitle: Padding(
-                              padding: const EdgeInsets.only(top: 4.0),
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.access_time_rounded,
-                                    size: 14,
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.onSurfaceVariant,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    '${timeFormat.format(item.startTime)} - ${timeFormat.format(item.endTime)}',
-                                    style: Theme.of(context).textTheme.bodySmall
-                                        ?.copyWith(
-                                          color: Theme.of(
-                                            context,
-                                          ).colorScheme.onSurfaceVariant,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                  ),
-                                  if (item.location.isNotEmpty) ...[
-                                    const SizedBox(width: 8),
-                                    Icon(
-                                      Icons.location_on_outlined,
-                                      size: 14,
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.onSurfaceVariant,
-                                    ),
-                                    const SizedBox(width: 2),
-                                    Expanded(
-                                      child: Text(
-                                        item.location,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodySmall
-                                            ?.copyWith(
-                                              color: Theme.of(
-                                                context,
-                                              ).colorScheme.onSurfaceVariant,
-                                            ),
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                  ],
-                                ],
-                              ),
+                          ),
+                          trailing: IconButton(
+                            icon: Icon(
+                              Icons.open_in_new_rounded,
+                              size: 18,
+                              color: eventColor,
                             ),
-                            trailing: IconButton(
-                              icon: Icon(
-                                Icons.open_in_new_rounded,
-                                size: 18,
-                                color: eventColor,
-                              ),
-                              tooltip: AppLocalizations.of(
-                                context,
-                              )!.openInRocisSchedule,
-                              onPressed: () {
-                                HapticFeedback.lightImpact();
-                                ScheduleBridgeService.openScheduleEvent(
-                                  eventId: item.id,
-                                );
-                              },
-                            ),
-                            onTap: () {
+                            tooltip: AppLocalizations.of(
+                              context,
+                            )!.openInRocisSchedule,
+                            onPressed: () {
                               HapticFeedback.lightImpact();
                               ScheduleBridgeService.openScheduleEvent(
                                 eventId: item.id,
                               );
                             },
                           ),
+                          onTap: () {
+                            HapticFeedback.lightImpact();
+                            ScheduleBridgeService.openScheduleEvent(
+                              eventId: item.id,
+                            );
+                          },
                         ),
+                      ),
+                    );
+                  }
+                  return const SizedBox();
+                },
+              );
+        final tokenBanner = <Widget>[
+          if (calendarProvider.isGoogleCalendarTokenExpired)
+            Container(
+              width: double.infinity,
+              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.amber.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.amber.shade700),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.warning_amber_rounded, color: Colors.amber),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      l10n.googleTasksDisconnected,
+                      style: const TextStyle(fontSize: 13),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      final authService = Provider.of<AuthService>(
+                        context,
+                        listen: false,
                       );
-                    }
-                    return const SizedBox();
-                  },
+                      final success = await authService.linkGoogleTasks();
+                      if (success) {
+                        calendarProvider.resetTokenExpiredState();
+                        await calendarProvider.loadEvents();
+                      }
+                    },
+                    child: Text(l10n.reconnect),
+                  ),
+                ],
+              ),
+            ),
+        ];
+        if (isWide) {
+          return Column(
+            children: [
+              ...tokenBanner,
+              Expanded(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Expanded(child: calendarCard),
+                    SizedBox(
+                      width: 400,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(8, 20, 16, 8),
+                            child: Text(
+                              DateFormat.MMMMEEEEd().format(selectedDay),
+                              style: GoogleFonts.outfit(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          Expanded(child: agenda),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-        ),
-      ],
+              ),
+            ],
+          );
+        }
+        return Column(
+          children: [
+            ...tokenBanner,
+            calendarCard,
+            const SizedBox(height: 8.0),
+            Expanded(child: agenda),
+          ],
+        );
+      },
     );
   }
 }

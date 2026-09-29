@@ -826,7 +826,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get guideCloudSyncDesc =>
-      'ادخل إلى مهامك من أي جهاز مع مزامنة سحابية آمنة.';
+      'سجّل الدخول لمزامنة مهامك بين هاتفك و tasks.rocisapps.com. تحتوي الإعدادات أيضاً على المزامنة الآن وسلة المهملات ونسخة احتياطية يمكنك تصديرها أو استيرادها.';
 
   @override
   String get guideAddingTasksTitle => 'إضافة المهام';
@@ -840,14 +840,14 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get guideGesturesDesc =>
-      'اسحب لليمين لإكمال مهمة، ولليسار لحذفها. اضغط مطولًا لمزيد من الخيارات.';
+      'اضغط على مهمة لفتحها. اسحب لليمين لإكمالها ولليسار لحذفها؛ تنتظر المهام المحذوفة في سلة المهملات حيث يمكنك استعادتها. اضغط مطولاً على مهمة لتحديد عدة مهام معاً.';
 
   @override
   String get guideWidgetsTitle => 'ويدجت الشاشة الرئيسية';
 
   @override
   String get guideWidgetsDesc =>
-      'أضف ويدجت مهام ROCI إلى الشاشة الرئيسية للوصول السريع وتحديثات الحالة.';
+      'اضغط مطولاً على الشاشة الرئيسية وافتح الأدوات واختر ROCI\'s Tasks: قوائم المهام أو جدول اليوم أو التقويم أو اللوحة. يمكنك تعديل مظهرها من الإعدادات.';
 
   @override
   String get guideCustomizationTitle => 'التخصيص';
@@ -970,7 +970,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get requireSubTasksBeforeRemindersSubtitle =>
-      'لا ترسل تذكيرات حتى تكتمل جميع المهام الفرعية';
+      'لا يمكن إكمال المهمة حتى تكتمل جميع المهام الفرعية';
 
   @override
   String get debugModeUnlocked => 'تم فتح وضع التصحيح!';
@@ -2085,4 +2085,68 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get flipCamera => 'تبديل الكاميرا';
+
+  @override
+  String completeSubtasksFirst(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'أكمل المهام الفرعية المفتوحة ($count) أولاً',
+      one: 'أكمل المهمة الفرعية الأخيرة أولاً',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get guideSearchHint => 'ابحث في الدليل';
+
+  @override
+  String get guideNoResults => 'لا توجد مواضيع مطابقة';
+
+  @override
+  String get guideProBadge => 'PRO';
+
+  @override
+  String get guideQuickAddTitle => 'إضافة سريعة بالنص الذكي';
+
+  @override
+  String get guideQuickAddBody =>
+      'اضغط + واختر مهمة جديدة، ثم اكتب بشكل طبيعي. تُملأ التفاصيل تلقائياً:\n• التواريخ: today, tomorrow, tonight, next week, in 3 days, friday\n• الأوقات: 6pm, 18:30, at 9\n• الأولوية: !high, !low (أو p1 إلى p3)\n• الفئة: #work\nمثال: \"Call mom tomorrow 6pm !high #family\"';
+
+  @override
+  String get guideSubtasksBody =>
+      'افتح مهمة وأضف مهاماً فرعية لتقسيمها إلى خطوات. فعّل \"المهام الفرعية مطلوبة\" فلن يمكن إكمال المهمة حتى تكتمل جميع المهام الفرعية. تكتمل قوائم التسوق تلقائياً عند تحديد جميع العناصر.';
+
+  @override
+  String get guideRecurringTitle => 'المهام المتكررة';
+
+  @override
+  String get guideRecurringBody =>
+      'اضبط المهمة لتتكرر يومياً أو في أيام العمل أو أسبوعياً أو شهرياً أو سنوياً أو وفق قاعدة مخصصة. عند إكمالها تُجدول المهمة التالية مع تذكيرها وتظهر في يومها.';
+
+  @override
+  String get guideRemindersBody =>
+      'المهمة ذات وقت الاستحقاق تذكّرك عند حلوله. من الإشعار يمكنك إكمالها أو فتحها أو تأجيلها. يضيف Pro خيارات تأجيل أكثر وتذكيرات متكررة حتى تتصرف وساعات الهدوء.';
+
+  @override
+  String get guideViewsTitle => 'القائمة واللوحة والتقويم';
+
+  @override
+  String get guideViewsBody =>
+      'بدّل بين القائمة واللوحة والتقويم. ترتب اللوحة المهام في أعمدة للإنجاز وقيد التركيز ومكتملة، ويمكنك سحب البطاقات بينها. يعرض التقويم مهامك بجانب أحداث Google Calendar ومحاضرات ROCIs Schedule.';
+
+  @override
+  String get guideSharingTitle => 'مشاركة المهام';
+
+  @override
+  String get guideSharingBody =>
+      'افتح مهمة وشاركها كرابط أو رمز QR. يرى الطرف الآخر معاينة ويمكنه استيراد نسخته الخاصة. لمسح رمز، اضغط + واختر مسح رمز QR.';
+
+  @override
+  String get guidePrivacyBody =>
+      'حدّد فئة كخاصة واضبط رمز PIN في الإعدادات. أثناء القفل تُخفى مهامها من القائمة والأدوات والإشعارات.';
+
+  @override
+  String get guideGoogleTasksBody =>
+      'فعّل المزامنة مع Google Tasks لمهمة ما لنسخها إلى قائمة Google Tasks الخاصة بك.';
 }

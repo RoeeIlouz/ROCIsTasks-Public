@@ -313,13 +313,13 @@
   "guideNotificationsTitle": "Notifications",
   "guideNotificationsDesc": "Stay on top of your schedule with smart reminders and a persistent task counter.",
   "guideCloudSyncTitle": "Cloud Sync",
-  "guideCloudSyncDesc": "Access your tasks from any device with secure cloud synchronization.",
+  "guideCloudSyncDesc": "Sign in to sync your tasks between your phone and tasks.rocisapps.com. Settings also has Sync now, Trash, and a backup you can export or import.",
   "guideAddingTasksTitle": "Adding Tasks",
   "guideAddingTasksDesc": "Tap the + button to add a new task. Use natural language (e.g., \"Lunch tomorrow at 1pm\") for quick entry.",
   "guideGesturesTitle": "Gestures",
-  "guideGesturesDesc": "Swipe right to complete a task, swipe left to delete it. Long-press for more options.",
+  "guideGesturesDesc": "Tap a task to open it. Swipe right to complete it and left to delete it; deleted tasks wait in Trash, where you can restore them. Long-press a task to select several at once.",
   "guideWidgetsTitle": "Home Widgets",
-  "guideWidgetsDesc": "Add ROCI's Tasks widgets to your home screen for quick access and status updates.",
+  "guideWidgetsDesc": "Long-press your home screen, open Widgets and pick ROCI's Tasks: task lists, today's agenda, the calendar or the board. Adjust their look in Settings.",
   "guideCustomizationTitle": "Customization",
   "guideCustomizationDesc": "Personalize your experience in Settings with themes, language options, and more.",
   "guideHappyOrganizing": "Happy Organizing!",
@@ -359,7 +359,7 @@
   "accentColor": "Accent color",
   "accentColorSubtitle": "Customize the app colors (Pro)",
   "requireSubTasksBeforeReminders": "Subtasks required",
-  "requireSubTasksBeforeRemindersSubtitle": "Don’t send reminders until all subtasks are completed",
+  "requireSubTasksBeforeRemindersSubtitle": "The task can't be checked off until every subtask is done",
   "debugModeUnlocked": "Debug mode unlocked!",
   "submitBugReport": "Submit Bug Report",
   "submitBugReportSubtitle": "Fill out our Google Form",
@@ -533,11 +533,29 @@
   "kanbanWidget": "Kanban Board",
   "kanbanWidgetDesc": "Interactive Kanban board with To Do, In Focus, and Done columns",
   "freeTrialBadge": "{days}-day free trial",
-  "@freeTrialBadge": {"placeholders": {"days": {"type": "int"}}},
+  "@freeTrialBadge": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
   "startFreeTrial": "Start {days}-day free trial",
-  "@startFreeTrial": {"placeholders": {"days": {"type": "int"}}},
+  "@startFreeTrial": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
   "trialThenPrice": "Then {price} per year. Cancel anytime before the trial ends and you won't be charged.",
-  "@trialThenPrice": {"placeholders": {"price": {"type": "String"}}},
+  "@trialThenPrice": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
   "plansUnavailable": "Plans couldn't load. Check your connection and try again.",
   "addToHomeScreen": "Add to home screen",
   "fullCalendarWidgetTitle": "Full Calendar",
@@ -846,5 +864,28 @@
   "grantPermission": "Grant Permission",
   "flashOn": "Turn on flash",
   "flashOff": "Turn off flash",
-  "flipCamera": "Flip camera"
+  "flipCamera": "Flip camera",
+  "completeSubtasksFirst": "{count, plural, =1{Finish the last subtask first} other{Finish the {count} open subtasks first}}",
+  "@completeSubtasksFirst": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "guideSearchHint": "Search the guide",
+  "guideNoResults": "No matching topics",
+  "guideProBadge": "PRO",
+  "guideQuickAddTitle": "Quick add with smart text",
+  "guideQuickAddBody": "Tap + and choose New task, then type naturally. The details are filled in for you:\n• Dates: today, tomorrow, tonight, next week, in 3 days, friday\n• Times: 6pm, 18:30, at 9\n• Priority: !high, !low (or p1 to p3)\n• Category: #work\nExample: \"Call mom tomorrow 6pm !high #family\"",
+  "guideSubtasksBody": "Open a task and add subtasks to split it into steps. Turn on \"Subtasks required\" and the task can't be checked off until every subtask is done. Grocery lists complete themselves once every item is checked.",
+  "guideRecurringTitle": "Recurring tasks",
+  "guideRecurringBody": "Set a task to repeat daily, on weekdays, weekly, monthly, yearly or on a custom rule. When you complete it, the next one is scheduled with its reminder and shows up on its day.",
+  "guideRemindersBody": "A task with a due time reminds you when it's due. From the notification you can complete it, open it or snooze it. Pro adds more snooze options, repeat reminders until you act, and quiet hours.",
+  "guideViewsTitle": "List, board and calendar",
+  "guideViewsBody": "Switch between the list, the board and the calendar. The board sorts tasks into To do, In focus and Done, and you can drag cards between columns. The calendar shows your tasks next to Google Calendar events and ROCIs Schedule classes.",
+  "guideSharingTitle": "Share tasks",
+  "guideSharingBody": "Open a task and share it as a link or a QR code. The other person sees a preview and can import their own copy. To scan a code, tap + and choose Scan QR code.",
+  "guidePrivacyBody": "Mark a category as private and set a PIN in Settings. While locked, its tasks are hidden from the list, widgets and notifications.",
+  "guideGoogleTasksBody": "Turn on Sync with Google Tasks for a task to mirror it into your Google Tasks list."
 }

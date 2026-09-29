@@ -53,7 +53,7 @@ void main() {
     mockSubscriptionService = MockSubscriptionService();
     mockPrivateModeService = MockPrivateModeService();
 
-    when(() => mockTaskProvider.tasks).thenReturn([]);
+    when(() => mockTaskProvider.allTasks).thenReturn([]);
     when(() => mockTaskProvider.categories).thenReturn([]);
     when(() => mockTaskProvider.upcomingRecurringTasks).thenReturn([]);
     when(() => mockTaskProvider.getCategoryById(any())).thenReturn(null);
@@ -146,11 +146,31 @@ void main() {
       dueDate: today.add(const Duration(hours: 14)),
     );
 
-    when(() => mockTaskProvider.tasks).thenReturn([task1, task2]);
+    when(() => mockTaskProvider.allTasks).thenReturn([task1, task2]);
 
     await tester.pumpWidget(buildTestWidget());
     await tester.pumpAndSettle();
 
     expect(find.byType(CalendarScreen), findsOneWidget);
+  });
+
+  testWidgets('wide layout titles events in the grid beside the agenda', (
+    tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(1400, 900));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    final today = DateTime.now();
+    final task = Task(
+      id: 't3',
+      title: 'Dentist',
+      dueDate: DateTime(today.year, today.month, today.day, 10),
+    );
+    when(() => mockTaskProvider.allTasks).thenReturn([task]);
+
+    await tester.pumpWidget(buildTestWidget());
+    await tester.pumpAndSettle();
+
+    // Once as a chip in the month grid, once in the day agenda.
+    expect(find.text('Dentist'), findsNWidgets(2));
   });
 }
