@@ -11,7 +11,7 @@ REPO_NAME = "ROCIs-Tasks"
 BRANCH = "main"
 GITHUB_RAW_BASE = f"https://raw.githubusercontent.com/{REPO_OWNER}/{REPO_NAME}/{BRANCH}"
 
-DEFAULT_BANNER_PATH = "assets/images/play_store/feature_graphic.png"
+DEFAULT_BANNER_PATH = "assets/images/play_store/en/feature.jpg"
 DEFAULT_LOGO_PATH = "assets/images/logo.png"
 
 class MediaManager:
@@ -71,12 +71,12 @@ class MediaManager:
 
     def list_available_screenshots(self) -> List[str]:
         """Lists relative paths of available screenshots."""
-        screenshots_dir = self.root_dir / "assets" / "images" / "play_store"
+        screenshots_dir = self.root_dir / "assets" / "images" / "play_store" / "en" / "phone"
         if not screenshots_dir.is_dir():
             return []
         shots = sorted([
-            f"assets/images/play_store/{p.name}"
-            for p in screenshots_dir.glob("screenshot_*.png")
+            f"assets/images/play_store/en/phone/{p.name}"
+            for p in screenshots_dir.glob("*.jpg")
         ])
         return shots
 

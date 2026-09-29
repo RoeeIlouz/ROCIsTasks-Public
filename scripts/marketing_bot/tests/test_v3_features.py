@@ -34,22 +34,22 @@ class TestV3MarketingFeatures(unittest.TestCase):
         logo_url = mgr.get_logo_url()
 
         self.assertIn("raw.githubusercontent.com/RoeeIlouz/ROCIs-Tasks/main", banner_url)
-        self.assertIn("feature_graphic.png", banner_url)
+        self.assertIn("play_store/en/feature.jpg", banner_url)
         self.assertIn("logo.png", logo_url)
 
     def test_media_manager_local_resolution(self):
         # Create a mock asset directory structure in temp_dir
-        assets_dir = Path(self.temp_dir.name) / "assets" / "images" / "play_store"
+        assets_dir = Path(self.temp_dir.name) / "assets" / "images" / "play_store" / "en" / "phone"
         assets_dir.mkdir(parents=True, exist_ok=True)
-        sample_img = assets_dir / "screenshot_01.png"
-        sample_img.write_bytes(b"\x89PNG\r\n\x1a\nfake_image_bytes")
+        sample_img = assets_dir / "01.jpg"
+        sample_img.write_bytes(b"\xff\xd8\xfffake_image_bytes")
 
         mgr = MediaManager(root_dir=Path(self.temp_dir.name))
-        res = mgr.get_asset_data("assets/images/play_store/screenshot_01.png")
+        res = mgr.get_asset_data("assets/images/play_store/en/phone/01.jpg")
         self.assertIsNotNone(res)
         data, mime = res
-        self.assertEqual(data, b"\x89PNG\r\n\x1a\nfake_image_bytes")
-        self.assertEqual(mime, "image/png")
+        self.assertEqual(data, b"\xff\xd8\xfffake_image_bytes")
+        self.assertEqual(mime, "image/jpeg")
 
         shots = mgr.list_available_screenshots()
         self.assertEqual(len(shots), 1)
