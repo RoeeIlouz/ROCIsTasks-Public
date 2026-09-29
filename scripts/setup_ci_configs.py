@@ -103,7 +103,11 @@ def main():
     setup_file("FIREBASE_OPTIONS_BASE64", "lib/firebase_options.dart", "lib/firebase_options.dart.example")
 
     # 3. firebase_schedule_options.dart
-    if os.path.exists("lib/firebase_schedule_options.dart.example"):
+    # Real values when the secret is set (required for release builds and
+    # patches); the placeholder is only good enough for tests.
+    if read_env_secret("FIREBASE_SCHEDULE_OPTIONS_BASE64"):
+        setup_file("FIREBASE_SCHEDULE_OPTIONS_BASE64", "lib/firebase_schedule_options.dart", "lib/firebase_schedule_options.dart.example")
+    elif os.path.exists("lib/firebase_schedule_options.dart.example"):
         shutil.copyfile("lib/firebase_schedule_options.dart.example", "lib/firebase_schedule_options.dart")
         print("Copied lib/firebase_schedule_options.dart.example -> lib/firebase_schedule_options.dart")
 
