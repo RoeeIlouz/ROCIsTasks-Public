@@ -4,6 +4,10 @@
   upload <dir> [--commit]       <dir>/<lang>/phone/*.png + <dir>/<lang>/feature.png
                                 replaces phoneScreenshots/featureGraphic per language;
                                 without --commit the edit is validated then discarded.
+  graphics <store_dir> <icon.png> [--commit]
+                                icon + <store_dir>/<deck>/feature.jpg for every existing
+                                listing language (deck = language prefix, iw -> he, falls
+                                back to en). PLAY_PKG selects the app (default Tasks).
 """
 import glob, json, os, sys
 
@@ -12,7 +16,7 @@ sys.path.insert(0, os.path.join(ROOT, '.agent', 'skills', 'rocis-autonomous-rele
 import publish_internal as pi  # noqa: E402
 import requests  # noqa: E402
 
-PKG = 'com.rocisapps.tasks'
+PKG = os.environ.get('PLAY_PKG') or 'com.rocisapps.tasks'  # empty string must not win
 BASE = f'https://androidpublisher.googleapis.com/androidpublisher/v3/applications/{PKG}/edits'
 UPLOAD = f'https://androidpublisher.googleapis.com/upload/androidpublisher/v3/applications/{PKG}/edits'
 
@@ -68,6 +72,28 @@ try:
         if '--commit' in sys.argv and v.status_code == 200:
             c = requests.post(f'{BASE}/{eid}:commit', headers=H, timeout=120)
             print('commit:', c.status_code, c.text[:500] if c.status_code != 200 else 'ok')
+            committed = c.status_code == 200
+    elif sys.argv[1] == 'graphics':
+        store_dir, icon = sys.argv[2], sys.argv[3]
+        langs = [l['language'] for l in requests.get(f'{BASE}/{eid}/listings', headers=H, timeout=30).json().get('listings', [])]
+        for lang in langs:
+            prefix = lang.split('-')[0]
+            deck = 'he' if prefix == 'iw' else prefix
+            feature = os.path.join(store_dir, deck, 'feature.jpg')
+            if not os.path.exists(feature):
+                feature = os.path.join(store_dir, 'en', 'feature.jpg')
+            for t, path, mime in (('icon', icon, 'image/png'), ('featureGraphic', feature, 'image/jpeg')):
+                requests.delete(f'{BASE}/{eid}/listings/{lang}/{t}', headers=H, timeout=60).raise_for_status()
+                with open(path, 'rb') as fh:
+                    r = requests.post(f'{UPLOAD}/{eid}/listings/{lang}/{t}?uploadType=media',
+                                      headers={**H, 'Content-Type': mime}, data=fh.read(), timeout=120)
+                r.raise_for_status()
+            print(f'{lang}: icon + featureGraphic <- {os.path.relpath(feature, store_dir)}')
+        v = requests.post(f'{BASE}/{eid}:validate', headers=H, timeout=60)
+        print('validate:', v.status_code, v.text[:300] if v.status_code != 200 else 'ok')
+        if '--commit' in sys.argv and v.status_code == 200:
+            c = requests.post(f'{BASE}/{eid}:commit', headers=H, timeout=120)
+            print('commit:', c.status_code, c.text[:300] if c.status_code != 200 else 'ok')
             committed = c.status_code == 200
     elif sys.argv[1] == 'upload':
         src = sys.argv[2]
