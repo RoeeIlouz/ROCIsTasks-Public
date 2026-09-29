@@ -9,7 +9,7 @@ This file summarizes errors encountered and changes made to the codebase, ensuri
 * README used an older, separate set (`assets/images/play_store/screenshot_0N.png`); store exports under `tools/store-screenshots/exports/` are untracked.
 
 #### Solutions Applied
-* Canonical store set: `assets/images/play_store/<locale>/{feature.jpg, phone/01-08.jpg}`, 8 locales, JPEG q92 without alpha. README points at `en/`. Old flat files kept until deletion is approved.
+* Canonical store set: `assets/images/play_store/<locale>/{feature.jpg, phone/01-08.jpg}`, 8 locales, JPEG q92 without alpha. README points at `en/`. Old flat files removed, and `scripts/marketing_bot/` pointed to the canonical set.
 * Refreshed slides 4 (My Tasks) and 5 (Board + Calendar); slide 8 is now "Share by QR or link" (share sheet + import preview). Widget slides unchanged.
 * Web capture pipeline: `tools/store-screenshots/scripts/capture_web.py` (Flutter web build with `SCREENSHOT_SEED`, pinned clock, Android status bar) and `convert_images.py`; editor supports `STORE_PROJECT=schedule` for the ROCIs Schedule deck.
 
