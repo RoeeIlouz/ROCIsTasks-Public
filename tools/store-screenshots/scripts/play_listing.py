@@ -41,10 +41,10 @@ try:
                 counts[t] = len(imgs)
             print(f"{lang:6} title={l.get('title')!r} short={l.get('shortDescription','')[:60]!r} {counts}")
     elif sys.argv[1] == 'store':
-        # store <exports_root> [--commit]: listing text from listings.json (new languages)
+        # store <exports_root> [--commit]: listing text from listings.json, or $LISTINGS (new languages)
         # + <exports_root>/<deck>/phone/*.png and feature.png for every language incl. en-US.
         root = sys.argv[2]
-        cfg = json.load(open(os.path.join(ROOT, 'tools', 'store-screenshots', 'listings.json'), encoding='utf-8'))
+        cfg = json.load(open(os.path.join(ROOT, 'tools', 'store-screenshots', os.environ.get('LISTINGS') or 'listings.json'), encoding='utf-8'))
         targets = {'en-US': 'en'}
         for lang, v in cfg.items():
             if lang.startswith('_'):

@@ -4,7 +4,14 @@
   "themeId": "rocis-tide",
   "connectedCanvas": false,
   "locales": [
-    "en"
+    "en",
+    "he",
+    "ar",
+    "es",
+    "de",
+    "fr",
+    "sv",
+    "hi"
   ],
   "locale": "en",
   "device": "feature-graphic",
@@ -75,10 +82,24 @@
         "id": "sch_1",
         "layout": "hero",
         "label": {
-          "en": "WEEKLY TIMETABLE"
+          "en": "WEEKLY TIMETABLE",
+          "he": "מערכת שבועית",
+          "ar": "الجدول الأسبوعي",
+          "es": "HORARIO SEMANAL",
+          "de": "WOCHENPLAN",
+          "fr": "EMPLOI DU TEMPS",
+          "sv": "VECKOSCHEMA",
+          "hi": "साप्ताहिक समय-सारणी"
         },
         "headline": {
-          "en": "Your semester,\nsorted."
+          "en": "Your semester,\nsorted.",
+          "he": "הסמסטר שלך,\nמסודר.",
+          "ar": "فصلك الدراسي،\nمنظّم.",
+          "es": "Tu semestre,\nen orden.",
+          "de": "Dein Semester,\ngut sortiert.",
+          "fr": "Ton semestre,\nbien rangé.",
+          "sv": "Din termin,\ni ordning.",
+          "hi": "आपका सेमेस्टर,\nव्यवस्थित।"
         },
         "screenshot": "/screenshots/schedule/phone/{locale}/01.png"
       },
@@ -86,10 +107,24 @@
         "id": "sch_2",
         "layout": "two-devices",
         "label": {
-          "en": "SHARE BY QR OR LINK"
+          "en": "SHARE BY QR OR LINK",
+          "he": "שיתוף ב-QR או בקישור",
+          "ar": "مشاركة عبر QR أو رابط",
+          "es": "COMPARTE CON QR O ENLACE",
+          "de": "PER QR ODER LINK TEILEN",
+          "fr": "PARTAGE PAR QR OU LIEN",
+          "sv": "DELA MED QR ELLER LÄNK",
+          "hi": "QR या लिंक से शेयर"
         },
         "headline": {
-          "en": "Share a course\nin one scan."
+          "en": "Share a course\nin one scan.",
+          "he": "שיתוף קורס\nבסריקה אחת.",
+          "ar": "شارك مقررًا\nبمسحة واحدة.",
+          "es": "Comparte un curso\ncon un escaneo.",
+          "de": "Kurs teilen\nmit einem Scan.",
+          "fr": "Partage un cours\nen un scan.",
+          "sv": "Dela en kurs\nmed en skanning.",
+          "hi": "एक स्कैन में\nकोर्स शेयर करें।"
         },
         "screenshot": "/screenshots/schedule/phone/{locale}/03.png",
         "screenshotSecondary": "/screenshots/schedule/phone/{locale}/02.png",
@@ -125,10 +160,24 @@
         "id": "sch_3",
         "layout": "device-bottom",
         "label": {
-          "en": "GPA & CREDITS"
+          "en": "GPA & CREDITS",
+          "he": "ממוצע ונקודות זכות",
+          "ar": "المعدل والساعات",
+          "es": "PROMEDIO Y CRÉDITOS",
+          "de": "NOTENSCHNITT & CREDITS",
+          "fr": "MOYENNE ET CRÉDITS",
+          "sv": "SNITT OCH POÄNG",
+          "hi": "GPA और क्रेडिट"
         },
         "headline": {
-          "en": "Your GPA,\nalways current."
+          "en": "Your GPA,\nalways current.",
+          "he": "הממוצע שלך,\nתמיד מעודכן.",
+          "ar": "معدلك،\nمحدّث دائمًا.",
+          "es": "Tu promedio,\nsiempre al día.",
+          "de": "Dein Schnitt,\nimmer aktuell.",
+          "fr": "Ta moyenne,\ntoujours à jour.",
+          "sv": "Ditt snitt,\nalltid aktuellt.",
+          "hi": "आपका GPA,\nहमेशा अपडेट।"
         },
         "screenshot": "/screenshots/schedule/phone/{locale}/04.png"
       },
@@ -136,10 +185,24 @@
         "id": "sch_4",
         "layout": "device-top",
         "label": {
-          "en": "ASSIGNMENTS"
+          "en": "ASSIGNMENTS",
+          "he": "מטלות",
+          "ar": "الواجبات",
+          "es": "TAREAS",
+          "de": "AUFGABEN",
+          "fr": "DEVOIRS",
+          "sv": "UPPGIFTER",
+          "hi": "असाइनमेंट"
         },
         "headline": {
-          "en": "Never miss\na deadline."
+          "en": "Never miss\na deadline.",
+          "he": "לא מפספסים\nאף הגשה.",
+          "ar": "لا تفوّت\nأي موعد تسليم.",
+          "es": "Nunca pierdas\nuna entrega.",
+          "de": "Keine Abgabe\nmehr verpassen.",
+          "fr": "Ne rate plus\naucune échéance.",
+          "sv": "Missa aldrig\nen deadline.",
+          "hi": "कोई डेडलाइन\nन छूटे।"
         },
         "screenshot": "/screenshots/schedule/phone/{locale}/05.png",
         "inverted": true
@@ -148,10 +211,24 @@
         "id": "sch_5",
         "layout": "device-bottom",
         "label": {
-          "en": "CALENDAR IMPORT"
+          "en": "CALENDAR IMPORT",
+          "he": "ייבוא לוח שנה",
+          "ar": "استيراد التقويم",
+          "es": "IMPORTAR CALENDARIO",
+          "de": "KALENDER-IMPORT",
+          "fr": "IMPORT DE CALENDRIER",
+          "sv": "KALENDERIMPORT",
+          "hi": "कैलेंडर इम्पोर्ट"
         },
         "headline": {
-          "en": "Import your\ntimetable."
+          "en": "Import your\ntimetable.",
+          "he": "ייבוא מערכת\nהשעות שלך.",
+          "ar": "استورد\nجدولك.",
+          "es": "Importa tu\nhorario.",
+          "de": "Stundenplan\nimportieren.",
+          "fr": "Importe ton\nemploi du temps.",
+          "sv": "Importera\nditt schema.",
+          "hi": "अपनी समय-सारणी\nइम्पोर्ट करें।"
         },
         "screenshot": "/screenshots/schedule/phone/{locale}/06.png"
       },
@@ -159,10 +236,24 @@
         "id": "sch_6",
         "layout": "hero",
         "label": {
-          "en": "DARK MODE"
+          "en": "DARK MODE",
+          "he": "מצב כהה",
+          "ar": "الوضع الداكن",
+          "es": "MODO OSCURO",
+          "de": "DUNKELMODUS",
+          "fr": "MODE SOMBRE",
+          "sv": "MÖRKT LÄGE",
+          "hi": "डार्क मोड"
         },
         "headline": {
-          "en": "Easy on the eyes,\nlate at night."
+          "en": "Easy on the eyes,\nlate at night.",
+          "he": "נעים לעיניים,\nגם בלילה.",
+          "ar": "مريح للعين،\nحتى في الليل.",
+          "es": "Descansa la vista,\ntambién de noche.",
+          "de": "Schont die Augen,\nauch spät nachts.",
+          "fr": "Doux pour les yeux,\nmême tard le soir.",
+          "sv": "Skonsamt för ögonen,\näven sent på kvällen.",
+          "hi": "आँखों को आराम,\nदेर रात भी।"
         },
         "screenshot": "/screenshots/schedule/phone/{locale}/07.png"
       },
@@ -170,10 +261,24 @@
         "id": "sch_7",
         "layout": "no-device",
         "label": {
-          "en": "AND MORE"
+          "en": "AND MORE",
+          "he": "ועוד",
+          "ar": "والمزيد",
+          "es": "Y MÁS",
+          "de": "UND MEHR",
+          "fr": "ET PLUS ENCORE",
+          "sv": "OCH MER",
+          "hi": "और भी बहुत कुछ"
         },
         "headline": {
-          "en": "Class reminders.\nExam countdowns.\nWorks offline."
+          "en": "Class reminders.\nExam countdowns.\nWorks offline.",
+          "he": "תזכורות לשיעורים.\nספירה לאחור למבחנים.\nעובד גם אופליין.",
+          "ar": "تذكيرات المحاضرات.\nعدّ تنازلي للامتحانات.\nيعمل دون إنترنت.",
+          "es": "Recordatorios de clase.\nCuenta atrás de exámenes.\nFunciona sin conexión.",
+          "de": "Kurserinnerungen.\nPrüfungs-Countdowns.\nFunktioniert offline.",
+          "fr": "Rappels de cours.\nComptes à rebours d’examens.\nFonctionne hors ligne.",
+          "sv": "Lektionspåminnelser.\nNedräkning till tentor.\nFungerar offline.",
+          "hi": "क्लास रिमाइंडर।\nपरीक्षा काउंटडाउन।\nऑफ़लाइन भी चलता है।"
         },
         "screenshot": "",
         "inverted": true
@@ -268,10 +373,24 @@
         "id": "sch_fg",
         "layout": "feature-graphic",
         "label": {
-          "en": ""
+          "en": "",
+          "he": "",
+          "ar": "",
+          "es": "",
+          "de": "",
+          "fr": "",
+          "sv": "",
+          "hi": ""
         },
         "headline": {
-          "en": "Timetable, exams and GPA, in one calm app."
+          "en": "Timetable, exams and GPA, in one calm app.",
+          "he": "מערכת שעות, מבחנים וממוצע, באפליקציה אחת רגועה.",
+          "ar": "الجدول والامتحانات والمعدل، في تطبيق واحد هادئ.",
+          "es": "Horario, exámenes y promedio en una app tranquila.",
+          "de": "Stundenplan, Prüfungen und Notenschnitt in einer ruhigen App.",
+          "fr": "Emploi du temps, examens et moyenne, dans une app sereine.",
+          "sv": "Schema, tentor och snitt i en lugn app.",
+          "hi": "समय-सारणी, परीक्षाएँ और GPA, एक शांत ऐप में।"
         },
         "screenshot": "",
         "inverted": true
