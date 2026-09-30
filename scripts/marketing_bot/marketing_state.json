@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-29T17:13:47.946652+00:00",
+  "last_run_timestamp": "2026-09-30T02:53:47.814669+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -3350,6 +3350,72 @@
       "title": "Show HN: Squidbrake – self-hosted approval gateway for AI agent tool calls",
       "url": "https://news.ycombinator.com/item?id=49894667",
       "inspected_at": "2026-09-29T17:13:47.939666+00:00"
+    },
+    "hn_49900368": {
+      "platform": "hackernews",
+      "title": "Show HN: A tool site with zero back end – everything runs client-side",
+      "url": "https://news.ycombinator.com/item?id=49900368",
+      "inspected_at": "2026-09-29T21:38:24.030232+00:00"
+    },
+    "hn_49900300": {
+      "platform": "hackernews",
+      "title": "Show HN: Kursal, a decentralized E2E encrypted messenger",
+      "url": "https://news.ycombinator.com/item?id=49900300",
+      "inspected_at": "2026-09-29T21:38:24.030316+00:00"
+    },
+    "hn_49899464": {
+      "platform": "hackernews",
+      "title": "Show HN: Clx 0.4.0 – native compiler for Lua",
+      "url": "https://news.ycombinator.com/item?id=49899464",
+      "inspected_at": "2026-09-29T21:38:24.030386+00:00"
+    },
+    "hn_49899130": {
+      "platform": "hackernews",
+      "title": "Show HN: Chow, a FOSS food diary",
+      "url": "https://news.ycombinator.com/item?id=49899130",
+      "inspected_at": "2026-09-29T21:38:24.030441+00:00"
+    },
+    "hn_49898465": {
+      "platform": "hackernews",
+      "title": "Ask HN: OpenSEO inspiration for other tools, asking for opinion",
+      "url": "https://news.ycombinator.com/item?id=49898465",
+      "inspected_at": "2026-09-29T21:38:24.030488+00:00"
+    },
+    "hn_49898411": {
+      "platform": "hackernews",
+      "title": "Show HN: Relay – a harness for AI coding agents that recover and verify",
+      "url": "https://news.ycombinator.com/item?id=49898411",
+      "inspected_at": "2026-09-29T21:38:24.030528+00:00"
+    },
+    "hn_49903470": {
+      "platform": "hackernews",
+      "title": "Show HN: Moching – AI desktop agent with 219 built-in tools (Rust)",
+      "url": "https://news.ycombinator.com/item?id=49903470",
+      "inspected_at": "2026-09-30T02:53:47.809799+00:00"
+    },
+    "hn_49902852": {
+      "platform": "hackernews",
+      "title": "Show HN: InfiniHash App Store – compliance tools built end-to-end by AI agents",
+      "url": "https://news.ycombinator.com/item?id=49902852",
+      "inspected_at": "2026-09-30T02:53:47.809861+00:00"
+    },
+    "hn_49902837": {
+      "platform": "hackernews",
+      "title": "Show HN: EventSend – Event tracking and routing for solo founders and SaaS teams",
+      "url": "https://news.ycombinator.com/item?id=49902837",
+      "inspected_at": "2026-09-30T02:53:47.809884+00:00"
+    },
+    "hn_49901420": {
+      "platform": "hackernews",
+      "title": "Ask HN: How do you maintain depth of understanding and velocity when using AI?",
+      "url": "https://news.ycombinator.com/item?id=49901420",
+      "inspected_at": "2026-09-30T02:53:47.809964+00:00"
+    },
+    "hn_49894384": {
+      "platform": "hackernews",
+      "title": "Show HN: We built a real-time desktop companion for patient's telehealth visits",
+      "url": "https://news.ycombinator.com/item?id=49894384",
+      "inspected_at": "2026-09-30T02:53:47.809989+00:00"
     }
   },
   "pending_drafts": {
