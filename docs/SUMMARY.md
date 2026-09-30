@@ -2,6 +2,14 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## Quick-Add Controls Overflow - 2026-09-30 (Patch 2 on 0.3.3+117)
+
+#### Problems & Root Causes
+* `QuickAddTaskBottomSheet`'s bottom Row (Today/Tomorrow chips, four icon buttons, Spacer, submit) was wider than the sheet at 390 CSS px and in longer languages, so the Row overflowed and clipped the submit button.
+
+#### Solutions Applied
+* Chips and icon buttons sit in `Expanded(SingleChildScrollView(horizontal))`; the submit button stays pinned at the end. Found while recording the promo video (`tools/promo-video`).
+
 ## Instant FAB Speed Dial - 2026-09-30 (Patch 1 on 0.3.3+117)
 
 #### Problems & Root Causes
