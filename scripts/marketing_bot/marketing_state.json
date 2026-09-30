@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-30T11:33:16.802850+00:00",
+  "last_run_timestamp": "2026-09-30T17:13:33.269235+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -3452,6 +3452,42 @@
       "title": "Ask HN: Has there been a \"software crisis\" since the 60s?",
       "url": "https://news.ycombinator.com/item?id=49906083",
       "inspected_at": "2026-09-30T11:33:16.796521+00:00"
+    },
+    "hn_49911500": {
+      "platform": "hackernews",
+      "title": "Show HN: Open-source model routing for coding agents at Astra-level performance",
+      "url": "https://news.ycombinator.com/item?id=49911500",
+      "inspected_at": "2026-09-30T17:13:33.262911+00:00"
+    },
+    "hn_49910856": {
+      "platform": "hackernews",
+      "title": "Show HN: Beyond \"chat with your database\" – agentic data exploration",
+      "url": "https://news.ycombinator.com/item?id=49910856",
+      "inspected_at": "2026-09-30T17:13:33.262980+00:00"
+    },
+    "hn_49910673": {
+      "platform": "hackernews",
+      "title": "Show HN: Stem splitting and audio conversion running in-browser with Rust/WASM",
+      "url": "https://news.ycombinator.com/item?id=49910673",
+      "inspected_at": "2026-09-30T17:13:33.263033+00:00"
+    },
+    "hn_49910273": {
+      "platform": "hackernews",
+      "title": "Show HN: Focusgrid– keyboard-controlled webapps like tmux",
+      "url": "https://news.ycombinator.com/item?id=49910273",
+      "inspected_at": "2026-09-30T17:13:33.263085+00:00"
+    },
+    "hn_49910250": {
+      "platform": "hackernews",
+      "title": "Ask HN: How do you sync or migrate KDE settings?",
+      "url": "https://news.ycombinator.com/item?id=49910250",
+      "inspected_at": "2026-09-30T17:13:33.263138+00:00"
+    },
+    "hn_49910141": {
+      "platform": "hackernews",
+      "title": "Show HN: Ikarem – Zero-dependency Python ASGI framework with built-in MCP tools",
+      "url": "https://news.ycombinator.com/item?id=49910141",
+      "inspected_at": "2026-09-30T17:13:33.263183+00:00"
     }
   },
   "pending_drafts": {
