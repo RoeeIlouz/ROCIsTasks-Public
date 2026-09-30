@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ROCIs promo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Unbounded:wght@700&display=block" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: #000; overflow: hidden; }
+  #stage { position: relative; overflow: hidden; font-family: 'Outfit', sans-serif; color: #fff; }
+  .glow { position: absolute; border-radius: 50%; filter: blur(0); pointer-events: none; }
+  .phone { position: absolute; border-radius: 7%/3.3%; background: #0c0d10; box-shadow: 0 40px 120px rgba(0,0,0,.55), 0 0 0 2px rgba(255,255,255,.08) inset; will-change: transform, opacity; }
+  .screen { position: absolute; overflow: hidden; border-radius: 5.6%/2.6%; background: #111; }
+  .screen img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .cam { position: absolute; left: 50%; width: 3.2%; aspect-ratio: 1; border-radius: 50%; background: #050506; transform: translateX(-50%); }
+  .cap { position: absolute; will-change: transform, opacity; }
+  .label { font-weight: 600; letter-spacing: .18em; }
+  .head { font-weight: 800; letter-spacing: -.02em; line-height: 1.02; }
+  .head span { display: block; will-change: transform, opacity; }
+  .brand { position: absolute; left: 0; right: 0; text-align: center; }
+  .wordmark { font-family: 'Unbounded', sans-serif; font-weight: 700; letter-spacing: -.01em; }
+  .pill { display: inline-flex; align-items: center; gap: .5em; border-radius: 999px; font-weight: 600; }
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<script>
+const q = new URLSearchParams(location.search);
+const APP = q.get('app') || 'tasks';
+const FMT = q.get('fmt') || '16x9';
+const W = FMT === '9x16' ? 1080 : 1920, H = FMT === '9x16' ? 1920 : 1080;
+const V = FMT === '9x16';
+
+const THEMES = {
+  tasks: { name: 'ROCIs Tasks', tagline: 'Tasks and calendar, right on your home screen.', bg: '#0b0b0d',
+           a: '#E5323F', b: '#7a1a22', accent: '#ff5a66' },
+  schedule: { name: 'ROCIs Schedule', tagline: 'Timetable, exams and GPA, in one calm app.', bg: '#061417',
+              a: '#0E6FA8', b: '#14B8A6', accent: '#2dd4bf' },
+};
+const T = THEMES[APP];
+
+// Frames: [seconds from scene start, image]. Typing frames advance every 0.16s.
+const typing = [[0, 'home'], [0.7, 'dial'], [1.2, 'k00']];
+for (let i = 1; i <= 20; i++) typing.push([1.5 + i * 0.16, 'k' + String(i).padStart(2, '0')]);
+typing.push([4.9, 'k99'], [5.3, 'added']);
+
+const SCENES = {
+  tasks: [
+    { kind: 'intro', d: 3.0 },
+    { d: 5.0, label: 'HOME SCREEN WIDGETS', head: 'Your day,\nat a glance.', phones: [[[0, '01'], [1.7, '02'], [3.3, '03']]] },
+    { d: 7.2, label: 'QUICK ADD', head: "Type it.\nIt's scheduled.", phones: [typing] },
+    { d: 4.4, label: 'CALENDAR + BOARD', head: 'Plan it\nyour way.', phones: [[[0, '05']], [[0, '06']]] },
+    { d: 4.4, label: 'SHARE BY QR OR LINK', head: 'Send a task.\nNo account needed.', phones: [[[0, '10']], [[0, '11']]] },
+    { d: 3.6, label: '8 LANGUAGES', head: 'Speaks your\nlanguage.', phones: [[[0, '07']]] },
+    { kind: 'outro', d: 4.2 },
+  ],
+  schedule: [
+    { kind: 'intro', d: 3.0 },
+    { d: 4.6, label: 'WEEKLY TIMETABLE', head: 'Your semester,\nsorted.', phones: [[[0, 'home'], [2.2, 'tue']]] },
+    { d: 6.0, label: 'SHARE BY QR OR LINK', head: 'Share a course\nin one scan.', phones: [[[0, '02'], [2.2, 'import'], [4.3, 'imported']]] },
+    { d: 4.0, label: 'GPA & CREDITS', head: 'Your GPA,\nalways current.', phones: [[[0, '04']]] },
+    { d: 4.0, label: 'ASSIGNMENTS', head: 'Never miss\na deadline.', phones: [[[0, '05']]] },
+    { d: 4.0, label: 'DARK MODE', head: 'Easy on the eyes,\nlate at night.', phones: [[[0, '07']]] },
+    { kind: 'outro', d: 4.2 },
+  ],
+}[APP];
+
+let acc = 0;
+for (const s of SCENES) { s.t0 = acc; acc += s.d; }
+window.DURATION = acc;
+
+// ---------- helpers ----------
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const easeOut = x => 1 - Math.pow(1 - clamp(x), 3);
+const easeIn = x => Math.pow(clamp(x), 3);
+const easeBack = x => { x = clamp(x); const c = 1.4; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
+const el = (tag, cls, parent, css = {}) => { const e = document.createElement(tag); if (cls) e.className = cls; Object.assign(e.style, css); parent.appendChild(e); return e; };
+const src = name => `assets/${APP}/${name}.png`;
+
+const stage = document.getElementById('stage');
+Object.assign(stage.style, { width: W + 'px', height: H + 'px', background: T.bg });
+const g1 = el('div', 'glow', stage, { width: W * 1.1 + 'px', height: W * 1.1 + 'px', background: `radial-gradient(circle, ${T.a}55 0%, ${T.a}00 60%)` });
+const g2 = el('div', 'glow', stage, { width: W * 0.9 + 'px', height: W * 0.9 + 'px', background: `radial-gradient(circle, ${T.b}44 0%, ${T.b}00 60%)` });
+
+// ---------- phones ----------
+const PH = V ? H * 0.58 : H * 0.84;          // phone height
+const PW = PH * (1170 / 2532) * 1.045;        // bezel adds a little width
+function makePhone() {
+  const p = el('div', 'phone', stage, { width: PW + 'px', height: PH + 'px' });
+  const inset = PW * 0.035;
+  const s = el('div', 'screen', p, { left: inset + 'px', top: inset + 'px', right: inset + 'px', bottom: inset + 'px' });
+  el('div', 'cam', p, { top: PH * 0.022 + 'px' });
+  return { p, s, imgs: {} };
+}
+function phoneImg(ph, name) {
+  if (!ph.imgs[name]) ph.imgs[name] = el('img', '', ph.s, { opacity: 0 });
+  if (!ph.imgs[name].src) ph.imgs[name].src = src(name);
+  return ph.imgs[name];
+}
+
+// ---------- captions ----------
+const cap = el('div', 'cap', stage);
+const capLabel = el('div', 'label', cap, { color: T.accent, fontSize: (V ? 34 : 28) + 'px', marginBottom: (V ? 22 : 20) + 'px' });
+const capHead = el('div', 'head', cap, { fontSize: (V ? 104 : 96) + 'px' });
+if (V) Object.assign(cap.style, { left: '80px', right: '80px', top: '170px', textAlign: 'center' });
+else Object.assign(cap.style, { left: '150px', width: '760px', top: '50%' });
+
+// ---------- brand (intro / outro) ----------
+const brand = el('div', 'brand', stage);
+const icon = el('img', '', brand, { width: (V ? 300 : 230) + 'px', borderRadius: '22%', boxShadow: '0 30px 90px rgba(0,0,0,.5)' });
+icon.src = src('icon');
+const word = el('div', 'wordmark', brand, { fontSize: (V ? 92 : 84) + 'px', marginTop: '46px' });
+word.textContent = T.name;
+const tag = el('div', '', brand, { fontSize: (V ? 40 : 36) + 'px', color: 'rgba(255,255,255,.72)', marginTop: '18px', fontWeight: 500, padding: '0 60px' });
+tag.textContent = T.tagline;
+const cta = el('div', '', brand, { marginTop: (V ? 70 : 54) + 'px' });
+const pill = el('div', 'pill', cta, { background: '#fff', color: '#111', fontSize: (V ? 40 : 34) + 'px', padding: '22px 44px' });
+pill.innerHTML = '<svg width="1em" height="1em" viewBox="0 0 24 24"><path fill="#34A853" d="M3.6 1.8 13.4 12l-9.8 10.2c-.4-.2-.6-.6-.6-1.1V2.9c0-.5.2-.9.6-1.1z"/><path fill="#FBBC04" d="m17 8.4-3.6 3.6L17 15.6l4-2.3c.8-.5.8-1.7 0-2.1z"/><path fill="#4285F4" d="M13.4 12 3.6 22.2c.3.2.8.2 1.2 0L17 15.6z"/><path fill="#EA4335" d="M3.6 1.8c.4-.2.9-.2 1.2 0L17 8.4 13.4 12z"/></svg>Get it on Google Play';
+const url = el('div', '', cta, { marginTop: '30px', fontSize: (V ? 34 : 30) + 'px', color: 'rgba(255,255,255,.6)', fontWeight: 500, letterSpacing: '.04em' });
+url.textContent = 'rocisapps.com';
+
+// Pre-create one or two phones per feature scene.
+for (const s of SCENES) if (s.phones) s.ph = s.phones.map(() => makePhone());
+
+// ---------- render ----------
+window.seek = function (t) {
+  // Background drift
+  g1.style.left = (-W * 0.25 + Math.sin(t * 0.25) * W * 0.08) + 'px';
+  g1.style.top = (-W * 0.35 + Math.cos(t * 0.2) * H * 0.08) + 'px';
+  g2.style.left = (W * 0.45 + Math.cos(t * 0.22) * W * 0.07) + 'px';
+  g2.style.top = (H * 0.25 + Math.sin(t * 0.18) * H * 0.08) + 'px';
+
+  let capOn = false, brandOn = false;
+  for (const s of SCENES) {
+    const lt = t - s.t0, active = lt >= -0.01 && lt < s.d + 0.01;
+    const inP = easeBack(lt / 0.75), outP = easeIn((lt - (s.d - 0.45)) / 0.45);
+    if (s.ph) {
+      s.ph.forEach((ph, i) => {
+        if (!active) { ph.p.style.opacity = 0; return; }
+        const two = s.ph.length > 1;
+        const stagger = i * 0.12;
+        const ip = easeBack((lt - stagger) / 0.75);
+        let x, y, rot = 0, sc = 1;
+        if (V) {
+          x = W / 2 - PW / 2 + (two ? (i ? -1 : 1) * PW * 0.36 : 0);
+          y = H - PH - 150 + (two && i ? 60 : 0);
+          rot = two ? (i ? -5 : 4) : 0;
+          sc = two ? 0.92 : 1;
+        } else {
+          x = W * 0.66 - PW / 2 + (two ? (i ? -1 : 1) * PW * 0.46 : 0);
+          y = H / 2 - PH / 2 + (two && i ? 40 : 0);
+          rot = two ? (i ? -5 : 4) : 0;
+          sc = two ? 0.94 : 1;
+        }
+        const dy = (1 - ip) * (V ? 420 : 380) + outP * 260;
+        const drift = Math.sin(lt * 0.9 + i) * 6;
+        ph.p.style.zIndex = two ? (i ? 2 : 3) : 3;
+        ph.p.style.opacity = clamp(lt / 0.25) * (1 - outP);
+        ph.p.style.transform = `translate(${x}px, ${y + dy + drift}px) rotate(${rot}deg) scale(${sc * (0.96 + 0.04 * ip)})`;
+        // screen frames with crossfade
+        const frames = s.phones[i];
+        const fade = frames === typing ? 0.06 : 0.35;
+        frames.forEach(([ft, name], k) => {
+          const next = frames[k + 1];
+          const a = k === 0 ? 1 : clamp((lt - ft) / fade);
+          const b = next ? 1 - clamp((lt - next[0]) / fade) : 1;
+          const img = phoneImg(ph, name);
+          img.style.opacity = Math.min(a, next ? (lt < next[0] + fade ? 1 : 0) : 1);
+          img.style.zIndex = k;
+        });
+        // subtle zoom on long static shots
+        ph.s.style.transform = `scale(${1 + 0.015 * clamp(lt / s.d)})`;
+      });
+    }
+    if (!active) continue;
+    if (s.label) {
+      capOn = true;
+      if (capLabel.textContent !== s.label) {
+        capLabel.textContent = s.label;
+        capHead.innerHTML = s.head.split('\n').map(l => `<span>${l}</span>`).join('');
+      }
+      const lp = easeOut((lt - 0.15) / 0.5);
+      capLabel.style.opacity = lp * (1 - outP);
+      capLabel.style.transform = `translateY(${(1 - lp) * 24}px)`;
+      [...capHead.children].forEach((sp, k) => {
+        const hp = easeOut((lt - 0.3 - k * 0.12) / 0.55);
+        sp.style.opacity = hp * (1 - outP);
+        sp.style.transform = `translateY(${(1 - hp) * 50 - outP * 30}px)`;
+      });
+      cap.style.transform = V ? '' : 'translateY(-50%)';
+    }
+    if (s.kind === 'intro' || s.kind === 'outro') {
+      brandOn = true;
+      const ip = easeBack(lt / 0.8), tp = easeOut((lt - 0.45) / 0.6), gp = easeOut((lt - 0.7) / 0.6);
+      const op = s.kind === 'intro' ? easeIn((lt - (s.d - 0.4)) / 0.4) : 0;
+      brand.style.top = (H / 2 - (V ? 420 : 330) + (s.kind === 'intro' ? (V ? 120 : 90) : 0)) + 'px';
+      brand.style.opacity = 1 - op;
+      icon.style.transform = `scale(${0.6 + 0.4 * ip}) translateY(${-op * 40}px)`;
+      icon.style.opacity = clamp(lt / 0.3);
+      word.style.opacity = tp; word.style.transform = `translateY(${(1 - tp) * 30}px)`;
+      tag.style.opacity = gp; tag.style.transform = `translateY(${(1 - gp) * 24}px)`;
+      cta.style.display = s.kind === 'outro' ? 'block' : 'none';
+      const cp = easeOut((lt - 1.0) / 0.6);
+      cta.style.opacity = cp; cta.style.transform = `translateY(${(1 - cp) * 30}px)`;
+    }
+  }
+  cap.style.display = capOn ? 'block' : 'none';
+  brand.style.display = brandOn ? 'block' : 'none';
+};
+
+// Preload every image and the fonts, then signal readiness.
+window.ready = (async () => {
+  const names = new Set(['icon']);
+  for (const s of SCENES) if (s.phones) s.phones.forEach(fr => fr.forEach(([, n]) => names.add(n)));
+  await Promise.all([...names].map(n => { const i = new Image(); i.src = src(n); return i.decode(); }));
+  for (const s of SCENES) if (s.ph) s.ph.forEach((ph, i) => s.phones[i].forEach(([, n]) => phoneImg(ph, n)));
+  await Promise.all([...document.images].map(i => i.decode().catch(() => {})));
+  await document.fonts.ready;
+  window.seek(0);
+  return true;
+})();
+</script>
+</body>
+</html>
