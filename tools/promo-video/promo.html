@@ -46,14 +46,15 @@ for (let i = 1; i <= 20; i++) typing.push([1.5 + i * 0.16, 'k' + String(i).padSt
 typing.push([4.9, 'k99'], [5.3, 'added']);
 
 const SCENES = {
+  // Tasks is timed to its music: the beat hits at 2.25s and the last stab lands at ~32.5s.
   tasks: [
-    { kind: 'intro', d: 3.0 },
+    { kind: 'intro', d: 2.25 },
     { d: 5.0, label: 'HOME SCREEN WIDGETS', head: 'Your day,\nat a glance.', phones: [[[0, '01'], [1.7, '02'], [3.3, '03']]] },
     { d: 7.2, label: 'QUICK ADD', head: "Type it.\nIt's scheduled.", phones: [typing] },
     { d: 4.4, label: 'CALENDAR + BOARD', head: 'Plan it\nyour way.', phones: [[[0, '05']], [[0, '06']]] },
     { d: 4.4, label: 'SHARE BY QR OR LINK', head: 'Send a task.\nNo account needed.', phones: [[[0, '10']], [[0, '11']]] },
     { d: 3.6, label: '8 LANGUAGES', head: 'Speaks your\nlanguage.', phones: [[[0, '07']]] },
-    { kind: 'outro', d: 4.2 },
+    { kind: 'outro', d: 5.95 },
   ],
   schedule: [
     { kind: 'intro', d: 3.0 },
