@@ -47,7 +47,7 @@ class TestRASAndTelegramListener(unittest.TestCase):
         mock_res.json.return_value = {
             "success": True,
             "data": {
-                "app": {"name": "ROCI's Tasks", "version": "0.2.10", "buildNumber": 88},
+                "app": {"name": "ROCIs Tasks", "version": "0.2.10", "buildNumber": 88},
                 "metrics": {"dau": 1840, "mau": 24900, "dauGrowth": 14.8},
                 "stability": {"crashFreeRate": 99.85},
                 "googleTasksSync": {"totalSyncs24h": 48200, "averageLatencyMs": 142}

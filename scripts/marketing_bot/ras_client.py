@@ -15,7 +15,7 @@ logger = logging.getLogger("RASClient")
 
 class RASClient:
     """
-    Bridge client to ROCI's AI System (RAS) running locally or hosted (default: http://localhost:3000).
+    Bridge client to ROCIs AI System (RAS) running locally or hosted (default: http://localhost:3000).
     Provides real-time app telemetry, cognitive routing, and graceful offline fallback.
     """
 

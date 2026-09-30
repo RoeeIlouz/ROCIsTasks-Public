@@ -847,7 +847,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get guideWidgetsDesc =>
-      'اضغط مطولاً على الشاشة الرئيسية وافتح الأدوات واختر ROCI\'s Tasks: قوائم المهام أو جدول اليوم أو التقويم أو اللوحة. يمكنك تعديل مظهرها من الإعدادات.';
+      'اضغط مطولاً على الشاشة الرئيسية وافتح الأدوات واختر ROCIs Tasks: قوائم المهام أو جدول اليوم أو التقويم أو اللوحة. يمكنك تعديل مظهرها من الإعدادات.';
 
   @override
   String get guideCustomizationTitle => 'التخصيص';
@@ -1502,7 +1502,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get widgetPinUnsupported =>
-      'لا تدعم الشاشة الرئيسية إضافة الأدوات من التطبيقات. اضغط مطولاً على الشاشة الرئيسية، ثم الأدوات وابحث عن ROCI\'s Tasks.';
+      'لا تدعم الشاشة الرئيسية إضافة الأدوات من التطبيقات. اضغط مطولاً على الشاشة الرئيسية، ثم الأدوات وابحث عن ROCIs Tasks.';
 
   @override
   String get yesterday => 'أمس';

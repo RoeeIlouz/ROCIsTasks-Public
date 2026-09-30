@@ -112,7 +112,7 @@ abstract class AppLocalizations {
   /// No description provided for @appTitle.
   ///
   /// In en, this message translates to:
-  /// **'ROCI\'s Tasks'**
+  /// **'ROCIs Tasks'**
   String get appTitle;
 
   /// No description provided for @settings.
@@ -904,7 +904,7 @@ abstract class AppLocalizations {
   /// No description provided for @aboutApp.
   ///
   /// In en, this message translates to:
-  /// **'About ROCI\'s Tasks'**
+  /// **'About ROCIs Tasks'**
   String get aboutApp;
 
   /// No description provided for @aboutAppSubtitle.
@@ -916,7 +916,7 @@ abstract class AppLocalizations {
   /// No description provided for @aboutAppDescription.
   ///
   /// In en, this message translates to:
-  /// **'ROCI\'s Tasks is designed to help you stay organized and productive. Built with Flutter, it provides a seamless experience for managing your daily tasks, categories, and schedule.'**
+  /// **'ROCIs Tasks is designed to help you stay organized and productive. Built with Flutter, it provides a seamless experience for managing your daily tasks, categories, and schedule.'**
   String get aboutAppDescription;
 
   /// No description provided for @visitWebsite.
@@ -1162,7 +1162,7 @@ abstract class AppLocalizations {
   /// No description provided for @welcomeToApp.
   ///
   /// In en, this message translates to:
-  /// **'Welcome to ROCI\'s Tasks'**
+  /// **'Welcome to ROCIs Tasks'**
   String get welcomeToApp;
 
   /// No description provided for @signInToSync.
@@ -1186,7 +1186,7 @@ abstract class AppLocalizations {
   /// No description provided for @onboardingWelcomeTitle.
   ///
   /// In en, this message translates to:
-  /// **'Welcome to ROCI\'s Tasks'**
+  /// **'Welcome to ROCIs Tasks'**
   String get onboardingWelcomeTitle;
 
   /// No description provided for @onboardingWelcomeDesc.
@@ -1360,7 +1360,7 @@ abstract class AppLocalizations {
   /// No description provided for @appStartupErrorBody.
   ///
   /// In en, this message translates to:
-  /// **'ROCI\'s Tasks encountered a problem during startup. Our team has been notified.'**
+  /// **'ROCIs Tasks encountered a problem during startup. Our team has been notified.'**
   String get appStartupErrorBody;
 
   /// No description provided for @appTagline.
@@ -1600,7 +1600,7 @@ abstract class AppLocalizations {
   /// No description provided for @appGuideSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Learn how to use ROCI\'s Tasks'**
+  /// **'Learn how to use ROCIs Tasks'**
   String get appGuideSubtitle;
 
   /// No description provided for @appGuideTitle.
@@ -1714,7 +1714,7 @@ abstract class AppLocalizations {
   /// No description provided for @guideWidgetsDesc.
   ///
   /// In en, this message translates to:
-  /// **'Long-press your home screen, open Widgets and pick ROCI\'s Tasks: task lists, today\'s agenda, the calendar or the board. Adjust their look in Settings.'**
+  /// **'Long-press your home screen, open Widgets and pick ROCIs Tasks: task lists, today\'s agenda, the calendar or the board. Adjust their look in Settings.'**
   String get guideWidgetsDesc;
 
   /// No description provided for @guideCustomizationTitle.
@@ -2950,7 +2950,7 @@ abstract class AppLocalizations {
   /// No description provided for @widgetPinUnsupported.
   ///
   /// In en, this message translates to:
-  /// **'Your launcher can\'t add widgets from apps. Long-press your home screen, tap Widgets and find ROCI\'s Tasks.'**
+  /// **'Your launcher can\'t add widgets from apps. Long-press your home screen, tap Widgets and find ROCIs Tasks.'**
   String get widgetPinUnsupported;
 
   /// No description provided for @yesterday.

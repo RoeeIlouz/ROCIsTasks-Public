@@ -9,7 +9,7 @@ class AppLocalizationsFr extends AppLocalizations {
   AppLocalizationsFr([String locale = 'fr']) : super(locale);
 
   @override
-  String get appTitle => 'ROCI\'s Tasks';
+  String get appTitle => 'ROCIs Tasks';
 
   @override
   String get settings => 'Paramètres';
@@ -421,14 +421,14 @@ class AppLocalizationsFr extends AppLocalizations {
   String get about => 'À propos';
 
   @override
-  String get aboutApp => 'À propos de ROCI\'s Tasks';
+  String get aboutApp => 'À propos de ROCIs Tasks';
 
   @override
   String get aboutAppSubtitle => 'Version de l\'application, support et infos';
 
   @override
   String get aboutAppDescription =>
-      'ROCI\'s Tasks est conçu pour vous aider à rester organisé et productif. Conçu avec Flutter, il offre une expérience fluide pour gérer vos tâches quotidiennes, vos catégories et votre emploi du temps.';
+      'ROCIs Tasks est conçu pour vous aider à rester organisé et productif. Conçu avec Flutter, il offre une expérience fluide pour gérer vos tâches quotidiennes, vos catégories et votre emploi du temps.';
 
   @override
   String get visitWebsite => 'Visiter notre site Web';
@@ -559,7 +559,7 @@ class AppLocalizationsFr extends AppLocalizations {
       'Échec de l\'enregistrement de la tâche. Veuillez réessayer.';
 
   @override
-  String get welcomeToApp => 'Bienvenue sur ROCI\'s Tasks';
+  String get welcomeToApp => 'Bienvenue sur ROCIs Tasks';
 
   @override
   String get signInToSync =>
@@ -572,7 +572,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get signInFailed => 'Échec de la connexion';
 
   @override
-  String get onboardingWelcomeTitle => 'Bienvenue sur ROCI\'s Tasks';
+  String get onboardingWelcomeTitle => 'Bienvenue sur ROCIs Tasks';
 
   @override
   String get onboardingWelcomeDesc =>
@@ -668,7 +668,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get appStartupErrorBody =>
-      'ROCI\'s Tasks a rencontré un problème lors du démarrage. Notre équipe a été prévenue.';
+      'ROCIs Tasks a rencontré un problème lors du démarrage. Notre équipe a été prévenue.';
 
   @override
   String get appTagline =>
@@ -799,7 +799,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get appGuide => 'Guide de l\'application';
 
   @override
-  String get appGuideSubtitle => 'Découvrez comment utiliser ROCI\'s Tasks';
+  String get appGuideSubtitle => 'Découvrez comment utiliser ROCIs Tasks';
 
   @override
   String get appGuideTitle => 'Guide de l\'application';
@@ -867,7 +867,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get guideWidgetsDesc =>
-      'Appuyez longuement sur l\'écran d\'accueil, ouvrez Widgets et choisissez ROCI\'s Tasks : listes de tâches, agenda du jour, calendrier ou tableau. Ajustez leur apparence dans les Paramètres.';
+      'Appuyez longuement sur l\'écran d\'accueil, ouvrez Widgets et choisissez ROCIs Tasks : listes de tâches, agenda du jour, calendrier ou tableau. Ajustez leur apparence dans les Paramètres.';
 
   @override
   String get guideCustomizationTitle => 'Personnalisation';
@@ -1535,7 +1535,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get widgetPinUnsupported =>
-      'Votre lanceur ne permet pas d\'ajouter des widgets depuis une app. Appuyez longuement sur l\'écran d\'accueil, touchez Widgets et cherchez ROCI\'s Tasks.';
+      'Votre lanceur ne permet pas d\'ajouter des widgets depuis une app. Appuyez longuement sur l\'écran d\'accueil, touchez Widgets et cherchez ROCIs Tasks.';
 
   @override
   String get yesterday => 'Hier';

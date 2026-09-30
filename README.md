@@ -24,7 +24,7 @@
 
 ## 🌟 Overview
 
-**ROCIs Tasks** is an offline-first productivity and workload management application built with Flutter. Engineered according to ROCI's Design System, it seamlessly unifies smart natural language task creation, Google Calendar synchronization, on-device calendar integration, interactive Android home screen widgets, and real-time local-cloud database synchronization.
+**ROCIs Tasks** is an offline-first productivity and workload management application built with Flutter. Engineered according to ROCIs Design System, it seamlessly unifies smart natural language task creation, Google Calendar synchronization, on-device calendar integration, interactive Android home screen widgets, and real-time local-cloud database synchronization.
 
 ---
 
