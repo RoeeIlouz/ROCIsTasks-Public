@@ -1,5 +1,11 @@
 {
   "_comment": "ROCIs Schedule Play listing text per language (deck = screenshot locale). Used by play_listing.py store with LISTINGS=listings.schedule.json PLAY_PKG=com.rocisapps.schedule.",
+  "en-US": {
+    "deck": "en",
+    "title": "ROCIs Schedule",
+    "shortDescription": "Student timetable, class reminders, exam countdowns and a GPA calculator.",
+    "fullDescription": "ROCIs Schedule keeps your whole semester in one place: lectures, labs, exams and assignments, in a clear, calm app.\n\nWEEKLY TIMETABLE\n• All your lectures, labs, tutorials and study sessions at a glance.\n• A color for every course, so subjects stand out instantly.\n• A quick day strip to see what's next.\n\nCLASS AND ASSIGNMENT REMINDERS\n• A notification 15 minutes before each class, with the room and instructor.\n• Reminders before every due date.\n\nEXAM COUNTDOWN\n• Exams in the next 30 days, always at the top.\n• \"In 3 days\", \"Tomorrow\", \"Today at 10:00\".\n\nGPA AND CREDITS\n• Grades and credits for every course.\n• Weighted GPA and semester average, always up to date.\n\nIMPORT YOUR TIMETABLE\n• Import .ics files from Moodle, Canvas, Blackboard or Google Calendar.\n• Recurring classes, rooms and course details are detected automatically.\n\nSHARE COURSES BY QR OR LINK\n• A classmate scans, and the course with all its class times lands in their schedule.\n\nWORKS WITH ROCIs TASKS\n• Send assignments to your task manager with one tap.\n\nDESIGN\n• Dark mode and a battery-saving AMOLED mode.\n• 8 languages, with full right-to-left support.\n\nWORKS OFFLINE\n• All your data stays on your device.\n• Backup and sync across devices with secure Google sign-in.\n\nPRIVACY\n• No ads and no third-party tracking.\n• Your schedule belongs only to you."
+  },
   "iw-IL": {
     "deck": "he",
     "title": "ROCIs Schedule",
