@@ -2,6 +2,14 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## Instant FAB Speed Dial - 2026-09-30 (Patch 1 on 0.3.3+117)
+
+#### Problems & Root Causes
+* The My Tasks FAB (and the Categories FAB) opened ~300ms late. Both are wrapped in `EasterEggSpinner`, whose `GestureDetector(onDoubleTap:)` holds the gesture arena for `kDoubleTapTimeout` after every tap, so the child `InkWell.onTap` only won afterwards. The earlier speed-dial render fix (Patch 3 on 0.3.2+116) could not help.
+
+#### Solutions Applied
+* `EasterEggSpinner` detects double taps from raw `Listener.onPointerUp` events (time + slop check), which never enter the arena; long-press spin is unchanged.
+
 ## Recurring Reminders, Required Subtasks, Brand Theme, Web Fixes - 2026-09-29 (Patch 3 on 0.3.2+116)
 
 #### Problems & Root Causes
