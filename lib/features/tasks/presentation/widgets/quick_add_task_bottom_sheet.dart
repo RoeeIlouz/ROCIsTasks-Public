@@ -406,139 +406,156 @@ class _QuickAddTaskBottomSheetState extends State<QuickAddTaskBottomSheet> {
 
                 const SizedBox(height: 14),
 
-                // Bottom Controls Row
+                // Bottom Controls Row: the controls scroll on narrow screens so
+                // the submit button always stays fully visible.
                 Row(
                   children: [
-                    // Quick Date Preset: Today
-                    _buildActionButton(
-                      icon: Icons.today_rounded,
-                      label: l10n.quickDateToday,
-                      isSelected:
-                          _selectedDate != null &&
-                          DateUtils.isSameDay(_selectedDate, DateTime.now()),
-                      onTap: () {
-                        setState(() {
-                          final now = DateTime.now();
-                          _selectedDate = DateTime(
-                            now.year,
-                            now.month,
-                            now.day,
-                            12,
-                            0,
-                          );
-                        });
-                        HapticUtils.throttledLightImpact();
-                      },
-                      theme: theme,
-                    ),
-                    const SizedBox(width: 6),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: [
+                            // Quick Date Preset: Today
+                            _buildActionButton(
+                              icon: Icons.today_rounded,
+                              label: l10n.quickDateToday,
+                              isSelected:
+                                  _selectedDate != null &&
+                                  DateUtils.isSameDay(
+                                    _selectedDate,
+                                    DateTime.now(),
+                                  ),
+                              onTap: () {
+                                setState(() {
+                                  final now = DateTime.now();
+                                  _selectedDate = DateTime(
+                                    now.year,
+                                    now.month,
+                                    now.day,
+                                    12,
+                                    0,
+                                  );
+                                });
+                                HapticUtils.throttledLightImpact();
+                              },
+                              theme: theme,
+                            ),
+                            const SizedBox(width: 6),
 
-                    // Quick Date Preset: Tomorrow
-                    _buildActionButton(
-                      icon: Icons.wb_sunny_outlined,
-                      label: l10n.quickDateTomorrow,
-                      isSelected:
-                          _selectedDate != null &&
-                          DateUtils.isSameDay(
-                            _selectedDate,
-                            DateTime.now().add(const Duration(days: 1)),
-                          ),
-                      onTap: () {
-                        setState(() {
-                          final tom = DateTime.now().add(
-                            const Duration(days: 1),
-                          );
-                          _selectedDate = DateTime(
-                            tom.year,
-                            tom.month,
-                            tom.day,
-                            12,
-                            0,
-                          );
-                        });
-                        HapticUtils.throttledLightImpact();
-                      },
-                      theme: theme,
-                    ),
-                    const SizedBox(width: 6),
+                            // Quick Date Preset: Tomorrow
+                            _buildActionButton(
+                              icon: Icons.wb_sunny_outlined,
+                              label: l10n.quickDateTomorrow,
+                              isSelected:
+                                  _selectedDate != null &&
+                                  DateUtils.isSameDay(
+                                    _selectedDate,
+                                    DateTime.now().add(const Duration(days: 1)),
+                                  ),
+                              onTap: () {
+                                setState(() {
+                                  final tom = DateTime.now().add(
+                                    const Duration(days: 1),
+                                  );
+                                  _selectedDate = DateTime(
+                                    tom.year,
+                                    tom.month,
+                                    tom.day,
+                                    12,
+                                    0,
+                                  );
+                                });
+                                HapticUtils.throttledLightImpact();
+                              },
+                              theme: theme,
+                            ),
+                            const SizedBox(width: 6),
 
-                    // Date Picker Icon
-                    IconButton(
-                      icon: Icon(
-                        Icons.event_available_rounded,
-                        size: 20,
-                        color: _selectedDate != null
-                            ? theme.colorScheme.primary
-                            : theme.colorScheme.onSurface.withValues(
-                                alpha: 0.6,
+                            // Date Picker Icon
+                            IconButton(
+                              icon: Icon(
+                                Icons.event_available_rounded,
+                                size: 20,
+                                color: _selectedDate != null
+                                    ? theme.colorScheme.primary
+                                    : theme.colorScheme.onSurface.withValues(
+                                        alpha: 0.6,
+                                      ),
                               ),
-                      ),
-                      tooltip: l10n.dueDateTime,
-                      onPressed: _pickCustomDate,
-                      constraints: const BoxConstraints(
-                        minWidth: 36,
-                        minHeight: 36,
-                      ),
-                      padding: EdgeInsets.zero,
-                    ),
-
-                    // Priority Toggle
-                    IconButton(
-                      icon: Icon(
-                        Icons.flag_rounded,
-                        size: 20,
-                        color: _getPriorityColor(_priority),
-                      ),
-                      tooltip: '${l10n.priority}: ${_priority.name}',
-                      onPressed: _cyclePriority,
-                      constraints: const BoxConstraints(
-                        minWidth: 36,
-                        minHeight: 36,
-                      ),
-                      padding: EdgeInsets.zero,
-                    ),
-
-                    // Category Picker
-                    IconButton(
-                      icon: Icon(
-                        selectedCategory != null
-                            ? IconUtils.getIconData(selectedCategory.iconCode)
-                            : Icons.label_outline_rounded,
-                        size: 20,
-                        color: selectedCategory != null
-                            ? Color(selectedCategory.colorValue)
-                            : theme.colorScheme.onSurface.withValues(
-                                alpha: 0.6,
+                              tooltip: l10n.dueDateTime,
+                              onPressed: _pickCustomDate,
+                              constraints: const BoxConstraints(
+                                minWidth: 36,
+                                minHeight: 36,
                               ),
-                      ),
-                      tooltip: l10n.categories,
-                      onPressed: () => _showCategoryPicker(categories, l10n),
-                      constraints: const BoxConstraints(
-                        minWidth: 36,
-                        minHeight: 36,
-                      ),
-                      padding: EdgeInsets.zero,
-                    ),
+                              padding: EdgeInsets.zero,
+                            ),
 
-                    // More Options (Open Full AddTaskScreen)
-                    IconButton(
-                      icon: Icon(
-                        Icons.open_in_full_rounded,
-                        size: 18,
-                        color: theme.colorScheme.onSurface.withValues(
-                          alpha: 0.6,
+                            // Priority Toggle
+                            IconButton(
+                              icon: Icon(
+                                Icons.flag_rounded,
+                                size: 20,
+                                color: _getPriorityColor(_priority),
+                              ),
+                              tooltip: '${l10n.priority}: ${_priority.name}',
+                              onPressed: _cyclePriority,
+                              constraints: const BoxConstraints(
+                                minWidth: 36,
+                                minHeight: 36,
+                              ),
+                              padding: EdgeInsets.zero,
+                            ),
+
+                            // Category Picker
+                            IconButton(
+                              icon: Icon(
+                                selectedCategory != null
+                                    ? IconUtils.getIconData(
+                                        selectedCategory.iconCode,
+                                      )
+                                    : Icons.label_outline_rounded,
+                                size: 20,
+                                color: selectedCategory != null
+                                    ? Color(selectedCategory.colorValue)
+                                    : theme.colorScheme.onSurface.withValues(
+                                        alpha: 0.6,
+                                      ),
+                              ),
+                              tooltip: l10n.categories,
+                              onPressed: () =>
+                                  _showCategoryPicker(categories, l10n),
+                              constraints: const BoxConstraints(
+                                minWidth: 36,
+                                minHeight: 36,
+                              ),
+                              padding: EdgeInsets.zero,
+                            ),
+
+                            // More Options (Open Full AddTaskScreen)
+                            IconButton(
+                              icon: Icon(
+                                Icons.open_in_full_rounded,
+                                size: 18,
+                                color: theme.colorScheme.onSurface.withValues(
+                                  alpha: 0.6,
+                                ),
+                              ),
+                              tooltip: AppLocalizations.of(
+                                context,
+                              )!.moreOptions,
+                              onPressed: _openFullAddTaskScreen,
+                              constraints: const BoxConstraints(
+                                minWidth: 36,
+                                minHeight: 36,
+                              ),
+                              padding: EdgeInsets.zero,
+                            ),
+                          ],
                         ),
                       ),
-                      tooltip: AppLocalizations.of(context)!.moreOptions,
-                      onPressed: _openFullAddTaskScreen,
-                      constraints: const BoxConstraints(
-                        minWidth: 36,
-                        minHeight: 36,
-                      ),
-                      padding: EdgeInsets.zero,
                     ),
-
-                    const Spacer(),
+                    const SizedBox(width: 8),
 
                     // Submit / Create Task FAB Pill
                     Material(
