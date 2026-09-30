@@ -656,7 +656,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get appStartupErrorBody =>
-      'ROCI\'s Tasks נתקלה בבעיה במהלך ההפעלה. הצוות שלנו קיבל הודעה.';
+      'ROCIs Tasks נתקלה בבעיה במהלך ההפעלה. הצוות שלנו קיבל הודעה.';
 
   @override
   String get appTagline => 'שמים לב לכל הפרטים';
@@ -782,7 +782,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get appGuide => 'מדריך למשתמש';
 
   @override
-  String get appGuideSubtitle => 'למד איך להשתמש ב-ROCI\'s Tasks';
+  String get appGuideSubtitle => 'למד איך להשתמש ב-ROCIs Tasks';
 
   @override
   String get appGuideTitle => 'מדריך למשתמש';
@@ -848,7 +848,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get guideWidgetsDesc =>
-      'לחצו לחיצה ארוכה על מסך הבית, פתחו ווידג\'טים ובחרו ROCI\'s Tasks: רשימות משימות, סדר היום, לוח השנה או הלוח. את המראה שלהם אפשר להתאים בהגדרות.';
+      'לחצו לחיצה ארוכה על מסך הבית, פתחו ווידג\'טים ובחרו ROCIs Tasks: רשימות משימות, סדר היום, לוח השנה או הלוח. את המראה שלהם אפשר להתאים בהגדרות.';
 
   @override
   String get guideCustomizationTitle => 'התאמה אישית';
@@ -1502,7 +1502,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get widgetPinUnsupported =>
-      'המסך הראשי שלך לא תומך בהוספת ווידג׳טים מהאפליקציה. לחצו לחיצה ארוכה על מסך הבית, בחרו ווידג׳טים ומצאו את ROCI\'s Tasks.';
+      'המסך הראשי שלך לא תומך בהוספת ווידג׳טים מהאפליקציה. לחצו לחיצה ארוכה על מסך הבית, בחרו ווידג׳טים ומצאו את ROCIs Tasks.';
 
   @override
   String get yesterday => 'אתמול';

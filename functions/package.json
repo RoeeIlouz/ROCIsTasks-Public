@@ -1,6 +1,6 @@
 {
   "name": "functions",
-  "description": "Cloud Functions for ROCI's Tasks",
+  "description": "Cloud Functions for ROCIs Tasks",
   "version": "1.0.0",
   "private": true,
   "engines": {

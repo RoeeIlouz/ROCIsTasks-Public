@@ -4,7 +4,7 @@ import 'package:rocis_tasks/core/config/app_config.dart';
 void main() {
   group('AppConfig', () {
     test('should have correct app name', () {
-      expect(AppConfig.appName, "ROCI's Tasks");
+      expect(AppConfig.appName, 'ROCIs Tasks');
     });
 
     test('should have valid version string', () {
@@ -49,7 +49,7 @@ void main() {
     test('getConfigSummary should return map', () {
       final summary = AppConfig.getConfigSummary();
       expect(summary, isA<Map<String, dynamic>>());
-      expect(summary['appName'], "ROCI's Tasks");
+      expect(summary['appName'], 'ROCIs Tasks');
       expect(summary['appVersion'], isNotEmpty);
       expect(summary['firebaseProjectId'], 'rocis-todo');
       expect(summary.containsKey('isProduction'), true);

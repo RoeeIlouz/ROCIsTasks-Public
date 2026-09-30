@@ -9,7 +9,7 @@ class AppLocalizationsHi extends AppLocalizations {
   AppLocalizationsHi([String locale = 'hi']) : super(locale);
 
   @override
-  String get appTitle => 'ROCI\'s Tasks';
+  String get appTitle => 'ROCIs Tasks';
 
   @override
   String get settings => 'सेटिंग्स';
@@ -417,14 +417,14 @@ class AppLocalizationsHi extends AppLocalizations {
   String get about => 'के बारे में';
 
   @override
-  String get aboutApp => 'ROCI\'s Tasks के बारे में';
+  String get aboutApp => 'ROCIs Tasks के बारे में';
 
   @override
   String get aboutAppSubtitle => 'ऐप संस्करण, सहायता और जानकारी';
 
   @override
   String get aboutAppDescription =>
-      'ROCI\'s Tasks आपको संगठित और उत्पादक बने रहने में मदद करने के लिए डिज़ाइन किया गया है। फ्लटर से निर्मित, यह आपके दैनिक कार्यों, श्रेणियों और शेड्यूल को प्रबंधित करने के लिए एक सहज अनुभव प्रदान करता है।';
+      'ROCIs Tasks आपको संगठित और उत्पादक बने रहने में मदद करने के लिए डिज़ाइन किया गया है। फ्लटर से निर्मित, यह आपके दैनिक कार्यों, श्रेणियों और शेड्यूल को प्रबंधित करने के लिए एक सहज अनुभव प्रदान करता है।';
 
   @override
   String get visitWebsite => 'हमारी वेबसाइट पर जाएँ';
@@ -554,7 +554,7 @@ class AppLocalizationsHi extends AppLocalizations {
       'कार्य सहेजने में विफल। कृपया पुनः प्रयास करें।';
 
   @override
-  String get welcomeToApp => 'ROCI\'s Tasks में आपका स्वागत है';
+  String get welcomeToApp => 'ROCIs Tasks में आपका स्वागत है';
 
   @override
   String get signInToSync =>
@@ -567,7 +567,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get signInFailed => 'साइन इन विफल रहा';
 
   @override
-  String get onboardingWelcomeTitle => 'ROCI\'s Tasks में आपका स्वागत है';
+  String get onboardingWelcomeTitle => 'ROCIs Tasks में आपका स्वागत है';
 
   @override
   String get onboardingWelcomeDesc =>
@@ -663,7 +663,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get appStartupErrorBody =>
-      'ROCI\'s Tasks को स्टार्ट-अप के दौरान समस्या का सामना करना पड़ा। हमारी टीम को सूचित कर दिया गया है।';
+      'ROCIs Tasks को स्टार्ट-अप के दौरान समस्या का सामना करना पड़ा। हमारी टीम को सूचित कर दिया गया है।';
 
   @override
   String get appTagline => 'हर विवरण को पूर्णता देना';
@@ -791,7 +791,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get appGuide => 'ऐप गाइड';
 
   @override
-  String get appGuideSubtitle => 'ROCI\'s Tasks का उपयोग करना सीखें';
+  String get appGuideSubtitle => 'ROCIs Tasks का उपयोग करना सीखें';
 
   @override
   String get appGuideTitle => 'ऐप गाइड';
@@ -859,7 +859,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get guideWidgetsDesc =>
-      'होम स्क्रीन को देर तक दबाएँ, विजेट खोलें और ROCI\'s Tasks चुनें: कार्य सूचियाँ, आज का एजेंडा, कैलेंडर या बोर्ड। उनका रूप सेटिंग्स में बदलें।';
+      'होम स्क्रीन को देर तक दबाएँ, विजेट खोलें और ROCIs Tasks चुनें: कार्य सूचियाँ, आज का एजेंडा, कैलेंडर या बोर्ड। उनका रूप सेटिंग्स में बदलें।';
 
   @override
   String get guideCustomizationTitle => 'कस्टमाइज़ेशन';
@@ -1518,7 +1518,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get widgetPinUnsupported =>
-      'आपका लॉन्चर ऐप से विजेट नहीं जोड़ सकता। होम स्क्रीन को देर तक दबाएँ, विजेट चुनें और ROCI\'s Tasks खोजें।';
+      'आपका लॉन्चर ऐप से विजेट नहीं जोड़ सकता। होम स्क्रीन को देर तक दबाएँ, विजेट चुनें और ROCIs Tasks खोजें।';
 
   @override
   String get yesterday => 'कल';

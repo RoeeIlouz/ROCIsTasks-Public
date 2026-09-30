@@ -9,7 +9,7 @@ class AppLocalizationsDe extends AppLocalizations {
   AppLocalizationsDe([String locale = 'de']) : super(locale);
 
   @override
-  String get appTitle => 'ROCI\'s Tasks';
+  String get appTitle => 'ROCIs Tasks';
 
   @override
   String get settings => 'Einstellungen';
@@ -420,14 +420,14 @@ class AppLocalizationsDe extends AppLocalizations {
   String get about => 'Über';
 
   @override
-  String get aboutApp => 'Über ROCI\'s Tasks';
+  String get aboutApp => 'Über ROCIs Tasks';
 
   @override
   String get aboutAppSubtitle => 'App-Version, Support und Infos';
 
   @override
   String get aboutAppDescription =>
-      'ROCI\'s Tasks hilft Ihnen, organisiert und produktiv zu bleiben. Entwickelt mit Flutter, bietet es eine nahtlose Erfahrung bei der Verwaltung Ihrer täglichen Aufgaben, Kategorien und Zeitpläne.';
+      'ROCIs Tasks hilft Ihnen, organisiert und produktiv zu bleiben. Entwickelt mit Flutter, bietet es eine nahtlose Erfahrung bei der Verwaltung Ihrer täglichen Aufgaben, Kategorien und Zeitpläne.';
 
   @override
   String get visitWebsite => 'Besuchen Sie unsere Website';
@@ -559,7 +559,7 @@ class AppLocalizationsDe extends AppLocalizations {
       'Aufgabe konnte nicht gespeichert werden. Bitte versuchen Sie es erneut.';
 
   @override
-  String get welcomeToApp => 'Willkommen bei ROCI\'s Tasks';
+  String get welcomeToApp => 'Willkommen bei ROCIs Tasks';
 
   @override
   String get signInToSync =>
@@ -572,7 +572,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get signInFailed => 'Anmeldung fehlgeschlagen';
 
   @override
-  String get onboardingWelcomeTitle => 'Willkommen bei ROCI\'s Tasks';
+  String get onboardingWelcomeTitle => 'Willkommen bei ROCIs Tasks';
 
   @override
   String get onboardingWelcomeDesc =>
@@ -668,7 +668,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get appStartupErrorBody =>
-      'ROCI\'s Tasks hat beim Start einen Fehler festgestellt. Unser Team wurde benachrichtigt.';
+      'ROCIs Tasks hat beim Start einen Fehler festgestellt. Unser Team wurde benachrichtigt.';
 
   @override
   String get appTagline => 'Perfekt organisiert durch den Alltag';
@@ -799,8 +799,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get appGuide => 'App-Anleitung';
 
   @override
-  String get appGuideSubtitle =>
-      'Erfahren Sie, wie Sie ROCI\'s Tasks verwenden';
+  String get appGuideSubtitle => 'Erfahren Sie, wie Sie ROCIs Tasks verwenden';
 
   @override
   String get appGuideTitle => 'App-Anleitung';
@@ -868,7 +867,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get guideWidgetsDesc =>
-      'Halte den Startbildschirm gedrückt, öffne Widgets und wähle ROCI\'s Tasks: Aufgabenlisten, die Tagesübersicht, den Kalender oder das Board. Ihr Aussehen passt du in den Einstellungen an.';
+      'Halte den Startbildschirm gedrückt, öffne Widgets und wähle ROCIs Tasks: Aufgabenlisten, die Tagesübersicht, den Kalender oder das Board. Ihr Aussehen passt du in den Einstellungen an.';
 
   @override
   String get guideCustomizationTitle => 'Anpassung';
@@ -1536,7 +1535,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get widgetPinUnsupported =>
-      'Dein Launcher kann keine Widgets aus Apps hinzufügen. Halte den Startbildschirm gedrückt, tippe auf Widgets und suche ROCI\'s Tasks.';
+      'Dein Launcher kann keine Widgets aus Apps hinzufügen. Halte den Startbildschirm gedrückt, tippe auf Widgets und suche ROCIs Tasks.';
 
   @override
   String get yesterday => 'Gestern';

@@ -1,4 +1,4 @@
-// This is a basic Flutter widget test for ROCI's Tasks app.
+// This is a basic Flutter widget test for ROCIs Tasks app.
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:rocis_tasks/core/services/validation_service.dart';

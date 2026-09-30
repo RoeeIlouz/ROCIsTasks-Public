@@ -263,7 +263,7 @@ class _AppRootState extends State<AppRoot> {
                         const CircularProgressIndicator(color: Colors.white),
                         const SizedBox(height: 24),
                         Text(
-                          "ROCI's Tasks",
+                          'ROCIs Tasks',
                           style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -336,7 +336,7 @@ class _AppRootState extends State<AppRoot> {
                           const SizedBox(height: 16),
                           Text(
                             l10n?.appStartupErrorBody ??
-                                'ROCI\'s Tasks encountered a problem during startup. Our team has been notified.',
+                                'ROCIs Tasks encountered a problem during startup. Our team has been notified.',
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: Colors.white.withValues(alpha: 0.7),
@@ -526,7 +526,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         _syncWidgetTheme(lightTheme.colorScheme, darkTheme.colorScheme);
 
         return MaterialApp.router(
-          title: "ROCI's Tasks",
+          title: 'ROCIs Tasks',
           debugShowCheckedModeBanner: false,
           scaffoldMessengerKey: appMessengerKey,
           theme: lightTheme,

@@ -1,11 +1,11 @@
-# Theme & Style Guide - ROCI's Tasks
+# Theme & Style Guide - ROCIs Tasks
 
-This document summarizes the complete design system, typography, colors, component specifications, and behavioral styling rules of **ROCI's Tasks**. It is designed to be fed directly into an AI system to guide it in replicating the exact visual identity and UI feel of the application.
+This document summarizes the complete design system, typography, colors, component specifications, and behavioral styling rules of **ROCIs Tasks**. It is designed to be fed directly into an AI system to guide it in replicating the exact visual identity and UI feel of the application.
 
 ---
 
 ## 🎨 Design Philosophy & Aesthetic
-ROCI's Tasks uses a **premium, minimalist, and ultra-modern aesthetic** that relies on:
+ROCIs Tasks uses a **premium, minimalist, and ultra-modern aesthetic** that relies on:
 - **Glassmorphism** (soft translucent backdrops, thin subtle borders, and blur effects).
 - **Deep space dark mode** (sleek slate backgrounds) and optional pure black AMOLED styling.
 - **Vibrant accent gradients** that pop against dark backdrops.

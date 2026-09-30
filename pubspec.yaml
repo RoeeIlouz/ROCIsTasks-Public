@@ -1,5 +1,5 @@
 name: rocis_tasks
-description: "ROCI's Tasks — A premium task management app with Google Tasks sync, calendar integration, and glassmorphism UI."
+description: "ROCIs Tasks — A premium task management app with Google Tasks sync, calendar integration, and glassmorphism UI."
 publish_to: "none"
 
 version: 0.3.3+117

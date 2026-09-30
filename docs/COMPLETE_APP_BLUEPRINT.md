@@ -1,8 +1,8 @@
 # 🏛️ Complete System Architecture & Feature Blueprint: ROCIs Tasks
 
-![ROCI's Tasks System Architecture & Flow](images/app_architecture_flow.jpg)
+![ROCIs Tasks System Architecture & Flow](images/app_architecture_flow.jpg)
 
-This document maps the entire ecosystem of **ROCI's Tasks** — detailing every layer, feature, external API, local database, background isolate, Android native widget, security mechanism, and autonomous subsystem.
+This document maps the entire ecosystem of **ROCIs Tasks** — detailing every layer, feature, external API, local database, background isolate, Android native widget, security mechanism, and autonomous subsystem.
 
 ---
 

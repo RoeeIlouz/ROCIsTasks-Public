@@ -1,10 +1,10 @@
-# Privacy Policy for ROCI's Tasks
+# Privacy Policy for ROCIs Tasks
 
 **Last Updated:** September 22, 2026
 
-Thank you for choosing to be part of our community at ROCI's Apps ("**we**", "**us**", or "**our**"). We are committed to protecting your personal information and your right to privacy. If you have any questions or concerns about this privacy notice, or our practices with regards to your personal information, please contact us at our support email (`support@rocisapps.com`).
+Thank you for choosing to be part of our community at ROCIs Apps ("**we**", "**us**", or "**our**"). We are committed to protecting your personal information and your right to privacy. If you have any questions or concerns about this privacy notice, or our practices with regards to your personal information, please contact us at our support email (`support@rocisapps.com`).
 
-This Privacy Policy applies to all information collected through our application, **ROCI's Tasks**, available across Android, iOS, and Web platforms (`https://tasks.rocisapps.com`), and/or any related services, sales, marketing or events.
+This Privacy Policy applies to all information collected through our application, **ROCIs Tasks**, available across Android, iOS, and Web platforms (`https://tasks.rocisapps.com`), and/or any related services, sales, marketing or events.
 
 Please read this privacy notice carefully as it will help you understand what we do with the information that we collect.
 
@@ -30,15 +30,15 @@ Like many apps, we also automatically collect information when you use our app:
 
 With your permission, we may access certain features on your device or linked third-party services:
 
-- **Calendar Access:** If you enable the calendar integration, the app requests permission to read and write to your device's local calendar or Google Calendar to schedule events related to your tasks. We do not transmit your full calendar data to third parties; it is only used to create and sync events with the ROCI's Tasks app.
-- **Google Tasks & Calendar Integration:** When you link Google Tasks or Google Calendar, our app requests permission through Google OAuth 2.0 to access your task lists and calendar events so you can manage them directly within ROCI's Tasks.
+- **Calendar Access:** If you enable the calendar integration, the app requests permission to read and write to your device's local calendar or Google Calendar to schedule events related to your tasks. We do not transmit your full calendar data to third parties; it is only used to create and sync events with the ROCIs Tasks app.
+- **Google Tasks & Calendar Integration:** When you link Google Tasks or Google Calendar, our app requests permission through Google OAuth 2.0 to access your task lists and calendar events so you can manage them directly within ROCIs Tasks.
 
 ---
 
 ## 2. COOKIES, LOCAL STORAGE, AND SESSION PERSISTENCE
 
 ### Web Cookies and Local Storage
-When using ROCI's Tasks on the Web, we use browser storage mechanisms (including `localStorage` and HTTP cookies):
+When using ROCIs Tasks on the Web, we use browser storage mechanisms (including `localStorage` and HTTP cookies):
 - **Essential Storage:** Required to remember your authenticated session, user preferences (theme, task display density), and local offline task cache.
 - **Session Continuity Cookies:** We set secure, `SameSite=Lax` cookies to persist your Google service tokens across browser launches so you do not have to repeatedly sign in every time you open the web application.
 - **Cookie Consent:** On the web version, a consent banner allows you to select between **"Accept All"** (enables full session cookie persistence) and **"Essential Only"** (restricts persistence strictly to core local storage). You can change this preference at any time by clearing your browser cookies or clicking the cookie settings link.
@@ -91,4 +91,4 @@ You can revoke device permissions (such as Calendar access) at any time through 
 
 ## 7. HOW CAN YOU CONTACT US ABOUT THIS NOTICE?
 
-If you have questions or comments about this notice, you may email us at `support@rocisapps.com` or through the "Contact Support" link found in the App's Settings menu under "About ROCI's Tasks".
+If you have questions or comments about this notice, you may email us at `support@rocisapps.com` or through the "Contact Support" link found in the App's Settings menu under "About ROCIs Tasks".

@@ -55,7 +55,7 @@ class AppConfig {
   }
 
   // App information
-  static const String appName = 'ROCI\'s Tasks';
+  static const String appName = 'ROCIs Tasks';
   static const String appVersion = '0.3.3';
   static const String supportEmail = 'support@rocisapps.com';
   static const String privacyPolicyUrl = 'https://rocisapps.com/privacy.html';
