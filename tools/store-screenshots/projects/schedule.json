@@ -7,7 +7,7 @@
     "en"
   ],
   "locale": "en",
-  "device": "android",
+  "device": "feature-graphic",
   "orientation": "portrait",
   "appIcon": "/schedule-icon.png",
   "slidesByDevice": {
