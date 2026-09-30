@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-30T02:53:47.814669+00:00",
+  "last_run_timestamp": "2026-09-30T11:33:16.802850+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -3416,6 +3416,42 @@
       "title": "Show HN: We built a real-time desktop companion for patient's telehealth visits",
       "url": "https://news.ycombinator.com/item?id=49894384",
       "inspected_at": "2026-09-30T02:53:47.809989+00:00"
+    },
+    "hn_49907325": {
+      "platform": "hackernews",
+      "title": "Show HN: Gryphana – an IDE that runs in the browser",
+      "url": "https://news.ycombinator.com/item?id=49907325",
+      "inspected_at": "2026-09-30T11:33:16.796264+00:00"
+    },
+    "hn_49905667": {
+      "platform": "hackernews",
+      "title": "Show HN: Kguardian – seccomp profiles and NetworkPolicies from eBPF traces",
+      "url": "https://news.ycombinator.com/item?id=49905667",
+      "inspected_at": "2026-09-30T11:33:16.796351+00:00"
+    },
+    "hn_49905410": {
+      "platform": "hackernews",
+      "title": "Show HN: A small side project for even colour scales",
+      "url": "https://news.ycombinator.com/item?id=49905410",
+      "inspected_at": "2026-09-30T11:33:16.796404+00:00"
+    },
+    "hn_49905215": {
+      "platform": "hackernews",
+      "title": "Show HN: Anxiety Checklist – 3 years of itterate with no success yet",
+      "url": "https://news.ycombinator.com/item?id=49905215",
+      "inspected_at": "2026-09-30T11:33:16.796443+00:00"
+    },
+    "hn_49904074": {
+      "platform": "hackernews",
+      "title": "Ask HN: How do you handle hitting AI coding agent usage limits?",
+      "url": "https://news.ycombinator.com/item?id=49904074",
+      "inspected_at": "2026-09-30T11:33:16.796483+00:00"
+    },
+    "hn_49906083": {
+      "platform": "hackernews",
+      "title": "Ask HN: Has there been a \"software crisis\" since the 60s?",
+      "url": "https://news.ycombinator.com/item?id=49906083",
+      "inspected_at": "2026-09-30T11:33:16.796521+00:00"
     }
   },
   "pending_drafts": {
