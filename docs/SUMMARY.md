@@ -2,6 +2,14 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## 1.0.0 Production Release Build - 2026-10-01 (1.0.0+118)
+
+#### Problems & Root Causes
+* First production release (planned public date 2026-10-10). The "ROCIs" spelling change touches the native launcher label (`AndroidManifest.xml`), which Shorebird patches cannot ship.
+
+#### Solutions Applied
+* Version 0.3.3+117 -> 1.0.0+118 (first number leaves 0 at the production release, per CLAUDE.md). Built with `shorebird release android`, published to the internal track first; promote the same build to production with managed publishing for 10-10. Includes Patches 1-2 of 0.3.3 and the ROCIs rename.
+
 ## Quick-Add Controls Overflow - 2026-09-30 (Patch 2 on 0.3.3+117)
 
 #### Problems & Root Causes

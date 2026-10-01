@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0+118] - 2026-10-01
+
+### Added
+- ROCIs Tasks 1.0, the first public release.
+
+### Changed
+- The app is now called "ROCIs Tasks" everywhere, including its name on your home screen.
+- The + button opens its menu instantly.
+
+### Fixed
+- Quick add: the send button is no longer cut off on narrow screens or in longer languages.
+
 ## [0.3.3+117] - 2026-09-30 (Patch 2)
 
 ### Fixed
