@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-10-01T02:59:59.969289+00:00",
+  "last_run_timestamp": "2026-10-01T12:01:23.670228+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -3560,6 +3560,42 @@
       "title": "Show HN: Desbordante 2.5.0 Released",
       "url": "https://news.ycombinator.com/item?id=49915856",
       "inspected_at": "2026-10-01T02:59:59.963818+00:00"
+    },
+    "hn_49920240": {
+      "platform": "hackernews",
+      "title": "Show HN: Built a tool to organize my lab reports and visualise biomarker trends",
+      "url": "https://news.ycombinator.com/item?id=49920240",
+      "inspected_at": "2026-10-01T12:01:23.663492+00:00"
+    },
+    "hn_49920001": {
+      "platform": "hackernews",
+      "title": "Show HN: Autobox – Make your agents sandbox themselves",
+      "url": "https://news.ycombinator.com/item?id=49920001",
+      "inspected_at": "2026-10-01T12:01:23.663569+00:00"
+    },
+    "hn_49919971": {
+      "platform": "hackernews",
+      "title": "Show HN: Inbox Cleanup – get to inbox zero in Gmail",
+      "url": "https://news.ycombinator.com/item?id=49919971",
+      "inspected_at": "2026-10-01T12:01:23.663627+00:00"
+    },
+    "hn_49919952": {
+      "platform": "hackernews",
+      "title": "Show HN: Dev tools that stay out of your way (JSON, Base64, JWT, etc.)",
+      "url": "https://news.ycombinator.com/item?id=49919952",
+      "inspected_at": "2026-10-01T12:01:23.663676+00:00"
+    },
+    "hn_49912618": {
+      "platform": "hackernews",
+      "title": "Show HN: Ciao – Control coding agents from your phone",
+      "url": "https://news.ycombinator.com/item?id=49912618",
+      "inspected_at": "2026-10-01T12:01:23.663762+00:00"
+    },
+    "hn_49912208": {
+      "platform": "hackernews",
+      "title": "Show HN: Hypercolor – Epic RGB lighting control for everything",
+      "url": "https://news.ycombinator.com/item?id=49912208",
+      "inspected_at": "2026-10-01T12:01:23.663806+00:00"
     }
   },
   "pending_drafts": {
