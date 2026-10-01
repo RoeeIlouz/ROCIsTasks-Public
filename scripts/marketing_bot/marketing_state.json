@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-09-30T21:39:14.720551+00:00",
+  "last_run_timestamp": "2026-10-01T02:59:59.969289+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -3524,6 +3524,42 @@
       "title": "Ask HN: AI revived my durable delay queue project. Is it worth building on?",
       "url": "https://news.ycombinator.com/item?id=49912969",
       "inspected_at": "2026-09-30T21:39:14.714129+00:00"
+    },
+    "hn_49917084": {
+      "platform": "hackernews",
+      "title": "Show HN: War365 - Satire",
+      "url": "https://news.ycombinator.com/item?id=49917084",
+      "inspected_at": "2026-10-01T02:59:59.963653+00:00"
+    },
+    "hn_49916997": {
+      "platform": "hackernews",
+      "title": "Show HN: Yantra – an LALR(1) parser generator for C++",
+      "url": "https://news.ycombinator.com/item?id=49916997",
+      "inspected_at": "2026-10-01T02:59:59.963736+00:00"
+    },
+    "hn_49916747": {
+      "platform": "hackernews",
+      "title": "Show HN: Smartly – Plain English to shell commands, with GNU/BSD awareness",
+      "url": "https://news.ycombinator.com/item?id=49916747",
+      "inspected_at": "2026-10-01T02:59:59.963762+00:00"
+    },
+    "hn_49916539": {
+      "platform": "hackernews",
+      "title": "Show HN: Kanmaps – Product roadmaps like videogame skill trees",
+      "url": "https://news.ycombinator.com/item?id=49916539",
+      "inspected_at": "2026-10-01T02:59:59.963781+00:00"
+    },
+    "hn_49916447": {
+      "platform": "hackernews",
+      "title": "Show HN: Web Scraper kittools (base64, JSON, JWT, regex)",
+      "url": "https://news.ycombinator.com/item?id=49916447",
+      "inspected_at": "2026-10-01T02:59:59.963802+00:00"
+    },
+    "hn_49915856": {
+      "platform": "hackernews",
+      "title": "Show HN: Desbordante 2.5.0 Released",
+      "url": "https://news.ycombinator.com/item?id=49915856",
+      "inspected_at": "2026-10-01T02:59:59.963818+00:00"
     }
   },
   "pending_drafts": {
