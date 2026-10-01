@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-10-01T12:01:23.670228+00:00",
+  "last_run_timestamp": "2026-10-01T22:07:01.744012+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -3596,6 +3596,42 @@
       "title": "Show HN: Hypercolor – Epic RGB lighting control for everything",
       "url": "https://news.ycombinator.com/item?id=49912208",
       "inspected_at": "2026-10-01T12:01:23.663806+00:00"
+    },
+    "hn_49927295": {
+      "platform": "hackernews",
+      "title": "Show HN: Graphene – Data analysis toolkit for your coding agent",
+      "url": "https://news.ycombinator.com/item?id=49927295",
+      "inspected_at": "2026-10-01T22:07:01.736960+00:00"
+    },
+    "hn_49927208": {
+      "platform": "hackernews",
+      "title": "Show HN: DOM-defense – turn your current webpage into a tower defense level",
+      "url": "https://news.ycombinator.com/item?id=49927208",
+      "inspected_at": "2026-10-01T22:07:01.737064+00:00"
+    },
+    "hn_49927078": {
+      "platform": "hackernews",
+      "title": "Show HN: Fumble – keybr, but it learns from everything you type (macOS)",
+      "url": "https://news.ycombinator.com/item?id=49927078",
+      "inspected_at": "2026-10-01T22:07:01.737132+00:00"
+    },
+    "hn_49926136": {
+      "platform": "hackernews",
+      "title": "Show HN: Cascade, Mac OS window cascade utility",
+      "url": "https://news.ycombinator.com/item?id=49926136",
+      "inspected_at": "2026-10-01T22:07:01.737208+00:00"
+    },
+    "hn_49925738": {
+      "platform": "hackernews",
+      "title": "Show HN: PBI Guard – Stop people from messing up your Power BI (you included)",
+      "url": "https://news.ycombinator.com/item?id=49925738",
+      "inspected_at": "2026-10-01T22:07:01.737276+00:00"
+    },
+    "hn_49924953": {
+      "platform": "hackernews",
+      "title": "Show HN: The Zoomist – looking and listening to ordinary things more closely",
+      "url": "https://news.ycombinator.com/item?id=49924953",
+      "inspected_at": "2026-10-01T22:07:01.737344+00:00"
     }
   },
   "pending_drafts": {
