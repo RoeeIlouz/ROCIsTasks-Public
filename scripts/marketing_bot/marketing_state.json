@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-10-02T17:00:39.020721+00:00",
+  "last_run_timestamp": "2026-10-02T21:33:58.579666+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -3734,6 +3734,42 @@
       "title": "Ask HN: What to do with lots of spare compute in colocation?",
       "url": "https://news.ycombinator.com/item?id=49932912",
       "inspected_at": "2026-10-02T17:00:39.014366+00:00"
+    },
+    "hn_49937964": {
+      "platform": "hackernews",
+      "title": "Show HN: Building a Better Story for Your Brand",
+      "url": "https://news.ycombinator.com/item?id=49937964",
+      "inspected_at": "2026-10-02T21:33:58.572761+00:00"
+    },
+    "hn_49937916": {
+      "platform": "hackernews",
+      "title": "Show HN: Made an open-source Lego AI generator",
+      "url": "https://news.ycombinator.com/item?id=49937916",
+      "inspected_at": "2026-10-02T21:33:58.572871+00:00"
+    },
+    "hn_49937418": {
+      "platform": "hackernews",
+      "title": "Show HN: Open-Source M&A Tools",
+      "url": "https://news.ycombinator.com/item?id=49937418",
+      "inspected_at": "2026-10-02T21:33:58.572947+00:00"
+    },
+    "hn_49937079": {
+      "platform": "hackernews",
+      "title": "Show HN: Another stock screener without AI, news, or analyst ratings",
+      "url": "https://news.ycombinator.com/item?id=49937079",
+      "inspected_at": "2026-10-02T21:33:58.573009+00:00"
+    },
+    "hn_49936836": {
+      "platform": "hackernews",
+      "title": "Show HN: UseJunction – Find what your team's AI tools usage",
+      "url": "https://news.ycombinator.com/item?id=49936836",
+      "inspected_at": "2026-10-02T21:33:58.573097+00:00"
+    },
+    "hn_49936621": {
+      "platform": "hackernews",
+      "title": "Show HN: I'm color blind, so I built a way to show people how I see",
+      "url": "https://news.ycombinator.com/item?id=49936621",
+      "inspected_at": "2026-10-02T21:33:58.573155+00:00"
     }
   },
   "pending_drafts": {
