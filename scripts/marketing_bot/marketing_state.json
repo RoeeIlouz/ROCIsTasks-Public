@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-10-02T11:33:10.691732+00:00",
+  "last_run_timestamp": "2026-10-02T17:00:39.020721+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -3698,6 +3698,42 @@
       "title": "Indie app developer accuses Vietnamese builder of copying his app",
       "url": "https://news.ycombinator.com/item?id=49905465",
       "inspected_at": "2026-10-02T11:33:10.685477+00:00"
+    },
+    "hn_49934165": {
+      "platform": "hackernews",
+      "title": "Show HN: What's Agent Doing – a Claude Code UI mod that explains each step",
+      "url": "https://news.ycombinator.com/item?id=49934165",
+      "inspected_at": "2026-10-02T17:00:39.013957+00:00"
+    },
+    "hn_49933605": {
+      "platform": "hackernews",
+      "title": "Show HN: UtilsDock – 200 free tools that run in the browser",
+      "url": "https://news.ycombinator.com/item?id=49933605",
+      "inspected_at": "2026-10-02T17:00:39.014063+00:00"
+    },
+    "hn_49933454": {
+      "platform": "hackernews",
+      "title": "Show HN: SOC2 Auditor Skill",
+      "url": "https://news.ycombinator.com/item?id=49933454",
+      "inspected_at": "2026-10-02T17:00:39.014135+00:00"
+    },
+    "hn_49933266": {
+      "platform": "hackernews",
+      "title": "Show HN: Spens sandboxed, observable coding agents",
+      "url": "https://news.ycombinator.com/item?id=49933266",
+      "inspected_at": "2026-10-02T17:00:39.014241+00:00"
+    },
+    "hn_49933171": {
+      "platform": "hackernews",
+      "title": "Show HN: Moon-dev-tools – rust and egui agentic task board, shell and reviews",
+      "url": "https://news.ycombinator.com/item?id=49933171",
+      "inspected_at": "2026-10-02T17:00:39.014309+00:00"
+    },
+    "hn_49932912": {
+      "platform": "hackernews",
+      "title": "Ask HN: What to do with lots of spare compute in colocation?",
+      "url": "https://news.ycombinator.com/item?id=49932912",
+      "inspected_at": "2026-10-02T17:00:39.014366+00:00"
     }
   },
   "pending_drafts": {
