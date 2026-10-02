@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-10-01T22:07:01.744012+00:00",
+  "last_run_timestamp": "2026-10-02T03:02:31.762480+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -3632,6 +3632,36 @@
       "title": "Show HN: The Zoomist – looking and listening to ordinary things more closely",
       "url": "https://news.ycombinator.com/item?id=49924953",
       "inspected_at": "2026-10-01T22:07:01.737344+00:00"
+    },
+    "hn_49929101": {
+      "platform": "hackernews",
+      "title": "Show HN: Simply @dotlink in ChatGPT web,space or dot to access local files,tools",
+      "url": "https://news.ycombinator.com/item?id=49929101",
+      "inspected_at": "2026-10-02T03:02:31.756023+00:00"
+    },
+    "hn_49928811": {
+      "platform": "hackernews",
+      "title": "Show HN: QLCodePreview, syntax highlighting in Finder's Quick Look",
+      "url": "https://news.ycombinator.com/item?id=49928811",
+      "inspected_at": "2026-10-02T03:02:31.756327+00:00"
+    },
+    "hn_49928398": {
+      "platform": "hackernews",
+      "title": "Show HN: Bun-install – Global CLI installer for Bun with local monorepo support",
+      "url": "https://news.ycombinator.com/item?id=49928398",
+      "inspected_at": "2026-10-02T03:02:31.756193+00:00"
+    },
+    "hn_49928275": {
+      "platform": "hackernews",
+      "title": "Show HN: Grist, open source coding harness",
+      "url": "https://news.ycombinator.com/item?id=49928275",
+      "inspected_at": "2026-10-02T03:02:31.756239+00:00"
+    },
+    "hn_49928011": {
+      "platform": "hackernews",
+      "title": "Show HN: PhreshOS – OS for Web Apps",
+      "url": "https://news.ycombinator.com/item?id=49928011",
+      "inspected_at": "2026-10-02T03:02:31.756285+00:00"
     }
   },
   "pending_drafts": {
