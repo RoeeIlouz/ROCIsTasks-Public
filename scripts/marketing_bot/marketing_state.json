@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-10-03T02:49:02.273598+00:00",
+  "last_run_timestamp": "2026-10-03T10:47:49.604704+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -3806,6 +3806,30 @@
       "title": "Show HN: Sidekins – a Mac companion that visits friends and does your work",
       "url": "https://news.ycombinator.com/item?id=49935328",
       "inspected_at": "2026-10-03T02:49:02.267362+00:00"
+    },
+    "hn_49942483": {
+      "platform": "hackernews",
+      "title": "Show HN: .cmd, cross-platform build tool manager and task launcher you check in",
+      "url": "https://news.ycombinator.com/item?id=49942483",
+      "inspected_at": "2026-10-03T10:47:49.597763+00:00"
+    },
+    "hn_49942274": {
+      "platform": "hackernews",
+      "title": "Show HN: A critical thinking site for kids and teens",
+      "url": "https://news.ycombinator.com/item?id=49942274",
+      "inspected_at": "2026-10-03T10:47:49.597870+00:00"
+    },
+    "hn_49942264": {
+      "platform": "hackernews",
+      "title": "Show HN: Zebu - time tracking/invoicing for freelancers and small teams",
+      "url": "https://news.ycombinator.com/item?id=49942264",
+      "inspected_at": "2026-10-03T10:47:49.597940+00:00"
+    },
+    "hn_49941004": {
+      "platform": "hackernews",
+      "title": "Show HN: Fakeflac-go – A tool for quickly finding \"fake\" .flac files",
+      "url": "https://news.ycombinator.com/item?id=49941004",
+      "inspected_at": "2026-10-03T10:47:49.597992+00:00"
     }
   },
   "pending_drafts": {
