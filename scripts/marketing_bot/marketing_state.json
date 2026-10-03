@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-10-02T21:33:58.579666+00:00",
+  "last_run_timestamp": "2026-10-03T02:49:02.273598+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -3770,6 +3770,42 @@
       "title": "Show HN: I'm color blind, so I built a way to show people how I see",
       "url": "https://news.ycombinator.com/item?id=49936621",
       "inspected_at": "2026-10-02T21:33:58.573155+00:00"
+    },
+    "hn_49939817": {
+      "platform": "hackernews",
+      "title": "Show HN: Television – an open source GUI for your agent harness",
+      "url": "https://news.ycombinator.com/item?id=49939817",
+      "inspected_at": "2026-10-03T02:49:02.266964+00:00"
+    },
+    "hn_49939688": {
+      "platform": "hackernews",
+      "title": "Show HN: Teacher Planner – A digital planbook with AI tools for teachers",
+      "url": "https://news.ycombinator.com/item?id=49939688",
+      "inspected_at": "2026-10-03T02:49:02.267078+00:00"
+    },
+    "hn_49934133": {
+      "platform": "hackernews",
+      "title": "Ask HN: I have too many tokens. What should I do?",
+      "url": "https://news.ycombinator.com/item?id=49934133",
+      "inspected_at": "2026-10-03T02:49:02.267163+00:00"
+    },
+    "hn_49931993": {
+      "platform": "hackernews",
+      "title": "Show HN: Our space game has a built-in RISC-V emulator that runs Linux",
+      "url": "https://news.ycombinator.com/item?id=49931993",
+      "inspected_at": "2026-10-03T02:49:02.267242+00:00"
+    },
+    "hn_49911910": {
+      "platform": "hackernews",
+      "title": "Show HN: Token compression CLI to save Codex/Astra costs",
+      "url": "https://news.ycombinator.com/item?id=49911910",
+      "inspected_at": "2026-10-03T02:49:02.267307+00:00"
+    },
+    "hn_49935328": {
+      "platform": "hackernews",
+      "title": "Show HN: Sidekins – a Mac companion that visits friends and does your work",
+      "url": "https://news.ycombinator.com/item?id=49935328",
+      "inspected_at": "2026-10-03T02:49:02.267362+00:00"
     }
   },
   "pending_drafts": {
