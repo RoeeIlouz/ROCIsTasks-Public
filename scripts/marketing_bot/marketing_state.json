@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-10-03T15:23:49.460430+00:00",
+  "last_run_timestamp": "2026-10-03T20:20:13.107008+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -3842,6 +3842,42 @@
       "title": "Show HN: Photoc – Command-line tools for photographers",
       "url": "https://news.ycombinator.com/item?id=49944196",
       "inspected_at": "2026-10-03T15:23:49.453877+00:00"
+    },
+    "hn_49946507": {
+      "platform": "hackernews",
+      "title": "Show HN: Claude Code Routine Session Cleanup Skill",
+      "url": "https://news.ycombinator.com/item?id=49946507",
+      "inspected_at": "2026-10-03T20:20:13.100276+00:00"
+    },
+    "hn_49946506": {
+      "platform": "hackernews",
+      "title": "Show HN: Revline – an AI web app that researches TikTok and Instagram for you",
+      "url": "https://news.ycombinator.com/item?id=49946506",
+      "inspected_at": "2026-10-03T20:20:13.100369+00:00"
+    },
+    "hn_49945805": {
+      "platform": "hackernews",
+      "title": "Ask HN: When you code with AI, do you tell it how to manage state?",
+      "url": "https://news.ycombinator.com/item?id=49945805",
+      "inspected_at": "2026-10-03T20:20:13.100435+00:00"
+    },
+    "hn_49945661": {
+      "platform": "hackernews",
+      "title": "Show HN: I made a Mac app to centralize and monitor my dev tools",
+      "url": "https://news.ycombinator.com/item?id=49945661",
+      "inspected_at": "2026-10-03T20:20:13.100499+00:00"
+    },
+    "hn_49946562": {
+      "platform": "hackernews",
+      "title": "Government of India officially removes bitchat from the App Store",
+      "url": "https://news.ycombinator.com/item?id=49946562",
+      "inspected_at": "2026-10-03T20:20:13.100558+00:00"
+    },
+    "hn_49945989": {
+      "platform": "hackernews",
+      "title": "Apple removes Bitchat from India app store;Twitter co-founder Jack Dorsey reacts",
+      "url": "https://news.ycombinator.com/item?id=49945989",
+      "inspected_at": "2026-10-03T20:20:13.100615+00:00"
     }
   },
   "pending_drafts": {
