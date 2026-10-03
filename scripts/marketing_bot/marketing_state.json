@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-10-03T10:47:49.604704+00:00",
+  "last_run_timestamp": "2026-10-03T15:23:49.460430+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -3830,6 +3830,18 @@
       "title": "Show HN: Fakeflac-go – A tool for quickly finding \"fake\" .flac files",
       "url": "https://news.ycombinator.com/item?id=49941004",
       "inspected_at": "2026-10-03T10:47:49.597992+00:00"
+    },
+    "hn_49945001": {
+      "platform": "hackernews",
+      "title": "Show HN: Use Zoxide to change Nemo file manager location",
+      "url": "https://news.ycombinator.com/item?id=49945001",
+      "inspected_at": "2026-10-03T15:23:49.453777+00:00"
+    },
+    "hn_49944196": {
+      "platform": "hackernews",
+      "title": "Show HN: Photoc – Command-line tools for photographers",
+      "url": "https://news.ycombinator.com/item?id=49944196",
+      "inspected_at": "2026-10-03T15:23:49.453877+00:00"
     }
   },
   "pending_drafts": {
