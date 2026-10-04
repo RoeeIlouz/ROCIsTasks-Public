@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_run_timestamp": "2026-10-03T20:20:13.107008+00:00",
+  "last_run_timestamp": "2026-10-04T03:19:00.982871+00:00",
   "telegram_last_update_id": 0,
   "inspected_threads": {
     "hn_49574041": {
@@ -3878,6 +3878,36 @@
       "title": "Apple removes Bitchat from India app store;Twitter co-founder Jack Dorsey reacts",
       "url": "https://news.ycombinator.com/item?id=49945989",
       "inspected_at": "2026-10-03T20:20:13.100615+00:00"
+    },
+    "hn_49948810": {
+      "platform": "hackernews",
+      "title": "Show HN: AgentiLoop Agent Mac GUI Agent Loop for macOS 14.6 or Later",
+      "url": "https://news.ycombinator.com/item?id=49948810",
+      "inspected_at": "2026-10-04T03:19:00.975472+00:00"
+    },
+    "hn_49948321": {
+      "platform": "hackernews",
+      "title": "Show HN: Focus Tool for ADHD",
+      "url": "https://news.ycombinator.com/item?id=49948321",
+      "inspected_at": "2026-10-04T03:19:00.975585+00:00"
+    },
+    "hn_49947702": {
+      "platform": "hackernews",
+      "title": "Show HN: [Open-source] Sign JSON and send it as a business document",
+      "url": "https://news.ycombinator.com/item?id=49947702",
+      "inspected_at": "2026-10-04T03:19:00.975640+00:00"
+    },
+    "hn_49950177": {
+      "platform": "hackernews",
+      "title": "Ask HN: How different is Apple App Store and Play Store paid apps market",
+      "url": "https://news.ycombinator.com/item?id=49950177",
+      "inspected_at": "2026-10-04T03:19:00.975693+00:00"
+    },
+    "hn_49945837": {
+      "platform": "hackernews",
+      "title": "Apple Removes BitChat from India App Store at Government's Request",
+      "url": "https://news.ycombinator.com/item?id=49945837",
+      "inspected_at": "2026-10-04T03:19:00.975751+00:00"
     }
   },
   "pending_drafts": {
