@@ -2,8 +2,8 @@
 
   <img src="assets/images/logo.png" alt="ROCIs Tasks Icon" width="120" style="border-radius: 24px;" />
 
-  # 📋 ROCIs Tasks
-  **The Next-Generation Task & Calendar Workspace for Android**
+  # ROCIs Tasks
+  **Tasks and your calendar on one timeline. Type a task the way you would say it.**
 
   [![Flutter](https://img.shields.io/badge/Flutter-3.x-02569B?style=for-the-badge&logo=flutter&logoColor=white)](https://flutter.dev)
   [![Dart](https://img.shields.io/badge/Dart-3.x-0175C2?style=for-the-badge&logo=dart&logoColor=white)](https://dart.dev)
@@ -21,50 +21,19 @@
 
 ---
 
-## 🌟 Overview
+Get it on [Google Play](https://play.google.com/store/apps/details?id=com.rocisapps.tasks) or use the [web version](https://tasks.rocisapps.com).
 
-**ROCIs Tasks** is an offline-first productivity and workload management application built with Flutter. Engineered according to ROCIs Design System, it seamlessly unifies smart natural language task creation, Google Calendar synchronization, on-device calendar integration, interactive Android home screen widgets, and real-time local-cloud database synchronization.
+## What it does
 
----
+- **Natural language input.** Type `Submit essay tomorrow at 5pm #urgent @school` and the date, time, priority and category are filled in for you.
+- **One timeline.** Tasks, Google Calendar events and your phone's calendars side by side.
+- **Home screen widgets** for today's agenda and a month view, with tasks you can check off without opening the app.
+- **Subtasks, checklists and repeating tasks** (daily, weekly, monthly or custom rules).
+- **Insights**: a 7-day completion chart, streaks and a per-category balance.
+- **Works offline** and syncs when you are back online.
+- **Pairs with [ROCIs Schedule](https://github.com/RoeeIlouz/ROCIs-Schedule)**: send an assignment or exam from your timetable straight into Tasks.
 
-## ✨ Features
-
-- ⚡ **Zero-Friction Natural Language Task Input:**
-  - Fast typing parser: type *"Submit research essay tomorrow at 5pm #urgent @school"* to auto-configure dates, times, priority levels, and category tags with zero manual dropdown navigation.
-  - Quick-date chips for instant rescheduling (*Today*, *Tomorrow*, *This Weekend*, *Next Week*).
-
-- 📱 **Interactive Android Home Screen Widgets:**
-  - View focus agendas, check off completed tasks, and browse monthly calendar views directly from the home launcher.
-  - Native Kotlin offset persistence eliminates synchronization lag and prevents double-incrementing navigation states before notifying the Dart background isolate.
-
-- 📅 **Unified Calendar & Device Sync:**
-  - Side-by-side agenda displaying tasks, Google Calendar events, and local device calendars via `table_calendar` and `device_calendar`.
-  - Color-coded category markers for rapid glanceability across complex schedules.
-
-- 📋 **Nested Subtasks, Checklists & Attachments:**
-  - Break down daunting projects into granular subtask checklists with live progress tracking.
-  - Attach images, study notes, and PDF references directly to tasks via Cloud Storage.
-  - Flexible rule-based task recurrence (daily, weekly, monthly, custom intervals via `rrule`).
-
-- 📊 **Productivity Analytics & Visual Streaks:**
-  - 7-day completion velocity charts and category effort balancing powered by `fl_chart`.
-  - Motivating milestone streaks and completion summaries.
-
-- 🌙 **True AMOLED Pitch-Black Mode & Glassmorphism:**
-  - Battery-saving pure black mode (`#000000`) and Material You dynamic color adaptation.
-  - Frosted glass cards and dialogs (`GlassContainer`) with 10–18% category tint borders.
-  - Satisfying micro-haptic tactile feedback on completing tasks and playful UI easter eggs.
-
-- 🔄 **Offline-First Synchronization:**
-  - Instant local read/write access via **Hive** local cache.
-  - Effortless background syncing with **Firebase Firestore** whenever internet connectivity is restored.
-
-- 🌉 **ROCIs Ecosystem Synergy:**
-  - Inter-app bridge support for **ROCIs Schedule** via deep linking (`roci-tasks://create-task`), allowing direct assignment and exam export from course schedules into your task workflow.
-
----
-
-## 📸 Screenshots
+## Screenshots
 
 <div align="center">
   <table>
@@ -91,85 +60,32 @@
   </table>
 </div>
 
----
+## How it works
 
-## 🛠️ Architecture & Tech Stack
+- **Local first.** Tasks live in Hive on the device, so reads and writes are instant and nothing waits on the network.
+- **Sync.** When signed in, changes are pushed to Cloud Firestore and pulled on other devices. Security rules scope every document to its owner. QR "Cloud Link" shares are short-lived snapshots that can be opened by ID but never listed.
+- **Widgets** are native Android views fed from the Dart side through `home_widget`, so they update without the app running.
+- **Releases** go through GitHub Actions to Google Play. Dart-only fixes ship as Shorebird patches, without a store review.
 
-```mermaid
-graph TD
-    UI[Presentation: Outfit Typography & GlassContainer] --> Provider[State Management: Providers]
-    Provider --> Domain[Domain Layer: Models & Repository Interfaces]
-    Domain --> Data[Data Layer: Hive Local Cache & Firestore Sync]
-    Data --> Hive[(Hive Local Storage)]
-    Data --> Firestore[(Cloud Firestore Remote DB)]
-    UI --> Widgets[Android Native Widgets: Kotlin / Glance]
-    UI --> EcoBridge[Ecosystem Bridge: ROCIs Schedule Integration]
-```
+**Stack:** Flutter, Dart 3, Provider, go_router, Hive CE, Firebase (Auth, Firestore, Crashlytics, Analytics, Remote Config), RevenueCat, Shorebird.
 
-- **Framework:** Flutter 3.x / Dart 3.x
-- **Architecture:** Feature-First Clean Architecture
-- **State Management:** `provider`
-- **Local Persistence:** `hive` & `shared_preferences` (Offline-first architecture)
-- **Cloud Backend:** Firebase Auth, Cloud Firestore, Firebase Storage, Crashlytics & Analytics
-- **Calendar & Time:** `table_calendar`, `device_calendar`, `timezone`, `rrule`
-- **UI & Theming:** Google Fonts `Outfit`, `GlassContainer`, Material You `dynamic_color`
-- **Monetization:** `purchases_flutter` (RevenueCat SDK)
-- **Quality & Testing:** 42 test suites with automated Antigravity validation scripts
-
----
-
-## 🚀 Getting Started
-
-### Prerequisites
-
-- [Flutter SDK](https://docs.flutter.dev/get-started/install) (version `>= 3.10.0`)
-- [Android Studio](https://developer.android.com/studio) or VS Code with Flutter extension
-- Android SDK (API Level 21+) / Java JDK 17+
-- Configured Firebase Project (Auth, Firestore, Storage)
-
-### Installation & Run
+## Run it locally
 
 ```bash
-# Clone the repository
-git clone https://github.com/RoeeIlouz/ROCIs-tasks.git
-cd ROCIs-tasks
-
-# Retrieve dependencies
+git clone https://github.com/RoeeIlouz/ROCIsTasks-Public.git
+cd ROCIsTasks-Public
 flutter pub get
-
-# Initialize environment configuration templates
 cp .env.example .env
 cp lib/firebase_options.dart.example lib/firebase_options.dart
 cp lib/firebase_schedule_options.dart.example lib/firebase_schedule_options.dart
-
-# Generate Hive type adapters
 dart run build_runner build --delete-conflicting-outputs
-
-# Run static analysis
 flutter analyze
-
-# Run all test suites
 flutter test
-
-# Launch the app in debug mode
 flutter run
 ```
 
-### Build Release APK
+Firebase and RevenueCat setup is in [docs/SETUP.md](docs/SETUP.md). Architecture notes are in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), and the release history in [docs/CHANGELOG.md](docs/CHANGELOG.md).
 
-```bash
-# Build standalone release APK
-flutter build apk --release
+## License
 
-# The compiled APK is generated at:
-# build/app/outputs/flutter-apk/app-release.apk
-```
-
----
-
-## 📄 License & Documentation
-
-- **License:** Licensed under the [MIT License](LICENSE).
-- **Backend Setup:** Refer to [docs/SETUP.md](docs/SETUP.md) for full Firebase & RevenueCat instructions.
-- **Architectural Guidelines:** Refer to [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
-- **Release History:** Review [docs/CHANGELOG.md](docs/CHANGELOG.md) for updates.
+MIT. See [LICENSE](LICENSE).
