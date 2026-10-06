@@ -7,8 +7,7 @@
 
   [![Flutter](https://img.shields.io/badge/Flutter-3.x-02569B?style=for-the-badge&logo=flutter&logoColor=white)](https://flutter.dev)
   [![Dart](https://img.shields.io/badge/Dart-3.x-0175C2?style=for-the-badge&logo=dart&logoColor=white)](https://dart.dev)
-  [![Tests](https://img.shields.io/badge/Tests-42%20Suites%20Passing-10B981?style=for-the-badge&logo=githubactions&logoColor=white)]()
-  [![Analysis](https://img.shields.io/badge/Flutter%20Analyze-0%20Issues-6366F1?style=for-the-badge)]()
+  [![CI](https://img.shields.io/github/actions/workflow/status/RoeeIlouz/ROCIsTasks-Public/flutter-ci.yml?branch=main&style=for-the-badge&logo=githubactions&logoColor=white&label=analyze%20%2B%20tests)](https://github.com/RoeeIlouz/ROCIsTasks-Public/actions/workflows/flutter-ci.yml)
   [![Google Play](https://img.shields.io/badge/Google_Play-ROCIs_Tasks-34A853?style=for-the-badge&logo=googleplay&logoColor=white)](https://play.google.com/store/apps/details?id=com.rocisapps.tasks)
   [![Web App](https://img.shields.io/badge/Web_Version-tasks.rocisapps.com-0284C7?style=for-the-badge&logo=googlechrome&logoColor=white)](https://tasks.rocisapps.com)
   [![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20Web-F59E0B?style=for-the-badge)]()
