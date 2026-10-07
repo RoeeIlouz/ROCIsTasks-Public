@@ -26,6 +26,10 @@ class NlpResult {
 }
 
 class NlpService {
+  /// Hour given to any due date set without an explicit time ("tomorrow",
+  /// "friday", the Today/Tomorrow buttons), so every day behaves the same.
+  static const int defaultDueHour = 10;
+
   static final List<String> _daysOfWeek = [
     'monday',
     'tuesday',
@@ -151,7 +155,7 @@ class NlpService {
         targetDate.year,
         targetDate.month,
         targetDate.day,
-        10,
+        defaultDueHour,
         0,
       );
       hasTime = true;
@@ -167,7 +171,7 @@ class NlpService {
         targetDate.year,
         targetDate.month,
         targetDate.day,
-        9,
+        defaultDueHour,
         0,
       );
       hasTime = true;
@@ -266,6 +270,17 @@ class NlpService {
         hasTime = true;
         cleanTitle = _removeMatch(cleanTitle, timeRegex);
       }
+    }
+
+    // A date without a time used to land at midnight (already overdue on
+    // the day itself); give it the shared default hour instead.
+    if (dueDate != null && !hasTime) {
+      dueDate = DateTime(
+        dueDate.year,
+        dueDate.month,
+        dueDate.day,
+        defaultDueHour,
+      );
     }
 
     // 7. Clean up prepositions left at edges and multiple spaces

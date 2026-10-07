@@ -172,7 +172,7 @@ class _QuickAddTaskBottomSheetState extends State<QuickAddTaskBottomSheet> {
         context: context,
         initialTime: _selectedDate != null
             ? TimeOfDay.fromDateTime(_selectedDate!)
-            : const TimeOfDay(hour: 12, minute: 0),
+            : const TimeOfDay(hour: NlpService.defaultDueHour, minute: 0),
       );
 
       setState(() {
@@ -189,7 +189,7 @@ class _QuickAddTaskBottomSheetState extends State<QuickAddTaskBottomSheet> {
             pickedDate.year,
             pickedDate.month,
             pickedDate.day,
-            12,
+            NlpService.defaultDueHour,
             0,
           );
         }
@@ -432,7 +432,7 @@ class _QuickAddTaskBottomSheetState extends State<QuickAddTaskBottomSheet> {
                                     now.year,
                                     now.month,
                                     now.day,
-                                    12,
+                                    NlpService.defaultDueHour,
                                     0,
                                   );
                                 });
@@ -461,7 +461,7 @@ class _QuickAddTaskBottomSheetState extends State<QuickAddTaskBottomSheet> {
                                     tom.year,
                                     tom.month,
                                     tom.day,
-                                    12,
+                                    NlpService.defaultDueHour,
                                     0,
                                   );
                                 });

@@ -237,5 +237,33 @@ void main() {
         expect(result2.hasTime, false);
       });
     });
+    group('default due hour', () {
+      test('dates without a time get 10:00, the same for every day', () {
+        for (final input in [
+          'Pay rent today',
+          'Submit report tomorrow',
+          'Call mom friday',
+          'Renew passport next friday',
+          'Water plants in 3 days',
+          'Plan sprint next week',
+          'Hike this weekend',
+        ]) {
+          final result = NlpService.parse(input);
+          expect(result.dueDate, isNotNull, reason: input);
+          expect(
+            result.dueDate!.hour,
+            NlpService.defaultDueHour,
+            reason: input,
+          );
+          expect(result.dueDate!.minute, 0, reason: input);
+        }
+        expect(NlpService.defaultDueHour, 10);
+      });
+
+      test('an explicit time still wins', () {
+        expect(NlpService.parse('Call mom friday 4pm').dueDate!.hour, 16);
+        expect(NlpService.parse('Dinner tonight').dueDate!.hour, 20);
+      });
+    });
   });
 }

@@ -2,6 +2,14 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## Uniform Default Due Time - 2026-10-07 (Patch 2 on 1.0.0+118)
+
+#### Problems & Root Causes
+* `NlpService` gave date-only phrases midnight (overdue on the day itself), "this weekend" 10:00, "next week" 9:00, and the quick add Today/Tomorrow buttons, date picker fallback and Kanban inline add used 12:00.
+
+#### Solutions Applied
+* `NlpService.defaultDueHour = 10` applied to every date without an explicit time and used by all those call sites; "tonight" keeps 20:00 and explicit times still win. Tests pin it.
+
 ## Counter Notification Priority Ring - 2026-10-07 (Patch 1 on 1.0.0+118)
 
 #### Problems & Root Causes

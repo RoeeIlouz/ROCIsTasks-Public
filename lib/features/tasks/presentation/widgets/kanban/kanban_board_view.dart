@@ -7,6 +7,7 @@ import 'package:rocis_tasks/features/categories/domain/models/category.dart';
 import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
 import 'package:rocis_tasks/features/tasks/presentation/widgets/kanban/kanban_column.dart';
 import 'package:rocis_tasks/features/tasks/presentation/screens/add_task_screen.dart';
+import 'package:rocis_tasks/features/tasks/services/nlp_service.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -308,11 +309,16 @@ class _KanbanBoardViewState extends State<KanbanBoardView> {
         onAddTask: () => _openAddTask(context, dueDate: DateTime.now()),
         onInlineAddTask: (title) async {
           final now = DateTime.now();
-          final todayNoon = DateTime(now.year, now.month, now.day, 12, 0);
+          final todayDefault = DateTime(
+            now.year,
+            now.month,
+            now.day,
+            NlpService.defaultDueHour,
+          );
           await taskProvider.addTask(
             title,
             '',
-            todayNoon,
+            todayDefault,
             TaskPriority.medium,
             null,
           );
