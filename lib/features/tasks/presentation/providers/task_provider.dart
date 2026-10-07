@@ -138,6 +138,9 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
   bool _widgetUpdateInProgress = false;
   bool _pendingWidgetUpdate = false;
   bool _pendingWidgetNotification = false;
+  // Survives debounce cancels so a later widget-only refresh can't drop a
+  // queued counter-notification refresh (which carries the priority ring).
+  bool _debouncedWidgetNotification = false;
   bool get isLoading => _isLoading;
 
   bool _showSecurityPrompt = false;
@@ -809,19 +812,6 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
     return parts.join(' • ');
   }
 
-  Future<void> _updateTaskCounterNotification() async {
-    final allTasks = _source.getTasks();
-    final uncompletedTasks = allTasks
-        .where((t) => !t.isCompleted && !(t.isDeleted ?? false))
-        .toList();
-
-    await _notificationManager.updateTaskCounterNotification(
-      uncompletedTasks: uncompletedTasks,
-      isDarkMode: _themeService.isDarkMode,
-      l10n: _l10n,
-    );
-  }
-
   Future<void> updateHomeWidget() async {
     await _updateWidgets(showNotification: false);
   }
@@ -838,10 +828,13 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
       return;
     }
 
+    _debouncedWidgetNotification |= showNotification;
     _widgetDebounce?.cancel();
     _widgetDebounce = Timer(
       Duration(milliseconds: AppConfig.notificationDebounceMs),
       () async {
+        final showNotification = _debouncedWidgetNotification;
+        _debouncedWidgetNotification = false;
         if (_widgetUpdateInProgress) {
           _pendingWidgetUpdate = true;
           _pendingWidgetNotification |= showNotification;
@@ -965,7 +958,6 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
     await _syncTaskGoogleTasksState(task);
 
     updateHomeWidgetWithNotification();
-    _updateTaskCounterNotification();
 
     await _analyticsService.logTaskCreated(
       categoryId: categoryIds?.isNotEmpty == true
@@ -1146,7 +1138,6 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
     }
     _refreshPagination();
     notifyListeners();
-    unawaited(_updateTaskCounterNotification());
     updateHomeWidgetWithNotification();
 
     if (task.isCompleted) {
@@ -1269,7 +1260,6 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
     if (anyMaterialized) {
       _refreshPagination();
       notifyListeners();
-      unawaited(_updateTaskCounterNotification());
       updateHomeWidgetWithNotification();
     }
   }
@@ -1435,7 +1425,6 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
 
     await _syncTaskGoogleTasksState(task);
 
-    unawaited(_updateTaskCounterNotification());
     updateHomeWidgetWithNotification();
   }
 
@@ -1507,7 +1496,6 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
             );
           });
 
-      unawaited(_updateTaskCounterNotification());
       updateHomeWidgetWithNotification();
     }
   }
@@ -1551,7 +1539,6 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
     } catch (e, s) {
       _errorHandlingService.logError(e, s, reason: 'Deleting task');
     }
-    unawaited(_updateTaskCounterNotification());
     updateHomeWidgetWithNotification();
 
     await _analyticsService.logTaskDeleted();
@@ -1586,7 +1573,6 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
     }
     _refreshPagination();
     notifyListeners();
-    unawaited(_updateTaskCounterNotification());
     updateHomeWidgetWithNotification();
   }
 

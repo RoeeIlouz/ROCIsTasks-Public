@@ -2,6 +2,14 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## Counter Notification Priority Ring - 2026-10-07 (Patch 1 on 1.0.0+118)
+
+#### Problems & Root Causes
+* The ring is a rendered chart passed as the notification's large icon; `NotificationHelper` rebuilds the notification each call. `_updateTaskCounterNotification()` posted it without the image on every task change, and `_updateWidgets` debounce let a later `updateHomeWidget()` (cloud sync echo) cancel the queued notify-with-chart refresh, so the ring stayed gone.
+
+#### Solutions Applied
+* `_debouncedWidgetNotification` ORs `showNotification` across debounce cancels; removed `_updateTaskCounterNotification()` and its 7 call sites.
+
 ## 1.0.0 Production Release Build - 2026-10-01 (1.0.0+118)
 
 #### Problems & Root Causes
