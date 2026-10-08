@@ -136,7 +136,8 @@
                 android:layout_height="match_parent"
                 android:orientation="horizontal">
 
-                <View
+                <!-- FrameLayout, not View: RemoteViews refuses to inflate a plain View. -->
+                <FrameLayout
                     android:layout_width="26dp"
                     android:layout_height="match_parent" />
 
