@@ -10,7 +10,7 @@ object WidgetLimitHelper {
     val ALL_PROVIDERS = listOf(
         TaskWidgetProvider::class.java,
         FullCalendarWidgetProvider::class.java,
-        TodayAgendaWidgetProvider::class.java,
+        WeekViewWidgetProvider::class.java,
         MonthAgendaWidgetProvider::class.java,
         TimelineAgendaWidgetProvider::class.java,
         QuickActionWidgetProvider::class.java,

@@ -223,7 +223,7 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
       case 0:
         return '4×4 · ${AppLocalizations.of(context)!.calendar}';
       case 1:
-        return '4×3 · ${AppLocalizations.of(context)!.todayAgendaWidgetTitle}';
+        return '4×4 · ${AppLocalizations.of(context)!.weekViewWidgetTitle}';
       case 2:
         return '4×4 · ${AppLocalizations.of(context)!.widgetNameMonthList}';
       case 3:
@@ -240,7 +240,7 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
   Widget _buildWidgetSwitcher(ThemeData theme, AppLocalizations l10n) {
     final tabs = [
       {'icon': Icons.calendar_month_rounded, 'name': l10n.calendar},
-      {'icon': Icons.view_agenda_rounded, 'name': l10n.todayAgendaWidgetTitle},
+      {'icon': Icons.view_week_rounded, 'name': l10n.weekViewWidgetTitle},
       {
         'icon': Icons.calendar_view_month_rounded,
         'name': l10n.widgetNameMonthList,
@@ -399,7 +399,7 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
           accentColor,
         );
       case 1:
-        return _buildDayAgendaMock(
+        return _buildWeekViewMock(
           theme,
           textColor,
           secondaryTextColor,
@@ -634,31 +634,55 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
     );
   }
 
-  Widget _buildDayAgendaMock(
+  /// The Week View widget: ROCIs Schedule's weekly timetable with a few
+  /// sample blocks (classes, events and a task).
+  Widget _buildWeekViewMock(
     ThemeData theme,
     Color textColor,
     Color secondaryTextColor,
     Color accentColor,
   ) {
+    final l10n = AppLocalizations.of(context)!;
+    final offset = (_previewDate.weekday - _startOfWeek + 7) % 7;
+    final weekStart = DateTime(
+      _previewDate.year,
+      _previewDate.month,
+      _previewDate.day - offset,
+    );
+    final days = List.generate(
+      7,
+      (i) => DateTime(weekStart.year, weekStart.month, weekStart.day + i),
+    );
+    const firstHour = 9;
+    const hours = 5;
+    const hourHeight = 22.0;
+    const axisWidth = 24.0;
+    final gridLine = textColor.withValues(alpha: 0.1);
+    // (day column, start hour, length in hours, title, color)
+    final blocks = [
+      (1, 9.0, 1.5, l10n.previewSampleDesignReview, accentColor),
+      (3, 10.0, 1.0, l10n.previewSampleDesignReview, const Color(0xFF0EA5E9)),
+      (
+        offset,
+        11.0,
+        1.0,
+        l10n.previewSampleUpdateDeps,
+        const Color(0xFF10B981),
+      ),
+      (5, 12.0, 1.5, l10n.previewSampleUpdateDeps, const Color(0xFFF59E0B)),
+    ];
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
-            Text(
-              '❮',
-              style: TextStyle(
-                color: secondaryTextColor,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(width: 8),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    DateFormat.MMMMEEEEd(_loc).format(_previewDate),
+                    '${DateFormat.MMMd(_loc).format(days.first)} – ${DateFormat.MMMd(_loc).format(days.last)}',
                     style: TextStyle(
                       color: textColor,
                       fontWeight: FontWeight.bold,
@@ -666,7 +690,7 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
                     ),
                   ),
                   Text(
-                    '${AppLocalizations.of(context)!.quickDateToday} · ${AppLocalizations.of(context)!.previewTasksRemaining('3')}',
+                    l10n.weekViewThisWeek,
                     style: TextStyle(
                       color: accentColor,
                       fontSize: 11,
@@ -676,41 +700,151 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
                 ],
               ),
             ),
-            Text(
-              '❯',
-              style: TextStyle(
-                color: secondaryTextColor,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(width: 8),
-            Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: accentColor.withValues(alpha: 0.15),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(Icons.add, size: 16, color: accentColor),
-            ),
+            Icon(Icons.chevron_left_rounded, size: 18, color: textColor),
+            Icon(Icons.chevron_right_rounded, size: 18, color: textColor),
+            const SizedBox(width: 6),
+            Icon(Icons.add, size: 18, color: textColor),
           ],
         ),
-        const SizedBox(height: 10),
-        _buildAgendaRowMock(
-          AppLocalizations.of(context)!.previewSampleDesignReview,
-          _previewTime(10, 0),
-          accentColor,
-          textColor,
-          secondaryTextColor,
-          isDone: false,
-        ),
-        const SizedBox(height: 6),
-        _buildAgendaRowMock(
-          AppLocalizations.of(context)!.previewSampleUpdateDeps,
-          _previewTime(14, 30),
-          const Color(0xFF10B981),
-          textColor,
-          secondaryTextColor,
-          isDone: true,
+        const SizedBox(height: 8),
+        Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: gridLine),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: Column(
+            children: [
+              Container(
+                color: textColor.withValues(alpha: 0.04),
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Row(
+                  children: [
+                    const SizedBox(width: axisWidth),
+                    ...List.generate(7, (i) {
+                      final isToday = i == offset;
+                      return Expanded(
+                        child: Column(
+                          children: [
+                            Text(
+                              DateFormat('EEEEE', _loc).format(days[i]),
+                              style: TextStyle(
+                                fontSize: 9,
+                                fontWeight: FontWeight.w700,
+                                color: isToday
+                                    ? accentColor
+                                    : textColor.withValues(alpha: 0.6),
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 5,
+                                vertical: 1,
+                              ),
+                              decoration: BoxDecoration(
+                                color: isToday
+                                    ? accentColor
+                                    : Colors.transparent,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                '${days[i].day}',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: isToday
+                                      ? FontWeight.bold
+                                      : FontWeight.w500,
+                                  color: isToday
+                                      ? (accentColor.computeLuminance() > 0.6
+                                            ? Colors.black
+                                            : Colors.white)
+                                      : textColor,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: hours * hourHeight,
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final colWidth = (constraints.maxWidth - axisWidth) / 7;
+                    return Stack(
+                      children: [
+                        for (var h = 0; h < hours; h++) ...[
+                          PositionedDirectional(
+                            start: 0,
+                            top: h * hourHeight + 2,
+                            width: axisWidth,
+                            child: Text(
+                              (firstHour + h).toString().padLeft(2, '0'),
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 8,
+                                fontWeight: FontWeight.w600,
+                                color: textColor.withValues(alpha: 0.45),
+                              ),
+                            ),
+                          ),
+                          if (h > 0)
+                            PositionedDirectional(
+                              start: axisWidth,
+                              end: 0,
+                              top: h * hourHeight,
+                              child: Container(height: 0.7, color: gridLine),
+                            ),
+                        ],
+                        for (var c = 0; c < 7; c++)
+                          PositionedDirectional(
+                            start: axisWidth + c * colWidth,
+                            top: 0,
+                            bottom: 0,
+                            child: Container(width: 0.7, color: gridLine),
+                          ),
+                        for (final b in blocks)
+                          PositionedDirectional(
+                            start: axisWidth + b.$1 * colWidth + 1.5,
+                            width: colWidth - 3,
+                            top: (b.$2 - firstHour) * hourHeight + 1,
+                            height: b.$3 * hourHeight - 2,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: b.$5.withValues(alpha: 0.18),
+                                borderRadius: BorderRadius.circular(5),
+                                border: BorderDirectional(
+                                  start: BorderSide(color: b.$5, width: 3),
+                                ),
+                              ),
+                              padding: const EdgeInsetsDirectional.only(
+                                start: 2,
+                                top: 1,
+                              ),
+                              child: Text(
+                                b.$4,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 7.5,
+                                  height: 1.15,
+                                  fontWeight: FontWeight.bold,
+                                  color: textColor,
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       ],
     );
@@ -1614,13 +1748,13 @@ class _WidgetCustomizationScreenState extends State<WidgetCustomizationScreen> {
         'provider': 'FullCalendarWidgetProvider',
       },
       {
-        'title': l10n.todayAgendaWidgetTitle,
-        'subtitle': l10n.todayAgendaWidgetSubtitle,
-        'icon': Icons.view_agenda_rounded,
-        'tag': '4x3 / 4x2',
+        'title': l10n.weekViewWidgetTitle,
+        'subtitle': l10n.weekViewWidgetSubtitle,
+        'icon': Icons.view_week_rounded,
+        'tag': '4x4 / 5x4',
         'color': const Color(0xFF6366F1),
         'previewIndex': 1,
-        'provider': 'TodayAgendaWidgetProvider',
+        'provider': 'WeekViewWidgetProvider',
       },
       {
         'title': l10n.monthAgendaWidgetTitle,

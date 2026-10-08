@@ -2197,17 +2197,23 @@ abstract class AppLocalizations {
   /// **'Choose from our suite of widgets. Free users can place 1 active widget on screen; Pro users can place unlimited widgets.'**
   String get widgetSuiteSubtitle;
 
-  /// No description provided for @todayAgendaWidgetTitle.
+  /// No description provided for @weekViewWidgetTitle.
   ///
   /// In en, this message translates to:
-  /// **'Day Agenda'**
-  String get todayAgendaWidgetTitle;
+  /// **'Week View'**
+  String get weekViewWidgetTitle;
 
-  /// No description provided for @todayAgendaWidgetSubtitle.
+  /// No description provided for @weekViewWidgetSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Interactive day-by-day task & event viewer with instant completion.'**
-  String get todayAgendaWidgetSubtitle;
+  /// **'Your week as a timetable, like ROCIs Schedule: classes, events and tasks side by side.'**
+  String get weekViewWidgetSubtitle;
+
+  /// No description provided for @weekViewThisWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'This week'**
+  String get weekViewThisWeek;
 
   /// No description provided for @monthAgendaWidgetTitle.
   ///

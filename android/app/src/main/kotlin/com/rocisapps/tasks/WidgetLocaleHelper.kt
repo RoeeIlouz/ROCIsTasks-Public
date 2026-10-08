@@ -154,6 +154,19 @@ object WidgetLocaleHelper {
         }
     }
 
+    fun getThisWeekText(locale: Locale): String {
+        return when (getNormalizedLanguage(locale)) {
+            "he" -> "השבוע"
+            "es" -> "Esta semana"
+            "de" -> "Diese Woche"
+            "fr" -> "Cette semaine"
+            "ar" -> "هذا الأسبوع"
+            "sv" -> "Denna vecka"
+            "hi" -> "इस सप्ताह"
+            else -> "This week"
+        }
+    }
+
     fun getTomorrowText(locale: Locale): String {
         return when (getNormalizedLanguage(locale)) {
             "he" -> "מחר"

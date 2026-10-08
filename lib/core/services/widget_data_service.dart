@@ -377,7 +377,7 @@ class WidgetDataService {
     if (kIsWeb) return;
     try {
       await Future.wait([
-        updateTodayAgendaWidget(allTasks, getCategoryById, userId: userId),
+        updateWeekViewWidget(allTasks, getCategoryById, userId: userId),
         updateMonthAgendaWidget(allTasks, getCategoryById, userId: userId),
         updateTimelineAgendaWidget(allTasks, getCategoryById, userId: userId),
         updateQuickActionWidget(allTasks, userId: userId),
@@ -389,8 +389,10 @@ class WidgetDataService {
     }
   }
 
-  /// Update Day-by-Day Today Agenda Widget
-  Future<void> updateTodayAgendaWidget(
+  /// Writes `today_agenda_data` (tasks, calendar events and ROCIs Schedule
+  /// classes, 60 days back to 120 ahead) and refreshes the Week View widget,
+  /// which pages weeks over it natively. Month & Agenda's day list reads it too.
+  Future<void> updateWeekViewWidget(
     List<Task> allTasks,
     Category? Function(String?) getCategoryById, {
     String? userId,
@@ -474,6 +476,7 @@ class WidgetDataService {
             'subtitle':
                 event.location ?? (isAllDay ? allDayLabel : timeDisplay),
             'date': (isFirstDay ? start : day).toIso8601String(),
+            'end': end?.toIso8601String(),
             'dateOnly': dayFormatted,
             'dateDisplay': dayFormatted,
             'timeDisplay': timeDisplay,
@@ -490,7 +493,7 @@ class WidgetDataService {
       }
     } catch (e) {
       AppLogger.debug(
-        'Failed to load calendar events for today agenda widget: $e',
+        'Failed to load calendar events for week view widget: $e',
       );
     }
 
@@ -504,6 +507,7 @@ class WidgetDataService {
         'title': _scheduleTitle(o.event, noTitleLabel),
         'subtitle': _scheduleSubtitle(o.event),
         'date': o.start.toIso8601String(),
+        'end': o.end.toIso8601String(),
         'dateOnly': day,
         'dateDisplay': day,
         'timeDisplay': '${clock.format(o.start)}-${clock.format(o.end)}',
@@ -539,11 +543,11 @@ class WidgetDataService {
 
     try {
       await HomeWidget.updateWidget(
-        name: 'TodayAgendaWidgetProvider',
-        iOSName: 'TodayAgendaWidget',
+        name: 'WeekViewWidgetProvider',
+        iOSName: 'WeekViewWidget',
       );
     } catch (e) {
-      AppLogger.debug('Failed to update today agenda widget: $e');
+      AppLogger.debug('Failed to update week view widget: $e');
     }
   }
 

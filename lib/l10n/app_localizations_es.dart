@@ -1129,11 +1129,14 @@ class AppLocalizationsEs extends AppLocalizations {
       'Elige entre nuestra suite de widgets. Los usuarios gratuitos pueden colocar 1 widget activo; usuarios Pro sin límites.';
 
   @override
-  String get todayAgendaWidgetTitle => 'Agenda del Día';
+  String get weekViewWidgetTitle => 'Vista semanal';
 
   @override
-  String get todayAgendaWidgetSubtitle =>
-      'Visor interactivo diario de tareas y eventos con completado inmediato.';
+  String get weekViewWidgetSubtitle =>
+      'Tu semana como horario, como en ROCIs Schedule: clases, eventos y tareas lado a lado.';
+
+  @override
+  String get weekViewThisWeek => 'Esta semana';
 
   @override
   String get monthAgendaWidgetTitle => 'Mes y Agenda';

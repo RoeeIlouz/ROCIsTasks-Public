@@ -429,7 +429,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   /// primary accent, surfaceContainerLow card and onSurface text.
   static const _widgetProviders = [
     'FullCalendarWidgetProvider',
-    'TodayAgendaWidgetProvider',
+    'WeekViewWidgetProvider',
     'MonthAgendaWidgetProvider',
     'TimelineAgendaWidgetProvider',
     'TaskWidgetProvider',

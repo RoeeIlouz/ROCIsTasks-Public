@@ -1118,11 +1118,14 @@ class AppLocalizationsSv extends AppLocalizations {
       'Välj bland våra widgets. Gratisanvändare kan placera 1 aktiv widget; Pro-användare obegränsat.';
 
   @override
-  String get todayAgendaWidgetTitle => 'Dagsagenda';
+  String get weekViewWidgetTitle => 'Veckovy';
 
   @override
-  String get todayAgendaWidgetSubtitle =>
-      'Interaktiv dag-för-dag-översikt för uppgifter och händelser med direkt slutförande.';
+  String get weekViewWidgetSubtitle =>
+      'Din vecka som ett schema, som i ROCIs Schedule: lektioner, händelser och uppgifter sida vid sida.';
+
+  @override
+  String get weekViewThisWeek => 'Denna vecka';
 
   @override
   String get monthAgendaWidgetTitle => 'Månad & Agenda';

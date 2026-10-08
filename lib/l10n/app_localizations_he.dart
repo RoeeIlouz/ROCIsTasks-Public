@@ -1099,11 +1099,14 @@ class AppLocalizationsHe extends AppLocalizations {
       'בחר מתוך מגוון הווידג\'טים. משתמשים חינמיים יכולים להציב ווידג\'ט 1 פעיל; משתמשי Pro ללא הגבלה.';
 
   @override
-  String get todayAgendaWidgetTitle => 'אג\'נדה יומית';
+  String get weekViewWidgetTitle => 'תצוגה שבועית';
 
   @override
-  String get todayAgendaWidgetSubtitle =>
-      'תצוגת משימות ואירועים יומית אינטראקטיבית עם סימון ביצוע מיידי.';
+  String get weekViewWidgetSubtitle =>
+      'השבוע שלך כמערכת שעות, כמו ב-ROCIs Schedule: שיעורים, אירועים ומשימות זה לצד זה.';
+
+  @override
+  String get weekViewThisWeek => 'השבוע';
 
   @override
   String get monthAgendaWidgetTitle => 'חודש ואג\'נדה';

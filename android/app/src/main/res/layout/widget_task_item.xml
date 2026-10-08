@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- One pending task row (same design as widget_today_agenda_item): tinted tile, category
+<!-- One pending task row (same design as widget_timeline_event_item): tinted tile, category
      color bar, checkbox, title and due/category line, optional priority chip.
      Colored by the factory. -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"

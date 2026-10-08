@@ -69,17 +69,14 @@
                 android:resource="@xml/full_calendar_widget_info" />
         </receiver>
 
-        <!-- Today & Day-by-Day Agenda Widget -->
-        <receiver android:name=".TodayAgendaWidgetProvider" android:exported="true" android:label="Day Agenda">
+        <!-- Week View Widget (ROCIs Schedule style timetable) -->
+        <receiver android:name=".WeekViewWidgetProvider" android:exported="true" android:label="Week View">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
             <meta-data android:name="android.appwidget.provider"
-                android:resource="@xml/today_agenda_widget_info" />
+                android:resource="@xml/week_view_widget_info" />
         </receiver>
-
-        <service android:name=".TodayAgendaWidgetService"
-            android:permission="android.permission.BIND_REMOTEVIEWS" />
 
         <!-- Samsung-Style Month + Day Agenda Widget -->
         <receiver android:name=".MonthAgendaWidgetProvider" android:exported="true" android:label="Month &amp; Agenda">

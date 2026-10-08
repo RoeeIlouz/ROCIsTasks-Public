@@ -71,7 +71,7 @@ void main() {
         ]);
 
         // Trigger update with empty tasks and empty events (transient failure / idle)
-        await service.updateTodayAgendaWidget([], (id) => null);
+        await service.updateWeekViewWidget([], (id) => null);
 
         // Verify that existing data was NOT overwritten with '[]'
         final storedData = savedWidgetData['today_agenda_data'] as String;

@@ -257,7 +257,7 @@ class SubscriptionService extends ChangeNotifier {
         final providers = [
           ('TaskWidgetProvider', 'TaskWidget'),
           ('FullCalendarWidgetProvider', 'FullCalendarWidget'),
-          ('TodayAgendaWidgetProvider', 'TodayAgendaWidget'),
+          ('WeekViewWidgetProvider', 'WeekViewWidget'),
           ('MonthAgendaWidgetProvider', 'MonthAgendaWidget'),
           ('TimelineAgendaWidgetProvider', 'TimelineAgendaWidget'),
           ('QuickActionWidgetProvider', 'QuickActionWidget'),

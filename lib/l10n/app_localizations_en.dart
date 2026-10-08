@@ -1107,11 +1107,14 @@ class AppLocalizationsEn extends AppLocalizations {
       'Choose from our suite of widgets. Free users can place 1 active widget on screen; Pro users can place unlimited widgets.';
 
   @override
-  String get todayAgendaWidgetTitle => 'Day Agenda';
+  String get weekViewWidgetTitle => 'Week View';
 
   @override
-  String get todayAgendaWidgetSubtitle =>
-      'Interactive day-by-day task & event viewer with instant completion.';
+  String get weekViewWidgetSubtitle =>
+      'Your week as a timetable, like ROCIs Schedule: classes, events and tasks side by side.';
+
+  @override
+  String get weekViewThisWeek => 'This week';
 
   @override
   String get monthAgendaWidgetTitle => 'Month & Agenda';

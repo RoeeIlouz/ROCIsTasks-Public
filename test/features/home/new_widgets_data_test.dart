@@ -56,9 +56,9 @@ void main() {
       service = WidgetDataService(mockCalendar);
     });
 
-    test('updateTodayAgendaWidget handles empty tasks gracefully', () async {
+    test('updateWeekViewWidget handles empty tasks gracefully', () async {
       await expectLater(
-        service.updateTodayAgendaWidget([], (id) => null),
+        service.updateWeekViewWidget([], (id) => null),
         completes,
       );
       expect(savedWidgetData.containsKey('today_agenda_data'), isTrue);

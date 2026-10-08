@@ -1100,11 +1100,14 @@ class AppLocalizationsAr extends AppLocalizations {
       'اختر من مجموعتنا من الأدوات. يمكن للمستخدمين المجانيين وضع أداة واحدة نشطة؛ ومستخدمو Pro بلا حدود.';
 
   @override
-  String get todayAgendaWidgetTitle => 'أجندة اليوم';
+  String get weekViewWidgetTitle => 'عرض الأسبوع';
 
   @override
-  String get todayAgendaWidgetSubtitle =>
-      'عرض تفاعلي يومي للمهام والأحداث مع إكمال فوري.';
+  String get weekViewWidgetSubtitle =>
+      'أسبوعك كجدول حصص كما في ROCIs Schedule: الحصص والأحداث والمهام جنبًا إلى جنب.';
+
+  @override
+  String get weekViewThisWeek => 'هذا الأسبوع';
 
   @override
   String get monthAgendaWidgetTitle => 'الشهر والأجندة';

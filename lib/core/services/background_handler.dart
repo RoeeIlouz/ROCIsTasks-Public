@@ -41,8 +41,6 @@ class BackgroundHandler {
       if (taskId != null) {
         await _completeTaskInBackground(taskId);
       }
-    } else if (host.startsWith('today_agenda_')) {
-      await _handleTodayAgendaSync();
     } else if (host.startsWith('month_agenda_')) {
       await _handleMonthAgendaSync();
     } else if (host == 'full_calendar_prev' ||
@@ -113,41 +111,6 @@ class BackgroundHandler {
     } catch (e, s) {
       AppLogger.error(
         'Error handling kanban widget sync',
-        error: e,
-        stack: s,
-        tag: 'Background',
-      );
-    }
-  }
-
-  static Future<void> _handleTodayAgendaSync() async {
-    try {
-      await AppInitializer.initialize(isBackground: true);
-      final calendarService = _createCalendarService();
-      await calendarService.init();
-
-      final taskSource = LocalTaskSource();
-      await taskSource.init();
-
-      final categories = taskSource.getCategories();
-      Category? getCategoryById(String? id) {
-        if (id == null || id.isEmpty) return null;
-        try {
-          return categories.firstWhere((c) => c.id == id);
-        } catch (_) {
-          return null;
-        }
-      }
-
-      final widgetDataService = WidgetDataService(calendarService);
-      await widgetDataService.updateTodayAgendaWidget(
-        taskSource.getTasks(),
-        getCategoryById,
-        userId: FirebaseAuth.instance.currentUser?.uid,
-      );
-    } catch (e, s) {
-      AppLogger.error(
-        'Error handling today agenda sync',
         error: e,
         stack: s,
         tag: 'Background',

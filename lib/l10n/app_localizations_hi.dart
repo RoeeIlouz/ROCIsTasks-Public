@@ -1115,11 +1115,14 @@ class AppLocalizationsHi extends AppLocalizations {
       'हमारे विजेट्स में से चुनें। मुफ्त उपयोगकर्ता 1 विजेट लगा सकते हैं; Pro उपयोगकर्ता असीमित।';
 
   @override
-  String get todayAgendaWidgetTitle => 'दैनिक एजेंडा';
+  String get weekViewWidgetTitle => 'साप्ताहिक दृश्य';
 
   @override
-  String get todayAgendaWidgetSubtitle =>
-      'कार्यों और घटनाओं का इंटरैक्टिव दैनिक दृश्य व त्वरित पूर्णता।';
+  String get weekViewWidgetSubtitle =>
+      'ROCIs Schedule की तरह आपका सप्ताह समय-सारिणी में: कक्षाएँ, इवेंट और कार्य साथ-साथ।';
+
+  @override
+  String get weekViewThisWeek => 'इस सप्ताह';
 
   @override
   String get monthAgendaWidgetTitle => 'माह और एजेंडा';

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- One timeline row (same design as widget_today_agenda_item): tinted tile, category
+<!-- One timeline row (same design as widget_task_item): tinted tile, category
      color bar, checkbox (tasks) or event glyph, title and time/meta line, optional
      priority chip. The root's vertical padding spaces the rows. Colored by the factory. -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"

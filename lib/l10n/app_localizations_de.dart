@@ -1130,11 +1130,14 @@ class AppLocalizationsDe extends AppLocalizations {
       'Wählen Sie aus unseren Widgets. Kostenlose Benutzer können 1 aktives Widget platzieren; Pro-Benutzer unbegrenzt.';
 
   @override
-  String get todayAgendaWidgetTitle => 'Tagesagenda';
+  String get weekViewWidgetTitle => 'Wochenansicht';
 
   @override
-  String get todayAgendaWidgetSubtitle =>
-      'Interaktive Tagesübersicht für Aufgaben & Termine mit Direktabschluss.';
+  String get weekViewWidgetSubtitle =>
+      'Deine Woche als Stundenplan wie in ROCIs Schedule: Kurse, Termine und Aufgaben nebeneinander.';
+
+  @override
+  String get weekViewThisWeek => 'Diese Woche';
 
   @override
   String get monthAgendaWidgetTitle => 'Monat & Agenda';
