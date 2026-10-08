@@ -12,6 +12,7 @@ import 'package:rocis_tasks/features/tasks/presentation/screens/task_detail_scre
 import 'package:rocis_tasks/shared/ui/theme/theme_service.dart';
 import 'package:rocis_tasks/shared/ui/widgets/bouncy_checkbox.dart';
 import 'package:rocis_tasks/shared/ui/widgets/glass_container.dart';
+import 'package:rocis_tasks/core/utils/bidi_utils.dart';
 
 class KanbanCard extends StatelessWidget {
   final Task task;
@@ -260,6 +261,10 @@ class KanbanCard extends StatelessWidget {
                             Expanded(
                               child: Text(
                                 task.title,
+                                textDirection: BidiUtils.of(
+                                  context,
+                                  task.title,
+                                ),
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                                 style: GoogleFonts.outfit(
@@ -288,6 +293,10 @@ class KanbanCard extends StatelessWidget {
                             padding: const EdgeInsets.only(left: 28),
                             child: Text(
                               task.description.trim(),
+                              textDirection: BidiUtils.of(
+                                context,
+                                task.description.trim(),
+                              ),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                               style: theme.textTheme.bodySmall?.copyWith(

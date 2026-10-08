@@ -1,4 +1,3 @@
-import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -17,6 +16,7 @@ import 'package:rocis_tasks/core/validation/validators.dart';
 import 'package:rocis_tasks/features/tasks/services/nlp_service.dart';
 import 'package:rocis_tasks/features/tasks/domain/services/task_recurrence_service.dart';
 import 'package:rocis_tasks/features/tasks/presentation/widgets/recurrence_picker_sheet.dart';
+import 'package:rocis_tasks/core/utils/bidi_utils.dart';
 import 'package:rocis_tasks/core/utils/haptic_utils.dart';
 
 import 'package:rocis_tasks/l10n/app_localizations.dart';
@@ -58,8 +58,6 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   bool _recurrenceCleared = false;
   TaskPriority _priority = TaskPriority.medium;
   List<String> _selectedCategoryIds = [];
-  ui.TextDirection _titleDirection = ui.TextDirection.ltr;
-  ui.TextDirection _descriptionDirection = ui.TextDirection.ltr;
   List<SubTask> _subTasks = [];
   List<TextEditingController> _subTaskControllers = [];
   NlpResult? _nlpSuggestion;
@@ -91,8 +89,6 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
         widget.initialCategoryId != null) {
       _selectedCategoryIds.add(widget.initialCategoryId!);
     }
-    _titleDirection = _getTextDirection(_titleController.text);
-    _descriptionDirection = _getTextDirection(_descriptionController.text);
     _subTasks =
         widget.task?.subTasks?.map((st) => st.copyWith()).toList() ?? [];
     _subTaskControllers = _subTasks
@@ -511,12 +507,6 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     );
   }
 
-  ui.TextDirection _getTextDirection(String text) {
-    return Bidi.detectRtlDirectionality(text)
-        ? ui.TextDirection.rtl
-        : ui.TextDirection.ltr;
-  }
-
   void _applyNlpSuggestion() {
     if (_nlpSuggestion == null) return;
 
@@ -595,7 +585,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
               TextFormField(
                 controller: _titleController,
                 style: GoogleFonts.outfit(fontWeight: FontWeight.w600),
-                textDirection: _titleDirection,
+                textDirection: BidiUtils.of(context, _titleController.text),
                 decoration: SharedInputDecorations.getFieldDecoration(
                   label: l10n.title,
                   prefixIcon: Icons.title,
@@ -626,7 +616,6 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                     categories: taskProvider.categories,
                   );
                   setState(() {
-                    _titleDirection = _getTextDirection(value);
                     _nlpSuggestion = parsed.hasAnySuggestion ? parsed : null;
                   });
                 },
@@ -651,35 +640,33 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                 ),
               ],
               const SizedBox(height: 20),
-              TextFormField(
+              BidiTextFieldBuilder(
                 controller: _descriptionController,
-                style: GoogleFonts.outfit(),
-                textDirection: _descriptionDirection,
-                decoration: SharedInputDecorations.getFieldDecoration(
-                  label: l10n.description,
-                  prefixIcon: Icons.description_outlined,
-                  theme: theme,
+                builder: (context, direction) => TextFormField(
+                  controller: _descriptionController,
+                  style: GoogleFonts.outfit(),
+                  textDirection: direction,
+                  decoration: SharedInputDecorations.getFieldDecoration(
+                    label: l10n.description,
+                    prefixIcon: Icons.description_outlined,
+                    theme: theme,
+                  ),
+                  maxLines: 4,
+                  maxLength: 500,
+                  validator: (value) {
+                    final error = ValidationService.validateTaskDescription(
+                      value,
+                    );
+                    if (error != null) return error;
+
+                    if (value != null &&
+                        ValidationService.containsHarmfulContent(value)) {
+                      return l10n.descriptionInvalidContent;
+                    }
+
+                    return null;
+                  },
                 ),
-                maxLines: 4,
-                maxLength: 500,
-                validator: (value) {
-                  final error = ValidationService.validateTaskDescription(
-                    value,
-                  );
-                  if (error != null) return error;
-
-                  if (value != null &&
-                      ValidationService.containsHarmfulContent(value)) {
-                    return l10n.descriptionInvalidContent;
-                  }
-
-                  return null;
-                },
-                onChanged: (value) {
-                  setState(() {
-                    _descriptionDirection = _getTextDirection(value);
-                  });
-                },
               ),
               const SizedBox(height: 20),
               Text(
@@ -1301,16 +1288,20 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   },
                 ),
                 Expanded(
-                  child: TextField(
+                  child: BidiTextFieldBuilder(
                     controller: _subTaskControllers[index],
-                    onChanged: (value) {
-                      _subTasks[index].title = value;
-                    },
-                    decoration: InputDecoration(
-                      hintText: l10n.enterSubtask,
-                      border: InputBorder.none,
+                    builder: (context, direction) => TextField(
+                      textDirection: direction,
+                      controller: _subTaskControllers[index],
+                      onChanged: (value) {
+                        _subTasks[index].title = value;
+                      },
+                      decoration: InputDecoration(
+                        hintText: l10n.enterSubtask,
+                        border: InputBorder.none,
+                      ),
+                      style: GoogleFonts.outfit(fontSize: 14),
                     ),
-                    style: GoogleFonts.outfit(fontSize: 14),
                   ),
                 ),
                 IconButton(

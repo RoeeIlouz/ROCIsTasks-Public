@@ -18,6 +18,7 @@ import 'package:rocis_tasks/core/services/subscription_service.dart';
 import 'package:rocis_tasks/core/utils/attachment_utils.dart';
 import 'package:rocis_tasks/features/tasks/domain/services/custom_field_action_service.dart';
 import 'package:rocis_tasks/features/tasks/domain/services/task_recurrence_service.dart';
+import 'package:rocis_tasks/core/utils/bidi_utils.dart';
 
 class TaskDetailScreen extends StatefulWidget {
   final Task task;
@@ -250,6 +251,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                     Expanded(
                       child: Text(
                         updatedTask.title,
+                        textDirection: BidiUtils.of(context, updatedTask.title),
                         style: GoogleFonts.outfit(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
@@ -376,6 +378,10 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                       padding: const EdgeInsets.all(16),
                       child: Text(
                         updatedTask.description,
+                        textDirection: BidiUtils.of(
+                          context,
+                          updatedTask.description,
+                        ),
                         style: theme.textTheme.bodyLarge?.copyWith(height: 1.5),
                       ),
                     ),
@@ -418,6 +424,10 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                               controlAffinity: ListTileControlAffinity.leading,
                               title: Text(
                                 subtask.title,
+                                textDirection: BidiUtils.of(
+                                  context,
+                                  subtask.title,
+                                ),
                                 style: TextStyle(
                                   decoration: subtask.isCompleted
                                       ? TextDecoration.lineThrough
@@ -763,25 +773,29 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
             children: [
               Expanded(
                 flex: 3,
-                child: TextField(
+                child: BidiTextFieldBuilder(
                   controller: _newGroceryItemController,
-                  decoration: InputDecoration(
-                    hintText: l10n.addItemHint,
-                    border: InputBorder.none,
-                    isDense: true,
+                  builder: (context, direction) => TextField(
+                    textDirection: direction,
+                    controller: _newGroceryItemController,
+                    decoration: InputDecoration(
+                      hintText: l10n.addItemHint,
+                      border: InputBorder.none,
+                      isDense: true,
+                    ),
+                    style: GoogleFonts.outfit(fontSize: 14),
+                    onSubmitted: (val) {
+                      if (val.trim().isNotEmpty) {
+                        provider.addGroceryItem(
+                          task,
+                          val,
+                          quantity: _newGroceryQtyController.text,
+                        );
+                        _newGroceryItemController.clear();
+                        _newGroceryQtyController.clear();
+                      }
+                    },
                   ),
-                  style: GoogleFonts.outfit(fontSize: 14),
-                  onSubmitted: (val) {
-                    if (val.trim().isNotEmpty) {
-                      provider.addGroceryItem(
-                        task,
-                        val,
-                        quantity: _newGroceryQtyController.text,
-                      );
-                      _newGroceryItemController.clear();
-                      _newGroceryQtyController.clear();
-                    }
-                  },
                 ),
               ),
               const SizedBox(width: 8),
@@ -843,6 +857,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                   controlAffinity: ListTileControlAffinity.leading,
                   title: Text(
                     item.title,
+                    textDirection: BidiUtils.of(context, item.title),
                     style: GoogleFonts.outfit(fontWeight: FontWeight.w500),
                   ),
                   secondary: item.quantity != null && item.quantity!.isNotEmpty
@@ -913,6 +928,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                   controlAffinity: ListTileControlAffinity.leading,
                   title: Text(
                     item.title,
+                    textDirection: BidiUtils.of(context, item.title),
                     style: GoogleFonts.outfit(
                       decoration: TextDecoration.lineThrough,
                       color: theme.disabledColor,

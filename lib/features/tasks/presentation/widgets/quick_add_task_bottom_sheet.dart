@@ -14,6 +14,7 @@ import 'package:rocis_tasks/shared/ui/widgets/glass_container.dart';
 import 'package:rocis_tasks/shared/ui/theme/theme_service.dart';
 import 'package:rocis_tasks/core/utils/icon_utils.dart';
 import 'package:rocis_tasks/core/utils/haptic_utils.dart';
+import 'package:rocis_tasks/core/utils/bidi_utils.dart';
 
 class QuickAddTaskBottomSheet extends StatefulWidget {
   final DateTime? initialDueDate;
@@ -330,28 +331,34 @@ class _QuickAddTaskBottomSheetState extends State<QuickAddTaskBottomSheet> {
                 const SizedBox(height: 12),
 
                 // Main Text Input Field
-                TextField(
+                BidiTextFieldBuilder(
                   controller: _textController,
-                  focusNode: _focusNode,
-                  autofocus: true,
-                  textCapitalization: TextCapitalization.sentences,
-                  style: GoogleFonts.outfit(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: theme.colorScheme.onSurface,
-                  ),
-                  decoration: InputDecoration(
-                    hintText: 'e.g. Finish report tomorrow 3pm !high #work',
-                    hintStyle: GoogleFonts.outfit(
-                      fontSize: 14,
-                      fontWeight: FontWeight.normal,
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                  builder: (context, direction) => TextField(
+                    textDirection: direction,
+                    controller: _textController,
+                    focusNode: _focusNode,
+                    autofocus: true,
+                    textCapitalization: TextCapitalization.sentences,
+                    style: GoogleFonts.outfit(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: theme.colorScheme.onSurface,
                     ),
-                    border: InputBorder.none,
-                    isDense: true,
-                    contentPadding: EdgeInsets.zero,
+                    decoration: InputDecoration(
+                      hintText: 'e.g. Finish report tomorrow 3pm !high #work',
+                      hintStyle: GoogleFonts.outfit(
+                        fontSize: 14,
+                        fontWeight: FontWeight.normal,
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.4,
+                        ),
+                      ),
+                      border: InputBorder.none,
+                      isDense: true,
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                    onSubmitted: (_) => _submitTask(),
                   ),
-                  onSubmitted: (_) => _submitTask(),
                 ),
 
                 // Live NLP Token Chip Bar

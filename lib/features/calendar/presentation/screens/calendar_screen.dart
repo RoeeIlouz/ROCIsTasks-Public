@@ -22,6 +22,7 @@ import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:rocis_tasks/shared/ui/ui_kit.dart';
 import 'package:rocis_tasks/core/services/schedule_firestore_service.dart';
 import 'package:rocis_tasks/core/services/schedule_bridge_service.dart';
+import 'package:rocis_tasks/core/utils/bidi_utils.dart';
 
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({super.key});
@@ -772,6 +773,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                   children: [
                                     Text(
                                       item.title,
+                                      textDirection: BidiUtils.of(
+                                        context,
+                                        item.title,
+                                      ),
                                       style: GoogleFonts.outfit(
                                         fontWeight: FontWeight.w600,
                                         fontSize: 15,
@@ -1046,6 +1051,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                 const SizedBox(height: 2),
                                 Text(
                                   item.title,
+                                  textDirection: BidiUtils.of(
+                                    context,
+                                    item.title,
+                                  ),
                                   style: Theme.of(context).textTheme.bodySmall
                                       ?.copyWith(
                                         color: eventColor,

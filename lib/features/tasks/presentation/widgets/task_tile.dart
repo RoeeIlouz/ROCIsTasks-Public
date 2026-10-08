@@ -16,6 +16,7 @@ import 'package:rocis_tasks/core/services/subscription_service.dart';
 import 'package:rocis_tasks/features/tasks/domain/services/task_recurrence_service.dart';
 import 'package:rocis_tasks/features/tasks/domain/services/custom_field_action_service.dart';
 import 'package:rocis_tasks/features/tasks/presentation/widgets/task_unlock_dialog.dart';
+import 'package:rocis_tasks/core/utils/bidi_utils.dart';
 
 class TaskTile extends StatelessWidget {
   final Task task;
@@ -277,12 +278,22 @@ class TaskTile extends StatelessWidget {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Row(
+                                    // Title and its badge start on the side
+                                    // the title's own script reads from.
+                                    textDirection: BidiUtils.of(
+                                      context,
+                                      task.title,
+                                    ),
                                     crossAxisAlignment:
                                         CrossAxisAlignment.center,
                                     children: [
                                       Flexible(
                                         child: Text(
                                           task.title,
+                                          textDirection: BidiUtils.of(
+                                            context,
+                                            task.title,
+                                          ),
                                           style: GoogleFonts.outfit(
                                             fontSize: 16,
                                             fontWeight: FontWeight.w600,
@@ -304,15 +315,22 @@ class TaskTile extends StatelessWidget {
                                   ),
                                   if (task.description.isNotEmpty) ...[
                                     const SizedBox(height: 6),
-                                    Text(
-                                      task.description,
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: GoogleFonts.outfit(
-                                        fontSize: 13,
-                                        color: theme.colorScheme.onSurface
-                                            .withValues(alpha: 0.6),
-                                        height: 1.35,
+                                    SizedBox(
+                                      width: double.infinity,
+                                      child: Text(
+                                        task.description,
+                                        textDirection: BidiUtils.of(
+                                          context,
+                                          task.description,
+                                        ),
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: GoogleFonts.outfit(
+                                          fontSize: 13,
+                                          color: theme.colorScheme.onSurface
+                                              .withValues(alpha: 0.6),
+                                          height: 1.35,
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -839,6 +857,7 @@ class TaskTile extends StatelessWidget {
                   Expanded(
                     child: Text(
                       subTask.title,
+                      textDirection: BidiUtils.of(context, subTask.title),
                       style: GoogleFonts.outfit(
                         fontSize: 12,
                         color: subTask.isCompleted
