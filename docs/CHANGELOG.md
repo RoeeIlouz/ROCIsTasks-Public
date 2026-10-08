@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0+119] - 2026-10-08
+
+### Added
+- Week View home widget in the ROCIs Schedule timetable style replaces Day Agenda; mixed Hebrew and English task text now keeps its own direction
+
 ## [1.0.0+118] - 2026-10-07 (Patch 2)
 
 ### Fixed
