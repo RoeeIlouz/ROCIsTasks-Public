@@ -47,6 +47,18 @@
 	<true/>
 	<key>NSCalendarsUsageDescription</key>
 	<string>This app needs access to your calendar to sync tasks with your schedule.</string>
+	<key>NSCalendarsFullAccessUsageDescription</key>
+	<string>This app needs access to your calendar to sync tasks with your schedule.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>The camera is used to scan task QR codes.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Photos are used to attach images and scan QR codes from saved pictures.</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Face ID is used to unlock your tasks.</string>
+	<key>GIDClientID</key>
+	<string>867477199658-t4pj7e58lf9800saht1in5271okdnrc4.apps.googleusercontent.com</string>
+	<key>GIDServerClientID</key>
+	<string>867477199658-df3ptf7v5fi66ijc5jeunfmrpf5eghou.apps.googleusercontent.com</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -54,6 +66,7 @@
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
+				<string>com.googleusercontent.apps.867477199658-t4pj7e58lf9800saht1in5271okdnrc4</string>
 				<string>com.googleusercontent.apps.867477199658-f79j3ag3fj8dcpmmfpaljactnfcqvfov</string>
 			</array>
 		</dict>
