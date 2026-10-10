@@ -1,5 +1,6 @@
 import SwiftUI
 import WidgetKit
+import AppIntents
 
 // MARK: - Data store
 
@@ -179,4 +180,102 @@ enum DayKey {
 
     static func of(_ date: Date) -> String { formatter.string(from: date) }
     static func date(_ key: String) -> Date? { formatter.date(from: key) }
+}
+
+// MARK: - Paging
+
+/// Widgets can't scroll, so long lists page with buttons (iOS 17 interactive
+/// widgets). The page lives in the shared store under `key`; the button sets
+/// the target page and WidgetKit reloads the widget.
+struct PageIntent: AppIntent {
+    static var title: LocalizedStringResource = "Change widget page"
+    static var isDiscoverable = false
+
+    @Parameter(title: "Key") var key: String
+    @Parameter(title: "Value") var value: Int
+
+    init() {}
+    init(key: String, value: Int) {
+        self.key = key
+        self.value = value
+    }
+
+    func perform() async throws -> some IntentResult {
+        WidgetStore.defaults?.set(value, forKey: key)
+        return .result()
+    }
+}
+
+struct PagerBar: View {
+    let key: String
+    let page: Int
+    let pages: Int
+
+    var body: some View {
+        HStack(spacing: 10) {
+            Spacer(minLength: 0)
+            Button(intent: PageIntent(key: key, value: page - 1)) {
+                Image(systemName: "chevron.up")
+            }
+            .disabled(page == 0)
+            Text("\(page + 1)/\(pages)")
+                .font(.caption2.monospacedDigit())
+                .foregroundStyle(Theme.secondaryText)
+            Button(intent: PageIntent(key: key, value: page + 1)) {
+                Image(systemName: "chevron.down")
+            }
+            .disabled(page >= pages - 1)
+        }
+        .font(.caption.bold())
+        .buttonStyle(.plain)
+        .foregroundStyle(Theme.accent)
+        .frame(height: PagedList<Int, EmptyView>.pagerHeight)
+    }
+}
+
+/// Lays out as many rows as fit the widget's real height and pages the rest.
+struct PagedList<Item, Row: View>: View {
+    static var pagerHeight: CGFloat { 18 }
+
+    let items: [Item]
+    let pageKey: String
+    var spacing: CGFloat = 4
+    let height: (Item) -> CGFloat
+    @ViewBuilder let row: (Item) -> Row
+
+    var body: some View {
+        GeometryReader { geo in
+            let all = pages(fitting: geo.size.height)
+            let paged = all.count > 1
+            let pagesList = paged ? pages(fitting: geo.size.height - Self.pagerHeight - spacing) : all
+            let page = min(max(0, WidgetStore.int(pageKey) ?? 0), pagesList.count - 1)
+            VStack(alignment: .leading, spacing: spacing) {
+                ForEach(Array(pagesList[page].enumerated()), id: \.offset) { _, index in
+                    row(items[index]).frame(height: height(items[index]))
+                }
+                Spacer(minLength: 0)
+                if paged {
+                    PagerBar(key: pageKey, page: page, pages: pagesList.count)
+                }
+            }
+        }
+    }
+
+    /// Splits item indices into pages whose rows fit `available` points.
+    private func pages(fitting available: CGFloat) -> [[Int]] {
+        var result: [[Int]] = [[]]
+        var used: CGFloat = 0
+        for index in items.indices {
+            let h = height(items[index])
+            let needed = result[result.count - 1].isEmpty ? h : used + spacing + h
+            if needed > available, !result[result.count - 1].isEmpty {
+                result.append([index])
+                used = h
+            } else {
+                result[result.count - 1].append(index)
+                used = needed
+            }
+        }
+        return result
+    }
 }

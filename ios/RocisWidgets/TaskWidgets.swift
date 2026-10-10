@@ -40,10 +40,9 @@ struct TaskWidgetView: View {
             if all.isEmpty {
                 EmptyState(text: "All tasks completed")
             } else {
-                ForEach(all.prefix(family.rowLimit)) { task in
+                PagedList(items: all, pageKey: "ios_page_tasks", height: { _ in rowHeight }) { task in
                     Link(destination: WidgetLink.task(task.id)) { row(task) }
                 }
-                Spacer(minLength: 0)
             }
         }
         // Small widgets ignore Links; the whole widget opens the app.
@@ -71,8 +70,9 @@ struct TaskWidgetView: View {
                 Circle().fill(color).frame(width: 6, height: 6)
             }
         }
-        .frame(height: family == .systemSmall ? 22 : 30)
     }
+
+    private var rowHeight: CGFloat { family == .systemSmall ? 22 : 30 }
 }
 
 struct TaskWidget: Widget {
