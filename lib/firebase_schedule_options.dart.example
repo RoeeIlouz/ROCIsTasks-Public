@@ -28,7 +28,8 @@ class ScheduleFirebaseOptions {
   // --- Default placeholder values (fallback) ---
   static const String _defaultApiKey = 'YOUR_SCHEDULE_API_KEY';
   static const String _defaultAndroidAppId = 'YOUR_SCHEDULE_ANDROID_APP_ID';
-  static const String _defaultMessagingSenderId = 'YOUR_SCHEDULE_MESSAGING_SENDER_ID';
+  static const String _defaultMessagingSenderId =
+      'YOUR_SCHEDULE_MESSAGING_SENDER_ID';
   static const String _defaultProjectId = 'YOUR_SCHEDULE_PROJECT_ID';
   static const String _defaultStorageBucket = 'YOUR_SCHEDULE_STORAGE_BUCKET';
   static const String _defaultDatabaseURL = 'YOUR_SCHEDULE_DATABASE_URL';
@@ -50,9 +51,13 @@ class ScheduleFirebaseOptions {
 
   /// Firebase options for iOS platform - rocis-schedule project
   static FirebaseOptions get ios => FirebaseOptions(
-    apiKey: dotenv.env['FIREBASE_SCHEDULE_API_KEY'] ?? _defaultApiKey,
+    apiKey:
+        dotenv.env['FIREBASE_SCHEDULE_IOS_API_KEY'] ??
+        dotenv.env['FIREBASE_SCHEDULE_API_KEY'] ??
+        _defaultApiKey,
     appId:
-        dotenv.env['FIREBASE_SCHEDULE_IOS_APP_ID'] ?? 'YOUR_SCHEDULE_IOS_APP_ID',
+        dotenv.env['FIREBASE_SCHEDULE_IOS_APP_ID'] ??
+        'YOUR_SCHEDULE_IOS_APP_ID',
     messagingSenderId:
         dotenv.env['FIREBASE_SCHEDULE_MESSAGING_SENDER_ID'] ??
         _defaultMessagingSenderId,
@@ -61,6 +66,6 @@ class ScheduleFirebaseOptions {
         dotenv.env['FIREBASE_SCHEDULE_STORAGE_BUCKET'] ?? _defaultStorageBucket,
     databaseURL:
         dotenv.env['FIREBASE_SCHEDULE_DATABASE_URL'] ?? _defaultDatabaseURL,
-    iosBundleId: 'com.yourcompany.schedule',
+    iosBundleId: 'com.rocisapps.tasks',
   );
 }

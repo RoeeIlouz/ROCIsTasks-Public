@@ -38,6 +38,7 @@ jobs:
       - name: Setup iOS Firebase config
         env:
           GOOGLE_SERVICE_INFO_PLIST_BASE64: ${{ secrets.GOOGLE_SERVICE_INFO_PLIST_BASE64 }}
+          GOOGLE_SERVICE_INFO_PLIST_SCHEDULE_BASE64: ${{ secrets.GOOGLE_SERVICE_INFO_PLIST_SCHEDULE_BASE64 }}
         run: |
           set -euo pipefail
           if [ -z "$GOOGLE_SERVICE_INFO_PLIST_BASE64" ]; then
@@ -45,7 +46,14 @@ jobs:
             exit 1
           fi
           echo "$GOOGLE_SERVICE_INFO_PLIST_BASE64" | base64 --decode > ios/Runner/GoogleService-Info.plist
-          python3 scripts/patch_env_ios.py
+          SCHEDULE_ARGS=()
+          if [ -n "$GOOGLE_SERVICE_INFO_PLIST_SCHEDULE_BASE64" ]; then
+            echo "$GOOGLE_SERVICE_INFO_PLIST_SCHEDULE_BASE64" | base64 --decode > "$RUNNER_TEMP/GoogleService-Info-Schedule.plist"
+            SCHEDULE_ARGS=(--schedule-plist "$RUNNER_TEMP/GoogleService-Info-Schedule.plist")
+          else
+            echo "::warning::GOOGLE_SERVICE_INFO_PLIST_SCHEDULE_BASE64 not set; ROCIs Schedule may not load on iOS"
+          fi
+          python3 scripts/patch_env_ios.py ${SCHEDULE_ARGS[@]+"${SCHEDULE_ARGS[@]}"}
 
       - name: Install dependencies
         run: flutter pub get

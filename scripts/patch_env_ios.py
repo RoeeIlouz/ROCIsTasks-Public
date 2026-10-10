@@ -13,6 +13,9 @@ import sys
 
 PLIST_PATH = "ios/Runner/GoogleService-Info.plist"
 ENV_PATH = ".env"
+# Optional: the iOS app registered in the rocis-schedule project, used by
+# ScheduleFirebaseOptions.ios to read ROCIs Schedule data.
+SCHEDULE_PLIST_ARG = "--schedule-plist"
 
 
 def main():
@@ -25,6 +28,13 @@ def main():
         "FIREBASE_IOS_CLIENT_ID": plist["CLIENT_ID"],
         "FIREBASE_IOS_BUNDLE_ID": plist["BUNDLE_ID"],
     }
+
+    if SCHEDULE_PLIST_ARG in sys.argv:
+        schedule_path = sys.argv[sys.argv.index(SCHEDULE_PLIST_ARG) + 1]
+        with open(schedule_path, "rb") as f:
+            schedule = plistlib.load(f)
+        values["FIREBASE_SCHEDULE_IOS_APP_ID"] = schedule["GOOGLE_APP_ID"]
+        values["FIREBASE_SCHEDULE_IOS_API_KEY"] = schedule["API_KEY"]
 
     with open(ENV_PATH, encoding="utf-8") as f:
         env = f.read()
