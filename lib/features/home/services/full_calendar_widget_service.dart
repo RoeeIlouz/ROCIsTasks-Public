@@ -300,7 +300,11 @@ class FullCalendarWidgetService {
       final startOfWeek = prefs.getInt('full_calendar_start_of_week') ?? 7;
       final firstDayOfMonth = targetMonth;
       final difference = (firstDayOfMonth.weekday - startOfWeek) % 7;
-      final startDate = firstDayOfMonth.subtract(Duration(days: difference));
+      final startDate = DateTime(
+        firstDayOfMonth.year,
+        firstDayOfMonth.month,
+        firstDayOfMonth.day - difference,
+      );
 
       // Sources that could not be refreshed this run; only their previously
       // saved entries are carried forward (see mergeStaleSummaries).
@@ -735,13 +739,21 @@ class FullCalendarWidgetService {
       final gridData = <Map<String, dynamic>>[];
 
       for (int row = 0; row < 6; row++) {
-        final rowStartDate = startDate.add(Duration(days: row * 7));
+        final rowStartDate = DateTime(
+          startDate.year,
+          startDate.month,
+          startDate.day + row * 7,
+        );
         final weekNumber = _getWeekNumber(rowStartDate);
 
         gridData.add({'isWeekNumber': true, 'weekNumber': weekNumber});
 
         for (int col = 0; col < 7; col++) {
-          final date = rowStartDate.add(Duration(days: col));
+          final date = DateTime(
+            rowStartDate.year,
+            rowStartDate.month,
+            rowStartDate.day + col,
+          );
           final dateKey = DateFormat('yyyy-MM-dd').format(date);
           final summaries = masterSummariesByDate[dateKey] ?? [];
 
@@ -923,18 +935,30 @@ class FullCalendarWidgetService {
       final startOfWeek = prefs.getInt('full_calendar_start_of_week') ?? 7;
       final firstDayOfMonth = targetMonth;
       final difference = (firstDayOfMonth.weekday - startOfWeek) % 7;
-      final startDate = firstDayOfMonth.subtract(Duration(days: difference));
+      final startDate = DateTime(
+        firstDayOfMonth.year,
+        firstDayOfMonth.month,
+        firstDayOfMonth.day - difference,
+      );
 
       final gridData = <Map<String, dynamic>>[];
 
       for (int row = 0; row < 6; row++) {
-        final rowStartDate = startDate.add(Duration(days: row * 7));
+        final rowStartDate = DateTime(
+          startDate.year,
+          startDate.month,
+          startDate.day + row * 7,
+        );
         final weekNumber = _getWeekNumber(rowStartDate);
 
         gridData.add({'isWeekNumber': true, 'weekNumber': weekNumber});
 
         for (int col = 0; col < 7; col++) {
-          final date = rowStartDate.add(Duration(days: col));
+          final date = DateTime(
+            rowStartDate.year,
+            rowStartDate.month,
+            rowStartDate.day + col,
+          );
           final dateKey = DateFormat('yyyy-MM-dd').format(date);
 
           gridData.add({

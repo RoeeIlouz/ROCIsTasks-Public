@@ -544,10 +544,26 @@ private struct MonthGrid: View {
 
         GeometryReader { geo in
             let spacing: CGFloat = 2
-            let rowHeight = rows.isEmpty ? 0 : (geo.size.height - spacing * CGFloat(rows.count - 1)) / CGFloat(rows.count)
+            let weekdayH: CGFloat = 12
+            let rowsH = geo.size.height - weekdayH - spacing
+            let rowHeight = rows.isEmpty ? 0 : (rowsH - spacing * CGFloat(rows.count - 1)) / CGFloat(rows.count)
             // Date circle is 18pt; each summary chip needs ~10pt.
             let summaryCount = showSummaries ? max(0, Int((rowHeight - 19) / 10)) : 0
             VStack(spacing: spacing) {
+                // Weekday names from the grid's own first week, so they follow
+                // the start-of-week setting and the app language.
+                HStack(spacing: spacing) {
+                    if showWeekNumbers { Color.clear.frame(width: 14) }
+                    ForEach(Array((rows.first ?? []).enumerated()), id: \.offset) { _, day in
+                        Text(weekdayLabel(day.date))
+                            .font(.system(size: 8, weight: .semibold))
+                            .foregroundStyle(Theme.secondaryText)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.7)
+                            .frame(maxWidth: .infinity)
+                    }
+                }
+                .frame(height: weekdayH)
                 ForEach(Array(rows.enumerated()), id: \.offset) { index, row in
                     HStack(spacing: spacing) {
                         if showWeekNumbers {
@@ -566,6 +582,11 @@ private struct MonthGrid: View {
                 }
             }
         }
+    }
+
+    private func weekdayLabel(_ key: String?) -> String {
+        guard let key, let date = DayKey.date(key) else { return "" }
+        return date.formatted(.dateTime.weekday(.abbreviated).locale(L10n.locale)).uppercased(with: L10n.locale)
     }
 
     private func cell(_ day: GridDay, summaryCount: Int) -> some View {

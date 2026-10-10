@@ -33,9 +33,15 @@ class MonthWidgetService {
       final firstDayOfMonth = targetMonth;
       // Calculate start date (Sunday before or on firstDay)
       final difference = firstDayOfMonth.weekday % 7;
-      final startDate = firstDayOfMonth.subtract(Duration(days: difference));
-      final endDate = startDate.add(
-        const Duration(days: 34),
+      final startDate = DateTime(
+        firstDayOfMonth.year,
+        firstDayOfMonth.month,
+        firstDayOfMonth.day - difference,
+      );
+      final endDate = DateTime(
+        startDate.year,
+        startDate.month,
+        startDate.day + 34,
       ); // 35 days total (5 weeks)
 
       final events = await _calendarService.getEvents(
@@ -54,7 +60,11 @@ class MonthWidgetService {
 
       for (int row = 0; row < 5; row++) {
         // First cell of each row is the Week Number
-        final rowStartDate = startDate.add(Duration(days: row * 7));
+        final rowStartDate = DateTime(
+          startDate.year,
+          startDate.month,
+          startDate.day + row * 7,
+        );
         final weekNumber = _getWeekNumber(rowStartDate);
 
         gridData.add({
@@ -67,7 +77,11 @@ class MonthWidgetService {
         });
 
         for (int col = 0; col < 7; col++) {
-          final date = rowStartDate.add(Duration(days: col));
+          final date = DateTime(
+            rowStartDate.year,
+            rowStartDate.month,
+            rowStartDate.day + col,
+          );
           final dateKey = DateFormat('yyyy-MM-dd').format(date);
 
           // Find events for this day (including multi-day events)
