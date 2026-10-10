@@ -115,9 +115,19 @@ class NotificationService {
     const LinuxInitializationSettings initializationSettingsLinux =
         LinuxInitializationSettings(defaultActionName: 'Open notification');
 
+    // iOS throws without Darwin settings. Permission is asked later by
+    // requestPermissions(), not at init, so startup never blocks on a prompt.
+    const DarwinInitializationSettings initializationSettingsDarwin =
+        DarwinInitializationSettings(
+          requestAlertPermission: false,
+          requestBadgePermission: false,
+          requestSoundPermission: false,
+        );
+
     const InitializationSettings initializationSettings =
         InitializationSettings(
           android: initializationSettingsAndroid,
+          iOS: initializationSettingsDarwin,
           linux: initializationSettingsLinux,
         );
 
@@ -224,6 +234,11 @@ class NotificationService {
         // Error requesting exact alarm permission
       }
     }
+    await flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+          IOSFlutterLocalNotificationsPlugin
+        >()
+        ?.requestPermissions(alert: true, badge: true, sound: true);
   }
 
   /// TASK COUNT NOTIFICATION

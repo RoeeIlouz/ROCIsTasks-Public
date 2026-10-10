@@ -64,7 +64,8 @@ jobs:
         run: dart run build_runner build --delete-conflicting-outputs
 
       - name: Build iOS (no codesign)
-        run: flutter build ios --release --no-codesign
+        # VERBOSE_LOGS: app logs reach the device log, read with idevicesyslog.
+        run: flutter build ios --release --no-codesign --dart-define=VERBOSE_LOGS=true
 
       # xtool takes each bundle's entitlements (the widget App Group) from its
       # existing signature, so ad-hoc sign with them; xtool re-signs on install.

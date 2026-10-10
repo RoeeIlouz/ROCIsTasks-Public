@@ -80,7 +80,10 @@ class AppConfig {
   // Feature flags
   static const bool enableAnalytics = isProduction;
   static const bool enableCrashReporting = isProduction;
-  static const bool enableDebugLogging = isDevelopment;
+  /// `--dart-define=VERBOSE_LOGS=true` turns logging on in release builds
+  /// (used by the sideloaded iOS test build, read through the device log).
+  static const bool enableDebugLogging =
+      isDevelopment || bool.fromEnvironment('VERBOSE_LOGS');
   static const bool enablePerformanceMonitoring = isProduction;
   static const bool enableRemoteConfig =
       true; // Enabled for both to allow overrides
