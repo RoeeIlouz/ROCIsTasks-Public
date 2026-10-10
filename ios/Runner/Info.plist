@@ -70,6 +70,16 @@
 				<string>com.googleusercontent.apps.867477199658-f79j3ag3fj8dcpmmfpaljactnfcqvfov</string>
 			</array>
 		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.rocisapps.tasks.widgets</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>rocistasks</string>
+			</array>
+		</dict>
 	</array>
 </dict>
 </plist>

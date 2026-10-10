@@ -56,6 +56,17 @@ jobs:
       - name: Build iOS (no codesign)
         run: flutter build ios --release --no-codesign
 
+      # xtool takes each bundle's entitlements (the widget App Group) from its
+      # existing signature, so ad-hoc sign with them; xtool re-signs on install.
+      - name: Ad-hoc sign with entitlements
+        run: |
+          set -euo pipefail
+          APP=build/ios/iphoneos/Runner.app
+          find "$APP/Frameworks" -maxdepth 1 \( -name '*.framework' -o -name '*.dylib' \) -exec codesign --force --sign - {} \;
+          codesign --force --sign - --entitlements ios/RocisWidgets/RocisWidgets.entitlements "$APP/PlugIns/RocisWidgets.appex"
+          codesign --force --sign - --entitlements ios/Runner/Runner.entitlements "$APP"
+          codesign -d --entitlements - "$APP/PlugIns/RocisWidgets.appex"
+
       - name: Package IPA
         run: |
           set -euo pipefail

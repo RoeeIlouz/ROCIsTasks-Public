@@ -1,6 +1,9 @@
 import 'dart:async';
 import 'package:flutter/widgets.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart'
+    show kIsWeb, defaultTargetPlatform, TargetPlatform;
+import 'package:flutter/services.dart' show MethodChannel;
+import 'package:home_widget/home_widget.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -50,6 +53,10 @@ class AppInitializer {
 
       // 2. Load Environment Variables First
       await _initEnvironment();
+
+      // iOS widgets read data through an App Group; set it before any
+      // HomeWidget write.
+      await _initWidgetAppGroup();
 
       // 3. Initialize DEFAULT Firebase
       await _initFirebase();
@@ -139,6 +146,23 @@ class AppInitializer {
       AppLogger.warning('Could not load .env file (this is OK)', error: e);
       AppLogger.info('App will use default configuration');
       // This is not critical - continue without .env file
+    }
+  }
+
+  /// The App Group is `group.<bundle id>`. Sideloading tools such as xtool
+  /// rename the bundle ID (and the group with it), so the native side reports
+  /// the runtime value instead of Dart hardcoding it.
+  static Future<void> _initWidgetAppGroup() async {
+    if (kIsWeb || defaultTargetPlatform != TargetPlatform.iOS) return;
+    try {
+      final groupId = await const MethodChannel(
+        'com.rocisapps.tasks/widgets',
+      ).invokeMethod<String>('appGroupId').timeout(const Duration(seconds: 2));
+      if (groupId != null && groupId.isNotEmpty) {
+        await HomeWidget.setAppGroupId(groupId);
+      }
+    } catch (e) {
+      AppLogger.warning('Could not set the widget App Group', error: e);
     }
   }
 
