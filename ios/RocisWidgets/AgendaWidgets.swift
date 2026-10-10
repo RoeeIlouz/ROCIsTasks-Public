@@ -10,6 +10,9 @@ struct AgendaItem: Decodable {
     let subtitle: String?
     let category_color: String?
     let dateOnly: String?
+    /// ISO start/end (Dart toIso8601String), used by the Week View timetable.
+    let date: String?
+    let end: String?
     let timeDisplay: String?
     let isAllDay: Bool?
     let priority: String?
@@ -120,21 +123,97 @@ private enum WeekPaging {
     }
 }
 
+/// One agenda item placed in the week: column, all-day flag, minutes of day.
+/// Same rules as Android's WeekViewRenderer.loadItems.
+private struct WeekItem {
+    static let minBlockMinutes = 30
+
+    let item: AgendaItem
+    let color: Color
+    let day: Int
+    let allDay: Bool
+    let startMin: Int
+    let endMin: Int
+
+    static func load(_ items: [AgendaItem], dayKeys: [String]) -> [WeekItem] {
+        items.compactMap { item in
+            guard let dateOnly = item.dateOnly, let day = dayKeys.firstIndex(of: dateOnly) else { return nil }
+            let start = LocalISO.parse(item.date)
+            var startMin = 0
+            if let start, DayKey.of(start) == dateOnly { startMin = minuteOf(start) }
+            let end = LocalISO.parse(item.end)
+            var endMin: Int
+            if let end {
+                let endKey = DayKey.of(end)
+                endMin = endKey > dateOnly ? 24 * 60 : (endKey == dateOnly ? minuteOf(end) : startMin + minBlockMinutes)
+            } else {
+                endMin = startMin + minBlockMinutes
+            }
+            startMin = min(startMin, 24 * 60 - minBlockMinutes)
+            endMin = min(max(endMin, startMin + minBlockMinutes), 24 * 60)
+            return WeekItem(
+                item: item,
+                color: Color(hex: item.category_color ?? ""),
+                day: day,
+                allDay: item.isAllDay == true,
+                startMin: startMin,
+                endMin: endMin
+            )
+        }
+    }
+
+    private static func minuteOf(_ date: Date) -> Int {
+        let c = Calendar.current.dateComponents([.hour, .minute], from: date)
+        return (c.hour ?? 0) * 60 + (c.minute ?? 0)
+    }
+}
+
+/// Dart's DateTime.toIso8601String(): local time without an offset, or UTC
+/// with a trailing "Z".
+private enum LocalISO {
+    static let local: DateFormatter = {
+        let f = DateFormatter()
+        f.locale = Locale(identifier: "en_US_POSIX")
+        f.timeZone = .current
+        f.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+        return f
+    }()
+
+    static func parse(_ value: String?) -> Date? {
+        guard let value, value.count >= 19 else { return nil }
+        let tail = value.dropFirst(19)
+        if tail.contains("Z") || tail.contains("+") || tail.contains("-") {
+            let f = ISO8601DateFormatter()
+            f.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+            if let date = f.date(from: value) { return date }
+            f.formatOptions = [.withInternetDateTime]
+            return f.date(from: value)
+        }
+        return local.date(from: String(value.prefix(19)))
+    }
+}
+
 struct WeekViewWidgetView: View {
     let date: Date
 
     var body: some View {
-        let items = WidgetStore.json("today_agenda_data", as: [AgendaItem].self) ?? []
-        let byDay = Dictionary(grouping: items, by: { $0.dateOnly ?? "" })
         let offset = WeekPaging.offset
         let calendar = weekCalendar
         let shown = calendar.date(byAdding: .weekOfYear, value: offset, to: date) ?? date
-        let days = weekDays(containing: shown, calendar: calendar)
+        let weekStart = calendar.dateInterval(of: .weekOfYear, for: shown)?.start ?? shown
+        let days = (0..<7).compactMap { calendar.date(byAdding: .day, value: $0, to: weekStart) }
+        let items = WeekItem.load(
+            WidgetStore.json("today_agenda_data", as: [AgendaItem].self) ?? [],
+            dayKeys: days.map(DayKey.of)
+        )
 
         VStack(alignment: .leading, spacing: 6) {
             HStack(spacing: 8) {
-                Text(shown, format: .dateTime.month(.wide).year())
-                    .font(.headline).foregroundStyle(Theme.primaryText)
+                VStack(alignment: .leading, spacing: 0) {
+                    Text(offset == 0 ? "This week" : weekStart.formatted(.dateTime.month(.wide).year()))
+                        .font(.headline)
+                        .foregroundStyle(offset == 0 ? Theme.accent : Theme.primaryText)
+                }
                 Spacer(minLength: 0)
                 if offset != 0 {
                     Button(intent: PageIntent(key: WeekPaging.key, value: 0)) {
@@ -154,53 +233,10 @@ struct WeekViewWidgetView: View {
             .buttonStyle(.plain)
             .foregroundStyle(Theme.accent)
 
-            GeometryReader { geo in
-                // Weekday + date header take ~40pt; each item chip is 13pt + 3pt gap.
-                let capacity = max(1, Int((geo.size.height - 40) / 16))
-                HStack(alignment: .top, spacing: 4) {
-                    ForEach(days, id: \.self) { day in
-                        let key = DayKey.of(day)
-                        Link(destination: WidgetLink.calendar(date: key)) {
-                            column(day: day, items: byDay[key] ?? [], capacity: capacity)
-                        }
-                    }
-                }
-            }
+            WeekTimetable(days: days, items: items, isCurrentWeek: offset == 0)
         }
         .widgetURL(WidgetLink.calendar())
         .rocisBackground()
-    }
-
-    private func column(day: Date, items: [AgendaItem], capacity: Int) -> some View {
-        let isToday = Calendar.current.isDateInToday(day)
-        // Reserve the last slot for "+N" when the day has more than fits.
-        let limit = items.count > capacity ? max(0, capacity - 1) : capacity
-        return VStack(spacing: 3) {
-            Text(day, format: .dateTime.weekday(.narrow))
-                .font(.caption2).foregroundStyle(Theme.secondaryText)
-            Text(day, format: .dateTime.day())
-                .font(.caption.bold())
-                .frame(width: 22, height: 22)
-                .background(Circle().fill(isToday ? Theme.accent : .clear))
-                .foregroundStyle(Theme.primaryText)
-            ForEach(Array(items.prefix(limit).enumerated()), id: \.offset) { _, item in
-                Text(item.title ?? "")
-                    .font(.system(size: 9))
-                    .lineLimit(1)
-                    .padding(.horizontal, 2)
-                    .frame(maxWidth: .infinity, minHeight: 13, maxHeight: 13, alignment: .leading)
-                    .background(RoundedRectangle(cornerRadius: 3).fill(Color(hex: item.category_color ?? "").opacity(0.35)))
-                    .foregroundStyle(Theme.primaryText)
-            }
-            if items.count > limit {
-                Text("+\(items.count - limit)")
-                    .font(.system(size: 9))
-                    .frame(height: 13)
-                    .foregroundStyle(Theme.secondaryText)
-            }
-            Spacer(minLength: 0)
-        }
-        .frame(maxWidth: .infinity)
     }
 
     /// Honors the app's start-of-week setting (Dart: 1 = Monday ... 7 = Sunday).
@@ -209,10 +245,251 @@ struct WeekViewWidgetView: View {
         calendar.firstWeekday = (WidgetStore.int("full_calendar_start_of_week") ?? 7) % 7 + 1
         return calendar
     }
+}
 
-    private func weekDays(containing date: Date, calendar: Calendar) -> [Date] {
-        let start = calendar.dateInterval(of: .weekOfYear, for: date)?.start ?? date
-        return (0..<7).compactMap { calendar.date(byAdding: .day, value: $0, to: start) }
+/// The Schedule-style grid: day header, all-day strip, hour axis and timed
+/// blocks laid out in lanes when they overlap.
+private struct WeekTimetable: View {
+    let days: [Date]
+    let items: [WeekItem]
+    let isCurrentWeek: Bool
+
+    private let axisW: CGFloat = 26
+    private let headerH: CGFloat = 34
+    private let allDayRowH: CGFloat = 14
+    private let minHourH: CGFloat = 22
+    private let gridLine = Color.white.opacity(0.12)
+
+    var body: some View {
+        GeometryReader { geo in
+            let w = geo.size.width
+            let h = geo.size.height
+            let colW = (w - axisW) / 7
+            let todayCol = isCurrentWeek ? days.firstIndex(where: { Calendar.current.isDateInToday($0) }) : nil
+
+            let allDay = Dictionary(grouping: items.filter(\.allDay), by: \.day)
+            let allDayRows = min(2, allDay.values.map(\.count).max() ?? 0)
+            let gridTop = headerH + (allDayRows > 0 ? CGFloat(allDayRows) * allDayRowH + 3 : 0)
+
+            let timed = items.filter { !$0.allDay }
+            let window = hourWindow(timed: timed, gridH: h - gridTop)
+            let hourH = (h - gridTop) / CGFloat(window.count)
+
+            ZStack(alignment: .topLeading) {
+                // 1. Day header.
+                Rectangle().fill(Color.white.opacity(0.04)).frame(width: w, height: headerH)
+                ForEach(0..<days.count, id: \.self) { col in
+                    header(day: days[col], isToday: col == todayCol)
+                        .frame(width: colW, height: headerH)
+                        .offset(x: axisW + CGFloat(col) * colW)
+                }
+                line(width: w, height: 1).offset(y: headerH)
+
+                // 2. All-day strip: up to two pills per day, then "+N".
+                if allDayRows > 0 {
+                    ForEach(Array(allDay.keys), id: \.self) { col in
+                        let dayItems = allDay[col] ?? []
+                        let shown = dayItems.count > allDayRows ? allDayRows - 1 : allDayRows
+                        ForEach(0..<allDayRows, id: \.self) { row in
+                            Group {
+                                if row < shown, row < dayItems.count {
+                                    allDayPill(dayItems[row])
+                                } else if row == allDayRows - 1, dayItems.count > allDayRows {
+                                    Text("+\(dayItems.count - shown)")
+                                        .font(.system(size: 7.5, weight: .medium))
+                                        .foregroundStyle(Theme.secondaryText)
+                                        .frame(maxWidth: .infinity)
+                                }
+                            }
+                            .frame(width: colW - 3, height: allDayRowH - 2)
+                            .offset(x: axisW + CGFloat(col) * colW + 1.5, y: headerH + 2 + CGFloat(row) * allDayRowH)
+                        }
+                    }
+                    line(width: w, height: 1).offset(y: gridTop)
+                }
+
+                // 3. Hour lines and labels.
+                ForEach(Array(window.enumerated()), id: \.offset) { i, hour in
+                    let y = gridTop + CGFloat(i) * hourH
+                    if i > 0 { line(width: w - axisW, height: 1).offset(x: axisW, y: y) }
+                    Text(hourLabel(hour))
+                        .font(.system(size: 8, weight: .medium))
+                        .foregroundStyle(Theme.secondaryText)
+                        .minimumScaleFactor(0.6)
+                        .lineLimit(1)
+                        .frame(width: axisW - 2)
+                        .offset(y: y + 2)
+                }
+                ForEach(0..<7, id: \.self) { col in
+                    line(width: 1, height: h - gridTop).offset(x: axisW + CGFloat(col) * colW, y: gridTop)
+                }
+                if let todayCol {
+                    Rectangle().fill(Theme.accent.opacity(0.05))
+                        .frame(width: colW, height: h - gridTop)
+                        .offset(x: axisW + CGFloat(todayCol) * colW, y: gridTop)
+                }
+
+                // 4. Blocks, with dots for items above/below the hour window.
+                let windowStart = (window.first ?? 0) * 60
+                let windowEnd = ((window.last ?? 23) + 1) * 60
+                ForEach(Array(Dictionary(grouping: timed, by: \.day)), id: \.key) { col, dayItems in
+                    let lanes = Self.layoutLanes(dayItems)
+                    let left = axisW + CGFloat(col) * colW
+                    ForEach(Array(dayItems.enumerated()), id: \.offset) { index, item in
+                        if item.endMin > windowStart, item.startMin < windowEnd {
+                            let lane = lanes[index]
+                            let laneW = (colW - 3) / CGFloat(lane.count)
+                            let blockW = laneW - (lane.count > 1 ? 1.5 : 0)
+                            let top = max(item.startMin, windowStart)
+                            let bottom = min(item.endMin, windowEnd)
+                            let y = gridTop + CGFloat(top - windowStart) / 60 * hourH + 1
+                            let blockH = max(CGFloat(bottom - top) / 60 * hourH - 2, 10)
+                            Link(destination: item.item.link) {
+                                block(item, height: blockH)
+                            }
+                            .frame(width: blockW, height: blockH)
+                            .offset(x: left + 1.5 + CGFloat(lane.index) * laneW, y: y)
+                        }
+                    }
+                    if dayItems.contains(where: { $0.endMin <= windowStart }) {
+                        Circle().fill(Theme.secondaryText).frame(width: 3, height: 3)
+                            .offset(x: left + colW / 2 - 1.5, y: gridTop + 2)
+                    }
+                    if dayItems.contains(where: { $0.startMin >= windowEnd }) {
+                        Circle().fill(Theme.secondaryText).frame(width: 3, height: 3)
+                            .offset(x: left + colW / 2 - 1.5, y: h - 5)
+                    }
+                }
+            }
+            .frame(width: w, height: h, alignment: .topLeading)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .overlay(RoundedRectangle(cornerRadius: 12).stroke(gridLine, lineWidth: 1))
+        }
+    }
+
+    private func line(width: CGFloat, height: CGFloat) -> some View {
+        Rectangle().fill(gridLine).frame(width: width, height: height)
+    }
+
+    private func header(day: Date, isToday: Bool) -> some View {
+        ZStack(alignment: .bottom) {
+            if isToday { Theme.accent.opacity(0.08) }
+            VStack(spacing: 2) {
+                Text(day.formatted(.dateTime.weekday(.abbreviated)).uppercased())
+                    .font(.system(size: 9, weight: .bold))
+                    .foregroundStyle(isToday ? Theme.accent : Theme.secondaryText)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.6)
+                Text(day.formatted(.dateTime.day()))
+                    .font(.system(size: 11, weight: isToday ? .bold : .regular))
+                    .foregroundStyle(Theme.primaryText)
+                    .padding(.horizontal, 5)
+                    .background(Capsule().fill(isToday ? Theme.accent : .clear))
+            }
+            .frame(maxHeight: .infinity)
+            if isToday { Theme.accent.frame(height: 2.5) }
+        }
+    }
+
+    private func allDayPill(_ item: WeekItem) -> some View {
+        Text(item.item.title ?? "")
+            .font(.system(size: 7.5, weight: .medium))
+            .lineLimit(1)
+            .padding(.horizontal, 2)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+            .background(RoundedRectangle(cornerRadius: 4).fill(item.color.opacity(0.35)))
+            .foregroundStyle(Theme.primaryText)
+    }
+
+    private func block(_ item: WeekItem, height: CGFloat) -> some View {
+        HStack(spacing: 0) {
+            item.color.frame(width: 3)
+            VStack(alignment: .leading, spacing: 1) {
+                HStack(alignment: .top, spacing: 2) {
+                    if item.item.type == "task" {
+                        Circle().stroke(item.color, lineWidth: 1.1).frame(width: 5, height: 5).padding(.top, 2)
+                    }
+                    Text(item.item.title ?? "")
+                        .font(.system(size: 8, weight: .bold))
+                        .foregroundStyle(Theme.primaryText)
+                        .lineLimit(max(1, Int((height - 4) / 10)))
+                }
+                if height >= 34 {
+                    Text(timeLabel(item.startMin))
+                        .font(.system(size: 7, weight: .medium))
+                        .foregroundStyle(item.color)
+                        .lineLimit(1)
+                }
+                Spacer(minLength: 0)
+            }
+            .padding(.leading, 2)
+            .padding(.top, 2)
+            Spacer(minLength: 0)
+        }
+        .background(item.color.opacity(0.3))
+        .clipShape(RoundedRectangle(cornerRadius: 5))
+        .overlay(RoundedRectangle(cornerRadius: 5).stroke(item.color.opacity(0.35), lineWidth: 0.8))
+    }
+
+    /// 8:00-20:00 by default, widened to fit the week's items, then narrowed to
+    /// the hours that stay readable, anchored at the current hour this week.
+    private func hourWindow(timed: [WeekItem], gridH: CGFloat) -> [Int] {
+        var startHour = 8
+        var endHour = 20
+        for item in timed {
+            startHour = min(startHour, item.startMin / 60)
+            endHour = max(endHour, Int((Double(item.endMin) / 60).rounded(.up)))
+        }
+        endHour = min(endHour, 24)
+        let total = endHour - startHour
+        let visible = min(total, max(4, Int(gridH / minHourH)))
+        var windowStart = startHour
+        if visible < total {
+            let anchor = isCurrentWeek
+                ? Calendar.current.component(.hour, from: Date()) - 1
+                : (timed.map { $0.startMin / 60 }.min() ?? startHour)
+            windowStart = min(max(anchor, startHour), endHour - visible)
+        }
+        return Array(windowStart..<(windowStart + visible))
+    }
+
+    private func hourLabel(_ hour: Int) -> String {
+        let date = Calendar.current.date(bySettingHour: hour, minute: 0, second: 0, of: Date()) ?? Date()
+        return date.formatted(.dateTime.hour())
+    }
+
+    private func timeLabel(_ minutes: Int) -> String {
+        let date = Calendar.current.date(bySettingHour: minutes / 60, minute: minutes % 60, second: 0, of: Date()) ?? Date()
+        return date.formatted(date: .omitted, time: .shortened)
+    }
+
+    /// Side-by-side lanes for overlapping items, same rule as the Schedule grid.
+    private static func layoutLanes(_ items: [WeekItem]) -> [(index: Int, count: Int)] {
+        let order = items.indices.sorted { items[$0].startMin < items[$1].startMin }
+        var result = Array(repeating: (index: 0, count: 1), count: items.count)
+        var cluster: [(item: Int, lane: Int)] = []
+        var laneEnds: [Int] = []
+        var clusterEnd = -1
+        func close() {
+            for entry in cluster { result[entry.item] = (entry.lane, laneEnds.count) }
+            cluster = []
+            laneEnds = []
+        }
+        for i in order {
+            let item = items[i]
+            if item.startMin >= clusterEnd { close() }
+            var lane = laneEnds.firstIndex(where: { $0 <= item.startMin }) ?? -1
+            if lane < 0 {
+                lane = laneEnds.count
+                laneEnds.append(item.endMin)
+            } else {
+                laneEnds[lane] = item.endMin
+            }
+            cluster.append((i, lane))
+            clusterEnd = max(clusterEnd, item.endMin)
+        }
+        close()
+        return result
     }
 }
 
@@ -222,7 +499,7 @@ struct WeekViewWidget: Widget {
             WeekViewWidgetView(date: entry.date)
         }
         .configurationDisplayName("Week View")
-        .description("Your week at a glance. Page between weeks.")
+        .description("Your week as a timetable. Page between weeks.")
         .supportedFamilies([.systemMedium, .systemLarge, .systemExtraLarge])
     }
 }
