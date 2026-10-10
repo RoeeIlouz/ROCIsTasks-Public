@@ -25,6 +25,17 @@ import UserNotifications
       switch call.method {
       case "appGroupId":
         result(Bundle.main.bundleIdentifier.map { "group.\($0)" })
+      case "setBadgeCount":
+        // The iOS stand-in for Android's ongoing task counter notification.
+        let count = (call.arguments as? Int) ?? 0
+        if #available(iOS 16.0, *) {
+          UNUserNotificationCenter.current().setBadgeCount(count) { error in
+            result(error == nil)
+          }
+        } else {
+          UIApplication.shared.applicationIconBadgeNumber = count
+          result(true)
+        }
       default:
         result(FlutterMethodNotImplemented)
       }

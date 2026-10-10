@@ -3,7 +3,7 @@ import WidgetKit
 
 // MARK: - Task list (pending_tasks_list)
 
-private struct WidgetTask: Decodable, Identifiable {
+struct WidgetTask: Decodable, Identifiable {
     let id: String
     let title: String
     let priority: String?
@@ -78,11 +78,14 @@ struct TaskWidgetView: View {
 struct TaskWidget: Widget {
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: "TaskWidget", provider: SimpleProvider()) { _ in
-            TaskWidgetView()
+            TaskWidgetEntryView()
         }
         .configurationDisplayName("Tasks")
         .description("Your pending tasks.")
-        .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
+        .supportedFamilies([
+            .systemSmall, .systemMedium, .systemLarge,
+            .accessoryCircular, .accessoryRectangular, .accessoryInline,
+        ])
     }
 }
 
@@ -150,11 +153,11 @@ struct UpNextWidgetView: View {
 struct UpNextWidget: Widget {
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: "UpNextWidget", provider: SimpleProvider(refresh: 15 * 60)) { _ in
-            UpNextWidgetView()
+            UpNextWidgetEntryView()
         }
         .configurationDisplayName("Up Next")
         .description("Your next task, event or class.")
-        .supportedFamilies([.systemSmall, .systemMedium])
+        .supportedFamilies([.systemSmall, .systemMedium, .accessoryRectangular, .accessoryInline])
     }
 }
 
@@ -205,5 +208,120 @@ struct QuickActionWidget: Widget {
         .configurationDisplayName("Quick Actions")
         .description("Today's progress with quick add.")
         .supportedFamilies([.systemSmall])
+    }
+}
+
+// MARK: - Lock Screen (accessory families of Tasks and Up Next)
+
+/// Lock Screen sizes share the Tasks / Up Next kinds, so the app's existing
+/// HomeWidget.updateWidget calls refresh them too.
+private extension WidgetFamily {
+    var isAccessory: Bool {
+        self == .accessoryCircular || self == .accessoryRectangular || self == .accessoryInline
+    }
+}
+
+private extension View {
+    /// Lock Screen widgets draw on the system's tinted background.
+    func lockScreenBackground() -> some View {
+        containerBackground(for: .widget) { Color.clear }
+            .environment(\.locale, L10n.locale)
+            .environment(\.layoutDirection, L10n.isRTL ? .rightToLeft : .leftToRight)
+    }
+}
+
+struct TaskWidgetEntryView: View {
+    @Environment(\.widgetFamily) private var family
+
+    var body: some View {
+        if family.isAccessory {
+            TaskLockScreenView()
+        } else {
+            TaskWidgetView()
+        }
+    }
+}
+
+struct TaskLockScreenView: View {
+    @Environment(\.widgetFamily) private var family
+
+    var body: some View {
+        let tasks = (WidgetStore.json("pending_tasks_list", as: [WidgetTask].self) ?? [])
+            .filter { $0.isCompleted != true }
+        Group {
+            switch family {
+            case .accessoryCircular:
+                ZStack {
+                    AccessoryWidgetBackground()
+                    VStack(spacing: 0) {
+                        Image(systemName: "checklist").font(.caption2)
+                        Text("\(tasks.count)").font(.title3.bold()).minimumScaleFactor(0.6)
+                    }
+                }
+            case .accessoryInline:
+                Label("\(tasks.count) \(L10n.pendingTasks)", systemImage: "checklist")
+            default:
+                VStack(alignment: .leading, spacing: 1) {
+                    Text("\(tasks.count) \(L10n.pendingTasks)").font(.headline).lineLimit(1)
+                    if tasks.isEmpty {
+                        Text(L10n.allTasksCompleted).font(.caption).lineLimit(1)
+                    } else {
+                        ForEach(tasks.prefix(2)) { task in
+                            Text("• \(task.title)").font(.caption).lineLimit(1)
+                        }
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+        }
+        .widgetURL(WidgetLink.url("tasks"))
+        .lockScreenBackground()
+    }
+}
+
+struct UpNextWidgetEntryView: View {
+    @Environment(\.widgetFamily) private var family
+
+    var body: some View {
+        if family.isAccessory {
+            UpNextLockScreenView()
+        } else {
+            UpNextWidgetView()
+        }
+    }
+}
+
+struct UpNextLockScreenView: View {
+    @Environment(\.widgetFamily) private var family
+
+    var body: some View {
+        let type = WidgetStore.string("up_next_type") ?? "none"
+        let title = WidgetStore.string("up_next_title") ?? L10n.allTasksCompleted
+        let startMillis = WidgetStore.int("up_next_start_millis") ?? -1
+        let start = startMillis > 0 ? Date(timeIntervalSince1970: Double(startMillis) / 1000) : nil
+        let id = WidgetStore.string("up_next_id") ?? ""
+
+        Group {
+            if family == .accessoryInline {
+                if let start, start > Date() {
+                    Text("\(title) · \(start, style: .relative)")
+                } else {
+                    Text(title)
+                }
+            } else {
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(L10n.upNext).font(.caption2).lineLimit(1)
+                    Text(title).font(.headline).lineLimit(2)
+                    if let start, start > Date() {
+                        Text(start, style: .relative).font(.caption).lineLimit(1)
+                    } else if let start {
+                        Text(start, style: .time).font(.caption).lineLimit(1)
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+        }
+        .widgetURL(type == "task" && !id.isEmpty ? WidgetLink.task(id) : WidgetLink.calendar())
+        .lockScreenBackground()
     }
 }

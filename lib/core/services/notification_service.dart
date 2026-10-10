@@ -1,5 +1,6 @@
 import 'package:flutter/services.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart'
+    show kIsWeb, defaultTargetPlatform, TargetPlatform;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest_all.dart' as tz;
@@ -33,6 +34,8 @@ class NotificationService {
       FlutterLocalNotificationsPlugin();
 
   static const _platform = MethodChannel('com.rocisapps.tasks/notifications');
+  // iOS-only native helpers (AppDelegate): widget App Group, app badge.
+  static const _iosChannel = MethodChannel('com.rocisapps.tasks/widgets');
 
   final _actionController = StreamController<String>.broadcast();
   Stream<String> get onAction => _actionController.stream;
@@ -253,6 +256,17 @@ class NotificationService {
     String? addTaskLabel,
   }) async {
     if (kIsWeb) return;
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      // iOS has no ongoing notifications; the app icon badge carries the count.
+      try {
+        await _iosChannel
+            .invokeMethod('setBadgeCount', count)
+            .timeout(const Duration(seconds: 2));
+      } catch (e) {
+        AppLogger.warning('Error setting app badge: $e', tag: 'Notifications');
+      }
+      return;
+    }
     try {
       await _platform.invokeMethod('updateTaskCountIcon', {
         'count': count,
