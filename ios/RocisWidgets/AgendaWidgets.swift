@@ -515,14 +515,14 @@ struct WeekViewWidget: Widget {
 // MARK: - Month grids (month_agenda_*, full_calendar_*)
 
 private struct GridDay: Decodable {
-    let isWeekNumber: Bool?
-    let weekNumber: Int?
-    let date: String?
-    let day: Int?
-    let isCurrentMonth: Bool?
-    let isToday: Bool?
-    let hasEvents: Bool?
-    let summaries: [Summary]?
+    var isWeekNumber: Bool? = nil
+    var weekNumber: Int? = nil
+    var date: String? = nil
+    var day: Int? = nil
+    var isCurrentMonth: Bool? = nil
+    var isToday: Bool? = nil
+    var hasEvents: Bool? = nil
+    var summaries: [Summary]? = nil
 
     struct Summary: Decodable {
         let text: String?
@@ -669,20 +669,58 @@ struct MonthAgendaWidget: Widget {
 
 // MARK: - Full calendar
 
+/// The widget builds its own month grid from full_calendar_events_by_date,
+/// which the app fills for 6 months before to 12 months after the current
+/// month. That lets it page months without the app, and Calendar's day math
+/// keeps dates right across DST changes.
+private enum MonthPaging {
+    static let key = "ios_full_calendar_offset"
+    static let range = -6...12
+
+    static var offset: Int {
+        min(max(WidgetStore.int(key) ?? 0, range.lowerBound), range.upperBound)
+    }
+}
+
 struct FullCalendarWidgetView: View {
+    let date: Date
+
     var body: some View {
-        let grid = WidgetStore.json("full_calendar_grid_data", as: [GridDay].self) ?? []
+        let offset = MonthPaging.offset
+        let calendar = monthCalendar
+        let thisMonth = calendar.dateInterval(of: .month, for: date)?.start ?? date
+        let month = calendar.date(byAdding: .month, value: offset, to: thisMonth) ?? thisMonth
+
         VStack(alignment: .leading, spacing: 4) {
-            HStack {
-                Text(WidgetStore.string("full_calendar_month_name") ?? "")
+            HStack(spacing: 8) {
+                Text(month.formatted(.dateTime.month(.wide).year().locale(L10n.locale)))
                     .font(.headline).foregroundStyle(Theme.primaryText)
-                Spacer()
+                    .lineLimit(1)
+                Spacer(minLength: 0)
+                Group {
+                    if offset != 0 {
+                        Button(intent: PageIntent(key: MonthPaging.key, value: 0)) {
+                            Image(systemName: "calendar.badge.clock")
+                        }
+                    }
+                    Button(intent: PageIntent(key: MonthPaging.key, value: offset - 1)) {
+                        Image(systemName: "chevron.backward")
+                    }
+                    .disabled(offset <= MonthPaging.range.lowerBound)
+                    Button(intent: PageIntent(key: MonthPaging.key, value: offset + 1)) {
+                        Image(systemName: "chevron.forward")
+                    }
+                    .disabled(offset >= MonthPaging.range.upperBound)
+                }
+                .font(.subheadline.bold())
+                .buttonStyle(.plain)
+                .foregroundStyle(Theme.accent)
                 Link(destination: WidgetLink.addTask) {
                     Image(systemName: "plus.circle.fill").foregroundStyle(Theme.accent)
                 }
             }
             MonthGrid(
-                entries: grid,
+                entries: grid(for: month, calendar: calendar),
                 showSummaries: true,
                 // The app's "Show week numbers" widget setting.
                 showWeekNumbers: WidgetStore.bool("full_calendar_show_week_numbers", default: false)
@@ -691,12 +729,44 @@ struct FullCalendarWidgetView: View {
         .widgetURL(WidgetLink.calendar())
         .rocisBackground()
     }
+
+    /// Six weeks from the start of the week containing the 1st, in the same
+    /// shape as the app's full_calendar_grid_data (a week number, then 7 days).
+    private func grid(for month: Date, calendar: Calendar) -> [GridDay] {
+        let byDate = WidgetStore.json("full_calendar_events_by_date", as: [String: [GridDay.Summary]].self) ?? [:]
+        let first = calendar.dateInterval(of: .weekOfYear, for: month)?.start ?? month
+        let iso = Calendar(identifier: .iso8601)
+        var entries: [GridDay] = []
+        for row in 0..<6 {
+            guard let rowStart = calendar.date(byAdding: .day, value: row * 7, to: first) else { continue }
+            entries.append(GridDay(isWeekNumber: true, weekNumber: iso.component(.weekOfYear, from: rowStart)))
+            for col in 0..<7 {
+                guard let day = calendar.date(byAdding: .day, value: row * 7 + col, to: first) else { continue }
+                let key = DayKey.of(day)
+                entries.append(GridDay(
+                    date: key,
+                    day: calendar.component(.day, from: day),
+                    isCurrentMonth: calendar.isDate(day, equalTo: month, toGranularity: .month),
+                    isToday: calendar.isDateInToday(day),
+                    summaries: byDate[key] ?? []
+                ))
+            }
+        }
+        return entries
+    }
+
+    /// Honors the app's start-of-week setting (Dart: 1 = Monday ... 7 = Sunday).
+    private var monthCalendar: Calendar {
+        var calendar = Calendar.current
+        calendar.firstWeekday = (WidgetStore.int("full_calendar_start_of_week") ?? 7) % 7 + 1
+        return calendar
+    }
 }
 
 struct FullCalendarWidget: Widget {
     var body: some WidgetConfiguration {
-        StaticConfiguration(kind: "FullCalendarWidget", provider: SimpleProvider()) { _ in
-            FullCalendarWidgetView()
+        StaticConfiguration(kind: "FullCalendarWidget", provider: SimpleProvider()) { entry in
+            FullCalendarWidgetView(date: entry.date)
         }
         .configurationDisplayName("Full Calendar")
         .description("The whole month with your tasks, events and classes.")
