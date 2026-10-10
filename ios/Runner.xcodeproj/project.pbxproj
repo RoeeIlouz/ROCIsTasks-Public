@@ -21,6 +21,7 @@
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
 		DE144DDD9F7C926E84E1E859 /* TaskWidgets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A4B158F657CBCD1D2C2BE82 /* TaskWidgets.swift */; };
 		E2C3E55DD4C617D097B891DA /* RocisWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 5ED94CA426AEDBB817A7BE7D /* RocisWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		E8127717D223AFD5D1BC9539 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0F9DFA81370A01CDBA0851BE /* GoogleService-Info.plist */; };
 		F271F726A3A136AC3128FB8D /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BDBEC626E78EB21451634AFF /* SwiftUI.framework */; };
 /* End PBXBuildFile section */
 
@@ -67,6 +68,7 @@
 
 /* Begin PBXFileReference section */
 		01A856F59D2A499F41C79270 /* AgendaWidgets.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AgendaWidgets.swift; sourceTree = "<group>"; };
+		0F9DFA81370A01CDBA0851BE /* GoogleService-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GeneratedPluginRegistrant.h; sourceTree = "<group>"; };
 		1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeneratedPluginRegistrant.m; sourceTree = "<group>"; };
 		25FF6995E599E50B63E33B2E /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
@@ -176,6 +178,7 @@
 				74858FAE1ED2DC5600515810 /* AppDelegate.swift */,
 				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
 				B2C13E6A4E2CFADBF57F6963 /* Runner.entitlements */,
+				0F9DFA81370A01CDBA0851BE /* GoogleService-Info.plist */,
 			);
 			path = Runner;
 			sourceTree = "<group>";
@@ -326,6 +329,7 @@
 				3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */,
 				97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */,
 				97C146FC1CF9000F007C117D /* Main.storyboard in Resources */,
+				E8127717D223AFD5D1BC9539 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

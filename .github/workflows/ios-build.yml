@@ -33,6 +33,8 @@ jobs:
           GOOGLE_SERVICES_JSON_BASE64: ${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}
           ENV_FILE_BASE64: ${{ secrets.ENV_FILE_BASE64 }}
           FIREBASE_OPTIONS_BASE64: ${{ secrets.FIREBASE_OPTIONS_BASE64 }}
+          # Real values: the .example template reads .env, which isn't bundled.
+          FIREBASE_SCHEDULE_OPTIONS_BASE64: ${{ secrets.FIREBASE_SCHEDULE_OPTIONS_BASE64 }}
         run: python3 scripts/setup_ci_configs.py
 
       - name: Setup iOS Firebase config

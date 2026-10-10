@@ -47,7 +47,7 @@ enum WidgetLink {
         components.host = host
         components.queryItems = query.map { URLQueryItem(name: $0.key, value: $0.value) }
             + [URLQueryItem(name: "homeWidget", value: nil)]
-        return components.url!
+        return components.url ?? URL(fileURLWithPath: "/")
     }
 
     static let addTask = url("add_task")
@@ -79,12 +79,14 @@ enum Theme {
 }
 
 extension Color {
-    /// Accepts "#RRGGBB" and the app's "#AARRGGBB".
-    init(hex: String, fallback: Color = Theme.accent) {
+    /// Accepts "#RRGGBB" and the app's "#AARRGGBB"; anything else is the
+    /// brand red. (No `Theme.accent` default argument: Theme.accent is built
+    /// with this initializer, and reading it while it initializes traps.)
+    init(hex: String) {
         var value = hex.trimmingCharacters(in: .whitespaces)
         if value.hasPrefix("#") { value.removeFirst() }
         guard let number = UInt64(value, radix: 16), value.count == 6 || value.count == 8 else {
-            self = fallback
+            self = Color(.sRGB, red: 0xE5 / 255, green: 0x32 / 255, blue: 0x3F / 255)
             return
         }
         let alpha = value.count == 8 ? Double((number >> 24) & 0xFF) / 255 : 1
