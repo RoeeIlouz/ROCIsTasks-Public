@@ -70,14 +70,14 @@ struct TimelineAgendaWidgetView: View {
         let rows = WidgetStore.json("timeline_agenda_data", as: [AgendaItem].self) ?? []
         VStack(alignment: .leading, spacing: 4) {
             HStack {
-                Text("Agenda").font(.headline).foregroundStyle(Theme.primaryText)
+                Text(L10n.agenda).font(.headline).foregroundStyle(Theme.primaryText)
                 Spacer()
                 Link(destination: WidgetLink.addTask) {
                     Image(systemName: "plus.circle.fill").foregroundStyle(Theme.accent)
                 }
             }
             if rows.isEmpty {
-                EmptyState(text: "Nothing scheduled")
+                EmptyState(text: L10n.noEventsOrTasks)
             } else {
                 PagedList(
                     items: rows,
@@ -210,7 +210,7 @@ struct WeekViewWidgetView: View {
         VStack(alignment: .leading, spacing: 6) {
             HStack(spacing: 8) {
                 VStack(alignment: .leading, spacing: 0) {
-                    Text(offset == 0 ? "This week" : weekStart.formatted(.dateTime.month(.wide).year()))
+                    Text(offset == 0 ? L10n.thisWeek : weekStart.formatted(.dateTime.month(.wide).year().locale(L10n.locale)))
                         .font(.headline)
                         .foregroundStyle(offset == 0 ? Theme.accent : Theme.primaryText)
                 }
@@ -221,11 +221,11 @@ struct WeekViewWidgetView: View {
                     }
                 }
                 Button(intent: PageIntent(key: WeekPaging.key, value: offset - 1)) {
-                    Image(systemName: "chevron.left")
+                    Image(systemName: "chevron.backward")
                 }
                 .disabled(offset <= WeekPaging.range.lowerBound)
                 Button(intent: PageIntent(key: WeekPaging.key, value: offset + 1)) {
-                    Image(systemName: "chevron.right")
+                    Image(systemName: "chevron.forward")
                 }
                 .disabled(offset >= WeekPaging.range.upperBound)
             }
@@ -265,6 +265,11 @@ private struct WeekTimetable: View {
             let w = geo.size.width
             let h = geo.size.height
             let colW = (w - axisW) / 7
+            // Positions are absolute offsets, so right-to-left languages mirror x
+            // by hand (day 1 on the right, axis on the right), like Android.
+            let rtl = L10n.isRTL
+            let mx = { (left: CGFloat, width: CGFloat) -> CGFloat in rtl ? w - left - width : left }
+            let textDirection: LayoutDirection = rtl ? .rightToLeft : .leftToRight
             let todayCol = isCurrentWeek ? days.firstIndex(where: { Calendar.current.isDateInToday($0) }) : nil
 
             let allDay = Dictionary(grouping: items.filter(\.allDay), by: \.day)
@@ -281,7 +286,7 @@ private struct WeekTimetable: View {
                 ForEach(0..<days.count, id: \.self) { col in
                     header(day: days[col], isToday: col == todayCol)
                         .frame(width: colW, height: headerH)
-                        .offset(x: axisW + CGFloat(col) * colW)
+                        .offset(x: mx(axisW + CGFloat(col) * colW, colW))
                 }
                 line(width: w, height: 1).offset(y: headerH)
 
@@ -302,7 +307,8 @@ private struct WeekTimetable: View {
                                 }
                             }
                             .frame(width: colW - 3, height: allDayRowH - 2)
-                            .offset(x: axisW + CGFloat(col) * colW + 1.5, y: headerH + 2 + CGFloat(row) * allDayRowH)
+                            .environment(\.layoutDirection, textDirection)
+                            .offset(x: mx(axisW + CGFloat(col) * colW + 1.5, colW - 3), y: headerH + 2 + CGFloat(row) * allDayRowH)
                         }
                     }
                     line(width: w, height: 1).offset(y: gridTop)
@@ -311,22 +317,22 @@ private struct WeekTimetable: View {
                 // 3. Hour lines and labels.
                 ForEach(Array(window.enumerated()), id: \.offset) { i, hour in
                     let y = gridTop + CGFloat(i) * hourH
-                    if i > 0 { line(width: w - axisW, height: 1).offset(x: axisW, y: y) }
+                    if i > 0 { line(width: w - axisW, height: 1).offset(x: mx(axisW, w - axisW), y: y) }
                     Text(hourLabel(hour))
                         .font(.system(size: 8, weight: .medium))
                         .foregroundStyle(Theme.secondaryText)
                         .minimumScaleFactor(0.6)
                         .lineLimit(1)
                         .frame(width: axisW - 2)
-                        .offset(y: y + 2)
+                        .offset(x: mx(0, axisW - 2), y: y + 2)
                 }
                 ForEach(0..<7, id: \.self) { col in
-                    line(width: 1, height: h - gridTop).offset(x: axisW + CGFloat(col) * colW, y: gridTop)
+                    line(width: 1, height: h - gridTop).offset(x: mx(axisW + CGFloat(col) * colW, 1), y: gridTop)
                 }
                 if let todayCol {
                     Rectangle().fill(Theme.accent.opacity(0.05))
                         .frame(width: colW, height: h - gridTop)
-                        .offset(x: axisW + CGFloat(todayCol) * colW, y: gridTop)
+                        .offset(x: mx(axisW + CGFloat(todayCol) * colW, colW), y: gridTop)
                 }
 
                 // 4. Blocks, with dots for items above/below the hour window.
@@ -348,20 +354,22 @@ private struct WeekTimetable: View {
                                 block(item, height: blockH)
                             }
                             .frame(width: blockW, height: blockH)
-                            .offset(x: left + 1.5 + CGFloat(lane.index) * laneW, y: y)
+                            .environment(\.layoutDirection, textDirection)
+                            .offset(x: mx(left + 1.5 + CGFloat(lane.index) * laneW, blockW), y: y)
                         }
                     }
                     if dayItems.contains(where: { $0.endMin <= windowStart }) {
                         Circle().fill(Theme.secondaryText).frame(width: 3, height: 3)
-                            .offset(x: left + colW / 2 - 1.5, y: gridTop + 2)
+                            .offset(x: mx(left + colW / 2 - 1.5, 3), y: gridTop + 2)
                     }
                     if dayItems.contains(where: { $0.startMin >= windowEnd }) {
                         Circle().fill(Theme.secondaryText).frame(width: 3, height: 3)
-                            .offset(x: left + colW / 2 - 1.5, y: h - 5)
+                            .offset(x: mx(left + colW / 2 - 1.5, 3), y: h - 5)
                     }
                 }
             }
             .frame(width: w, height: h, alignment: .topLeading)
+            .environment(\.layoutDirection, .leftToRight)
             .clipShape(RoundedRectangle(cornerRadius: 12))
             .overlay(RoundedRectangle(cornerRadius: 12).stroke(gridLine, lineWidth: 1))
         }
@@ -375,12 +383,12 @@ private struct WeekTimetable: View {
         ZStack(alignment: .bottom) {
             if isToday { Theme.accent.opacity(0.08) }
             VStack(spacing: 2) {
-                Text(day.formatted(.dateTime.weekday(.abbreviated)).uppercased())
+                Text(day.formatted(.dateTime.weekday(.abbreviated).locale(L10n.locale)).uppercased(with: L10n.locale))
                     .font(.system(size: 9, weight: .bold))
                     .foregroundStyle(isToday ? Theme.accent : Theme.secondaryText)
                     .lineLimit(1)
                     .minimumScaleFactor(0.6)
-                Text(day.formatted(.dateTime.day()))
+                Text(day.formatted(.dateTime.day().locale(L10n.locale)))
                     .font(.system(size: 11, weight: isToday ? .bold : .regular))
                     .foregroundStyle(Theme.primaryText)
                     .padding(.horizontal, 5)
@@ -455,12 +463,12 @@ private struct WeekTimetable: View {
 
     private func hourLabel(_ hour: Int) -> String {
         let date = Calendar.current.date(bySettingHour: hour, minute: 0, second: 0, of: Date()) ?? Date()
-        return date.formatted(.dateTime.hour())
+        return date.formatted(.dateTime.hour().locale(L10n.locale))
     }
 
     private func timeLabel(_ minutes: Int) -> String {
         let date = Calendar.current.date(bySettingHour: minutes / 60, minute: minutes % 60, second: 0, of: Date()) ?? Date()
-        return date.formatted(date: .omitted, time: .shortened)
+        return date.formatted(Date.FormatStyle(date: .omitted, time: .shortened, locale: L10n.locale))
     }
 
     /// Side-by-side lanes for overlapping items, same rule as the Schedule grid.
@@ -612,9 +620,9 @@ struct MonthAgendaWidgetView: View {
                 MonthGrid(entries: grid, showSummaries: false)
             }
             VStack(alignment: .leading, spacing: 4) {
-                Text("Today").font(.caption.bold()).foregroundStyle(Theme.accent)
+                Text(L10n.today).font(.caption.bold()).foregroundStyle(Theme.accent)
                 if agenda.isEmpty {
-                    EmptyState(text: "Nothing today")
+                    EmptyState(text: L10n.nothingToday)
                 } else {
                     PagedList(items: agenda, pageKey: "ios_page_month_agenda", height: { _ in 30 }) { item in
                         Link(destination: item.link) { AgendaRow(item: item) }
@@ -698,11 +706,11 @@ struct KanbanWidgetView: View {
     var body: some View {
         let data = WidgetStore.json("kanban_data", as: KanbanData.self)
         VStack(alignment: .leading, spacing: 6) {
-            Text("Board").font(.headline).foregroundStyle(Theme.primaryText)
+            Text(L10n.board).font(.headline).foregroundStyle(Theme.primaryText)
             HStack(alignment: .top, spacing: 6) {
-                column("In focus", data?.column_infocus ?? [], Theme.accent)
-                column("To do", data?.column_todo ?? [], Color(hex: "#3B82F6"))
-                column("Done", data?.column_done ?? [], Theme.done)
+                column(L10n.inFocus, data?.column_infocus ?? [], Theme.accent)
+                column(L10n.toDo, data?.column_todo ?? [], Color(hex: "#3B82F6"))
+                column(L10n.done, data?.column_done ?? [], Theme.done)
             }
         }
         .widgetURL(WidgetLink.kanban)

@@ -103,8 +103,11 @@ extension Color {
 
 extension View {
     /// Dark card background used by every ROCIs widget.
+    /// Also applies the app's language and its reading direction.
     func rocisBackground() -> some View {
         containerBackground(for: .widget) { Theme.background }
+            .environment(\.locale, L10n.locale)
+            .environment(\.layoutDirection, L10n.isRTL ? .rightToLeft : .leftToRight)
     }
 }
 
@@ -278,4 +281,44 @@ struct PagedList<Item, Row: View>: View {
         }
         return result
     }
+}
+
+// MARK: - Localization
+
+/// Widget labels in the app's language. Strings shared with Android are
+/// generated from WidgetLocaleHelper.kt so both platforms read the same.
+enum L10n {
+    /// "app_language" (or "language_code") from the app; "system" or none
+    /// means the device language. Same rule as WidgetLocaleHelper.getWidgetLocale.
+    static var locale: Locale {
+        let code = WidgetStore.string("app_language") ?? WidgetStore.string("language_code")
+        guard let code, !code.isEmpty, code != "system" else { return .current }
+        return Locale(identifier: code.replacingOccurrences(of: "_", with: "-"))
+    }
+
+    static var language: String {
+        let lang = locale.language.languageCode?.identifier ?? "en"
+        return lang == "iw" ? "he" : lang
+    }
+
+    static var isRTL: Bool { ["he", "ar"].contains(language) }
+
+    private static func pick(_ table: [String: String]) -> String {
+        table[language] ?? table["en"] ?? ""
+    }
+
+    static var today: String { pick(["en": "Today", "he": "היום", "es": "Hoy", "de": "Heute", "fr": "Aujourd'hui", "ar": "اليوم", "sv": "Idag", "hi": "आज"]) }
+    static var thisWeek: String { pick(["en": "This week", "he": "השבוע", "es": "Esta semana", "de": "Diese Woche", "fr": "Cette semaine", "ar": "هذا الأسبوع", "sv": "Denna vecka", "hi": "इस सप्ताह"]) }
+    static var pendingTasks: String { pick(["en": "Pending Tasks", "he": "משימות פתוחות", "es": "Tareas pendientes", "de": "Ausstehende Aufgaben", "fr": "Tâches en attente", "ar": "المهام المعلقة", "sv": "Väntande uppgifter", "hi": "लंबित कार्य"]) }
+    static var allTasksCompleted: String { pick(["en": "All tasks completed", "he": "כל המשימות הושלמו", "es": "Todas las tareas completadas", "de": "Alle Aufgaben erledigt", "fr": "Toutes les tâches terminées", "ar": "اكتملت جميع المهام", "sv": "Alla uppgifter slutförda", "hi": "सभी कार्य पूरे हो गए"]) }
+    static var noEventsOrTasks: String { pick(["en": "No events or tasks", "he": "אין אירועים או משימות", "es": "No hay eventos ni tareas", "de": "Keine Termine oder Aufgaben", "fr": "Aucun événement ou tâche", "ar": "لا توجد أحداث أو مهام", "sv": "Inga händelser eller uppgifter", "hi": "कोई घटना या कार्य नहीं"]) }
+    static var newTask: String { pick(["en": "New Task", "he": "משימה חדשה", "es": "Nueva Tarea", "de": "Neue Aufgabe", "fr": "Nouvelle tâche", "ar": "مهمة جديدة", "sv": "Ny uppgift", "hi": "नया कार्य"]) }
+    static var calendar: String { pick(["en": "Calendar", "he": "לוח שנה", "es": "Calendario", "de": "Kalender", "fr": "Calendrier", "ar": "التقويم", "sv": "Kalender", "hi": "कैलेंडर"]) }
+    static var inFocus: String { pick(["en": "In Focus", "he": "בפוקוס", "es": "En Foco", "de": "Im Fokus", "fr": "En Focus", "ar": "قيد التركيز", "sv": "I fokus", "hi": "फ़ोकस में"]) }
+    static var done: String { pick(["en": "Done", "he": "הושלם", "es": "Hecho", "de": "Erledigt", "fr": "Terminé", "ar": "مكتمل", "sv": "Klart", "hi": "पूर्ण"]) }
+    static var toDo: String { pick(["en": "To Do", "he": "לביצוע", "es": "Por Hacer", "de": "Zu Erledigen", "fr": "À Faire", "ar": "للقيام به", "sv": "Att göra", "hi": "करने के लिए"]) }
+    static var upNext: String { pick(["en": "Up next", "he": "הבא בתור", "es": "A continuación", "de": "Als Nächstes", "fr": "À suivre", "ar": "التالي", "sv": "Nästa", "hi": "आगे"]) }
+    static var agenda: String { pick(["en": "Agenda", "he": "סדר יום", "es": "Agenda", "de": "Agenda", "fr": "Agenda", "ar": "جدول الأعمال", "sv": "Agenda", "hi": "एजेंडा"]) }
+    static var board: String { pick(["en": "Board", "he": "לוח", "es": "Tablero", "de": "Board", "fr": "Tableau", "ar": "اللوحة", "sv": "Tavla", "hi": "बोर्ड"]) }
+    static var nothingToday: String { pick(["en": "Nothing today", "he": "אין כלום היום", "es": "Nada hoy", "de": "Heute nichts", "fr": "Rien aujourd'hui", "ar": "لا شيء اليوم", "sv": "Inget idag", "hi": "आज कुछ नहीं"]) }
 }

@@ -26,7 +26,7 @@ struct TaskWidgetView: View {
         let all = tasks
         VStack(alignment: .leading, spacing: 6) {
             HStack {
-                Text("Tasks").font(.headline).foregroundStyle(Theme.primaryText)
+                Text(L10n.pendingTasks).font(.headline).foregroundStyle(Theme.primaryText)
                 Spacer()
                 Text("\(all.count)")
                     .font(.caption.bold())
@@ -38,7 +38,7 @@ struct TaskWidgetView: View {
                 }
             }
             if all.isEmpty {
-                EmptyState(text: "All tasks completed")
+                EmptyState(text: L10n.allTasksCompleted)
             } else {
                 PagedList(items: all, pageKey: "ios_page_tasks", height: { _ in rowHeight }) { task in
                     Link(destination: WidgetLink.task(task.id)) { row(task) }
@@ -93,7 +93,7 @@ struct UpNextWidgetView: View {
 
     var body: some View {
         let type = WidgetStore.string("up_next_type") ?? "none"
-        let title = WidgetStore.string("up_next_title") ?? "All tasks completed"
+        let title = WidgetStore.string("up_next_title") ?? L10n.allTasksCompleted
         let subtitle = WidgetStore.string("up_next_subtitle") ?? ""
         let color = Color(hex: WidgetStore.string("up_next_color") ?? "#10B981")
         let startMillis = WidgetStore.int("up_next_start_millis") ?? -1
@@ -103,7 +103,7 @@ struct UpNextWidgetView: View {
         VStack(alignment: .leading, spacing: 6) {
             HStack(spacing: 6) {
                 Image(systemName: icon(for: type)).foregroundStyle(color)
-                Text("Up next").font(.caption.bold()).foregroundStyle(Theme.secondaryText)
+                Text(L10n.upNext).font(.caption.bold()).foregroundStyle(Theme.secondaryText)
                 Spacer(minLength: 0)
             }
             Text(title)
@@ -167,7 +167,7 @@ struct QuickActionWidgetView: View {
         let total = pending + completed
 
         VStack(alignment: .leading, spacing: 8) {
-            Text("Today").font(.caption.bold()).foregroundStyle(Theme.secondaryText)
+            Text(L10n.today).font(.caption.bold()).foregroundStyle(Theme.secondaryText)
             HStack(alignment: .firstTextBaseline, spacing: 4) {
                 Text("\(completed)").font(.largeTitle.bold()).foregroundStyle(Theme.primaryText)
                 Text("/ \(total)").font(.headline).foregroundStyle(Theme.secondaryText)
@@ -176,8 +176,8 @@ struct QuickActionWidgetView: View {
                 .tint(Theme.done)
             Spacer(minLength: 0)
             HStack(spacing: 8) {
-                Link(destination: WidgetLink.addTask) { action("plus", "Add") }
-                Link(destination: WidgetLink.calendar()) { action("calendar", "Plan") }
+                Link(destination: WidgetLink.addTask) { action("plus", L10n.newTask) }
+                Link(destination: WidgetLink.calendar()) { action("calendar", L10n.calendar) }
             }
         }
         .widgetURL(WidgetLink.addTask)
