@@ -4128,6 +4128,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Turn on Sync with Google Tasks for a task to mirror it into your Google Tasks list.'**
   String get guideGoogleTasksBody;
+
+  /// No description provided for @openInGoogleCalendar.
+  ///
+  /// In en, this message translates to:
+  /// **'Open in Google Calendar'**
+  String get openInGoogleCalendar;
+
+  /// No description provided for @openInMaps.
+  ///
+  /// In en, this message translates to:
+  /// **'Open in Maps'**
+  String get openInMaps;
+
+  /// No description provided for @copyLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy location'**
+  String get copyLocation;
+
+  /// No description provided for @locationCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Location copied to clipboard'**
+  String get locationCopied;
+
+  /// No description provided for @joinMeeting.
+  ///
+  /// In en, this message translates to:
+  /// **'Join Meeting'**
+  String get joinMeeting;
+
+  /// No description provided for @copyToTasks.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy to ROCIs Tasks'**
+  String get copyToTasks;
+
+  /// No description provided for @eventCopiedToTasks.
+  ///
+  /// In en, this message translates to:
+  /// **'Event copied to ROCIs Tasks'**
+  String get eventCopiedToTasks;
+
+  /// No description provided for @eventDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Event Details'**
+  String get eventDetails;
+
+  /// No description provided for @organizer.
+  ///
+  /// In en, this message translates to:
+  /// **'Organizer'**
+  String get organizer;
+
+  /// No description provided for @attendees.
+  ///
+  /// In en, this message translates to:
+  /// **'Attendees'**
+  String get attendees;
+
+  /// No description provided for @noDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'No description provided'**
+  String get noDescription;
 }
 
 class _AppLocalizationsDelegate

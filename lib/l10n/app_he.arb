@@ -734,5 +734,16 @@
   "guideSharingTitle": "שיתוף משימות",
   "guideSharingBody": "פתחו משימה ושתפו אותה כקישור או כקוד QR. הצד השני יראה תצוגה מקדימה ויוכל לייבא עותק משלו. כדי לסרוק קוד, הקישו על + ובחרו סריקת קוד QR.",
   "guidePrivacyBody": "סמנו קטגוריה כפרטית והגדירו קוד PIN בהגדרות. כל עוד היא נעולה, המשימות שלה מוסתרות מהרשימה, מהווידג'טים ומההתראות.",
-  "guideGoogleTasksBody": "הפעילו סנכרון עם Google Tasks במשימה כדי לשקף אותה לרשימת Google Tasks שלכם."
+  "guideGoogleTasksBody": "הפעילו סנכרון עם Google Tasks במשימה כדי לשקף אותה לרשימת Google Tasks שלכם.",
+  "openInGoogleCalendar": "פתח ב-Google Calendar",
+  "openInMaps": "פתח במפות",
+  "copyLocation": "העתק מיקום",
+  "locationCopied": "המיקום הועתק ללוח",
+  "joinMeeting": "הצטרף לפגישה",
+  "copyToTasks": "העתק ל-ROCIs Tasks",
+  "eventCopiedToTasks": "האירוע הועתק ל-ROCIs Tasks",
+  "eventDetails": "פרטי אירוע",
+  "organizer": "מארגן",
+  "attendees": "משתתפים",
+  "noDescription": "אין תיאור"
 }

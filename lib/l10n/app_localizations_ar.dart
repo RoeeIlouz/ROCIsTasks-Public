@@ -2152,4 +2152,37 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get guideGoogleTasksBody =>
       'فعّل المزامنة مع Google Tasks لمهمة ما لنسخها إلى قائمة Google Tasks الخاصة بك.';
+
+  @override
+  String get openInGoogleCalendar => 'فتح في Google Calendar';
+
+  @override
+  String get openInMaps => 'فتح في الخرائط';
+
+  @override
+  String get copyLocation => 'نسخ الموقع';
+
+  @override
+  String get locationCopied => 'تم نسخ الموقع إلى الحافظة';
+
+  @override
+  String get joinMeeting => 'الانضمام إلى الاجتماع';
+
+  @override
+  String get copyToTasks => 'نسخ إلى مهام ROCIs';
+
+  @override
+  String get eventCopiedToTasks => 'تم نسخ الحدث إلى مهام ROCIs';
+
+  @override
+  String get eventDetails => 'تفاصيل الحدث';
+
+  @override
+  String get organizer => 'المنظم';
+
+  @override
+  String get attendees => 'الحاضرون';
+
+  @override
+  String get noDescription => 'لا يوجد وصف';
 }

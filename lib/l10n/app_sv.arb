@@ -735,5 +735,16 @@
   "guideSharingTitle": "Dela uppgifter",
   "guideSharingBody": "Öppna en uppgift och dela den som länk eller QR-kod. Mottagaren ser en förhandsvisning och kan importera en egen kopia. Tryck på + och välj Skanna QR-kod för att skanna en kod.",
   "guidePrivacyBody": "Markera en kategori som privat och ange en PIN-kod i Inställningar. Så länge den är låst döljs dess uppgifter i listan, widgetar och aviseringar.",
-  "guideGoogleTasksBody": "Slå på synk med Google Tasks för en uppgift för att spegla den till din Google Tasks-lista."
+  "guideGoogleTasksBody": "Slå på synk med Google Tasks för en uppgift för att spegla den till din Google Tasks-lista.",
+  "openInGoogleCalendar": "Öppna i Google Kalender",
+  "openInMaps": "Öppna i Kartor",
+  "copyLocation": "Kopiera plats",
+  "locationCopied": "Plats kopierad till urklipp",
+  "joinMeeting": "Gå med i möte",
+  "copyToTasks": "Kopiera till ROCIs Tasks",
+  "eventCopiedToTasks": "Händelse kopierad till ROCIs Tasks",
+  "eventDetails": "Händelseinformation",
+  "organizer": "Organisatör",
+  "attendees": "Deltagare",
+  "noDescription": "Ingen beskrivning angiven"
 }

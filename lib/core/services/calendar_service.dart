@@ -745,6 +745,27 @@ class CalendarService {
                 final id = item['id'] as String?;
                 final title = item['summary'] as String? ?? 'No Title';
                 final desc = item['description'] as String?;
+                final location = (item['location'] as String?)?.trim();
+                final htmlLink = item['htmlLink'] as String?;
+                final hangoutLink = item['hangoutLink'] as String?;
+                final urlStr = htmlLink ?? hangoutLink;
+                final parsedUrl = urlStr != null ? Uri.tryParse(urlStr) : null;
+
+                final rawAttendees = item['attendees'] as List<dynamic>?;
+                final attendees = rawAttendees?.map((att) {
+                  final m = att as Map<String, dynamic>;
+                  final email = m['email'] as String?;
+                  final displayName = m['displayName'] as String?;
+                  final name = displayName?.isNotEmpty == true
+                      ? displayName
+                      : (email?.isNotEmpty == true ? email!.split('@').first : null);
+                  return Attendee(
+                    name: name,
+                    emailAddress: email,
+                    isOrganiser: m['organizer'] == true,
+                    isCurrentUser: m['self'] == true,
+                  );
+                }).toList();
 
                 final startData = item['start'] as Map<String, dynamic>?;
                 final endData = item['end'] as Map<String, dynamic>?;
@@ -806,6 +827,9 @@ class CalendarService {
                     start: _toTZDateTime(startTime),
                     end: _toTZDateTime(endTime),
                     allDay: allDay,
+                    location: location,
+                    url: parsedUrl,
+                    attendees: attendees,
                   ),
                 );
               }
@@ -860,6 +884,8 @@ class CalendarService {
           'start': e.start?.toIso8601String(),
           'end': e.end?.toIso8601String(),
           'allDay': e.allDay,
+          'location': e.location,
+          'url': e.url?.toString(),
         };
       }).toList();
       await prefs.setString(_keyCachedEvents, jsonEncode(list));
@@ -908,6 +934,8 @@ class CalendarService {
             start: _toTZDateTime(start),
             end: _toTZDateTime(end),
             allDay: map['allDay'] == true,
+            location: map['location'] as String?,
+            url: map['url'] != null ? Uri.tryParse(map['url'] as String) : null,
           ),
         );
       }

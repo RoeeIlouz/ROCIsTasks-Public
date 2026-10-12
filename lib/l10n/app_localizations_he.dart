@@ -2151,4 +2151,37 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get guideGoogleTasksBody =>
       'הפעילו סנכרון עם Google Tasks במשימה כדי לשקף אותה לרשימת Google Tasks שלכם.';
+
+  @override
+  String get openInGoogleCalendar => 'פתח ב-Google Calendar';
+
+  @override
+  String get openInMaps => 'פתח במפות';
+
+  @override
+  String get copyLocation => 'העתק מיקום';
+
+  @override
+  String get locationCopied => 'המיקום הועתק ללוח';
+
+  @override
+  String get joinMeeting => 'הצטרף לפגישה';
+
+  @override
+  String get copyToTasks => 'העתק ל-ROCIs Tasks';
+
+  @override
+  String get eventCopiedToTasks => 'האירוע הועתק ל-ROCIs Tasks';
+
+  @override
+  String get eventDetails => 'פרטי אירוע';
+
+  @override
+  String get organizer => 'מארגן';
+
+  @override
+  String get attendees => 'משתתפים';
+
+  @override
+  String get noDescription => 'אין תיאור';
 }

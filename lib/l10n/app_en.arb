@@ -888,5 +888,16 @@
   "guideSharingTitle": "Share tasks",
   "guideSharingBody": "Open a task and share it as a link or a QR code. The other person sees a preview and can import their own copy. To scan a code, tap + and choose Scan QR code.",
   "guidePrivacyBody": "Mark a category as private and set a PIN in Settings. While locked, its tasks are hidden from the list, widgets and notifications.",
-  "guideGoogleTasksBody": "Turn on Sync with Google Tasks for a task to mirror it into your Google Tasks list."
+  "guideGoogleTasksBody": "Turn on Sync with Google Tasks for a task to mirror it into your Google Tasks list.",
+  "openInGoogleCalendar": "Open in Google Calendar",
+  "openInMaps": "Open in Maps",
+  "copyLocation": "Copy location",
+  "locationCopied": "Location copied to clipboard",
+  "joinMeeting": "Join Meeting",
+  "copyToTasks": "Copy to ROCIs Tasks",
+  "eventCopiedToTasks": "Event copied to ROCIs Tasks",
+  "eventDetails": "Event Details",
+  "organizer": "Organizer",
+  "attendees": "Attendees",
+  "noDescription": "No description provided"
 }

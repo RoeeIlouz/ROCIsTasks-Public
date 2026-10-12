@@ -2196,4 +2196,37 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get guideGoogleTasksBody =>
       'Aktiviere bei einer Aufgabe die Synchronisierung mit Google Tasks, um sie in deine Google-Tasks-Liste zu spiegeln.';
+
+  @override
+  String get openInGoogleCalendar => 'In Google Kalender öffnen';
+
+  @override
+  String get openInMaps => 'In Maps öffnen';
+
+  @override
+  String get copyLocation => 'Standort kopieren';
+
+  @override
+  String get locationCopied => 'Standort in die Zwischenablage kopiert';
+
+  @override
+  String get joinMeeting => 'An Besprechung teilnehmen';
+
+  @override
+  String get copyToTasks => 'In ROCIs Tasks kopieren';
+
+  @override
+  String get eventCopiedToTasks => 'Termin in ROCIs Tasks kopiert';
+
+  @override
+  String get eventDetails => 'Termindetails';
+
+  @override
+  String get organizer => 'Organisator';
+
+  @override
+  String get attendees => 'Teilnehmer';
+
+  @override
+  String get noDescription => 'Keine Beschreibung vorhanden';
 }

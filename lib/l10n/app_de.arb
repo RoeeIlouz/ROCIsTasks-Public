@@ -735,5 +735,16 @@
   "guideSharingTitle": "Aufgaben teilen",
   "guideSharingBody": "Öffne eine Aufgabe und teile sie als Link oder QR-Code. Die andere Person sieht eine Vorschau und kann eine eigene Kopie importieren. Zum Scannen tippe auf + und wähle QR-Code scannen.",
   "guidePrivacyBody": "Markiere eine Kategorie als privat und lege in den Einstellungen eine PIN fest. Solange sie gesperrt ist, sind ihre Aufgaben in Liste, Widgets und Benachrichtigungen verborgen.",
-  "guideGoogleTasksBody": "Aktiviere bei einer Aufgabe die Synchronisierung mit Google Tasks, um sie in deine Google-Tasks-Liste zu spiegeln."
+  "guideGoogleTasksBody": "Aktiviere bei einer Aufgabe die Synchronisierung mit Google Tasks, um sie in deine Google-Tasks-Liste zu spiegeln.",
+  "openInGoogleCalendar": "In Google Kalender öffnen",
+  "openInMaps": "In Maps öffnen",
+  "copyLocation": "Standort kopieren",
+  "locationCopied": "Standort in die Zwischenablage kopiert",
+  "joinMeeting": "An Besprechung teilnehmen",
+  "copyToTasks": "In ROCIs Tasks kopieren",
+  "eventCopiedToTasks": "Termin in ROCIs Tasks kopiert",
+  "eventDetails": "Termindetails",
+  "organizer": "Organisator",
+  "attendees": "Teilnehmer",
+  "noDescription": "Keine Beschreibung vorhanden"
 }

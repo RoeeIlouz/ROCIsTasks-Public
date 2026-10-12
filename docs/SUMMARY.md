@@ -2,6 +2,35 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## Google Calendar Event Full Details & Meeting Link Actions - 2026-10-12 (Patch 1 on 1.0.0+120)
+
+#### Problems & User Requirements
+* Google Calendar events on the daily calendar agenda displayed only basic title and time without rich details, unlike ROCIs Schedule classes which provide instructor, location, type, and detailed actions.
+* Users had no way to view event descriptions, locations, attendees, or join video meetings directly from the calendar tile.
+* Solution had to be 100% pure Dart/Flutter without native Android changes to ensure immediate distribution via Shorebird OTA patch.
+
+#### Solutions Applied
+* **Data Parsing & Caching (`calendar_service.dart`)**:
+  - Parsed `location`, `htmlLink`/`hangoutLink`, and `attendees` (mapped into `Attendee` objects) from Google Calendar v3 REST API responses.
+  - Cached `location` and `url` in local JSON storage (`_cacheEvents` / `_getCachedEvents`) for offline access and widget synchronization.
+* **Full Details Modal Sheet (`google_calendar_event_detail_sheet.dart`)**:
+  - Implemented `GlassContainer` bottom sheet adhering strictly to the ROCIs glassmorphism design system.
+  - Added `cleanHtmlDescription()` to strip HTML markup, convert common tags (`<br>`, `<p>`, `<li>`, `<a>`), decode HTML entities, and collapse extra whitespace.
+  - Added `_detectMeetingLink()` to automatically recognize and highlight video meeting links (Google Meet, Zoom, Microsoft Teams, Webex) with a prominent 1-tap "Join Meeting" action.
+  - Added location section with "Open in Maps" (via `google.com/maps/search`) and clipboard copy.
+  - Added attendee list with organizer badges and participant status chips.
+  - Added direct actions: "Open in Google Calendar" (native calendar intent / web URL fallback) and "Copy to ROCIs Tasks" (prefills title, notes, and due date in `TaskProvider`).
+* **Agenda Tile Integration (`calendar_screen.dart`)**:
+  - Added inline location icon (`Icons.location_on_outlined`) with location text on the daily agenda event tile.
+  - Tapping any Google Calendar event tile opens `GoogleCalendarEventDetailSheet`.
+* **Localization (`app_*.arb`)**:
+  - Added 11 localized strings across all 8 supported languages (`en`, `he`, `ar`, `es`, `de`, `fr`, `hi`, `sv`).
+* **Testing & Verification**:
+  - Added unit and widget tests in `test/features/calendar/presentation/google_calendar_event_detail_sheet_test.dart`.
+  - `flutter analyze`: 0 issues found.
+  - `flutter test`: All 26 calendar tests passed.
+  - 100% pure Dart/Flutter: Ready for immediate distribution via `shorebird patch --platforms=android`.
+
 ## Uniform Default Due Time - 2026-10-07 (Patch 2 on 1.0.0+118)
 
 #### Problems & Root Causes

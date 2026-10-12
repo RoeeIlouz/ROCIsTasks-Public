@@ -2174,4 +2174,37 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get guideGoogleTasksBody =>
       'किसी कार्य को अपनी Google Tasks सूची में दिखाने के लिए उस पर Google Tasks के साथ सिंक चालू करें।';
+
+  @override
+  String get openInGoogleCalendar => 'Google Calendar में खोलें';
+
+  @override
+  String get openInMaps => 'Maps में खोलें';
+
+  @override
+  String get copyLocation => 'स्थान कॉपी करें';
+
+  @override
+  String get locationCopied => 'स्थान क्लिपबोर्ड पर कॉपी किया गया';
+
+  @override
+  String get joinMeeting => 'मीटिंग में शामिल हों';
+
+  @override
+  String get copyToTasks => 'ROCIs Tasks में कॉपी करें';
+
+  @override
+  String get eventCopiedToTasks => 'इवेंट ROCIs Tasks में कॉपी किया गया';
+
+  @override
+  String get eventDetails => 'इवेंट विवरण';
+
+  @override
+  String get organizer => 'आयोजक';
+
+  @override
+  String get attendees => 'उपस्थित लोग';
+
+  @override
+  String get noDescription => 'कोई विवरण नहीं दिया गया';
 }

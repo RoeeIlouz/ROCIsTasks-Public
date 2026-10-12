@@ -2180,4 +2180,37 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get guideGoogleTasksBody =>
       'Slå på synk med Google Tasks för en uppgift för att spegla den till din Google Tasks-lista.';
+
+  @override
+  String get openInGoogleCalendar => 'Öppna i Google Kalender';
+
+  @override
+  String get openInMaps => 'Öppna i Kartor';
+
+  @override
+  String get copyLocation => 'Kopiera plats';
+
+  @override
+  String get locationCopied => 'Plats kopierad till urklipp';
+
+  @override
+  String get joinMeeting => 'Gå med i möte';
+
+  @override
+  String get copyToTasks => 'Kopiera till ROCIs Tasks';
+
+  @override
+  String get eventCopiedToTasks => 'Händelse kopierad till ROCIs Tasks';
+
+  @override
+  String get eventDetails => 'Händelseinformation';
+
+  @override
+  String get organizer => 'Organisatör';
+
+  @override
+  String get attendees => 'Deltagare';
+
+  @override
+  String get noDescription => 'Ingen beskrivning angiven';
 }

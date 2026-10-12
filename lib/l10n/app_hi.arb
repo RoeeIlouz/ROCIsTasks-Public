@@ -735,5 +735,16 @@
   "guideSharingTitle": "कार्य साझा करें",
   "guideSharingBody": "कोई कार्य खोलें और उसे लिंक या QR कोड के रूप में साझा करें। दूसरे व्यक्ति को पूर्वावलोकन दिखता है और वह अपनी कॉपी आयात कर सकता है। कोड स्कैन करने के लिए + पर टैप करें और QR कोड स्कैन करें चुनें।",
   "guidePrivacyBody": "किसी श्रेणी को निजी चिह्नित करें और सेटिंग्स में PIN सेट करें। लॉक रहने तक उसके कार्य सूची, विजेट और सूचनाओं से छिपे रहते हैं।",
-  "guideGoogleTasksBody": "किसी कार्य को अपनी Google Tasks सूची में दिखाने के लिए उस पर Google Tasks के साथ सिंक चालू करें।"
+  "guideGoogleTasksBody": "किसी कार्य को अपनी Google Tasks सूची में दिखाने के लिए उस पर Google Tasks के साथ सिंक चालू करें।",
+  "openInGoogleCalendar": "Google Calendar में खोलें",
+  "openInMaps": "Maps में खोलें",
+  "copyLocation": "स्थान कॉपी करें",
+  "locationCopied": "स्थान क्लिपबोर्ड पर कॉपी किया गया",
+  "joinMeeting": "मीटिंग में शामिल हों",
+  "copyToTasks": "ROCIs Tasks में कॉपी करें",
+  "eventCopiedToTasks": "इवेंट ROCIs Tasks में कॉपी किया गया",
+  "eventDetails": "इवेंट विवरण",
+  "organizer": "आयोजक",
+  "attendees": "उपस्थित लोग",
+  "noDescription": "कोई विवरण नहीं दिया गया"
 }

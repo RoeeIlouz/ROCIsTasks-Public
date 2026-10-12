@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0+120] - 2026-10-12 (Patch 1)
+
+### Added
+- Google Calendar event details: view full notes, location, attendees, join video meetings (Meet, Zoom, Teams, Webex), and copy events to tasks.
+
+## [1.0.0+120] - 2026-10-10 (Production)
+
+### Added
+- ROCIs Tasks 1.0 is available on the Google Play production track. Build 120 is promoted unchanged from internal testing; Play release notes in all store languages are in `docs/release-notes/1.0.0+120-production.txt`.
+
+### Changed
+- Since the 0.3.0 open beta: Week View home widget replaces Day Agenda, task sharing by QR code or link, red and charcoal theme matching the new app icon, + button menu, searchable App guide, and about 130 additional screens translated.
+
+### Fixed
+- Since the 0.3.0 open beta: tasks with a date but no time are consistently due at 10:00, the counter notification keeps its priority ring, mixed Hebrew and English text keeps its own direction, and the Week View widget can be added to the home screen.
+
 ## [1.0.0+120] - 2026-10-08
 
 ### Fixed

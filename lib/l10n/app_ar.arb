@@ -735,5 +735,16 @@
   "guideSharingTitle": "مشاركة المهام",
   "guideSharingBody": "افتح مهمة وشاركها كرابط أو رمز QR. يرى الطرف الآخر معاينة ويمكنه استيراد نسخته الخاصة. لمسح رمز، اضغط + واختر مسح رمز QR.",
   "guidePrivacyBody": "حدّد فئة كخاصة واضبط رمز PIN في الإعدادات. أثناء القفل تُخفى مهامها من القائمة والأدوات والإشعارات.",
-  "guideGoogleTasksBody": "فعّل المزامنة مع Google Tasks لمهمة ما لنسخها إلى قائمة Google Tasks الخاصة بك."
+  "guideGoogleTasksBody": "فعّل المزامنة مع Google Tasks لمهمة ما لنسخها إلى قائمة Google Tasks الخاصة بك.",
+  "openInGoogleCalendar": "فتح في Google Calendar",
+  "openInMaps": "فتح في الخرائط",
+  "copyLocation": "نسخ الموقع",
+  "locationCopied": "تم نسخ الموقع إلى الحافظة",
+  "joinMeeting": "الانضمام إلى الاجتماع",
+  "copyToTasks": "نسخ إلى مهام ROCIs",
+  "eventCopiedToTasks": "تم نسخ الحدث إلى مهام ROCIs",
+  "eventDetails": "تفاصيل الحدث",
+  "organizer": "المنظم",
+  "attendees": "الحاضرون",
+  "noDescription": "لا يوجد وصف"
 }

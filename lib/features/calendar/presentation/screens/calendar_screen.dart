@@ -18,6 +18,7 @@ import 'package:intl/intl.dart';
 import 'package:rocis_tasks/features/categories/domain/models/category.dart';
 import 'package:rocis_tasks/features/calendar/presentation/widgets/calendar_filter_sheet.dart';
 import 'package:rocis_tasks/features/calendar/presentation/widgets/calendar_coloring_sheet.dart';
+import 'package:rocis_tasks/features/calendar/presentation/widgets/google_calendar_event_detail_sheet.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:rocis_tasks/shared/ui/ui_kit.dart';
 import 'package:rocis_tasks/core/services/schedule_firestore_service.dart';
@@ -863,6 +864,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         );
                     final isDark =
                         Theme.of(context).brightness == Brightness.dark;
+                    final calName = cal.name?.trim().isNotEmpty == true
+                        ? cal.name!.trim()
+                        : 'Google';
+                    final hasLocation = item.location != null &&
+                        item.location!.trim().isNotEmpty;
+
                     return GlassContainer(
                       margin: const EdgeInsets.symmetric(
                         horizontal: 16,
@@ -920,8 +927,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
-                                  '${item.start != null ? timeFormat.format(item.start!) : ''} - '
-                                  '${item.end != null ? timeFormat.format(item.end!) : ''}',
+                                  item.allDay == true
+                                      ? l10n.allDay
+                                      : '${item.start != null ? timeFormat.format(item.start!) : ''} - '
+                                          '${item.end != null ? timeFormat.format(item.end!) : ''}',
                                   style: Theme.of(context).textTheme.bodySmall
                                       ?.copyWith(
                                         color: Theme.of(
@@ -930,27 +939,79 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                         fontWeight: FontWeight.w500,
                                       ),
                                 ),
+                                if (hasLocation) ...[
+                                  const SizedBox(width: 8),
+                                  Icon(
+                                    Icons.location_on_outlined,
+                                    size: 14,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurfaceVariant,
+                                  ),
+                                  const SizedBox(width: 2),
+                                  Expanded(
+                                    child: Text(
+                                      item.location!.trim(),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.copyWith(
+                                            color: Theme.of(
+                                              context,
+                                            ).colorScheme.onSurfaceVariant,
+                                          ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
                               ],
                             ),
                           ),
-                          trailing: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: eventColor.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              'Google',
-                              style: Theme.of(context).textTheme.labelSmall
-                                  ?.copyWith(
-                                    color: eventColor,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                            ),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: eventColor.withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  calName,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: Theme.of(context).textTheme.labelSmall
+                                      ?.copyWith(
+                                        color: eventColor,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              Icon(
+                                Icons.chevron_right_rounded,
+                                size: 18,
+                                color: eventColor.withValues(alpha: 0.7),
+                              ),
+                            ],
                           ),
+                          onTap: () {
+                            HapticFeedback.lightImpact();
+                            showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              backgroundColor: Colors.transparent,
+                              constraints: const BoxConstraints(maxWidth: 500),
+                              builder: (context) => GoogleCalendarEventDetailSheet(
+                                event: item,
+                                eventColor: eventColor,
+                                calendarName: calName,
+                              ),
+                            );
+                          },
                         ),
                       ),
                     );

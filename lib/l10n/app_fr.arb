@@ -735,5 +735,16 @@
   "guideSharingTitle": "Partager des tâches",
   "guideSharingBody": "Ouvrez une tâche et partagez-la par lien ou code QR. L'autre personne voit un aperçu et peut importer sa propre copie. Pour scanner un code, touchez + et choisissez Scanner un code QR.",
   "guidePrivacyBody": "Marquez une catégorie comme privée et définissez un code PIN dans les Paramètres. Tant qu'elle est verrouillée, ses tâches sont masquées de la liste, des widgets et des notifications.",
-  "guideGoogleTasksBody": "Activez la synchronisation avec Google Tasks sur une tâche pour la reproduire dans votre liste Google Tasks."
+  "guideGoogleTasksBody": "Activez la synchronisation avec Google Tasks sur une tâche pour la reproduire dans votre liste Google Tasks.",
+  "openInGoogleCalendar": "Ouvrir dans Google Agenda",
+  "openInMaps": "Ouvrir dans Maps",
+  "copyLocation": "Copier l'emplacement",
+  "locationCopied": "Emplacement copié dans le presse-papiers",
+  "joinMeeting": "Rejoindre la réunion",
+  "copyToTasks": "Copier dans ROCIs Tasks",
+  "eventCopiedToTasks": "Événement copié dans ROCIs Tasks",
+  "eventDetails": "Détails de l'événement",
+  "organizer": "Organisateur",
+  "attendees": "Participants",
+  "noDescription": "Aucune description fournie"
 }
