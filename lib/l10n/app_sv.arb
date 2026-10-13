@@ -746,5 +746,11 @@
   "eventDetails": "Händelseinformation",
   "organizer": "Organisatör",
   "attendees": "Deltagare",
-  "noDescription": "Ingen beskrivning angiven"
+  "noDescription": "Ingen beskrivning angiven",
+  "scheduleTypeClass": "Lektion",
+  "scheduleTypeExam": "Tenta",
+  "scheduleTypeLab": "Labb",
+  "scheduleTypeStudy": "Plugg",
+  "scheduleTypeOther": "Övrigt",
+  "scheduleRepeatsWeekly": "Varje vecka på {days}"
 }

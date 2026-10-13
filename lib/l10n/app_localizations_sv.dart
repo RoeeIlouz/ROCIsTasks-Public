@@ -2213,4 +2213,24 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get noDescription => 'Ingen beskrivning angiven';
+
+  @override
+  String get scheduleTypeClass => 'Lektion';
+
+  @override
+  String get scheduleTypeExam => 'Tenta';
+
+  @override
+  String get scheduleTypeLab => 'Labb';
+
+  @override
+  String get scheduleTypeStudy => 'Plugg';
+
+  @override
+  String get scheduleTypeOther => 'Övrigt';
+
+  @override
+  String scheduleRepeatsWeekly(String days) {
+    return 'Varje vecka på $days';
+  }
 }

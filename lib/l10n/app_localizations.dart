@@ -4194,6 +4194,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No description provided'**
   String get noDescription;
+
+  /// No description provided for @scheduleTypeClass.
+  ///
+  /// In en, this message translates to:
+  /// **'Class'**
+  String get scheduleTypeClass;
+
+  /// No description provided for @scheduleTypeExam.
+  ///
+  /// In en, this message translates to:
+  /// **'Exam'**
+  String get scheduleTypeExam;
+
+  /// No description provided for @scheduleTypeLab.
+  ///
+  /// In en, this message translates to:
+  /// **'Lab'**
+  String get scheduleTypeLab;
+
+  /// No description provided for @scheduleTypeStudy.
+  ///
+  /// In en, this message translates to:
+  /// **'Study'**
+  String get scheduleTypeStudy;
+
+  /// No description provided for @scheduleTypeOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get scheduleTypeOther;
+
+  /// Recurrence line in the ROCIs Schedule class popup; days is a comma-separated list of short weekday names
+  ///
+  /// In en, this message translates to:
+  /// **'Every week on {days}'**
+  String scheduleRepeatsWeekly(String days);
 }
 
 class _AppLocalizationsDelegate

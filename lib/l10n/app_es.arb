@@ -745,5 +745,11 @@
   "eventDetails": "Detalles del evento",
   "organizer": "Organizador",
   "attendees": "Asistentes",
-  "noDescription": "Sin descripción proporcionada"
+  "noDescription": "Sin descripción proporcionada",
+  "scheduleTypeClass": "Clase",
+  "scheduleTypeExam": "Examen",
+  "scheduleTypeLab": "Laboratorio",
+  "scheduleTypeStudy": "Estudio",
+  "scheduleTypeOther": "Otro",
+  "scheduleRepeatsWeekly": "Cada semana los {days}"
 }

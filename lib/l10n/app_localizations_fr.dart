@@ -2230,4 +2230,24 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get noDescription => 'Aucune description fournie';
+
+  @override
+  String get scheduleTypeClass => 'Cours';
+
+  @override
+  String get scheduleTypeExam => 'Examen';
+
+  @override
+  String get scheduleTypeLab => 'TP';
+
+  @override
+  String get scheduleTypeStudy => 'Révisions';
+
+  @override
+  String get scheduleTypeOther => 'Autre';
+
+  @override
+  String scheduleRepeatsWeekly(String days) {
+    return 'Chaque semaine le $days';
+  }
 }

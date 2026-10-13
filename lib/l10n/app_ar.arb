@@ -746,5 +746,11 @@
   "eventDetails": "تفاصيل الحدث",
   "organizer": "المنظم",
   "attendees": "الحاضرون",
-  "noDescription": "لا يوجد وصف"
+  "noDescription": "لا يوجد وصف",
+  "scheduleTypeClass": "محاضرة",
+  "scheduleTypeExam": "امتحان",
+  "scheduleTypeLab": "مختبر",
+  "scheduleTypeStudy": "دراسة",
+  "scheduleTypeOther": "أخرى",
+  "scheduleRepeatsWeekly": "كل أسبوع يوم {days}"
 }

@@ -2184,4 +2184,24 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get noDescription => 'אין תיאור';
+
+  @override
+  String get scheduleTypeClass => 'שיעור';
+
+  @override
+  String get scheduleTypeExam => 'מבחן';
+
+  @override
+  String get scheduleTypeLab => 'מעבדה';
+
+  @override
+  String get scheduleTypeStudy => 'למידה';
+
+  @override
+  String get scheduleTypeOther => 'אחר';
+
+  @override
+  String scheduleRepeatsWeekly(String days) {
+    return 'כל שבוע ב$days';
+  }
 }

@@ -19,6 +19,7 @@ import 'package:rocis_tasks/features/categories/domain/models/category.dart';
 import 'package:rocis_tasks/features/calendar/presentation/widgets/calendar_filter_sheet.dart';
 import 'package:rocis_tasks/features/calendar/presentation/widgets/calendar_coloring_sheet.dart';
 import 'package:rocis_tasks/features/calendar/presentation/widgets/google_calendar_event_detail_sheet.dart';
+import 'package:rocis_tasks/features/calendar/presentation/widgets/schedule_event_detail_sheet.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:rocis_tasks/shared/ui/ui_kit.dart';
 import 'package:rocis_tasks/core/services/schedule_firestore_service.dart';
@@ -1195,8 +1196,15 @@ class _CalendarScreenState extends State<CalendarScreen> {
                           ),
                           onTap: () {
                             HapticFeedback.lightImpact();
-                            ScheduleBridgeService.openScheduleEvent(
-                              eventId: item.id,
+                            showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              backgroundColor: Colors.transparent,
+                              constraints: const BoxConstraints(maxWidth: 500),
+                              builder: (context) => ScheduleEventDetailSheet(
+                                event: item,
+                                day: selectedDay,
+                              ),
                             );
                           },
                         ),

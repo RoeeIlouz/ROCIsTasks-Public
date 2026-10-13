@@ -746,5 +746,11 @@
   "eventDetails": "इवेंट विवरण",
   "organizer": "आयोजक",
   "attendees": "उपस्थित लोग",
-  "noDescription": "कोई विवरण नहीं दिया गया"
+  "noDescription": "कोई विवरण नहीं दिया गया",
+  "scheduleTypeClass": "कक्षा",
+  "scheduleTypeExam": "परीक्षा",
+  "scheduleTypeLab": "लैब",
+  "scheduleTypeStudy": "अध्ययन",
+  "scheduleTypeOther": "अन्य",
+  "scheduleRepeatsWeekly": "हर सप्ताह {days} को"
 }

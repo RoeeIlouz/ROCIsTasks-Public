@@ -746,5 +746,11 @@
   "eventDetails": "Termindetails",
   "organizer": "Organisator",
   "attendees": "Teilnehmer",
-  "noDescription": "Keine Beschreibung vorhanden"
+  "noDescription": "Keine Beschreibung vorhanden",
+  "scheduleTypeClass": "Kurs",
+  "scheduleTypeExam": "Prüfung",
+  "scheduleTypeLab": "Labor",
+  "scheduleTypeStudy": "Lernen",
+  "scheduleTypeOther": "Sonstiges",
+  "scheduleRepeatsWeekly": "Jede Woche am {days}"
 }

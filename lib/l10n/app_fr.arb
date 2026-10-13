@@ -746,5 +746,11 @@
   "eventDetails": "Détails de l'événement",
   "organizer": "Organisateur",
   "attendees": "Participants",
-  "noDescription": "Aucune description fournie"
+  "noDescription": "Aucune description fournie",
+  "scheduleTypeClass": "Cours",
+  "scheduleTypeExam": "Examen",
+  "scheduleTypeLab": "TP",
+  "scheduleTypeStudy": "Révisions",
+  "scheduleTypeOther": "Autre",
+  "scheduleRepeatsWeekly": "Chaque semaine le {days}"
 }

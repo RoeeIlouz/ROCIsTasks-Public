@@ -2207,4 +2207,24 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get noDescription => 'कोई विवरण नहीं दिया गया';
+
+  @override
+  String get scheduleTypeClass => 'कक्षा';
+
+  @override
+  String get scheduleTypeExam => 'परीक्षा';
+
+  @override
+  String get scheduleTypeLab => 'लैब';
+
+  @override
+  String get scheduleTypeStudy => 'अध्ययन';
+
+  @override
+  String get scheduleTypeOther => 'अन्य';
+
+  @override
+  String scheduleRepeatsWeekly(String days) {
+    return 'हर सप्ताह $days को';
+  }
 }

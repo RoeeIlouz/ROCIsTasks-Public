@@ -745,5 +745,11 @@
   "eventDetails": "פרטי אירוע",
   "organizer": "מארגן",
   "attendees": "משתתפים",
-  "noDescription": "אין תיאור"
+  "noDescription": "אין תיאור",
+  "scheduleTypeClass": "שיעור",
+  "scheduleTypeExam": "מבחן",
+  "scheduleTypeLab": "מעבדה",
+  "scheduleTypeStudy": "למידה",
+  "scheduleTypeOther": "אחר",
+  "scheduleRepeatsWeekly": "כל שבוע ב{days}"
 }

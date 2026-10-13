@@ -899,5 +899,19 @@
   "eventDetails": "Event Details",
   "organizer": "Organizer",
   "attendees": "Attendees",
-  "noDescription": "No description provided"
+  "noDescription": "No description provided",
+  "scheduleTypeClass": "Class",
+  "scheduleTypeExam": "Exam",
+  "scheduleTypeLab": "Lab",
+  "scheduleTypeStudy": "Study",
+  "scheduleTypeOther": "Other",
+  "scheduleRepeatsWeekly": "Every week on {days}",
+  "@scheduleRepeatsWeekly": {
+    "description": "Recurrence line in the ROCIs Schedule class popup; days is a comma-separated list of short weekday names",
+    "placeholders": {
+      "days": {
+        "type": "String"
+      }
+    }
+  }
 }

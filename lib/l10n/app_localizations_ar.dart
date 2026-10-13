@@ -2185,4 +2185,24 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get noDescription => 'لا يوجد وصف';
+
+  @override
+  String get scheduleTypeClass => 'محاضرة';
+
+  @override
+  String get scheduleTypeExam => 'امتحان';
+
+  @override
+  String get scheduleTypeLab => 'مختبر';
+
+  @override
+  String get scheduleTypeStudy => 'دراسة';
+
+  @override
+  String get scheduleTypeOther => 'أخرى';
+
+  @override
+  String scheduleRepeatsWeekly(String days) {
+    return 'كل أسبوع يوم $days';
+  }
 }
