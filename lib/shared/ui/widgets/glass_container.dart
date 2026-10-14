@@ -22,7 +22,7 @@ class GlassContainer extends StatelessWidget {
   const GlassContainer({
     super.key,
     required this.child,
-    this.blur = 10.0,
+    this.blur = 14.0,
     this.opacity = 0.15,
     this.borderRadius,
     this.padding,
@@ -38,57 +38,101 @@ class GlassContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final useGlassmorphism = context.select<ThemeService, bool>(
+    final useGlassmorphism = context.select<ThemeService, bool?>(
       (s) => s.useGlassmorphism,
-    );
-    final useMaterialTheme = context.select<ThemeService, bool>(
+    ) ?? false;
+    final useMaterialTheme = context.select<ThemeService, bool?>(
       (s) => s.useMaterialTheme,
-    );
-    final isPremium = context.select<SubscriptionService, bool>(
+    ) ?? false;
+    final isPremium = context.select<SubscriptionService, bool?>(
       (s) => s.isPremium,
-    );
+    ) ?? false;
     final isDark = theme.brightness == Brightness.dark;
+    final isAmoled = isDark &&
+        (theme.scaffoldBackgroundColor == Colors.black ||
+            theme.colorScheme.surface == const Color(0xFF000000));
     final useGlass = useGlassmorphism && isPremium && !kIsWeb;
 
     // Default glass color adapts to theme if not provided, with a beautiful primary/category tint
     final effectiveTint = tintColor ?? color ?? theme.colorScheme.primary;
-    final baseColor = isDark
-        ? (useMaterialTheme
-              ? theme.colorScheme.surface
-              : const Color(0xFF151824))
-        : (useMaterialTheme ? theme.colorScheme.surface : Colors.white);
+    final baseColor = isAmoled
+        ? const Color(0xFF000000)
+        : (isDark
+              ? (useMaterialTheme
+                    ? theme.colorScheme.surface
+                    : const Color(0xFF151824))
+              : (useMaterialTheme ? theme.colorScheme.surface : Colors.white));
+
     final glassColor = Color.lerp(
       baseColor,
       effectiveTint,
-      isDark ? 0.18 : 0.12,
+      isDark ? (isAmoled ? 0.22 : 0.18) : 0.12,
     )!;
 
     final radius = borderRadius ?? BorderRadius.circular(24.0);
 
-    // Default border if not provided, subtly tinted with the primary/category color
-    final borderTint = tintColor ?? color ?? theme.colorScheme.primary;
+    // Specular border: frosted glass rim catches ambient light with a clean white/tint blend
+    final Color borderTone;
+    if (isSelected) {
+      borderTone = selectedBorderColor ?? theme.colorScheme.primary;
+    } else if (useGlass) {
+      if (isDark) {
+        borderTone = Color.lerp(
+          Colors.white,
+          effectiveTint,
+          0.35,
+        )!.withValues(alpha: isAmoled ? 0.22 : 0.18);
+      } else {
+        borderTone = Color.lerp(
+          Colors.white,
+          effectiveTint,
+          0.20,
+        )!.withValues(alpha: 0.38);
+      }
+    } else {
+      borderTone = effectiveTint.withValues(alpha: isDark ? 0.16 : 0.12);
+    }
+
     final glassBorder =
         border ??
         Border.all(
-          color: isSelected
-              ? (selectedBorderColor ?? theme.colorScheme.primary)
-              : (isDark
-                    ? borderTint.withValues(alpha: useGlass ? 0.12 : 0.18)
-                    : borderTint.withValues(alpha: useGlass ? 0.08 : 0.12)),
+          color: borderTone,
           width: isSelected ? 1.5 : 1.0,
         );
 
-    final double shadowElevation = elevation ?? (useGlass ? 0.0 : 2.0);
-    final List<BoxShadow>? shadow = (!useGlass && shadowElevation > 0.0)
-        ? [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.06),
-              blurRadius: shadowElevation * 2.0 + 2.0,
-              spreadRadius: 0.0,
-              offset: Offset(0, shadowElevation),
-            ),
-          ]
-        : null;
+    final double shadowElevation = elevation ?? (useGlass ? 2.0 : 2.0);
+    final List<BoxShadow>? shadow;
+    if (useGlass && shadowElevation > 0.0) {
+      // Floating ambient specular occlusion shadow
+      shadow = [
+        BoxShadow(
+          color: (isDark ? Colors.black : effectiveTint).withValues(
+            alpha: isDark ? (isAmoled ? 0.45 : 0.25) : 0.06,
+          ),
+          blurRadius: shadowElevation * 4.0 + 8.0,
+          spreadRadius: -1.0,
+          offset: Offset(0, shadowElevation * 1.5),
+        ),
+        if (!isAmoled)
+          BoxShadow(
+            color: effectiveTint.withValues(alpha: isDark ? 0.04 : 0.03),
+            blurRadius: shadowElevation * 6.0 + 12.0,
+            spreadRadius: 1.0,
+            offset: const Offset(0, 1),
+          ),
+      ];
+    } else if (!useGlass && shadowElevation > 0.0) {
+      shadow = [
+        BoxShadow(
+          color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.06),
+          blurRadius: shadowElevation * 2.0 + 2.0,
+          spreadRadius: 0.0,
+          offset: Offset(0, shadowElevation),
+        ),
+      ];
+    } else {
+      shadow = null;
+    }
 
     final innerContainer = Container(
       padding: padding,
@@ -123,6 +167,7 @@ class GlassContainer extends StatelessWidget {
       margin: margin,
       child: ClipRRect(
         borderRadius: radius,
+        clipBehavior: Clip.antiAlias,
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: blur, sigmaY: blur),
           child: innerContainer,
