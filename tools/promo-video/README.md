@@ -18,6 +18,29 @@ python render.py tasks 9x16 still.png --still 11           # one frame, for revi
 
 Needs Playwright + Chromium and ffmpeg on PATH. Scene text and timing live in `SCENES` in `promo.html`.
 
+## Feature shorts (`shorts.html`)
+
+Three 9:16 Shorts/Reels for ROCIs Tasks over real emulator footage: 1 quick add, 2 widget check-off,
+3 counter-notification ring. Timeline, captions, camera keyframes and tap ripples live in `SHORTS` in
+`shorts.html`.
+
+```
+python cut_shorts.py <raw_dir>   # takes -> assets/shorts/<n>/NNNN.jpg, sped-up segments per CUTS
+python sfx.py                    # assets/shorts/sfx<n>.wav: key clicks, taps, chimes, whooshes (no music)
+python render_shorts.py 1 ../../docs/marketing/videos/rocis_tasks_short1_quickadd_9x16.mp4
+python render_shorts.py 3 still.png --still 5.5
+```
+
+Takes come from `adb shell screenrecord` on the `rocis_shots` emulator (`-gpu swiftshader_indirect`) running a
+`flutter build apk --profile --dart-define=SCREENSHOT_SEED=true` build, with the system in dark mode
+(`cmd uimode night yes`), a charcoal wallpaper, home-screen suggestions off, `show_touches` on and the
+SystemUI demo-mode status bar. screenrecord writes variable frame rate, so convert each take with
+`ffmpeg -vf fps=30` to `d<n>_cfr.mp4` before `cut_shorts.py` cuts it by frame number. Music is left out on
+purpose: add a track in the YouTube/Instagram editor when posting.
+`assets/shorts/icon.png` is `assets/brand/png/tasks-icon-1024.png`. `plate1`-`plate3.jpg` (behind each hook) and
+`outro.jpg` (behind the end card) are Higgsfield `z_image` b-roll stills (9:16, 0.15 credits each), cropped to
+1080x1920. They never show app UI; every screen in the shorts is real footage.
+
 ## Screens (`assets/<app>/`, not tracked)
 
 - `icon.png`: `assets/brand/png/<app>-icon-1024.png`.

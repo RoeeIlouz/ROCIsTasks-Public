@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ROCIs Tasks shorts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Unbounded:wght@700&display=block" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: #000; overflow: hidden; }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: #1E2026; font-family: 'Outfit', sans-serif; color: #fff; }
+  .abs { position: absolute; will-change: transform, opacity; }
+  .unb { font-family: 'Unbounded', sans-serif; font-weight: 700; letter-spacing: -.025em; }
+  .phone { position: absolute; left: 0; top: 0; transform-origin: 0 0; border-radius: 86px; background: #08090b;
+           box-shadow: 0 60px 160px rgba(0,0,0,.7), 0 0 0 3px rgba(255,255,255,.1) inset; }
+  .screen { position: absolute; left: 14px; top: 14px; width: 720px; height: 1600px; overflow: hidden; border-radius: 72px; background: #000; }
+  .screen img { position: absolute; left: 0; top: 0; width: 720px; height: 1600px; }
+  .ripple { position: absolute; border-radius: 50%; border: 6px solid #E5323F; width: 150px; height: 150px; margin: -75px 0 0 -75px; }
+  .label { font-weight: 700; letter-spacing: .24em; font-size: 28px; color: #ff6b75; }
+  .head { font-size: 62px; line-height: 1.12; margin-top: 18px; }
+  .head .w { display: inline-block; white-space: pre; }
+  .hook { text-align: center; font-size: 132px; line-height: 1.04; }
+  .hook .w { display: inline-block; white-space: pre; }
+  .r { color: #E5323F; } .o { color: #FFAB40; } .g { color: #69F0AE; }
+  .pill { display: inline-flex; align-items: center; gap: .5em; border-radius: 999px; font-weight: 700; background: #fff; color: #111; font-size: 40px; padding: 24px 46px; }
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<script>
+const V = new URLSearchParams(location.search).get('v') || '1';
+
+// F0: when the footage (assets/shorts/<v>/NNNN.jpg, 30 fps, cut by cut_shorts.py) starts; its last frame holds
+// until the outro. cam: [time, scale, focusX, focusY, centerY] keyframes; the focus point (a fraction of the
+// screen) is placed at x=540, y=centerY. caps: [time, label, head]; *word* is red, {o}/{g} wrap orange/green.
+// taps: [time, x, y] ripples on the screen. All times are seconds of the final video.
+const SHORTS = {
+  1: { hook: 'Just type\n*it.*', F0: 1.1, frames: 304, outro: 11.4, D: 13.6,
+       caps: [[2.9, 'QUICK ADD', "Type it like\nyou'd *say* it."], [6.35, 'SMART PARSING', 'Date, time,\npriority. *Parsed.*'],
+              [8.9, 'ONE TAP', 'Task *created.*']],
+       cam: [[1.1, 1, .5, .5, 1150], [2.7, 1, .5, .5, 1150], [3.2, 1.45, .5, .56, 1080], [8.55, 1.45, .5, .56, 1080],
+             [9.1, 1, .5, .5, 1150]],
+       taps: [[1.6, .806, .829], [2.33, .806, .765], [8.6, .886, .580]] },
+  2: { hook: 'Done in\none *tap.*', F0: 1.1, frames: 212, outro: 8.5, D: 10.7,
+       caps: [[1.7, 'HOME SCREEN WIDGET', 'Tick it off from\nyour *home* *screen.*'], [5.6, 'LIVE COUNT', '*12* to *10*\nin two taps.']],
+       cam: [[1.1, 1, .5, .5, 1150], [1.7, 1, .5, .5, 1150], [2.2, 1.5, .5, .41, 1180], [5.55, 1.5, .5, .41, 1180],
+             [6.0, 2.3, .32, .255, 1080], [8.4, 2.4, .32, .255, 1080]],
+       taps: [[2.77, .165, .34], [4.93, .165, .34]] },
+  3: { hook: 'Your day in\none *ring.*', F0: 1.1, frames: 333, outro: 12.4, D: 14.6,
+       caps: [[1.6, 'COUNTER NOTIFICATION', 'Every task left,\nin your *shade.*'],
+              [3.0, 'COLOR = PRIORITY', '*Red* high. {o}Orange{/}\nmedium. {g}Green{/} low.'],
+              [5.2, 'FINISH ONE', 'Tick off a\n*high* priority task.'], [9.3, 'ALWAYS CURRENT', '*12* to *11.*\nA little less red.']],
+       cam: [[1.1, 1, .5, .5, 1150], [1.7, 1, .5, .5, 1150], [2.2, 1.3, .5, .47, 1180], [2.9, 1.3, .5, .47, 1180],
+             [3.4, 2.8, .74, .345, 1120], [4.6, 2.9, .74, .345, 1120], [5.0, 1, .5, .5, 1150], [5.3, 1, .5, .5, 1150],
+             [5.7, 1.55, .5, .2, 820], [7.5, 1.55, .5, .2, 820], [7.9, 1, .5, .5, 1150], [9.4, 1, .5, .5, 1150],
+             [9.9, 1.3, .5, .47, 1180], [10.3, 1.3, .5, .47, 1180], [10.8, 2.8, .74, .345, 1120], [12.3, 2.95, .74, .345, 1120]],
+       taps: [[6.95, .106, .1625]] },
+};
+const S = SHORTS[V];
+window.DURATION = S.D;
+
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const easeOut = x => 1 - Math.pow(1 - clamp(x), 3);
+const easeIn = x => Math.pow(clamp(x), 3);
+const easeInOut = x => { x = clamp(x); return x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; };
+const easeBack = x => { x = clamp(x); const c = 1.6; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
+const el = (tag, cls, parent, css = {}) => { const e = document.createElement(tag); if (cls) e.className = cls; Object.assign(e.style, css); parent.appendChild(e); return e; };
+// Text with *red*, {o}orange{/}, {g}green{/} into word spans, one block per line.
+const words = (node, text) => {
+  const html = text.replace(/\*([^*]+)\*/g, '<b class="r">$1</b>').replace(/\{(o|g)\}([^{]+)\{\/\}/g, '<b class="$1">$2</b>');
+  node.innerHTML = html.split('\n').map(l => '<div>' + l.split(/ (?![^<]*>)/).map(w => `<span class="w">${w}</span>`).join(' ') + '</div>').join('');
+  node.querySelectorAll('b').forEach(b => b.style.fontWeight = 'inherit');
+  return [...node.querySelectorAll('.w')];
+};
+const frame = i => `assets/shorts/${V}/${String(i).padStart(4, '0')}.jpg`;
+
+const stage = document.getElementById('stage');
+const g1 = el('div', 'abs', stage, { width: '1400px', height: '1400px', borderRadius: '50%', background: 'radial-gradient(circle, #E5323F55 0%, #E5323F00 62%)' });
+const g2 = el('div', 'abs', stage, { width: '1100px', height: '1100px', borderRadius: '50%', background: 'radial-gradient(circle, #3B3E4688 0%, #3B3E4600 62%)' });
+
+// Higgsfield b-roll plates (no UI): behind the hook and behind the end card.
+const plate = src => {
+  const wrap = el('div', 'abs', stage, { inset: 0, overflow: 'hidden', opacity: 0 });
+  const img = el('img', '', wrap, { width: '100%', height: '100%', objectFit: 'cover' });
+  img.src = src;
+  el('div', 'abs', wrap, { inset: 0, background: 'linear-gradient(rgba(20,21,26,.5), rgba(20,21,26,.3) 45%, rgba(20,21,26,.85))' });
+  return { wrap, img };
+};
+const hookPlate = plate(`assets/shorts/plate${V}.jpg`);
+
+// Phone, moved by the camera keyframes
+const phone = el('div', 'phone', stage, { width: '748px', height: '1628px' });
+const screen = el('div', 'screen', phone);
+const shot = el('img', '', screen);
+const ripples = S.taps.map(([, x, y]) => el('div', 'ripple', screen, { left: x * 720 + 'px', top: y * 1600 + 'px', opacity: 0 }));
+
+// Caption band over the top of the phone
+const band = el('div', 'abs', stage, { left: 0, right: 0, top: 0, height: '620px', background: 'linear-gradient(rgba(22,23,28,.96) 0%, rgba(22,23,28,.88) 45%, rgba(22,23,28,0) 100%)' });
+const cap = el('div', 'abs', stage, { left: '60px', right: '60px', top: '150px', textAlign: 'center' });
+const capLabel = el('div', 'label', cap);
+const capHead = el('div', 'unb head', cap);
+let capKey = null, capWords = [];
+
+// Hook
+const hook = el('div', 'abs unb hook', stage, { left: '40px', right: '40px', top: '640px' });
+const hookWords = words(hook, S.hook);
+const hookBar = el('div', 'abs', stage, { width: '150px', height: '16px', borderRadius: '8px', background: '#E5323F', left: '465px', top: '1010px' });
+
+// Outro
+const outroPlate = plate('assets/shorts/outro.jpg');
+const outro = el('div', 'abs', stage, { left: 0, right: 0, top: '470px', textAlign: 'center' });
+const icon = el('img', '', outro, { width: '320px', borderRadius: '22%', boxShadow: '0 30px 90px rgba(0,0,0,.55)' });
+icon.src = 'assets/shorts/icon.png';
+const word = el('div', 'unb', outro, { fontSize: '100px', marginTop: '56px' });
+word.textContent = 'ROCIs Tasks';
+const tag = el('div', 'label', outro, { marginTop: '26px', fontSize: '32px' });
+tag.textContent = 'OUT OCTOBER 10';
+const cta = el('div', '', outro, { marginTop: '60px' });
+el('div', 'pill', cta).innerHTML = '<svg width="1em" height="1em" viewBox="0 0 24 24"><path fill="#34A853" d="M3.6 1.8 13.4 12l-9.8 10.2c-.4-.2-.6-.6-.6-1.1V2.9c0-.5.2-.9.6-1.1z"/><path fill="#FBBC04" d="m17 8.4-3.6 3.6L17 15.6l4-2.3c.8-.5.8-1.7 0-2.1z"/><path fill="#4285F4" d="M13.4 12 3.6 22.2c.3.2.8.2 1.2 0L17 15.6z"/><path fill="#EA4335" d="M3.6 1.8c.4-.2.9-.2 1.2 0L17 8.4 13.4 12z"/></svg>Free on Google Play';
+const url = el('div', '', cta, { marginTop: '30px', fontSize: '36px', color: 'rgba(255,255,255,.65)', fontWeight: 600, letterSpacing: '.03em' });
+url.textContent = 'tasks.rocisapps.com';
+
+function camAt(t) {
+  const k = S.cam;
+  if (t <= k[0][0]) return k[0].slice(1);
+  for (let i = 0; i < k.length - 1; i++) {
+    const [ta, ...a] = k[i], [tb, ...b] = k[i + 1];
+    if (t <= tb) { const p = easeInOut((t - ta) / (tb - ta)); return a.map((v, j) => v + (b[j] - v) * p); }
+  }
+  return k[k.length - 1].slice(1);
+}
+
+const pending = [];
+function setSrc(img, src) {
+  if (img.dataset.u === src) return;
+  img.dataset.u = src; img.src = src;
+  pending.push(img.decode().catch(() => {}));
+}
+
+window.seek = async function (t) {
+  pending.length = 0;
+  g1.style.transform = `translate(${-160 + Math.sin(t * .4) * 110}px, ${-380 + Math.cos(t * .33) * 140}px)`;
+  g2.style.transform = `translate(${380 + Math.cos(t * .35) * 90}px, ${1150 + Math.sin(t * .27) * 110}px)`;
+
+  // Hook: words punch in over the plate, then the whole line blows up and fades as the phone flies in.
+  const hOut = easeIn((t - .95) / .4);
+  hookPlate.wrap.style.opacity = clamp(t / .15) * (1 - easeIn((t - 1.0) / .45));
+  hookPlate.img.style.transform = `scale(${1.15 - .1 * clamp(t / 1.4)})`;
+  hookWords.forEach((w, i) => {
+    const p = easeBack((t - .05 - i * .12) / .32);
+    w.style.opacity = clamp((t - .05 - i * .12) / .1) * (1 - hOut);
+    w.style.transform = `scale(${.4 + .6 * p})`;
+  });
+  const bp = easeOut((t - .45) / .3);
+  hookBar.style.opacity = bp * (1 - hOut);
+  hookBar.style.transform = `scaleX(${bp * (1 + hOut)})`;
+  hook.style.transform = `scale(${1 + hOut * .45})`;
+  hook.style.display = hookBar.style.display = t < 1.4 ? 'block' : 'none';
+
+  // Phone: flies up from below, follows the camera, then drops away for the outro.
+  const [s, fx, fy, cy] = camAt(t);
+  const fly = 1 - easeOut((t - S.F0) / .5), drop = easeIn((t - S.outro) / .45);
+  const x = 540 - (14 + fx * 720) * s, y = cy - (14 + fy * 1600) * s + fly * 1700 + drop * 1500;
+  phone.style.opacity = t < S.F0 ? 0 : 1 - drop;
+  phone.style.transform = `translate(${x}px, ${y}px) scale(${s * (1 - .1 * drop)})`;
+  setSrc(shot, frame(clamp(Math.floor((t - S.F0) * 30), 0, S.frames - 1)));
+  S.taps.forEach(([tt], i) => {
+    const p = (t - tt) / .45;
+    ripples[i].style.opacity = p >= 0 && p <= 1 ? 1 - easeIn(p) : 0;
+    ripples[i].style.transform = `scale(${.3 + 1.1 * easeOut(p)})`;
+  });
+
+  // Captions: label slides, words pop in one after another; the band only shows while a caption is up.
+  let active = null;
+  for (const c of S.caps) if (t >= c[0] && t < S.outro) active = c;
+  const bandOn = clamp((t - S.caps[0][0] + .2) / .3) * (1 - clamp((t - S.outro) / .3));
+  band.style.opacity = bandOn;
+  cap.style.display = active ? 'block' : 'none';
+  if (active) {
+    if (capKey !== active) { capKey = active; capLabel.textContent = active[1]; capWords = words(capHead, active[2]); }
+    const lt = t - active[0];
+    const next = S.caps[S.caps.indexOf(active) + 1];
+    const out = Math.max(next ? easeIn((t - (next[0] - .22)) / .22) : 0, easeIn((t - (S.outro - .3)) / .3));
+    const lp = easeOut(lt / .3);
+    capLabel.style.opacity = lp * (1 - out);
+    capLabel.style.transform = `translateY(${(1 - lp) * 20}px)`;
+    capWords.forEach((w, k) => {
+      const p = easeBack((lt - .06 - k * .055) / .3);
+      w.style.opacity = clamp((lt - .06 - k * .055) / .08) * (1 - out);
+      w.style.transform = `translateY(${(1 - p) * 36 - out * 20}px) scale(${.85 + .15 * p})`;
+    });
+  }
+
+  // Outro
+  const ot = t - S.outro;
+  outroPlate.wrap.style.opacity = easeOut(ot / .5);
+  outroPlate.img.style.transform = `scale(${1.15 - .1 * clamp(ot / 2.5)})`;
+  outro.style.display = ot >= 0 ? 'block' : 'none';
+  if (ot >= 0) {
+    const ip = easeBack((ot - .15) / .45), tp = easeOut((ot - .4) / .4), gp = easeOut((ot - .6) / .4), cp = easeOut((ot - .8) / .45);
+    icon.style.opacity = clamp((ot - .15) / .15); icon.style.transform = `scale(${.5 + .5 * ip})`;
+    word.style.opacity = tp; word.style.transform = `translateY(${(1 - tp) * 30}px)`;
+    tag.style.opacity = gp; tag.style.transform = `translateY(${(1 - gp) * 20}px)`;
+    cta.style.opacity = cp; cta.style.transform = `translateY(${(1 - cp) * 30}px)`;
+  }
+  await Promise.all(pending);
+};
+
+window.ready = (async () => {
+  await Promise.all([icon, hookPlate.img, outroPlate.img].map(i => i.decode()));
+  await document.fonts.ready;
+  await window.seek(0);
+  return true;
+})();
+</script>
+</body>
+</html>

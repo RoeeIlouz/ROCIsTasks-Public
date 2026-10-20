@@ -1,0 +1,90 @@
+<en-US>
+ROCIs Tasks 1.0 is now officially available.
+• Quick add: enter a task with its date, time, priority and category in a single line
+• Two-way sync with Google Tasks and Google Calendar
+• Interactive home screen widgets, including the new Week View
+• Board view, subtasks, recurring tasks and PIN-protected private tasks
+• Task sharing by QR code or link
+• Offline support on Android and the web, in eight languages
+Thank you to all beta testers for their valuable feedback.
+</en-US>
+<iw-IL>
+ROCIs Tasks 1.0 זמינה כעת באופן רשמי.
+• הוספה מהירה: הזנת משימה עם תאריך, שעה, עדיפות וקטגוריה בשורה אחת
+• סנכרון דו-כיווני עם Google Tasks ו-Google Calendar
+• ווידג'טים אינטראקטיביים למסך הבית, כולל תצוגת השבוע החדשה
+• תצוגת לוח, תתי-משימות, משימות חוזרות ומשימות פרטיות המוגנות בקוד PIN
+• שיתוף משימות באמצעות קוד QR או קישור
+• עבודה במצב לא מקוון ב-Android ובאינטרנט, בשמונה שפות
+תודה לכל בודקי הבטא על המשוב החשוב.
+</iw-IL>
+<ar>
+ROCIs Tasks 1.0 متاح الآن رسميًا.
+• إضافة سريعة: أدخل المهمة مع تاريخها ووقتها وأولويتها وفئتها في سطر واحد
+• مزامنة ثنائية الاتجاه مع Google Tasks وGoogle Calendar
+• أدوات تفاعلية للشاشة الرئيسية، بما فيها أداة عرض الأسبوع الجديدة
+• عرض اللوحة، والمهام الفرعية، والمهام المتكررة، والمهام الخاصة المحمية برمز PIN
+• مشاركة المهام عبر رمز QR أو رابط
+• يعمل دون اتصال على Android والويب، وبثماني لغات
+شكرًا لجميع مختبري النسخة التجريبية على ملاحظاتهم القيّمة.
+</ar>
+<de-DE>
+ROCIs Tasks 1.0 ist ab sofort offiziell verfügbar.
+• Schnelleingabe: Datum, Uhrzeit, Priorität und Kategorie in einer Zeile
+• Zwei-Wege-Synchronisierung mit Google Tasks und Google Kalender
+• Interaktive Widgets, einschließlich der neuen Wochenansicht
+• Board-Ansicht, Unteraufgaben, Wiederholungen und PIN-geschützte private Aufgaben
+• Aufgaben per QR-Code oder Link teilen
+• Offline nutzbar auf Android und im Web, in acht Sprachen
+Vielen Dank an alle Betatester für ihr wertvolles Feedback.
+</de-DE>
+<es-ES>
+ROCIs Tasks 1.0 ya está disponible oficialmente.
+• Añadido rápido: fecha, hora, prioridad y categoría en una sola línea
+• Sincronización bidireccional con Google Tasks y Google Calendar
+• Widgets interactivos, incluida la nueva vista semanal
+• Vista de tablero, subtareas, tareas periódicas y tareas privadas protegidas con PIN
+• Comparte tareas mediante código QR o enlace
+• Sin conexión en Android y en la web, en ocho idiomas
+Gracias a todos los participantes de la beta por sus comentarios.
+</es-ES>
+<es-419>
+ROCIs Tasks 1.0 ya está disponible oficialmente.
+• Añadido rápido: fecha, hora, prioridad y categoría en una sola línea
+• Sincronización bidireccional con Google Tasks y Google Calendar
+• Widgets interactivos, incluida la nueva vista semanal
+• Vista de tablero, subtareas, tareas periódicas y tareas privadas protegidas con PIN
+• Comparte tareas mediante código QR o enlace
+• Sin conexión en Android y en la web, en ocho idiomas
+Gracias a todos los participantes de la beta por sus comentarios.
+</es-419>
+<fr-FR>
+ROCIs Tasks 1.0 est désormais officiellement disponible.
+• Saisie rapide : date, heure, priorité et catégorie en une seule ligne
+• Synchronisation bidirectionnelle avec Google Tasks et Google Agenda
+• Widgets interactifs, dont la nouvelle vue Semaine
+• Vue Tableau, sous-tâches, tâches récurrentes et tâches privées protégées par code PIN
+• Partage de tâches par code QR ou par lien
+• Hors ligne sur Android et sur le Web, en huit langues
+Merci à tous les bêta-testeurs pour leurs précieux retours.
+</fr-FR>
+<hi-IN>
+ROCIs Tasks 1.0 अब आधिकारिक रूप से उपलब्ध है।
+• क्विक ऐड: तारीख, समय, प्राथमिकता और श्रेणी के साथ कार्य एक ही पंक्ति में जोड़ें
+• Google Tasks और Google Calendar के साथ दोतरफ़ा सिंक
+• इंटरैक्टिव होम स्क्रीन विजेट, नए साप्ताहिक दृश्य सहित
+• बोर्ड व्यू, सब-टास्क, दोहराए जाने वाले कार्य और PIN से सुरक्षित निजी कार्य
+• QR कोड या लिंक से कार्य साझा करें
+• Android और वेब पर ऑफ़लाइन काम करता है, आठ भाषाओं में
+सभी बीटा टेस्टर्स को उनके बहुमूल्य फ़ीडबैक के लिए धन्यवाद।
+</hi-IN>
+<sv-SE>
+ROCIs Tasks 1.0 är nu officiellt tillgänglig.
+• Snabbinmatning: ange en uppgift med datum, tid, prioritet och kategori på en rad
+• Tvåvägssynkronisering med Google Tasks och Google Kalender
+• Interaktiva widgetar för hemskärmen, inklusive den nya veckovyn
+• Tavelvy, deluppgifter, återkommande uppgifter och PIN-skyddade privata uppgifter
+• Dela uppgifter med QR-kod eller länk
+• Fungerar offline på Android och webben, på åtta språk
+Tack till alla betatestare för värdefull feedback.
+</sv-SE>

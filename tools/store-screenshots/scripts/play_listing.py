@@ -4,6 +4,7 @@
   upload <dir> [--commit]       <dir>/<lang>/phone/*.png + <dir>/<lang>/feature.png
                                 replaces phoneScreenshots/featureGraphic per language;
                                 without --commit the edit is validated then discarded.
+  en-us [--commit]              en-US title/short/full from listing.en-US.json (video kept)
   graphics <store_dir> <icon.png> [--commit]
                                 icon + <store_dir>/<deck>/feature.jpg for every existing
                                 listing language (deck = language prefix, iw -> he, falls
@@ -72,6 +73,20 @@ try:
         if '--commit' in sys.argv and v.status_code == 200:
             c = requests.post(f'{BASE}/{eid}:commit', headers=H, timeout=120)
             print('commit:', c.status_code, c.text[:500] if c.status_code != 200 else 'ok')
+            committed = c.status_code == 200
+    elif sys.argv[1] == 'en-us':
+        # en-us [--commit]: en-US listing text from listing.en-US.json; keeps the live video.
+        new = json.load(open(os.path.join(ROOT, 'tools', 'store-screenshots', 'listing.en-US.json'), encoding='utf-8'))
+        cur = requests.get(f'{BASE}/{eid}/listings/en-US', headers=H, timeout=30).json()
+        body = {k: new[k] for k in ('title', 'shortDescription', 'fullDescription')}
+        body['video'] = cur.get('video', '')
+        requests.put(f'{BASE}/{eid}/listings/en-US', headers=H, json=body, timeout=60).raise_for_status()
+        print('en-US: listing text')
+        v = requests.post(f'{BASE}/{eid}:validate', headers=H, timeout=60)
+        print('validate:', v.status_code, v.text[:300] if v.status_code != 200 else 'ok')
+        if '--commit' in sys.argv and v.status_code == 200:
+            c = requests.post(f'{BASE}/{eid}:commit', headers=H, timeout=120)
+            print('commit:', c.status_code, c.text[:300] if c.status_code != 200 else 'ok')
             committed = c.status_code == 200
     elif sys.argv[1] == 'graphics':
         store_dir, icon = sys.argv[2], sys.argv[3]
