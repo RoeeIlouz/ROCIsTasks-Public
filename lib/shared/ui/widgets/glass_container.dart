@@ -1,5 +1,5 @@
 import 'dart:ui';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kIsWeb, listEquals;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rocis_tasks/shared/ui/theme/theme_service.dart';
@@ -136,55 +136,26 @@ class GlassContainer extends StatelessWidget {
       shadow = null;
     }
 
+    // Several categories: the fill stays as for one category and only the
+    // border becomes a gradient across their colors.
     final tints = (tintColors != null && tintColors!.length > 1)
         ? tintColors!
         : null;
-    final fillGradient =
-        tints != null && (useGlass || isSelected || color == null);
     final gradientRim = tints != null && !isSelected && border == null;
-
-    Color fillFor(Color tint) {
-      if (useGlass) {
-        return Color.lerp(
-          baseColor,
-          tint,
-          isDark ? (isAmoled ? 0.22 : 0.18) : 0.12,
-        )!.withValues(alpha: isSelected ? opacity + 0.1 : opacity);
-      }
-      if (isSelected) return tint.withValues(alpha: 0.2);
-      return Color.lerp(
-        theme.colorScheme.surfaceContainerLow,
-        tint,
-        isDark ? 0.10 : 0.07,
-      )!;
-    }
 
     final innerContainer = Container(
       padding: padding,
       decoration: BoxDecoration(
-        color: fillGradient
-            ? null
-            : (useGlass
-                  ? glassColor.withValues(
-                      alpha: isSelected ? opacity + 0.1 : opacity,
-                    )
-                  : (isSelected
-                        ? (color?.withValues(alpha: 0.2) ??
-                              (tintColor?.withValues(alpha: 0.2) ??
-                                  theme.colorScheme.primary.withValues(
-                                    alpha: 0.12,
-                                  )))
-                        : (color ?? theme.colorScheme.surfaceContainerLow))),
-        gradient: fillGradient
-            ? LinearGradient(
-                begin: AlignmentDirectional.centerStart,
-                end: AlignmentDirectional.centerEnd,
-                colors: [for (final t in tints) fillFor(t)],
-              )
-            : null,
-        borderRadius: gradientRim ? radius - BorderRadius.circular(1) : radius,
+        color: useGlass
+            ? glassColor.withValues(alpha: isSelected ? opacity + 0.1 : opacity)
+            : (isSelected
+                  ? (color?.withValues(alpha: 0.2) ??
+                        (tintColor?.withValues(alpha: 0.2) ??
+                            theme.colorScheme.primary.withValues(alpha: 0.12)))
+                  : (color ?? theme.colorScheme.surfaceContainerLow)),
+        borderRadius: radius,
         border: gradientRim ? null : glassBorder,
-        boxShadow: gradientRim ? null : shadow,
+        boxShadow: shadow,
       ),
       child: Material(
         type: MaterialType.transparency,
@@ -195,27 +166,15 @@ class GlassContainer extends StatelessWidget {
     );
 
     final Widget framed = gradientRim
-        ? Container(
-            padding: const EdgeInsets.all(1),
-            decoration: BoxDecoration(
-              borderRadius: radius,
-              gradient: LinearGradient(
-                begin: AlignmentDirectional.centerStart,
-                end: AlignmentDirectional.centerEnd,
-                colors: [
-                  for (final t in tints)
-                    useGlass
-                        ? Color.lerp(
-                            Colors.white,
-                            t,
-                            isDark ? 0.35 : 0.20,
-                          )!.withValues(
-                            alpha: isDark ? (isAmoled ? 0.22 : 0.18) : 0.38,
-                          )
-                        : t.withValues(alpha: isDark ? 0.16 : 0.12),
-                ],
-              ),
-              boxShadow: shadow,
+        ? CustomPaint(
+            foregroundPainter: _GradientBorderPainter(
+              radius: radius,
+              width: 1.5,
+              colors: [
+                for (final t in tints)
+                  t.withValues(alpha: isDark ? 0.55 : 0.45),
+              ],
+              textDirection: Directionality.of(context),
             ),
             child: innerContainer,
           )
@@ -240,4 +199,40 @@ class GlassContainer extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Strokes a rounded border with a start-to-end gradient.
+class _GradientBorderPainter extends CustomPainter {
+  final BorderRadius radius;
+  final double width;
+  final List<Color> colors;
+  final TextDirection textDirection;
+
+  _GradientBorderPainter({
+    required this.radius,
+    required this.width,
+    required this.colors,
+    required this.textDirection,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final rect = Offset.zero & size;
+    final paint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = width
+      ..shader = LinearGradient(
+        begin: AlignmentDirectional.centerStart,
+        end: AlignmentDirectional.centerEnd,
+        colors: colors,
+      ).createShader(rect, textDirection: textDirection);
+    canvas.drawRRect(radius.toRRect(rect.deflate(width / 2)), paint);
+  }
+
+  @override
+  bool shouldRepaint(_GradientBorderPainter old) =>
+      old.radius != radius ||
+      old.width != width ||
+      old.textDirection != textDirection ||
+      !listEquals(old.colors, colors);
 }
