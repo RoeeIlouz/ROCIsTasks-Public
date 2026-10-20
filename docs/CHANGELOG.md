@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0+121] - 2026-10-20
+
+### Added
+- Multi-category color gradients in app and widgets, onboarding setup page with starter templates, share button, weekly recap, glass preview
+
 ## [1.0.0+120] - 2026-10-13 (Patch 2)
 
 ### Added
