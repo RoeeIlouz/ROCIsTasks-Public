@@ -98,6 +98,44 @@ class _CalendarScreenState extends State<CalendarScreen> {
     return [...tasks, ...upcomingTasks, ...events];
   }
 
+  /// Every category color of a task (a gradient when there are several);
+  /// a single-element list for everything else.
+  List<Color> _getEventColors(
+    dynamic event,
+    TaskProvider taskProvider,
+    CalendarProvider calendarProvider,
+    CalendarColorService colorService,
+  ) {
+    if (event is Task && event.categoryIds.length > 1) {
+      final colors = <Color>[
+        for (final id in event.categoryIds)
+          if (taskProvider.getCategoryById(id) case final cat?)
+            Color(cat.colorValue),
+      ];
+      if (colors.length > 1) return colors;
+    }
+    return [
+      _getEventColor(event, taskProvider, calendarProvider, colorService),
+    ];
+  }
+
+  static Gradient? _colorsGradient(
+    List<Color> colors, {
+    double alpha = 1,
+    Axis axis = Axis.horizontal,
+  }) {
+    if (colors.length < 2) return null;
+    return LinearGradient(
+      begin: axis == Axis.horizontal
+          ? AlignmentDirectional.centerStart
+          : Alignment.topCenter,
+      end: axis == Axis.horizontal
+          ? AlignmentDirectional.centerEnd
+          : Alignment.bottomCenter,
+      colors: [for (final c in colors) c.withValues(alpha: alpha)],
+    );
+  }
+
   Color _getEventColor(
     dynamic event,
     TaskProvider taskProvider,
@@ -184,7 +222,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
               for (final event in shown)
                 _buildWideChip(
                   event,
-                  _getEventColor(
+                  _getEventColors(
                     event,
                     taskProvider,
                     calendarProvider,
@@ -212,33 +250,56 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
   Widget _buildWideChip(
     dynamic event,
-    Color color,
+    List<Color> colors,
     String title,
     ThemeData theme,
     double extent,
   ) {
     final done = event is Task && event.isCompleted;
+    final color = colors.first;
+    final multi = colors.length > 1;
+    final label = Text(
+      title,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      style: TextStyle(
+        fontSize: 11,
+        fontWeight: FontWeight.w600,
+        color: theme.colorScheme.onSurface,
+        decoration: done ? TextDecoration.lineThrough : null,
+      ),
+    );
     return Container(
       height: extent - 2,
       margin: const EdgeInsets.only(bottom: 2),
-      padding: const EdgeInsets.symmetric(horizontal: 6),
+      padding: EdgeInsets.symmetric(horizontal: multi ? 0 : 6),
       alignment: AlignmentDirectional.centerStart,
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.14),
+        color: multi ? null : color.withValues(alpha: 0.14),
+        gradient: _colorsGradient(colors, alpha: 0.14),
         borderRadius: BorderRadius.circular(5),
-        border: BorderDirectional(start: BorderSide(color: color, width: 3)),
+        border: multi
+            ? null
+            : BorderDirectional(start: BorderSide(color: color, width: 3)),
       ),
-      child: Text(
-        title,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        style: TextStyle(
-          fontSize: 11,
-          fontWeight: FontWeight.w600,
-          color: theme.colorScheme.onSurface,
-          decoration: done ? TextDecoration.lineThrough : null,
-        ),
-      ),
+      child: multi
+          ? Row(
+              children: [
+                Container(
+                  width: 3,
+                  decoration: BoxDecoration(
+                    gradient: _colorsGradient(colors, axis: Axis.vertical),
+                    borderRadius: const BorderRadiusDirectional.horizontal(
+                      start: Radius.circular(5),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 6),
+                Expanded(child: label),
+                const SizedBox(width: 6),
+              ],
+            )
+          : label,
     );
   }
 
@@ -504,12 +565,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         if (events.length == 1) {
                           final event = events.first;
                           String title = '';
-                          final c = _getEventColor(
+                          final cs = _getEventColors(
                             event,
                             taskProvider,
                             calendarProvider,
                             colorService,
                           );
+                          final c = cs.first;
                           if (event is Task) {
                             title = event.title;
                           } else if (event is Event) {
@@ -540,7 +602,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                 vertical: 1.5,
                               ),
                               decoration: BoxDecoration(
-                                color: c.withValues(alpha: 0.15),
+                                color: cs.length > 1
+                                    ? null
+                                    : c.withValues(alpha: 0.15),
+                                gradient: _colorsGradient(cs, alpha: 0.2),
                                 borderRadius: BorderRadius.circular(4),
                                 border: Border.all(
                                   color: c.withValues(alpha: 0.35),
@@ -566,12 +631,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         final dotWidgets = <Widget>[];
                         final visibleEvents = events.take(3).toList();
                         for (final event in visibleEvents) {
-                          final c = _getEventColor(
+                          final cs = _getEventColors(
                             event,
                             taskProvider,
                             calendarProvider,
                             colorService,
                           );
+                          final c = cs.first;
                           dotWidgets.add(
                             Container(
                               width: 6,
@@ -580,7 +646,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                 horizontal: 1.5,
                               ),
                               decoration: BoxDecoration(
-                                color: c,
+                                color: cs.length > 1 ? null : c,
+                                gradient: _colorsGradient(cs),
                                 shape: BoxShape.circle,
                                 boxShadow: [
                                   BoxShadow(
@@ -868,7 +935,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     final calName = cal.name?.trim().isNotEmpty == true
                         ? cal.name!.trim()
                         : 'Google';
-                    final hasLocation = item.location != null &&
+                    final hasLocation =
+                        item.location != null &&
                         item.location!.trim().isNotEmpty;
 
                     return GlassContainer(
@@ -931,7 +999,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                   item.allDay == true
                                       ? l10n.allDay
                                       : '${item.start != null ? timeFormat.format(item.start!) : ''} - '
-                                          '${item.end != null ? timeFormat.format(item.end!) : ''}',
+                                            '${item.end != null ? timeFormat.format(item.end!) : ''}',
                                   style: Theme.of(context).textTheme.bodySmall
                                       ?.copyWith(
                                         color: Theme.of(
@@ -1006,11 +1074,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
                               isScrollControlled: true,
                               backgroundColor: Colors.transparent,
                               constraints: const BoxConstraints(maxWidth: 500),
-                              builder: (context) => GoogleCalendarEventDetailSheet(
-                                event: item,
-                                eventColor: eventColor,
-                                calendarName: calName,
-                              ),
+                              builder: (context) =>
+                                  GoogleCalendarEventDetailSheet(
+                                    event: item,
+                                    eventColor: eventColor,
+                                    calendarName: calName,
+                                  ),
                             );
                           },
                         ),

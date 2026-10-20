@@ -2,9 +2,11 @@ package com.rocisapps.tasks
 
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.LinearGradient
 import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.RectF
+import android.graphics.Shader
 import android.graphics.Typeface
 import android.os.Build
 import android.text.Layout
@@ -51,7 +53,9 @@ object WeekViewRenderer {
         val day: Int,
         val allDay: Boolean,
         val startMin: Int,
-        val endMin: Int
+        val endMin: Int,
+        /** All category colors (gradient when 2+); [color] is the first. */
+        val colors: List<Int> = emptyList()
     )
 
     private data class Lane(val lane: Int, val lanes: Int)
@@ -105,7 +109,8 @@ object WeekViewRenderer {
                     day = day,
                     allDay = allDay,
                     startMin = startMin,
-                    endMin = endMin
+                    endMin = endMin,
+                    colors = WidgetStyle.parseColors(obj)
                 )
             )
         }
@@ -356,16 +361,31 @@ object WeekViewRenderer {
         text: TextPaint
     ) {
         val r = 5 * d
+        val multi = item.colors.size > 1
         fill.color = blend(item.color, palette)
+        if (multi) {
+            fill.shader = LinearGradient(
+                rect.left, rect.top, rect.right, rect.bottom,
+                IntArray(item.colors.size) { blend(item.colors[it], palette) }, null, Shader.TileMode.CLAMP
+            )
+        }
         canvas.drawRoundRect(rect, r, r, fill)
+        fill.shader = null
 
         // Start-side accent bar, clipped to the rounded block.
         canvas.save()
         canvas.clipPath(Path().apply { addRoundRect(rect, r, r, Path.Direction.CW) })
         fill.color = item.color
         val barW = 3 * d
+        if (multi) {
+            fill.shader = LinearGradient(
+                0f, rect.top, 0f, rect.bottom,
+                IntArray(item.colors.size) { item.colors[it] }, null, Shader.TileMode.CLAMP
+            )
+        }
         if (rtl) canvas.drawRect(rect.right - barW, rect.top, rect.right, rect.bottom, fill)
         else canvas.drawRect(rect.left, rect.top, rect.left + barW, rect.bottom, fill)
+        fill.shader = null
 
         val strokeColor = line.color
         val strokeWidth = line.strokeWidth

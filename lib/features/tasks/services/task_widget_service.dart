@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart' hide Category;
 import 'package:flutter/material.dart';
 import 'package:home_widget/home_widget.dart';
+import 'package:rocis_tasks/core/services/widget_category_colors.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/features/categories/domain/models/category.dart';
 import 'package:rocis_tasks/shared/ui/ui_kit.dart';
@@ -21,6 +22,7 @@ class TaskWidgetService {
   static Map<String, dynamic> _serializeTaskForWidget(
     Task task,
     Category? category,
+    List<String> categoryColors,
   ) {
     try {
       return {
@@ -31,6 +33,7 @@ class TaskWidgetService {
         'category_color': category != null
             ? _formatColorForWidget(category.colorValue)
             : '',
+        'category_colors': categoryColors,
         'dueDate': task.dueDate != null
             ? formatDateForDisplay(task.dueDate!)
             : '',
@@ -159,7 +162,11 @@ class TaskWidgetService {
       for (final task in pendingTasks) {
         try {
           final category = getCategoryById(task.categoryId);
-          final serializedTask = _serializeTaskForWidget(task, category);
+          final serializedTask = _serializeTaskForWidget(
+            task,
+            category,
+            widgetCategoryColors(task, getCategoryById),
+          );
           tasksJson.add(serializedTask);
         } catch (e) {
           // Error processing task

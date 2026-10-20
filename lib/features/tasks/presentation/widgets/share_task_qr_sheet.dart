@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:share_plus/share_plus.dart';
 
 import 'package:rocis_tasks/core/services/auth_service.dart';
 import 'package:rocis_tasks/core/utils/haptic_utils.dart';
@@ -17,10 +18,7 @@ enum ShareMode { offline, cloud }
 class ShareTaskQrSheet extends StatefulWidget {
   final Task task;
 
-  const ShareTaskQrSheet({
-    super.key,
-    required this.task,
-  });
+  const ShareTaskQrSheet({super.key, required this.task});
 
   static Future<void> show(BuildContext context, Task task) {
     return showModalBottomSheet(
@@ -116,6 +114,28 @@ class _ShareTaskQrSheetState extends State<ShareTaskQrSheet> {
     }
   }
 
+  /// Play listing link with an install referrer, so shares can be measured.
+  static const String _playUrl =
+      'https://play.google.com/store/apps/details?id=com.rocisapps.tasks'
+      '&referrer=utm_source%3Dtask_share';
+
+  Future<void> _shareLink(String link, AppLocalizations l10n) async {
+    HapticFeedback.lightImpact();
+    final text = [
+      widget.task.title,
+      link,
+      '',
+      l10n.shareFooter(_playUrl),
+    ].join('\n');
+    try {
+      await SharePlus.instance.share(
+        ShareParams(text: text, subject: widget.task.title),
+      );
+    } catch (_) {
+      _copyToClipboard(link, l10n);
+    }
+  }
+
   void _copyToClipboard(String data, AppLocalizations l10n) {
     Clipboard.setData(ClipboardData(text: data));
     HapticFeedback.lightImpact();
@@ -134,8 +154,9 @@ class _ShareTaskQrSheetState extends State<ShareTaskQrSheet> {
     final l10n = AppLocalizations.of(context)!;
     final primary = theme.colorScheme.primary;
 
-    final activePayload =
-        _mode == ShareMode.offline ? _offlinePayload : _cloudPayload;
+    final activePayload = _mode == ShareMode.offline
+        ? _offlinePayload
+        : _cloudPayload;
 
     return Padding(
       padding: EdgeInsets.only(
@@ -184,8 +205,9 @@ class _ShareTaskQrSheetState extends State<ShareTaskQrSheet> {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: theme.textTheme.bodyMedium?.copyWith(
-                            color: theme.colorScheme.onSurface
-                                .withValues(alpha: 0.7),
+                            color: theme.colorScheme.onSurface.withValues(
+                              alpha: 0.7,
+                            ),
                           ),
                         ),
                       ],
@@ -193,8 +215,9 @@ class _ShareTaskQrSheetState extends State<ShareTaskQrSheet> {
                   ),
                   IconButton(
                     icon: const Icon(Icons.close_rounded),
-                    tooltip:
-                        MaterialLocalizations.of(context).closeButtonTooltip,
+                    tooltip: MaterialLocalizations.of(
+                      context,
+                    ).closeButtonTooltip,
                     onPressed: () => Navigator.pop(context),
                   ),
                 ],
@@ -217,9 +240,7 @@ class _ShareTaskQrSheetState extends State<ShareTaskQrSheet> {
                 ],
                 selected: {_mode},
                 onSelectionChanged: (set) => _onModeChanged(set.first),
-                style: const ButtonStyle(
-                  visualDensity: VisualDensity.compact,
-                ),
+                style: const ButtonStyle(visualDensity: VisualDensity.compact),
               ),
               const SizedBox(height: 20),
 
@@ -257,47 +278,47 @@ class _ShareTaskQrSheetState extends State<ShareTaskQrSheet> {
                         ),
                       )
                     : _mode == ShareMode.cloud && _cloudError != null
-                        ? Center(
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                _cloudError!,
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                  color: Colors.red,
-                                  fontSize: 12,
-                                ),
-                              ),
+                    ? Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            _cloudError!,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              color: Colors.red,
+                              fontSize: 12,
                             ),
-                          )
-                        : (activePayload != null
-                            ? QrImageView(
-                                data: activePayload,
-                                version: QrVersions.auto,
-                                size: 218,
-                                eyeStyle: QrEyeStyle(
-                                  eyeShape: QrEyeShape.square,
-                                  color: primary,
-                                ),
-                                dataModuleStyle: const QrDataModuleStyle(
-                                  dataModuleShape: QrDataModuleShape.square,
-                                  color: Colors.black87,
-                                ),
-                              )
-                            : const SizedBox.shrink()),
+                          ),
+                        ),
+                      )
+                    : (activePayload != null
+                          ? QrImageView(
+                              data: activePayload,
+                              version: QrVersions.auto,
+                              size: 218,
+                              eyeStyle: QrEyeStyle(
+                                eyeShape: QrEyeShape.square,
+                                color: primary,
+                              ),
+                              dataModuleStyle: const QrDataModuleStyle(
+                                dataModuleShape: QrDataModuleShape.square,
+                                color: Colors.black87,
+                              ),
+                            )
+                          : const SizedBox.shrink()),
               ),
               const SizedBox(height: 16),
 
               // Mode Description Banner
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 10,
+                ),
                 decoration: BoxDecoration(
                   color: primary.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: primary.withValues(alpha: 0.2),
-                  ),
+                  border: Border.all(color: primary.withValues(alpha: 0.2)),
                 ),
                 child: Row(
                   children: [
@@ -316,8 +337,9 @@ class _ShareTaskQrSheetState extends State<ShareTaskQrSheet> {
                             : l10n.cloudShareDesc,
                         style: theme.textTheme.bodySmall?.copyWith(
                           fontSize: 12,
-                          color: theme.colorScheme.onSurface
-                              .withValues(alpha: 0.8),
+                          color: theme.colorScheme.onSurface.withValues(
+                            alpha: 0.8,
+                          ),
                         ),
                       ),
                     ),
@@ -335,6 +357,16 @@ class _ShareTaskQrSheetState extends State<ShareTaskQrSheet> {
                       label: Text(l10n.copyQrPayload),
                       onPressed: activePayload != null
                           ? () => _copyToClipboard(activePayload, l10n)
+                          : null,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: FilledButton.icon(
+                      icon: const Icon(Icons.ios_share_rounded, size: 18),
+                      label: Text(l10n.shareAction),
+                      onPressed: activePayload != null
+                          ? () => _shareLink(activePayload, l10n)
                           : null,
                     ),
                   ),

@@ -115,8 +115,16 @@ extension View {
 
 struct ColorBar: View {
     let color: Color
+    /// Hex colors of every category on the item; two or more draw a gradient.
+    var colors: [String]? = nil
     var body: some View {
-        RoundedRectangle(cornerRadius: 2).fill(color).frame(width: 4)
+        if let hexes = colors, hexes.count > 1 {
+            RoundedRectangle(cornerRadius: 2)
+                .fill(LinearGradient(colors: hexes.map { Color(hex: $0) }, startPoint: .top, endPoint: .bottom))
+                .frame(width: 4)
+        } else {
+            RoundedRectangle(cornerRadius: 2).fill(color).frame(width: 4)
+        }
     }
 }
 

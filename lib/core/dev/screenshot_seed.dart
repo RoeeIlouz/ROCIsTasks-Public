@@ -193,8 +193,11 @@ class ScreenshotSeed {
       (day(6, 17), TaskPriority.medium, 3),
       (day(4), TaskPriority.medium, 0),
     ];
+    // Tasks with a second category, so the screenshots show blended colors.
+    const secondCategory = {0: 1, 2: 4, 6: 2};
     for (var i = 0; i < plan.length; i++) {
       final (due, priority, cat) = plan[i];
+      final extra = secondCategory[i];
       await source.addTask(
         Task(
           id: 'demo-task-$i',
@@ -202,7 +205,10 @@ class ScreenshotSeed {
           dueDate: due,
           priority: priority,
           categoryId: categories[cat].id,
-          categoryIds: [categories[cat].id],
+          categoryIds: [
+            categories[cat].id,
+            if (extra != null) categories[extra].id,
+          ],
         ),
       );
     }

@@ -2,11 +2,18 @@ package com.rocisapps.tasks
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.LinearGradient
+import android.graphics.Paint
+import android.graphics.RectF
+import android.graphics.Shader
 import android.net.Uri
 import android.view.View
 import android.widget.RemoteViews
 import es.antonborri.home_widget.HomeWidgetLaunchIntent
+import org.json.JSONObject
 import java.util.Locale
 
 /**
@@ -35,6 +42,41 @@ object WidgetStyle {
     fun parseColor(hex: String?, fallback: Int): Int {
         if (hex.isNullOrEmpty() || !hex.startsWith("#")) return fallback
         return try { Color.parseColor(hex) } catch (_: Exception) { fallback }
+    }
+
+    /** Every category color of [item] (`category_colors`), in order; empty when absent or invalid. */
+    fun parseColors(item: JSONObject): List<Int> {
+        val arr = item.optJSONArray("category_colors") ?: return emptyList()
+        val out = ArrayList<Int>(arr.length())
+        for (i in 0 until arr.length()) {
+            val c = parseColor(arr.optString(i, ""), 0)
+            if (c != 0) out.add(c)
+        }
+        return out
+    }
+
+    /**
+     * Colors a vertical accent bar ImageView from the item's categories: a solid color
+     * filter for one category, a top-to-bottom gradient bitmap for two or more.
+     * The layout ImageViews must not declare an `android:tint`, which would flatten the bitmap.
+     */
+    fun applyAccent(views: RemoteViews, viewId: Int, item: JSONObject, fallback: Int) {
+        val colors = parseColors(item)
+        if (colors.size < 2) {
+            views.setInt(viewId, "setColorFilter", parseColor(item.optString("category_color", ""), fallback))
+            return
+        }
+        val w = 12
+        val h = 96
+        val bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+        paint.shader = LinearGradient(
+            0f, 0f, 0f, h.toFloat(),
+            IntArray(colors.size) { withAlpha(colors[it], 0xFF) }, null, Shader.TileMode.CLAMP
+        )
+        Canvas(bmp).drawRoundRect(RectF(0f, 0f, w.toFloat(), h.toFloat()), w / 2f, w / 2f, paint)
+        views.setImageViewBitmap(viewId, bmp)
+        views.setInt(viewId, "setColorFilter", 0)
     }
 
     /**

@@ -2249,4 +2249,104 @@ class AppLocalizationsDe extends AppLocalizations {
   String scheduleRepeatsWeekly(String days) {
     return 'Jede Woche am $days';
   }
+
+  @override
+  String get onboardingSetupTitle => 'Mach sie zu deiner';
+
+  @override
+  String get onboardingSetupDesc =>
+      'Wähle eine Vorlage, verbinde deinen Kalender und lege ein Widget auf den Startbildschirm. Alles optional.';
+
+  @override
+  String get onboardingTemplateLabel => 'Startvorlage';
+
+  @override
+  String get templateNone => 'Leer';
+
+  @override
+  String get templateStudent => 'Studienwoche';
+
+  @override
+  String get templateGrocery => 'Einkauf';
+
+  @override
+  String get templateCatClasses => 'Kurse';
+
+  @override
+  String get templateCatHomework => 'Hausaufgaben';
+
+  @override
+  String get templateCatExams => 'Prüfungen';
+
+  @override
+  String get templateStudentTask1 =>
+      'Die Vorlesungsnotizen von heute durchgehen';
+
+  @override
+  String get templateStudentTask2 => 'Die Abgabe einreichen';
+
+  @override
+  String get templateStudentTask3 => 'Für die Zwischenprüfung lernen';
+
+  @override
+  String get templateGroceryItem1 => 'Milch';
+
+  @override
+  String get templateGroceryItem2 => 'Brot';
+
+  @override
+  String get templateGroceryItem3 => 'Eier';
+
+  @override
+  String get templateGroceryItem4 => 'Obst';
+
+  @override
+  String get onboardingImportCalendar => 'Meinen Kalender importieren';
+
+  @override
+  String get onboardingCalendarConnected => 'Kalender verbunden';
+
+  @override
+  String get onboardingAddWidget => 'Widget zum Startbildschirm hinzufügen';
+
+  @override
+  String get shareAction => 'Teilen';
+
+  @override
+  String shareFooter(String url) {
+    return 'Gesendet mit ROCIs Tasks, kostenlos bei Google Play: $url';
+  }
+
+  @override
+  String get weeklyRecapTitle => 'Wochenrückblick';
+
+  @override
+  String weeklyRecapSubtitle(int count, int streak) {
+    return 'Sonntags um 18 Uhr. $count diese Woche erledigt, $streak Tage in Folge.';
+  }
+
+  @override
+  String get weeklyRecapNotifTitle => 'Deine Woche in Aufgaben';
+
+  @override
+  String get weeklyRecapNotifBody =>
+      'Sieh, was du geschafft hast, und plane die nächste Woche.';
+
+  @override
+  String get glassPreviewOffer =>
+      'Starker Lauf! Möchtest du den Glas-Look testen?';
+
+  @override
+  String get glassPreviewTry => 'Vorschau';
+
+  @override
+  String get glassPreviewEnd =>
+      'Gefällt dir der Glas-Look? Er ist in Pro enthalten.';
+
+  @override
+  String get glassPreviewGetPro => 'Pro holen';
+
+  @override
+  String get categoryMultiTip =>
+      'Wähle mehr als eine Kategorie, und die Aufgabe mischt deren Farben.';
 }

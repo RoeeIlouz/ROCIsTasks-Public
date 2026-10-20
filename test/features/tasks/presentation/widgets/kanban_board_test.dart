@@ -115,6 +115,10 @@ void main() {
     ).thenAnswer((_) async {});
 
     when(() => mockThemeService.useGlassmorphism).thenReturn(true);
+
+    when(() => mockThemeService.glassPreviewActive).thenReturn(false);
+
+    when(() => mockThemeService.glassActive(any())).thenReturn(true);
     when(() => mockThemeService.useMaterialTheme).thenReturn(false);
     when(() => mockThemeService.useCustomSeedColor).thenReturn(false);
     when(() => mockThemeService.customSeedColorValue).thenReturn(null);

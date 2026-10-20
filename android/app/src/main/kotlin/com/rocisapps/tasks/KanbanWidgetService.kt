@@ -79,7 +79,7 @@ class KanbanWidgetFactory(private val context: Context) : RemoteViewsService.Rem
 
             // Tile: a faint onSurface wash on the card, like the app's list tiles.
             WidgetStyle.applyTile(views, R.id.widget_kanban_item_fill, palette.onSurface, if (palette.isDark) 0x14 else 0x0D)
-            views.setInt(R.id.widget_kanban_color_strip, "setColorFilter", accent)
+            WidgetStyle.applyAccent(views, R.id.widget_kanban_color_strip, item, accent)
             views.setInt(R.id.widget_kanban_color_strip, "setImageAlpha", if (isCompleted) 0x66 else 0xFF)
 
             // Title: done cards are muted and struck through, like the app's completed tasks.

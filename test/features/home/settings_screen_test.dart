@@ -73,6 +73,8 @@ void main() {
     when(() => mockThemeService.themeMode).thenReturn(ThemeMode.system);
     when(() => mockThemeService.useMaterialTheme).thenReturn(true);
     when(() => mockThemeService.useGlassmorphism).thenReturn(true);
+    when(() => mockThemeService.glassPreviewActive).thenReturn(false);
+    when(() => mockThemeService.glassActive(any())).thenReturn(true);
     when(() => mockThemeService.useAmoledTheme).thenReturn(false);
     when(() => mockThemeService.use24HourFormat).thenReturn(true);
     when(() => mockThemeService.autoRemoveNlpDates).thenReturn(true);

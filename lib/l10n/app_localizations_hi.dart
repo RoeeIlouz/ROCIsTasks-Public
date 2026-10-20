@@ -2227,4 +2227,102 @@ class AppLocalizationsHi extends AppLocalizations {
   String scheduleRepeatsWeekly(String days) {
     return 'हर सप्ताह $days को';
   }
+
+  @override
+  String get onboardingSetupTitle => 'इसे अपना बनाएं';
+
+  @override
+  String get onboardingSetupDesc =>
+      'एक स्टार्टर चुनें, अपना कैलेंडर जोड़ें और होम स्क्रीन पर विजेट लगाएं। सब कुछ वैकल्पिक है।';
+
+  @override
+  String get onboardingTemplateLabel => 'स्टार्टर टेम्पलेट';
+
+  @override
+  String get templateNone => 'खाली';
+
+  @override
+  String get templateStudent => 'विद्यार्थी सप्ताह';
+
+  @override
+  String get templateGrocery => 'किराने की खरीद';
+
+  @override
+  String get templateCatClasses => 'कक्षाएं';
+
+  @override
+  String get templateCatHomework => 'होमवर्क';
+
+  @override
+  String get templateCatExams => 'परीक्षाएं';
+
+  @override
+  String get templateStudentTask1 => 'आज के लेक्चर नोट्स दोहराएं';
+
+  @override
+  String get templateStudentTask2 => 'असाइनमेंट जमा करें';
+
+  @override
+  String get templateStudentTask3 => 'मिडटर्म की तैयारी करें';
+
+  @override
+  String get templateGroceryItem1 => 'दूध';
+
+  @override
+  String get templateGroceryItem2 => 'ब्रेड';
+
+  @override
+  String get templateGroceryItem3 => 'अंडे';
+
+  @override
+  String get templateGroceryItem4 => 'फल';
+
+  @override
+  String get onboardingImportCalendar => 'मेरा कैलेंडर इम्पोर्ट करें';
+
+  @override
+  String get onboardingCalendarConnected => 'कैलेंडर जुड़ गया';
+
+  @override
+  String get onboardingAddWidget => 'होम स्क्रीन पर विजेट जोड़ें';
+
+  @override
+  String get shareAction => 'शेयर करें';
+
+  @override
+  String shareFooter(String url) {
+    return 'ROCIs Tasks से भेजा गया, Google Play पर मुफ़्त: $url';
+  }
+
+  @override
+  String get weeklyRecapTitle => 'साप्ताहिक सारांश';
+
+  @override
+  String weeklyRecapSubtitle(int count, int streak) {
+    return 'रविवार शाम 6 बजे। इस सप्ताह $count पूरे, $streak दिन की लय।';
+  }
+
+  @override
+  String get weeklyRecapNotifTitle => 'कार्यों में आपका सप्ताह';
+
+  @override
+  String get weeklyRecapNotifBody =>
+      'देखें आपने क्या पूरा किया और अगले सप्ताह की योजना बनाएं।';
+
+  @override
+  String get glassPreviewOffer =>
+      'बढ़िया! क्या आप ग्लास लुक का प्रीव्यू देखना चाहेंगे?';
+
+  @override
+  String get glassPreviewTry => 'प्रीव्यू';
+
+  @override
+  String get glassPreviewEnd => 'ग्लास लुक पसंद आया? यह Pro में मिलता है।';
+
+  @override
+  String get glassPreviewGetPro => 'Pro लें';
+
+  @override
+  String get categoryMultiTip =>
+      'एक से अधिक श्रेणी चुनें और कार्य उनके रंग मिलाकर दिखाएगा।';
 }

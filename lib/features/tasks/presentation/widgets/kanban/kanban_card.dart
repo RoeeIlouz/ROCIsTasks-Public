@@ -83,6 +83,7 @@ class KanbanCard extends StatelessWidget {
     final categoryColor = primaryCategory != null
         ? Color(primaryCategory.colorValue)
         : theme.colorScheme.primary;
+    final categoryColors = [for (final c in categories) Color(c.colorValue)];
     final hasTaskFeedback = _isTaskFeedbackEnabled(context);
 
     final subtasks = task.subTasks ?? [];
@@ -95,16 +96,23 @@ class KanbanCard extends StatelessWidget {
             ? (isDark ? Colors.grey.shade900 : Colors.grey.shade200)
             : null,
         tintColor: primaryCategory != null ? categoryColor : null,
-        border: Border.all(
-          color: isDark
-              ? (primaryCategory != null
-                    ? categoryColor.withValues(alpha: 0.25)
-                    : theme.colorScheme.outlineVariant.withValues(alpha: 0.2))
-              : (primaryCategory != null
-                    ? categoryColor.withValues(alpha: 0.18)
-                    : theme.colorScheme.outlineVariant.withValues(alpha: 0.15)),
-          width: 1.0,
-        ),
+        tintColors: categoryColors,
+        border: categoryColors.length > 1
+            ? null
+            : Border.all(
+                color: isDark
+                    ? (primaryCategory != null
+                          ? categoryColor.withValues(alpha: 0.25)
+                          : theme.colorScheme.outlineVariant.withValues(
+                              alpha: 0.2,
+                            ))
+                    : (primaryCategory != null
+                          ? categoryColor.withValues(alpha: 0.18)
+                          : theme.colorScheme.outlineVariant.withValues(
+                              alpha: 0.15,
+                            )),
+                width: 1.0,
+              ),
         elevation: isDragging ? 8.0 : 1.5,
         child: InkWell(
           onTap:
@@ -131,9 +139,23 @@ class KanbanCard extends StatelessWidget {
                       vertical: 8,
                     ).copyWith(left: 6),
                     decoration: BoxDecoration(
-                      color: task.isCompleted
-                          ? categoryColor.withValues(alpha: 0.4)
-                          : categoryColor,
+                      color: categoryColors.length > 1
+                          ? null
+                          : (task.isCompleted
+                                ? categoryColor.withValues(alpha: 0.4)
+                                : categoryColor),
+                      gradient: categoryColors.length > 1
+                          ? LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                for (final c in categoryColors)
+                                  task.isCompleted
+                                      ? c.withValues(alpha: 0.4)
+                                      : c,
+                              ],
+                            )
+                          : null,
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),

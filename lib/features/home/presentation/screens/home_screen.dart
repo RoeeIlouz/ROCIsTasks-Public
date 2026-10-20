@@ -387,8 +387,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final themeService = Provider.of<ThemeService>(context);
     final taskProvider = Provider.of<TaskProvider>(context);
     final subscriptionService = Provider.of<SubscriptionService>(context);
-    final useGlass =
-        themeService.useGlassmorphism && subscriptionService.isPremium;
+    final useGlass = themeService.glassActive(subscriptionService.isPremium);
 
     if (taskProvider.taskToEdit != null) {
       final task = taskProvider.taskToEdit!;

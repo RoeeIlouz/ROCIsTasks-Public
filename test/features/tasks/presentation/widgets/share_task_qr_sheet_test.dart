@@ -38,6 +38,10 @@ void main() {
     mockAuthService = MockAuthService();
 
     when(() => mockThemeService.useGlassmorphism).thenReturn(false);
+
+    when(() => mockThemeService.glassPreviewActive).thenReturn(false);
+
+    when(() => mockThemeService.glassActive(any())).thenReturn(false);
     when(() => mockThemeService.useMaterialTheme).thenReturn(true);
     when(() => mockSubscriptionService.isPremium).thenReturn(true);
     when(() => mockAuthService.currentUser).thenReturn(null);

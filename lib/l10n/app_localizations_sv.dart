@@ -2233,4 +2233,103 @@ class AppLocalizationsSv extends AppLocalizations {
   String scheduleRepeatsWeekly(String days) {
     return 'Varje vecka på $days';
   }
+
+  @override
+  String get onboardingSetupTitle => 'Gör den till din';
+
+  @override
+  String get onboardingSetupDesc =>
+      'Välj en startmall, anslut din kalender och lägg en widget på startskärmen. Allt är valfritt.';
+
+  @override
+  String get onboardingTemplateLabel => 'Startmall';
+
+  @override
+  String get templateNone => 'Tom';
+
+  @override
+  String get templateStudent => 'Studentvecka';
+
+  @override
+  String get templateGrocery => 'Matinköp';
+
+  @override
+  String get templateCatClasses => 'Lektioner';
+
+  @override
+  String get templateCatHomework => 'Läxor';
+
+  @override
+  String get templateCatExams => 'Prov';
+
+  @override
+  String get templateStudentTask1 =>
+      'Gå igenom dagens föreläsningsanteckningar';
+
+  @override
+  String get templateStudentTask2 => 'Lämna in uppgiften';
+
+  @override
+  String get templateStudentTask3 => 'Plugga inför mellanprovet';
+
+  @override
+  String get templateGroceryItem1 => 'Mjölk';
+
+  @override
+  String get templateGroceryItem2 => 'Bröd';
+
+  @override
+  String get templateGroceryItem3 => 'Ägg';
+
+  @override
+  String get templateGroceryItem4 => 'Frukt';
+
+  @override
+  String get onboardingImportCalendar => 'Importera min kalender';
+
+  @override
+  String get onboardingCalendarConnected => 'Kalender ansluten';
+
+  @override
+  String get onboardingAddWidget => 'Lägg till en widget på startskärmen';
+
+  @override
+  String get shareAction => 'Dela';
+
+  @override
+  String shareFooter(String url) {
+    return 'Skickat med ROCIs Tasks, gratis på Google Play: $url';
+  }
+
+  @override
+  String get weeklyRecapTitle => 'Veckosammanfattning';
+
+  @override
+  String weeklyRecapSubtitle(int count, int streak) {
+    return 'Söndagar kl. 18. $count klara den här veckan, $streak dagar i rad.';
+  }
+
+  @override
+  String get weeklyRecapNotifTitle => 'Din vecka i uppgifter';
+
+  @override
+  String get weeklyRecapNotifBody =>
+      'Se vad du hann med och planera veckan som kommer.';
+
+  @override
+  String get glassPreviewOffer =>
+      'Bra jobbat! Vill du förhandsvisa glaslooken?';
+
+  @override
+  String get glassPreviewTry => 'Förhandsvisa';
+
+  @override
+  String get glassPreviewEnd => 'Gillar du glaslooken? Den ingår i Pro.';
+
+  @override
+  String get glassPreviewGetPro => 'Skaffa Pro';
+
+  @override
+  String get categoryMultiTip =>
+      'Välj fler än en kategori så blandar uppgiften deras färger.';
 }

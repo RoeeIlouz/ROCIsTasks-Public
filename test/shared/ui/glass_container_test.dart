@@ -19,6 +19,10 @@ void main() {
     mockSubscriptionService = MockSubscriptionService();
 
     when(() => mockThemeService.useGlassmorphism).thenReturn(false);
+
+    when(() => mockThemeService.glassPreviewActive).thenReturn(false);
+
+    when(() => mockThemeService.glassActive(any())).thenReturn(false);
     when(() => mockThemeService.useMaterialTheme).thenReturn(true);
     when(() => mockSubscriptionService.isPremium).thenReturn(true);
   });
@@ -152,6 +156,8 @@ void main() {
       'renders BackdropFilter when glassmorphism is active and user is premium',
       (tester) async {
         when(() => mockThemeService.useGlassmorphism).thenReturn(true);
+        when(() => mockThemeService.glassPreviewActive).thenReturn(false);
+        when(() => mockThemeService.glassActive(any())).thenReturn(true);
         when(() => mockSubscriptionService.isPremium).thenReturn(true);
 
         await tester.pumpWidget(buildTestWidget());
@@ -165,6 +171,8 @@ void main() {
       'tints glass background with custom tintColor when glassmorphism is active',
       (tester) async {
         when(() => mockThemeService.useGlassmorphism).thenReturn(true);
+        when(() => mockThemeService.glassPreviewActive).thenReturn(false);
+        when(() => mockThemeService.glassActive(any())).thenReturn(true);
         when(() => mockSubscriptionService.isPremium).thenReturn(true);
 
         const tint = Color(0xFFFF5722);

@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rocis_tasks/core/dev/screenshot_seed.dart';
 import 'package:rocis_tasks/core/config/app_config.dart';
 import 'package:rocis_tasks/core/services/review_prompt_service.dart';
+import 'package:rocis_tasks/core/services/engagement_service.dart';
 import 'package:rocis_tasks/core/services/analytics_service.dart';
 import 'package:rocis_tasks/core/services/auth_service.dart';
 import 'package:rocis_tasks/core/services/calendar_service.dart';
@@ -65,6 +66,7 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
   final ErrorHandlingService _errorHandlingService;
   final SubscriptionService _subscriptionService;
   final PrivateModeService _privateModeService;
+  final EngagementService _engagementService;
 
   late final MonthWidgetService _monthWidgetService;
   late final FullCalendarWidgetService _fullCalendarWidgetService;
@@ -114,7 +116,9 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
     FirestoreService? firestoreService,
     ConnectivityService? connectivityService,
     AnalyticsService? analyticsService,
+    EngagementService? engagementService,
   }) : _privateModeService = privateModeService ?? PrivateModeService(),
+       _engagementService = engagementService ?? EngagementService(),
        _source = source ?? LocalTaskSource(),
        _notificationService = notificationService ?? NotificationService(),
        _firestoreService = firestoreService ?? FirestoreService(),
@@ -982,6 +986,45 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
     return task.subTasks?.where((st) => !st.isCompleted).length ?? 0;
   }
 
+  /// On a free user's third completed task, offers a short preview of the
+  /// Pro glass theme, then a way to unlock it.
+  void _maybeOfferGlassPreview() {
+    if (!_engagementService.recordCompletion(
+      isPremium: _subscriptionService.isPremium,
+    )) {
+      return;
+    }
+    final l10n = _l10n;
+    appMessengerKey.currentState
+      ?..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(l10n.glassPreviewOffer),
+          duration: const Duration(seconds: 8),
+          action: SnackBarAction(
+            label: l10n.glassPreviewTry,
+            onPressed: () => _themeService.previewGlass(
+              onEnd: () {
+                if (_subscriptionService.isPremium) return;
+                appMessengerKey.currentState?.showSnackBar(
+                  SnackBar(
+                    content: Text(l10n.glassPreviewEnd),
+                    duration: const Duration(seconds: 8),
+                    action: SnackBarAction(
+                      label: l10n.glassPreviewGetPro,
+                      onPressed: () => _subscriptionService.showPaywall(
+                        source: PaywallSource.glassmorphism,
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
+      );
+  }
+
   /// Returns false when the task could not be completed because required
   /// subtasks are still open.
   Future<bool> toggleTaskCompletion(Task task) async {
@@ -1025,6 +1068,7 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
     if (task.isCompleted) {
       await _cancelTaskNotifications(task);
       unawaited(ReviewPromptService().onTaskCompleted());
+      _maybeOfferGlassPreview();
 
       // If this is a recurring task and user is Pro, determine the next recurring instance
       if (task.recurrenceRule != null &&

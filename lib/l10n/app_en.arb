@@ -913,5 +913,52 @@
         "type": "String"
       }
     }
-  }
+  },
+  "onboardingSetupTitle": "Make it yours",
+  "onboardingSetupDesc": "Pick a starter, connect your calendar and put a widget on your home screen. All optional.",
+  "onboardingTemplateLabel": "Starter template",
+  "templateNone": "Empty",
+  "templateStudent": "Student week",
+  "templateGrocery": "Grocery run",
+  "templateCatClasses": "Classes",
+  "templateCatHomework": "Homework",
+  "templateCatExams": "Exams",
+  "templateStudentTask1": "Review today's lecture notes",
+  "templateStudentTask2": "Submit the assignment",
+  "templateStudentTask3": "Study for the midterm",
+  "templateGroceryItem1": "Milk",
+  "templateGroceryItem2": "Bread",
+  "templateGroceryItem3": "Eggs",
+  "templateGroceryItem4": "Fruit",
+  "onboardingImportCalendar": "Import my calendar",
+  "onboardingCalendarConnected": "Calendar connected",
+  "onboardingAddWidget": "Add a home screen widget",
+  "shareAction": "Share",
+  "shareFooter": "Sent with ROCIs Tasks, free on Google Play: {url}",
+  "@shareFooter": {
+    "placeholders": {
+      "url": {
+        "type": "String"
+      }
+    }
+  },
+  "weeklyRecapTitle": "Weekly recap",
+  "weeklyRecapSubtitle": "Sundays at 6 PM. {count} done this week, {streak}-day streak.",
+  "@weeklyRecapSubtitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "streak": {
+        "type": "int"
+      }
+    }
+  },
+  "weeklyRecapNotifTitle": "Your week in tasks",
+  "weeklyRecapNotifBody": "See what you finished and plan the week ahead.",
+  "glassPreviewOffer": "Nice streak! Want to preview the glass look?",
+  "glassPreviewTry": "Preview",
+  "glassPreviewEnd": "Like the glass look? It comes with Pro.",
+  "glassPreviewGetPro": "Get Pro",
+  "categoryMultiTip": "Pick more than one category and the task blends their colors."
 }

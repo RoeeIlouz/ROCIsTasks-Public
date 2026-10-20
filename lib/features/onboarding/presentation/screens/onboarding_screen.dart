@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:rocis_tasks/features/onboarding/data/services/onboarding_service.dart';
+import 'package:rocis_tasks/features/onboarding/data/services/starter_templates.dart';
+import 'package:rocis_tasks/features/onboarding/presentation/widgets/onboarding_setup_page.dart';
+import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
 
 import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
@@ -16,27 +19,48 @@ class OnboardingScreen extends StatefulWidget {
 class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
+  StarterTemplate _template = StarterTemplate.none;
+
+  /// Marks onboarding done, seeding the chosen starter template unless the
+  /// user skipped.
+  Future<void> _finish({bool applyTemplate = true}) async {
+    final l10n = AppLocalizations.of(context)!;
+    final taskProvider = Provider.of<TaskProvider>(context, listen: false);
+    final onboarding = Provider.of<OnboardingService>(context, listen: false);
+    if (applyTemplate) {
+      await StarterTemplates.apply(_template, taskProvider, l10n);
+    }
+    await onboarding.completeOnboarding();
+    if (mounted) context.go('/');
+  }
 
   List<_OnboardingPage> _buildPages(AppLocalizations l10n) => [
-        _OnboardingPage(
-          title: l10n.onboardingWelcomeTitle,
-          description: l10n.onboardingWelcomeDesc,
-          icon: Icons.sync_alt_rounded,
-          color: const Color(0xFF38BDF8),
-        ),
-        _OnboardingPage(
-          title: l10n.onboardingSyncTitle,
-          description: l10n.onboardingSyncDesc,
-          icon: Icons.auto_awesome_rounded,
-          color: const Color(0xFF6366F1),
-        ),
-        _OnboardingPage(
-          title: l10n.onboardingGesturesTitle,
-          description: l10n.onboardingGesturesDesc,
-          icon: Icons.widgets_rounded,
-          color: const Color(0xFF10B981),
-        ),
-      ];
+    _OnboardingPage(
+      title: l10n.onboardingWelcomeTitle,
+      description: l10n.onboardingWelcomeDesc,
+      icon: Icons.sync_alt_rounded,
+      color: const Color(0xFF38BDF8),
+    ),
+    _OnboardingPage(
+      title: l10n.onboardingSyncTitle,
+      description: l10n.onboardingSyncDesc,
+      icon: Icons.auto_awesome_rounded,
+      color: const Color(0xFF6366F1),
+    ),
+    _OnboardingPage(
+      title: l10n.onboardingGesturesTitle,
+      description: l10n.onboardingGesturesDesc,
+      icon: Icons.widgets_rounded,
+      color: const Color(0xFF10B981),
+    ),
+    _OnboardingPage(
+      title: l10n.onboardingSetupTitle,
+      description: l10n.onboardingSetupDesc,
+      icon: Icons.tune_rounded,
+      color: const Color(0xFFF59E0B),
+      isSetup: true,
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -54,15 +78,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: TextButton(
-                  onPressed: () async {
-                    await Provider.of<OnboardingService>(
-                      context,
-                      listen: false,
-                    ).completeOnboarding();
-                    if (context.mounted) {
-                      context.go('/');
-                    }
-                  },
+                  onPressed: () => _finish(applyTemplate: false),
                   child: Text(
                     l10n.skip,
                     style: GoogleFonts.outfit(
@@ -85,6 +101,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 },
                 itemBuilder: (context, index) {
                   final page = pages[index];
+                  if (page.isSetup) {
+                    return OnboardingSetupPage(
+                      title: page.title,
+                      description: page.description,
+                      accent: page.color,
+                      template: _template,
+                      onTemplateChanged: (t) => setState(() => _template = t),
+                    );
+                  }
                   return Padding(
                     padding: const EdgeInsets.all(32.0),
                     child: Column(
@@ -96,11 +121,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             color: page.color.withValues(alpha: 0.1),
                             shape: BoxShape.circle,
                           ),
-                          child: Icon(
-                            page.icon,
-                            size: 100,
-                            color: page.color,
-                          ),
+                          child: Icon(page.icon, size: 100, color: page.color),
                         ),
                         const SizedBox(height: 48),
                         Text(
@@ -162,14 +183,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             curve: Curves.easeInOut,
                           );
                         } else {
-                          await Provider.of<OnboardingService>(
-                            context,
-                            listen: false,
-                          ).completeOnboarding();
-
-                          if (context.mounted) {
-                            context.go('/');
-                          }
+                          await _finish();
                         }
                       },
                       style: ElevatedButton.styleFrom(
@@ -206,11 +220,13 @@ class _OnboardingPage {
   final String description;
   final IconData icon;
   final Color color;
+  final bool isSetup;
 
   const _OnboardingPage({
     required this.title,
     required this.description,
     required this.icon,
     required this.color,
+    this.isSetup = false,
   });
 }

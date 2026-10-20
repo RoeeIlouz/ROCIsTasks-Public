@@ -163,8 +163,9 @@ class CategoriesScreen extends StatelessWidget {
           final theme = Theme.of(context);
           final themeService = Provider.of<ThemeService>(context);
           final subscriptionService = Provider.of<SubscriptionService>(context);
-          final useGlass =
-              themeService.useGlassmorphism && subscriptionService.isPremium;
+          final useGlass = themeService.glassActive(
+            subscriptionService.isPremium,
+          );
 
           return EasterEggSpinner(
             child: GlassContainer(

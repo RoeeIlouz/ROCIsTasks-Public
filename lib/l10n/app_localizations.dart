@@ -4230,6 +4230,186 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Every week on {days}'**
   String scheduleRepeatsWeekly(String days);
+
+  /// No description provided for @onboardingSetupTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Make it yours'**
+  String get onboardingSetupTitle;
+
+  /// No description provided for @onboardingSetupDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a starter, connect your calendar and put a widget on your home screen. All optional.'**
+  String get onboardingSetupDesc;
+
+  /// No description provided for @onboardingTemplateLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Starter template'**
+  String get onboardingTemplateLabel;
+
+  /// No description provided for @templateNone.
+  ///
+  /// In en, this message translates to:
+  /// **'Empty'**
+  String get templateNone;
+
+  /// No description provided for @templateStudent.
+  ///
+  /// In en, this message translates to:
+  /// **'Student week'**
+  String get templateStudent;
+
+  /// No description provided for @templateGrocery.
+  ///
+  /// In en, this message translates to:
+  /// **'Grocery run'**
+  String get templateGrocery;
+
+  /// No description provided for @templateCatClasses.
+  ///
+  /// In en, this message translates to:
+  /// **'Classes'**
+  String get templateCatClasses;
+
+  /// No description provided for @templateCatHomework.
+  ///
+  /// In en, this message translates to:
+  /// **'Homework'**
+  String get templateCatHomework;
+
+  /// No description provided for @templateCatExams.
+  ///
+  /// In en, this message translates to:
+  /// **'Exams'**
+  String get templateCatExams;
+
+  /// No description provided for @templateStudentTask1.
+  ///
+  /// In en, this message translates to:
+  /// **'Review today\'s lecture notes'**
+  String get templateStudentTask1;
+
+  /// No description provided for @templateStudentTask2.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit the assignment'**
+  String get templateStudentTask2;
+
+  /// No description provided for @templateStudentTask3.
+  ///
+  /// In en, this message translates to:
+  /// **'Study for the midterm'**
+  String get templateStudentTask3;
+
+  /// No description provided for @templateGroceryItem1.
+  ///
+  /// In en, this message translates to:
+  /// **'Milk'**
+  String get templateGroceryItem1;
+
+  /// No description provided for @templateGroceryItem2.
+  ///
+  /// In en, this message translates to:
+  /// **'Bread'**
+  String get templateGroceryItem2;
+
+  /// No description provided for @templateGroceryItem3.
+  ///
+  /// In en, this message translates to:
+  /// **'Eggs'**
+  String get templateGroceryItem3;
+
+  /// No description provided for @templateGroceryItem4.
+  ///
+  /// In en, this message translates to:
+  /// **'Fruit'**
+  String get templateGroceryItem4;
+
+  /// No description provided for @onboardingImportCalendar.
+  ///
+  /// In en, this message translates to:
+  /// **'Import my calendar'**
+  String get onboardingImportCalendar;
+
+  /// No description provided for @onboardingCalendarConnected.
+  ///
+  /// In en, this message translates to:
+  /// **'Calendar connected'**
+  String get onboardingCalendarConnected;
+
+  /// No description provided for @onboardingAddWidget.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a home screen widget'**
+  String get onboardingAddWidget;
+
+  /// No description provided for @shareAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get shareAction;
+
+  /// No description provided for @shareFooter.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent with ROCIs Tasks, free on Google Play: {url}'**
+  String shareFooter(String url);
+
+  /// No description provided for @weeklyRecapTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly recap'**
+  String get weeklyRecapTitle;
+
+  /// No description provided for @weeklyRecapSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sundays at 6 PM. {count} done this week, {streak}-day streak.'**
+  String weeklyRecapSubtitle(int count, int streak);
+
+  /// No description provided for @weeklyRecapNotifTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your week in tasks'**
+  String get weeklyRecapNotifTitle;
+
+  /// No description provided for @weeklyRecapNotifBody.
+  ///
+  /// In en, this message translates to:
+  /// **'See what you finished and plan the week ahead.'**
+  String get weeklyRecapNotifBody;
+
+  /// No description provided for @glassPreviewOffer.
+  ///
+  /// In en, this message translates to:
+  /// **'Nice streak! Want to preview the glass look?'**
+  String get glassPreviewOffer;
+
+  /// No description provided for @glassPreviewTry.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview'**
+  String get glassPreviewTry;
+
+  /// No description provided for @glassPreviewEnd.
+  ///
+  /// In en, this message translates to:
+  /// **'Like the glass look? It comes with Pro.'**
+  String get glassPreviewEnd;
+
+  /// No description provided for @glassPreviewGetPro.
+  ///
+  /// In en, this message translates to:
+  /// **'Get Pro'**
+  String get glassPreviewGetPro;
+
+  /// No description provided for @categoryMultiTip.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick more than one category and the task blends their colors.'**
+  String get categoryMultiTip;
 }
 
 class _AppLocalizationsDelegate

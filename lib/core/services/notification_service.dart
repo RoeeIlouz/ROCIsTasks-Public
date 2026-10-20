@@ -218,6 +218,45 @@ class NotificationService {
         });
   }
 
+  /// Repeats every Sunday at 18:00 local time until cancelled with [id].
+  Future<void> scheduleWeeklyRecap({
+    required int id,
+    required String title,
+    required String body,
+  }) async {
+    if (kIsWeb) return;
+    final now = tz.TZDateTime.now(tz.local);
+    var next = tz.TZDateTime(tz.local, now.year, now.month, now.day, 18);
+    while (next.weekday != DateTime.sunday || !next.isAfter(now)) {
+      next = next.add(const Duration(days: 1));
+    }
+    try {
+      await flutterLocalNotificationsPlugin.zonedSchedule(
+        id: id,
+        title: title,
+        body: body,
+        scheduledDate: next,
+        notificationDetails: const NotificationDetails(
+          android: AndroidNotificationDetails(
+            'rocis_tasks_recap_channel',
+            'Weekly recap',
+            channelDescription: 'Your weekly summary of finished tasks',
+            importance: Importance.defaultImportance,
+            priority: Priority.defaultPriority,
+          ),
+        ),
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
+      );
+    } catch (e) {
+      AppLogger.error(
+        'Error scheduling weekly recap',
+        error: e,
+        tag: 'Notifications',
+      );
+    }
+  }
+
   Future<void> cancelNotification(int id) async {
     if (kIsWeb) return;
     await flutterLocalNotificationsPlugin.cancel(id: id);

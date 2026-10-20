@@ -195,7 +195,7 @@ class TimelineAgendaWidgetFactory(private val context: Context) : RemoteViewsSer
 
             // Tile: a faint onSurface wash on the card, like the app's list tiles.
             WidgetStyle.applyTile(views, R.id.widget_timeline_item_fill, palette.onSurface, if (palette.isDark) 0x14 else 0x0D)
-            views.setInt(R.id.widget_timeline_color_strip, "setColorFilter", accent)
+            WidgetStyle.applyAccent(views, R.id.widget_timeline_color_strip, item, accent)
 
             views.setTextViewText(R.id.widget_timeline_item_title, item.optString("title", ""))
             views.setTextColor(R.id.widget_timeline_item_title, palette.onSurface)

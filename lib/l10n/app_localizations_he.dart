@@ -2204,4 +2204,100 @@ class AppLocalizationsHe extends AppLocalizations {
   String scheduleRepeatsWeekly(String days) {
     return 'כל שבוע ב$days';
   }
+
+  @override
+  String get onboardingSetupTitle => 'מתאימים לך את האפליקציה';
+
+  @override
+  String get onboardingSetupDesc =>
+      'בחרו תבנית התחלה, חברו את לוח השנה והוסיפו ווידג׳ט למסך הבית. הכול אופציונלי.';
+
+  @override
+  String get onboardingTemplateLabel => 'תבנית התחלה';
+
+  @override
+  String get templateNone => 'ריק';
+
+  @override
+  String get templateStudent => 'שבוע סטודנט';
+
+  @override
+  String get templateGrocery => 'קניות';
+
+  @override
+  String get templateCatClasses => 'שיעורים';
+
+  @override
+  String get templateCatHomework => 'שיעורי בית';
+
+  @override
+  String get templateCatExams => 'מבחנים';
+
+  @override
+  String get templateStudentTask1 => 'לעבור על סיכומי ההרצאה של היום';
+
+  @override
+  String get templateStudentTask2 => 'להגיש את העבודה';
+
+  @override
+  String get templateStudentTask3 => 'ללמוד למבחן אמצע';
+
+  @override
+  String get templateGroceryItem1 => 'חלב';
+
+  @override
+  String get templateGroceryItem2 => 'לחם';
+
+  @override
+  String get templateGroceryItem3 => 'ביצים';
+
+  @override
+  String get templateGroceryItem4 => 'פירות';
+
+  @override
+  String get onboardingImportCalendar => 'לייבא את לוח השנה שלי';
+
+  @override
+  String get onboardingCalendarConnected => 'לוח השנה מחובר';
+
+  @override
+  String get onboardingAddWidget => 'הוספת ווידג׳ט למסך הבית';
+
+  @override
+  String get shareAction => 'שיתוף';
+
+  @override
+  String shareFooter(String url) {
+    return 'נשלח מ-ROCIs Tasks, חינם ב-Google Play: $url';
+  }
+
+  @override
+  String get weeklyRecapTitle => 'סיכום שבועי';
+
+  @override
+  String weeklyRecapSubtitle(int count, int streak) {
+    return 'בימי ראשון ב-18:00. $count הושלמו השבוע, רצף של $streak ימים.';
+  }
+
+  @override
+  String get weeklyRecapNotifTitle => 'השבוע שלך במשימות';
+
+  @override
+  String get weeklyRecapNotifBody => 'ראו מה סיימתם ותכננו את השבוע הבא.';
+
+  @override
+  String get glassPreviewOffer => 'יפה! רוצים לראות את מראה הזכוכית?';
+
+  @override
+  String get glassPreviewTry => 'תצוגה מקדימה';
+
+  @override
+  String get glassPreviewEnd => 'אהבתם את מראה הזכוכית? הוא כלול ב-Pro.';
+
+  @override
+  String get glassPreviewGetPro => 'שדרוג ל-Pro';
+
+  @override
+  String get categoryMultiTip =>
+      'בחרו יותר מקטגוריה אחת והמשימה תציג שילוב של הצבעים שלהן.';
 }

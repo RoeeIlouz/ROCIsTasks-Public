@@ -8,6 +8,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import 'package:rocis_tasks/core/services/engagement_service.dart';
 import 'package:rocis_tasks/shared/ui/app_messenger.dart';
 import 'package:rocis_tasks/shared/ui/ui_kit.dart';
 import 'package:rocis_tasks/core/services/auth_service.dart';
@@ -95,7 +96,9 @@ class _AppRootState extends State<AppRoot> {
     _subscriptionService,
     privateModeService: _privateModeService,
     source: _taskSource,
+    engagementService: _engagementService,
   );
+  final _engagementService = EngagementService();
   final _connectivityService = ConnectivityService();
   late final OnboardingService _onboardingService;
   AppRouter? _appRouter;
@@ -400,6 +403,7 @@ class _AppRootState extends State<AppRoot> {
               ),
             ),
             ChangeNotifierProvider.value(value: _onboardingService),
+            ChangeNotifierProvider.value(value: _engagementService),
             Provider.value(value: _appRouter!),
             Provider.value(value: _errorHandlingService),
             ChangeNotifierProvider.value(value: _connectivityService),

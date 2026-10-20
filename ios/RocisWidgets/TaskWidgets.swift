@@ -9,6 +9,7 @@ struct WidgetTask: Decodable, Identifiable {
     let priority: String?
     let category_name: String?
     let category_color: String?
+    let category_colors: [String]?
     let dueDate: String?
     let isCompleted: Bool?
     let isPinned: Bool?
@@ -52,7 +53,7 @@ struct TaskWidgetView: View {
 
     private func row(_ task: WidgetTask) -> some View {
         HStack(spacing: 8) {
-            ColorBar(color: Color(hex: task.category_color ?? ""))
+            ColorBar(color: Color(hex: task.category_color ?? ""), colors: task.category_colors)
             VStack(alignment: .leading, spacing: 1) {
                 Text(task.title)
                     .font(.subheadline)

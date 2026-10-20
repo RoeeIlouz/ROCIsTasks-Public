@@ -135,6 +135,7 @@ internal object TaskListData {
                 put("dueDateIso", extractStringSafely(taskObj, "dueDateIso", ""))
                 put("category_name", extractStringSafely(taskObj, "category_name", ""))
                 put("category_color", extractColorSafely(taskObj, "category_color", ""))
+                taskObj.optJSONArray("category_colors")?.let { put("category_colors", it) }
                 put("priority", extractStringSafely(taskObj, "priority", "medium"))
                 put("isCompleted", extractBooleanSafely(taskObj, "isCompleted", false))
                 put("isPinned", extractBooleanSafely(taskObj, "isPinned", false))
@@ -224,7 +225,7 @@ class TaskWidgetFactory(private val context: Context) : RemoteViewsService.Remot
 
             // Tile: a faint onSurface wash on the card, like the app's list tiles.
             WidgetStyle.applyTile(views, R.id.widget_task_fill, palette.onSurface, if (palette.isDark) 0x14 else 0x0D)
-            views.setInt(R.id.widget_task_category_color, "setColorFilter", accent)
+            WidgetStyle.applyAccent(views, R.id.widget_task_category_color, task, accent)
 
             views.setTextViewText(R.id.widget_task_title, task.optString("title", ""))
             views.setTextColor(R.id.widget_task_title, palette.onSurface)

@@ -15,6 +15,10 @@ class GlassContainer extends StatelessWidget {
   final BoxBorder? border;
   final Color? color;
   final Color? tintColor;
+
+  /// Tints of every category on the item. With two or more, the fill and the
+  /// rim become a gradient across them instead of the first category's tint.
+  final List<Color>? tintColors;
   final bool isSelected;
   final Color? selectedBorderColor;
   final double? elevation;
@@ -30,6 +34,7 @@ class GlassContainer extends StatelessWidget {
     this.border,
     this.color,
     this.tintColor,
+    this.tintColors,
     this.isSelected = false,
     this.selectedBorderColor,
     this.elevation,
@@ -38,20 +43,21 @@ class GlassContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final useGlassmorphism = context.select<ThemeService, bool?>(
-      (s) => s.useGlassmorphism,
-    ) ?? false;
-    final useMaterialTheme = context.select<ThemeService, bool?>(
-      (s) => s.useMaterialTheme,
-    ) ?? false;
-    final isPremium = context.select<SubscriptionService, bool?>(
-      (s) => s.isPremium,
-    ) ?? false;
+    final useGlassmorphism =
+        context.select<ThemeService, bool?>((s) => s.useGlassmorphism) ?? false;
+    final useMaterialTheme =
+        context.select<ThemeService, bool?>((s) => s.useMaterialTheme) ?? false;
+    final isPremium =
+        context.select<SubscriptionService, bool?>((s) => s.isPremium) ?? false;
+    final glassPreview =
+        context.select<ThemeService, bool?>((s) => s.glassPreviewActive) ??
+        false;
     final isDark = theme.brightness == Brightness.dark;
-    final isAmoled = isDark &&
+    final isAmoled =
+        isDark &&
         (theme.scaffoldBackgroundColor == Colors.black ||
             theme.colorScheme.surface == const Color(0xFF000000));
-    final useGlass = useGlassmorphism && isPremium && !kIsWeb;
+    final useGlass = useGlassmorphism && (isPremium || glassPreview) && !kIsWeb;
 
     // Default glass color adapts to theme if not provided, with a beautiful primary/category tint
     final effectiveTint = tintColor ?? color ?? theme.colorScheme.primary;
@@ -94,11 +100,7 @@ class GlassContainer extends StatelessWidget {
     }
 
     final glassBorder =
-        border ??
-        Border.all(
-          color: borderTone,
-          width: isSelected ? 1.5 : 1.0,
-        );
+        border ?? Border.all(color: borderTone, width: isSelected ? 1.5 : 1.0);
 
     final double shadowElevation = elevation ?? (useGlass ? 2.0 : 2.0);
     final List<BoxShadow>? shadow;
@@ -134,19 +136,55 @@ class GlassContainer extends StatelessWidget {
       shadow = null;
     }
 
+    final tints = (tintColors != null && tintColors!.length > 1)
+        ? tintColors!
+        : null;
+    final fillGradient =
+        tints != null && (useGlass || isSelected || color == null);
+    final gradientRim = tints != null && !isSelected && border == null;
+
+    Color fillFor(Color tint) {
+      if (useGlass) {
+        return Color.lerp(
+          baseColor,
+          tint,
+          isDark ? (isAmoled ? 0.22 : 0.18) : 0.12,
+        )!.withValues(alpha: isSelected ? opacity + 0.1 : opacity);
+      }
+      if (isSelected) return tint.withValues(alpha: 0.2);
+      return Color.lerp(
+        theme.colorScheme.surfaceContainerLow,
+        tint,
+        isDark ? 0.10 : 0.07,
+      )!;
+    }
+
     final innerContainer = Container(
       padding: padding,
       decoration: BoxDecoration(
-        color: useGlass
-            ? glassColor.withValues(alpha: isSelected ? opacity + 0.1 : opacity)
-            : (isSelected
-                  ? (color?.withValues(alpha: 0.2) ??
-                        (tintColor?.withValues(alpha: 0.2) ??
-                            theme.colorScheme.primary.withValues(alpha: 0.12)))
-                  : (color ?? theme.colorScheme.surfaceContainerLow)),
-        borderRadius: radius,
-        border: glassBorder,
-        boxShadow: shadow,
+        color: fillGradient
+            ? null
+            : (useGlass
+                  ? glassColor.withValues(
+                      alpha: isSelected ? opacity + 0.1 : opacity,
+                    )
+                  : (isSelected
+                        ? (color?.withValues(alpha: 0.2) ??
+                              (tintColor?.withValues(alpha: 0.2) ??
+                                  theme.colorScheme.primary.withValues(
+                                    alpha: 0.12,
+                                  )))
+                        : (color ?? theme.colorScheme.surfaceContainerLow))),
+        gradient: fillGradient
+            ? LinearGradient(
+                begin: AlignmentDirectional.centerStart,
+                end: AlignmentDirectional.centerEnd,
+                colors: [for (final t in tints) fillFor(t)],
+              )
+            : null,
+        borderRadius: gradientRim ? radius - BorderRadius.circular(1) : radius,
+        border: gradientRim ? null : glassBorder,
+        boxShadow: gradientRim ? null : shadow,
       ),
       child: Material(
         type: MaterialType.transparency,
@@ -156,11 +194,38 @@ class GlassContainer extends StatelessWidget {
       ),
     );
 
+    final Widget framed = gradientRim
+        ? Container(
+            padding: const EdgeInsets.all(1),
+            decoration: BoxDecoration(
+              borderRadius: radius,
+              gradient: LinearGradient(
+                begin: AlignmentDirectional.centerStart,
+                end: AlignmentDirectional.centerEnd,
+                colors: [
+                  for (final t in tints)
+                    useGlass
+                        ? Color.lerp(
+                            Colors.white,
+                            t,
+                            isDark ? 0.35 : 0.20,
+                          )!.withValues(
+                            alpha: isDark ? (isAmoled ? 0.22 : 0.18) : 0.38,
+                          )
+                        : t.withValues(alpha: isDark ? 0.16 : 0.12),
+                ],
+              ),
+              boxShadow: shadow,
+            ),
+            child: innerContainer,
+          )
+        : innerContainer;
+
     // blur <= 0 keeps the glass tint but skips the BackdropFilter, for
     // surfaces that animate over a dimmed barrier where a live blur only
     // costs frames.
     if (!useGlass || blur <= 0) {
-      return Container(margin: margin, child: innerContainer);
+      return Container(margin: margin, child: framed);
     }
 
     return Container(
@@ -170,7 +235,7 @@ class GlassContainer extends StatelessWidget {
         clipBehavior: Clip.antiAlias,
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: blur, sigmaY: blur),
-          child: innerContainer,
+          child: framed,
         ),
       ),
     );

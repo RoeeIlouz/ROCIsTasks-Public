@@ -33,8 +33,7 @@
             android:layout_width="4dp"
             android:layout_height="28dp"
             android:scaleType="fitXY"
-            android:src="@drawable/widget_accent_bar"
-            android:tint="#FF6366F1" />
+            android:src="@drawable/widget_accent_bar" />
 
         <ImageView
             android:id="@+id/widget_timeline_check"

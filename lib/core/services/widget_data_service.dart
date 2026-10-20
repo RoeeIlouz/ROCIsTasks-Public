@@ -4,6 +4,7 @@ import 'package:home_widget/home_widget.dart';
 import 'package:intl/intl.dart';
 import 'package:rocis_tasks/core/services/calendar_service.dart';
 import 'package:rocis_tasks/core/services/schedule_events_loader.dart';
+import 'package:rocis_tasks/core/services/widget_category_colors.dart';
 import 'package:rocis_tasks/core/services/schedule_firestore_service.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/features/categories/domain/models/category.dart';
@@ -430,6 +431,7 @@ class WidgetDataService {
         'category_color': cat != null
             ? '#${cat.colorValue.toRadixString(16).padLeft(8, '0')}'
             : '#E5323F',
+        'category_colors': widgetCategoryColors(t, getCategoryById),
         'date': taskDate.toIso8601String(),
         'dateOnly': dateOnlyFormatted,
         'dateDisplay': dateOnlyFormatted,
@@ -703,6 +705,7 @@ class WidgetDataService {
           'category_color': cat != null
               ? '#${cat.colorValue.toRadixString(16).padLeft(8, '0')}'
               : '#E5323F',
+          'category_colors': widgetCategoryColors(t, getCategoryById),
           'date': taskDate.toIso8601String(),
           'dateOnly': DateFormat('yyyy-MM-dd').format(taskDate),
           'timeDisplay': t.dueDate != null
@@ -928,6 +931,7 @@ class WidgetDataService {
         'category_color': cat != null
             ? '#${cat.colorValue.toRadixString(16).padLeft(8, '0')}'
             : '#E5323F',
+        'category_colors': widgetCategoryColors(t, getCategoryById),
         'rank': due ?? now.add(const Duration(hours: 24)),
         'start': due,
         'priority': t.priority.name,
@@ -1103,6 +1107,7 @@ class WidgetDataService {
         'category_color': cat != null
             ? '#${cat.colorValue.toRadixString(16).padLeft(8, '0')}'
             : '#E5323F',
+        'category_colors': widgetCategoryColors(t, getCategoryById),
         'priority': t.priority.name,
         'isCompleted': t.isCompleted,
         'isOverdue': isOverdue,

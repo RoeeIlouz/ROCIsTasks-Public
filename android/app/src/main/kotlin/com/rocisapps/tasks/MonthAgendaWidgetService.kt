@@ -80,7 +80,7 @@ class MonthAgendaListFactory(private val context: Context) : RemoteViewsService.
 
             WidgetStyle.applyDirection(views, R.id.widget_month_item_root, locale)
             WidgetStyle.applyTile(views, R.id.widget_month_item_fill, palette.onSurface, if (palette.isDark) 0x14 else 0x0D)
-            views.setInt(R.id.widget_month_item_bar, "setColorFilter", accent)
+            WidgetStyle.applyAccent(views, R.id.widget_month_item_bar, item, accent)
 
             views.setTextViewText(R.id.widget_month_item_title, item.optString("title", ""))
             views.setTextColor(R.id.widget_month_item_title, palette.onSurface)

@@ -832,6 +832,35 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   color: theme.colorScheme.primary,
                 ),
               ),
+              // Multi-select is easy to miss; the tip goes away once the
+              // task has two categories.
+              if (_selectedCategoryIds.length < 2 &&
+                  Provider.of<TaskProvider>(
+                        context,
+                        listen: false,
+                      ).categories.length >
+                      1) ...[
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.gradient_rounded,
+                      size: 14,
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        l10n.categoryMultiTip,
+                        style: GoogleFonts.outfit(
+                          fontSize: 12,
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
               const SizedBox(height: 10),
               Consumer<TaskProvider>(
                 builder: (context, provider, child) {

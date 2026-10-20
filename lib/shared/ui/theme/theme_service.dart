@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart' show kIsWeb, PlatformDispatcher;
@@ -11,6 +13,8 @@ class ThemeService extends ChangeNotifier {
   bool _useMaterialTheme = false;
   bool _useAmoledTheme = false;
   bool _useGlassmorphism = false;
+  bool _glassPreview = false;
+  Timer? _glassPreviewTimer;
   bool _use24HourFormat = false;
   bool _autoRemoveNlpDates = true;
   bool _taskCompletionFeedback = true;
@@ -23,7 +27,32 @@ class ThemeService extends ChangeNotifier {
   ThemeMode get themeMode => _themeMode;
   bool get useMaterialTheme => _useMaterialTheme;
   bool get useAmoledTheme => _useAmoledTheme;
-  bool get useGlassmorphism => !kIsWeb && _useGlassmorphism;
+  bool get useGlassmorphism => !kIsWeb && (_useGlassmorphism || _glassPreview);
+
+  /// True while a free user is trying the glass look (see [previewGlass]).
+  bool get glassPreviewActive => _glassPreview;
+
+  /// Glass is drawn for Pro users who turned it on, or during a preview.
+  bool glassActive(bool isPremium) =>
+      useGlassmorphism && (isPremium || _glassPreview);
+
+  /// Turns the glass look on for [duration] without saving it, then calls
+  /// [onEnd].
+  void previewGlass({
+    Duration duration = const Duration(seconds: 45),
+    VoidCallback? onEnd,
+  }) {
+    if (kIsWeb) return;
+    _glassPreviewTimer?.cancel();
+    _glassPreview = true;
+    notifyListeners();
+    _glassPreviewTimer = Timer(duration, () {
+      _glassPreview = false;
+      notifyListeners();
+      onEnd?.call();
+    });
+  }
+
   bool get use24HourFormat => _use24HourFormat;
   bool get autoRemoveNlpDates => _autoRemoveNlpDates;
   bool get taskCompletionFeedback => _taskCompletionFeedback;

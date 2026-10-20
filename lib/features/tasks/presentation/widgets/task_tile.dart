@@ -196,6 +196,13 @@ class TaskTile extends StatelessWidget {
                 tintColor: categories.isNotEmpty
                     ? Color(categories.first.colorValue)
                     : null,
+                // Done tasks keep their blend but fade it toward grey.
+                tintColors: [
+                  for (final c in categories)
+                    task.isCompleted
+                        ? Color.lerp(Color(c.colorValue), Colors.grey, 0.55)!
+                        : Color(c.colorValue),
+                ],
                 color: isSelected
                     ? (categories.isNotEmpty
                           ? Color(categories.first.colorValue)
@@ -944,6 +951,7 @@ class _MaskedPrivateTaskTile extends StatelessWidget {
       isSelected: isSelected,
       selectedBorderColor: categoryColor ?? theme.colorScheme.primary,
       tintColor: categoryColor,
+      tintColors: [for (final c in categories) Color(c.colorValue)],
       color: isSelected ? (categoryColor ?? theme.colorScheme.primary) : null,
       child: InkWell(
         onTap: () => _handleTap(context),

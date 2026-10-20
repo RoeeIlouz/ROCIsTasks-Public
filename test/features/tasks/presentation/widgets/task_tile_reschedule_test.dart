@@ -34,6 +34,8 @@ void main() {
     when(() => mockThemeService.use24HourFormat).thenReturn(true);
     when(() => mockThemeService.isDarkMode).thenReturn(false);
     when(() => mockThemeService.useGlassmorphism).thenReturn(false);
+    when(() => mockThemeService.glassPreviewActive).thenReturn(false);
+    when(() => mockThemeService.glassActive(any())).thenReturn(false);
     when(() => mockThemeService.taskCompletionFeedback).thenReturn(false);
     when(() => mockThemeService.useMaterialTheme).thenReturn(true);
     when(() => mockSubscriptionService.isPremium).thenReturn(true);

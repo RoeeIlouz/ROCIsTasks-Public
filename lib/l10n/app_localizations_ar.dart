@@ -2205,4 +2205,100 @@ class AppLocalizationsAr extends AppLocalizations {
   String scheduleRepeatsWeekly(String days) {
     return 'كل أسبوع يوم $days';
   }
+
+  @override
+  String get onboardingSetupTitle => 'خصّصه لك';
+
+  @override
+  String get onboardingSetupDesc =>
+      'اختر قالباً للبدء، واربط تقويمك، وأضف أداة إلى الشاشة الرئيسية. كل ذلك اختياري.';
+
+  @override
+  String get onboardingTemplateLabel => 'قالب البدء';
+
+  @override
+  String get templateNone => 'فارغ';
+
+  @override
+  String get templateStudent => 'أسبوع الطالب';
+
+  @override
+  String get templateGrocery => 'التسوق';
+
+  @override
+  String get templateCatClasses => 'المحاضرات';
+
+  @override
+  String get templateCatHomework => 'الواجبات';
+
+  @override
+  String get templateCatExams => 'الامتحانات';
+
+  @override
+  String get templateStudentTask1 => 'مراجعة ملاحظات محاضرة اليوم';
+
+  @override
+  String get templateStudentTask2 => 'تسليم الواجب';
+
+  @override
+  String get templateStudentTask3 => 'المذاكرة للامتحان النصفي';
+
+  @override
+  String get templateGroceryItem1 => 'حليب';
+
+  @override
+  String get templateGroceryItem2 => 'خبز';
+
+  @override
+  String get templateGroceryItem3 => 'بيض';
+
+  @override
+  String get templateGroceryItem4 => 'فاكهة';
+
+  @override
+  String get onboardingImportCalendar => 'استيراد تقويمي';
+
+  @override
+  String get onboardingCalendarConnected => 'تم ربط التقويم';
+
+  @override
+  String get onboardingAddWidget => 'إضافة أداة إلى الشاشة الرئيسية';
+
+  @override
+  String get shareAction => 'مشاركة';
+
+  @override
+  String shareFooter(String url) {
+    return 'أُرسلت عبر ROCIs Tasks، مجاناً على Google Play: $url';
+  }
+
+  @override
+  String get weeklyRecapTitle => 'ملخص أسبوعي';
+
+  @override
+  String weeklyRecapSubtitle(int count, int streak) {
+    return 'الأحد عند 6 مساءً. أُنجز $count هذا الأسبوع، سلسلة $streak أيام.';
+  }
+
+  @override
+  String get weeklyRecapNotifTitle => 'أسبوعك في المهام';
+
+  @override
+  String get weeklyRecapNotifBody =>
+      'اطّلع على ما أنجزته وخطّط للأسبوع القادم.';
+
+  @override
+  String get glassPreviewOffer => 'عمل رائع! هل تريد معاينة المظهر الزجاجي؟';
+
+  @override
+  String get glassPreviewTry => 'معاينة';
+
+  @override
+  String get glassPreviewEnd => 'أعجبك المظهر الزجاجي؟ إنه ضمن Pro.';
+
+  @override
+  String get glassPreviewGetPro => 'الترقية إلى Pro';
+
+  @override
+  String get categoryMultiTip => 'اختر أكثر من فئة وستمزج المهمة ألوانها.';
 }

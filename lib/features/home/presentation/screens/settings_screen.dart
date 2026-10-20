@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:rocis_tasks/core/services/auth_service.dart';
+import 'package:rocis_tasks/core/services/engagement_service.dart';
 import 'package:rocis_tasks/shared/ui/ui_kit.dart';
 import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
 import 'package:rocis_tasks/features/calendar/presentation/providers/calendar_provider.dart';
@@ -859,6 +860,7 @@ class SettingsScreen extends StatelessWidget {
               value: themeService.taskCompletionFeedback,
               onChanged: themeService.toggleTaskCompletionFeedback,
             ),
+          if (!kIsWeb) _buildWeeklyRecapTile(context, taskProvider),
           SwitchListTile(
             secondary: _buildLeadingIcon(
               context,
@@ -1519,6 +1521,42 @@ class SettingsScreen extends StatelessWidget {
           fontWeight: FontWeight.bold,
           letterSpacing: 0.5,
         ),
+      ),
+    );
+  }
+
+  /// Opt-in Sunday recap; the subtitle shows this week's count and streak.
+  Widget _buildWeeklyRecapTile(
+    BuildContext context,
+    TaskProvider taskProvider,
+  ) {
+    final l10n = AppLocalizations.of(context)!;
+    final EngagementService engagement;
+    try {
+      engagement = Provider.of<EngagementService>(context);
+    } on ProviderNotFoundException {
+      return const SizedBox.shrink();
+    }
+    final now = DateTime.now();
+    final tasks = taskProvider.allTasks;
+    return SwitchListTile(
+      secondary: _buildLeadingIcon(
+        context,
+        Icons.local_fire_department_rounded,
+        Colors.orange,
+      ),
+      title: Text(l10n.weeklyRecapTitle),
+      subtitle: Text(
+        l10n.weeklyRecapSubtitle(
+          EngagementService.completedThisWeek(tasks, now),
+          EngagementService.streak(tasks, now),
+        ),
+      ),
+      value: engagement.weeklyRecapEnabled,
+      onChanged: (value) => engagement.setWeeklyRecap(
+        value,
+        title: l10n.weeklyRecapNotifTitle,
+        body: l10n.weeklyRecapNotifBody,
       ),
     );
   }

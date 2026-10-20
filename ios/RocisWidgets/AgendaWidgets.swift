@@ -9,6 +9,7 @@ struct AgendaItem: Decodable {
     let title: String?
     let subtitle: String?
     let category_color: String?
+    let category_colors: [String]?
     let dateOnly: String?
     /// ISO start/end (Dart toIso8601String), used by the Week View timetable.
     let date: String?
@@ -33,7 +34,7 @@ struct AgendaRow: View {
 
     var body: some View {
         HStack(spacing: 8) {
-            ColorBar(color: Color(hex: item.category_color ?? ""))
+            ColorBar(color: Color(hex: item.category_color ?? ""), colors: item.category_colors)
             VStack(alignment: .leading, spacing: 1) {
                 Text(item.title ?? "")
                     .font(compact ? .caption : .subheadline)
@@ -785,6 +786,7 @@ private struct KanbanData: Decodable {
         let id: String?
         let title: String?
         let category_color: String?
+        let category_colors: [String]?
         let priority: String?
         let isOverdue: Bool?
         let dateDisplay: String?
@@ -834,7 +836,13 @@ struct KanbanWidgetView: View {
                         RoundedRectangle(cornerRadius: 5)
                             .fill(Theme.card)
                             .overlay(alignment: .leading) {
-                                Rectangle().fill(Color(hex: card.category_color ?? "")).frame(width: 2)
+                                Group {
+                                    if let hexes = card.category_colors, hexes.count > 1 {
+                                        Rectangle().fill(LinearGradient(colors: hexes.map { Color(hex: $0) }, startPoint: .top, endPoint: .bottom))
+                                    } else {
+                                        Rectangle().fill(Color(hex: card.category_color ?? ""))
+                                    }
+                                }.frame(width: 2)
                             }
                     )
                 }
