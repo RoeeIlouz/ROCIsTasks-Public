@@ -247,7 +247,7 @@ class AuthService extends ChangeNotifier {
       return popupToken;
     }
 
-    // Step 2: Try to establish GIS user session via lightweight auth (One Tap)
+    // Step 2: Try to establish GIS user session via lightweight auth (One Tap) or authenticate
     if (_oauthManager.googleUser == null) {
       try {
         await _oauthManager.ensureGoogleSignInInitialized();
@@ -261,9 +261,23 @@ class AuthService extends ChangeNotifier {
           );
         } else {
           AppLogger.info(
-            'Web: GIS lightweight auth returned null (no prior GIS session).',
+            'Web: GIS lightweight auth returned null. Attempting interactive authenticate()...',
             tag: 'Auth',
           );
+          try {
+            final authUser = await _oauthManager.googleSignIn.authenticate(
+              scopeHint: GoogleOAuthManager.googleTasksScopes,
+            );
+            if (authUser != null) {
+              _oauthManager.setGoogleUser(authUser);
+              AppLogger.info(
+                'Web: GIS authenticate acquired user: ${authUser.email}',
+                tag: 'Auth',
+              );
+            }
+          } catch (authErr) {
+            AppLogger.info('Web: GIS authenticate prompt: $authErr', tag: 'Auth');
+          }
         }
       } catch (e) {
         AppLogger.warning('Web: GIS lightweight auth failed: $e', tag: 'Auth');
@@ -272,7 +286,7 @@ class AuthService extends ChangeNotifier {
 
     // Step 3: If we have a GIS user, try non-interactive then interactive authorization
     if (_oauthManager.googleUser != null) {
-      // 3a: Try non-interactive (silent) — succeeds if user previously granted scopes
+      // 3a: Try non-interactive (silent)
       try {
         final clientAuth = await _oauthManager.googleUser!.authorizationClient
             .authorizationForScopes(GoogleOAuthManager.googleTasksScopes);
@@ -313,7 +327,29 @@ class AuthService extends ChangeNotifier {
       }
     }
 
-    // Step 4: Last resort — check SharedPreferences cache
+    // Step 4: Fallback to cached token in Cookies or SharedPreferences
+    try {
+      final cookieToken = CookieService.instance.getCookie(
+        GoogleOAuthManager.keyAccessToken,
+      );
+      if (cookieToken != null && cookieToken.isNotEmpty) {
+        AppLogger.info(
+          'Web: Restored token from cookie fallback.',
+          tag: 'Auth',
+        );
+        return cookieToken;
+      }
+      final prefs = await SharedPreferences.getInstance();
+      final cachedToken = prefs.getString(GoogleOAuthManager.keyAccessToken);
+      if (cachedToken != null && cachedToken.isNotEmpty) {
+        AppLogger.info(
+          'Web: Restored token from SharedPreferences fallback.',
+          tag: 'Auth',
+        );
+        return cachedToken;
+      }
+    } catch (_) {}
+
     AppLogger.warning(
       'Web: All token resolution attempts failed.',
       tag: 'Auth',
