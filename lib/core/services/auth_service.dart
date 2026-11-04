@@ -10,6 +10,7 @@ import 'package:rocis_tasks/core/services/auth/google_oauth_manager.dart';
 import 'package:rocis_tasks/core/services/encryption_service.dart';
 import 'package:rocis_tasks/core/services/error_handling_service.dart';
 import 'package:rocis_tasks/core/services/logger_service.dart';
+import 'package:rocis_tasks/core/services/web/cookie_service.dart';
 
 export 'package:rocis_tasks/core/services/auth/google_oauth_manager.dart'
     show GoogleTokenExpiredException;
