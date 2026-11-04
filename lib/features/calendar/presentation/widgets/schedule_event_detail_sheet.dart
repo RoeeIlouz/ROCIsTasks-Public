@@ -40,7 +40,10 @@ class ScheduleEventDetailSheet extends StatelessWidget {
       event.startTime.hour,
       event.startTime.minute,
     );
-    return (start: start, end: start.add(event.endTime.difference(event.startTime)));
+    return (
+      start: start,
+      end: start.add(event.endTime.difference(event.startTime)),
+    );
   }
 
   /// Display title: the course name, falling back to the event title.
@@ -54,7 +57,8 @@ class ScheduleEventDetailSheet extends StatelessWidget {
   String? get subtitle {
     final title = event.title.trim();
     if (title.isEmpty || event.courseName.trim().isEmpty) return null;
-    if (title.toLowerCase() == event.courseName.trim().toLowerCase()) return null;
+    if (title.toLowerCase() == event.courseName.trim().toLowerCase())
+      return null;
     return title;
   }
 
@@ -134,7 +138,9 @@ class ScheduleEventDetailSheet extends StatelessWidget {
         SnackBar(
           content: Text(l10n.eventCopiedToTasks),
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
           duration: const Duration(seconds: 3),
         ),
       );
@@ -397,8 +403,9 @@ class ScheduleEventDetailSheet extends StatelessWidget {
                           .withValues(alpha: 0.25),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: theme.colorScheme.outlineVariant
-                            .withValues(alpha: 0.4),
+                        color: theme.colorScheme.outlineVariant.withValues(
+                          alpha: 0.4,
+                        ),
                         width: 0.8,
                       ),
                     ),
@@ -523,7 +530,11 @@ class _InfoRow extends StatelessWidget {
   final Color color;
   final Widget child;
 
-  const _InfoRow({required this.icon, required this.color, required this.child});
+  const _InfoRow({
+    required this.icon,
+    required this.color,
+    required this.child,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -536,8 +547,9 @@ class _InfoRow extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: theme.colorScheme.surfaceContainerHighest
-                  .withValues(alpha: 0.5),
+              color: theme.colorScheme.surfaceContainerHighest.withValues(
+                alpha: 0.5,
+              ),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(icon, size: 18, color: color),

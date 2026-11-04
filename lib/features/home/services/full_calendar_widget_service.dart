@@ -2,7 +2,9 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import 'package:device_calendar/device_calendar.dart' show Event;
 import 'package:home_widget/home_widget.dart';
+import 'package:rocis_tasks/features/calendar/utils/calendar_item_order.dart';
 import 'package:intl/intl.dart';
 import 'package:rocis_tasks/core/services/widget_data_service.dart';
 import 'package:rocis_tasks/core/services/logger_service.dart';
@@ -603,94 +605,101 @@ class FullCalendarWidgetService {
 
         final summaries = <Map<String, dynamic>>[];
 
-        // 1. Prioritize tasks
-        for (final t in dayTasks) {
+        // One list ordered by time of day (all-day first), so the per-day cap
+        // drops the latest items instead of a whole kind of item.
+        for (final item in sortCalendarItems([
+          ...dayTasks,
+          ...dayEvents,
+          ...daySchedule,
+        ])) {
           if (summaries.length >= _maxSummariesPerDay) break;
-          int? colorVal;
-          try {
-            final cat = categories.firstWhere(
-              (c) => t.categoryIds.isNotEmpty
-                  ? t.categoryIds.contains(c.id)
-                  : c.id == t.categoryId,
+          if (item is Task) {
+            final t = item;
+            int? colorVal;
+            try {
+              final cat = categories.firstWhere(
+                (c) => t.categoryIds.isNotEmpty
+                    ? t.categoryIds.contains(c.id)
+                    : c.id == t.categoryId,
+              );
+              colorVal = cat.colorValue;
+            } catch (_) {}
+
+            final title = t.title.length > 25
+                ? '${t.title.substring(0, 22)}...'
+                : t.title;
+
+            summaries.add({
+              'text': title,
+              'priority': t.priority.toString().split('.').last,
+              'color': colorVal != null
+                  ? '#${colorVal.toRadixString(16).padLeft(8, '0')}'
+                  : taskColorHex,
+              'type': 'task',
+            });
+          } else if (item is Event) {
+            final e = item;
+            final timeStr = e.start != null
+                ? _formatEventTime(e.start, e.end, l10n, clock)
+                : '';
+
+            final displayTitle = e.title ?? l10n?.event ?? 'Event';
+            final title = displayTitle.length > 25
+                ? '${displayTitle.substring(0, 22)}...'
+                : displayTitle;
+            final location = (e.location ?? '').length > 20
+                ? '${(e.location ?? '').substring(0, 17)}...'
+                : (e.location ?? '');
+
+            final eventColor =
+                e.calendarId != null && calendarColors.containsKey(e.calendarId)
+                ? calendarColors[e.calendarId]
+                : googleColorHex;
+
+            summaries.add({
+              'text': title,
+              'time': timeStr,
+              'subtitle': location,
+              'color': eventColor,
+              'type': 'google',
+            });
+          } else if (item is SyncedScheduleEvent) {
+            final s = item;
+            final timeStr = _formatEventTime(
+              s.startTime,
+              s.endTime,
+              l10n,
+              clock,
             );
-            colorVal = cat.colorValue;
-          } catch (_) {}
+            final displayTitle = s.courseName.isNotEmpty
+                ? (s.title.isNotEmpty &&
+                          s.title.toLowerCase().trim() !=
+                              s.courseName.toLowerCase().trim()
+                      ? '${s.courseName}: ${s.title}'
+                      : s.courseName)
+                : (s.title.isNotEmpty ? s.title : (l10n?.event ?? 'Class'));
+            final title = displayTitle.length > 28
+                ? '${displayTitle.substring(0, 25)}...'
+                : displayTitle;
+            final rawSubtitle = s.location.isNotEmpty
+                ? (s.courseCode.isNotEmpty
+                      ? '${s.courseCode} • ${s.location}'
+                      : s.location)
+                : s.courseCode;
+            final location = rawSubtitle.length > 25
+                ? '${rawSubtitle.substring(0, 22)}...'
+                : rawSubtitle;
+            final eventColor =
+                '#${s.color.toARGB32().toRadixString(16).padLeft(8, '0')}';
 
-          final title = t.title.length > 25
-              ? '${t.title.substring(0, 22)}...'
-              : t.title;
-
-          summaries.add({
-            'text': title,
-            'priority': t.priority.toString().split('.').last,
-            'color': colorVal != null
-                ? '#${colorVal.toRadixString(16).padLeft(8, '0')}'
-                : taskColorHex,
-            'type': 'task',
-          });
-        }
-
-        // 2. Google Calendar events
-        for (final e in dayEvents) {
-          if (summaries.length >= _maxSummariesPerDay) break;
-          final timeStr = e.start != null
-              ? _formatEventTime(e.start, e.end, l10n, clock)
-              : '';
-
-          final displayTitle = e.title ?? l10n?.event ?? 'Event';
-          final title = displayTitle.length > 25
-              ? '${displayTitle.substring(0, 22)}...'
-              : displayTitle;
-          final location = (e.location ?? '').length > 20
-              ? '${(e.location ?? '').substring(0, 17)}...'
-              : (e.location ?? '');
-
-          final eventColor =
-              e.calendarId != null && calendarColors.containsKey(e.calendarId)
-              ? calendarColors[e.calendarId]
-              : googleColorHex;
-
-          summaries.add({
-            'text': title,
-            'time': timeStr,
-            'subtitle': location,
-            'color': eventColor,
-            'type': 'google',
-          });
-        }
-
-        // 3. ROCIs Schedule events
-        for (final s in daySchedule) {
-          if (summaries.length >= _maxSummariesPerDay) break;
-          final timeStr = _formatEventTime(s.startTime, s.endTime, l10n, clock);
-          final displayTitle = s.courseName.isNotEmpty
-              ? (s.title.isNotEmpty &&
-                        s.title.toLowerCase().trim() !=
-                            s.courseName.toLowerCase().trim()
-                    ? '${s.courseName}: ${s.title}'
-                    : s.courseName)
-              : (s.title.isNotEmpty ? s.title : (l10n?.event ?? 'Class'));
-          final title = displayTitle.length > 28
-              ? '${displayTitle.substring(0, 25)}...'
-              : displayTitle;
-          final rawSubtitle = s.location.isNotEmpty
-              ? (s.courseCode.isNotEmpty
-                    ? '${s.courseCode} • ${s.location}'
-                    : s.location)
-              : s.courseCode;
-          final location = rawSubtitle.length > 25
-              ? '${rawSubtitle.substring(0, 22)}...'
-              : rawSubtitle;
-          final eventColor =
-              '#${s.color.toARGB32().toRadixString(16).padLeft(8, '0')}';
-
-          summaries.add({
-            'text': title,
-            'time': timeStr,
-            'subtitle': location,
-            'color': eventColor,
-            'type': 'schedule',
-          });
+            summaries.add({
+              'text': title,
+              'time': timeStr,
+              'subtitle': location,
+              'color': eventColor,
+              'type': 'schedule',
+            });
+          }
         }
 
         return summaries;

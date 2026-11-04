@@ -84,7 +84,11 @@ class GoogleCalendarEventDetailSheet extends StatelessWidget {
     if (teamsMatch != null) {
       final uri = Uri.tryParse(teamsMatch.group(0)!);
       if (uri != null) {
-        return (label: 'Microsoft Teams', icon: Icons.videocam_rounded, url: uri);
+        return (
+          label: 'Microsoft Teams',
+          icon: Icons.videocam_rounded,
+          url: uri,
+        );
       }
     }
 
@@ -118,7 +122,9 @@ class GoogleCalendarEventDetailSheet extends StatelessWidget {
     // 2. Try native android calendar event URI if eventId is available
     final eventId = event.eventId;
     if (eventId != null && eventId.isNotEmpty) {
-      final nativeUri = Uri.parse('content://com.android.calendar/events/$eventId');
+      final nativeUri = Uri.parse(
+        'content://com.android.calendar/events/$eventId',
+      );
       try {
         final launched = await launchUrl(
           nativeUri,
@@ -174,7 +180,9 @@ class GoogleCalendarEventDetailSheet extends StatelessWidget {
         SnackBar(
           content: Text(l10n.eventCopiedToTasks),
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
           duration: const Duration(seconds: 3),
         ),
       );
@@ -200,7 +208,9 @@ class GoogleCalendarEventDetailSheet extends StatelessWidget {
       context,
       use24h: themeService.use24HourFormat,
     );
-    final dateFormat = DateFormat.yMMMMEEEEd(Localizations.localeOf(context).toString());
+    final dateFormat = DateFormat.yMMMMEEEEd(
+      Localizations.localeOf(context).toString(),
+    );
 
     final startTime = event.start?.toLocal();
     final endTime = event.end?.toLocal();
@@ -209,7 +219,8 @@ class GoogleCalendarEventDetailSheet extends StatelessWidget {
     if (isAllDay) {
       timeRangeStr = l10n.allDay;
     } else if (startTime != null && endTime != null) {
-      timeRangeStr = '${timeFormat.format(startTime)} – ${timeFormat.format(endTime)}';
+      timeRangeStr =
+          '${timeFormat.format(startTime)} – ${timeFormat.format(endTime)}';
       final diff = endTime.difference(startTime);
       if (diff.inMinutes > 0) {
         if (diff.inHours > 0) {
@@ -223,10 +234,16 @@ class GoogleCalendarEventDetailSheet extends StatelessWidget {
       timeRangeStr = timeFormat.format(startTime);
     }
 
-    final attendees = event.attendees
-        ?.where((a) => a != null && (a.name?.isNotEmpty == true || a.emailAddress?.isNotEmpty == true))
-        .cast<Attendee>()
-        .toList() ??
+    final attendees =
+        event.attendees
+            ?.where(
+              (a) =>
+                  a != null &&
+                  (a.name?.isNotEmpty == true ||
+                      a.emailAddress?.isNotEmpty == true),
+            )
+            .cast<Attendee>()
+            .toList() ??
         [];
 
     return GlassContainer(
@@ -328,14 +345,18 @@ class GoogleCalendarEventDetailSheet extends StatelessWidget {
               // Date & Time
               if (startTime != null)
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 6,
+                  ),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                          color: theme.colorScheme.surfaceContainerHighest
+                              .withValues(alpha: 0.5),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Icon(
@@ -376,7 +397,10 @@ class GoogleCalendarEventDetailSheet extends StatelessWidget {
               if (meeting != null) ...[
                 const SizedBox(height: 8),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 4,
+                  ),
                   child: Container(
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
@@ -463,14 +487,18 @@ class GoogleCalendarEventDetailSheet extends StatelessWidget {
               if (location.isNotEmpty) ...[
                 const SizedBox(height: 8),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 6,
+                  ),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                          color: theme.colorScheme.surfaceContainerHighest
+                              .withValues(alpha: 0.5),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Icon(
@@ -500,14 +528,24 @@ class GoogleCalendarEventDetailSheet extends StatelessWidget {
                                     final mapUri = Uri.parse(
                                       'https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent(location)}',
                                     );
-                                    launchUrl(mapUri, mode: LaunchMode.externalApplication);
+                                    launchUrl(
+                                      mapUri,
+                                      mode: LaunchMode.externalApplication,
+                                    );
                                   },
                                   child: Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 2,
+                                      horizontal: 4,
+                                    ),
                                     child: Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        Icon(Icons.directions_outlined, size: 14, color: eventColor),
+                                        Icon(
+                                          Icons.directions_outlined,
+                                          size: 14,
+                                          color: eventColor,
+                                        ),
                                         const SizedBox(width: 4),
                                         Text(
                                           l10n.openInMaps,
@@ -526,24 +564,35 @@ class GoogleCalendarEventDetailSheet extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(6),
                                   onTap: () {
                                     HapticFeedback.lightImpact();
-                                    Clipboard.setData(ClipboardData(text: location));
+                                    Clipboard.setData(
+                                      ClipboardData(text: location),
+                                    );
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                         content: Text(l10n.locationCopied),
                                         behavior: SnackBarBehavior.floating,
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(10),
+                                          borderRadius: BorderRadius.circular(
+                                            10,
+                                          ),
                                         ),
                                         duration: const Duration(seconds: 2),
                                       ),
                                     );
                                   },
                                   child: Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 2,
+                                      horizontal: 4,
+                                    ),
                                     child: Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        Icon(Icons.copy_rounded, size: 14, color: eventColor),
+                                        Icon(
+                                          Icons.copy_rounded,
+                                          size: 14,
+                                          color: eventColor,
+                                        ),
                                         const SizedBox(width: 4),
                                         Text(
                                           l10n.copyLocation,
@@ -571,14 +620,18 @@ class GoogleCalendarEventDetailSheet extends StatelessWidget {
               if (cleanDesc.isNotEmpty) ...[
                 const SizedBox(height: 8),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 6,
+                  ),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                          color: theme.colorScheme.surfaceContainerHighest
+                              .withValues(alpha: 0.5),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Icon(
@@ -592,10 +645,12 @@ class GoogleCalendarEventDetailSheet extends StatelessWidget {
                         child: Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.25),
+                            color: theme.colorScheme.surfaceContainerHighest
+                                .withValues(alpha: 0.25),
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
-                              color: theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
+                              color: theme.colorScheme.outlineVariant
+                                  .withValues(alpha: 0.4),
                               width: 0.8,
                             ),
                           ),
@@ -618,14 +673,18 @@ class GoogleCalendarEventDetailSheet extends StatelessWidget {
               if (attendees.isNotEmpty) ...[
                 const SizedBox(height: 8),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 6,
+                  ),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                          color: theme.colorScheme.surfaceContainerHighest
+                              .withValues(alpha: 0.5),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Icon(
@@ -661,12 +720,16 @@ class GoogleCalendarEventDetailSheet extends StatelessWidget {
                                   decoration: BoxDecoration(
                                     color: att.isOrganiser
                                         ? eventColor.withValues(alpha: 0.15)
-                                        : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+                                        : theme
+                                              .colorScheme
+                                              .surfaceContainerHighest
+                                              .withValues(alpha: 0.4),
                                     borderRadius: BorderRadius.circular(8),
                                     border: Border.all(
                                       color: att.isOrganiser
                                           ? eventColor.withValues(alpha: 0.3)
-                                          : theme.colorScheme.outlineVariant.withValues(alpha: 0.2),
+                                          : theme.colorScheme.outlineVariant
+                                                .withValues(alpha: 0.2),
                                       width: 0.8,
                                     ),
                                   ),
@@ -757,10 +820,7 @@ class GoogleCalendarEventDetailSheet extends StatelessWidget {
                             borderRadius: BorderRadius.circular(14),
                           ),
                         ),
-                        icon: const Icon(
-                          Icons.add_task_rounded,
-                          size: 18,
-                        ),
+                        icon: const Icon(Icons.add_task_rounded, size: 18),
                         label: Text(
                           l10n.copyToTasks,
                           maxLines: 1,
