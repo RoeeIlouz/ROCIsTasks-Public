@@ -133,6 +133,12 @@ class PrivateModeService extends ChangeNotifier {
     }
   }
 
+  /// Re-reads the saved state, e.g. after preferences synced from the account.
+  Future<void> reload() async {
+    _initialized = false;
+    await init();
+  }
+
   Future<void> setEnabled(bool enabled) async {
     final prefs = await SharedPreferences.getInstance();
     _enabled = enabled;

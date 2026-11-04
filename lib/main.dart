@@ -2,6 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:rocis_tasks/core/services/user_prefs_sync.dart';
+import 'package:rocis_tasks/core/services/user_prefs_adapters.dart';
 import 'package:provider/provider.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -103,6 +106,57 @@ class _AppRootState extends State<AppRoot> {
   late final OnboardingService _onboardingService;
   AppRouter? _appRouter;
   StreamSubscription<User?>? _authStateToSubscriptionSync;
+  UserPrefsSync? _prefsSync;
+  String? _prefsUid;
+  bool _prefsListening = false;
+  bool _reloadingPrefs = false;
+
+  /// Starts (or stops) keeping this user's preferences in sync with their
+  /// account: pulls newer settings from the cloud, pushes newer local ones.
+  Future<void> _startPrefsSync(String? uid) async {
+    _prefsSync?.dispose();
+    _prefsSync = null;
+    _prefsUid = uid;
+    if (uid == null) return;
+    try {
+      final sync = UserPrefsSync(
+        prefs: await SharedPreferences.getInstance(),
+        secret: FlutterSecureSecretStore(),
+        remote: FirestorePrefsRemote(),
+      );
+      _prefsSync = sync;
+      if (!_prefsListening) {
+        _prefsListening = true;
+        _themeService.addListener(_onPrefsChanged);
+        _timezoneService.addListener(_onPrefsChanged);
+        _privateModeService.addListener(_onPrefsChanged);
+      }
+      if (await sync.sync(uid) == PrefsSyncOutcome.applied) {
+        _reloadingPrefs = true;
+        try {
+          final saved = (await SharedPreferences.getInstance()).getString(
+            'app_selected_timezone',
+          );
+          await _themeService.init();
+          await _timezoneService.setTimezone(saved);
+          await _privateModeService.reload();
+        } finally {
+          _reloadingPrefs = false;
+        }
+      }
+    } catch (e) {
+      debugPrint('AppRoot: preferences sync failed: $e');
+    }
+  }
+
+  void _onPrefsChanged() {
+    final uid = _prefsUid;
+    final sync = _prefsSync;
+    if (uid == null || sync == null || _reloadingPrefs || sync.isApplying) {
+      return;
+    }
+    sync.localChanged(uid);
+  }
 
   @override
   void initState() {
@@ -207,7 +261,9 @@ class _AppRootState extends State<AppRoot> {
         user,
       ) {
         unawaited(_subscriptionService.syncWithAuthUserId(user?.uid));
+        unawaited(_startPrefsSync(user?.uid));
       });
+      unawaited(_startPrefsSync(_authService.currentUser?.uid));
 
       // Synchronize subscription non-blockingly in the background
       unawaited(
@@ -228,6 +284,7 @@ class _AppRootState extends State<AppRoot> {
   @override
   void dispose() {
     _authStateToSubscriptionSync?.cancel();
+    _prefsSync?.dispose();
     _taskProvider.dispose();
     _authService.dispose();
     _subscriptionService.dispose();
