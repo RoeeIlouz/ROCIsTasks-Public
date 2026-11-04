@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rocis_tasks/core/services/auth/google_oauth_manager.dart';
+import 'package:rocis_tasks/core/services/firestore_rest_pager.dart';
 import 'package:rocis_tasks/firebase_schedule_options.dart';
 
 class SyncedScheduleEvent {
@@ -492,15 +493,9 @@ class ScheduleFirestoreService {
 
       final headers = await _restAuthHeaders();
       final responses = await Future.wait([
-        http
-            .get(coursesUrl, headers: headers)
-            .timeout(const Duration(seconds: 10)),
-        http
-            .get(eventsUrl, headers: headers)
-            .timeout(const Duration(seconds: 10)),
-        http
-            .get(semestersUrl, headers: headers)
-            .timeout(const Duration(seconds: 10)),
+        getAllFirestorePages(coursesUrl, headers),
+        getAllFirestorePages(eventsUrl, headers),
+        getAllFirestorePages(semestersUrl, headers),
       ]);
 
       final coursesResp = responses[0];
