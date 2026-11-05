@@ -5,6 +5,7 @@ import 'package:rocis_tasks/core/models/schedule_assignment.dart';
 import 'package:rocis_tasks/core/utils/app_date_formats.dart';
 import 'package:rocis_tasks/core/utils/attachment_utils.dart';
 import 'package:rocis_tasks/features/calendar/presentation/providers/schedule_assignments_provider.dart';
+import 'package:rocis_tasks/features/calendar/presentation/widgets/schedule_assignments_section.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:rocis_tasks/shared/ui/widgets/glass_container.dart';
 
@@ -174,6 +175,15 @@ class _AssignmentCard extends StatelessWidget {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
+              Tooltip(
+                message: l10n.scheduleAssignmentMarkDone,
+                child: Checkbox(
+                  value: a.isCompleted,
+                  visualDensity: VisualDensity.compact,
+                  onChanged: (v) =>
+                      setScheduleAssignmentDone(context, a, v ?? false),
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 6),

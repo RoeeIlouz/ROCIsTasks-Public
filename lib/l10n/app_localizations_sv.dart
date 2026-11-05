@@ -2370,4 +2370,16 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get scheduleAssignmentAttachmentUnavailable =>
       'Filen är inte tillgänglig just nu. Kontrollera anslutningen och försök igen.';
+
+  @override
+  String scheduleAssignmentsSection(String count) {
+    return 'Uppgifter ($count)';
+  }
+
+  @override
+  String get scheduleAssignmentSaveFailed =>
+      'Det gick inte att uppdatera ROCIs Schedule. Kontrollera anslutningen och försök igen.';
+
+  @override
+  String get scheduleAssignmentMarkDone => 'Markera som klar';
 }

@@ -792,5 +792,8 @@
   "scheduleAssignmentDue": "Fällig am {date}",
   "scheduleAssignmentGivenIn": "Gegeben in {lecture} am {date}",
   "scheduleAssignmentGivenOn": "Gegeben in der Vorlesung am {date}",
-  "scheduleAssignmentAttachmentUnavailable": "Diese Datei ist gerade nicht verfügbar. Prüfe deine Verbindung und versuche es erneut."
+  "scheduleAssignmentAttachmentUnavailable": "Diese Datei ist gerade nicht verfügbar. Prüfe deine Verbindung und versuche es erneut.",
+  "scheduleAssignmentsSection": "Aufgaben ({count})",
+  "scheduleAssignmentSaveFailed": "ROCIs Schedule konnte nicht aktualisiert werden. Prüfe deine Verbindung und versuche es erneut.",
+  "scheduleAssignmentMarkDone": "Als erledigt markieren"
 }

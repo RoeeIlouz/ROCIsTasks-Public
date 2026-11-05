@@ -83,6 +83,22 @@ class ScheduleAssignment {
 
   bool get hasLecture => lectureEventId != null && lectureDate != null;
 
+  ScheduleAssignment withCompleted(bool done) => ScheduleAssignment(
+    id: id,
+    courseId: courseId,
+    courseName: courseName,
+    courseCode: courseCode,
+    color: color,
+    title: title,
+    description: description,
+    dueDate: dueDate,
+    isCompleted: done,
+    priority: priority,
+    lectureEventId: lectureEventId,
+    lectureDate: lectureDate,
+    attachments: attachments,
+  );
+
   /// Overdue means the due day has passed, not merely the due time.
   bool isOverdue(DateTime now) {
     if (isCompleted) return false;

@@ -1,4 +1,5 @@
 import 'package:device_calendar/device_calendar.dart';
+import 'package:rocis_tasks/core/models/schedule_assignment.dart';
 import 'package:rocis_tasks/core/services/schedule_firestore_service.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 
@@ -16,6 +17,8 @@ int calendarItemMinutes(dynamic item) {
     allDay = item.allDay == true;
   } else if (item is SyncedScheduleEvent) {
     at = item.startTime;
+  } else if (item is ScheduleAssignment) {
+    at = item.dueDate;
   }
   if (allDay || at == null) return -1;
   return at.hour * 60 + at.minute;

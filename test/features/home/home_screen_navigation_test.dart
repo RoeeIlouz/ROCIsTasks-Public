@@ -1,3 +1,5 @@
+import 'package:rocis_tasks/features/calendar/presentation/providers/schedule_assignments_provider.dart';
+import 'package:rocis_tasks/core/services/schedule_firestore_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -105,6 +107,9 @@ void main() {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider<TaskProvider>.value(value: mockTaskProvider),
+        ChangeNotifierProvider<ScheduleAssignmentsProvider>(
+          create: (_) => ScheduleAssignmentsProvider(ScheduleFirestoreService()),
+        ),
         ChangeNotifierProvider<CalendarProvider>.value(value: mockCalendarProvider),
         ChangeNotifierProvider<ThemeService>.value(value: mockThemeService),
         ChangeNotifierProvider<CalendarColorService>.value(value: mockCalendarColorService),

@@ -994,5 +994,15 @@
       }
     }
   },
-  "scheduleAssignmentAttachmentUnavailable": "This file isn't available right now. Check your connection and try again."
+  "scheduleAssignmentAttachmentUnavailable": "This file isn't available right now. Check your connection and try again.",
+  "scheduleAssignmentsSection": "Assignments ({count})",
+  "@scheduleAssignmentsSection": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "scheduleAssignmentSaveFailed": "Couldn't update ROCIs Schedule. Check your connection and try again.",
+  "scheduleAssignmentMarkDone": "Mark as done"
 }

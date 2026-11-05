@@ -2388,4 +2388,16 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get scheduleAssignmentAttachmentUnavailable =>
       'Diese Datei ist gerade nicht verfügbar. Prüfe deine Verbindung und versuche es erneut.';
+
+  @override
+  String scheduleAssignmentsSection(String count) {
+    return 'Aufgaben ($count)';
+  }
+
+  @override
+  String get scheduleAssignmentSaveFailed =>
+      'ROCIs Schedule konnte nicht aktualisiert werden. Prüfe deine Verbindung und versuche es erneut.';
+
+  @override
+  String get scheduleAssignmentMarkDone => 'Als erledigt markieren';
 }

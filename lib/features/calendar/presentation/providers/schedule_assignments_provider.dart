@@ -105,6 +105,39 @@ class ScheduleAssignmentsProvider extends ChangeNotifier {
     }
   }
 
+  /// Unfinished assignments, overdue first. These stay until marked done.
+  List<ScheduleAssignment> get pending =>
+      _items.where((a) => !a.isCompleted).toList();
+
+  /// Unfinished assignments due on the calendar day of [day].
+  List<ScheduleAssignment> pendingDueOn(DateTime day) => pending
+      .where(
+        (a) =>
+            a.dueDate.year == day.year &&
+            a.dueDate.month == day.month &&
+            a.dueDate.day == day.day,
+      )
+      .toList();
+
+  /// Marks [assignment] done (or not). The list updates at once and goes back
+  /// if Schedule could not be updated. Returns whether it was saved.
+  Future<bool> setCompleted(ScheduleAssignment assignment, bool done) async {
+    final index = _items.indexWhere((a) => a.id == assignment.id);
+    if (index < 0) return false;
+    final previous = _items;
+    _items = [
+      for (final a in _items) a.id == assignment.id ? a.withCompleted(done) : a,
+    ];
+    notifyListeners();
+
+    final saved = await _service.setAssignmentCompleted(assignment.id, done);
+    if (!saved) {
+      _items = previous;
+      notifyListeners();
+    }
+    return saved;
+  }
+
   Future<Uint8List?> bytesFor(
     ScheduleAssignment assignment,
     ScheduleAttachment attachment,

@@ -2354,4 +2354,16 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get scheduleAssignmentAttachmentUnavailable =>
       'This file isn\'t available right now. Check your connection and try again.';
+
+  @override
+  String scheduleAssignmentsSection(String count) {
+    return 'Assignments ($count)';
+  }
+
+  @override
+  String get scheduleAssignmentSaveFailed =>
+      'Couldn\'t update ROCIs Schedule. Check your connection and try again.';
+
+  @override
+  String get scheduleAssignmentMarkDone => 'Mark as done';
 }

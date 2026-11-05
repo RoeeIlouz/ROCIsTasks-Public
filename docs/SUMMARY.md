@@ -2,6 +2,17 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## Assignments In The Task List And Calendar - 2026-11-06 (Patch 1 on 1.0.0+122)
+
+#### Problems & User Requirements
+* Schedule assignments were only on a separate screen; they should sit with the tasks, show in the calendar, stay until done, and be marked done from here.
+
+#### Solutions Applied
+* **Section (`schedule_assignments_section.dart`)**: collapsible list above the tasks of unfinished assignments (overdue first), no swipe or delete; the checkbox is the only way out.
+* **Calendar (`calendar_screen.dart`, `calendar_item_order.dart`)**: pending assignments appear on their due day (list and markers) as a fourth item type.
+* **Done (`schedule_firestore_service.dart`)**: `setAssignmentCompleted` PATCHes only `isCompleted` (integer 1/0, as Schedule stores it) with the Schedule sign-in token; the provider updates optimistically and reverts on failure.
+* Not covered: home-screen widgets, kanban, Google Tasks sync. Dart-only, so it shipped as a Shorebird patch.
+
 ## ROCIs Schedule Assignments With Lectures & Files - 2026-11-05 (Patch 4 on 1.0.0+121)
 
 #### Problems & User Requirements

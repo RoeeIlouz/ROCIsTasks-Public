@@ -169,5 +169,22 @@ void main() {
       });
       expect(done.isOverdue(DateTime(2026, 11, 6)), isFalse);
     });
+
+    test('withCompleted flips only the done flag', () {
+      final a = ScheduleAssignment.fromMap({
+        'id': 'x',
+        'title': 't',
+        'courseId': 'c1',
+        'dueDate': '2026-11-05T10:00:00.000',
+        'lectureEventId': 'e1',
+        'lectureDate': '2026-11-01T00:00:00.000',
+      });
+      final done = a.withCompleted(true);
+      expect(done.isCompleted, isTrue);
+      expect(done.title, 't');
+      expect(done.dueDate, a.dueDate);
+      expect(done.lectureEventId, 'e1');
+      expect(done.withCompleted(false).isCompleted, isFalse);
+    });
   });
 }

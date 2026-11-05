@@ -4470,6 +4470,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This file isn\'t available right now. Check your connection and try again.'**
   String get scheduleAssignmentAttachmentUnavailable;
+
+  /// No description provided for @scheduleAssignmentsSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Assignments ({count})'**
+  String scheduleAssignmentsSection(String count);
+
+  /// No description provided for @scheduleAssignmentSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t update ROCIs Schedule. Check your connection and try again.'**
+  String get scheduleAssignmentSaveFailed;
+
+  /// No description provided for @scheduleAssignmentMarkDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as done'**
+  String get scheduleAssignmentMarkDone;
 }
 
 class _AppLocalizationsDelegate

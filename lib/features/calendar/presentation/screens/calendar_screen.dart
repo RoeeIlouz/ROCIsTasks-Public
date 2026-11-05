@@ -25,6 +25,9 @@ import 'package:rocis_tasks/features/calendar/presentation/widgets/schedule_even
 import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:rocis_tasks/shared/ui/ui_kit.dart';
 import 'package:rocis_tasks/core/services/schedule_firestore_service.dart';
+import 'package:rocis_tasks/core/models/schedule_assignment.dart';
+import 'package:rocis_tasks/features/calendar/presentation/providers/schedule_assignments_provider.dart';
+import 'package:rocis_tasks/features/calendar/presentation/widgets/schedule_assignments_section.dart';
 import 'package:rocis_tasks/core/services/schedule_bridge_service.dart';
 import 'package:rocis_tasks/core/utils/bidi_utils.dart';
 
@@ -96,8 +99,17 @@ class _CalendarScreenState extends State<CalendarScreen> {
         : const <Task>[];
 
     final events = calendarProvider.getEventsForDay(day);
+    // Unfinished ROCIs Schedule assignments sit on their due day like tasks.
+    final assignments = calendarProvider.showTasks
+        ? context.read<ScheduleAssignmentsProvider>().pendingDueOn(day)
+        : const <ScheduleAssignment>[];
 
-    return sortCalendarItems([...tasks, ...upcomingTasks, ...events]);
+    return sortCalendarItems([
+      ...tasks,
+      ...upcomingTasks,
+      ...assignments,
+      ...events,
+    ]);
   }
 
   /// Every category color of a task (a gradient when there are several);
@@ -170,6 +182,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
       );
     } else if (event is SyncedScheduleEvent) {
       return event.color;
+    } else if (event is ScheduleAssignment) {
+      return event.color;
     }
     return colorService.taskColor;
   }
@@ -183,6 +197,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
   String _eventTitle(dynamic event, AppLocalizations l10n) {
     if (event is Task) return event.title;
+    if (event is ScheduleAssignment) return event.title;
     if (event is Event) return event.title ?? l10n.noTitle;
     if (event is SyncedScheduleEvent) {
       final course = event.courseName.trim();
@@ -369,6 +384,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
     // Every task, not the list screen's filtered view: list filters must
     // not silently hide tasks here.
+    // Rebuild when an assignment is added or marked done.
+    context.watch<ScheduleAssignmentsProvider>();
     final tasksByDay = _indexTasksByDay(taskProvider.allTasks);
     final upcomingByDay = _indexTasksByDay(taskProvider.upcomingRecurringTasks);
     // events list not needed here as we query provider by day
@@ -587,6 +604,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
                           );
                           final c = cs.first;
                           if (event is Task) {
+                            title = event.title;
+                          } else if (event is ScheduleAssignment) {
                             title = event.title;
                           } else if (event is Event) {
                             title =
@@ -1290,6 +1309,64 @@ class _CalendarScreenState extends State<CalendarScreen> {
                               ),
                             );
                           },
+                        ),
+                      ),
+                    );
+                  }
+                  if (item is ScheduleAssignment) {
+                    final color = item.color;
+                    final timeFormat = AppDateFormats.time(
+                      context,
+                      use24h: themeService.use24HourFormat,
+                    );
+                    final course = item.courseName.isEmpty
+                        ? item.courseCode
+                        : item.courseName;
+                    final hasTime =
+                        item.dueDate.hour != 0 || item.dueDate.minute != 0;
+                    return GlassContainer(
+                      margin: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 6,
+                      ),
+                      isSelected: false,
+                      tintColor: color,
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 4,
+                        ),
+                        leading: Tooltip(
+                          message: l10n.scheduleAssignmentMarkDone,
+                          child: Checkbox(
+                            value: false,
+                            shape: const CircleBorder(),
+                            side: BorderSide(color: color, width: 2),
+                            onChanged: (_) =>
+                                setScheduleAssignmentDone(context, item, true),
+                          ),
+                        ),
+                        title: Text(
+                          item.title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.bold),
+                        ),
+                        subtitle: Text(
+                          [
+                            if (course.isNotEmpty) course,
+                            if (hasTime) timeFormat.format(item.dueDate),
+                          ].join('  ·  '),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(color: color),
+                        ),
+                        trailing: Icon(Icons.assignment_outlined, color: color),
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const ScheduleAssignmentsScreen(),
+                          ),
                         ),
                       ),
                     );

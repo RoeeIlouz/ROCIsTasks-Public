@@ -2339,4 +2339,16 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get scheduleAssignmentAttachmentUnavailable =>
       'هذا الملف غير متاح حاليًا. تحقق من الاتصال وحاول مرة أخرى.';
+
+  @override
+  String scheduleAssignmentsSection(String count) {
+    return 'الواجبات ($count)';
+  }
+
+  @override
+  String get scheduleAssignmentSaveFailed =>
+      'تعذر تحديث ROCIs Schedule. تحقق من الاتصال وحاول مرة أخرى.';
+
+  @override
+  String get scheduleAssignmentMarkDone => 'تحديد كمكتمل';
 }

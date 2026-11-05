@@ -2338,4 +2338,16 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get scheduleAssignmentAttachmentUnavailable =>
       'הקובץ אינו זמין כרגע. בדקו את החיבור ונסו שוב.';
+
+  @override
+  String scheduleAssignmentsSection(String count) {
+    return 'מטלות ($count)';
+  }
+
+  @override
+  String get scheduleAssignmentSaveFailed =>
+      'לא ניתן לעדכן את ROCIs Schedule. בדקו את החיבור ונסו שוב.';
+
+  @override
+  String get scheduleAssignmentMarkDone => 'סימון כהושלם';
 }

@@ -792,5 +792,8 @@
   "scheduleAssignmentDue": "जमा करने की तारीख {date}",
   "scheduleAssignmentGivenIn": "{lecture} में {date} को दिया गया",
   "scheduleAssignmentGivenOn": "{date} के लेक्चर में दिया गया",
-  "scheduleAssignmentAttachmentUnavailable": "यह फ़ाइल अभी उपलब्ध नहीं है। कनेक्शन जाँचें और फिर कोशिश करें।"
+  "scheduleAssignmentAttachmentUnavailable": "यह फ़ाइल अभी उपलब्ध नहीं है। कनेक्शन जाँचें और फिर कोशिश करें।",
+  "scheduleAssignmentsSection": "असाइनमेंट ({count})",
+  "scheduleAssignmentSaveFailed": "ROCIs Schedule अपडेट नहीं हो सका। कनेक्शन जाँचें और फिर कोशिश करें।",
+  "scheduleAssignmentMarkDone": "पूरा चिह्नित करें"
 }

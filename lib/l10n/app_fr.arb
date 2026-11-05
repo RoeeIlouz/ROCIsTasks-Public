@@ -792,5 +792,8 @@
   "scheduleAssignmentDue": "À rendre le {date}",
   "scheduleAssignmentGivenIn": "Donné pendant {lecture} le {date}",
   "scheduleAssignmentGivenOn": "Donné pendant le cours du {date}",
-  "scheduleAssignmentAttachmentUnavailable": "Ce fichier n'est pas disponible pour le moment. Vérifiez votre connexion et réessayez."
+  "scheduleAssignmentAttachmentUnavailable": "Ce fichier n'est pas disponible pour le moment. Vérifiez votre connexion et réessayez.",
+  "scheduleAssignmentsSection": "Devoirs ({count})",
+  "scheduleAssignmentSaveFailed": "Impossible de mettre à jour ROCIs Schedule. Vérifiez votre connexion et réessayez.",
+  "scheduleAssignmentMarkDone": "Marquer comme terminé"
 }

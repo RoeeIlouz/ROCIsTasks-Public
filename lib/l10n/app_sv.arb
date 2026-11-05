@@ -792,5 +792,8 @@
   "scheduleAssignmentDue": "Förfaller {date}",
   "scheduleAssignmentGivenIn": "Given på {lecture} den {date}",
   "scheduleAssignmentGivenOn": "Given på föreläsningen den {date}",
-  "scheduleAssignmentAttachmentUnavailable": "Filen är inte tillgänglig just nu. Kontrollera anslutningen och försök igen."
+  "scheduleAssignmentAttachmentUnavailable": "Filen är inte tillgänglig just nu. Kontrollera anslutningen och försök igen.",
+  "scheduleAssignmentsSection": "Uppgifter ({count})",
+  "scheduleAssignmentSaveFailed": "Det gick inte att uppdatera ROCIs Schedule. Kontrollera anslutningen och försök igen.",
+  "scheduleAssignmentMarkDone": "Markera som klar"
 }

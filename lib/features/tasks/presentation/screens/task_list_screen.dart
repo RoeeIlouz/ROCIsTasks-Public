@@ -6,6 +6,7 @@ import 'package:rocis_tasks/core/services/auth_service.dart';
 import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
 import 'package:rocis_tasks/features/calendar/presentation/providers/calendar_provider.dart';
 import 'package:rocis_tasks/features/tasks/presentation/widgets/task_tile.dart';
+import 'package:rocis_tasks/features/calendar/presentation/widgets/schedule_assignments_section.dart';
 import 'package:rocis_tasks/features/tasks/presentation/widgets/task_skeleton.dart';
 import 'package:rocis_tasks/features/tasks/presentation/screens/add_task_screen.dart';
 import 'package:rocis_tasks/features/tasks/presentation/screens/task_detail_screen.dart';
@@ -716,6 +717,7 @@ class _TaskListViewState extends State<TaskListView> {
           children: [
             if (isGoogleTasksExpired)
               _buildGoogleTasksWarning(context, l10n, authService),
+            if (!isLoading) const ScheduleAssignmentsSection(),
             mainContent,
           ],
         );

@@ -791,5 +791,8 @@
   "scheduleAssignmentDue": "Entrega: {date}",
   "scheduleAssignmentGivenIn": "Entregada en {lecture} el {date}",
   "scheduleAssignmentGivenOn": "Entregada en la clase del {date}",
-  "scheduleAssignmentAttachmentUnavailable": "Este archivo no está disponible ahora. Revisa tu conexión e inténtalo de nuevo."
+  "scheduleAssignmentAttachmentUnavailable": "Este archivo no está disponible ahora. Revisa tu conexión e inténtalo de nuevo.",
+  "scheduleAssignmentsSection": "Tareas ({count})",
+  "scheduleAssignmentSaveFailed": "No se pudo actualizar ROCIs Schedule. Revisa tu conexión e inténtalo de nuevo.",
+  "scheduleAssignmentMarkDone": "Marcar como hecha"
 }

@@ -792,5 +792,8 @@
   "scheduleAssignmentDue": "الموعد النهائي {date}",
   "scheduleAssignmentGivenIn": "أُعطيت في {lecture} بتاريخ {date}",
   "scheduleAssignmentGivenOn": "أُعطيت في المحاضرة بتاريخ {date}",
-  "scheduleAssignmentAttachmentUnavailable": "هذا الملف غير متاح حاليًا. تحقق من الاتصال وحاول مرة أخرى."
+  "scheduleAssignmentAttachmentUnavailable": "هذا الملف غير متاح حاليًا. تحقق من الاتصال وحاول مرة أخرى.",
+  "scheduleAssignmentsSection": "الواجبات ({count})",
+  "scheduleAssignmentSaveFailed": "تعذر تحديث ROCIs Schedule. تحقق من الاتصال وحاول مرة أخرى.",
+  "scheduleAssignmentMarkDone": "تحديد كمكتمل"
 }

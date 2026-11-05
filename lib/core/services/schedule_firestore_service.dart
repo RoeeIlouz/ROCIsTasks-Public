@@ -1121,6 +1121,56 @@ class ScheduleFirestoreService {
     return _cachedAssignments ??= await _loadCachedAssignments();
   }
 
+  /// Marks a Schedule assignment done (or not) in the Schedule project; the
+  /// Schedule app picks the change up through its live sync. Only that one
+  /// field is written. Returns false when it could not be saved.
+  Future<bool> setAssignmentCompleted(String assignmentId, bool done) async {
+    try {
+      final userId = await _resolveScheduleUserId();
+      if (userId == null || userId.isEmpty) return false;
+      final headers = await _restAuthHeaders();
+      // Without a signed-in Schedule account the rules would refuse anyway.
+      if (!headers.containsKey('Authorization')) return false;
+
+      final apiKey = ScheduleFirebaseOptions.currentPlatform.apiKey;
+      final projectId = ScheduleFirebaseOptions.currentPlatform.projectId;
+      final url = Uri.parse(
+        'https://firestore.googleapis.com/v1/projects/$projectId/databases/(default)/documents/users/$userId/assignments/$assignmentId?updateMask.fieldPaths=isCompleted&currentDocument.exists=true&key=$apiKey',
+      );
+      // Schedule stores the flag as 1 / 0.
+      final resp = await http
+          .patch(
+            url,
+            headers: {...headers, 'Content-Type': 'application/json'},
+            body: jsonEncode({
+              'fields': {
+                'isCompleted': {'integerValue': done ? '1' : '0'},
+              },
+            }),
+          )
+          .timeout(const Duration(seconds: 15));
+      if (resp.statusCode != 200) {
+        debugPrint(
+          'ScheduleFirestoreService: complete assignment HTTP ${resp.statusCode}',
+        );
+        return false;
+      }
+
+      final cached = _cachedAssignments;
+      if (cached != null) {
+        _cachedAssignments = [
+          for (final a in cached)
+            a.id == assignmentId ? a.withCompleted(done) : a,
+        ];
+        _saveCachedAssignments(_cachedAssignments!);
+      }
+      return true;
+    } catch (e) {
+      debugPrint('ScheduleFirestoreService: complete assignment error: $e');
+      return false;
+    }
+  }
+
   /// Original bytes of [attachment] on [assignmentId], or null if they can't
   /// be fetched right now.
   Future<Uint8List?> fetchAttachmentBytes(

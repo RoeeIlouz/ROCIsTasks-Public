@@ -791,5 +791,8 @@
   "scheduleAssignmentDue": "להגשה עד {date}",
   "scheduleAssignmentGivenIn": "ניתנה ב{lecture} ב-{date}",
   "scheduleAssignmentGivenOn": "ניתנה בהרצאה ב-{date}",
-  "scheduleAssignmentAttachmentUnavailable": "הקובץ אינו זמין כרגע. בדקו את החיבור ונסו שוב."
+  "scheduleAssignmentAttachmentUnavailable": "הקובץ אינו זמין כרגע. בדקו את החיבור ונסו שוב.",
+  "scheduleAssignmentsSection": "מטלות ({count})",
+  "scheduleAssignmentSaveFailed": "לא ניתן לעדכן את ROCIs Schedule. בדקו את החיבור ונסו שוב.",
+  "scheduleAssignmentMarkDone": "סימון כהושלם"
 }
