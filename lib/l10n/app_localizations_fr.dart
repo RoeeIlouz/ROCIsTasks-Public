@@ -2349,4 +2349,43 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get categoryMultiTip =>
       'Choisissez plusieurs catégories et la tâche mélangera leurs couleurs.';
+
+  @override
+  String get scheduleAssignmentsTitle => 'Devoirs de l\'emploi du temps';
+
+  @override
+  String get scheduleAssignmentsEmpty =>
+      'Aucun devoir dans ROCIs Schedule pour l\'instant';
+
+  @override
+  String get scheduleAssignmentsHint =>
+      'Ajoutez ou modifiez les devoirs et leurs fichiers dans ROCIs Schedule';
+
+  @override
+  String get scheduleAssignmentsOverdue => 'En retard';
+
+  @override
+  String get scheduleAssignmentsUpcoming => 'À venir';
+
+  @override
+  String get scheduleAssignmentsCompleted => 'Terminés';
+
+  @override
+  String scheduleAssignmentDue(String date) {
+    return 'À rendre le $date';
+  }
+
+  @override
+  String scheduleAssignmentGivenIn(String lecture, String date) {
+    return 'Donné pendant $lecture le $date';
+  }
+
+  @override
+  String scheduleAssignmentGivenOn(String date) {
+    return 'Donné pendant le cours du $date';
+  }
+
+  @override
+  String get scheduleAssignmentAttachmentUnavailable =>
+      'Ce fichier n\'est pas disponible pour le moment. Vérifiez votre connexion et réessayez.';
 }

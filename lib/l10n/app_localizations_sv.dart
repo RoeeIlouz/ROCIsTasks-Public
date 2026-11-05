@@ -2332,4 +2332,42 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get categoryMultiTip =>
       'Välj fler än en kategori så blandar uppgiften deras färger.';
+
+  @override
+  String get scheduleAssignmentsTitle => 'Uppgifter från schemat';
+
+  @override
+  String get scheduleAssignmentsEmpty => 'Inga uppgifter i ROCIs Schedule än';
+
+  @override
+  String get scheduleAssignmentsHint =>
+      'Lägg till eller redigera uppgifter och deras filer i ROCIs Schedule';
+
+  @override
+  String get scheduleAssignmentsOverdue => 'Försenade';
+
+  @override
+  String get scheduleAssignmentsUpcoming => 'Kommande';
+
+  @override
+  String get scheduleAssignmentsCompleted => 'Klara';
+
+  @override
+  String scheduleAssignmentDue(String date) {
+    return 'Förfaller $date';
+  }
+
+  @override
+  String scheduleAssignmentGivenIn(String lecture, String date) {
+    return 'Given på $lecture den $date';
+  }
+
+  @override
+  String scheduleAssignmentGivenOn(String date) {
+    return 'Given på föreläsningen den $date';
+  }
+
+  @override
+  String get scheduleAssignmentAttachmentUnavailable =>
+      'Filen är inte tillgänglig just nu. Kontrollera anslutningen och försök igen.';
 }

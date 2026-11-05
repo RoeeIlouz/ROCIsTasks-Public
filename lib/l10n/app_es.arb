@@ -781,5 +781,15 @@
   "glassPreviewTry": "Vista previa",
   "glassPreviewEnd": "¿Te gusta el estilo cristal? Viene con Pro.",
   "glassPreviewGetPro": "Obtener Pro",
-  "categoryMultiTip": "Elige más de una categoría y la tarea mezclará sus colores."
+  "categoryMultiTip": "Elige más de una categoría y la tarea mezclará sus colores.",
+  "scheduleAssignmentsTitle": "Tareas del horario",
+  "scheduleAssignmentsEmpty": "Aún no hay tareas en ROCIs Schedule",
+  "scheduleAssignmentsHint": "Añade o edita tareas y sus archivos en ROCIs Schedule",
+  "scheduleAssignmentsOverdue": "Vencidas",
+  "scheduleAssignmentsUpcoming": "Próximas",
+  "scheduleAssignmentsCompleted": "Completadas",
+  "scheduleAssignmentDue": "Entrega: {date}",
+  "scheduleAssignmentGivenIn": "Entregada en {lecture} el {date}",
+  "scheduleAssignmentGivenOn": "Entregada en la clase del {date}",
+  "scheduleAssignmentAttachmentUnavailable": "Este archivo no está disponible ahora. Revisa tu conexión e inténtalo de nuevo."
 }

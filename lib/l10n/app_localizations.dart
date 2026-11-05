@@ -4410,6 +4410,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Pick more than one category and the task blends their colors.'**
   String get categoryMultiTip;
+
+  /// No description provided for @scheduleAssignmentsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Schedule assignments'**
+  String get scheduleAssignmentsTitle;
+
+  /// No description provided for @scheduleAssignmentsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No assignments in ROCIs Schedule yet'**
+  String get scheduleAssignmentsEmpty;
+
+  /// No description provided for @scheduleAssignmentsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Add or edit assignments and their files in ROCIs Schedule'**
+  String get scheduleAssignmentsHint;
+
+  /// No description provided for @scheduleAssignmentsOverdue.
+  ///
+  /// In en, this message translates to:
+  /// **'Overdue'**
+  String get scheduleAssignmentsOverdue;
+
+  /// No description provided for @scheduleAssignmentsUpcoming.
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming'**
+  String get scheduleAssignmentsUpcoming;
+
+  /// No description provided for @scheduleAssignmentsCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get scheduleAssignmentsCompleted;
+
+  /// No description provided for @scheduleAssignmentDue.
+  ///
+  /// In en, this message translates to:
+  /// **'Due {date}'**
+  String scheduleAssignmentDue(String date);
+
+  /// No description provided for @scheduleAssignmentGivenIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Given in {lecture} on {date}'**
+  String scheduleAssignmentGivenIn(String lecture, String date);
+
+  /// No description provided for @scheduleAssignmentGivenOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Given in the lecture on {date}'**
+  String scheduleAssignmentGivenOn(String date);
+
+  /// No description provided for @scheduleAssignmentAttachmentUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'This file isn\'t available right now. Check your connection and try again.'**
+  String get scheduleAssignmentAttachmentUnavailable;
 }
 
 class _AppLocalizationsDelegate

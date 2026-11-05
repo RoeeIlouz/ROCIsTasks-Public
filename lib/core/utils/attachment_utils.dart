@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
 
@@ -141,6 +142,28 @@ class AttachmentUtils {
         AppLocalizations.of(context)!.cannotOpenLocalFileOnWeb,
       );
     }
+  }
+
+  /// Open an attachment that only exists in memory (downloaded from the cloud
+  /// rather than stored on this device). Images preview in a zoomable dialog;
+  /// anything else goes to the system share sheet so another app can open it.
+  static Future<void> openBytes(
+    BuildContext context, {
+    required String name,
+    required String mime,
+    required Uint8List bytes,
+  }) async {
+    if (mime.startsWith('image/')) {
+      _showImagePreviewDialog(context, name, Image.memory(bytes));
+      return;
+    }
+    await SharePlus.instance.share(
+      ShareParams(
+        files: [XFile.fromData(bytes, mimeType: mime)],
+        fileNameOverrides: [name],
+        title: name,
+      ),
+    );
   }
 
   static void _showImagePreviewDialog(

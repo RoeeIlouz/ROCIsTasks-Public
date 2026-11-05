@@ -960,5 +960,39 @@
   "glassPreviewTry": "Preview",
   "glassPreviewEnd": "Like the glass look? It comes with Pro.",
   "glassPreviewGetPro": "Get Pro",
-  "categoryMultiTip": "Pick more than one category and the task blends their colors."
+  "categoryMultiTip": "Pick more than one category and the task blends their colors.",
+  "scheduleAssignmentsTitle": "Schedule assignments",
+  "scheduleAssignmentsEmpty": "No assignments in ROCIs Schedule yet",
+  "scheduleAssignmentsHint": "Add or edit assignments and their files in ROCIs Schedule",
+  "scheduleAssignmentsOverdue": "Overdue",
+  "scheduleAssignmentsUpcoming": "Upcoming",
+  "scheduleAssignmentsCompleted": "Completed",
+  "scheduleAssignmentDue": "Due {date}",
+  "@scheduleAssignmentDue": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "scheduleAssignmentGivenIn": "Given in {lecture} on {date}",
+  "@scheduleAssignmentGivenIn": {
+    "placeholders": {
+      "lecture": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "scheduleAssignmentGivenOn": "Given in the lecture on {date}",
+  "@scheduleAssignmentGivenOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "scheduleAssignmentAttachmentUnavailable": "This file isn't available right now. Check your connection and try again."
 }

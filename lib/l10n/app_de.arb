@@ -782,5 +782,15 @@
   "glassPreviewTry": "Vorschau",
   "glassPreviewEnd": "Gefällt dir der Glas-Look? Er ist in Pro enthalten.",
   "glassPreviewGetPro": "Pro holen",
-  "categoryMultiTip": "Wähle mehr als eine Kategorie, und die Aufgabe mischt deren Farben."
+  "categoryMultiTip": "Wähle mehr als eine Kategorie, und die Aufgabe mischt deren Farben.",
+  "scheduleAssignmentsTitle": "Aufgaben aus dem Stundenplan",
+  "scheduleAssignmentsEmpty": "Noch keine Aufgaben in ROCIs Schedule",
+  "scheduleAssignmentsHint": "Aufgaben und ihre Dateien fügst du in ROCIs Schedule hinzu oder bearbeitest sie dort",
+  "scheduleAssignmentsOverdue": "Überfällig",
+  "scheduleAssignmentsUpcoming": "Anstehend",
+  "scheduleAssignmentsCompleted": "Erledigt",
+  "scheduleAssignmentDue": "Fällig am {date}",
+  "scheduleAssignmentGivenIn": "Gegeben in {lecture} am {date}",
+  "scheduleAssignmentGivenOn": "Gegeben in der Vorlesung am {date}",
+  "scheduleAssignmentAttachmentUnavailable": "Diese Datei ist gerade nicht verfügbar. Prüfe deine Verbindung und versuche es erneut."
 }

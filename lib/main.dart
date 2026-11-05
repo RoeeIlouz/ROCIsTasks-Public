@@ -22,6 +22,7 @@ import 'package:rocis_tasks/core/services/background_handler.dart';
 import 'package:rocis_tasks/core/services/connectivity_service.dart';
 import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
 import 'package:rocis_tasks/features/calendar/presentation/providers/calendar_provider.dart';
+import 'package:rocis_tasks/features/calendar/presentation/providers/schedule_assignments_provider.dart';
 import 'package:rocis_tasks/features/onboarding/data/services/onboarding_service.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:rocis_tasks/core/config/router.dart';
@@ -458,6 +459,13 @@ class _AppRootState extends State<AppRoot> {
                 subscriptionService: _subscriptionService,
                 authService: _authService,
               ),
+            ),
+            ChangeNotifierProvider(
+              // Refreshes quietly on every launch so the screen is current.
+              create: (_) => ScheduleAssignmentsProvider(
+                _scheduleService,
+                authService: _authService,
+              )..load(forceRefresh: true),
             ),
             ChangeNotifierProvider.value(value: _onboardingService),
             ChangeNotifierProvider.value(value: _engagementService),

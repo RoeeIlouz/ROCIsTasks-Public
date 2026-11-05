@@ -781,5 +781,15 @@
   "glassPreviewTry": "תצוגה מקדימה",
   "glassPreviewEnd": "אהבתם את מראה הזכוכית? הוא כלול ב-Pro.",
   "glassPreviewGetPro": "שדרוג ל-Pro",
-  "categoryMultiTip": "בחרו יותר מקטגוריה אחת והמשימה תציג שילוב של הצבעים שלהן."
+  "categoryMultiTip": "בחרו יותר מקטגוריה אחת והמשימה תציג שילוב של הצבעים שלהן.",
+  "scheduleAssignmentsTitle": "מטלות ממערכת השעות",
+  "scheduleAssignmentsEmpty": "עדיין אין מטלות ב-ROCIs Schedule",
+  "scheduleAssignmentsHint": "הוספה ועריכה של מטלות וקבצים מתבצעות ב-ROCIs Schedule",
+  "scheduleAssignmentsOverdue": "באיחור",
+  "scheduleAssignmentsUpcoming": "בקרוב",
+  "scheduleAssignmentsCompleted": "הושלמו",
+  "scheduleAssignmentDue": "להגשה עד {date}",
+  "scheduleAssignmentGivenIn": "ניתנה ב{lecture} ב-{date}",
+  "scheduleAssignmentGivenOn": "ניתנה בהרצאה ב-{date}",
+  "scheduleAssignmentAttachmentUnavailable": "הקובץ אינו זמין כרגע. בדקו את החיבור ונסו שוב."
 }

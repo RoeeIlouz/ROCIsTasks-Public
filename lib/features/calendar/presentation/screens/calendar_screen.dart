@@ -14,6 +14,7 @@ import 'package:rocis_tasks/features/calendar/presentation/providers/calendar_pr
 import 'package:rocis_tasks/core/services/auth_service.dart';
 import 'package:rocis_tasks/core/services/calendar_color_service.dart';
 import 'package:device_calendar/device_calendar.dart';
+import 'package:rocis_tasks/features/calendar/presentation/screens/schedule_assignments_screen.dart';
 import 'package:rocis_tasks/features/calendar/utils/calendar_item_order.dart';
 import 'package:intl/intl.dart';
 import 'package:rocis_tasks/features/categories/domain/models/category.dart';
@@ -447,6 +448,18 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         },
                       ),
                       const SizedBox(width: 4),
+                      IconButton(
+                        icon: const Icon(Icons.assignment_outlined),
+                        tooltip: l10n.scheduleAssignmentsTitle,
+                        visualDensity: VisualDensity.compact,
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute<void>(
+                              builder: (_) => const ScheduleAssignmentsScreen(),
+                            ),
+                          );
+                        },
+                      ),
                       IconButton(
                         icon: const Icon(Icons.palette_outlined),
                         tooltip: l10n.calendarColors,

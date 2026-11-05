@@ -782,5 +782,15 @@
   "glassPreviewTry": "Förhandsvisa",
   "glassPreviewEnd": "Gillar du glaslooken? Den ingår i Pro.",
   "glassPreviewGetPro": "Skaffa Pro",
-  "categoryMultiTip": "Välj fler än en kategori så blandar uppgiften deras färger."
+  "categoryMultiTip": "Välj fler än en kategori så blandar uppgiften deras färger.",
+  "scheduleAssignmentsTitle": "Uppgifter från schemat",
+  "scheduleAssignmentsEmpty": "Inga uppgifter i ROCIs Schedule än",
+  "scheduleAssignmentsHint": "Lägg till eller redigera uppgifter och deras filer i ROCIs Schedule",
+  "scheduleAssignmentsOverdue": "Försenade",
+  "scheduleAssignmentsUpcoming": "Kommande",
+  "scheduleAssignmentsCompleted": "Klara",
+  "scheduleAssignmentDue": "Förfaller {date}",
+  "scheduleAssignmentGivenIn": "Given på {lecture} den {date}",
+  "scheduleAssignmentGivenOn": "Given på föreläsningen den {date}",
+  "scheduleAssignmentAttachmentUnavailable": "Filen är inte tillgänglig just nu. Kontrollera anslutningen och försök igen."
 }

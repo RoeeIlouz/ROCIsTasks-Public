@@ -2300,4 +2300,42 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get categoryMultiTip =>
       'בחרו יותר מקטגוריה אחת והמשימה תציג שילוב של הצבעים שלהן.';
+
+  @override
+  String get scheduleAssignmentsTitle => 'מטלות ממערכת השעות';
+
+  @override
+  String get scheduleAssignmentsEmpty => 'עדיין אין מטלות ב-ROCIs Schedule';
+
+  @override
+  String get scheduleAssignmentsHint =>
+      'הוספה ועריכה של מטלות וקבצים מתבצעות ב-ROCIs Schedule';
+
+  @override
+  String get scheduleAssignmentsOverdue => 'באיחור';
+
+  @override
+  String get scheduleAssignmentsUpcoming => 'בקרוב';
+
+  @override
+  String get scheduleAssignmentsCompleted => 'הושלמו';
+
+  @override
+  String scheduleAssignmentDue(String date) {
+    return 'להגשה עד $date';
+  }
+
+  @override
+  String scheduleAssignmentGivenIn(String lecture, String date) {
+    return 'ניתנה ב$lecture ב-$date';
+  }
+
+  @override
+  String scheduleAssignmentGivenOn(String date) {
+    return 'ניתנה בהרצאה ב-$date';
+  }
+
+  @override
+  String get scheduleAssignmentAttachmentUnavailable =>
+      'הקובץ אינו זמין כרגע. בדקו את החיבור ונסו שוב.';
 }

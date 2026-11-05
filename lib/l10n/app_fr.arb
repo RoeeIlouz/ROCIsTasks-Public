@@ -782,5 +782,15 @@
   "glassPreviewTry": "Aperçu",
   "glassPreviewEnd": "Le style verre vous plaît ? Il est inclus dans Pro.",
   "glassPreviewGetPro": "Passer à Pro",
-  "categoryMultiTip": "Choisissez plusieurs catégories et la tâche mélangera leurs couleurs."
+  "categoryMultiTip": "Choisissez plusieurs catégories et la tâche mélangera leurs couleurs.",
+  "scheduleAssignmentsTitle": "Devoirs de l'emploi du temps",
+  "scheduleAssignmentsEmpty": "Aucun devoir dans ROCIs Schedule pour l'instant",
+  "scheduleAssignmentsHint": "Ajoutez ou modifiez les devoirs et leurs fichiers dans ROCIs Schedule",
+  "scheduleAssignmentsOverdue": "En retard",
+  "scheduleAssignmentsUpcoming": "À venir",
+  "scheduleAssignmentsCompleted": "Terminés",
+  "scheduleAssignmentDue": "À rendre le {date}",
+  "scheduleAssignmentGivenIn": "Donné pendant {lecture} le {date}",
+  "scheduleAssignmentGivenOn": "Donné pendant le cours du {date}",
+  "scheduleAssignmentAttachmentUnavailable": "Ce fichier n'est pas disponible pour le moment. Vérifiez votre connexion et réessayez."
 }

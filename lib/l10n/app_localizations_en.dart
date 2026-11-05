@@ -2316,4 +2316,42 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get categoryMultiTip =>
       'Pick more than one category and the task blends their colors.';
+
+  @override
+  String get scheduleAssignmentsTitle => 'Schedule assignments';
+
+  @override
+  String get scheduleAssignmentsEmpty => 'No assignments in ROCIs Schedule yet';
+
+  @override
+  String get scheduleAssignmentsHint =>
+      'Add or edit assignments and their files in ROCIs Schedule';
+
+  @override
+  String get scheduleAssignmentsOverdue => 'Overdue';
+
+  @override
+  String get scheduleAssignmentsUpcoming => 'Upcoming';
+
+  @override
+  String get scheduleAssignmentsCompleted => 'Completed';
+
+  @override
+  String scheduleAssignmentDue(String date) {
+    return 'Due $date';
+  }
+
+  @override
+  String scheduleAssignmentGivenIn(String lecture, String date) {
+    return 'Given in $lecture on $date';
+  }
+
+  @override
+  String scheduleAssignmentGivenOn(String date) {
+    return 'Given in the lecture on $date';
+  }
+
+  @override
+  String get scheduleAssignmentAttachmentUnavailable =>
+      'This file isn\'t available right now. Check your connection and try again.';
 }

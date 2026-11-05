@@ -1,10 +1,13 @@
 import 'dart:convert';
+import 'dart:typed_data';
+import 'package:archive/archive.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:rocis_tasks/core/models/schedule_assignment.dart';
 import 'package:rocis_tasks/core/services/auth/google_oauth_manager.dart';
 import 'package:rocis_tasks/core/services/firestore_rest_pager.dart';
 import 'package:rocis_tasks/firebase_schedule_options.dart';
@@ -265,6 +268,9 @@ class ScheduleFirestoreService {
       _cachedScheduleUserId = null;
       _cachedEvents = null;
       _lastFetchTime = null;
+      _cachedAssignments = null;
+      _lastAssignmentsFetch = null;
+      _attachmentBytes.clear();
       SharedPreferences.getInstance()
           .then((prefs) {
             prefs.remove('cached_schedule_user_id');
@@ -278,6 +284,8 @@ class ScheduleFirestoreService {
     _cachedScheduleUserId = null;
     _cachedEvents = null;
     _lastFetchTime = null;
+    _cachedAssignments = null;
+    _lastAssignmentsFetch = null;
     SharedPreferences.getInstance()
         .then((prefs) {
           prefs.remove('cached_schedule_user_id');
@@ -353,11 +361,20 @@ class ScheduleFirestoreService {
           result[key] = val['timestampValue'];
         } else if (val.containsKey('nullValue')) {
           result[key] = null;
+        } else if (val.containsKey('bytesValue')) {
+          // Left as the base64 string the REST API sends.
+          result[key] = val['bytesValue'];
         } else if (val.containsKey('arrayValue')) {
           final arr = val['arrayValue'] as Map<String, dynamic>;
           final values = arr['values'] as List<dynamic>? ?? [];
           result[key] = values.map((v) {
             if (v is Map<String, dynamic>) {
+              final nested = v['mapValue'];
+              if (nested is Map<String, dynamic>) {
+                return decodeFirestoreFields(
+                  nested['fields'] as Map<String, dynamic>? ?? {},
+                );
+              }
               return v['stringValue'] ??
                   v['integerValue'] ??
                   v['doubleValue'] ??
@@ -971,6 +988,183 @@ class ScheduleFirestoreService {
     }
 
     return [];
+  }
+
+  // --- Assignments -------------------------------------------------------
+
+  List<ScheduleAssignment>? _cachedAssignments;
+  DateTime? _lastAssignmentsFetch;
+  static const String _keyCachedAssignmentsJson =
+      'cached_schedule_assignments_json';
+
+  /// Stored attachment bytes already downloaded this session, by attachment id.
+  final Map<String, Uint8List> _attachmentBytes = {};
+  static const int _maxCachedAttachments = 20;
+
+  /// Direct REST read of assignments plus their courses. Null means the read
+  /// failed (so callers keep what they have); an empty list means the user
+  /// genuinely has none.
+  Future<List<ScheduleAssignment>?> _fetchAssignmentsViaRest(
+    String targetUserId,
+  ) async {
+    try {
+      final apiKey = ScheduleFirebaseOptions.currentPlatform.apiKey;
+      final projectId = ScheduleFirebaseOptions.currentPlatform.projectId;
+      final base =
+          'https://firestore.googleapis.com/v1/projects/$projectId/databases/(default)/documents/users/$targetUserId';
+      final headers = await _restAuthHeaders();
+
+      final responses = await Future.wait([
+        getAllFirestorePages(
+          Uri.parse('$base/assignments?key=$apiKey'),
+          headers,
+        ),
+        getAllFirestorePages(Uri.parse('$base/courses?key=$apiKey'), headers),
+      ]);
+      final assignmentsResp = responses[0];
+      final coursesResp = responses[1];
+      if (assignmentsResp.statusCode != 200) {
+        debugPrint(
+          'ScheduleFirestoreService: assignments HTTP ${assignmentsResp.statusCode}',
+        );
+        return null;
+      }
+
+      final courses = <String, Map<String, dynamic>>{};
+      if (coursesResp.statusCode == 200) {
+        final json = jsonDecode(coursesResp.body) as Map<String, dynamic>;
+        for (final doc in json['documents'] as List<dynamic>? ?? const []) {
+          if (doc is! Map<String, dynamic>) continue;
+          final id = (doc['name'] as String? ?? '').split('/').last;
+          courses[id] = decodeFirestoreFields(
+            doc['fields'] as Map<String, dynamic>? ?? {},
+          );
+        }
+      }
+
+      final json = jsonDecode(assignmentsResp.body) as Map<String, dynamic>;
+      final result = <ScheduleAssignment>[];
+      for (final doc in json['documents'] as List<dynamic>? ?? const []) {
+        if (doc is! Map<String, dynamic>) continue;
+        final decoded = decodeFirestoreFields(
+          doc['fields'] as Map<String, dynamic>? ?? {},
+        );
+        decoded['id'] ??= (doc['name'] as String? ?? '').split('/').last;
+        result.add(
+          ScheduleAssignment.fromMap(
+            decoded,
+            course: courses[decoded['courseId']?.toString() ?? ''],
+          ),
+        );
+      }
+      return result;
+    } catch (e) {
+      debugPrint('ScheduleFirestoreService: assignments REST error: $e');
+      return null;
+    }
+  }
+
+  Future<void> _saveCachedAssignments(List<ScheduleAssignment> items) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(
+        _keyCachedAssignmentsJson,
+        jsonEncode(items.map((a) => a.toMap()).toList()),
+      );
+    } catch (_) {}
+  }
+
+  Future<List<ScheduleAssignment>> _loadCachedAssignments() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final raw = prefs.getString(_keyCachedAssignmentsJson);
+      if (raw == null || raw.isEmpty) return [];
+      return (jsonDecode(raw) as List<dynamic>)
+          .whereType<Map<String, dynamic>>()
+          .map(ScheduleAssignment.fromMap)
+          .toList();
+    } catch (_) {
+      return [];
+    }
+  }
+
+  /// The user's ROCIs Schedule assignments, soonest due first. Falls back to
+  /// the last good copy when offline, so an empty result is a real "none".
+  Future<List<ScheduleAssignment>> fetchAssignments({
+    String? uid,
+    String? email,
+    bool forceRefresh = false,
+  }) async {
+    if (!forceRefresh &&
+        _cachedAssignments != null &&
+        _lastAssignmentsFetch != null &&
+        DateTime.now().difference(_lastAssignmentsFetch!) < _cacheTtl) {
+      return _cachedAssignments!;
+    }
+
+    final targetEmail = email ?? _userEmail ?? await _getStoredEmail();
+    final userId = await _resolveScheduleUserId(uid: uid, email: targetEmail);
+
+    List<ScheduleAssignment>? fetched;
+    if (userId != null && userId.isNotEmpty) {
+      fetched = await _fetchAssignmentsViaRest(userId);
+    }
+
+    if (fetched != null) {
+      fetched.sort((a, b) => a.dueDate.compareTo(b.dueDate));
+      _cachedAssignments = fetched;
+      _lastAssignmentsFetch = DateTime.now();
+      _saveCachedAssignments(fetched);
+      return fetched;
+    }
+
+    return _cachedAssignments ??= await _loadCachedAssignments();
+  }
+
+  /// Original bytes of [attachment] on [assignmentId], or null if they can't
+  /// be fetched right now.
+  Future<Uint8List?> fetchAttachmentBytes(
+    String assignmentId,
+    ScheduleAttachment attachment,
+  ) async {
+    final cached = _attachmentBytes[attachment.id];
+    if (cached != null) return cached;
+
+    try {
+      final userId = await _resolveScheduleUserId();
+      if (userId == null || userId.isEmpty) return null;
+
+      final apiKey = ScheduleFirebaseOptions.currentPlatform.apiKey;
+      final projectId = ScheduleFirebaseOptions.currentPlatform.projectId;
+      final url = Uri.parse(
+        'https://firestore.googleapis.com/v1/projects/$projectId/databases/(default)/documents/users/$userId/assignments/$assignmentId/attachments/${attachment.id}?key=$apiKey',
+      );
+      final resp = await http
+          .get(url, headers: await _restAuthHeaders())
+          .timeout(const Duration(seconds: 20));
+      if (resp.statusCode != 200) return null;
+
+      final fields =
+          (jsonDecode(resp.body) as Map<String, dynamic>)['fields']
+              as Map<String, dynamic>? ??
+          {};
+      final encoded = decodeFirestoreFields(fields)['data'];
+      if (encoded is! String || encoded.isEmpty) return null;
+
+      var bytes = Uint8List.fromList(base64Decode(encoded));
+      if (attachment.gzipped) {
+        bytes = GZipDecoder().decodeBytes(bytes);
+      }
+
+      if (_attachmentBytes.length >= _maxCachedAttachments) {
+        _attachmentBytes.remove(_attachmentBytes.keys.first);
+      }
+      _attachmentBytes[attachment.id] = bytes;
+      return bytes;
+    } catch (e) {
+      debugPrint('ScheduleFirestoreService: attachment fetch error: $e');
+      return null;
+    }
   }
 
   /// Stream schedule events with course and semester metadata

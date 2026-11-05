@@ -2325,4 +2325,43 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get categoryMultiTip =>
       'एक से अधिक श्रेणी चुनें और कार्य उनके रंग मिलाकर दिखाएगा।';
+
+  @override
+  String get scheduleAssignmentsTitle => 'शेड्यूल के असाइनमेंट';
+
+  @override
+  String get scheduleAssignmentsEmpty =>
+      'ROCIs Schedule में अभी कोई असाइनमेंट नहीं है';
+
+  @override
+  String get scheduleAssignmentsHint =>
+      'असाइनमेंट और उनकी फ़ाइलें ROCIs Schedule में जोड़ें या बदलें';
+
+  @override
+  String get scheduleAssignmentsOverdue => 'देर से';
+
+  @override
+  String get scheduleAssignmentsUpcoming => 'आने वाले';
+
+  @override
+  String get scheduleAssignmentsCompleted => 'पूरे हुए';
+
+  @override
+  String scheduleAssignmentDue(String date) {
+    return 'जमा करने की तारीख $date';
+  }
+
+  @override
+  String scheduleAssignmentGivenIn(String lecture, String date) {
+    return '$lecture में $date को दिया गया';
+  }
+
+  @override
+  String scheduleAssignmentGivenOn(String date) {
+    return '$date के लेक्चर में दिया गया';
+  }
+
+  @override
+  String get scheduleAssignmentAttachmentUnavailable =>
+      'यह फ़ाइल अभी उपलब्ध नहीं है। कनेक्शन जाँचें और फिर कोशिश करें।';
 }

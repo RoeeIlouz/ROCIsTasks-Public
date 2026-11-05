@@ -2,6 +2,17 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## ROCIs Schedule Assignments With Lectures & Files - 2026-11-05 (Patch 4 on 1.0.0+121)
+
+#### Problems & User Requirements
+* Assignments created in ROCIs Schedule were not visible in Tasks, had no files, and were not tied to the lecture they were given in.
+
+#### Solutions Applied
+* **Data (`schedule_firestore_service.dart`, `schedule_assignment.dart`)**: reads `users/{uid}/assignments` plus the `attachments` subcollection over REST; the REST decoder now handles arrays of maps and bytes. Attachment bytes (compressed by Schedule to 700 KB or less) are fetched only when opened.
+* **UI (`schedule_assignments_screen.dart`)**: Overdue / Upcoming / Completed sections, lecture line, attachment chips that preview images or share other files. Entry point is the calendar header.
+* **Refresh (`schedule_assignments_provider.dart`)**: reloads silently on every launch and when the signed-in user changes. Read-only; editing happens in Schedule.
+* Dart-only, no new dependencies or icons, shipped as a Shorebird patch.
+
 ## Google Calendar Event Full Details & Meeting Link Actions - 2026-10-12 (Patch 1 on 1.0.0+120)
 
 #### Problems & User Requirements

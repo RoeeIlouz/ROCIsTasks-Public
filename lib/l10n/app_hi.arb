@@ -782,5 +782,15 @@
   "glassPreviewTry": "प्रीव्यू",
   "glassPreviewEnd": "ग्लास लुक पसंद आया? यह Pro में मिलता है।",
   "glassPreviewGetPro": "Pro लें",
-  "categoryMultiTip": "एक से अधिक श्रेणी चुनें और कार्य उनके रंग मिलाकर दिखाएगा।"
+  "categoryMultiTip": "एक से अधिक श्रेणी चुनें और कार्य उनके रंग मिलाकर दिखाएगा।",
+  "scheduleAssignmentsTitle": "शेड्यूल के असाइनमेंट",
+  "scheduleAssignmentsEmpty": "ROCIs Schedule में अभी कोई असाइनमेंट नहीं है",
+  "scheduleAssignmentsHint": "असाइनमेंट और उनकी फ़ाइलें ROCIs Schedule में जोड़ें या बदलें",
+  "scheduleAssignmentsOverdue": "देर से",
+  "scheduleAssignmentsUpcoming": "आने वाले",
+  "scheduleAssignmentsCompleted": "पूरे हुए",
+  "scheduleAssignmentDue": "जमा करने की तारीख {date}",
+  "scheduleAssignmentGivenIn": "{lecture} में {date} को दिया गया",
+  "scheduleAssignmentGivenOn": "{date} के लेक्चर में दिया गया",
+  "scheduleAssignmentAttachmentUnavailable": "यह फ़ाइल अभी उपलब्ध नहीं है। कनेक्शन जाँचें और फिर कोशिश करें।"
 }
