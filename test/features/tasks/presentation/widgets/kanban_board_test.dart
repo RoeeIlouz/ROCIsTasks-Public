@@ -3,6 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:provider/provider.dart';
+import 'package:rocis_tasks/core/services/schedule_firestore_service.dart';
+import 'package:rocis_tasks/features/calendar/presentation/providers/schedule_assignments_provider.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/sub_task.dart';
 import 'package:rocis_tasks/features/categories/domain/models/category.dart';
@@ -131,6 +133,10 @@ void main() {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider<TaskProvider>.value(value: mockTaskProvider),
+        ChangeNotifierProvider<ScheduleAssignmentsProvider>(
+          create: (_) =>
+              ScheduleAssignmentsProvider(ScheduleFirestoreService()),
+        ),
         ChangeNotifierProvider<ThemeService>.value(value: mockThemeService),
         ChangeNotifierProvider<SubscriptionService>.value(
           value: mockSubscriptionService,

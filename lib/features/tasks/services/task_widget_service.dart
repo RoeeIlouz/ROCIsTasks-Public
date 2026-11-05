@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart' hide Category;
 import 'package:flutter/material.dart';
 import 'package:home_widget/home_widget.dart';
+import 'package:rocis_tasks/core/models/schedule_assignment.dart';
 import 'package:rocis_tasks/core/services/widget_category_colors.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/features/categories/domain/models/category.dart';
@@ -57,6 +58,29 @@ class TaskWidgetService {
     }
   }
 
+  /// A ROCIs Schedule assignment as a task-list row. The "sa:" id tells the
+  /// app to finish it in ROCIs Schedule when its checkbox is tapped.
+  static Map<String, dynamic> _serializeAssignmentForWidget(
+    ScheduleAssignment a,
+  ) {
+    final color = _formatColorForWidget(a.color.toARGB32());
+    return {
+      'id': 'sa:${a.id}',
+      'title': a.title.isNotEmpty ? a.title : 'Untitled Task',
+      'priority': a.priority >= 2
+          ? 'high'
+          : (a.priority <= 0 ? 'low' : 'medium'),
+      'category_name': a.courseName.isNotEmpty ? a.courseName : a.courseCode,
+      'category_color': color,
+      'category_colors': [color],
+      'dueDate': formatDateForDisplay(a.dueDate),
+      'dueDateIso': a.dueDate.toIso8601String(),
+      'isCompleted': false,
+      'isPinned': false,
+      'categoryId': '',
+    };
+  }
+
   /// Filter tasks to get only pending (incomplete and not deleted) tasks
   static List<Task> filterPendingTasks(List<Task> allTasks) {
     try {
@@ -87,6 +111,7 @@ class TaskWidgetService {
     List<Task> allTasks,
     Category? Function(String?) getCategoryById, {
     bool isDarkText = false,
+    List<ScheduleAssignment> assignments = const [],
   }) async {
     if (kIsWeb) return null;
     String? chartPath;
@@ -109,6 +134,17 @@ class TaskWidgetService {
               low++;
               break;
           }
+        }
+      }
+
+      for (final a in assignments) {
+        if (a.isCompleted) continue;
+        if (a.priority >= 2) {
+          high++;
+        } else if (a.priority <= 0) {
+          low++;
+        } else {
+          medium++;
         }
       }
 
@@ -158,7 +194,10 @@ class TaskWidgetService {
       sortTasksByDueDate(pendingTasks);
 
       // Serialize tasks for widget consumption
-      final tasksJson = <Map<String, dynamic>>[];
+      final tasksJson = <Map<String, dynamic>>[
+        for (final a in assignments)
+          if (!a.isCompleted) _serializeAssignmentForWidget(a),
+      ];
       for (final task in pendingTasks) {
         try {
           final category = getCategoryById(task.categoryId);
@@ -174,7 +213,7 @@ class TaskWidgetService {
       }
 
       // If allTasks is empty, verify whether previous tasks existed to prevent transient background wipes
-      if (allTasks.isEmpty) {
+      if (allTasks.isEmpty && tasksJson.isEmpty) {
         final existing = await HomeWidget.getWidgetData<String>(
           'pending_tasks_list',
         );

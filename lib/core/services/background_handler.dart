@@ -273,6 +273,9 @@ class BackgroundHandler {
   }
 
   static Future<void> _completeTaskInBackground(String taskId) async {
+    // Assignments are finished in ROCIs Schedule by the running app, which
+    // holds the sign-in; there is nothing to do here.
+    if (taskId.startsWith('sa:')) return;
     try {
       await AppInitializer.initialize(isBackground: true);
 
@@ -388,16 +391,19 @@ class BackgroundHandler {
         }
       }
 
+      final calendarService = _createCalendarService();
+      await calendarService.init();
+      final widgetDataService = WidgetDataService(calendarService);
       final chartPath = await TaskWidgetService.updateTaskWidget(
         box.values.toList(),
         getCategoryById,
         isDarkText: isDarkText,
+        assignments: await widgetDataService.pendingAssignments(
+          userId: currentUser?.uid,
+        ),
       );
 
       // Update all new Android widgets in background
-      final calendarService = _createCalendarService();
-      await calendarService.init();
-      final widgetDataService = WidgetDataService(calendarService);
       await widgetDataService.updateAllWidgets(
         box.values.toList(),
         getCategoryById,

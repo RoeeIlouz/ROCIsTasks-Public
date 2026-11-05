@@ -850,10 +850,14 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
           final tasksForPublicSurfaces = _getTasksForPublicSurfaces();
           final tasksForTaskWidgetAndCounter =
               _getTasksForTaskWidgetAndCounter();
+          final assignments = await _widgetDataService.pendingAssignments(
+            userId: _authService.currentUser?.uid,
+          );
           final chartPath = await TaskWidgetService.updateTaskWidget(
             tasksForTaskWidgetAndCounter,
             getCategoryById,
             isDarkText: !_themeService.isDarkMode,
+            assignments: assignments,
           );
 
           if (showNotification) {

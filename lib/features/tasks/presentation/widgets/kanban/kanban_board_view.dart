@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:rocis_tasks/features/calendar/presentation/widgets/schedule_assignments_section.dart';
 import 'package:rocis_tasks/features/tasks/domain/models/task.dart';
 import 'package:rocis_tasks/features/categories/domain/models/category.dart';
 import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
@@ -96,6 +97,9 @@ class _KanbanBoardViewState extends State<KanbanBoardView> {
 
     return Column(
       children: [
+        // Unfinished ROCIs Schedule assignments sit above the board.
+        const ScheduleAssignmentsSection(),
+
         // Grouping Selector Bar
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),

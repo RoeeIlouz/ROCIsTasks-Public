@@ -2,7 +2,9 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart' hide Category;
 import 'package:home_widget/home_widget.dart';
 import 'package:intl/intl.dart';
+import 'package:rocis_tasks/core/models/schedule_assignment.dart';
 import 'package:rocis_tasks/core/services/calendar_service.dart';
+import 'package:rocis_tasks/core/services/schedule_assignments_loader.dart';
 import 'package:rocis_tasks/core/services/schedule_events_loader.dart';
 import 'package:rocis_tasks/core/services/widget_category_colors.dart';
 import 'package:rocis_tasks/core/services/schedule_firestore_service.dart';
@@ -41,6 +43,83 @@ class WidgetDataService {
       );
     }
     return _scheduleLoad!;
+  }
+
+  Future<List<ScheduleAssignment>>? _assignmentLoad;
+  DateTime? _assignmentLoadTime;
+
+  /// Unfinished ROCIs Schedule assignments, unless the user hid Schedule items
+  /// or filtered the widgets to one category (assignments have none). Callers
+  /// within a short span share one load.
+  Future<List<ScheduleAssignment>> pendingAssignments({String? userId}) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      if (!(prefs.getBool('full_calendar_show_schedule') ?? true)) return [];
+      final filterCatId = prefs.getString('widget_filter_category_id');
+      if (filterCatId != null &&
+          filterCatId.isNotEmpty &&
+          filterCatId != 'all') {
+        return [];
+      }
+    } catch (_) {}
+    final loadedAt = _assignmentLoadTime;
+    if (_assignmentLoad == null ||
+        loadedAt == null ||
+        DateTime.now().difference(loadedAt) > const Duration(seconds: 30)) {
+      _assignmentLoadTime = DateTime.now();
+      _assignmentLoad = loadPendingAssignments(
+        scheduleService: _scheduleService,
+        uid: userId,
+      );
+    }
+    return _assignmentLoad!;
+  }
+
+  /// "Course: Assignment", like the class titles.
+  @visibleForTesting
+  static String assignmentTitle(ScheduleAssignment a, String fallback) {
+    final title = a.title.trim();
+    final course = a.courseName.trim();
+    if (course.isEmpty) return title.isNotEmpty ? title : fallback;
+    if (title.isEmpty) return course;
+    return '$course: $title';
+  }
+
+  static String _assignmentColor(ScheduleAssignment a) =>
+      '#${a.color.toARGB32().toRadixString(16).padLeft(8, '0')}';
+
+  static String _assignmentPriority(ScheduleAssignment a) =>
+      a.priority >= 2 ? 'high' : (a.priority <= 0 ? 'low' : 'medium');
+
+  /// An assignment as a non-completable agenda row, shown on [day] at
+  /// [timeDisplay]. It uses the "schedule" row type: no checkbox, so it can
+  /// only be finished from the assignments list or a list widget checkbox.
+  static Map<String, dynamic> _assignmentAgendaItem(
+    ScheduleAssignment a, {
+    required DateTime day,
+    required String timeDisplay,
+    required int sortMinutes,
+    required String label,
+    required String fallback,
+  }) {
+    final dateOnly = DateFormat('yyyy-MM-dd').format(day);
+    return {
+      'type': 'schedule',
+      'id': 'sa:${a.id}',
+      'title': assignmentTitle(a, fallback),
+      'subtitle': a.courseCode.isEmpty
+          ? label
+          : '$label \u2022 ${a.courseCode}',
+      'date': a.dueDate.toIso8601String(),
+      'dateOnly': dateOnly,
+      'dateDisplay': dateOnly,
+      'timeDisplay': timeDisplay,
+      'isAllDay': false,
+      'sortMinutes': sortMinutes,
+      'isCompleted': false,
+      'category_color': _assignmentColor(a),
+      'priority': '',
+    };
   }
 
   /// Every class time of [events] on the days from [from] up to [to].
@@ -202,6 +281,28 @@ class WidgetDataService {
         return 'पूरा दिन';
       default:
         return 'All Day';
+    }
+  }
+
+  Future<String> _getAssignmentLabel() async {
+    final lang = await _getAppLanguage();
+    switch (lang.toLowerCase()) {
+      case 'he':
+        return 'מטלה';
+      case 'es':
+        return 'Tarea';
+      case 'de':
+        return 'Aufgabe';
+      case 'fr':
+        return 'Devoir';
+      case 'ar':
+        return 'واجب';
+      case 'sv':
+        return 'Uppgift';
+      case 'hi':
+        return 'असाइनमेंट';
+      default:
+        return 'Assignment';
     }
   }
 
@@ -376,6 +477,8 @@ class WidgetDataService {
     String? userId,
   }) async {
     if (kIsWeb) return;
+    // A fresh read each pass, so a just-finished assignment drops out.
+    _assignmentLoad = null;
     try {
       await Future.wait([
         updateWeekViewWidget(allTasks, getCategoryById, userId: userId),
@@ -521,6 +624,24 @@ class WidgetDataService {
       });
     }
 
+    // 4. Unfinished ROCIs Schedule assignments, on the day they are due.
+    final assignmentLabel = await _getAssignmentLabel();
+    for (final a in await pendingAssignments(userId: userId)) {
+      if (a.dueDate.isBefore(rangeStart) || !a.dueDate.isBefore(rangeEnd)) {
+        continue;
+      }
+      agendaItems.add(
+        _assignmentAgendaItem(
+          a,
+          day: a.dueDate,
+          timeDisplay: clock.format(a.dueDate),
+          sortMinutes: _sortMinutes(a.dueDate, allDay: false),
+          label: assignmentLabel,
+          fallback: noTitleLabel,
+        ),
+      );
+    }
+
     agendaItems.sort(_compareItems);
 
     // An empty result only means "no data yet" when no tasks are loaded;
@@ -613,6 +734,9 @@ class WidgetDataService {
       )) {
         final key = DateFormat('yyyy-MM-dd').format(t.dueDate!);
         eventsByDate[key] = true;
+      }
+      for (final a in await pendingAssignments(userId: userId)) {
+        eventsByDate[DateFormat('yyyy-MM-dd').format(a.dueDate)] = true;
       }
 
       final gridData = <Map<String, dynamic>>[];
@@ -791,6 +915,26 @@ class WidgetDataService {
       });
     }
 
+    // 4. Unfinished ROCIs Schedule assignments. Overdue ones wait at the top
+    // of today until they are done.
+    final assignmentLabel = await _getAssignmentLabel();
+    final overdueLabel = await _getOverdueLabel();
+    for (final a in await pendingAssignments(userId: userId)) {
+      final dueDay = DateTime(a.dueDate.year, a.dueDate.month, a.dueDate.day);
+      final overdue = dueDay.isBefore(today);
+      if (!overdue && !dueDay.isBefore(rangeEnd)) continue;
+      rawItems.add(
+        _assignmentAgendaItem(
+          a,
+          day: overdue ? today : dueDay,
+          timeDisplay: overdue ? overdueLabel : clock.format(a.dueDate),
+          sortMinutes: overdue ? -1 : _sortMinutes(a.dueDate, allDay: false),
+          label: assignmentLabel,
+          fallback: noTitleLabel,
+        ),
+      );
+    }
+
     rawItems.sort(_compareItems);
     final tomorrow = DateTime(today.year, today.month, today.day + 1);
 
@@ -880,10 +1024,14 @@ class WidgetDataService {
           t.dueDate!.isBefore(tomorrow);
     }).length;
 
+    final assignmentsToday = (await pendingAssignments(
+      userId: userId,
+    )).where((a) => _isSameDay(a.dueDate, today)).length;
+
     await Future.wait([
       HomeWidget.saveWidgetData<int>(
         'quick_action_pending_count',
-        pendingToday,
+        pendingToday + assignmentsToday,
       ),
       HomeWidget.saveWidgetData<int>(
         'quick_action_completed_count',
@@ -990,6 +1138,25 @@ class WidgetDataService {
       });
     }
 
+    // 4. Unfinished assignments due within three days. Overdue ones rank
+    // like undated tasks (after anything in the next 24 hours).
+    final assignmentLabel = await _getAssignmentLabel();
+    for (final a in await pendingAssignments(userId: userId)) {
+      final due = a.dueDate.toLocal();
+      if (due.isAfter(now.add(const Duration(days: 3)))) continue;
+      final overdue = due.isBefore(now);
+      upcomingList.add({
+        'type': 'schedule',
+        'id': 'sa:${a.id}',
+        'title': assignmentTitle(a, noTitle),
+        'subtitle': assignmentLabel,
+        'category_color': _assignmentColor(a),
+        'rank': overdue ? now.add(const Duration(hours: 24)) : due,
+        'start': overdue ? null : due,
+        'priority': '',
+      });
+    }
+
     upcomingList.sort(
       (a, b) => (a['rank'] as DateTime).compareTo(b['rank'] as DateTime),
     );
@@ -1079,6 +1246,38 @@ class WidgetDataService {
         .where((t) => !(t.isDeleted ?? false))
         .toList();
 
+    // Unfinished ROCIs Schedule assignments lead their column. Their checkbox
+    // marks them done in ROCIs Schedule (the "sa:" id is routed by the app).
+    final kanbanAssignments = await pendingAssignments(userId: userId);
+    for (final a in kanbanAssignments) {
+      final due = a.dueDate;
+      final dueDay = DateTime(due.year, due.month, due.day);
+      final isOverdue = dueDay.isBefore(today);
+      final isToday = dueDay == today;
+      final formattedDate = _formatDatePattern('MMM d', due, lang);
+      final color = _assignmentColor(a);
+      final item = {
+        'id': 'sa:${a.id}',
+        'title': a.title,
+        'category': a.courseName.isNotEmpty ? a.courseName : a.courseCode,
+        'category_color': color,
+        'category_colors': [color],
+        'priority': _assignmentPriority(a),
+        'isCompleted': false,
+        'isOverdue': isOverdue,
+        'dateDisplay': isOverdue
+            ? '$overdueLabel ($formattedDate)'
+            : (isToday
+                  ? todayLabel
+                  : (dueDay == tomorrow ? tomorrowLabel : formattedDate)),
+      };
+      if (isToday || isOverdue || a.priority >= 2) {
+        inFocusTasks.add(item);
+      } else {
+        todoTasks.add(item);
+      }
+    }
+
     for (final t in validTasks) {
       final cat = getCategoryById(t.categoryId);
       final isOverdue =
@@ -1131,7 +1330,7 @@ class WidgetDataService {
 
     final bool isKanbanEmpty =
         todoTasks.isEmpty && inFocusTasks.isEmpty && doneTasks.isEmpty;
-    if (isKanbanEmpty && allTasks.isEmpty) {
+    if (isKanbanEmpty && allTasks.isEmpty && kanbanAssignments.isEmpty) {
       final existing = await HomeWidget.getWidgetData<String>('kanban_data');
       if (existing != null && existing.isNotEmpty && existing != '{}') {
         return;

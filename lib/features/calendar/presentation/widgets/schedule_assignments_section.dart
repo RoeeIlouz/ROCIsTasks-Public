@@ -6,6 +6,7 @@ import 'package:rocis_tasks/core/models/schedule_assignment.dart';
 import 'package:rocis_tasks/core/utils/app_date_formats.dart';
 import 'package:rocis_tasks/features/calendar/presentation/providers/schedule_assignments_provider.dart';
 import 'package:rocis_tasks/features/calendar/presentation/screens/schedule_assignments_screen.dart';
+import 'package:rocis_tasks/features/tasks/presentation/providers/task_provider.dart';
 import 'package:rocis_tasks/l10n/app_localizations.dart';
 import 'package:rocis_tasks/shared/ui/widgets/glass_container.dart';
 
@@ -18,6 +19,7 @@ Future<void> setScheduleAssignmentDone(
 ) async {
   final provider = context.read<ScheduleAssignmentsProvider>();
   final messenger = ScaffoldMessenger.of(context);
+  final tasks = context.read<TaskProvider?>();
   final message = AppLocalizations.of(context)!.scheduleAssignmentSaveFailed;
   HapticFeedback.lightImpact();
   final saved = await provider.setCompleted(assignment, done);
@@ -25,6 +27,9 @@ Future<void> setScheduleAssignmentDone(
     messenger.showSnackBar(
       SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
     );
+  } else {
+    // Home-screen widgets list assignments too.
+    tasks?.updateAllWidgets();
   }
 }
 

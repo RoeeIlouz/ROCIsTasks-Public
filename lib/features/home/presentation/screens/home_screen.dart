@@ -17,6 +17,8 @@ import 'package:rocis_tasks/features/auth/presentation/screens/security_settings
 import 'package:home_widget/home_widget.dart' as hw;
 import 'package:provider/provider.dart';
 import 'package:rocis_tasks/features/calendar/presentation/providers/calendar_provider.dart';
+import 'package:rocis_tasks/features/calendar/presentation/providers/schedule_assignments_provider.dart';
+import 'package:rocis_tasks/features/calendar/presentation/screens/schedule_assignments_screen.dart';
 import 'package:rocis_tasks/core/services/review_prompt_service.dart';
 import 'package:rocis_tasks/core/services/notification_service.dart';
 import 'dart:async';
@@ -183,9 +185,32 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  /// A widget checkbox on a ROCIs Schedule assignment: mark it done there.
+  Future<void> _completeAssignmentFromWidget(String assignmentId) async {
+    final provider = Provider.of<ScheduleAssignmentsProvider>(
+      context,
+      listen: false,
+    );
+    final taskProvider = Provider.of<TaskProvider>(context, listen: false);
+    if (!provider.hasLoaded) await provider.load();
+    for (var i = 0; i < 40 && provider.isLoading; i++) {
+      await Future<void>.delayed(const Duration(milliseconds: 250));
+    }
+    final matches = provider.items.where(
+      (a) => a.id == assignmentId && !a.isCompleted,
+    );
+    if (matches.isEmpty) return;
+    await provider.setCompleted(matches.first, true);
+    taskProvider.updateAllWidgets();
+  }
+
   Future<void> _completeFromWidget(String taskId) async {
     final taskProvider = Provider.of<TaskProvider>(context, listen: false);
     try {
+      if (taskId.startsWith('sa:')) {
+        await _completeAssignmentFromWidget(taskId.substring(3));
+        return;
+      }
       // On a cold start the tasks may still be loading.
       for (var i = 0; i < 40 && taskProvider.isLoading; i++) {
         await Future<void>.delayed(const Duration(milliseconds: 250));
@@ -276,6 +301,13 @@ class _HomeScreenState extends State<HomeScreen> {
     // task_item is what the agenda widgets send for a row tap.
     if (uri.host == 'task_detail' || uri.host == 'task_item') {
       final taskId = uri.queryParameters['id'];
+      if (taskId != null && taskId.startsWith('sa:')) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const ScheduleAssignmentsScreen()),
+        );
+        return;
+      }
       if (taskId != null) {
         final taskProvider = Provider.of<TaskProvider>(context, listen: false);
         // Look up by id, not in the filtered list: the task may be hidden by

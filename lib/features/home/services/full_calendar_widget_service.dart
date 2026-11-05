@@ -10,6 +10,8 @@ import 'package:rocis_tasks/core/services/widget_data_service.dart';
 import 'package:rocis_tasks/core/services/logger_service.dart';
 import 'package:rocis_tasks/core/services/calendar_service.dart';
 import 'package:rocis_tasks/core/services/calendar_color_service.dart';
+import 'package:rocis_tasks/core/models/schedule_assignment.dart';
+import 'package:rocis_tasks/core/services/schedule_assignments_loader.dart';
 import 'package:rocis_tasks/core/services/schedule_events_loader.dart';
 import 'package:rocis_tasks/core/services/schedule_firestore_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -438,6 +440,29 @@ class FullCalendarWidgetService {
         }
       }
 
+      // Unfinished ROCIs Schedule assignments, shown on their due day.
+      Future<List<ScheduleAssignment>> fetchAssignments() async {
+        if (!filters.showRocisSchedule) return [];
+        final effectiveUid =
+            userId ??
+            (Firebase.apps.isNotEmpty
+                ? FirebaseAuth.instance.currentUser?.uid
+                : null);
+        final effectiveEmail =
+            userEmail ??
+            (Firebase.apps.isNotEmpty
+                ? FirebaseAuth.instance.currentUser?.email
+                : null) ??
+            prefs.getString(GoogleOAuthManager.keyUserEmail) ??
+            prefs.getString('user_email');
+        return loadPendingAssignments(
+          scheduleService: _scheduleService,
+          uid: effectiveUid,
+          email: effectiveEmail,
+          forceRefresh: forceRefresh,
+        );
+      }
+
       // 4. Load localization
       Future<AppLocalizations?> fetchL10n() async {
         if (_cachedLocaleCode == localeCode && _cachedL10n != null) {
@@ -462,12 +487,14 @@ class FullCalendarWidgetService {
         fetchColors(),
         fetchScheduleEvents(),
         fetchL10n(),
+        fetchAssignments(),
       ]);
 
       final events = asyncResults[0] as List<dynamic>;
       final calendarColors = asyncResults[1] as Map<String, String>;
       final scheduleEvents = asyncResults[2] as List<SyncedScheduleEvent>;
       final l10n = asyncResults[3] as AppLocalizations?;
+      final assignments = asyncResults[4] as List<ScheduleAssignment>;
       final clock = await WidgetDataService.clockFormat();
 
       // Pre-index Google events by date for O(1) lookup
@@ -521,6 +548,13 @@ class FullCalendarWidgetService {
             }
           }
         }
+      }
+
+      final assignmentsByDate = <String, List<ScheduleAssignment>>{};
+      for (final a in assignments) {
+        assignmentsByDate
+            .putIfAbsent(DateFormat('yyyy-MM-dd').format(a.dueDate), () => [])
+            .add(a);
       }
 
       // Pre-load categories for color lookup and privacy
@@ -602,6 +636,7 @@ class FullCalendarWidgetService {
         final dayEvents = eventsByDate[dateKey] ?? [];
         final dayTasks = tasksByDate[dateKey] ?? [];
         final daySchedule = scheduleEventsByDate[dateKey] ?? [];
+        final dayAssignments = assignmentsByDate[dateKey] ?? [];
 
         final summaries = <Map<String, dynamic>>[];
 
@@ -611,6 +646,7 @@ class FullCalendarWidgetService {
           ...dayTasks,
           ...dayEvents,
           ...daySchedule,
+          ...dayAssignments,
         ])) {
           if (summaries.length >= _maxSummariesPerDay) break;
           if (item is Task) {
@@ -699,6 +735,24 @@ class FullCalendarWidgetService {
               'color': eventColor,
               'type': 'schedule',
             });
+          } else if (item is ScheduleAssignment) {
+            final a = item;
+            final course = a.courseName.isNotEmpty
+                ? a.courseName
+                : a.courseCode;
+            final displayTitle = course.isNotEmpty
+                ? '$course: ${a.title}'
+                : a.title;
+            summaries.add({
+              'text': displayTitle.length > 28
+                  ? '${displayTitle.substring(0, 25)}...'
+                  : displayTitle,
+              'time': clock.format(a.dueDate),
+              'subtitle': '',
+              'color':
+                  '#${a.color.toARGB32().toRadixString(16).padLeft(8, '0')}',
+              'type': 'schedule',
+            });
           }
         }
 
@@ -710,6 +764,7 @@ class FullCalendarWidgetService {
         ...tasksByDate.keys,
         ...eventsByDate.keys,
         ...scheduleEventsByDate.keys,
+        ...assignmentsByDate.keys,
       };
       final masterSummariesByDate = <String, List<Map<String, dynamic>>>{};
       for (final dateKey in allDateKeys) {
