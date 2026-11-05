@@ -57,8 +57,9 @@ class ScheduleEventDetailSheet extends StatelessWidget {
   String? get subtitle {
     final title = event.title.trim();
     if (title.isEmpty || event.courseName.trim().isEmpty) return null;
-    if (title.toLowerCase() == event.courseName.trim().toLowerCase())
+    if (title.toLowerCase() == event.courseName.trim().toLowerCase()) {
       return null;
+    }
     return title;
   }
 

@@ -269,13 +269,11 @@ class AuthService extends ChangeNotifier {
             final authUser = await _oauthManager.googleSignIn.authenticate(
               scopeHint: GoogleOAuthManager.googleTasksScopes,
             );
-            if (authUser != null) {
-              _oauthManager.setGoogleUser(authUser);
-              AppLogger.info(
-                'Web: GIS authenticate acquired user: ${authUser.email}',
-                tag: 'Auth',
-              );
-            }
+            _oauthManager.setGoogleUser(authUser);
+            AppLogger.info(
+              'Web: GIS authenticate acquired user: ${authUser.email}',
+              tag: 'Auth',
+            );
           } catch (authErr) {
             AppLogger.info('Web: GIS authenticate prompt: $authErr', tag: 'Auth');
           }
