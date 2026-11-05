@@ -44,6 +44,14 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="https" android:host="tasks.rocisapps.com" android:pathPrefix="/share" />
             </intent-filter>
+            <!-- Custom scheme used by ROCIs Schedule to open the app and to send it
+                 an assignment (rocistasks://open, rocistasks://add_task?...). -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="rocistasks" />
+            </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->

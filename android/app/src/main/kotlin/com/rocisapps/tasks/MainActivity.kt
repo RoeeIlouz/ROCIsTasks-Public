@@ -12,6 +12,7 @@ class MainActivity : FlutterFragmentActivity() {
     private lateinit var notificationHelper: NotificationHelper
     private var widgetChannel: MethodChannel? = null
     private var returnHomeAfterWidgetAction = false
+    private var pendingLaunchLink: String? = null
 
     companion object {
     }
@@ -66,6 +67,11 @@ class MainActivity : FlutterFragmentActivity() {
                     moveTaskToBack(true)
                 }
                 result.success(null)
+            } else if (call.method == "getInitialLink") {
+                // A rocistasks:// link that cold-started the app (e.g. from ROCIs
+                // Schedule); Dart was not listening yet when it arrived.
+                result.success(pendingLaunchLink)
+                pendingLaunchLink = null
             } else if (call.method == "pinWidget") {
                 // Asks the launcher to add one of our widgets ("Add to home screen" sheet).
                 val provider = call.argument<String>("provider") ?: ""
@@ -83,17 +89,21 @@ class MainActivity : FlutterFragmentActivity() {
         }
 
         // Handle initial intent after channels are set up
-        handleIntent(intent, channel)
+        handleIntent(intent, channel, initial = true)
     }
 
     override fun onNewIntent(intent: android.content.Intent) {
         super.onNewIntent(intent)
         setIntent(intent) // Update the intent so HomeWidget can read it
         val channel = MethodChannel(flutterEngine!!.dartExecutor.binaryMessenger, CHANNEL)
-        handleIntent(intent, channel)
+        handleIntent(intent, channel, initial = false)
     }
 
-    private fun handleIntent(intent: android.content.Intent?, channel: MethodChannel) {
+    private fun handleIntent(
+        intent: android.content.Intent?,
+        channel: MethodChannel,
+        initial: Boolean,
+    ) {
         
         if (intent?.action == NotificationHelper.ACTION_ADD_TASK) {
             channel.invokeMethod("onNotificationAction", "add_task")
@@ -106,6 +116,8 @@ class MainActivity : FlutterFragmentActivity() {
         // engine would race it on the same Hive box), then asks to return home.
         returnHomeAfterWidgetAction = data?.scheme == "rocistasks" && data.host == "complete"
         if (data != null && data.scheme == "rocistasks") {
+            // Cold start: Dart is not ready, so it pulls the link via getInitialLink.
+            if (initial) pendingLaunchLink = data.toString()
             // Send the URI to Flutter via the widget channel
             if (widgetChannel != null) {
                 widgetChannel?.invokeMethod("onWidgetClick", data.toString())

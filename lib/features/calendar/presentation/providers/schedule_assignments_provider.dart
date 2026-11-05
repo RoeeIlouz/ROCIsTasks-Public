@@ -67,6 +67,15 @@ class ScheduleAssignmentsProvider extends ChangeNotifier {
     notifyListeners();
     try {
       final user = _authService?.currentUser;
+      // The Schedule project only lets its owner read, so the secondary
+      // sign-in must be in place before asking (the calendar does the same).
+      if (user != null) {
+        try {
+          await _authService?.ensureSecondaryAuth();
+        } catch (e) {
+          AppLogger.warning('Schedule assignments: secondary auth failed: $e');
+        }
+      }
       final results = await Future.wait([
         _service.fetchAssignments(
           uid: user?.uid,

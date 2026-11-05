@@ -67,6 +67,10 @@ class AppRouter {
       ),
     ],
     redirect: (context, state) {
+      // rocistasks:// links are handled natively (HomeScreen); the router must
+      // not treat them as a location.
+      if (state.uri.scheme == 'rocistasks') return '/';
+
       final isLoggedIn = authService.currentUser != null;
       final isOnboardingComplete = onboardingService.hasSeenOnboarding;
       final isLoggingIn = state.uri.path == '/login';

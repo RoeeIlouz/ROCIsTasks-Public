@@ -69,6 +69,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
       // Handle widget deep links via method channel (for fill-in intents)
       _widgetChannel.setMethodCallHandler(_handleWidgetMethodCall);
+
+      // A rocistasks:// link (from ROCIs Schedule) that cold-started the app.
+      _widgetChannel
+          .invokeMethod<String>('getInitialLink')
+          .then((link) {
+            if (!mounted || link == null) return;
+            _handleWidgetLaunch(Uri.tryParse(link));
+          })
+          .catchError((_) {});
     }
 
     // Handle Notification Actions
