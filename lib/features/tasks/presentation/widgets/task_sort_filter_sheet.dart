@@ -21,7 +21,8 @@ class TaskSortFilterSheet extends StatelessWidget {
             provider.selectedCategoryIds.isNotEmpty ||
             provider.currentDateFilter != DateTimeFilterOption.all ||
             provider.currentSortOption != TaskSortOption.dueDate ||
-            !provider.showCompleted;
+            !provider.showCompleted ||
+            !provider.showUpcomingRecurring;
 
         return DraggableScrollableSheet(
           initialChildSize: 0.65,
@@ -253,6 +254,22 @@ class TaskSortFilterSheet extends StatelessWidget {
                         provider.toggleShowCompleted(value);
                       },
                       secondary: const Icon(Icons.check_circle_outline),
+                    ),
+                  ),
+                  Material(
+                    type: MaterialType.transparency,
+                    child: SwitchListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(
+                        l10n.showUpcomingRecurring,
+                        style: GoogleFonts.outfit(fontWeight: FontWeight.w600),
+                      ),
+                      value: provider.showUpcomingRecurring,
+                      onChanged: (value) {
+                        HapticFeedback.lightImpact();
+                        provider.toggleShowUpcomingRecurring(value);
+                      },
+                      secondary: const Icon(Icons.update_rounded),
                     ),
                   ),
 

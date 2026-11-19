@@ -558,6 +558,7 @@
   "a11yRemoveField": "Quitar campo",
   "taskCompletionFeedback": "Respuesta al completar tareas",
   "taskCompletionFeedbackSubtitle": "Vibración breve al marcar una tarea",
+  "showUpcomingRecurring": "Mostrar tareas recurrentes próximas",
   "cookiePreferences": "Preferencias de cookies",
   "cookiePreferencesSubtitle": "Restablecer el consentimiento de cookies y almacenamiento",
   "scheduleSynergyTitle": "ROCIs Schedule",

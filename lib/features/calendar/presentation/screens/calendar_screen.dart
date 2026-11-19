@@ -466,18 +466,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       ),
                       const SizedBox(width: 4),
                       IconButton(
-                        icon: const Icon(Icons.assignment_outlined),
-                        tooltip: l10n.scheduleAssignmentsTitle,
-                        visualDensity: VisualDensity.compact,
-                        onPressed: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute<void>(
-                              builder: (_) => const ScheduleAssignmentsScreen(),
-                            ),
-                          );
-                        },
-                      ),
-                      IconButton(
                         icon: const Icon(Icons.palette_outlined),
                         tooltip: l10n.calendarColors,
                         visualDensity: VisualDensity.compact,

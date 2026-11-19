@@ -1606,6 +1606,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Kurze Vibration beim Abhaken einer Aufgabe';
 
   @override
+  String get showUpcomingRecurring =>
+      'Anstehende wiederkehrende Aufgaben anzeigen';
+
+  @override
   String get cookiePreferences => 'Cookie-Einstellungen';
 
   @override

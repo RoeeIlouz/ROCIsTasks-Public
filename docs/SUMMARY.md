@@ -2,6 +2,17 @@
 
 This file summarizes errors encountered and changes made to the codebase, ensuring new sessions can quickly align on the project's state.
 
+## Assignment Task Cards, Recurring Drawer Filter - 2026-11-19 (Patch 1 on 1.0.0+123)
+
+#### Problems & User Requirements
+* Assignments should keep their own drawer but look like normal tasks; the Upcoming Recurring drawer should be hideable from the task filters; the calendar header's assignments icon should go.
+
+#### Solutions Applied
+* **Cards (`schedule_assignments_section.dart`)**: `ScheduleAssignmentTaskTile` replaces the old row inside the drawer (also used above kanban); soonest due first. Swipe right only marks done, no delete or pin.
+* **Filter (`task_provider.dart`, `task_sort_filter_sheet.dart`)**: `showUpcomingRecurring` saved as `show_upcoming_recurring`, counts as an active filter, reset by Reset All.
+* **Calendar (`calendar_screen.dart`)**: header button removed; assignments screen still opens from assignment items.
+* Dart-only, shipped as a Shorebird patch.
+
 ## Assignments In The Task List And Calendar - 2026-11-06 (Patch 1 on 1.0.0+122)
 
 #### Problems & User Requirements

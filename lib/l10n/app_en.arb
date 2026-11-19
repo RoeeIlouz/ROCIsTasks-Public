@@ -615,6 +615,7 @@
   "a11yRemoveField": "Remove field",
   "taskCompletionFeedback": "Task Completion Feedback",
   "taskCompletionFeedbackSubtitle": "Haptic pulse when ticking off a task",
+  "showUpcomingRecurring": "Show upcoming recurring tasks",
   "cookiePreferences": "Cookie Preferences",
   "cookiePreferencesSubtitle": "Reset cookie & storage consent",
   "scheduleSynergyTitle": "ROCIs Schedule",

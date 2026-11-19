@@ -380,6 +380,9 @@ class _TaskListViewState extends State<TaskListView> {
     final isGoogleTasksExpired =
         authService.isGoogleTasksTokenExpired && !_dismissedGoogleTasksWarning;
     final theme = Theme.of(context);
+    final showUpcomingSetting = context.select<TaskProvider, bool>(
+      (p) => p.showUpcomingRecurring,
+    );
 
     return Selector<TaskProvider, ({List tasks, bool isLoading})>(
       selector: (_, provider) =>
@@ -584,7 +587,8 @@ class _TaskListViewState extends State<TaskListView> {
           final isAllCaughtUp =
               activeTasks.isEmpty && completedTasks.isNotEmpty;
 
-          final showUpcomingTile = upcomingRecurringTasks.isNotEmpty;
+          final showUpcomingTile =
+              showUpcomingSetting && upcomingRecurringTasks.isNotEmpty;
           final showCompletedTile = completedTasks.isNotEmpty;
           final headerCount = isAllCaughtUp ? 1 : 0;
           final activeCount = activeTasks.length;

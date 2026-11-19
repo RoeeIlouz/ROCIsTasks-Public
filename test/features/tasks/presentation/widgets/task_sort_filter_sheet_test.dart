@@ -44,6 +44,7 @@ void main() {
     ).thenReturn(DateTimeFilterOption.all);
     when(() => mockTaskProvider.selectedCategoryIds).thenReturn([]);
     when(() => mockTaskProvider.showCompleted).thenReturn(true);
+    when(() => mockTaskProvider.showUpcomingRecurring).thenReturn(true);
     when(() => mockThemeService.useGlassmorphism).thenReturn(false);
     when(() => mockThemeService.glassPreviewActive).thenReturn(false);
     when(() => mockThemeService.glassActive(any())).thenReturn(false);

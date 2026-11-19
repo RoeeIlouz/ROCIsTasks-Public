@@ -1588,6 +1588,9 @@ class AppLocalizationsHi extends AppLocalizations {
   String get taskCompletionFeedbackSubtitle => 'कार्य पूरा करने पर हल्का कंपन';
 
   @override
+  String get showUpcomingRecurring => 'आगामी दोहराए जाने वाले कार्य दिखाएं';
+
+  @override
   String get cookiePreferences => 'कुकी प्राथमिकताएं';
 
   @override

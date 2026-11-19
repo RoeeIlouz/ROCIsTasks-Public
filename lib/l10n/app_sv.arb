@@ -559,6 +559,7 @@
   "a11yRemoveField": "Ta bort fält",
   "taskCompletionFeedback": "Återkoppling vid avklarad uppgift",
   "taskCompletionFeedbackSubtitle": "Kort vibration när du bockar av en uppgift",
+  "showUpcomingRecurring": "Visa kommande återkommande uppgifter",
   "cookiePreferences": "Cookie-inställningar",
   "cookiePreferencesSubtitle": "Återställ samtycke till cookies och lagring",
   "scheduleSynergyTitle": "ROCIs Schedule",

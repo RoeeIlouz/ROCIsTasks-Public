@@ -1572,6 +1572,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get taskCompletionFeedbackSubtitle => 'اهتزاز خفيف عند إكمال مهمة';
 
   @override
+  String get showUpcomingRecurring => 'إظهار المهام المتكررة القادمة';
+
+  @override
   String get cookiePreferences => 'تفضيلات ملفات تعريف الارتباط';
 
   @override

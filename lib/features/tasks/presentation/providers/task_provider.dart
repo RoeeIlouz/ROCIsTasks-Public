@@ -191,6 +191,7 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
     _filterService.selectedCategoryIds =
         prefs.getStringList('category_filters') ?? [];
     _filterService.showCompleted = prefs.getBool('show_completed') ?? true;
+    _showUpcomingRecurring = prefs.getBool('show_upcoming_recurring') ?? true;
     _advancedRemindersEnabled =
         prefs.getBool('advanced_reminders_enabled') ?? false;
     _nagRemindersEnabled = prefs.getBool('nag_reminders_enabled') ?? false;
@@ -526,6 +527,11 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
       _filterService.currentDateFilter;
   List<String> get selectedCategoryIds => _filterService.selectedCategoryIds;
   bool get showCompleted => _filterService.showCompleted;
+
+  bool _showUpcomingRecurring = true;
+
+  /// Whether My Tasks shows the "Upcoming Recurring" drawer.
+  bool get showUpcomingRecurring => _showUpcomingRecurring;
   bool get advancedRemindersEnabled =>
       _subscriptionService.isPremium && _advancedRemindersEnabled;
   bool get nagRemindersEnabled =>
@@ -659,6 +665,7 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
     _filterService.currentDateFilter = DateTimeFilterOption.all;
     _filterService.clearCategoryFilters();
     _filterService.showCompleted = true;
+    _showUpcomingRecurring = true;
     _refreshPagination();
     notifyListeners();
     _saveCategoryFilters();
@@ -667,6 +674,7 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
           prefs.setInt('sort_option', TaskSortOption.dueDate.index);
           prefs.setInt('date_filter', DateTimeFilterOption.all.index);
           prefs.setBool('show_completed', true);
+          prefs.setBool('show_upcoming_recurring', true);
         })
         .catchError((e, s) {
           _errorHandlingService.logError(e, s, reason: 'Resetting filters');
@@ -696,6 +704,21 @@ class TaskProvider extends ChangeNotifier with WidgetsBindingObserver {
     _filterService.setSearchQuery(query);
     _refreshPagination();
     notifyListeners();
+  }
+
+  void toggleShowUpcomingRecurring(bool value) {
+    _showUpcomingRecurring = value;
+    notifyListeners();
+    SharedPreferences.getInstance()
+        .then((prefs) => prefs.setBool('show_upcoming_recurring', value))
+        .catchError((e, s) {
+          _errorHandlingService.logError(
+            e,
+            s,
+            reason: 'Saving show upcoming recurring preference',
+          );
+          return false;
+        });
   }
 
   void toggleShowCompleted(bool value) {

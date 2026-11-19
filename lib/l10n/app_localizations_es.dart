@@ -1604,6 +1604,9 @@ class AppLocalizationsEs extends AppLocalizations {
       'Vibración breve al marcar una tarea';
 
   @override
+  String get showUpcomingRecurring => 'Mostrar tareas recurrentes próximas';
+
+  @override
   String get cookiePreferences => 'Preferencias de cookies';
 
   @override

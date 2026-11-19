@@ -1572,6 +1572,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get taskCompletionFeedbackSubtitle => 'רטט קצר כשמסמנים משימה כבוצעה';
 
   @override
+  String get showUpcomingRecurring => 'הצג משימות חוזרות קרובות';
+
+  @override
   String get cookiePreferences => 'העדפות עוגיות';
 
   @override

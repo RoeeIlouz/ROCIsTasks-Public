@@ -1582,6 +1582,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Haptic pulse when ticking off a task';
 
   @override
+  String get showUpcomingRecurring => 'Show upcoming recurring tasks';
+
+  @override
   String get cookiePreferences => 'Cookie Preferences';
 
   @override

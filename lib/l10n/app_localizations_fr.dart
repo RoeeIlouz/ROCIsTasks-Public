@@ -1606,6 +1606,9 @@ class AppLocalizationsFr extends AppLocalizations {
       'Petite vibration quand vous cochez une tâche';
 
   @override
+  String get showUpcomingRecurring => 'Afficher les tâches récurrentes à venir';
+
+  @override
   String get cookiePreferences => 'Préférences de cookies';
 
   @override

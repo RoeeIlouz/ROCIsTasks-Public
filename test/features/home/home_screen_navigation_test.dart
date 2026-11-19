@@ -56,6 +56,7 @@ void main() {
     when(() => mockTaskProvider.tasks).thenReturn([]);
     when(() => mockTaskProvider.categories).thenReturn([]);
     when(() => mockTaskProvider.isLoading).thenReturn(false);
+    when(() => mockTaskProvider.showUpcomingRecurring).thenReturn(true);
     when(() => mockTaskProvider.errorMessage).thenReturn(null);
     when(() => mockTaskProvider.selectedCount).thenReturn(0);
     when(() => mockTaskProvider.isSelectionMode).thenReturn(false);

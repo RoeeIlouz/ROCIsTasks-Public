@@ -3067,6 +3067,12 @@ abstract class AppLocalizations {
   /// **'Haptic pulse when ticking off a task'**
   String get taskCompletionFeedbackSubtitle;
 
+  /// No description provided for @showUpcomingRecurring.
+  ///
+  /// In en, this message translates to:
+  /// **'Show upcoming recurring tasks'**
+  String get showUpcomingRecurring;
+
   /// No description provided for @cookiePreferences.
   ///
   /// In en, this message translates to:

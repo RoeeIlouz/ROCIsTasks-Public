@@ -1594,6 +1594,9 @@ class AppLocalizationsSv extends AppLocalizations {
       'Kort vibration när du bockar av en uppgift';
 
   @override
+  String get showUpcomingRecurring => 'Visa kommande återkommande uppgifter';
+
+  @override
   String get cookiePreferences => 'Cookie-inställningar';
 
   @override

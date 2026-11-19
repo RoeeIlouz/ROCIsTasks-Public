@@ -558,6 +558,7 @@
   "a11yRemoveField": "הסר שדה",
   "taskCompletionFeedback": "משוב בסיום משימה",
   "taskCompletionFeedbackSubtitle": "רטט קצר כשמסמנים משימה כבוצעה",
+  "showUpcomingRecurring": "הצג משימות חוזרות קרובות",
   "cookiePreferences": "העדפות עוגיות",
   "cookiePreferencesSubtitle": "איפוס ההסכמה לעוגיות ולאחסון",
   "scheduleSynergyTitle": "ROCIs Schedule",
